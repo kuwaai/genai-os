@@ -42,6 +42,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        $user ->tokens()->delete();
+        $user ->createToken('API_Token', ["access_api"]);
+
         event(new Registered($user));
 
         Auth::login($user);

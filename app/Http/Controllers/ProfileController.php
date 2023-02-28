@@ -38,6 +38,17 @@ class ProfileController extends Controller
     }
 
     /**
+     * Renew the user's API Token.
+     */
+    public function renew(Request $request): RedirectResponse
+    {
+        $request->user()->tokens()->delete();
+        $request->user()->createToken('API_Token', ["access_api"]);
+
+        return Redirect::route('profile.edit')->with('status', 'apiToken-updated');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
@@ -50,6 +61,7 @@ class ProfileController extends Controller
 
         Auth::logout();
 
+        $user ->tokens()->delete();
         $user->delete();
 
         $request->session()->invalidate();
