@@ -1,3 +1,3 @@
 cd ..
-npm install
 php artisan migrate
+npm install

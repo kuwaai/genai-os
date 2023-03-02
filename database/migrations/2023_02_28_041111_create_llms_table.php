@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
 			$table->string('name')->unique();
 			$table->string('link')->unique();
+			$table->string('API')->unique();
 			$table->integer('limit_per_day');
             $table->timestamps();
         });

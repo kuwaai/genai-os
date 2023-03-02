@@ -2,54 +2,26 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3">
+                @foreach (App\Models\LLMs::all() as $LLM)
                 <div class="mb-2 border border-white border-1 rounded-lg">
-                    <a href="https://openai.com/" target="_blank"
-                        class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">ChatGPT</a>
+                    <a href="{{$LLM->link}}" target="_blank"
+                        class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">{{$LLM->name}}</a>
                     <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
                         <button
                             class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 transition duration-300">
                             <p class="flex-1 text-center">New Chat</p>
                         </button>
                     </div>
+                    @foreach (App\Models\Chats::where("user_id", Auth::user()->id)->where("llm_id", $LLM->id)->get() as $chat)
+                    <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
+                        <button
+                            class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 transition duration-300">
+                            <p class="flex-1 text-center">{{$chat->name}}</p>
+                        </button>
+                    </div>
+                    @endforeach
                 </div>
-                <div class="mb-2 border border-white border-1 rounded-lg">
-                    <a href="https://huggingface.co/bigscience" target="_blank"
-                        class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">Bloom</a>
-                    <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
-                        <button
-                            class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 transition duration-300">
-                            <p class="flex-1 text-center">New Chat</p>
-                        </button>
-                    </div>
-                    <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
-                        <button
-                            class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 transition duration-300">
-                            <p class="flex-1 text-center">Chat 1</p>
-                        </button>
-                    </div>
-                </div>
-                <div class="mb-2 border border-white border-1 rounded-lg">
-                    <a href="https://huggingface.co/facebook" target="_blank"
-                        class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">OPT</a>
-                    <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
-                        <button
-                            class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 transition duration-300">
-                            <p class="flex-1 text-center">New Chat</p>
-                        </button>
-                    </div>
-                    <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
-                        <button
-                            class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 transition duration-300">
-                            <p class="flex-1 text-center">Chat 1</p>
-                        </button>
-                    </div>
-                    <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
-                        <button
-                            class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 transition duration-300">
-                            <p class="flex-1 text-center">Chat 2</p>
-                        </button>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
         <div class="flex-1 h-full flex flex-col w-full bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">

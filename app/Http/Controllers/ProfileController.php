@@ -16,6 +16,11 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        if ($request->user()->tokens()->count() != 1) {
+            $request->user()->tokens()->delete();
+            $request->user()->createToken('API_Token', ["access_api"]);
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
