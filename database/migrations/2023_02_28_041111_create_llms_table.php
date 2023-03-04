@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('llms', function (Blueprint $table) {
             $table->id();
+			$table->string('image')->unique();
 			$table->string('name')->unique();
 			$table->string('link')->unique();
 			$table->string('API')->unique();
