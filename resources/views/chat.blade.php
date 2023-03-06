@@ -144,7 +144,6 @@
             @if (request()->route('chat_id'))
                 <script>
                     function deleteChat() {
-                        $("#deleteChat input:eq(2)").val(id);
                         $("#deleteChat").submit();
                     }
 

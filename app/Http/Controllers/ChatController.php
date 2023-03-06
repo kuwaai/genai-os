@@ -24,6 +24,8 @@ class ChatController extends Controller
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chat->id, 'isbot' => false]);
         $history->save();
         $llm = LLMs::findOrFail($request->input('llm_id'));
+
+        #return Redirect::route('chats', $chat->id);
         $token = $request->user()->tokens()->where('name', 'API_Token')->where('abilities', 'like', '%access_api%')->first()->token;
         return Redirect::route('chats', $chat->id)->with('msg', $request->input('input'))->with('token', $token)->with('api', $llm->API)->with("chat_id",$chat->id);
     }
