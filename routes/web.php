@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\LLMController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\LLMController;
+use App\Http\Controllers\apiController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\LLMs;
@@ -34,6 +35,9 @@ Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
     Route::patch('/LLMs/update', [LLMController::class, 'update'])->name('update_LLM_by_id');
 });
 
+Route::post('/api/verifyToken', [apiController::class, 'verifyToken']);
+Route::post('/api/createRecord', [apiController::class, 'createRecord']);
+
 # User routes, required email verified
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -41,10 +45,12 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    # Just for the chat page, no chat opened
     Route::get('/chats', function () {
         return view('chat');
     })->name('chat');
 
+    # Setup the create chat parameters
     Route::get('/chats/new/{llm_id}', function ($llm_id) {
         if (!LLMs::findOrFail($llm_id)->exists()) {
             return redirect()->route('chat');
@@ -52,10 +58,16 @@ Route::middleware('auth', 'verified')->group(function () {
         return view('chat');
     })->name('new_chat');
 
-    Route::post('/chats/create/{llm_id}', [ChatController::class, 'create'])->name('create_chat');
-    Route::post('/chats/request/{chat_id}', [ChatController::class, 'request'])->name('request_chat');
+    # Create initial chat
+    Route::post('/chats/create', [ChatController::class, 'create'])->name('create_chat');
+    # Continue chatting by POST to this route
+    Route::post('/chats/request', [ChatController::class, 'request'])->name('request_chat');
+    # Edit chat name
+    Route::post('/chats/edit', [ChatController::class, 'edit'])->name('edit_chat');
+    # Delete chat by this route
     Route::delete('/chats/delete', [ChatController::class, 'delete'])->name('delete_chat');
 
+    # Access to a chat's histories by this route
     Route::get('/chats/{chat_id}', function ($chat_id) {
         if (
             !Chats::findOrFail($chat_id)

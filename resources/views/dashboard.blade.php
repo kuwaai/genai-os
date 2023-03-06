@@ -71,7 +71,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (App\Models\LLMs::all() as $LLM)
+                                    @foreach (App\Models\LLMs::orderby('created_at')->get() as $LLM)
                                         <tr id="llm{{ $LLM->id }}">
                                             <td class="px-3 py-2 flex">
                                                 <img width="40px" class="m-auto"
