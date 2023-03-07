@@ -1,0 +1,2 @@
+cd ../..
+php artisan serve
