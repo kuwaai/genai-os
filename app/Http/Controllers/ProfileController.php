@@ -16,9 +16,17 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        if ($request->user()->tokens()->count() != 1) {
-            $request->user()->tokens()->delete();
-            $request->user()->createToken('API_Token', ["access_api"]);
+        if (
+            $request
+                ->user()
+                ->tokens()
+                ->count() != 1
+        ) {
+            $request
+                ->user()
+                ->tokens()
+                ->delete();
+            $request->user()->createToken('API_Token', ['access_api']);
         }
 
         return view('profile.edit', [
@@ -31,15 +39,17 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        if (!$request->user()->forDemo) {
+            $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            if ($request->user()->isDirty('email')) {
+                $request->user()->email_verified_at = null;
+            }
+
+            $request->user()->save();
+            return Redirect::route('profile.edit')->with('status', 'profile-updated');
         }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.edit')->with('status', 'This is a demo account, you cannot modify information!');
     }
 
     /**
@@ -47,10 +57,16 @@ class ProfileController extends Controller
      */
     public function renew(Request $request): RedirectResponse
     {
-        $request->user()->tokens()->delete();
-        $request->user()->createToken('API_Token', ["access_api"]);
+        if (!$request->user()->forDemo) {
+            $request
+                ->user()
+                ->tokens()
+                ->delete();
+            $request->user()->createToken('API_Token', ['access_api']);
 
-        return Redirect::route('profile.edit')->with('status', 'apiToken-updated');
+            return Redirect::route('profile.edit')->with('status', 'apiToken-updated');
+        }
+        return Redirect::route('profile.edit')->with('status', 'This is a demo account, you cannot modify information!');
     }
 
     /**
@@ -58,20 +74,23 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current-password'],
-        ]);
+        if (!$request->user()->forDemo) {
+            $request->validateWithBag('userDeletion', [
+                'password' => ['required', 'current-password'],
+            ]);
 
-        $user = $request->user();
+            $user = $request->user();
 
-        Auth::logout();
+            Auth::logout();
 
-        $user ->tokens()->delete();
-        $user->delete();
+            $user->tokens()->delete();
+            $user->delete();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+            return Redirect::to('/');
+        }
+        return Redirect::route('profile.edit')->with('status', 'This is a demo account, you cannot modify information!');
     }
 }
