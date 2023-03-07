@@ -23,16 +23,23 @@ class apiController extends Controller
         $input = $request->input('input');
         $chat_id = $request->input('chat_id');
         $output = $request->input('output');
-        if ($chat_id > 0){
-            $history = new Histories();
-            $history->fill(['msg' => $output, 'chat_id' => $chat_id, 'isbot' => true]);
-            $history->save();
-        }else{
-            $userID = PersonalAccessToken::findToken($token)->tokenable->id;
-            $history = new APIHistories();
-            $history->fill(['output' => $output, 'input' => $input, 'user_id' => $userID ]);
-            $history->save();
+        if ($output && $output.trim() == "") $output = "[Sorry, This LLM generate nothing as feedback.]";
+        if ($input && $input.trim() == "") return response()->json(['result' => false]);
+        try{
+            if ($chat_id > 0){
+                $history = new Histories();
+                $history->fill(['msg' => $output, 'chat_id' => $chat_id, 'isbot' => true]);
+                $history->save();
+            }else{
+                $userID = PersonalAccessToken::findToken($token)->tokenable->id;
+                $history = new APIHistories();
+                $history->fill(['output' => $output, 'input' => $input, 'user_id' => $userID ]);
+                $history->save();
+            }
+            return response()->json(['result' => true]);
+        }catch (Exception $e){
+            error_log($e);
+            return response()->json(['result' => false]);
         }
-        return response()->json(['result' => true]);
     }
 }
