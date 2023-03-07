@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __("Manage your API Token, Please keep it secret!") }}
+            {{ __('Manage your API Token, Please keep it secret!') }}
         </p>
     </header>
 
@@ -15,7 +15,10 @@
 
         <div>
             <x-input-label for="name" :value="__('Personal API Token')" />
-            <x-text-input type="text" class="mt-1 block w-full" :value="$user->tokens()->where('name', 'API_Token')->first()->token" disabled/>
+            <x-text-input type="text" class="mt-1 block w-full" :value="$user
+                ->tokens()
+                ->where('name', 'API_Token')
+                ->first()->token" disabled />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
@@ -23,13 +26,8 @@
             <x-primary-button>{{ __('Renew') }}</x-primary-button>
 
             @if (session('status') === 'apiToken-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600 dark:text-green-400"
-                >{{ __('Renewed.') }}</p>
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                    class="text-sm text-gray-600 dark:text-green-400">{{ __('Renewed.') }}</p>
             @endif
         </div>
     </form>

@@ -49,7 +49,7 @@ class ProfileController extends Controller
             $request->user()->save();
             return Redirect::route('profile.edit')->with('status', 'profile-updated');
         }
-        return Redirect::route('profile.edit')->with('status', 'This is a demo account, you cannot modify information!');
+        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
     }
 
     /**
@@ -66,7 +66,7 @@ class ProfileController extends Controller
 
             return Redirect::route('profile.edit')->with('status', 'apiToken-updated');
         }
-        return Redirect::route('profile.edit')->with('status', 'This is a demo account, you cannot modify information!');
+        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
     }
 
     /**
@@ -91,6 +91,6 @@ class ProfileController extends Controller
 
             return Redirect::to('/');
         }
-        return Redirect::route('profile.edit')->with('status', 'This is a demo account, you cannot modify information!');
+        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
     }
 }
