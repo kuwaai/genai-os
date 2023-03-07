@@ -23,9 +23,7 @@ class apiController extends Controller
         $input = $request->input('input');
         $chat_id = $request->input('chat_id');
         $output = $request->input('output');
-        error_log($output);
         if (!$output || trim($output) == "") $output = "[Sorry, This LLM generate nothing as feedback.]";
-        error_log($output);
         if (!$input || trim($input) == "") return response()->json(['result' => false]);
         try{
             if ($chat_id > 0){
