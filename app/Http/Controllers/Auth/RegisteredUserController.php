@@ -30,26 +30,34 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        if (
+            \App\Models\SystemSetting::where('key', 'allowRegister')
+                ->where('value', 'true')
+                ->exists()
+        ) {
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'isAdmin'=> false,
-            'forDemo'=> false
-        ]);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'isAdmin' => false,
+                'forDemo' => false,
+            ]);
 
-        $user ->tokens()->delete();
-        $user ->createToken('API_Token', ["access_api"]);
+            $user->tokens()->delete();
+            $user->createToken('API_Token', ['access_api']);
 
-        event(new Registered($user));
+            event(new Registered($user));
 
-        Auth::login($user);
+            Auth::login($user);
+
+            return redirect(RouteServiceProvider::HOME);
+        }
 
         return redirect(RouteServiceProvider::HOME);
     }
