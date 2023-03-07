@@ -24,9 +24,9 @@ class apiController extends Controller
         $chat_id = $request->input('chat_id');
         $output = $request->input('output');
         error_log($output);
-        if (!$output && $output.trim() == "") $output = "[Sorry, This LLM generate nothing as feedback.]";
+        if (!$output || trim($output) == "") $output = "[Sorry, This LLM generate nothing as feedback.]";
         error_log($output);
-        if ($input && $input.trim() == "") return response()->json(['result' => false]);
+        if (!$input || trim($input) == "") return response()->json(['result' => false]);
         try{
             if ($chat_id > 0){
                 $history = new Histories();
