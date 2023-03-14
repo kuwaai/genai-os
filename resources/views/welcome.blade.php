@@ -46,18 +46,20 @@
             </div>
         @endif
 
-        <div class="max-w-7xl mx-auto p-6 lg:p-8"><div class="flex items-center flex-col">
-            <h3 class="text-3xl text-white font-bold mb-2">高大 Chat</h3>
-            <p class="text-lg text-white">Chat with many Open Source LLM!</p>
-          </div>
-          
+        <div class="max-w-7xl mx-auto p-6 lg:p-8">
+            <div class="flex items-center flex-col">
+                <h3 class="text-3xl text-white font-bold mb-2">高大 Chat</h3>
+                <p class="text-lg text-white">Chat with many Open Source LLM!</p>
+            </div>
+
 
             <div class="mt-16">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Bloom 1b1-zh</h2>
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Bloom 1b1-zh
+                            </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -74,8 +76,7 @@
                                 <div class="flex w-full mt-2 space-x-3 ">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img
-                                            src="http://chat.cdalab.tw/storage/images/ZHUGud9RaZ7AuVPZO2V4d3e9bbMXTkPiNPqgSke0.png">
+                                        <img src="{{ asset('images/bloom.png') }}">
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
@@ -117,8 +118,7 @@
                                 <div class="flex w-full mt-2 space-x-3 ">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img
-                                            src="http://localhost:8000/storage/images/35JbMdlup1Pgkl2GqB1BgLFm40pd0mRqbdbYNrrR.png">
+                                        <img src="{{ asset('images/opt.png') }}">
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
