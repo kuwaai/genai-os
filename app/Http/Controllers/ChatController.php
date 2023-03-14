@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redis;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
 use App\Models\Histories;
+use App\Jobs\RequestChat;
 use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
@@ -24,20 +26,22 @@ class ChatController extends Controller
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chat->id, 'isbot' => false]);
         $history->save();
         $llm = LLMs::findOrFail($request->input('llm_id'));
-
-        #return Redirect::route('chats', $chat->id);
-        $token = $request->user()->tokens()->where('name', 'API_Token')->where('abilities', 'like', '%access_api%')->first()->token;
-        return Redirect::route('chats', $chat->id)->with('msg', $request->input('input'))->with('token', $token)->with('api', $llm->API)->with("chat_id",$chat->id);
+        Redis::set($chat->id . 'status', 'pending');
+        RequestChat::dispatch($chat->id, $request->input('input'), $llm->API);
+        return Redirect::route('chats', $chat->id);
     }
 
     public function request(Request $request): RedirectResponse
     {
+        $chatId = $request->input('chat_id');
         $history = new Histories();
-        $history->fill(['msg' => $request->input('input'), 'chat_id' => $request->input('chat_id'), 'isbot' => false]);
+        $history->fill(['msg' => $request->input('input'), 'chat_id' => $chatId, 'isbot' => false]);
         $history->save();
-        $API = LLMs::findOrFail(Chats::findOrFail($request->input('chat_id'))->llm_id)->API;
-        $token = $request->user()->tokens()->where('name', 'API_Token')->where('abilities', 'like', '%access_api%')->first()->token;
-        return Redirect::route('chats', $request->input('chat_id'))->with('msg', $request->input('input'))->with('token', $token)->with('api', $API)->with("chat_id",$request->input('chat_id'));
+        $API = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->API;
+        Redis::del($chatId);
+        Redis::set($chatId . 'status', 'pending');
+        RequestChat::dispatch($chatId, $request->input('input'), $API);
+        return Redirect::route('chats', $chatId)->with('status', $request->input('req-failed'));
     }
 
     public function delete(Request $request): RedirectResponse
@@ -59,5 +63,54 @@ class ChatController extends Controller
         $chat->fill(['name' => $request->input('new_name')]);
         $chat->save();
         return Redirect::route('chats', $request->input('id'));
+    }
+
+    public function SSE(Request $request)
+    {
+        #Redis::flushAll();
+        set_time_limit(20);
+        $chatId = $request->input('chat_id');
+        $response = response()->stream(function () use ($chatId) {
+            $extendedLimit = false;
+            $sent = '';
+            if ($chatId) {
+                try{
+                    if ((Redis::get($chatId . 'status') && Redis::get($chatId . 'status') != 'finished')) {
+                        set_time_limit(20); # It should output something in 20 seconds
+                        while ((Redis::get($chatId) && Redis::get($chatId) != $sent) || Redis::get($chatId . 'status') != 'finished') {
+                            $result = Redis::get($chatId);
+                            $encoding = mb_detect_encoding($result, 'UTF-8, ISO-8859-1', true);
+                            if ($encoding !== 'UTF-8') {
+                                $result = mb_convert_encoding($result, 'UTF-8', $encoding);
+                            }
+                            $newData = mb_substr($result, mb_strlen($sent, 'utf-8'), null, 'utf-8');
+                            $sent = $result;
+                            $length = mb_strlen($newData, 'utf-8');
+                            for ($i = 0; $i < $length; $i++) {
+                                $char = mb_substr($newData, $i, 1, 'utf-8');
+                                if (mb_check_encoding($char, 'utf-8')) {
+                                    echo 'data: ' . $char . "\n\n";
+                                    set_time_limit(10); # each token shouldn't taken more than 10 seconds
+                                    ob_flush();
+                                    flush();
+                                }
+                            }
+                        }
+                        usleep(250000);
+                    }
+                }catch (\Throwable $e) {
+
+                }
+            }
+            echo "event: close\n\n";
+            ob_flush();
+            flush();
+            Redis::del($chatId);
+            Redis::del($chatId . 'status');
+        });
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('charset', 'utf-8');
+        return $response;
     }
 }

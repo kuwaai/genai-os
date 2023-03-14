@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('histories', function (Blueprint $table) {
             $table->id();
-			$table->string('msg');
+			$table->longText('msg');
 			$table->foreignId('chat_id')->references('id')->on('chats')->onDelete('cascade')->onUpdate('cascade');
 			$table->boolean('isbot');
             $table->timestamps();

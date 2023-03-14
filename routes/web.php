@@ -4,10 +4,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\LLMController;
 use App\Http\Controllers\apiController;
+use BeyondCode\LaravelSSE\Facades\SSE;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\LLMs;
 use App\Models\Chats;
+use \Symfony\Component\HttpFoundation\StreamedResponse;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +25,7 @@ use App\Models\Chats;
 Route::get('/', function () {
     return view('welcome');
 })->name('/');
+Route::get('/chats/stream', [ChatController::class, "SSE"])->name('chat_sse');
 
 # Admin routes, require admin permission
 Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
@@ -35,8 +38,8 @@ Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
     Route::patch('/LLMs/update', [LLMController::class, 'update'])->name('update_LLM_by_id');
 });
 
-Route::post('/api/verifyToken', [apiController::class, 'verifyToken']);
-Route::post('/api/createRecord', [apiController::class, 'createRecord']);
+#Route::post('/api/verifyToken', [apiController::class, 'verifyToken']);
+#Route::post('/api/createRecord', [apiController::class, 'createRecord']);
 
 # User routes, required email verified
 Route::middleware('auth', 'verified')->group(function () {
@@ -66,6 +69,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('/chats/edit', [ChatController::class, 'edit'])->name('edit_chat');
     # Delete chat by this route
     Route::delete('/chats/delete', [ChatController::class, 'delete'])->name('delete_chat');
+    # SSE Listener for listen to generated texts
 
     # Access to a chat's histories by this route
     Route::get('/chats/{chat_id}', function ($chat_id) {

@@ -78,7 +78,7 @@
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('updated_at', 'desc')->get() as $history)
                             <div
-                                class="flex w-full mt-2 space-x-3 max-w-xs {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
+                                class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
@@ -169,33 +169,34 @@
                         $("#chatHeader button").find('.fa-save').parent().addClass('hidden');
                         $("#chatHeader >p").text(input.val())
                     }
-
-                    @if (session('msg') && session('api') && session('token'))
-                        $.ajax({
-                            url: '{{ session('api') }}',
-                            method: 'POST',
-                            contentType: "application/json; charset=utf-8",
-                            data: JSON.stringify({
-                                input: "{{ session('msg') }}",
-                                chat_id: "{{ session('chat_id') }}",
-                                token: "{{ session('token') }}"
-                            }),
-                            success: function(response) {
-                                $("#chatroom").prepend(`<div class="flex w-full mt-2 space-x-3 max-w-xs">
+                    let created = false;
+                    var eventSource = new EventSource("{{ route('chat_sse') }}?chat_id={{ request()->route('chat_id') }}", {
+                        withCredentials: false
+                    });
+                    eventSource.addEventListener('error', error => {
+                        eventSource.close();
+                        $("#chatroom >div:first p:first").text($("#chatroom >div:first p:first").text().trim())
+                    });
+                    eventSource.addEventListener('message', event => {
+                        if (!created){
+                            created = true;
+                            $('#chatroom').prepend($(`<div class='flex w-full mt-2 space-x-3'>
                                 <div
-                                    class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                    <img src="{{ $botimgurl }}">
+                                    class='flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden'>
+                                    <img src='{{ $botimgurl }}'>
                                 </div>
                                 <div>
                                     <div
-                                        class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                        <p class="text-sm whitespace-pre-line">${response["output"]}</p>
+                                        class='p-3 bg-gray-300 rounded-r-lg rounded-bl-lg'>
+                                        <p class='text-sm whitespace-pre-line'></p>
                                     </div>
                                 </div>
-                            </div>`)
-                            }
-                        });
-                    @endif
+                            </div>`));
+                        }
+                        if (!(event.data == "" && $("#chatroom >div:first p:first").text() == "")){
+                            $("#chatroom >div:first p:first").text($("#chatroom >div:first p:first").text() + (event.data == "" ? "\n" : event.data))
+                        }
+                    });
                 </script>
             @endif
         @endif

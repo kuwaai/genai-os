@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('api_histories', function (Blueprint $table) {
             $table->id();
-			$table->string('input');
-			$table->string('output');
+			$table->longText('input');
+			$table->longText('output');
 			$table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
