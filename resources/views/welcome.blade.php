@@ -58,14 +58,14 @@
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Bloom 1b1-zh
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Bloom
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm whitespace-pre-line">列出十個必去景點</p>
+                                            <p class="text-sm whitespace-pre-line">"I'm Bloom, a Large language model, Is there anything you want to ask?" 翻譯為中文</p>
                                         </div>
                                     </div>
                                     <div
@@ -80,16 +80,7 @@
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line">1. 大都會公園（The Met）
-                                                2. 迪士尼樂園（Disney World）
-                                                3. 環球影城（GOLlywood）
-                                                4. 洛克菲勒中心（The Rockefeller Center）
-                                                5. 自由女神像（Freedom Tower）
-                                                6. 時代廣場（Time Square）
-                                                7. 洛克菲勒中心（The Rockefeller Center）
-                                                8. 自由女神像（Freedom Tower）
-                                                9. 時代廣場（Time Square）
-                                                10. 自由女神像（Freedom Tower）</p>
+                                            <p class="text-sm whitespace-pre-line">你好，我是Bloom，一個具有回答能力的大型語言生成模型</p>
                                         </div>
                                     </div>
                                 </div>
@@ -100,7 +91,7 @@
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">OPT 2.7b</h2>
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">OPT</h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
