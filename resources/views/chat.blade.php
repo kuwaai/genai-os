@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
-            <div class="p-3">
+            <div class="p-3 h-full overflow-y-auto scrollbar">
                 @foreach (App\Models\LLMs::orderby('updated_at')->get() as $LLM)
                     <div class="mb-2 border border-white border-1 rounded-lg">
                         <a href="{{ $LLM->link }}" target="_blank"
