@@ -20,7 +20,7 @@ class ChatController extends Controller
     public function create(ChatRequest $request): RedirectResponse
     {
         $chat = new Chats();
-        $chat->fill(['name' => $request->input('input'), 'llm_id' => $request->input('llm_id'), 'user_id' => $request->user()->id]);
+        $chat->fill(['name' => substr($request->input('input'), 0, 64), 'llm_id' => $request->input('llm_id'), 'user_id' => $request->user()->id]);
         $chat->save();
         $history = new Histories();
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chat->id, 'isbot' => false]);

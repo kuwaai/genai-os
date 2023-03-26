@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-			$table->string('name');
+			$table->longText('name');
 			$table->foreignId('llm_id')->references('id')->on('llms')->onDelete('cascade')->onUpdate('cascade');
 			$table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
