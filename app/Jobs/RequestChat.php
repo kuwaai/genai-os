@@ -68,6 +68,7 @@ class RequestChat implements ShouldQueue
                 }
             }
         } catch (Exception $e) {
+            sleep(2);
             if (Redis::get($this->chat_id) == '') {
                 Redis::set($this->chat_id, '[Oops, seems like LLM given empty message as output!]');
             }else{
