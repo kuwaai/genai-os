@@ -36,8 +36,8 @@ class RequestChat implements ShouldQueue
     public function handle(): void
     {
         try {
-            Redis::set($this->chat_id, '',"EX",5);
-            Redis::set($this->chat_id . 'status', 'running',"EX",5);
+            Redis::set($this->chat_id, '');
+            Redis::set($this->chat_id . 'status', 'running');
             $client = new Client();
             $response = $client->post($this->API, [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
@@ -62,21 +62,21 @@ class RequestChat implements ShouldQueue
                 if ($messageLength !== null) {
                     $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                     if (mb_check_encoding($message, 'UTF-8')){
-                        Redis::set($this->chat_id, Redis::get($this->chat_id) . $message,"EX",5);
+                        Redis::set($this->chat_id, Redis::get($this->chat_id) . $message);
                         $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                     }
                 }
             }
             if (Redis::get($this->chat_id) == '') {
-                Redis::set($this->chat_id, '[Oops, seems like LLM given empty message as output!]',"EX",5);
+                Redis::set($this->chat_id, '[Oops, seems like LLM given empty message as output!]');
             }
         } catch (Exception $e) {
-            Redis::set($this->chat_id, Redis::get($this->chat_id) . "\n[Sorry, something is broken!]","EX",5);
+            Redis::set($this->chat_id, Redis::get($this->chat_id) . "\n[Sorry, something is broken!]");
         } finally {
             $history = new Histories();
             $history->fill(['msg' => trim(Redis::get($this->chat_id)), 'chat_id' => $this->chat_id, 'isbot' => true]);
             $history->save();
-            Redis::set($this->chat_id . 'status', 'finished',"EX",5);
+            Redis::set($this->chat_id . 'status', 'finished');
         }
     }
 }
