@@ -67,13 +67,11 @@ class RequestChat implements ShouldQueue
                     }
                 }
             }
-        } catch (Exception $e) {
-            sleep(2);
             if (Redis::get($this->chat_id) == '') {
                 Redis::set($this->chat_id, '[Oops, seems like LLM given empty message as output!]');
-            }else{
-                Redis::set($this->chat_id, Redis::get($this->chat_id) . "\n[Sorry, something is broken!]");
             }
+        } catch (Exception $e) {
+            Redis::set($this->chat_id, Redis::get($this->chat_id) . "\n[Sorry, something is broken!]");
         } finally {
             $history = new Histories();
             $history->fill(['msg' => trim(Redis::get($this->chat_id)), 'chat_id' => $this->chat_id, 'isbot' => true]);
