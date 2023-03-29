@@ -67,7 +67,6 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        #Redis::flushAll();
         set_time_limit(20);
         $chatId = $request->input('chat_id');
         $response = response()->stream(function () use ($chatId) {
