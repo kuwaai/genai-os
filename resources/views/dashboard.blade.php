@@ -176,16 +176,16 @@
                 <section>
                     <header>
                         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                            {{ __('LLM Mnaagements') }}
+                            {{ __('Debug menu') }}
                         </h2>
 
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('Edit the LLM that is availables') }}
+                            {{ __('This just a menu that still been working on') }}
                         </p>
                     </header>
                     <div
                         class="shadow overflow-hidden border-b border-gray-800 sm:rounded-lg mt-3 overflow-x-auto scrollbar">
-                        Test
+                        <a href="{{route('debug_reset_redis')}}">Reset Redis Caches<br>(Should be pressed after database sorting)</a>
                     </div>
                 </section>
             </div>

@@ -32,6 +32,7 @@ Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    Route::get("/resetRedis", [ChatController::class, "ResetRedis"])->name("debug_reset_redis");
 
     Route::delete('/LLMs/delete', [LLMController::class, 'delete'])->name('delete_LLM_by_id');
     Route::post('/LLMs/create', [LLMController::class, 'create'])->name('create_new_LLM');

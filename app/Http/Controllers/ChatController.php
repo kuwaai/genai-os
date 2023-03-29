@@ -65,8 +65,14 @@ class ChatController extends Controller
         return Redirect::route('chats', $request->input('id'));
     }
 
+    public function ResetRedis(Request $request){
+        Redis::flushAll();
+        return Redirect::route('dashboard');
+    }
+
     public function SSE(Request $request)
     {
+        #Redis::flushAll();
         set_time_limit(20);
         $chatId = $request->input('chat_id');
         $response = response()->stream(function () use ($chatId) {
