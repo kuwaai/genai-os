@@ -2,10 +2,14 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 h-full overflow-y-auto scrollbar">
-                @php
-                    $have = false;
-                @endphp
-                @foreach (App\Models\LLMs::where('enabled', true)->orderby('order')->orderby('created_at')->get() as $LLM)
+                @if (App\Models\LLMs::where("enabled",true)->count() == 0)
+                <div
+                    class="flex-1 h-full flex flex-col w-full text-center shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-white">
+                    No available LLM to chat with<br>
+                    Please come back later!
+                </div>
+                @else
+                @foreach (App\Models\LLMs::where("enabled",true)->orderby('order')->orderby('created_at')->get() as $LLM)
                     <div class="mb-2 border border-white border-1 rounded-lg">
                         <a href="{{ $LLM->link }}" target="_blank"
                             class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">{{ $LLM->name }}</a>
@@ -22,21 +26,9 @@
                                     <p class="flex-1 text-center">{{ $chat->name }}</p>
                                 </a>
                             </div>
-                            @php
-                                if (!$have) {
-                                    $have = true;
-                                }
-                            @endphp
                         @endforeach
                     </div>
                 @endforeach
-
-                @if (!$have)
-                    <div
-                        class="flex-1 h-full flex flex-col w-full text-center shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-white">
-                        No available LLM to chat with<br>
-                        Please come back later!
-                    </div>
                 @endif
             </div>
         </div>
@@ -93,7 +85,8 @@
                             $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('updated_at', 'desc')->get() as $history)
-                            <div class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
+                            <div
+                                class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
@@ -193,7 +186,7 @@
                         $("#chatroom >div:first p:first").text($("#chatroom >div:first p:first").text().trim())
                     });
                     eventSource.addEventListener('message', event => {
-                        if (!created) {
+                        if (!created){
                             created = true;
                             $('#chatroom').prepend($(`<div class='flex w-full mt-2 space-x-3'>
                                 <div
@@ -208,9 +201,8 @@
                                 </div>
                             </div>`));
                         }
-                        if (!(event.data == "" && $("#chatroom >div:first p:first").text() == "")) {
-                            $("#chatroom >div:first p:first").text($("#chatroom >div:first p:first").text() + (event.data ==
-                                "" ? "\n" : event.data))
+                        if (!(event.data == "" && $("#chatroom >div:first p:first").text() == "")){
+                            $("#chatroom >div:first p:first").text($("#chatroom >div:first p:first").text() + (event.data == "" ? "\n" : event.data))
                         }
                     });
                 </script>
