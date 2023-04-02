@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
 use App\Models\Histories;
