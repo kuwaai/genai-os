@@ -17,7 +17,7 @@ use App\Models\User;
 
 class ChatController extends Controller
 {
-    public function main(Request $request): RedirectResponse
+    public function main(Request $request)
     {
         $chat = Chats::findOrFail($request->route("chat_id"));
         if ($chat->user_id != Auth::user()->id) {
