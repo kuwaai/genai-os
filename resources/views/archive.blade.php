@@ -10,7 +10,7 @@
                         <div class="mb-2 border border-white border-1 rounded-lg">
                             <a href="{{ $LLM->link }}" target="_blank"
                                 class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">{{ $LLM->name }}</a>
-                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('updated_at')->get() as $chat)
+                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
                                 <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex items-center justify-center overflow-y-auto scrollbar w-full h-12 hover:bg-gray-700 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-700' : '' }} transition duration-300"
                                         href="{{ route('archives', $chat->id) }}">
