@@ -19,8 +19,13 @@
                 </div>
                 @endif
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('chat')" :active="request()->routeIs('chat')">
+                    <x-nav-link :href="route('chat')" :active="request()->routeIs('chat') || request()->routeIs('chats') || request()->routeIs('new_chat')">
                         {{ __('Chat') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('archive')" :active="request()->routeIs('archive') || request()->routeIs('archives')">
+                        {{ __('Archive') }}
                     </x-nav-link>
                 </div>
             </div>

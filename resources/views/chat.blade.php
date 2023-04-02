@@ -2,7 +2,14 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 h-full overflow-y-auto scrollbar">
-                @foreach (App\Models\LLMs::orderby('updated_at')->get() as $LLM)
+                @if (App\Models\LLMs::where("enabled",true)->count() == 0)
+                <div
+                    class="flex-1 h-full flex flex-col w-full text-center shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-white">
+                    No available LLM to chat with<br>
+                    Please come back later!
+                </div>
+                @else
+                @foreach (App\Models\LLMs::where("enabled",true)->orderby('order')->orderby('created_at')->get() as $LLM)
                     <div class="mb-2 border border-white border-1 rounded-lg">
                         <a href="{{ $LLM->link }}" target="_blank"
                             class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">{{ $LLM->name }}</a>
@@ -15,13 +22,14 @@
                         @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('updated_at')->get() as $chat)
                             <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
                                 <a class="flex menu-btn flex items-center justify-center overflow-y-auto scrollbar w-full h-12 hover:bg-gray-700 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-700' : '' }} transition duration-300"
-                                    href="/chats/{{ $chat->id }}">
+                                    href="{{ route('chats', $chat->id) }}">
                                     <p class="flex-1 text-center">{{ $chat->name }}</p>
                                 </a>
                             </div>
                         @endforeach
                     </div>
                 @endforeach
+                @endif
             </div>
         </div>
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
@@ -33,14 +41,14 @@
             <div id="histories"
                 class="flex-1 h-full flex flex-col w-full bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
                 @if (request()->route('chat_id'))
-                    <form id="deleteChat" action="{{ route('delete_chat') }}" method="post" class="hidden">
+                    <form id="deleteChat" action="{{ route('chat_delete_chat') }}" method="post" class="hidden">
                         @csrf
                         @method('delete')
                         <input name="id"
                             value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
                     </form>
 
-                    <form id="editChat" action="{{ route('edit_chat') }}" method="post" class="hidden">
+                    <form id="editChat" action="{{ route('chat_edit_chat') }}" method="post" class="hidden">
                         @csrf
                         <input name="id"
                             value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
@@ -103,7 +111,7 @@
                 </div>
                 <div class="bg-gray-500 p-4 h-20">
                     @if (request()->route('llm_id'))
-                        <form method="post" action="{{ route('create_chat') }}" id="create_chat">
+                        <form method="post" action="{{ route('chat_create_chat') }}" id="create_chat">
                             <div class="flex">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
@@ -121,7 +129,7 @@
                             </div>
                         </form>
                     @elseif(request()->route('chat_id'))
-                        <form method="post" action="{{ route('request_chat') }}" id="create_chat">
+                        <form method="post" action="{{ route('chat_request_chat') }}" id="create_chat">
                             <div class="flex">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">

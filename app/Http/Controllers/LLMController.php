@@ -45,4 +45,12 @@ class LLMController extends Controller
         $model->save();
         return Redirect::route('dashboard');
     }
+
+    public function toggle(Request $request): RedirectResponse
+    {
+        $model = LLMs::findOrFail($request->route('llm_id'));
+        $model->enabled = !$model->enabled;
+        $model->save();
+        return Redirect::route('dashboard');
+    }
 }

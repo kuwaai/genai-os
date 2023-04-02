@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
 use App\Http\Requests\ChatRequest;
@@ -17,6 +16,17 @@ use App\Models\User;
 
 class ChatController extends Controller
 {
+    public function main(Request $request): RedirectResponse
+    {
+        $chat = Chats::findOrFail($request->route("chat_id"));
+        if ($chat->user_id != Auth::user()->id) {
+            return redirect()->route('chat');
+        } elseif (LLMs::findOrFail($chat->llm_id)->enabled == true) {
+            return view('chat');
+        }
+        return redirect()->route('archives', $request->route("chat_id"));
+    }
+
     public function create(ChatRequest $request): RedirectResponse
     {
         $chat = new Chats();
@@ -48,39 +58,44 @@ class ChatController extends Controller
     {
         try {
             $chat = Chats::findOrFail($request->input('id'));
-            $chat->delete();
         } catch (ModelNotFoundException $e) {
             // Handle the exception here, for example:
             return response()->json(['error' => 'Chat not found'], 404);
         }
 
+        $chat->delete();
         return Redirect::route('chat');
     }
 
     public function edit(Request $request): RedirectResponse
     {
-        $chat = Chats::findOrFail($request->input('id'));
+        try {
+            $chat = Chats::findOrFail($request->input('id'));
+        } catch (ModelNotFoundException $e) {
+            // Handle the exception here, for example:
+            return response()->json(['error' => 'Chat not found'], 404);
+        }
         $chat->fill(['name' => $request->input('new_name')]);
         $chat->save();
         return Redirect::route('chats', $request->input('id'));
     }
 
-    public function ResetRedis(Request $request){
+    public function ResetRedis(Request $request)
+    {
         Redis::flushAll();
         return Redirect::route('dashboard');
     }
 
     public function SSE(Request $request)
     {
-        #Redis::flushAll();
         set_time_limit(20);
         $chatId = $request->input('chat_id');
         $response = response()->stream(function () use ($chatId) {
             $extendedLimit = false;
             $sent = '';
             if ($chatId) {
-                try{
-                    if ((Redis::get($chatId . 'status') && Redis::get($chatId . 'status') != 'finished')) {
+                try {
+                    if (Redis::get($chatId . 'status') && Redis::get($chatId . 'status') != 'finished') {
                         set_time_limit(20); # It should output something in 20 seconds
                         while ((Redis::get($chatId) && Redis::get($chatId) != $sent) || Redis::get($chatId . 'status') != 'finished') {
                             $result = Redis::get($chatId);
@@ -103,8 +118,7 @@ class ChatController extends Controller
                         }
                         usleep(250000);
                     }
-                }catch (\Throwable $e) {
-
+                } catch (\Throwable $e) {
                 }
             }
             echo "event: close\n\n";

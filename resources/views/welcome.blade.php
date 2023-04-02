@@ -48,8 +48,9 @@
 
         <div class="max-w-7xl mx-auto p-6 lg:p-8">
             <div class="flex items-center flex-col">
-                <h3 class="text-3xl text-white font-bold mb-2">高大 Chat</h3>
-                <p class="text-lg text-white">Chat with many Open Source LLMs!</p>
+                <h3 class="text-5xl text-white font-bold mb-2 text-cyan-200">TAIDE Chat</h3>
+                <p class="text-lg text-white">(<span class="text-yellow-200">T</span>rustworthy <span class="text-yellow-200">AI</span> <span class="text-yellow-200">D</span>ialog <span class="text-yellow-200">E</span>ngine Chat)</p>
+                <p class="text-lg text-cyan-200">Free to chat with Open Source LLMs!</p>
             </div>
 
 

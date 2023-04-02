@@ -16,6 +16,7 @@ class LLMUpdateRequest extends FormRequest
             'name' => ['string', 'max:255', Rule::unique('llms')->ignore($id)],
             'link' => ['string', 'max:1024', Rule::unique('llms')->ignore($id)],
             'limit_per_day' => ['integer', 'digits_between:-1,1000000'],
+            'order' => ['integer', 'digits_between:-1000000,1000000'],
             'API' => ['string', 'max:1024', Rule::unique('llms')->ignore($id)],
         ];
     }

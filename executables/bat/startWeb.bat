@@ -1,2 +1,2 @@
 cd ../..
-php artisan serve
+php artisan route:cache & php artisan serve

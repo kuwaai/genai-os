@@ -6,7 +6,7 @@
                     <section>
                         <header>
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                {{ __('LLM Mnaagements') }}
+                                {{ __('LLM Managements') }}
                             </h2>
 
                             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -28,9 +28,10 @@
                                 <input id="update_img" name="image" type="file">
                                 <input name="name">
                                 <input name="link">
-                                <input name="limit_per_day">
+                                <input name="order">
                                 <input name="API">
                                 <input name="id">
+                                <input name="limit_per_day">
                             </form>
                             <form id="create_new_LLM" method="post" enctype="multipart/form-data"
                                 action="{{ route('create_new_LLM') }}" style="display:none">
@@ -38,8 +39,9 @@
                                 <input id="new_img" name="image" type="file">
                                 <input name="name">
                                 <input name="link">
-                                <input name="limit_per_day">
+                                <input name="order">
                                 <input name="API">
+                                <input name="limit_per_day">
                             </form>
                             <table class="whitespace-nowrap w-full">
                                 <thead class="bg-gray-800">
@@ -58,7 +60,7 @@
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                                            Limit
+                                            Order
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
@@ -71,7 +73,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (App\Models\LLMs::orderby('created_at')->get() as $LLM)
+                                    @foreach (App\Models\LLMs::orderby('order')->orderby('created_at')->get() as $LLM)
                                         <tr id="llm{{ $LLM->id }}">
                                             <td class="px-3 py-2 flex">
                                                 <img width="40px" class="m-auto"
@@ -84,7 +86,7 @@
                                                 <div class="text-sm font-medium">{{ $LLM->link }}</div>
                                             </td>
                                             <td class="px-3 py-2">
-                                                <div class="text-sm font-medium">{{ $LLM->limit_per_day }}</div>
+                                                <div class="text-sm font-medium">{{ $LLM->order }}</div>
                                             </td>
                                             <td class="px-3 py-2">
                                                 <div class="text-sm font-medium">{{ $LLM->API }}</div>
@@ -106,6 +108,10 @@
                                                         onclick="SaveRow({{ $LLM->id }})">
                                                         <i class="fas fa-save"></i>
                                                     </button>
+                                                    <a class="{{ $LLM->enabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}} text-white font-bold py-3 px-4 rounded flex items-center justify-center"
+                                                    href="{{ route('toggle_LLM', $LLM->id) }}">
+                                                        <i class="fas fa-power-off"></i>
+                                                    </a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -145,14 +151,14 @@
                                             <div class="flex items-center">
                                                 <input
                                                     class="appearance-none border rounded w-20 py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    id="new-limit" type="text" placeholder="Limit">
+                                                    id="new-order" type="text" placeholder="Order">
                                             </div>
                                         </td>
                                         <td class="px-3 py-2">
                                             <div class="flex items-center">
                                                 <input
                                                     class="appearance-none border rounded w-full py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    id="new-limit" type="text" placeholder="API Endpoint">
+                                                    id="new-API" type="text" placeholder="API Endpoint">
                                             </div>
                                         </td>
                                         <td class="px-3 py-2">
@@ -185,13 +191,14 @@
                     </header>
                     <div
                         class="shadow overflow-hidden border-b border-gray-800 sm:rounded-lg mt-3 overflow-x-auto scrollbar">
-                        <a href="{{route('debug_reset_redis')}}">Reset Redis Caches<br>(Should be pressed after database sorting)</a>
+                        <a href="{{ route('reset_redis') }}">Reset Redis Caches<br>(Should be pressed after database
+                            sorting)</a>
                     </div>
                 </section>
             </div>
         </div>
     </div>
-</div>
+    </div>
 
     <script>
         function DeleteRow(id) {
@@ -209,7 +216,7 @@
                 if (index == 0) {
                     cell.html(
                         `<label class="appearance-none m-auto border rounded py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline" for="update_img" old="${cell.find("img").attr("src")}">Upload</label>`
-                        )
+                    )
                 } else if (index < 5) {
                     cell.html(
                         `<input type="text" class="form-input rounded-md ${index == 1 || index == 3 ? "w-20" : "w-full"} bg-gray-700" old="${value}" value="${value}">`
@@ -228,6 +235,7 @@
                 $("#update_LLM_by_ID input").each(function(index) {
                     if (index < 7 && index > 2) $(this).val($(vals[index - 3]).val())
                     else if (index == 7) $(this).val(id);
+                    else if (index == 8) $(this).val(100);
                 });
                 $("#update_LLM_by_ID").submit();
             }
@@ -247,7 +255,8 @@
         function CreateRow() {
             datas = $("#createLLM input");
             $("#create_new_LLM input").each(function(index) {
-                if (index > 1) $(this).val($(datas[index - 2]).val());
+                if (index > 1 && index < 6) $(this).val($(datas[index - 2]).val());
+                else if (index == 6) $(this).val(100);
             })
             $("#create_new_LLM").submit();
         }
