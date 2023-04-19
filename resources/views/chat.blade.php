@@ -1,27 +1,27 @@
 <x-app-layout>
     <div class="flex h-full max-w-7xl mx-auto py-2">
-        <div class="bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 h-full overflow-y-auto scrollbar">
                 @if (App\Models\LLMs::where("enabled",true)->count() == 0)
                 <div
-                    class="flex-1 h-full flex flex-col w-full text-center shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-white">
+                    class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                     No available LLM to chat with<br>
                     Please come back later!
                 </div>
                 @else
                 @foreach (App\Models\LLMs::where("enabled",true)->orderby('order')->orderby('created_at')->get() as $LLM)
-                    <div class="mb-2 border border-white border-1 rounded-lg">
+                    <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
                         <a href="{{ $LLM->link }}" target="_blank"
-                            class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-300">{{ $LLM->name }}</a>
-                        <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
-                            <a class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-gray-700 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-700' : '' }} transition duration-300"
+                            class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                        <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                            <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                 href="{{ route('new_chat', $LLM->id) }}">
-                                <p class="flex-1 text-center">New Chat</p>
+                                <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
                             </a>
                         </div>
                         @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
-                            <div class="m-2 border border-white border-1 rounded-lg overflow-hidden">
-                                <a class="flex menu-btn flex items-center justify-center overflow-y-auto scrollbar w-full h-12 hover:bg-gray-700 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-700' : '' }} transition duration-300"
+                            <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                                <a class="flex menu-btn flex text-gray-700 dark:text-white items-center justify-center overflow-y-auto scrollbar w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                     href="{{ route('chats', $chat->id) }}">
                                     <p class="flex-1 text-center">{{ $chat->name }}</p>
                                 </a>
@@ -34,12 +34,12 @@
         </div>
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
-                class="flex-1 h-full flex flex-col w-full bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-white">
+                class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                 Select a chat to begin with
             </div>
         @else
             <div id="histories"
-                class="flex-1 h-full flex flex-col w-full bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
+                class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
                 @if (request()->route('chat_id'))
                     <form id="deleteChat" action="{{ route('chat_delete_chat') }}" method="post" class="hidden">
                         @csrf
@@ -55,7 +55,7 @@
                         <input name="new_name" />
                     </form>
                 @endif
-                <div id="chatHeader" class="bg-gray-700 p-4 h-20 text-white flex">
+                <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
                     @if (request()->route('llm_id'))
                         <p class="flex items-center">New Chat with
                             {{ App\Models\LLMs::findOrFail(request()->route('llm_id'))->name }}</p>
@@ -109,7 +109,7 @@
                         @endforeach
                     @endif
                 </div>
-                <div class="bg-gray-500 p-4 h-20">
+                <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
                     @if (request()->route('llm_id'))
                         <form method="post" action="{{ route('chat_create_chat') }}" id="create_chat">
                             <div class="flex">
@@ -117,9 +117,9 @@
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
                                 <input type="text" placeholder="Enter your text here" name="input"
                                     autocomplete="off"
-                                    class="w-full px-4 py-2 text-white placeholder-white bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
+                                    class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-500 rounded-r-md hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" clip-rule="evenodd"
                                             d="M2.5 9.5L17.5 2.5V17.5L2.5 10.5V9.5Z">
@@ -135,9 +135,9 @@
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
                                 <input type="text" placeholder="Enter your text here" name="input"
                                     autocomplete="off"
-                                    class="w-full px-4 py-2 text-white placeholder-white bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
+                                    class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-500 rounded-r-md hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" clip-rule="evenodd"
                                             d="M2.5 9.5L17.5 2.5V17.5L2.5 10.5V9.5Z">
@@ -160,7 +160,7 @@
                         $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
                         name = $("#chatHeader >p:eq(0)").text().trim();
                         $("#chatHeader >p:eq(0)").html(
-                            `<input type='text' class='form-input rounded-md w-full bg-gray-700' value='${name}' old='${name}'/>`)
+                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`)
 
                         $("#chatHeader >p >input:eq(0)").keypress(function(e) {
                             if (e.which == 13) saveChat();

@@ -14,7 +14,7 @@
                             </p>
                         </header>
                         <div
-                            class="shadow overflow-hidden border-b border-gray-800 sm:rounded-lg mt-3 overflow-x-auto scrollbar">
+                            class="shadow overflow-hidden border dark:border-gray-900 sm:rounded-lg mt-3 overflow-x-auto scrollbar">
                             <form id="del_LLM_by_ID" method="post" action="{{ route('delete_LLM_by_id') }}"
                                 style="display:none">
                                 @csrf
@@ -44,7 +44,7 @@
                                 <input name="limit_per_day">
                             </form>
                             <table class="whitespace-nowrap w-full">
-                                <thead class="bg-gray-800">
+                                <thead class="bg-gray-200 dark:bg-gray-900">
                                     <tr>
                                         <th scope="col"
                                             class="px-4 py-2 text-center text-xs font-medium uppercase tracking-wider">
@@ -75,8 +75,8 @@
                                 <tbody>
                                     @foreach (App\Models\LLMs::orderby('order')->orderby('created_at')->get() as $LLM)
                                         <tr id="llm{{ $LLM->id }}">
-                                            <td class="px-3 py-2 flex">
-                                                <img width="40px" class="m-auto"
+                                            <td class="px-3 py-2 flex justify-center">
+                                                <img class="rounded-full border border-gray-400 dark:border-gray-900" width="40px" class="m-auto"
                                                     src="{{ asset(Storage::url($LLM->image)) }}" />
                                             </td>
                                             <td class="px-3 py-2">
@@ -129,35 +129,35 @@
                                         <td class="px-3 py-2">
                                             <div class="flex items-center">
                                                 <label
-                                                    class="appearance-none m-auto border rounded py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
+                                                    class="appearance-none m-auto border rounded py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
                                                     for="new_img">Upload</label>
                                             </div>
                                         </td>
                                         <td class="px-3 py-2">
                                             <div class="flex items-center">
                                                 <input
-                                                    class="appearance-none border rounded w-20 py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
+                                                    class="appearance-none border rounded w-20 py-2 px-3 text-gray-700 border-gray-300 dark:border-gray-900 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
                                                     id="new-name" type="text" placeholder="Name">
                                             </div>
                                         </td>
                                         <td class="px-3 py-2">
                                             <div class="flex items-center">
                                                 <input
-                                                    class="appearance-none border rounded w-full py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
+                                                    class="appearance-none border rounded w-full py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
                                                     id="new-link" type="text" placeholder="Link">
                                             </div>
                                         </td>
                                         <td class="px-3 py-2">
                                             <div class="flex items-center">
                                                 <input
-                                                    class="appearance-none border rounded w-20 py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
+                                                    class="appearance-none border rounded w-20 py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
                                                     id="new-order" type="text" placeholder="Order">
                                             </div>
                                         </td>
                                         <td class="px-3 py-2">
                                             <div class="flex items-center">
                                                 <input
-                                                    class="appearance-none border rounded w-full py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
+                                                    class="appearance-none border rounded w-full py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
                                                     id="new-API" type="text" placeholder="API Endpoint">
                                             </div>
                                         </td>
@@ -182,17 +182,16 @@
                 <section>
                     <header>
                         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                            {{ __('Debug menu') }}
+                            {{ __('Debug buttons') }}
                         </h2>
 
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('This just a menu that still been working on') }}
+                            {{ __('Just a menu of buttons for debugging') }}
                         </p>
                     </header>
                     <div
-                        class="shadow overflow-hidden border-b border-gray-800 sm:rounded-lg mt-3 overflow-x-auto scrollbar">
-                        <a href="{{ route('reset_redis') }}">Reset Redis Caches<br>(Should be pressed after database
-                            sorting)</a>
+                        class="mt-3 mx-auto flex">
+                        <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center" href="{{ route('reset_redis') }}">Reset<br>Redis<br>Caches</a>
                     </div>
                 </section>
             </div>
@@ -244,7 +243,7 @@
             row.find('td').each(function(index) {
                 const cell = $(this);
                 if (index == 0) {
-                    cell.html(`<img width="40px" class="m-auto" src="${cell.find("label").attr('old')}">`)
+                    cell.html(`<img class="rounded-full border border-gray-400 dark:border-gray-900" width="40px" src="${cell.find("label").attr('old')}">`)
                 } else if (index < 5) {
                     const value = cell.find("input").attr('old');
                     cell.html(`<div class="text-sm font-medium">${value}</div>`);
