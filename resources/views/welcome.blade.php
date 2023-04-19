@@ -61,7 +61,7 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">LLaMA
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 dark:bg-gray-900 rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -93,7 +93,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Dolly</h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 dark:bg-gray-900 rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -129,7 +129,7 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Bloom
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 dark:bg-gray-900 rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -161,7 +161,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">OPT</h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar bg-gray-100 dark:bg-gray-900 rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
