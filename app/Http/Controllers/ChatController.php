@@ -136,7 +136,7 @@ class ChatController extends Controller
             echo "event: close\n\n";
             ob_flush();
             flush();
-            Redis::del("msg" . $history->id);
+            Redis::del("msg" . $history_id);
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
