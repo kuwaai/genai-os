@@ -115,6 +115,7 @@ class ChatController extends Controller
                                 $lengths += 1;
                                 # each token should restore 5 seconds of timeout, maximum is 300 seconds(5 mins)
                                 if ($timeouts < 300) {
+                                    export(time() - $start_time + 5);
                                     $timeouts = time() - $start_time + 5;
                                 }
                                 set_time_limit($timeouts);
