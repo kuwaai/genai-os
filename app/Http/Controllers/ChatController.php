@@ -19,13 +19,13 @@ class ChatController extends Controller
 {
     public function main(Request $request)
     {
-        $chat = Chats::findOrFail($request->route("chat_id"));
+        $chat = Chats::findOrFail($request->route('chat_id'));
         if ($chat->user_id != Auth::user()->id) {
             return redirect()->route('chat');
         } elseif (LLMs::findOrFail($chat->llm_id)->enabled == true) {
             return view('chat');
         }
-        return redirect()->route('archives', $request->route("chat_id"));
+        return redirect()->route('archives', $request->route('chat_id'));
     }
 
     public function create(ChatRequest $request): RedirectResponse
@@ -37,8 +37,8 @@ class ChatController extends Controller
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chat->id, 'isbot' => false]);
         $history->save();
         $llm = LLMs::findOrFail($request->input('llm_id'));
-        Redis::set($chat->id . 'status', 'pending');
-        RequestChat::dispatch($chat->id, $request->input('input'), $llm->API);
+        Redis::rpush("usertask_" . Auth::user()->id, $history->id);
+        RequestChat::dispatch($history->id, $request->input('input'), $llm->API, Auth::user()->id);
         return Redirect::route('chats', $chat->id);
     }
 
@@ -49,9 +49,8 @@ class ChatController extends Controller
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chatId, 'isbot' => false]);
         $history->save();
         $API = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->API;
-        Redis::del($chatId);
-        Redis::set($chatId . 'status', 'pending');
-        RequestChat::dispatch($chatId, $request->input('input'), $API);
+        Redis::del("msg" . $history->id);
+        RequestChat::dispatch($chatId, $request->input('input'), $API, Auth::user()->id);
         return Redirect::route('chats', $chatId)->with('status', $request->input('req-failed'));
     }
 
@@ -61,7 +60,7 @@ class ChatController extends Controller
             $chat = Chats::findOrFail($request->input('id'));
         } catch (ModelNotFoundException $e) {
             // Handle the exception here, for example:
-            return response()->json(['error' => 'Chat not found'], 404);
+            return Redirect::route('chat');
         }
 
         $chat->delete();
@@ -89,44 +88,55 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        set_time_limit(20);
-        $chatId = $request->input('chat_id');
-        $response = response()->stream(function () use ($chatId) {
-            $extendedLimit = false;
+        $history_id = $request->input('history_id');
+        $response = response()->stream(function () use ($history_id) {
+            $lengths = 0;
             $sent = '';
-            if ($chatId) {
-                try {
-                    if (Redis::get($chatId . 'status') && Redis::get($chatId . 'status') != 'finished') {
-                        set_time_limit(20); # It should output something in 20 seconds
-                        while ((Redis::get($chatId) && Redis::get($chatId) != $sent) || Redis::get($chatId . 'status') != 'finished') {
-                            $result = Redis::get($chatId);
-                            $encoding = mb_detect_encoding($result, 'UTF-8, ISO-8859-1', true);
-                            if ($encoding !== 'UTF-8') {
-                                $result = mb_convert_encoding($result, 'UTF-8', $encoding);
-                            }
-                            $newData = mb_substr($result, mb_strlen($sent, 'utf-8'), null, 'utf-8');
-                            $sent = $result;
-                            $length = mb_strlen($newData, 'utf-8');
-                            for ($i = 0; $i < $length; $i++) {
-                                $char = mb_substr($newData, $i, 1, 'utf-8');
-                                if (mb_check_encoding($char, 'utf-8')) {
-                                    echo 'data: ' . $char . "\n\n";
-                                    set_time_limit(10); # each token shouldn't taken more than 10 seconds
-                                    ob_flush();
-                                    flush();
+            if ($history_id) {
+                if (in_array($history_id, Redis::lrange("usertask_" . Auth::user()->id, 0, -1))) {
+                    $timeouts = 5;
+                    set_time_limit($timeouts);
+                    $start_time = time();
+                    while ($history_id) {
+                        $result = Redis::get("msg" . $history_id);
+                        # Validate and convert for the encoding of incoming message
+                        $encoding = mb_detect_encoding($result, 'UTF-8, ISO-8859-1', true);
+                        if ($encoding !== 'UTF-8') {
+                            $result = mb_convert_encoding($result, 'UTF-8', $encoding);
+                        }
+                        $newData = mb_substr($result, mb_strlen($sent, 'utf-8'), null, 'utf-8');
+                        $sent = $result;
+                        $length = mb_strlen($newData, 'utf-8');
+                        for ($i = 0; $i < $length; $i++) {
+                            # Make sure the data is correctly encoded and output a character at a time
+                            $char = mb_substr($newData, $i, 1, 'utf-8');
+                            if (mb_check_encoding($char, 'utf-8')) {
+                                echo 'data: ' . $char . "\n\n";
+                                $lengths += 1;
+                                # each token should restore 5 seconds of timeout, maximum is 300 seconds(5 mins)
+                                if ($timeouts < 300) {
+                                    $timeouts = time() - $start_time + 5;
                                 }
+                                set_time_limit($timeouts);
+                                #Flush the buffer
+                                ob_flush();
+                                flush();
                             }
+                            if ($lengths >= 600) {
+                                break;
+                            }
+                        }
+                        if ($lengths >= 600) {
+                            break;
                         }
                         usleep(250000);
                     }
-                } catch (\Throwable $e) {
                 }
             }
             echo "event: close\n\n";
             ob_flush();
             flush();
-            Redis::del($chatId);
-            Redis::del($chatId . 'status');
+            Redis::del("msg" . $history->id);
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');

@@ -1,2 +1,2 @@
 cd ../..
-php artisan queue:work  --verbose
+php artisan queue:work  --verbose --timeout=600

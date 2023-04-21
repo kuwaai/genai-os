@@ -14,8 +14,8 @@
         @method('patch')
 
         <div>
-            <x-input-label for="name" :value="__('Personal API Token')" />
-            <x-text-input type="text" class="mt-1 block w-full" :value="$user
+            <x-input-label for="api" :value="__('Personal API Token')" />
+            <x-text-input type="text" id="api" class="mt-1 block w-full" :value="$user
                 ->tokens()
                 ->where('name', 'API_Token')
                 ->first()->token" disabled />

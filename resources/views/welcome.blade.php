@@ -54,14 +54,14 @@
             </div>
 
 
-            <div class="mt-16">
+            <div class="mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">LLaMA
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar light:bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -93,7 +93,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Dolly</h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar light:bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -129,7 +129,7 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Bloom
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar light:bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -161,7 +161,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">OPT</h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar light:bg-gray-100 rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -195,7 +195,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex justify-center mt-16 px-0 sm:items-center sm:justify-between">
+            <div class="flex justify-center mt-4 px-0 sm:items-center sm:justify-between">
                 <div class="text-center text-sm text-gray-500 dark:text-gray-400 sm:text-left">
                     <div class="flex items-center gap-4">
                         <a href="https://www.nuk.edu.tw/"

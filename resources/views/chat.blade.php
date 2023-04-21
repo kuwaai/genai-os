@@ -2,33 +2,34 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 h-full overflow-y-auto scrollbar">
-                @if (App\Models\LLMs::where("enabled",true)->count() == 0)
-                <div
-                    class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                    No available LLM to chat with<br>
-                    Please come back later!
-                </div>
+                @if (App\Models\LLMs::where('enabled', true)->count() == 0)
+                    <div
+                        class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
+                        No available LLM to chat with<br>
+                        Please come back later!
+                    </div>
                 @else
-                @foreach (App\Models\LLMs::where("enabled",true)->orderby('order')->orderby('created_at')->get() as $LLM)
-                    <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                        <a href="{{ $LLM->link }}" target="_blank"
-                            class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                        <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                            <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                href="{{ route('new_chat', $LLM->id) }}">
-                                <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
-                            </a>
-                        </div>
-                        @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
+                    @foreach (App\Models\LLMs::where('enabled', true)->orderby('order')->orderby('created_at')->get() as $LLM)
+                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+                            <a href="{{ $LLM->link }}" target="_blank"
+                                class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
                             <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                <a class="flex menu-btn flex text-gray-700 dark:text-white items-center justify-center overflow-y-auto scrollbar w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                    href="{{ route('chats', $chat->id) }}">
-                                    <p class="flex-1 text-center">{{ $chat->name }}</p>
+                                <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                    href="{{ route('new_chat', $LLM->id) }}">
+                                    <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
                                 </a>
                             </div>
-                        @endforeach
-                    </div>
-                @endforeach
+                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
+                                <div
+                                    class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                                    <a class="flex menu-btn flex text-gray-700 dark:text-white items-center justify-center overflow-y-auto scrollbar w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                        href="{{ route('chats', $chat->id) }}">
+                                        <p class="flex-1 text-center">{{ $chat->name }}</p>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
                 @endif
             </div>
         </div>
@@ -83,9 +84,28 @@
                     @if (request()->route('chat_id'))
                         @php
                             $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
+                            $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+                            $index = 0;
                         @endphp
-                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('updated_at', 'desc')->get() as $history)
-                            <div
+                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->get() as $history)
+                            @if (count($tasks) > 0 && $tasks[$index] == $history->id)
+                                @php
+                                    $index += 1;
+                                @endphp
+                                <div class="flex w-full mt-2 space-x-3">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ $botimgurl }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm whitespace-pre-line break-all"
+                                                id="task_{{ $history->id }}"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                            <div id="history_{{ $history->id }}"
                                 class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
                                     <div
@@ -96,7 +116,7 @@
                                 <div>
                                     <div
                                         class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                        <p class="text-sm whitespace-pre-line">{{ $history->msg }}</p>
+                                        <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
                                     </div>
                                 </div>
                                 @if (!$history->isbot)
@@ -160,7 +180,8 @@
                         $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
                         name = $("#chatHeader >p:eq(0)").text().trim();
                         $("#chatHeader >p:eq(0)").html(
-                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`)
+                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`
+                        )
 
                         $("#chatHeader >p >input:eq(0)").keypress(function(e) {
                             if (e.which == 13) saveChat();
@@ -177,34 +198,20 @@
                         $("#chatHeader button").find('.fa-save').parent().addClass('hidden');
                         $("#chatHeader >p").text(input.val())
                     }
-                    let created = false;
-                    var eventSource = new EventSource("{{ route('chat_sse') }}?chat_id={{ request()->route('chat_id') }}", {
-                        withCredentials: false
-                    });
-                    eventSource.addEventListener('error', error => {
-                        eventSource.close();
-                        $("#chatroom >div:first p:first").text($("#chatroom >div:first p:first").text().trim())
-                    });
-                    eventSource.addEventListener('message', event => {
-                        if (!created){
-                            created = true;
-                            $('#chatroom').prepend($(`<div class='flex w-full mt-2 space-x-3'>
-                                <div
-                                    class='flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden'>
-                                    <img src='{{ $botimgurl }}'>
-                                </div>
-                                <div>
-                                    <div
-                                        class='p-3 bg-gray-300 rounded-r-lg rounded-bl-lg'>
-                                        <p class='text-sm whitespace-pre-line'></p>
-                                    </div>
-                                </div>
-                            </div>`));
-                        }
-                        if (!(event.data == "" && $("#chatroom >div:first p:first").text() == "")){
-                            $("#chatroom >div:first p:first").text($("#chatroom >div:first p:first").text() + (event.data == "" ? "\n" : event.data))
-                        }
-                    });
+
+                    @foreach (\Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1) as $history_id)
+                        task_{{ $history_id }} = new EventSource("{{ route('chat_sse') }}?history_id={{ $history_id }}", {
+                            withCredentials: false
+                        });
+                        task_{{ $history_id }}.addEventListener('error', error => {
+                            task_{{ $history_id }}.close();
+                            $('#task_{{ $history_id }}').text($('#task_{{ $history_id }}').text().trim())
+                        });
+                        task_{{ $history_id }}.addEventListener('message', event => {
+                            $('#task_{{ $history_id }}').text($('#task_{{ $history_id }}').text() + (event.data ==
+                                "" ? "\n" : event.data))
+                        });
+                    @endforeach
                 </script>
             @endif
         @endif

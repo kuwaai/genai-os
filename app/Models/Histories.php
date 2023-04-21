@@ -9,5 +9,5 @@ class Histories extends Model
 {
     use HasFactory;
     protected $table = 'histories';
-    protected $fillable = ['msg', 'chat_id', 'isbot'];
+    protected $fillable = ['msg', 'chat_id', 'isbot', 'created_at'];
 }

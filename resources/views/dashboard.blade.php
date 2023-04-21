@@ -214,11 +214,11 @@
                 const value = cell.find('div').text();
                 if (index == 0) {
                     cell.html(
-                        `<label class="appearance-none m-auto border rounded py-2 px-3 text-gray-300 bg-gray-700 leading-tight placeholder:text-gray-300 focus:outline-none focus:shadow-outline" for="update_img" old="${cell.find("img").attr("src")}">Upload</label>`
+                        `<label class="appearance-none m-auto border rounded py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline" for="update_img" old="${cell.find("img").attr("src")}">Upload</label>`
                     )
                 } else if (index < 5) {
                     cell.html(
-                        `<input type="text" class="form-input rounded-md ${index == 1 || index == 3 ? "w-20" : "w-full"} bg-gray-700" old="${value}" value="${value}">`
+                        `<input type="text" class="border rounded w-20 py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline form-input rounded-md ${index == 1 || index == 3 ? "w-20" : "w-full"}" old="${value}" value="${value}">`
                     );
                 }
             });
