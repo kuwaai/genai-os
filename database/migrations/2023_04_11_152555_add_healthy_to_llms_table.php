@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('llms', function (Blueprint $table) {
-            $table->timestamp('healthy')->default(0);
+            $table->timestamp('healthy');
         });
     }
 
