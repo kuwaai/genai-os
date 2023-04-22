@@ -50,7 +50,7 @@ class ChatController extends Controller
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chatId, 'isbot' => false]);
         $history->save();
         $API = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->API;
-        Redis::del("msg" . $history->id);
+        Redis::rpush("usertask_" . Auth::user()->id, $history->id);
         RequestChat::dispatch($history->id, $request->input('input'), $API, Auth::user()->id);
         return Redirect::route('chats', $chatId)->with('status', $request->input('req-failed'));
     }
