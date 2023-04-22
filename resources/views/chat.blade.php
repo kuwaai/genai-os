@@ -88,9 +88,9 @@
                             $index = 0;
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->get() as $history)
-                            @if (count($tasks) > 0 && $tasks[$index] == $history->id)
+                            @if (count($tasks) > $index && $tasks[$index] == $history->id)
                                 @php
-                                    if ($tasks[$index] == $history->id) $index += 1;
+                                    $index += 1;
                                 @endphp
                                 <div class="flex w-full mt-2 space-x-3">
                                     <div
