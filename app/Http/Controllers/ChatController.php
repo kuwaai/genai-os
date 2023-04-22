@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
 use App\Models\Histories;
@@ -116,7 +117,7 @@ class ChatController extends Controller
                                 # each token should restore 5 seconds of timeout, maximum is 300 seconds(5 mins)
                                 if ($timeouts < 300) {
                                     $timeouts = time() - $start_time + 5;
-                                    export($timeouts);
+                                    Log::debug($timeouts);
                                     set_time_limit($timeouts);
                                 }
                                 #Flush the buffer
