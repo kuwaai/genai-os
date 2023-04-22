@@ -52,7 +52,7 @@ class ChatController extends Controller
         $API = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->API;
         Redis::rpush("usertask_" . Auth::user()->id, $history->id);
         RequestChat::dispatch($history->id, $request->input('input'), $API, Auth::user()->id);
-        return Redirect::route('chats', $chatId)->with('status', $request->input('req-failed'));
+        return Redirect::route('chats', $chatId);
     }
 
     public function delete(Request $request): RedirectResponse
