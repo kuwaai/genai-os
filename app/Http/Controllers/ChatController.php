@@ -95,7 +95,7 @@ class ChatController extends Controller
             $sent = '';
             if ($history_id) {
                 if (in_array($history_id, Redis::lrange("usertask_" . Auth::user()->id, 0, -1))) {
-                    $timeouts = 5;
+                    $timeouts = 15;
                     set_time_limit($timeouts);
                     $start_time = time();
                     while ($history_id) {
