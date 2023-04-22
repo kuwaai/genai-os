@@ -95,7 +95,7 @@ class ChatController extends Controller
             $sent = '';
             if ($history_id) {
                 if (in_array($history_id, Redis::lrange("usertask_" . Auth::user()->id, 0, -1))) {
-                    $timeouts = 15;
+                    $timeouts = 5;
                     set_time_limit($timeouts);
                     $start_time = time();
                     while ($history_id) {
@@ -116,7 +116,7 @@ class ChatController extends Controller
                                 $lengths += 1;
                                 # each token should restore 5 seconds of timeout, maximum is 300 seconds(5 mins)
                                 if ($timeouts < 300) {
-                                    $timeouts = time() - $start_time + 5;
+                                    $timeouts = time() - $start_time + 20;
                                     Log::debug($timeouts);
                                     set_time_limit($timeouts);
                                 }
