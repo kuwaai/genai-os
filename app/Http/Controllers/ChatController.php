@@ -51,7 +51,7 @@ class ChatController extends Controller
         $history->save();
         $API = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->API;
         Redis::del("msg" . $history->id);
-        RequestChat::dispatch($chatId, $request->input('input'), $API, Auth::user()->id);
+        RequestChat::dispatch($history->id, $request->input('input'), $API, Auth::user()->id);
         return Redirect::route('chats', $chatId)->with('status', $request->input('req-failed'));
     }
 
@@ -114,10 +114,9 @@ class ChatController extends Controller
                             if (mb_check_encoding($char, 'utf-8')) {
                                 echo 'data: ' . $char . "\n\n";
                                 $lengths += 1;
-                                # each token should restore 5 seconds of timeout, maximum is 300 seconds(5 mins)
+                                # each token should restore 10 seconds of timeout, maximum is 300 seconds(5 mins)
                                 if ($timeouts < 300) {
-                                    $timeouts = time() - $start_time + 20;
-                                    Log::debug(time() - $start_time);
+                                    $timeouts = time() - $start_time + 10;
                                     set_time_limit($timeouts);
                                 }
                                 #Flush the buffer
