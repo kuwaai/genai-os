@@ -114,7 +114,7 @@ class ChatController extends Controller
                     }
                     $newData = mb_substr($result, $lengths[$history_id], null, 'utf-8');
                     $length = mb_strlen($newData, 'utf-8');
-                    if (mb_check_encoding($char, 'utf-8')) {
+                    if (mb_check_encoding($newData, 'utf-8')) {
                         $lengths[$history_id] += $length;
                         echo 'data: ' . $history_id . ',' . $newData . "\n\n";
                         # each token should restore 5 seconds of timeout
