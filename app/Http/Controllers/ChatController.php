@@ -100,14 +100,8 @@ class ChatController extends Controller
                 $lengths[$history_id] = 0;
             }
             while (!empty($listening)) {
-                if (connection_aborted()) {
-                    break;
-                }
                 $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 foreach ($listening as $history_id) {
-                    if (connection_aborted()) {
-                        break;
-                    }
                     $finished = false;
                     if (!in_array($history_id, $new_listening)) {
                         $finished = true;
@@ -121,9 +115,6 @@ class ChatController extends Controller
                     $newData = mb_substr($result, $lengths[$history_id], null, 'utf-8');
                     $length = mb_strlen($newData, 'utf-8');
                     for ($i = 0; $i < $length; $i++) {
-                        if (connection_aborted()) {
-                            break;
-                        }
                         # Make sure the data is correctly encoded and output a character at a time
                         $char = mb_substr($newData, $i, 1, 'utf-8');
                         if (mb_check_encoding($char, 'utf-8')) {
@@ -134,9 +125,6 @@ class ChatController extends Controller
                             #Flush the buffer
                             ob_flush();
                             flush();
-                            if (connection_aborted()) {
-                                echo "data: " . $history_id . ",?\n\n";
-                            }
                         }
                     }
                     if ($finished) {
