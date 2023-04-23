@@ -114,14 +114,18 @@ class ChatController extends Controller
                     }
                     $newData = mb_substr($result, $lengths[$history_id], null, 'utf-8');
                     $length = mb_strlen($newData, 'utf-8');
-                    if (mb_check_encoding($newData, 'utf-8')) {
-                        $lengths[$history_id] += $length;
-                        echo 'data: ' . $history_id . ',' . $newData . "\n\n";
-                        # each token should restore 5 seconds of timeout
-                        set_time_limit(time() - $start_time + 5);
-                        #Flush the buffer
-                        ob_flush();
-                        flush();
+                    for ($i = 0; $i < $length; $i++) {
+                        # Make sure the data is correctly encoded and output a character at a time
+                        $char = mb_substr($newData, $i, 1, 'utf-8');
+                        if (mb_check_encoding($char, 'utf-8')) {
+                            $lengths[$history_id] += 1;
+                            echo 'data: ' . $history_id . ',' . $char . "\n\n";
+                            # each token should restore 5 seconds of timeout
+                            set_time_limit(time() - $start_time + 5);
+                            #Flush the buffer
+                            ob_flush();
+                            flush();
+                        }
                     }
                     if ($finished) {
                         Redis::del('msg' . $history_id);
