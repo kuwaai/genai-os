@@ -126,7 +126,7 @@ class ChatController extends Controller
                             ob_flush();
                             flush();
                             if (connection_aborted()) {
-                                Log::Debug("Test");
+                                echo "data: " . $history_id . ",?\n\n";
                             }
                         }
                     }
