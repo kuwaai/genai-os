@@ -37,7 +37,7 @@ class RequestChat implements ShouldQueue
     public function handle(): void
     {
         try {
-            Redis::set("msg" . $this->history_id, '');
+            Redis::set('msg' . $this->history_id, '');
             $client = new Client();
             $response = $client->post($this->API, [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
@@ -62,21 +62,24 @@ class RequestChat implements ShouldQueue
                 if ($messageLength !== null) {
                     $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                     if (mb_check_encoding($message, 'UTF-8')) {
-                        Redis::set("msg" . $this->history_id, Redis::get("msg" . $this->history_id) . $message);
+                        Redis::set('msg' . $this->history_id, Redis::get('msg' . $this->history_id) . $message);
                         $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                     }
                 }
+                if (strlen(Redis::get('msg' . $this->history_id)) > 700) {
+                    break;
+                }
             }
-            if (Redis::get("msg" . $this->history_id) == '') {
-                Redis::set("msg" . $this->history_id, '[Oops, seems like LLM given empty message as output!]');
+            if (Redis::get('msg' . $this->history_id) == '') {
+                Redis::set('msg' . $this->history_id, '[Oops, seems like LLM given empty message as output!]');
             }
         } catch (Exception $e) {
-            Redis::set("msg" . $this->history_id, Redis::get("msg" . $this->history_id) . "\n[Sorry, something is broken!]");
+            Redis::set('msg' . $this->history_id, Redis::get('msg' . $this->history_id) . "\n[Sorry, something is broken!]");
         } finally {
             $history = new Histories();
-            $history->fill(['msg' => trim(Redis::get("msg" . $this->history_id)), 'chat_id' => $this->chat_id, 'isbot' => true, 'created_at' => $this->msgtime]);
+            $history->fill(['msg' => trim(Redis::get('msg' . $this->history_id)), 'chat_id' => $this->chat_id, 'isbot' => true, 'created_at' => $this->msgtime]);
             $history->save();
-            Redis::lrem("usertask_" . $this->user_id, 0, $this->history_id);
+            Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
         }
     }
 }

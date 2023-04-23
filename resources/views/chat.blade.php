@@ -199,19 +199,21 @@
                         $("#chatHeader >p").text(input.val())
                     }
 
-                    @foreach (\Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1) as $history_id)
-                        task_{{ $history_id }} = new EventSource("{{ route('chat_sse') }}?history_id={{ $history_id }}", {
-                            withCredentials: false
-                        });
-                        task_{{ $history_id }}.addEventListener('error', error => {
-                            task_{{ $history_id }}.close();
-                            $('#task_{{ $history_id }}').text($('#task_{{ $history_id }}').text().trim())
-                        });
-                        task_{{ $history_id }}.addEventListener('message', event => {
-                            $('#task_{{ $history_id }}').text($('#task_{{ $history_id }}').text() + (event.data ==
-                                "" ? "\n" : event.data))
-                        });
-                    @endforeach
+                    task = new EventSource("{{ route('chat_sse') }}", {
+                        withCredentials: false
+                    });
+                    task.addEventListener('error', error => {
+                        task.close();
+                    });
+                    task.addEventListener('message', event => {
+                        data = event.data;
+                        const commaIndex = data.indexOf(",");
+                        const number = data.slice(0, commaIndex);
+                        const msg = data.slice(commaIndex + 1);
+
+                        $('#task_' + number).text($('#task_' + number).text() + (msg ==
+                            "" ? "\n" : msg))
+                    });
                 </script>
             @endif
         @endif
