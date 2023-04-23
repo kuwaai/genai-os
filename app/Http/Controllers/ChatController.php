@@ -89,63 +89,71 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        $response = response()->stream(function () {
-            $lengths = [];
-            $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-            $start_time = time();
-            $timeouts = 5;
-            set_time_limit($timeouts);
-
-            foreach ($listening as $history_id) {
-                $lengths[$history_id] = 0;
-            }
-            while (!empty($listening)) {
-                $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                foreach ($listening as $history_id) {
-                    $finished = false;
-                    if (!in_array($history_id, $new_listening)) {
-                        $finished = true;
-                    }
-                    $result = Redis::get('msg' . $history_id);
-                    # Validate and convert for the encoding of incoming message
-                    $encoding = mb_detect_encoding($result, 'UTF-8, ISO-8859-1', true);
-                    if ($encoding !== 'UTF-8') {
-                        $result = mb_convert_encoding($result, 'UTF-8', $encoding);
-                    }
-                    $newData = mb_substr($result, $lengths[$history_id], null, 'utf-8');
-                    $length = mb_strlen($newData, 'utf-8');
-                    for ($i = 0; $i < $length; $i++) {
-                        # Make sure the data is correctly encoded and output a character at a time
-                        $char = mb_substr($newData, $i, 1, 'utf-8');
-                        if (mb_check_encoding($char, 'utf-8')) {
-                            $lengths[$history_id] += $length;
-                            echo 'data: ' . $history_id . ',' . $char . "\n\n";
-                            # each token should restore 5 seconds of timeout
-                            set_time_limit(time() - $start_time + 5);
-                            #Flush the buffer
-                            ob_flush();
-                            flush();
-                            if (connection_aborted()) {
-                                echo "data: " . $history_id . ",?\n\n";
-                            }
-                        }
-                    }
-                    if ($finished) {
-                        Redis::del('msg' . $history_id);
-                        unset($lengths[$history_id]);
-                        unset($listening[$history_id]);
-                    }
-                }
-            }
-            echo "event: close\n\n";
-            ob_flush();
-            flush();
-        });
-
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
-        return $response;
+        $response->headers->set('Connection', 'close');
+        $response->sendHeaders();
+        $lengths = [];
+        $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+        $start_time = time();
+        $timeouts = 5;
+        set_time_limit($timeouts);
+
+        foreach ($listening as $history_id) {
+            $lengths[$history_id] = 0;
+        }
+        while (!empty($listening)) {
+            if (connection_aborted()) {
+                break;
+            }
+            $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+            foreach ($listening as $history_id) {
+                if (connection_aborted()) {
+                    break;
+                }
+                $finished = false;
+                if (!in_array($history_id, $new_listening)) {
+                    $finished = true;
+                }
+                $result = Redis::get('msg' . $history_id);
+                # Validate and convert for the encoding of incoming message
+                $encoding = mb_detect_encoding($result, 'UTF-8, ISO-8859-1', true);
+                if ($encoding !== 'UTF-8') {
+                    $result = mb_convert_encoding($result, 'UTF-8', $encoding);
+                }
+                $newData = mb_substr($result, $lengths[$history_id], null, 'utf-8');
+                $length = mb_strlen($newData, 'utf-8');
+                for ($i = 0; $i < $length; $i++) {
+                    if (connection_aborted()) {
+                        break;
+                    }
+                    # Make sure the data is correctly encoded and output a character at a time
+                    $char = mb_substr($newData, $i, 1, 'utf-8');
+                    if (mb_check_encoding($char, 'utf-8')) {
+                        $lengths[$history_id] += $length;
+                        echo 'data: ' . $history_id . ',' . $char . "\n\n";
+                        # each token should restore 5 seconds of timeout
+                        set_time_limit(time() - $start_time + 5);
+                        #Flush the buffer
+                        ob_flush();
+                        flush();
+                        if (connection_aborted()) {
+                            echo "data: " . $history_id . ",?\n\n";
+                        }
+                    }
+                }
+                if ($finished) {
+                    Redis::del('msg' . $history_id);
+                    unset($lengths[$history_id]);
+                    unset($listening[$history_id]);
+                }
+            }
+        }
+        echo "event: close\n\n";
+        ob_flush();
+        flush();
+        die();
     }
 }
