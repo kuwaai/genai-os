@@ -118,7 +118,7 @@ class ChatController extends Controller
                         # Make sure the data is correctly encoded and output a character at a time
                         $char = mb_substr($newData, $i, 1, 'utf-8');
                         if (mb_check_encoding($char, 'utf-8')) {
-                            $lengths[$history_id] += $length;
+                            $lengths[$history_id] += 1;
                             echo 'data: ' . $history_id . ',' . $char . "\n\n";
                             # each token should restore 5 seconds of timeout
                             set_time_limit(time() - $start_time + 5);
