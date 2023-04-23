@@ -125,6 +125,9 @@ class ChatController extends Controller
                             #Flush the buffer
                             ob_flush();
                             flush();
+                            if (connection_aborted()) {
+                                Log::Debug("Test");
+                            }
                         }
                     }
                     if ($finished) {
