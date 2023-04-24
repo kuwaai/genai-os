@@ -15,7 +15,6 @@ use App\Jobs\RequestChat;
 use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
-use Predis\Client;
 
 class ChatController extends Controller
 {
@@ -39,9 +38,8 @@ class ChatController extends Controller
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chat->id, 'isbot' => false]);
         $history->save();
         $llm = LLMs::findOrFail($request->input('llm_id'));
-        $redis = new Client();
-        $redis->rpush('usertask_' . Auth::user()->id, $history->id);
-        RequestChat::dispatch($history->id, $request->input('input'), $llm->API, Auth::user()->id);
+        Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+        RequestChat::dispatchToQueue($history->id, $request->input('input'), $llm->API, Auth::user()->id);
         return Redirect::route('chats', $chat->id);
     }
 
@@ -52,9 +50,8 @@ class ChatController extends Controller
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chatId, 'isbot' => false]);
         $history->save();
         $API = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->API;
-        $redis = new Client();
-        $redis->rpush('usertask_' . Auth::user()->id, $history->id);
-        RequestChat::dispatch($history->id, $request->input('input'), $API, Auth::user()->id);
+        Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+        RequestChat::dispatchToQueue($history->id, $request->input('input'), $API, Auth::user()->id);
         return Redirect::route('chats', $chatId);
     }
 
