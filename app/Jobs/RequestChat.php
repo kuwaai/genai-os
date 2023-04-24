@@ -39,13 +39,28 @@ class RequestChat implements ShouldQueue
         try {
             Redis::set('msg' . $this->history_id, '');
             $client = new Client();
-            $response = $client->post($this->API, [
+            $response = $client->post("http://localhost:9000/status", [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
-                    'input' => $this->input,
+                    'name' => "Test",
+                    "userid" => $this->user_id
                 ],
                 'stream' => true,
             ]);
+            Log::Debug($response);
+            if ($response == "BUSY") {
+                $this->release(10);
+            }
+            $response = $client->post("http://localhost:9000/", [
+                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                'form_params' => [
+                    'input' => $this->input,
+                    'name' => "Test",
+                    "userid" => $this->user_id
+                ],
+                'stream' => true,
+            ]);
+            
             $stream = $response->getBody();
             $buffer = '';
             while (!$stream->eof()) {
