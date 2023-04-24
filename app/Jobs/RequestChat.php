@@ -50,6 +50,7 @@ class RequestChat implements ShouldQueue
             ]);
             if ($response->getBody()->getContents() == "BUSY") {
                 $this->release(10);
+                return;
             }
             $response = $client->post("http://localhost:9000/", [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
