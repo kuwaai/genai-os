@@ -47,8 +47,7 @@ class RequestChat implements ShouldQueue
                 ],
                 'stream' => true,
             ]);
-            Log::Debug($response);
-            if ($response == "BUSY") {
+            if ($response->getBody()->getContents() == "BUSY") {
                 $this->release(10);
             }
             $response = $client->post("http://localhost:9000/", [
