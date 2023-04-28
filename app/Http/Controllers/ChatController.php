@@ -100,6 +100,7 @@ class ChatController extends Controller
             foreach ($listening as $history_id) {
                 $lengths[$history_id] = 0;
             }
+            Log::Debug($lengths);
             while (!empty($listening)) {
                 $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 foreach ($listening as $history_id) {
@@ -130,9 +131,7 @@ class ChatController extends Controller
                     }
                     if ($finished) {
                         Redis::del('msg' . $history_id);
-                        Log::Debug($lengths);
                         unset($lengths[$history_id]);
-                        Log::Debug($lengths);
                         unset($listening[$history_id]);
                         continue;
                     }
