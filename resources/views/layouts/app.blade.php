@@ -30,7 +30,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-hidden">
+            <main class="flex-1 overflow-y-scroll scrollbar">
                 {{ $slot }}
             </main>
         </div>
