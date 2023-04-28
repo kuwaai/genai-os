@@ -100,12 +100,11 @@ class ChatController extends Controller
             foreach ($listening as $history_id) {
                 $lengths[$history_id] = 0;
             }
-            Log::Debug($listening);
             while (!empty($listening)) {
                 $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 foreach ($listening as $history_id) {
                     $finished = false;
-                    if (array_search($history_id, $new_listening) < 0) {
+                    if (array_search($history_id, $new_listening) === false) {
                         $finished = true;
                         Log::Debug($history_id);
                     }
