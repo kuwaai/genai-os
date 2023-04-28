@@ -96,7 +96,6 @@ class ChatController extends Controller
             $start_time = time();
             $timeouts = 5;
             set_time_limit($timeouts);
-            Log::Debug($listening);
             foreach ($listening as $history_id) {
                 $lengths[$history_id] = 0;
             }
@@ -129,15 +128,11 @@ class ChatController extends Controller
                         }
                     }
                     if ($finished) {
-                        Log::Debug("deleting...");
-                        Log::Debug($listening);
                         unset($lengths[$history_id]);
                         $key = array_search($history_id, $listening);
                         if ($key !== false) {
                             unset($listening[$key]);
                         }
-                        Log::Debug($listening);
-                        Log::Debug("deleted");
                     }
                 }
                 usleep(100000);
