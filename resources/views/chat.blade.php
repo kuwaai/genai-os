@@ -80,7 +80,7 @@
                         </div>
                     @endif
                 </div>
-                <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
+                <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar" uwu="{{count(\Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))}}">
                     @if (request()->route('chat_id'))
                         @php
                             $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
