@@ -87,7 +87,7 @@
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                             $index = count($tasks)-1;
                         @endphp
-                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->get() as $history)
+                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby("id")->get() as $history)
                             @if ($index > -1 && $tasks[$index] == $history->id)
                                 @php
                                     if ($tasks[$index] == $history->id) $index -= 1;
