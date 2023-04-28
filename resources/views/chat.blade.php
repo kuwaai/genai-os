@@ -85,12 +85,12 @@
                         @php
                             $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                            $index = 0;
+                            $index = count($tasks)-1;
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->get() as $history)
-                            @if (count($tasks) > $index && $tasks[$index] == $history->id)
+                            @if ($index > -1 && $tasks[$index] == $history->id)
                                 @php
-                                    if ($tasks[$index] == $history->id) $index += 1;
+                                    if ($tasks[$index] == $history->id) $index -= 1;
                                 @endphp
                                 <div class="flex w-full mt-2 space-x-3">
                                     <div
@@ -105,7 +105,7 @@
                                     </div>
                                 </div>
                             @endif
-                            <div id="history_{{ $history->id }}" uwu="{{$index}}"
+                            <div id="history_{{ $history->id }}"
                                 class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
                                     <div
