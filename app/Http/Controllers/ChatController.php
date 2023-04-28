@@ -100,12 +100,14 @@ class ChatController extends Controller
             foreach ($listening as $history_id) {
                 $lengths[$history_id] = 0;
             }
+            Log::Debug($listening);
             while (!empty($listening)) {
                 $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 foreach ($listening as $history_id) {
                     $finished = false;
                     if (array_search($history_id, $new_listening) < 0) {
                         $finished = true;
+                        Log::Debug($history_id);
                     }
                     $result = Redis::get('msg' . $history_id);
                     # Validate and convert for the encoding of incoming message
