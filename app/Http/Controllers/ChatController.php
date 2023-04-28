@@ -139,6 +139,7 @@ class ChatController extends Controller
                 }
                 usleep(100000);
             }
+            Log::Debug("ended");
             echo "event: close\n\n";
             ob_flush();
             flush();
