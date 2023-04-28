@@ -12,9 +12,9 @@
                                 class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
                             @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
                                 <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                    <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                    <a class="flex menu-btn flex text-gray-700 dark:text-white overflow-y-auto scrollbar w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                         href="{{ route('archives', $chat->id) }}">
-                                        <p class="flex-1 text-center text-gray-700 dark:text-white">{{ $chat->name }}</p>
+                                        <p class="flex-1 text-center scrollbar overflow-y-auto">{{ $chat->name }}</p>
                                     </a>
                                 </div>
                                 @php
