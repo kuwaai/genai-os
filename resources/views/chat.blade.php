@@ -92,7 +92,7 @@
                                 @php
                                     if ($tasks[$index] == $history->id) $index += 1;
                                 @endphp
-                                <div class="flex w-full mt-2 space-x-3" uwu="{{$index}}">
+                                <div class="flex w-full mt-2 space-x-3">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                         <img src="{{ $botimgurl }}">
@@ -105,7 +105,7 @@
                                     </div>
                                 </div>
                             @endif
-                            <div id="history_{{ $history->id }}"
+                            <div id="history_{{ $history->id }}" uwu="{{$index}}"
                                 class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
                                     <div
