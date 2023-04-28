@@ -87,6 +87,9 @@
             <x-responsive-nav-link :href="route('chat')" :active="request()->routeIs('chat')">
                 {{ __('Chats') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('archive')" :active="request()->routeIs('archive')">
+                {{ __('Archives') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
