@@ -134,6 +134,7 @@ class ChatController extends Controller
                         Redis::del('msg' . $history_id);
                         unset($lengths[$history_id]);
                         unset($listening[$history_id]);
+                        break;
                     }
                 }
                 usleep(100000);
