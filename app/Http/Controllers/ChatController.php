@@ -100,14 +100,12 @@ class ChatController extends Controller
             foreach ($listening as $history_id) {
                 $lengths[$history_id] = 0;
             }
-            Log::Debug($lengths);
             while (!empty($listening)) {
                 $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 foreach ($listening as $history_id) {
                     $finished = false;
                     if (!in_array($history_id, $new_listening)) {
                         $finished = true;
-                        Log::Debug($history_id);
                     }
                     $result = Redis::get('msg' . $history_id);
                     # Validate and convert for the encoding of incoming message
@@ -131,16 +129,11 @@ class ChatController extends Controller
                         }
                     }
                     if ($finished) {
-                        Redis::del('msg' . $history_id);
-                        Log::Debug("deleted " . $history_id);
-                        Log::Debug($lengths);
-                        Log::Debug($listening);
                         unset($lengths[$history_id]);
-                        unset($listening[$history_id]);
-                        Log::Debug($lengths);
-                        Log::Debug($listening);
-                        Log::Debug("deleted " . $history_id);
-                        break;
+                        $key = array_search($history_id, $listening);
+                        if ($key !== false) {
+                            unset($listening[$key]);
+                        }
                     }
                 }
                 usleep(100000);
