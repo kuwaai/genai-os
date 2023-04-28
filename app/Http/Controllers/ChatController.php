@@ -106,8 +106,8 @@ class ChatController extends Controller
                     $finished = false;
 
                     Log::Debug("|||");
-                    Log::Debug("old " . $listening);
-                    Log::Debug("new " . $new_listening);
+                    Log::Debug($listening);
+                    Log::Debug($new_listening);
                     Log::Debug("|||");
 
                     if (array_search($history_id, $new_listening) === false) {
