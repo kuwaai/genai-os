@@ -93,7 +93,6 @@ class ChatController extends Controller
         $response = response()->stream(function () {
             $lengths = [];
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-            Log::Debug($listening);
             $start_time = time();
             $timeouts = 5;
             set_time_limit($timeouts);
@@ -105,7 +104,7 @@ class ChatController extends Controller
                 $new_listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 foreach ($listening as $history_id) {
                     $finished = false;
-                    if (!in_array($history_id, $new_listening)) {
+                    if (array_search($history_id, $new_listening) === false) {
                         $finished = true;
                     }
                     $result = Redis::get('msg' . $history_id);
