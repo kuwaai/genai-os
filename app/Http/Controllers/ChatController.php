@@ -93,6 +93,7 @@ class ChatController extends Controller
         $response = response()->stream(function () {
             $lengths = [];
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+            Log::Debug($listening);
             $start_time = time();
             $timeouts = 5;
             set_time_limit($timeouts);
