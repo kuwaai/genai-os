@@ -214,10 +214,11 @@
                         $('#task_' + number).text($('#task_' + number).text() + (msg ==
                             "" ? "\n" : msg))
                     });
-
-                    $("#chat_input").focus();
                 </script>
             @endif
+            <script>
+                $("#chat_input").focus();
+            </script>
         @endif
     </div>
 </x-app-layout>
