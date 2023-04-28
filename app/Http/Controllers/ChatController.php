@@ -132,6 +132,7 @@ class ChatController extends Controller
                     }
                     if ($finished) {
                         Redis::del('msg' . $history_id);
+                        Log::Debug("deleted" . $history_id);
                         unset($lengths[$history_id]);
                         unset($listening[$history_id]);
                         break;
