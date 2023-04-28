@@ -106,6 +106,7 @@ class ChatController extends Controller
                     $finished = false;
                     if (array_search($history_id, $new_listening) === false) {
                         $finished = true;
+                        Log::Debug(array_search($history_id, $new_listening) . " | " . $history_id);
                     }
                     $result = Redis::get('msg' . $history_id);
                     # Validate and convert for the encoding of incoming message
