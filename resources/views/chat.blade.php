@@ -135,7 +135,7 @@
                             <div class="flex">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
-                                <input type="text" placeholder="Enter your text here" name="input"
+                                <input type="text" placeholder="Enter your text here" name="input" id="chat_input"
                                     autocomplete="off"
                                     class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
                                 <button type="submit"
@@ -153,7 +153,7 @@
                             <div class="flex">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
-                                <input type="text" placeholder="Enter your text here" name="input"
+                                <input type="text" placeholder="Enter your text here" name="input" id="chat_input"
                                     autocomplete="off"
                                     class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
                                 <button type="submit"
@@ -214,6 +214,8 @@
                         $('#task_' + number).text($('#task_' + number).text() + (msg ==
                             "" ? "\n" : msg))
                     });
+
+                    $("#chat_input").focus();
                 </script>
             @endif
         @endif
