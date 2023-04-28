@@ -44,6 +44,7 @@ class ChatController extends Controller
             'host'   => '127.0.0.1',
             'port'   => 6379,
         ]);
+        Log::Debug($redis->ping());
         $redis->rpush('usertask_' . Auth::user()->id, $history->id);
         RequestChat::dispatch($history->id, $request->input('input'), $llm->API, Auth::user()->id);
         return Redirect::route('chats', $chat->id);
@@ -61,6 +62,7 @@ class ChatController extends Controller
             'host'   => '127.0.0.1',
             'port'   => 6379,
         ]);
+        Log::Debug($redis->ping());
         $redis->rpush('usertask_' . Auth::user()->id, $history->id);
         RequestChat::dispatch($history->id, $request->input('input'), $API, Auth::user()->id);
         return Redirect::route('chats', $chatId);
