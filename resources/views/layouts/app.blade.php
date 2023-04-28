@@ -30,7 +30,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-{{request()->route('dashboard') ? 'scroll' : 'hidden'}} scrollbar">
+            <main class="flex-1 overflow-y-{{request()->routeIs('dashboard') ? 'scroll' : 'hidden'}} scrollbar">
                 {{ $slot }}
             </main>
         </div>
