@@ -111,6 +111,7 @@ if not dummy:
         del inputs
         del outputs
         torch.cuda.empty_cache()
+        Ready[0] = True
         print("finished")
     # model part ends
 else:
