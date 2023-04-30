@@ -40,7 +40,7 @@ class ChatController extends Controller
         $history->save();
         $llm = LLMs::findOrFail($request->input('llm_id'));
         Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-        RequestChat::dispatch($history->id, $request->input('input'), $llm->API, Auth::user()->id);
+        RequestChat::dispatch($history->id, $request->input('input'), $llm->access_code, Auth::user()->id);
         return Redirect::route('chats', $chat->id);
     }
 
@@ -50,9 +50,9 @@ class ChatController extends Controller
         $history = new Histories();
         $history->fill(['msg' => $request->input('input'), 'chat_id' => $chatId, 'isbot' => false]);
         $history->save();
-        $API = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->API;
+        $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
         Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-        RequestChat::dispatch($history->id, $request->input('input'), $API, Auth::user()->id);
+        RequestChat::dispatch($history->id, $request->input('input'), $access_code, Auth::user()->id);
         return Redirect::route('chats', $chatId);
     }
 

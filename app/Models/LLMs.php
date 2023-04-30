@@ -9,5 +9,5 @@ class LLMs extends Model
 {
     use HasFactory;
     protected $table = 'llms';
-    protected $fillable = ['image', 'name', 'link', 'limit_per_day', "API", "order", 'enabled'];
+    protected $fillable = ['image', 'name', 'link', 'limit_per_day', "access_code", "order", 'enabled'];
 }

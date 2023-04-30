@@ -39,8 +39,9 @@ class RequestChat implements ShouldQueue
     {
         try {
             Redis::set('msg' . $this->history_id, '');
+            $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
             $client = new Client();
-            $response = $client->post('http://localhost:9000/status', [
+            $response = $client->post($agent_location . 'status', [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
                     'name' => 'Test',
@@ -52,7 +53,7 @@ class RequestChat implements ShouldQueue
                 $this->release(10);
             } else {
                 try {
-                    $response = $client->post('http://localhost:9000/', [
+                    $response = $client->post($agent_location, [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'form_params' => [
                             'input' => $this->input,

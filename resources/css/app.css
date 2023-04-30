@@ -3,23 +3,36 @@
 @tailwind utilities;
 
 @layer utilities {
-    .scrollbar::-webkit-scrollbar {
-      width: 10px;
-      height: 20px;
-    }
-  
-    .scrollbar::-webkit-scrollbar-track {
-      border-radius: 100vh;
-      background: gray;
-    }
-  
-    .scrollbar::-webkit-scrollbar-thumb {
-      background: #f6f7ed;
-      border-radius: 100vh;
-    }
-  
-    .scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #c0a0b9;
+  .scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 20px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    background: #cbcbcb;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: rgb(152, 152, 152);
+    border-radius: 100vh;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #c0a0b9;
+  }
+    @media (prefers-color-scheme: dark) {
+      .scrollbar::-webkit-scrollbar-track {
+        background: gray;
+      }
+    
+      .scrollbar::-webkit-scrollbar-thumb {
+        background: #f6f7ed;
+        border-radius: 100vh;
+      }
+    
+      .scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #c0a0b9;
+      }
     }
   }
   

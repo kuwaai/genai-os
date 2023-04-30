@@ -6,6 +6,47 @@
                     <section>
                         <header>
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                {{ __('System Settings') }}
+                            </h2>
+
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                {{ __('All the system settings here') }}
+                            </p>
+                        </header>
+                        <div class="max-w-xl">
+                            <form method="post" action="{{ route('System.update') }}" class="mt-6 space-y-6">
+                                @csrf
+                                @method('patch')
+
+                                <div>
+                                    <x-input-label for="agent_location" :value="__('Agent API Location')" />
+                                    <x-text-input id="agent_location" name="agent_location" type="text" class="mt-1 block w-full"
+                                        value="{{ \App\Models\SystemSetting::where('key', 'agent_location')->first()->value }}"
+                                        required autocomplete="no" />
+                                </div>
+
+                                <div class="flex items-center gap-4">
+                                    <x-primary-button>{{ __('Save') }}</x-primary-button>
+
+                                    @if (session('status') === 'agent_location-updated')
+                                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                                            class="text-sm text-gray-600 dark:text-green-400">{{ __('Saved.') }}</p>
+                                    @endif
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="py-2">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <section>
+                        <header>
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                                 {{ __('LLM Managements') }}
                             </h2>
 
@@ -29,7 +70,7 @@
                                 <input name="name">
                                 <input name="link">
                                 <input name="order">
-                                <input name="API">
+                                <input name="access_code">
                                 <input name="id">
                                 <input name="limit_per_day">
                             </form>
@@ -40,7 +81,7 @@
                                 <input name="name">
                                 <input name="link">
                                 <input name="order">
-                                <input name="API">
+                                <input name="access_code">
                                 <input name="limit_per_day">
                             </form>
                             <table class="whitespace-nowrap w-full">
@@ -64,7 +105,7 @@
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                                            API Endpoint
+                                            Access Code
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
@@ -76,7 +117,8 @@
                                     @foreach (App\Models\LLMs::orderby('order')->orderby('created_at')->get() as $LLM)
                                         <tr id="llm{{ $LLM->id }}">
                                             <td class="px-3 py-2 flex justify-center">
-                                                <img class="rounded-full border border-gray-400 dark:border-gray-900" width="40px" class="m-auto"
+                                                <img class="rounded-full border border-gray-400 dark:border-gray-900"
+                                                    width="40px" class="m-auto"
                                                     src="{{ asset(Storage::url($LLM->image)) }}" />
                                             </td>
                                             <td class="px-3 py-2">
@@ -89,7 +131,7 @@
                                                 <div class="text-sm font-medium">{{ $LLM->order }}</div>
                                             </td>
                                             <td class="px-3 py-2">
-                                                <div class="text-sm font-medium">{{ $LLM->API }}</div>
+                                                <div class="text-sm font-medium">{{ $LLM->access_code }}</div>
                                             </td>
                                             <td class="px-3 py-2">
                                                 <div class="flex items-center space-x-4">
@@ -108,8 +150,8 @@
                                                         onclick="SaveRow({{ $LLM->id }})">
                                                         <i class="fas fa-save"></i>
                                                     </button>
-                                                    <a class="{{ $LLM->enabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}} text-white font-bold py-3 px-4 rounded flex items-center justify-center"
-                                                    href="{{ route('toggle_LLM', $LLM->id) }}">
+                                                    <a class="{{ $LLM->enabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600' }} text-white font-bold py-3 px-4 rounded flex items-center justify-center"
+                                                        href="{{ route('toggle_LLM', $LLM->id) }}">
                                                         <i class="fas fa-power-off"></i>
                                                     </a>
                                                 </div>
@@ -158,7 +200,7 @@
                                             <div class="flex items-center">
                                                 <input
                                                     class="appearance-none border rounded w-full py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    id="new-API" type="text" placeholder="API Endpoint">
+                                                    id="new-access_code" type="text" placeholder="Access Code">
                                             </div>
                                         </td>
                                         <td class="px-3 py-2">
@@ -176,29 +218,30 @@
             </div>
         </div>
     </div>
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
-                <section>
-                    <header>
-                        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                            {{ __('Debug buttons') }}
-                        </h2>
 
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('Just a menu of buttons for debugging') }}
-                        </p>
-                    </header>
-                    <div
-                        class="mt-3 mx-auto flex">
-                        <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center" href="{{ route('reset_redis') }}">Reset<br>Redis<br>Caches</a>
-                    </div>
-                </section>
+    <div class="py-2">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <section>
+                        <header>
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                {{ __('Debug buttons') }}
+                            </h2>
+
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                {{ __('Just a menu of buttons for debugging, should be removed in future') }}
+                            </p>
+                        </header>
+                        <div class="mt-3 mx-auto flex">
+                            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
+                                href="{{ route('reset_redis') }}">Reset<br>Redis<br>Caches</a>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     </div>
-    </div>
-
     <script>
         function DeleteRow(id) {
             $("#del_LLM_by_ID input:eq(2)").val(id);
@@ -243,7 +286,9 @@
             row.find('td').each(function(index) {
                 const cell = $(this);
                 if (index == 0) {
-                    cell.html(`<img class="rounded-full border border-gray-400 dark:border-gray-900" width="40px" src="${cell.find("label").attr('old')}">`)
+                    cell.html(
+                        `<img class="rounded-full border border-gray-400 dark:border-gray-900" width="40px" src="${cell.find("label").attr('old')}">`
+                    )
                 } else if (index < 5) {
                     const value = cell.find("input").attr('old');
                     cell.html(`<div class="text-sm font-medium">${value}</div>`);

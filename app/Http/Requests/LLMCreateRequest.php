@@ -17,7 +17,7 @@ class LLMCreateRequest extends FormRequest
             'link' => ['string', 'max:1024', Rule::unique('llms')],
             'limit_per_day' => ['integer', 'digits_between:-1,1000000'],
             'order' => ['integer', 'digits_between:-1000000,1000000'],
-            'API' => ['string', 'max:1024', Rule::unique('llms')],
+            'access_code' => ['string', 'max:1024', Rule::unique('llms')],
         ];
     }
 }

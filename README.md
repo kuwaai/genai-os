@@ -4,6 +4,7 @@
 * Nodejs 18
 * PHP & PHP-FPM 8.1
 * Redis Server
+* Vite (Use `npm install -g vite`)
 ### Setup the web
 1. Clone this project by using `git clone`
 2. Copy environment configure file `cp .env.debug .env`

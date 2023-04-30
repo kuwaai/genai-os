@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\LLMController;
 use App\Http\Controllers\ArchiveController;
+use App\Http\Controllers\SystemController;
 use BeyondCode\LaravelSSE\Facades\SSE;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -37,6 +38,8 @@ Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
     Route::delete('/LLMs/delete', [LLMController::class, 'delete'])->name('delete_LLM_by_id');
     Route::post('/LLMs/create', [LLMController::class, 'create'])->name('create_new_LLM');
     Route::patch('/LLMs/update', [LLMController::class, 'update'])->name('update_LLM_by_id');
+
+    Route::patch('/System/update', [SystemController::class, 'update'])->name('System.update');
 });
 
 # User routes, required email verified
