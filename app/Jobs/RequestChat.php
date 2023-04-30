@@ -17,17 +17,17 @@ use Illuminate\Support\Facades\Log;
 class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $API, $msgtime, $history_id, $user_id, $chat_id;
+    private $input, $access_code, $msgtime, $history_id, $user_id, $chat_id;
     public $tries = 30; # 10 seconds pending for each, 300 seconds in total
     /**
      * Create a new job instance.
      */
-    public function __construct($history_id, $input, $API, $user_id)
+    public function __construct($history_id, $input, $access_code, $user_id)
     {
         $this->history_id = $history_id;
         $this->input = $input;
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
-        $this->API = $API;
+        $this->access_code = $access_code;
         $this->user_id = $user_id;
         $this->chat_id = Histories::findOrFail($history_id)->chat_id;
     }
@@ -44,7 +44,7 @@ class RequestChat implements ShouldQueue
             $response = $client->post($agent_location . 'status', [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
-                    'name' => 'Test',
+                    'name' => $this->access_code,
                     'userid' => $this->user_id,
                 ],
                 'stream' => true,
@@ -57,7 +57,7 @@ class RequestChat implements ShouldQueue
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'form_params' => [
                             'input' => $this->input,
-                            'name' => 'Test',
+                            'name' => $this->access_code,
                             'userid' => $this->user_id,
                         ],
                         'stream' => true,
