@@ -1,5 +1,5 @@
 # -#- coding: UTF-8 -*-
-import time, re, requests, sys
+import time, re, requests, sys, socket
 from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
 app = Flask(__name__)
@@ -8,13 +8,18 @@ app.register_blueprint(sse, url_prefix='/')
 # -- Configs --
 agent_endpoint = "http://localhost:9000/"
 LLM_name = "Test"
-public_ip = "localhost"
+# This is the IP that will be stored in Agent, 
+# Make sure the IP address here are accessible by Agent
+public_ip = "localhost" 
 ignore_agent = False
-port = 8002
+port = None # By choosing None, it'll assign an unused port
+dummy = True
 # -- Config ends --
 
+if port == None:
+    with socket.socket() as s:
+        port = s.bind(('', 0)) or s.getsockname()[1]
 
-dummy = True
 Ready = [True]
 if not dummy:
     # model part
