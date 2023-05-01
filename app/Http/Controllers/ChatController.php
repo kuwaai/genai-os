@@ -112,6 +112,7 @@ class ChatController extends Controller
                                 echo "event: close\n\n";
                                 ob_flush();
                                 flush();
+                                Log::Debug("Trying...");
                                 Redis::unsubscribe();
                                 throw new Exception("Exit");
                             }
