@@ -131,8 +131,17 @@ class ChatController extends Controller
                         }
                         $newData = mb_substr($msg, $lengths[$history_id], null, 'utf-8');
                         $length = mb_strlen($newData, 'utf-8');
-                        echo 'data: ' . $history_id . ',' . $newData . "___\n\n";
-                        
+                        for ($i = 0; $i < $length; $i++) {
+                            # Make sure the data is correctly encoded and output a character at a time
+                            $char = mb_substr($newData, $i, 1, 'utf-8');
+                            if (mb_check_encoding($char, 'utf-8')) {
+                                $lengths[$history_id] += 1;
+                                echo 'data: ' . $history_id . ',' . $char . "___\n\n";
+                                # Flush the buffer
+                                ob_flush();
+                                flush();
+                            }
+                        }
                     }
                 });
             }
