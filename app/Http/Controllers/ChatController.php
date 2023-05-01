@@ -113,18 +113,18 @@ class ChatController extends Controller
                         if ($key !== false) {
                             unset($listening[$key]);
                         }
-                        if (count($listening) == 0) {
-                            echo "event: close\n\n";
-                            ob_flush();
-                            flush();
-                            Redis::unsubscribe();
-                            $response->close();
-                        }
                     } elseif ($type == 'New') {
                         echo 'data: ' . $history_id . ',' . $msg . "\n\n";
                         # Flush the buffer
                         ob_flush();
                         flush();
+                    }
+                    if (count($listening) == 0) {
+                        echo "event: close\n\n";
+                        ob_flush();
+                        flush();
+                        Redis::unsubscribe();
+                        $response->close();
                     }
                 });
             }
