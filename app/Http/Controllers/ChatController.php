@@ -125,8 +125,8 @@ class ChatController extends Controller
                         if (mb_check_encoding($char, 'utf-8')) {
                             $lengths[$history_id] += 1;
                             echo 'data: ' . $history_id . ',' . $char . "\n\n";
-                            # each token should restore 30 seconds of timeout
-                            set_time_limit(time() - $start_time + 30 + count($listening));
+                            # each token should restore 5 seconds of timeout
+                            set_time_limit(time() - $start_time + 5 + 0.5 * count($listening));
                             #Flush the buffer
                             ob_flush();
                             flush();
@@ -139,8 +139,9 @@ class ChatController extends Controller
                             unset($listening[$key]);
                         }
                     }
-                    usleep(1000000); #For each Request, wait 1 second
+                    usleep(500000 / count($listening));
                 }
+                #For each Request, wait 0.5 second in total
             }
             echo "event: close\n\n";
             ob_flush();
