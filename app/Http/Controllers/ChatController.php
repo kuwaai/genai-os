@@ -96,16 +96,10 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        $response = new StreamedResponse();
-        $response->headers->set('Content-Type', 'text/event-stream');
-        $response->headers->set('Cache-Control', 'no-cache');
-        $response->headers->set('X-Accel-Buffering', 'no');
-        $response->headers->set('charset', 'utf-8');
-        $response->headers->set('Connection', 'close');
-        $response->setCallback(function () use($response) {
+        $response = response()->stream(function () {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
-                Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $response) {
+                Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening) {
                     [$type, $msg] = explode(' ', $message, 2);
                     $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                     if ($type == 'Ended') {
@@ -127,8 +121,12 @@ class ChatController extends Controller
                     }
                 });
             }
-            $response->close();
         });
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        $response->headers->set('charset', 'utf-8');
+        $response->headers->set('Connection', 'close');
 
         return $response;
     }
