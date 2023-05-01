@@ -102,7 +102,7 @@ class ChatController extends Controller
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-        $response->setCallback(function () {
+        $response->setCallback(function () use($response) {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
                 Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $response) {
