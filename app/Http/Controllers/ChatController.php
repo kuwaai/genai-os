@@ -148,6 +148,6 @@ class ChatController extends Controller
                 $redis->pubSubLoop();
             }
         });
-        return $response;
+        $response->send();
     }
 }
