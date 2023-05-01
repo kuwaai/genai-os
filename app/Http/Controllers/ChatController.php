@@ -34,7 +34,7 @@ class ChatController extends Controller
     public function create(ChatRequest $request): RedirectResponse
     {
         $input = $request->input('input');
-        if ($input){
+        if ($input) {
             $chat = new Chats();
             $chat->fill(['name' => $input, 'llm_id' => $request->input('llm_id'), 'user_id' => $request->user()->id]);
             $chat->save();
@@ -51,7 +51,7 @@ class ChatController extends Controller
     public function request(Request $request): RedirectResponse
     {
         $chatId = $request->input('chat_id');
-        if ($chatId){
+        if ($chatId) {
             $history = new Histories();
             $history->fill(['msg' => $request->input('input'), 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
@@ -102,32 +102,41 @@ class ChatController extends Controller
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-        $response->setCallback(function() {
+        $response->setCallback(function () {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             foreach ($listening as $history_id) {
                 $lengths[$history_id] = 0;
             }
-            Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths) {
-                list($type, $msg) = explode(" ", $message, 2);
-                $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                if ($type == "Ended"){
-                    unset($lengths[$history_id]);
-                    $key = array_search($history_id, $listening);
-                    if ($key !== false) {
-                        unset($listening[$key]);
+            if (count($listening) > 0) {
+                Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths) {
+                    [$type, $msg] = explode(' ', $message, 2);
+                    $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                    if ($type == 'Ended') {
+                        unset($lengths[$history_id]);
+                        $key = array_search($history_id, $listening);
+                        if ($key !== false) {
+                            unset($listening[$key]);
+                        }
+                        if (count($listening) == 0) {
+                            echo "event: close\n\n";
+                            ob_flush();
+                            flush();
+                            Redis::unsubscribe();
+                            $response->close();
+                        }
+                    } elseif ($type == 'New') {
+                        echo 'data: ' . $history_id . ',' . $msg . "\n\n";
+                        $encoding = mb_detect_encoding($msg, 'UTF-8, ISO-8859-1', true);
+                        if ($encoding !== 'UTF-8') {
+                            $msg = mb_convert_encoding($msg, 'UTF-8', $encoding);
+                        }
+                        $newData = mb_substr($msg, $lengths[$history_id], null, 'utf-8');
+                        $length = mb_strlen($newData, 'utf-8');
+                        echo 'data: ' . $history_id . ',' . $newData . "___\n\n";
+                        
                     }
-                    if (count($listening) == 0){
-                        echo "event: close\n\n";
-                        ob_flush();
-                        flush();
-                        Redis::unsubscribe();
-                        $response->close();
-                    }
-                }else if ($type == "New"){
-                    echo 'data: ' . $history_id . ',' . $msg . "___\n\n";
-
-                }
-            });
+                });
+            }
         });
 
         return $response;
