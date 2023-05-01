@@ -111,7 +111,7 @@ class ChatController extends Controller
                             echo "event: close\n\n";
                             ob_flush();
                             flush();
-                            Redis::unsubscribe();
+                            Redis::unsubscribe($listening);
                         }
                     } elseif ($type == 'New') {
                         echo 'data: ' . $history_id . ',' . $msg . "\n\n";
