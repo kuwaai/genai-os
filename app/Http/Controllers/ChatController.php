@@ -108,7 +108,7 @@ class ChatController extends Controller
                             if ($key !== false) {
                                 unset($listening[$key]);
                             }
-                            Log::Debug(len($listening));
+                            Log::Debug(count($listening));
                             if (count($listening) == 0) {
                                 Log::Debug("Trying...");
                                 Redis::unsubscribe();
