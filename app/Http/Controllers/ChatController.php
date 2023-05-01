@@ -100,7 +100,7 @@ class ChatController extends Controller
             $lengths[$history_id] = 0;
         }
         $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function() use ($listening, $lengths){
-            Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths) {
+            Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths, &$response) {
                 list($type, $msg) = explode(" ", $message, 2);
                 $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                 if ($type == "Ended"){
