@@ -114,6 +114,7 @@ class ChatController extends Controller
                         ob_flush();
                         flush();
                         Redis::unsubscribe();
+                        $response->close();
                     }
                 }else if ($type == "New"){
                     $encoding = mb_detect_encoding($msg, 'UTF-8, ISO-8859-1', true);
