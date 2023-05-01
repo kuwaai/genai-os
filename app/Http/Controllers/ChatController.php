@@ -99,7 +99,13 @@ class ChatController extends Controller
         $response = response()->stream(function () {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
-                Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening) {
+                $client = new Predis\Client([
+                    'scheme' => 'tcp',
+                    'host'   => '127.0.0.1',
+                    'port'   => 6379,
+                ]);
+
+                $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
                     [$type, $msg] = explode(' ', $message, 2);
                     $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                     if ($type == 'Ended') {
@@ -111,7 +117,7 @@ class ChatController extends Controller
                             echo "event: close\n\n";
                             ob_flush();
                             flush();
-                            Redis::unsubscribe($listening);
+                            $client->disconnect();
                         }
                     } elseif ($type == 'New') {
                         echo 'data: ' . $history_id . ',' . $msg . "\n\n";
