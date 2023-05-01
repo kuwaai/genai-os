@@ -108,6 +108,7 @@ class ChatController extends Controller
                     $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                        Log::Debug($type);
                         if ($type == 'Ended') {
                             $key = array_search($history_id, $listening);
                             if ($key !== false) {
@@ -129,8 +130,8 @@ class ChatController extends Controller
                 }catch (Exception $e){
 
                 }
+                Log::Debug("Test");
             }
-            Log::Debug("Test");
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
