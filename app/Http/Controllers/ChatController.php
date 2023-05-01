@@ -117,6 +117,7 @@ class ChatController extends Controller
                             echo "event: close\n\n";
                             ob_flush();
                             flush();
+                            $client->unsubscribe($listening);
                             $client->disconnect();
                         }
                     } elseif ($type == 'New') {
@@ -127,7 +128,6 @@ class ChatController extends Controller
                     }
                 });
             }
-            Debug::Log($listening);
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
