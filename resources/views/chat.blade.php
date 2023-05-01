@@ -211,8 +211,7 @@
                         const number = data.slice(0, commaIndex);
                         const msg = data.slice(commaIndex+1);
 
-                        $('#task_' + number).text($('#task_' + number).text() + (msg ==
-                            "" ? "\n" : msg))
+                        $('#task_' + number).text(msg);
                     });
                 </script>
             @endif

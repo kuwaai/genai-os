@@ -104,17 +104,11 @@ class ChatController extends Controller
         $response->headers->set('Connection', 'close');
         $response->setCallback(function () {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-            foreach ($listening as $history_id) {
-                $lengths[$history_id] = 0;
-            }
             if (count($listening) > 0) {
-                Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths) {
+                Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening) {
                     [$type, $msg] = explode(' ', $message, 2);
                     $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                    Log::Debug($type);
                     if ($type == 'Ended') {
-                        Log::Debug($history_id);
-                        unset($lengths[$history_id]);
                         $key = array_search($history_id, $listening);
                         if ($key !== false) {
                             unset($listening[$key]);
@@ -127,23 +121,10 @@ class ChatController extends Controller
                             $response->close();
                         }
                     } elseif ($type == 'New') {
-                        $encoding = mb_detect_encoding($msg, 'UTF-8, ISO-8859-1', true);
-                        if ($encoding !== 'UTF-8') {
-                            $msg = mb_convert_encoding($msg, 'UTF-8', $encoding);
-                        }
-                        $newData = mb_substr($msg, $lengths[$history_id], null, 'utf-8');
-                        $length = mb_strlen($newData, 'utf-8');
-                        for ($i = 0; $i < $length; $i++) {
-                            # Make sure the data is correctly encoded and output a character at a time
-                            $char = mb_substr($newData, $i, 1, 'utf-8');
-                            if (mb_check_encoding($char, 'utf-8')) {
-                                $lengths[$history_id] += 1;
-                                echo 'data: ' . $history_id . ',' . $char . "\n\n";
-                                # Flush the buffer
-                                ob_flush();
-                                flush();
-                            }
-                        }
+                        echo 'data: ' . $history_id . ',' . $msg . "\n\n";
+                        # Flush the buffer
+                        ob_flush();
+                        flush();
                     }
                 });
             }

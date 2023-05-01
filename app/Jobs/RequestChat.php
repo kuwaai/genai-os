@@ -90,6 +90,8 @@ class RequestChat implements ShouldQueue
                     }
                     if (trim($tmp) == '') {
                         Redis::publish($this->history_id, 'New [Oops, seems like LLM given empty message as output!]');
+                    }else{
+                        Redis::publish($this->history_id, "New " . trim($tmp));
                     }
                 } catch (Exception $e) {
                     Redis::publish($this->history_id, "New " . $tmp . "\n[Sorry, something is broken!]");
