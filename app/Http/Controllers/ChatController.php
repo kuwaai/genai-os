@@ -106,9 +106,9 @@ class ChatController extends Controller
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-        $response->setCallback(function() use ($listening, $lengths, $response) {
+        $response->setCallback(function() use ($listening, $lengths) {
             // subscribe to a Redis channel
-            Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths, $response) {
+            Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths) {
                 list($type, $msg) = explode(" ", $message, 2);
                 $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                 if ($type == "Ended"){
@@ -118,7 +118,7 @@ class ChatController extends Controller
                         unset($listening[$key]);
                     }
                     if (count($listening) == 0){
-                        $response->write("event: close\n\n");
+                        echo "event: close\n\n";
                         ob_flush();
                         flush();
                         Redis::unsubscribe();
@@ -136,7 +136,7 @@ class ChatController extends Controller
                         $char = mb_substr($newData, $i, 1, 'utf-8');
                         if (mb_check_encoding($char, 'utf-8')) {
                             $lengths[$history_id] += 1;
-                            $response->write('data: ' . $history_id . ',' . $char . "\n\n");
+                            echo 'data: ' . $history_id . ',' . $char . "\n\n";
                             # Flush the buffer
                             ob_flush();
                             flush();
