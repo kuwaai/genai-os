@@ -100,15 +100,11 @@ class ChatController extends Controller
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
                 try{
-                    $client = new Client([
-                        'scheme' => 'tcp',
-                        'host' => '127.0.0.1',
-                        'port' => 6379,
-                    ]);
+                    $client = new Client();
                     $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
-                        Log::Debug($message);
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                        Log::Debug($type);
                         if ($type == 'Ended') {
                             $key = array_search($history_id, $listening);
                             if ($key !== false) {
