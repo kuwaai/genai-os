@@ -129,13 +129,13 @@ class ChatController extends Controller
                         if ($encoding !== 'UTF-8') {
                             $msg = mb_convert_encoding($msg, 'UTF-8', $encoding);
                         }
-                        $newData = mb_substr($msg, $lengths[$history_id], null, 'utf-8');
+                        $newData = mb_substr($result, $lengths[$history_id], null, 'utf-8');
                         $length = mb_strlen($newData, 'utf-8');
-                        $lengths[$history_id] += $length;
                         for ($i = 0; $i < $length; $i++) {
                             # Make sure the data is correctly encoded and output a character at a time
                             $char = mb_substr($newData, $i, 1, 'utf-8');
                             if (mb_check_encoding($char, 'utf-8')) {
+                                $lengths[$history_id] += 1;
                                 echo 'data: ' . $history_id . ',' . $char . "\n\n";
                                 # Flush the buffer
                                 ob_flush();
