@@ -37,6 +37,7 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
+        $tmp = "";
         try {
             Redis::set('msg' . $this->history_id, '');
             $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;

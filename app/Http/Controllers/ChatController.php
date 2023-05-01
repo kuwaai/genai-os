@@ -121,7 +121,7 @@ class ChatController extends Controller
                             $lengths[$history_id] += 1;
                             echo 'data: ' . $history_id . ',' . $char . "\n\n";
                             # each token should restore 5 seconds of timeout
-                            set_time_limit(time() - $start_time + 5);
+                            set_time_limit(time() - $start_time + 5 + count($listening));
                             #Flush the buffer
                             ob_flush();
                             flush();
