@@ -121,13 +121,13 @@ class ChatController extends Controller
                     }
                 });
             }
+            Debug::Log($listening);
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-
         return $response;
     }
 }
