@@ -118,7 +118,6 @@ class ChatController extends Controller
                             ob_flush();
                             flush();
                             Redis::unsubscribe();
-                            $response->close();
                         }
                     } elseif ($type == 'New') {
                         echo 'data: ' . $history_id . ',' . $msg . "\n\n";
@@ -128,6 +127,7 @@ class ChatController extends Controller
                     }
                 });
             }
+            $response->close();
         });
 
         return $response;
