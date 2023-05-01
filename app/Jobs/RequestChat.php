@@ -39,7 +39,6 @@ class RequestChat implements ShouldQueue
     {
         $tmp = "";
         try {
-            Redis::set('msg' . $this->history_id, '');
             $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
             $client = new Client();
             $response = $client->post($agent_location . 'status', [
@@ -80,8 +79,8 @@ class RequestChat implements ShouldQueue
                         if ($messageLength !== null) {
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
-                                $tmp = Redis::get('msg' . $this->history_id) . $message;
-                                Redis::set('msg' . $this->history_id, $tmp);
+                                $tmp .= $message;
+                                Redis::publish($this->history_id, "New " . $tmp);
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
@@ -90,10 +89,10 @@ class RequestChat implements ShouldQueue
                         }
                     }
                     if (trim($tmp) == '') {
-                        Redis::set('msg' . $this->history_id, '[Oops, seems like LLM given empty message as output!]');
+                        Redis::publish($this->history_id, 'New [Oops, seems like LLM given empty message as output!]');
                     }
                 } catch (Exception $e) {
-                    Redis::set('msg' . $this->history_id, $tmp . "\n[Sorry, something is broken!]");
+                    Redis::publish($this->history_id, "New " . $tmp . "\n[Sorry, something is broken!]");
                 } finally {
                     $history = new Histories();
                     $history->fill(['msg' => trim($tmp), 'chat_id' => $this->chat_id, 'isbot' => true, 'created_at' => $this->msgtime]);
