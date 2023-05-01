@@ -134,7 +134,7 @@ class ChatController extends Controller
                             unset($listening[$key]);
                         }
                     }
-                    usleep(500000);
+                    usleep(1000000); #For each Request, wait 1 second
                 }
             }
             echo "event: close\n\n";
