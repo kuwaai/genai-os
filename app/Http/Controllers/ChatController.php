@@ -126,6 +126,7 @@ class ChatController extends Controller
 
                 }
             }
+            Log::Debug("Test");
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
