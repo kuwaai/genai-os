@@ -137,9 +137,6 @@ class ChatController extends Controller
                             if (mb_check_encoding($char, 'utf-8')) {
                                 $lengths[$history_id] += 1;
                                 echo 'data: ' . $history_id . ',' . $char . "\n\n";
-                                # Flush the buffer
-                                ob_flush();
-                                flush();
                             }
                         }
                     }
