@@ -96,7 +96,10 @@ class ChatController extends Controller
     public function SSE(Request $request)
     {
         $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-        $response = response()->stream(Redis::subscribe($listening, function ($message, $chat_id) use ($listening) {
+        foreach ($listening as $history_id) {
+            $lengths[$history_id] = 0;
+        }
+        $response = response()->stream(Redis::subscribe($listening, function ($message, $chat_id) use ($listening, $lengths) {
             list($type, $msg) = explode(" ", $message, 2);
             if ($type == "Ended"){
                 unset($lengths[$chat_id]);
