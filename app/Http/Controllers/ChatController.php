@@ -125,7 +125,6 @@ class ChatController extends Controller
                             $response->close();
                         }
                     } elseif ($type == 'New') {
-                        echo 'data: ' . $history_id . ',' . $msg . "\n\n";
                         $encoding = mb_detect_encoding($msg, 'UTF-8, ISO-8859-1', true);
                         if ($encoding !== 'UTF-8') {
                             $msg = mb_convert_encoding($msg, 'UTF-8', $encoding);
