@@ -118,7 +118,6 @@ class ChatController extends Controller
                                 ob_flush();
                                 flush();
                                 $client->unsubscribe();
-                                $client->disconnect();
                             }
                         } elseif ($type == 'New') {
                             echo 'data: ' . $history_id . ',' . $msg . "\n\n";
