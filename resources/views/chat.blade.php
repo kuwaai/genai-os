@@ -209,7 +209,7 @@
                         data = event.data;
                         const commaIndex = data.indexOf(",");
                         const number = data.slice(0, commaIndex);
-                        const msg = data.slice(commaIndex);
+                        const msg = data.slice(commaIndex+1);
 
                         $('#task_' + number).text($('#task_' + number).text() + (msg ==
                             "" ? "\n" : msg))
