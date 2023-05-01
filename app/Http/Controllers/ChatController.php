@@ -125,6 +125,7 @@ class ChatController extends Controller
                             $response->close();
                         }
                     } elseif ($type == 'New') {
+                        Log::Debug($msg);
                         $encoding = mb_detect_encoding($msg, 'UTF-8, ISO-8859-1', true);
                         if ($encoding !== 'UTF-8') {
                             $msg = mb_convert_encoding($msg, 'UTF-8', $encoding);
@@ -137,7 +138,6 @@ class ChatController extends Controller
                             if (mb_check_encoding($char, 'utf-8')) {
                                 $lengths[$history_id] += 1;
                                 echo 'data: ' . $history_id . ',' . $char . "___\n\n";
-                                Log::Debug($char);
                                 # Flush the buffer
                                 ob_flush();
                                 flush();
