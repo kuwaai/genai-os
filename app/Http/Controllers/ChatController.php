@@ -96,18 +96,17 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-        foreach ($listening as $history_id) {
-            $lengths[$history_id] = 0;
-        }
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-        $response->setCallback(function() use ($listening, $lengths) {
-            // subscribe to a Redis channel
+        $response->setCallback(function() {
+            $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+            foreach ($listening as $history_id) {
+                $lengths[$history_id] = 0;
+            }
             Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths) {
                 list($type, $msg) = explode(" ", $message, 2);
                 $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
@@ -136,7 +135,8 @@ class ChatController extends Controller
                         $char = mb_substr($newData, $i, 1, 'utf-8');
                         if (mb_check_encoding($char, 'utf-8')) {
                             $lengths[$history_id] += 1;
-                            echo 'data: ' . $history_id . ',' . $char . "\n\n";
+                            #echo 'data: ' . $history_id . ',' . $char . "\n\n";
+                            echo 'data: ' . $history_id . ',' . $lengths[$history_id] . " \n\n";
                             # Flush the buffer
                             ob_flush();
                             flush();
