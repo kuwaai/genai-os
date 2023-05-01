@@ -117,7 +117,6 @@ class ChatController extends Controller
                             echo "event: close\n\n";
                             ob_flush();
                             flush();
-                            $client->unsubscribe();
                             $client->disconnect();
                         }
                     } elseif ($type == 'New') {
