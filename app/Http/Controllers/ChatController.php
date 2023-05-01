@@ -99,7 +99,7 @@ class ChatController extends Controller
         foreach ($listening as $history_id) {
             $lengths[$history_id] = 0;
         }
-        $response = response()->stream(function(){
+        $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function(){
             Redis::subscribe($listening, function ($message, $raw_history_id) use ($listening, $lengths) {
                 list($type, $msg) = explode(" ", $message, 2);
                 $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
