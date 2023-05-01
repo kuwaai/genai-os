@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
@@ -100,10 +101,6 @@ class ChatController extends Controller
             $lengths[$history_id] = 0;
         }
         $response = new StreamedResponse();
-        $response = response()->stream(function() use ($listening, $lengths){
-            
-        });
-
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
