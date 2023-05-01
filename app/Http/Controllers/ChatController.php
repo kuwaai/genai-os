@@ -99,7 +99,7 @@ class ChatController extends Controller
         $response = response()->stream(function () {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
-                $client = new Predis\Client([
+                $client = new Client([
                     'scheme' => 'tcp',
                     'host'   => '127.0.0.1',
                     'port'   => 6379,
