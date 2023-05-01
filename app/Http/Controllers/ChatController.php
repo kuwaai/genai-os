@@ -110,11 +110,11 @@ class ChatController extends Controller
                             }
                             Log::Debug(len($listening));
                             if (count($listening) == 0) {
+                                Log::Debug("Trying...");
+                                Redis::unsubscribe();
                                 echo "event: close\n\n";
                                 ob_flush();
                                 flush();
-                                Log::Debug("Trying...");
-                                Redis::unsubscribe();
                                 throw new Exception("Exit");
                             }
                         } elseif ($type == 'New') {
