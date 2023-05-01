@@ -131,7 +131,6 @@ class ChatController extends Controller
                         }
                         $newData = mb_substr($msg, $lengths[$history_id], null, 'utf-8');
                         $length = mb_strlen($newData, 'utf-8');
-                        $lengths[$history_id] += $length;
                         for ($i = 0; $i < $length; $i++) {
                             # Make sure the data is correctly encoded and output a character at a time
                             $char = mb_substr($newData, $i, 1, 'utf-8');
