@@ -136,7 +136,7 @@ class ChatController extends Controller
                             $char = mb_substr($newData, $i, 1, 'utf-8');
                             if (mb_check_encoding($char, 'utf-8')) {
                                 $lengths[$history_id] += 1;
-                                Log::Debug($msg);
+                                Log::Debug($lengths[$history_id]);
                                 echo 'data: ' . $history_id . ',' . $char . "\n\n";
                                 # Flush the buffer
                                 ob_flush();
