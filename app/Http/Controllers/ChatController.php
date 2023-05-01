@@ -134,8 +134,8 @@ class ChatController extends Controller
                             unset($listening[$key]);
                         }
                     }
+                    usleep(500000);
                 }
-                usleep(100000);
             }
             echo "event: close\n\n";
             ob_flush();
