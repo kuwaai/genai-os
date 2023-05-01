@@ -97,6 +97,7 @@ class RequestChat implements ShouldQueue
                     $history = new Histories();
                     $history->fill(['msg' => trim($tmp), 'chat_id' => $this->chat_id, 'isbot' => true, 'created_at' => $this->msgtime]);
                     $history->save();
+                    Redis::publish($this->history_id, "Ended Ended");
                     Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                 }
             }
