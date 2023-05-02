@@ -118,6 +118,7 @@ class ChatController extends Controller
                             if ($key !== false) {
                                 unset($listening[$key]);
                             }
+                            Log::Debug($listening);
                             if (count($listening) == 0) {
                                 echo "event: close\n\n";
                                 ob_flush();
