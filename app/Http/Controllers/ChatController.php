@@ -96,43 +96,42 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        $response = response()->stream(function () {
+        $client = Redis::connection();
+        $response = response()->stream(function () use ($client) {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
-                try {
-                    $client = Redis::connection();
-                    $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
-                        [$type, $msg] = explode(' ', $message, 2);
-                        $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                        if ($type == 'Ended') {
-                            $key = array_search($history_id, $listening);
-                            if ($key !== false) {
-                                unset($listening[$key]);
-                            }
-                            if (count($listening) == 0) {
-                                echo "event: close\n\n";
-                                ob_flush();
-                                flush();
-                                $client->disconnect();
-                            }
-                        } elseif ($type == 'New') {
-                            echo 'data: ' . $history_id . ',' . $msg . "\n\n";
-                            # Flush the buffer
+                $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
+                    [$type, $msg] = explode(' ', $message, 2);
+                    $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                    if ($type == 'Ended') {
+                        $key = array_search($history_id, $listening);
+                        if ($key !== false) {
+                            unset($listening[$key]);
+                        }
+                        if (count($listening) == 0) {
+                            echo "event: close\n\n";
                             ob_flush();
                             flush();
+                            $client->disconnect();
                         }
-                    });
-                } catch (Exception $e) {
-                }
-                Log::Debug('Test');
+                    } elseif ($type == 'New') {
+                        echo 'data: ' . $history_id . ',' . $msg . "\n\n";
+                        # Flush the buffer
+                        ob_flush();
+                        flush();
+                    }
+                });
             }
-            Log::Debug('Test2');
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
+
+        $response->getOriginalContent()->on('close', function () use ($client) {
+            $client->disconnect();
+        });
         return $response;
     }
 }
