@@ -109,7 +109,7 @@ class ChatController extends Controller
                 $client = Redis::connection();
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
                     if (connection_aborted()) {
-                        exit();
+                        $client->close();
                     }else{
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
@@ -122,7 +122,7 @@ class ChatController extends Controller
                                 echo "event: close\n\n";
                                 ob_flush();
                                 flush();
-                                exit();
+                                $client->close();
                             }
                         } elseif ($type == 'New') {
                             echo 'data: ' . $history_id . ',' . $msg . "\n\n";
