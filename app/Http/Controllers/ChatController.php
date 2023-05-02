@@ -129,7 +129,7 @@ class ChatController extends Controller
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
 
-        $response->getOriginalContent()->on('close', function () use ($client) {
+        $response->callWhenSafe(function () use ($client) {
             $client->disconnect();
         });
         return $response;
