@@ -107,6 +107,7 @@ class ChatController extends Controller
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
                 $client = Redis::connection();
+                try {
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
                     if (connection_aborted()) {
                         $client->close();
@@ -132,6 +133,9 @@ class ChatController extends Controller
                         }
                     }
                 });
+            } catch (RedisException $e) {
+                echo "Caught!";
+            }
             }
             Log::Debug("Finished!");
         });
