@@ -96,11 +96,19 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        $client = Redis::connection();
-        $response = response()->stream(function () use ($client) {
+        $response = response()->stream(function () {
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
-                $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
+                $client->subscribe($listening, function ($message, $raw_history_id) use ($listening) {
+                    $client = Redis::connection();
+                    $this->send();
+                    while (ob_get_level() > 0) {
+                        ob_end_flush();
+                    }
+                    if (connection_aborted()) {
+                        $client->disconnect();
+                    }
+
                     [$type, $msg] = explode(' ', $message, 2);
                     $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                     if ($type == 'Ended') {
@@ -128,10 +136,6 @@ class ChatController extends Controller
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-
-        $response->callWhenSafe(function () use ($client) {
-            $client->disconnect();
-        });
         return $response;
     }
 }
