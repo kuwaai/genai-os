@@ -104,7 +104,8 @@ class ChatController extends Controller
         $response->headers->set('Connection', 'close');
 
         $response->setCallback(function () use ($response) {
-            $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+            try{
+                $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
                 $client = Redis::connection();
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
@@ -132,6 +133,9 @@ class ChatController extends Controller
                         flush();
                     }
                 });
+            }
+            }catch (Exception $e){
+                Log::Debug("Force stopped SSE: " . $e->getMessage());
             }
         });
 
