@@ -110,10 +110,15 @@ class ChatController extends Controller
                             if ($key !== false) {
                                 unset($listening[$key]);
                             }
+                            Log::Debug("type correct");
+                            Log::Debug(count($listening));
+                            Log::Debug($listening);
                             if (count($listening) == 0) {
+                                Log::Debug("count correct");
                                 echo "event: close\n\n";
                                 ob_flush();
                                 flush();
+                                Log::Debug($type);
                                 $client->unsubscribe();
                                 $client->disconnect();
                             }
