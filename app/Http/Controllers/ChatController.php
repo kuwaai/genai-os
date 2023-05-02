@@ -113,11 +113,9 @@ class ChatController extends Controller
                                 echo "event: close\n\n";
                                 ob_flush();
                                 flush();
-                                Log::Debug("Hello");
-                                $client->unsubscribe();
-                                Log::Debug("unsub");
-                                $client->disconnect();
                                 Log::Debug("disconn");
+                                $client->disconnect();
+                                Log::Debug("disconn done");
                             }
                         } elseif ($type == 'New') {
                             echo 'data: ' . $history_id . ',' . $msg . "\n\n";
