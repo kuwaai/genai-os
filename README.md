@@ -12,9 +12,30 @@
 4. Go under the folder `cd executables/sh`
 5. Run the script `./install.sh`, this should install most of things you needed.
 6. Then run the following commands here to start the web service
+For 0.0.3, please use:
+```shell
+screen -dmS web bash -c "./startWeb_Public.sh" #This is the web process
+screen -dmS agent bash -c "python3 ~/LLMs/0.0.3/agent.py" # This agent is required
+
+#Below is your LLM API and workers, remember for each API, you should open a worker for it
+
+screen -dmS workerForBloom bash -c "cd /var/www/html/LLM_Project/executables/sh/ && ./work.sh"
+screen -dmS bloom1b1zh bash -c "python3 ~/LLMs/0.0.3/Bloom_1b1-zh.py"
+
+screen -dmS workerForDolly bash -c "cd /var/www/html/LLM_Project/executables/sh/ && ./work.sh"
+screen -dmS dolly bash -c "python3 ~/LLMs/0.0.3/Dolly.py"
+
+screen -dmS workerForLLaMA bash -c "cd /var/www/html/LLM_Project/executables/sh/ && ./work.sh"
+screen -dmS llama bash -c "python3 ~/LLMs/0.0.3/LLaMA_TW1.py"
+```
+For 0.0.2, please use:
 ```shell
 screen -dmS worker bash -c "./work.sh"
 screen -dmS web bash -c "./startWeb_Public.sh"
+
+screen -dmS bloom1b1zh bash -c "python3 ~/LLMs/0.0.2/Bloom_1b1-zh.py"
+screen -dmS dolly bash -c "python3 ~/LLMs/0.0.2/Dolly.py"
+screen -dmS llama bash -c "python3 ~/LLMs/0.0.2/LLaMA_TW1.py"
 ```
 ### Setup Redis worker
 7. Use another tty session or use `screen`, then execute `./work.sh` so you can start a fresh Redis worker
