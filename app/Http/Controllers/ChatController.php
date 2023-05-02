@@ -114,7 +114,7 @@ class ChatController extends Controller
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                         if ($type == 'Ended') {
-                            Log::Debug($key);
+                            Log::Debug($history_id);
                             $key = array_search($history_id, $listening);
                             if ($key !== false) {
                                 unset($listening[$key]);
