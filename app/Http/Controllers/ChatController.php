@@ -104,23 +104,20 @@ class ChatController extends Controller
                     $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                        Log::Debug($type);
                         if ($type == 'Ended') {
                             $key = array_search($history_id, $listening);
                             if ($key !== false) {
                                 unset($listening[$key]);
                             }
-                            Log::Debug("type correct");
-                            Log::Debug(count($listening));
-                            Log::Debug($listening);
                             if (count($listening) == 0) {
-                                Log::Debug("count correct");
                                 echo "event: close\n\n";
                                 ob_flush();
                                 flush();
-                                Log::Debug($type);
+                                Log::Debug("Hello");
                                 $client->unsubscribe();
+                                Log::Debug("unsub");
                                 $client->disconnect();
+                                Log::Debug("disconn");
                             }
                         } elseif ($type == 'New') {
                             echo 'data: ' . $history_id . ',' . $msg . "\n\n";
@@ -133,6 +130,7 @@ class ChatController extends Controller
                 }
                 Log::Debug('Test');
             }
+            Log::Debug('Test2');
         });
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
