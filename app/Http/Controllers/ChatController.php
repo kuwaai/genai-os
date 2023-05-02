@@ -110,7 +110,6 @@ class ChatController extends Controller
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
                     if (connection_aborted()) {
                         $client->disconnect();
-                        $response->close();
                     }else{
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
@@ -124,7 +123,6 @@ class ChatController extends Controller
                                 ob_flush();
                                 flush();
                                 $client->disconnect();
-                                $response->close();
                             }
                         } elseif ($type == 'New') {
                             echo 'data: ' . $history_id . ',' . $msg . "\n\n";
