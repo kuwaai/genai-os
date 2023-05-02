@@ -37,6 +37,12 @@ screen -dmS bloom1b1zh bash -c "python3 ~/LLMs/0.0.2/Bloom_1b1-zh.py"
 screen -dmS dolly bash -c "python3 ~/LLMs/0.0.2/Dolly.py"
 screen -dmS llama bash -c "python3 ~/LLMs/0.0.2/LLaMA_TW1.py"
 ```
+### For production
+Nginx is recommanded, Since that is the only tested one,
+The configure file is provided under the repo and named `nginx_config`.
+Remember to use PHP-FPM, for the web I hosted in TWCC,
+I have configured it to use maximum of 2048 child processes.
+
 ### Setup Redis worker
 7. Use another tty session or use `screen`, then execute `./work.sh` so you can start a fresh Redis worker
 8. Now you need LLM API, I included some examples inside the folder `LLMs`, the code can be modified to use other LLMs(`LLaMA_TW1.py` require the trained model from 塗子謙)
