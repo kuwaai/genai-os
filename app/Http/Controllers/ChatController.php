@@ -105,7 +105,7 @@ class ChatController extends Controller
                         'host' => '127.0.0.1',
                         'port' => 6379,
                     ]);
-                    $client->subscribe("", function ($message, $raw_history_id) use ($listening, $client) {
+                    $client->subscribe($listening, function ($a) use ($listening, $client) {
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                         Log::Debug($type);
