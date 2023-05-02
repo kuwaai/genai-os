@@ -105,6 +105,9 @@ class ChatController extends Controller
                         'host' => '127.0.0.1',
                         'port' => 6379,
                     ]);
+                    $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client) {
+
+                    });
                 } catch (Exception $e) {
                 }
                 Log::Debug('Test');
