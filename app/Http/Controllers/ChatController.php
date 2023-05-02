@@ -107,10 +107,10 @@ class ChatController extends Controller
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
                 $client = Redis::connection();
-                try {
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
                     if (connection_aborted()) {
-                        $client->close();
+                        $client->disconnect();
+                        $response->close();
                     }else{
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
@@ -123,7 +123,8 @@ class ChatController extends Controller
                                 echo "event: close\n\n";
                                 ob_flush();
                                 flush();
-                                $client->close();
+                                $client->disconnect();
+                                $response->close();
                             }
                         } elseif ($type == 'New') {
                             echo 'data: ' . $history_id . ',' . $msg . "\n\n";
@@ -133,9 +134,6 @@ class ChatController extends Controller
                         }
                     }
                 });
-            } catch (RedisException $e) {
-                echo "Caught!";
-            }
             }
             Log::Debug("Finished!");
         });
