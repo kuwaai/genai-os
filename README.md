@@ -1,4 +1,4 @@
-# TAIDE Chat 1.0.2
+# TAIDE Chat 0.0.3
 ### Basic Software Requirements
 * PostgreSQL 14
 * Nodejs 18
@@ -23,10 +23,10 @@ screen -dmS web bash -c "./startWeb_Public.sh"
 10. Wait until it's done, you can use `screen -rx bloom` to attach the terminal, and use `Ctrl+A` then `D` to detach
 11. Then you're all done, the service should work if nothing went wrong!
 ### How it works
-For 1.0.2, This is how it works
+For 0.0.3, This is how it works
 
-![arch_1.0.2](demo/arch_1.0.2.png?raw=true "Architecture for 1.0.2")
+![arch_0.0.3](demo/arch_0.0.3.png?raw=true "Architecture for 0.0.3")
 
-For 1.0.3 (Still resolving bugs, So it's not yet released, But main branch are the codes), This is how it works
+For 0.0.2, This is how it works
 
-![arch_1.0.3](demo/arch_1.0.3.png?raw=true "Architecture for 1.0.3")
+![arch_0.0.2](demo/arch_0.0.2.png?raw=true "Architecture for 0.0.2")

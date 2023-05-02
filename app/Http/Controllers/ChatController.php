@@ -104,15 +104,13 @@ class ChatController extends Controller
         $response->headers->set('Connection', 'close');
 
         $response->setCallback(function () use ($response) {
-            global $listening;
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
                 $client = Redis::connection();
-                $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
+                $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
                     if (connection_aborted()) {
                         $client->disconnect();
                     }else{
-                        global $listening;
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                         if ($type == 'Ended') {
