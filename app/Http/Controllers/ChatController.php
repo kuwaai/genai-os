@@ -108,9 +108,6 @@ class ChatController extends Controller
             if (count($listening) > 0) {
                 $client = Redis::connection();
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
-                    while (ob_get_level() > 0) {
-                        ob_end_flush();
-                    }
                     if (connection_aborted()) {
                         $client->disconnect();
                     }
