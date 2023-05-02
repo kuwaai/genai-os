@@ -104,38 +104,38 @@ class ChatController extends Controller
         $response->headers->set('Connection', 'close');
 
         $response->setCallback(function () use ($response) {
-            try{
-                $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+            $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {
                 $client = Redis::connection();
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($listening, $client, $response) {
-                    if (connection_aborted()) {
-                        $client->disconnect();
-                    }
-
-                    [$type, $msg] = explode(' ', $message, 2);
-                    $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                    if ($type == 'Ended') {
-                        $key = array_search($history_id, $listening);
-                        if ($key !== false) {
-                            unset($listening[$key]);
-                        }
-                        if (count($listening) == 0) {
-                            echo "event: close\n\n";
-                            ob_flush();
-                            flush();
+                    try {
+                        if (connection_aborted()) {
                             $client->disconnect();
                         }
-                    } elseif ($type == 'New') {
-                        echo 'data: ' . $history_id . ',' . $msg . "\n\n";
-                        # Flush the buffer
-                        ob_flush();
-                        flush();
+
+                        [$type, $msg] = explode(' ', $message, 2);
+                        $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                        if ($type == 'Ended') {
+                            $key = array_search($history_id, $listening);
+                            if ($key !== false) {
+                                unset($listening[$key]);
+                            }
+                            if (count($listening) == 0) {
+                                echo "event: close\n\n";
+                                ob_flush();
+                                flush();
+                                $client->disconnect();
+                            }
+                        } elseif ($type == 'New') {
+                            echo 'data: ' . $history_id . ',' . $msg . "\n\n";
+                            # Flush the buffer
+                            ob_flush();
+                            flush();
+                        }
+                    } catch (Exception $e) {
+                        Log::Debug('Force stopped SSE: ' . $e->getMessage());
                     }
                 });
-            }
-            }catch (Exception $e){
-                Log::Debug("Force stopped SSE: " . $e->getMessage());
             }
         });
 
