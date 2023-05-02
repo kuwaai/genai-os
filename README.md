@@ -12,6 +12,7 @@
 4. Go under the folder `cd executables/sh`
 5. Run the script `./install.sh`, this should install most of things you needed.
 6. Then run the following commands here to start the web service
+
 For 0.0.3, please use:
 ```shell
 screen -dmS web bash -c "./startWeb_Public.sh" #This is the web process
