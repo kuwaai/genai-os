@@ -25,7 +25,7 @@ use App\Models\Chats;
 Route::get('/', function () {
     return view('welcome');
 })->name('/');
-Route::get('/chats/stream', [ChatController::class, 'SSE'])->name('chat_sse');
+Route::get('/chats/stream', [ChatController::class, 'SSE'])->middleware('suppress_errors')->name('chat_sse');
 
 # Admin routes, require admin permission
 Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
