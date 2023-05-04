@@ -45,7 +45,7 @@ class RequestChat implements ShouldQueue
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
                     'name' => $this->access_code,
-                    'userid' => $this->user_id,
+                    'history_id' => $this->history_id,
                 ],
                 'stream' => true,
             ]);
@@ -58,7 +58,7 @@ class RequestChat implements ShouldQueue
                         'form_params' => [
                             'input' => $this->input,
                             'name' => $this->access_code,
-                            'userid' => $this->user_id,
+                            'history_id' => $this->history_id,
                         ],
                         'stream' => true,
                     ]);

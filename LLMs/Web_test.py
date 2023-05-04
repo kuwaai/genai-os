@@ -2,11 +2,11 @@ import requests, time
 from bs4 import BeautifulSoup
 # Configs
 url = "https://chat.gai.tw/"
-Test_LLM_index = 1
+Test_LLM_index = 0
 Test_Message = "Introduce yourself"
-Test_count = 5
+Test_count = 25
 Test_wait_time = 1.5
-Remove_After_Testing = False
+Remove_After_Testing = True
 # End of configs
 
 session = requests.Session()
@@ -91,7 +91,10 @@ if response.status_code == 200:
                 print("User input lengths", user_len)
                 print("LLM output lengths", llm_len)
                 
-                print("Feedback speed", llm_len / result_time, "chars/second")
+                print("\n\nAverage output length", llm_len / Test_count, "chars/request")
+                print("Average response speed", result_time / Test_count, "seconds/request")
+                print("Output speed", llm_len / result_time, "chars/second")
+                
                 if Remove_After_Testing:
                     delete_chat_data = {
                         "_token": csrf,

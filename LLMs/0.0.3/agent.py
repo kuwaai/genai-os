@@ -11,14 +11,14 @@ data = {}
 @app.route("/", methods=["POST"])
 def api():
     # Forward SSE stream to the READY state LLM API, If no exist then return empty message
-    # Parameters: name, input, userid
-    llm_name, inputs, userid = request.form.get("name"), request.form.get("input"), request.form.get("userid")
+    # Parameters: name, input, history_id
+    llm_name, inputs, history_id = request.form.get("name"), request.form.get("input"), request.form.get("history_id")
     if data.get(llm_name):
-        dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == userid]
+        dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == history_id]
         if len(dest) > 0:
             dest = dest[0]
             try:
-                response = requests.post(dest[0], data={"input": inputs, "name":llm_name, "userid":userid}, stream=True)
+                response = requests.post(dest[0], data={"input": inputs, "name":llm_name, "history_id":history_id}, stream=True)
                 def event_stream(dest, response):
                     dest[1] = "BUSY"
                     try:
@@ -39,12 +39,12 @@ def api():
 @app.route("/status", methods=["POST"])
 def status():
     # This will check if any LLM that is READY, then return "READY", if every is busy, return "BUSY"
-    # Parameters: name, userid
-    llm_name, userid = request.form.get("name"), request.form.get("userid")
+    # Parameters: name, history_id
+    llm_name, history_id = request.form.get("name"), request.form.get("history_id")
     if data.get(llm_name):
         for i in data[llm_name]:
             if i[1] == "READY" and i[2] == -1:
-                i[2] = userid
+                i[2] = history_id
                 return "READY"
     return "BUSY"
    
