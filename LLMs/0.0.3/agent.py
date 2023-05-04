@@ -75,5 +75,17 @@ def debug():
     # This route is for debugging
     return data
     
+@app.route("/reset", methods=["GET"])
+def reset():
+    # Reset specific status
+    llm_name, history_id = request.form.get("name"), request.form.get("history_id")
+    if data.get(llm_name):
+        dest = [i for i in data[llm_name] if i[2] == history_id]
+        if len(dest) > 0:
+            dest = dest[0]
+            dest[2] = -1
+            dest[1] = "READY"
+    return "Success"
+    
 if __name__ == '__main__':
     app.run(port=9000, host="0.0.0.0", debug=True)
