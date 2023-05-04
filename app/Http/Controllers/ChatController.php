@@ -116,12 +116,10 @@ class ChatController extends Controller
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                         if ($type == 'Ended') {
-                            Log::Debug($history_id);
                             $key = array_search($history_id, $listening);
                             if ($key !== false) {
                                 unset($listening[$key]);
                             }
-                            Log::Debug($listening);
                             if (count($listening) == 0) {
                                 echo "event: close\n\n";
                                 ob_flush();
@@ -130,14 +128,12 @@ class ChatController extends Controller
                             }
                         } elseif ($type == 'New') {
                             echo 'data: ' . $history_id . ',' . $msg . "\n\n";
-                            # Flush the buffer
                             ob_flush();
                             flush();
                         }
                     }
                 });
             }
-            Log::Debug("Finished!");
         });
 
         return $response;
