@@ -207,10 +207,10 @@
                     });
                     task.addEventListener('message', event => {
                         data = event.data;
+                        console.log(data);
                         const commaIndex = data.indexOf(",");
                         const number = data.slice(0, commaIndex);
                         const msg = data.slice(commaIndex+1);
-                        console.log(msg);
                         $('#task_' + number).text(msg);
                     });
                 </script>
