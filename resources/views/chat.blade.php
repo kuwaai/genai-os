@@ -206,7 +206,7 @@
                         task.close();
                     });
                     task.addEventListener('message', event => {
-                        data = event.data;
+                        data = event.data.replace(/\[NEWLINEPLACEHOLDERUWU\]/g, "\n");
                         console.log(data);
                         const commaIndex = data.indexOf(",");
                         const number = data.slice(0, commaIndex);

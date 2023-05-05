@@ -128,7 +128,7 @@ class ChatController extends Controller
                                 $client->disconnect();
                             }
                         } elseif ($type == 'New') {
-                            echo 'data: ' . $history_id . ',' . str_replace("\n", "\r", $msg) . "\n\n";
+                            echo 'data: ' . $history_id . ',' . str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $msg) . "\n\n";
                             ob_flush();
                             flush();
                         }
