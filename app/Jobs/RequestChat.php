@@ -19,7 +19,7 @@ class RequestChat implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     private $input, $access_code, $msgtime, $history_id, $user_id, $chat_id;
     public $tries = -1;
-    public $timeout = null;
+    public $timeout = -1;
     /**
      * Create a new job instance.
      */
