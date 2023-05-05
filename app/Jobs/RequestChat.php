@@ -18,7 +18,8 @@ class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     private $input, $access_code, $msgtime, $history_id, $user_id, $chat_id;
-    public $tries = 30; # 10 seconds pending for each, 300 seconds in total
+    public $tries = -1;
+    public $timeout = null;
     /**
      * Create a new job instance.
      */
