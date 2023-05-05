@@ -51,13 +51,14 @@ class ChatController extends Controller
     public function request(Request $request): RedirectResponse
     {
         $chatId = $request->input('chat_id');
-        if ($chatId) {
+        $input = $request->input('input');
+        if ($chatId && $input) {
             $history = new Histories();
-            $history->fill(['msg' => $request->input('input'), 'chat_id' => $chatId, 'isbot' => false]);
+            $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
             $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($history->id, $request->input('input'), $access_code, Auth::user()->id);
+            RequestChat::dispatch($history->id, $input, $access_code, Auth::user()->id);
         }
         return Redirect::route('chats', $chatId);
     }
