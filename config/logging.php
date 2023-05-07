@@ -119,6 +119,9 @@ return [
         ],
 
         'analyze' => [
+            'driver' => 'stack',
+            'channels' => ['single'],
+            'ignore_exceptions' => false,
             'path' => storage_path('logs/analyze.log'),
         ]
     ],
