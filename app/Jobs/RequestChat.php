@@ -39,6 +39,7 @@ class RequestChat implements ShouldQueue
     public function handle(): void
     {
         Log::channel("analyze")->Debug("startJob " . $this->history_id);
+        $start = microtime(true); 
         $tmp = '';
         try {
             $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
@@ -107,7 +108,9 @@ class RequestChat implements ShouldQueue
                     }
                     Redis::publish($this->history_id, 'Ended Ended');
                     Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
-                    Log::channel("analyze")->Debug("finishJob " . $this->history_id);
+                    $end = microtime(true); // Record end time
+                    $elapsed = $end - $start; // Calculate elapsed time
+                    Log::channel("analyze")->Debug("finishJob " . $this->history_id . " took " . $elapsed . " generated " . strlen(trim($tmp)));
                 }
             }
         } catch (Exception $e) {
