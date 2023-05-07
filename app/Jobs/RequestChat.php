@@ -38,7 +38,7 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::channel("analyze")->Debug("startJob " . $this->history_id . " input " . trim($this->input) . " length " . strlen(trim($this->input)));
+        Log::channel("analyze")->Debug("userID" . $this->user_id . "historyID " . $this->history_id . " input " . trim($this->input) . " length " . strlen(trim($this->input)));
         $start = microtime(true); 
         $tmp = '';
         try {
@@ -110,7 +110,7 @@ class RequestChat implements ShouldQueue
                     Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    Log::channel("analyze")->Debug("finishJob " . $this->history_id . " output " . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)) . " took " . $elapsed . " generated " . strlen(trim($tmp)));
+                    Log::channel("analyze")->Debug("userID" . $this->user_id . "historyID " . $this->history_id . " output " . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)) . " took " . $elapsed . " generated " . strlen(trim($tmp)));
                 }
             }
         } catch (Exception $e) {
