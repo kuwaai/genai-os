@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 url = "https://chat.gai.tw/"
 Test_LLM_index = 0
 Test_Message = "Introduce yourself"
-Test_count = 300
+Test_count = 10
 Test_wait_time = 1.5
 Remove_After_Testing = True
 # End of configs
