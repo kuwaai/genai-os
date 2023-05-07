@@ -119,10 +119,9 @@ return [
         ],
 
         'analyze' => [
-            'driver' => 'stack',
-            'channels' => ['single'],
-            'ignore_exceptions' => false,
+            'driver' => 'custom',
             'path' => storage_path('logs/analyze.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
         ]
     ],
 
