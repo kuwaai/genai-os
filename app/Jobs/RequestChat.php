@@ -6,13 +6,14 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Queueable;
 use App\Events\RequestStatus;
 use App\Models\Histories;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class RequestChat implements ShouldQueue
 {
@@ -38,7 +39,7 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::channel("analyze")->Debug("accessCode " . $this->access_code . " userID " . $this->user_id . " historyID " . $this->history_id . " input " . trim($this->input) . " length " . strlen(trim($this->input)) . " requestTime " . $this->msgtime);
+        Log::channel("analyze")->Debug("accessCode " . $this->access_code . " userID " . $this->user_id . " historyID " . $this->history_id . " input " . trim($this->input) . " length " . strlen(trim($this->input)) . " totalWait " . $this->msgtime->diffInSeconds(Carbon::now()));
         $start = microtime(true); 
         $tmp = '';
         try {
@@ -110,7 +111,7 @@ class RequestChat implements ShouldQueue
                     Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    Log::channel("analyze")->Debug("accessCode " . $this->access_code . " userID " . $this->user_id . " historyID " . $this->history_id . " output " . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)) . " took " . $elapsed . " generated " . strlen(trim($tmp)) . " requestTime " . $this->msgtime);
+                    Log::channel("analyze")->Debug("accessCode " . $this->access_code . " userID " . $this->user_id . " historyID " . $this->history_id . " output " . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)) . " took " . $elapsed . " generated " . strlen(trim($tmp)) . " requestTime " . $this->msgtime  . " totalWait " . $this->msgtime->diffInSeconds(Carbon::now()));
                 }
             }
         } catch (Exception $e) {
