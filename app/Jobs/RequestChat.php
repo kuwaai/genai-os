@@ -38,7 +38,7 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::channel("analyze")->Debug("startJob " . $this->history_id);
+        Log::channel("analyze")->Debug("startJob " . $this->history_id . " input " . trim($this->input) . " length " . strlen(trim($this->input)));
         $start = microtime(true); 
         $tmp = '';
         try {
