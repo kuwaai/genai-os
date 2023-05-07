@@ -38,6 +38,7 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
+        Log::channel("analyze")->Debug("startJob " . $this->history_id);
         $tmp = '';
         try {
             $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
@@ -96,6 +97,7 @@ class RequestChat implements ShouldQueue
                     }
                 } catch (Exception $e) {
                     Redis::publish($this->history_id, 'New ' . $tmp . "\n[Sorry, something is broken!]");
+                    Log::channel("analyze")->Debug("failJob " . $this->history_id);
                 } finally {
                     try {
                         $history = new Histories();
@@ -105,6 +107,7 @@ class RequestChat implements ShouldQueue
                     }
                     Redis::publish($this->history_id, 'Ended Ended');
                     Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                    Log::channel("analyze")->Debug("finishJob " . $this->history_id);
                 }
             }
         } catch (Exception $e) {

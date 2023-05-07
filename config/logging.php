@@ -117,6 +117,10 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'analyze' => [
+            'path' => storage_path('logs/analyze.log'),
+        ]
     ],
 
 ];
