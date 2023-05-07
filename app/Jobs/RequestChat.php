@@ -110,7 +110,7 @@ class RequestChat implements ShouldQueue
                     Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    Log::channel("analyze")->Debug("finishJob " . $this->history_id . " took " . $elapsed . " generated " . strlen(trim($tmp)));
+                    Log::channel("analyze")->Debug("finishJob " . $this->history_id . " output " . trim($tmp) . " took " . $elapsed . " generated " . strlen(trim($tmp)));
                 }
             }
         } catch (Exception $e) {
