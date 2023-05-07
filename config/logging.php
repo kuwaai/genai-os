@@ -119,7 +119,7 @@ return [
         ],
 
         'analyze' => [
-            'driver' => 'custom',
+            'driver' => 'single',
             'path' => storage_path('logs/analyze.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ]
