@@ -39,7 +39,7 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::channel("analyze")->Debug($this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . strlen(trim($this->input)) . "|input|" . trim($this->input));
+        Log::channel("analyze")->Debug("In:" . $this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . strlen(trim($this->input)) . "|" . trim($this->input));
         $start = microtime(true); 
         $tmp = '';
         try {
@@ -111,7 +111,7 @@ class RequestChat implements ShouldQueue
                     Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    Log::channel("analyze")->Debug($this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . $elapsed . "|" . strlen(trim($tmp)) . "|" . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . "|output|" . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)));
+                    Log::channel("analyze")->Debug("Out:" . $this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . $elapsed . "|" . strlen(trim($tmp)) . "|" . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . "|" . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)));
                 }
             }
         } catch (Exception $e) {
