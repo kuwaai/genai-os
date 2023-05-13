@@ -17,25 +17,15 @@ class UserFactory extends Factory
      */
 	public function definition(): array
 	{
-		static $count = 1;
+		static $count = 3;
 		
 		return [
 			'name' => 'demo' . $count++,
-			'email' => 'demo' . ($count - 1) . '@chat.cdalab.tw',
+			'email' => 'demo' . ($count - 1) . '@chat.gai.tw',
 			'email_verified_at' => now(),
 			'password' => Hash::make("chatchat"),
 			'isAdmin' => false,
 			'forDemo' => true
 		];
 	}
-
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
-    }
 }
