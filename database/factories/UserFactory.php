@@ -17,7 +17,7 @@ class UserFactory extends Factory
      */
 	public function definition(): array
 	{
-		static $count = 3;
+		static $count = 1;
 		
 		return [
 			'name' => 'demo' . $count++,

@@ -25,7 +25,7 @@ class DefaultSeeder extends Seeder
 				'forDemo' => false
 			]);
 			$user->save();
-			\App\Models\User::factory()->create();
+			\App\Models\User::factory(3)->create();
 		}
     }
 }
