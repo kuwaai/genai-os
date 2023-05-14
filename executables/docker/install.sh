@@ -3,7 +3,7 @@ composer update
 php artisan key:generate --force
 php artisan migrate --force
 php artisan db:seed --class=DefaultSeeder --force
-rm public/storage
+rm -rf /var/www/html/LLM_Project/public/storage
 php artisan storage:link
 npm install
 composer dump-autoload --optimize
