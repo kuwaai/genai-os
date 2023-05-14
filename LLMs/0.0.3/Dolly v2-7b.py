@@ -131,6 +131,7 @@ def api():
         resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
         if data: return resp
         print("I didn't see your input!")
+        Ready[0] = True
     return ""
 registered = True
 response = requests.post(agent_endpoint + "register", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
