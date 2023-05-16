@@ -1,0 +1,7 @@
+curl -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'name=llama7b_tw1&input=123&history_id=2722' -N http://localhost:9000/
+
+
+curl -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'name=llama7b_tw1&userid=1' -N http://localhost:9000/status
+
+
+curl -H "Content-Type: application/x-www-form-urlencoded" -X GET -d 'name=bloom-3b-zh&history_id=3169' -N http://localhost:9000/reset
