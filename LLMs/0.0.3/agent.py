@@ -1,6 +1,6 @@
 # -#- coding: UTF-8 -*-
 import time, re, requests
-from flask import Flask, request, Response
+from flask import Flask, request, Response, after_this_request
 from flask_sse import ServerSentEventsBlueprint
 app = Flask(__name__)
 app.config["REDIS_URL"] = "redis://localhost:6379/0"
@@ -24,11 +24,15 @@ def api():
                     try:
                         for c in response.iter_content(chunk_size=1):
                             yield c
+                        dest[2] = -1
+                        dest[1] = "READY"
+                        print("Done")
+                    except GeneratorExit as e:
+                        dest[2] = -1
+                        dest[1] = "READY"
+                        print("Done")
                     except Exception as e:
                         print('Error: {0}'.format(str(e)))
-                    dest[2] = -1
-                    dest[1] = "READY"
-                    print("Finished")
                 return Response(event_stream(dest, response), mimetype='text/event-stream')
             except requests.exceptions.ConnectionError as e:
                 #POST Failed, unregister this
