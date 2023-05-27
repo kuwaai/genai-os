@@ -26,11 +26,11 @@ class ArchiveController extends Controller
     {
         try {
             $chat = Chats::findOrFail($request->input('id'));
+            $chat->delete();
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Chat not found'], 404);
+            Log::error("Chat not found: " . $request->input('id'));
         }
 
-        $chat->delete();
         return Redirect::route('archive');
     }
 
@@ -38,11 +38,11 @@ class ArchiveController extends Controller
     {
         try {
             $chat = Chats::findOrFail($request->input('id'));
+            $chat->fill(['name' => $request->input('new_name')]);
+            $chat->save();
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Chat not found'], 404);
+            Log::error("Chat not found: " . $request->input('id'));
         }
-        $chat->fill(['name' => $request->input('new_name')]);
-        $chat->save();
         return Redirect::route('archives', $request->input('id'));
     }
 }

@@ -17,9 +17,9 @@
 
 <body class="antialiased scrollbar">
     <div
-        class="relative z-9999 sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
+        class="relative z-9999 min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
         @if (Route::has('login'))
-            <div class="sm:absolute sm:top-0 sm:right-0 p-6 text-right">
+            <div class="p-6 text-right">
                 @auth
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -27,6 +27,8 @@
                             <a href="{{ url('/dashboard') }}"
                                 class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</a>
                         @endif
+                        <a href="{{ route('duel') }}"
+                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Duel</a>
                         <a href="{{ route('chat') }}"
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Chat</a>
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
@@ -49,7 +51,11 @@
         <div class="max-w-7xl mx-auto p-6 lg:p-8">
             <div class="flex items-center flex-col">
                 <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">TAIDE Chat</h3>
-                <p class="text-lg dark:text-white text-black-600">(<span class="text-red-600 dark:text-yellow-200">T</span>rustworthy <span class="text-red-600 dark:text-yellow-200">AI</span> <span class="text-red-600 dark:text-yellow-200">D</span>ialog <span class="text-red-600 dark:text-yellow-200">E</span>ngine Chat)</p>
+                <p class="text-lg dark:text-white text-black-600">(<span
+                        class="text-red-600 dark:text-yellow-200">T</span>rustworthy <span
+                        class="text-red-600 dark:text-yellow-200">AI</span> <span
+                        class="text-red-600 dark:text-yellow-200">D</span>ialog <span
+                        class="text-red-600 dark:text-yellow-200">E</span>ngine Chat)</p>
                 <p class="text-lg dark:text-cyan-200 text-blue-600">Free to chat with Open Source LLMs!</p>
             </div>
 
@@ -81,7 +87,9 @@
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line">台灣的開源資料數據可以從該國內的一些大型開源資料中心或與組織來尋找，例如國家圖書館、台灣大學、台灣科學院、政府機構和公共圖書館。這些地方提供可用於學習、研究和開發的開源資源，包括軟件，文檔，圖書，數據庫等。此外，也可以通過網上平臺或社交媒體獲取和瀏覽開開源資料。                                            </p>
+                                            <p class="text-sm whitespace-pre-line">
+                                                台灣的開源資料數據可以從該國內的一些大型開源資料中心或與組織來尋找，例如國家圖書館、台灣大學、台灣科學院、政府機構和公共圖書館。這些地方提供可用於學習、研究和開發的開源資源，包括軟件，文檔，圖書，數據庫等。此外，也可以通過網上平臺或社交媒體獲取和瀏覽開開源資料。
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -98,7 +106,8 @@
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm whitespace-pre-line">Introduce yourself as a chatbot named dolly, as long as possible</p>
+                                            <p class="text-sm whitespace-pre-line">Introduce yourself as a chatbot named
+                                                dolly, as long as possible</p>
                                         </div>
                                     </div>
                                     <div
@@ -113,7 +122,12 @@
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line">Hi everyone! I'm dolly, an interactive AI chatbot. I'm here to help you with all your questions, no matter how big or small they may be. I'm learning from you, so I can become better at understanding and responding to your queries. What do you think? Do you have any additional questions for me? I can handle any of them!</p>
+                                            <p class="text-sm whitespace-pre-line">Hi everyone! I'm dolly, an
+                                                interactive AI chatbot. I'm here to help you with all your questions, no
+                                                matter how big or small they may be. I'm learning from you, so I can
+                                                become better at understanding and responding to your queries. What do
+                                                you think? Do you have any additional questions for me? I can handle any
+                                                of them!</p>
                                         </div>
                                     </div>
                                 </div>
@@ -134,7 +148,8 @@
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm whitespace-pre-line">"I'm Bloom, a Large language model, Is there anything you want to ask?" 翻譯為中文</p>
+                                            <p class="text-sm whitespace-pre-line">"I'm Bloom, a Large language model,
+                                                Is there anything you want to ask?" 翻譯為中文</p>
                                         </div>
                                     </div>
                                     <div
@@ -206,7 +221,7 @@
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.3</a>
+                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.4</a>
                 </div>
             </div>
         </div>

@@ -7,6 +7,14 @@
     width: 10px;
     height: 20px;
   }
+  .scrollbar-2::-webkit-scrollbar {
+    width: 20px;
+    height: 10px;
+  }
+  .scrollbar-3::-webkit-scrollbar {
+    width: 10px;
+    height: 5px;
+  }
 
   .scrollbar::-webkit-scrollbar-track {
     background: #cbcbcb;

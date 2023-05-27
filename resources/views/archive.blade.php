@@ -6,15 +6,18 @@
                     $have = false;
                 @endphp
                 @foreach (App\Models\LLMs::where('enabled', false)->orderby('order')->orderby('created_at')->get() as $LLM)
-                    @if (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->count() > 0)
+                    @if (App\Models\Chats::where('user_id', Auth::user()->id)->whereNull('dcID')->where('llm_id', $LLM->id)->count() > 0)
                         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
                             <a href="{{ $LLM->link }}" target="_blank"
                                 class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
-                                <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->whereNull('dcID')->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
+                                <div
+                                    class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                         href="{{ route('archives', $chat->id) }}">
-                                        <p class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">{{ $chat->name }}</p>
+                                        <p
+                                            class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
+                                            {{ $chat->name }}</p>
                                     </a>
                                 </div>
                                 @php
@@ -44,8 +47,8 @@
             </div>
         @else
             <div id="histories"
-            class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
-            @if (request()->route('chat_id'))
+                class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
+                @if (request()->route('chat_id'))
                     <form id="deleteChat" action="{{ route('archive_delete_chat') }}" method="post" class="hidden">
                         @csrf
                         @method('delete')
@@ -125,7 +128,8 @@
                         $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
                         name = $("#chatHeader >p:eq(0)").text().trim();
                         $("#chatHeader >p:eq(0)").html(
-                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`)
+                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`
+                            )
 
                         $("#chatHeader >p >input:eq(0)").keypress(function(e) {
                             if (e.which == 13) saveChat();

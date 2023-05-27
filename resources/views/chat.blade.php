@@ -19,12 +19,14 @@
                                     <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
                                 </a>
                             </div>
-                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
+                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
                                 <div
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                         href="{{ route('chats', $chat->id) }}">
-                                        <p class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">{{ $chat->name }}</p>
+                                        <p
+                                            class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
+                                            {{ $chat->name }}</p>
                                     </a>
                                 </div>
                             @endforeach
@@ -36,7 +38,7 @@
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                Select a chat to begin with
+                Select a chatroom to begin with
             </div>
         @else
             <div id="histories"
@@ -85,12 +87,14 @@
                         @php
                             $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                            $index = count($tasks)-1;
+                            $index = count($tasks) - 1;
                         @endphp
-                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby("id")->get() as $history)
+                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
                             @if ($index > -1 && $tasks[$index] == $history->id)
                                 @php
-                                    if ($tasks[$index] == $history->id) $index -= 1;
+                                    if ($tasks[$index] == $history->id) {
+                                        $index -= 1;
+                                    }
                                 @endphp
                                 <div class="flex w-full mt-2 space-x-3">
                                     <div
@@ -210,7 +214,7 @@
                         console.log(data);
                         const commaIndex = data.indexOf(",");
                         const number = data.slice(0, commaIndex);
-                        const msg = data.slice(commaIndex+1);
+                        const msg = data.slice(commaIndex + 1);
                         $('#task_' + number).text(msg);
                     });
                 </script>

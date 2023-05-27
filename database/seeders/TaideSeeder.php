@@ -14,6 +14,6 @@ class TaideSeeder extends Seeder
      */
     public function run(): void
     {
-        dump(Hash::make("taide"));
+        dump(Hash::make("12345"));
     }
 }
