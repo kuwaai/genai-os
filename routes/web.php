@@ -5,6 +5,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\LLMController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
+use App\Http\Controllers\DuelController;
 use BeyondCode\LaravelSSE\Facades\SSE;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -86,6 +87,23 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('/archives/edit', [ArchiveController::class, 'edit'])->name('archive_edit_chat');
     # Delete chat by this route
     Route::delete('/archives/delete', [ArchiveController::class, 'delete'])->name('archive_delete_chat');
+
+    #---Duel
+    Route::get('/duel', function () {
+        return view('duel');
+    })->name('duel');
+    
+    # Create duel chat
+    Route::post('/duel/create', [DuelController::class, 'create'])->name('duel_create_chat');
+    # Access to a chat's histories by this route
+    Route::get('/duel/{duel_id}',[DuelController::class, 'main'])->name('duels');
+    # Edit chat name
+    Route::post('/duel/edit', [DuelController::class, 'edit'])->name('duel_edit_chat');
+    # Delete chat by this route
+    Route::delete('/duel/delete', [DuelController::class, 'delete'])->name('duel_delete_chat');
+    # Continue chatting by POST to this route
+    Route::post('/duel/request', [DuelController::class, 'request'])->name('duel_request_chat');
+
 });
 
 require __DIR__ . '/auth.php';
