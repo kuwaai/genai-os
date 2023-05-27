@@ -147,10 +147,10 @@
                             @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', request()->route('duel_id'))->orderby('llm_id')->get() as $chat)
                                 <div
                                     class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                    <a><img data-tooltip-target="llm_{{ $chat->llm_id }}_hide"
+                                    <a><img data-tooltip-target="llm_{{ $chat->llm_id }}_toggle"
                                             data-tooltip-placement="top"
                                             src="{{ asset(Storage::url($chat->image)) }}"></a>
-                                    <div id="llm_{{ $chat->llm_id }}_hide" role="tooltip"
+                                    <div id="llm_{{ $chat->llm_id }}_toggle" role="tooltip"
                                         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                                         {{ $chat->name }}
                                         <div class="tooltip-arrow" data-popper-arrow></div>
@@ -176,11 +176,11 @@
                     @php
                         $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                     @endphp
-                    @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image')->union(
+                    @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', "llms.name as name")->union(
             App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', false)->where(
                     'chats.id',
                     App\Models\Chats::where('dcID', request()->route('duel_id'))->get()->first()->id,
-                )->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image'),
+                )->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', "llms.name as name"),
         )->get()->sortByDesc(function ($chat) {
             return [$chat->created_at, $chat->llm_id, -$chat->history_id];
         }) as $history)
@@ -201,9 +201,14 @@
                             <div id="history_{{ $history->history_id }}"
                                 class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
-                                    <div
+                                    <div data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                         <img src="{{ asset(Storage::url($history->image)) }}">
+                                    </div>
+                                    <div id="llm_{{ $history->llm_id }}_chat" role="tooltip"
+                                        class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                                        {{ $history->name }}
+                                        <div class="tooltip-arrow" data-popper-arrow></div>
                                     </div>
                                 @endif
                                 <div>
