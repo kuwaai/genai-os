@@ -9,11 +9,7 @@ sse = ServerSentEventsBlueprint('sse', __name__)
 app.register_blueprint(sse, url_prefix='/')
 # -- Configs --
 agent_endpoint = "http://localhost:9000/"
-<<<<<<< HEAD
 LLM_name = "llama7b"
-=======
-LLM_name = "llama7b_tw1"
->>>>>>> 8f0a4b8c805b9d2ca5561da2578facc69ed6ae96
 # This is the IP that will be stored in Agent, 
 # Make sure the IP address here are accessible by Agent
 public_ip = "localhost" 

@@ -87,21 +87,9 @@
                         @php
                             $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-<<<<<<< HEAD
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
                             @if (in_array($history->id, $tasks))
-=======
-                            $index = count($tasks) - 1;
-                        @endphp
-                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
-                            @if ($index > -1 && $tasks[$index] == $history->id)
-                                @php
-                                    if ($tasks[$index] == $history->id) {
-                                        $index -= 1;
-                                    }
-                                @endphp
->>>>>>> 8f0a4b8c805b9d2ca5561da2578facc69ed6ae96
                                 <div class="flex w-full mt-2 space-x-3">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">

@@ -299,8 +299,4 @@
             }
         </script>
     </div>
-<<<<<<< HEAD
 </x-app-layout>
-=======
-</x-app-layout>
->>>>>>> 8f0a4b8c805b9d2ca5561da2578facc69ed6ae96
