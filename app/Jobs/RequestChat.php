@@ -102,8 +102,8 @@ class RequestChat implements ShouldQueue
                     Log::channel("analyze")->Debug("failJob " . $this->history_id);
                 } finally {
                     try {
-                        $history = new Histories();
-                        $history->fill(['msg' => trim($tmp), 'chat_id' => $this->chat_id, 'isbot' => true, 'created_at' => $this->msgtime]);
+                        $history = Histories::findOrFail($this->history_id);
+                        $history->fill(['msg' => trim($tmp)]);
                         $history->save();
                     } catch (Exception $e) {
                     }

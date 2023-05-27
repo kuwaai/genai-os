@@ -78,9 +78,11 @@ class DuelController extends Controller
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
                 $history->save();
-                $access_code = LLMs::findOrFail($chat->llm_id)->access_code;
+                $history = new Histories();
+                $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->save();
+                RequestChat::dispatch($chat->id, $input, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id);
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-                RequestChat::dispatch($history->id, $input, $access_code, Auth::user()->id);
             }
         }
         return Redirect::route('duels', $duelId);

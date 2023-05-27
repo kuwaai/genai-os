@@ -41,9 +41,12 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
             $history->save();
+            $history = new Histories();
+            $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+            $history->save();
             $llm = LLMs::findOrFail($request->input('llm_id'));
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($history->id, $input, $llm->access_code, Auth::user()->id);
+            RequestChat::dispatch($chat->id, $input, $llm->access_code, Auth::user()->id, $history->id);
         }
         return Redirect::route('chats', $chat->id);
     }
@@ -56,9 +59,12 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
+            $history = new Histories();
+            $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+            $history->save();
             $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($history->id, $input, $access_code, Auth::user()->id);
+            RequestChat::dispatch($chatId, $input, $access_code, Auth::user()->id, $history->id);
         }
         return Redirect::route('chats', $chatId);
     }

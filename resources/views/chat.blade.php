@@ -87,15 +87,9 @@
                         @php
                             $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                            $index = count($tasks) - 1;
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
-                            @if ($index > -1 && $tasks[$index] == $history->id)
-                                @php
-                                    if ($tasks[$index] == $history->id) {
-                                        $index -= 1;
-                                    }
-                                @endphp
+                            @if (in_array($history->id, $tasks))
                                 <div class="flex w-full mt-2 space-x-3">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
@@ -104,11 +98,11 @@
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
                                             <p class="text-sm whitespace-pre-line break-all"
-                                                id="task_{{ $history->id }}"></p>
+                                                id="task_{{ $history->id }}">{{ $history->msg }}</p>
                                         </div>
                                     </div>
                                 </div>
-                            @endif
+                            @else
                             <div id="history_{{ $history->id }}"
                                 class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
@@ -130,6 +124,7 @@
                                     </div>
                                 @endif
                             </div>
+                            @endif
                         @endforeach
                     @endif
                 </div>

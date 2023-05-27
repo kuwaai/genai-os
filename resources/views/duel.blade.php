@@ -175,25 +175,16 @@
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
                     @php
                         $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                        $index = count($tasks) - 1;
                     @endphp
-                    @foreach (App\Models\Chats::join("histories", "chats.id", "=", "histories.chat_id")
-                    ->join("llms", "llms.id","=", "chats.llm_id")->where("isbot",True)
-                    ->whereIn('chats.id', App\Models\Chats::where("dcID", request()->route('duel_id'))->pluck("id"))
-                    ->select("chats.id as chat_id", "histories.id as history_id", "chats.llm_id as llm_id", 
-                    "histories.created_at as created_at", "histories.msg as msg", "histories.isbot as isbot", "llms.image as image")
-                    ->union(App\Models\Chats::join("histories", "chats.id", "=", "histories.chat_id")
-                    ->join("llms", "llms.id","=", "chats.llm_id")->where("isbot",False)
-                    ->where('chats.id', App\Models\Chats::where("dcID", request()->route('duel_id'))
-                    ->get()->first()->id)->select("chats.id as chat_id", "histories.id as history_id", "chats.llm_id as llm_id", 
-                    "histories.created_at as created_at", "histories.msg as msg", "histories.isbot as isbot", "llms.image as image"))->get()
-                    ->sortByDesc(function ($chat) { return [$chat->created_at, -$chat->llm_id, -$chat->history_id]; }) as $history)
-                        @if ($index > -1 && $tasks[$index] == $history->history_id)
-                            @php
-                                if ($tasks[$index] == $history->history_id) {
-                                    $index -= 1;
-                                }
-                            @endphp
+                    @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image')->union(
+            App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', false)->where(
+                    'chats.id',
+                    App\Models\Chats::where('dcID', request()->route('duel_id'))->get()->first()->id,
+                )->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image'),
+        )->get()->sortByDesc(function ($chat) {
+            return [$chat->created_at, $chat->llm_id, -$chat->history_id];
+        }) as $history)
+                        @if (in_array($history->history_id, $tasks))
                             <div class="flex w-full mt-2 space-x-3">
                                 <div
                                     class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
@@ -202,32 +193,33 @@
                                 <div>
                                     <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
                                         <p class="text-sm whitespace-pre-line break-all"
-                                            id="task_{{ $history->history_id }}"></p>
+                                            id="task_{{ $history->history_id }}">{{ $history->msg }}</p>
                                     </div>
                                 </div>
                             </div>
-                        @endif
-                        <div id="history_{{ $history->history_id }}"
-                            class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
-                            @if ($history->isbot)
-                                <div
-                                    class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                    <img src="{{ asset(Storage::url($history->image)) }}">
+                        @else
+                            <div id="history_{{ $history->history_id }}"
+                                class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
+                                @if ($history->isbot)
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset(Storage::url($history->image)) }}">
+                                    </div>
+                                @endif
+                                <div>
+                                    <div
+                                        class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
+                                        <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
+                                    </div>
                                 </div>
-                            @endif
-                            <div>
-                                <div
-                                    class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                    <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
-                                </div>
+                                @if (!$history->isbot)
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                @endif
                             </div>
-                            @if (!$history->isbot)
-                                <div
-                                    class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                    User
-                                </div>
-                            @endif
-                        </div>
+                        @endif
                     @endforeach
                 </div>
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
