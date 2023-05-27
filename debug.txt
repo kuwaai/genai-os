@@ -1,7 +1,10 @@
-curl -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'name=llama7b_tw1&input=123&history_id=2722' -N http://localhost:9000/
+curl -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'name=chinese_vicuna_llama_7b&input=123&history_id=1572' -N http://localhost:9000/
 
 
 curl -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'name=llama7b_tw1&userid=1' -N http://localhost:9000/status
 
 
-curl -H "Content-Type: application/x-www-form-urlencoded" -X GET -d 'name=bloom-3b-zh&history_id=3169' -N http://localhost:9000/reset
+curl -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'name=chinese_vicuna_llama_7b&endpoint=http://192.168.211.7:54317/' -N http://localhost:9000/unregister
+
+
+curl -H "Content-Type: application/x-www-form-urlencoded" -X GET -d 'name=chinese_vicuna_llama_7b&history_id=1572' -N http://localhost:9000/reset

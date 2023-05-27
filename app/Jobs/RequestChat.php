@@ -24,14 +24,14 @@ class RequestChat implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($history_id, $input, $access_code, $user_id)
+    public function __construct($chat_id, $input, $access_code, $user_id, $history_id)
     {
-        $this->history_id = $history_id;
         $this->input = $input;
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
         $this->access_code = $access_code;
         $this->user_id = $user_id;
-        $this->chat_id = Histories::findOrFail($history_id)->chat_id;
+        $this->chat_id = $chat_id;
+        $this->history_id = $history_id;
     }
 
     /**
