@@ -155,6 +155,11 @@
                                         {{ $chat->name }}
                                         <div class="tooltip-arrow" data-popper-arrow></div>
                                     </div>
+                                    <div id="llm_{{ $chat->llm_id }}_chat" role="tooltip"
+                                        class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                                        {{ $chat->name }}
+                                        <div class="tooltip-arrow" data-popper-arrow></div>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -186,7 +191,7 @@
         }) as $history)
                         @if (in_array($history->history_id, $tasks))
                             <div class="flex w-full mt-2 space-x-3">
-                                <div
+                                <div data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
                                     class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                     <img src="{{ asset(Storage::url($history->image)) }}">
                                 </div>
@@ -204,11 +209,6 @@
                                     <div data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                         <img src="{{ asset(Storage::url($history->image)) }}">
-                                    </div>
-                                    <div id="llm_{{ $history->llm_id }}_chat" role="tooltip"
-                                        class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                                        {{ $history->name }}
-                                        <div class="tooltip-arrow" data-popper-arrow></div>
                                     </div>
                                 @endif
                                 <div>

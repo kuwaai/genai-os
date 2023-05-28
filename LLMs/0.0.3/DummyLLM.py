@@ -9,7 +9,7 @@ sse = ServerSentEventsBlueprint('sse', __name__)
 app.register_blueprint(sse, url_prefix='/')
 # -- Configs --
 agent_endpoint = "http://localhost:9000/"
-LLM_name = "llama7b"
+LLM_name = "chatgpt"
 # This is the IP that will be stored in Agent, 
 # Make sure the IP address here are accessible by Agent
 public_ip = "localhost" 
@@ -24,10 +24,9 @@ if port == None:
 Ready = [True]
 # model part
 def process(data):
-    for o in range(100):
-        for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
-            yield i
-            time.sleep(0.02)
+    for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
+        yield i
+        time.sleep(0.02)
     Ready[0] = True
     print("finished")
 
