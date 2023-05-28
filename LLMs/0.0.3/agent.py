@@ -24,15 +24,12 @@ def api():
                     try:
                         for c in response.iter_content(chunk_size=1):
                             yield c
-                        dest[2] = -1
-                        dest[1] = "READY"
-                        print("Done")
-                    except GeneratorExit as e:
-                        dest[2] = -1
-                        dest[1] = "READY"
-                        print("Done")
                     except Exception as e:
                         print('Error: {0}'.format(str(e)))
+                    finally:
+                        dest[2] = -1
+                        dest[1] = "READY"
+                        print("Done")
                 return Response(event_stream(dest, response), mimetype='text/event-stream')
             except requests.exceptions.ConnectionError as e:
                 #POST Failed, unregister this

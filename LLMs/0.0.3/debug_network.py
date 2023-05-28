@@ -24,9 +24,13 @@ if port == None:
 
 Ready = [True]
 def process(data): 
-    yield data
-    Ready[0] = True
-    print("finished")
+    try:
+        yield data
+    except Exception as e:
+        print(e)
+    finally:
+        Ready[0] = True
+        print("finished")
 
 @app.route("/", methods=["POST"])
 def api():

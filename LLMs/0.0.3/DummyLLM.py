@@ -24,11 +24,15 @@ if port == None:
 Ready = [True]
 # model part
 def process(data):
-    for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
-        yield i
-        time.sleep(0.02)
-    Ready[0] = True
-    print("finished")
+    try:
+        for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
+            yield i
+            time.sleep(0.02)
+    except Exception as e:
+        print(e)
+    finally:
+        Ready[0] = True
+        print("finished")
 
 @app.route("/", methods=["POST"])
 def api():

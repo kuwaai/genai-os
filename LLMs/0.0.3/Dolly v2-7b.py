@@ -51,76 +51,84 @@ if not dummy:
     endPrompts = ["### End"]
     checklength = max([len(i) for i in endPrompts])
     def process(data):
-        prompt = eng_prompt
-        if "zh-TW" in data:
-            prompt = chi_prompt
-            data = data.replace("zh-TW", "")
-        inputs = tokenizer(prompt.format(data), return_tensors="pt").input_ids
-        buffer = None
-        run = True
-        counter = 0
-        checker = True
-        records = ""
-        regexs = [r'(.*\n)\1', r'(.{2,50})\1+', r': *.*\n', r".\n"]
-        repeat_limits = [5,5,2, 15]
-        repeat_detected = False
-        last = ""
-        pos = 0
-        #tokenPos = len(inputs[0])
-        while checker and counter < 600:
-            a = time.time()
-            outputs = model.generate(inputs.to("cuda:0"), pad_token_id=tokenizer.pad_token_id, eos_token_id=tokenizer.encode("### End")[0],
-                                max_new_tokens=1, top_p=0.92, top_k=0, do_sample=True#, no_repeat_ngram_size=7, temperature=0.1, top_p=0.65, num_beams=4
-            )
-            print(time.time() - a)
-            inputs = outputs
-            if counter % 4 == 0:
-                for index in range(len(regexs)):
-                    #validate for repeating
-                    pattern = re.compile(regexs[index])
-                    matches = pattern.findall(records)
-                    if matches:
-                        most_common_substring = max({match:matches.count(match) for match in matches}.items(), key=lambda x:x[1])[0].strip()
-                        times = records.count(most_common_substring)
-                        print(most_common_substring, times, repeat_limits[index])
-                        if times >= repeat_limits[index] or len(most_common_substring) > 6:
-                            print("Repeat detected!\n", records)
-                            repeat_detected = True
+        try:
+            prompt = eng_prompt
+            if "zh-TW" in data:
+                prompt = chi_prompt
+                data = data.replace("zh-TW", "")
+            inputs = tokenizer(prompt.format(data), return_tensors="pt").input_ids
+            buffer = None
+            run = True
+            counter = 0
+            checker = True
+            records = ""
+            regexs = [r'(.*\n)\1', r'(.{2,50})\1+', r': *.*\n', r".\n"]
+            repeat_limits = [5,5,2, 15]
+            repeat_detected = False
+            last = ""
+            pos = 0
+            #tokenPos = len(inputs[0])
+            while checker and counter < 600:
+                a = time.time()
+                outputs = model.generate(inputs.to("cuda:0"), pad_token_id=tokenizer.pad_token_id, eos_token_id=tokenizer.encode("### End")[0],
+                                    max_new_tokens=1, top_p=0.92, top_k=0, do_sample=True#, no_repeat_ngram_size=7, temperature=0.1, top_p=0.65, num_beams=4
+                )
+                print(time.time() - a)
+                inputs = outputs
+                if counter % 4 == 0:
+                    for index in range(len(regexs)):
+                        #validate for repeating
+                        pattern = re.compile(regexs[index])
+                        matches = pattern.findall(records)
+                        if matches:
+                            most_common_substring = max({match:matches.count(match) for match in matches}.items(), key=lambda x:x[1])[0].strip()
+                            times = records.count(most_common_substring)
+                            print(most_common_substring, times, repeat_limits[index])
+                            if times >= repeat_limits[index] or len(most_common_substring) > 6:
+                                print("Repeat detected!\n", records)
+                                repeat_detected = True
+                                break
+                    if repeat_detected: break
+                #if buffer == None: buffer = outputs[0, tokenPos:].cpu()
+                #else: buffer = torch.cat((buffer,outputs[0, tokenPos:].cpu()))
+                if buffer == None: buffer = outputs[0, -1:].cpu()
+                else: buffer = torch.cat((buffer,outputs[0, -1:].cpu()))
+                #tokenPos = len(outputs[0])
+                outputs = tokenizer.decode(buffer)
+                while checker and len(outputs[pos:]) > checklength:
+                    for i in endPrompts:
+                        if outputs[pos:].startswith(i):
+                            checker = False
                             break
-                if repeat_detected: break
-            #if buffer == None: buffer = outputs[0, tokenPos:].cpu()
-            #else: buffer = torch.cat((buffer,outputs[0, tokenPos:].cpu()))
-            if buffer == None: buffer = outputs[0, -1:].cpu()
-            else: buffer = torch.cat((buffer,outputs[0, -1:].cpu()))
-            #tokenPos = len(outputs[0])
-            outputs = tokenizer.decode(buffer)
-            while checker and len(outputs[pos:]) > checklength:
-                for i in endPrompts:
-                    if outputs[pos:].startswith(i):
-                        checker = False
-                        break
-                if checker:
-                    if last == outputs[pos]:
-                        counter += 1
-                        yield outputs[pos].encode("utf-8")
-                        print(outputs[pos], end="", flush=True)
-                        records += outputs[pos]
-                        pos+=1
-                    last = outputs[pos]
+                    if checker:
+                        if last == outputs[pos]:
+                            counter += 1
+                            yield outputs[pos].encode("utf-8")
+                            print(outputs[pos], end="", flush=True)
+                            records += outputs[pos]
+                            pos+=1
+                        last = outputs[pos]
+                torch.cuda.empty_cache()
+            del inputs
+            del outputs
+        except Exception as e:
+            print(e)
+        finally:
             torch.cuda.empty_cache()
-        del inputs
-        del outputs
-        torch.cuda.empty_cache()
-        Ready[0] = True
-        print("finished")
+            Ready[0] = True
+            print("finished")
     # model part ends
 else:
     def process(data): 
-        for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
-            yield i
-            time.sleep(0.02)
-        Ready[0] = True
-        print("finished")
+        try:
+            for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
+                yield i
+                time.sleep(0.02)
+        except Exception as e:
+            print(e)
+        finally:
+            Ready[0] = True
+            print("finished")
 
 @app.route("/", methods=["POST"])
 def api():
