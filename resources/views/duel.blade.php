@@ -26,6 +26,7 @@
                 <form method="post" action="{{ route('duel_create_chat') }}" class="p-6" id="create_duel"
                     onsubmit="return checkForm()">
                     @csrf
+                    <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                     <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Select the LLMs you want to use at
                         the same time.</p>
                     <ul class="my-4 space-y-3">
@@ -85,7 +86,7 @@
                     @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
                         @if (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('dcID', $DC->first()->id)->get()->where('enabled', false)->count() == 0)
                             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                                <div class="flex px-2 pt-3">
+                                <div class="flex px-2 py-3 border-b border-white">
                                     @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                                         <div
                                             class="mx-1 flex-shrink-0 h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
@@ -101,17 +102,18 @@
                                         </div>
                                     @endforeach
                                 </div>
+                                <div class="max-h-[182px] overflow-y-auto scrollbar">
                                 @foreach ($DC as $dc)
                                     <div
                                         class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                         <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('duels', $dc->id) }}">
-                                            <p
-                                                class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
+                                            href="{{ route('duels', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
+                                            <p class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
                                                 {{ $dc->name }}</p>
                                         </a>
                                     </div>
                                 @endforeach
+                                </div>
                             </div>
                         @endif
                     @endforeach
@@ -129,8 +131,8 @@
                 <form id="deleteChat" action="{{ route('duel_delete_chat') }}" method="post" class="hidden">
                     @csrf
                     @method('delete')
-                    <input name="id"
-                        value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
+                    <input name="id" value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
+                    <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 </form>
 
                 <form id="editChat" action="{{ route('duel_edit_chat') }}" method="post" class="hidden">
@@ -138,6 +140,7 @@
                     <input name="id"
                         value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
                     <input name="new_name" />
+                    <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 </form>
                 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
                     <p class="flex-1 flex flex-wrap items-center mr-3 overflow-x-hidden overflow-y-auto scrollbar">
@@ -234,7 +237,7 @@
                 </div>
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
                     <form method="post"
-                        action="{{ route('duel_request_chat') . (request()->input('limit') == null ? '' : '?limit=' . request()->input('limit')) }}"
+                        action="{{ route('duel_request_chat') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
                         id="create_chat">
                         <div class="flex">
                             @csrf
@@ -251,6 +254,7 @@
                                 </svg>
                             </button>
                         </div>
+                        <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                     </form>
                 </div>
             </div>

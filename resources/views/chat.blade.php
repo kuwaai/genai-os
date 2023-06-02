@@ -11,25 +11,29 @@
                 @else
                     @foreach (App\Models\LLMs::where('enabled', true)->orderby('order')->orderby('created_at')->get() as $LLM)
                         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                            <a href="{{ $LLM->link }}" target="_blank"
-                                class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                            <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                    href="{{ route('new_chat', $LLM->id) }}">
-                                    <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
-                                </a>
+                            <div class="border-b border-white"><a href="{{ $LLM->link }}" target="_blank"
+                                    class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
                             </div>
-                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
+                            <div class="max-h-[182px] overflow-y-auto scrollbar">
                                 <div
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                    <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                        href="{{ route('chats', $chat->id) }}">
-                                        <p
-                                            class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                            {{ $chat->name }}</p>
+                                    <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                        href="{{ route('new_chat', $LLM->id) }}">
+                                        <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
                                     </a>
                                 </div>
-                            @endforeach
+                                @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
+                                    <div
+                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                                        <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                            href="{{ route('chats', $chat->id) }}">
+                                            <p
+                                                class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
+                                                {{ $chat->name }}</p>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endforeach
                 @endif
@@ -103,27 +107,27 @@
                                     </div>
                                 </div>
                             @else
-                            <div id="history_{{ $history->id }}"
-                                class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
-                                @if ($history->isbot)
-                                    <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ $botimgurl }}">
+                                <div id="history_{{ $history->id }}"
+                                    class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
+                                    @if ($history->isbot)
+                                        <div
+                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            <img src="{{ $botimgurl }}">
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <div
+                                            class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
+                                            <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
+                                        </div>
                                     </div>
-                                @endif
-                                <div>
-                                    <div
-                                        class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                        <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
-                                    </div>
+                                    @if (!$history->isbot)
+                                        <div
+                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            User
+                                        </div>
+                                    @endif
                                 </div>
-                                @if (!$history->isbot)
-                                    <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        User
-                                    </div>
-                                @endif
-                            </div>
                             @endif
                         @endforeach
                     @endif

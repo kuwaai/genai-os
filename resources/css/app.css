@@ -31,6 +31,7 @@
     @media (prefers-color-scheme: dark) {
       .scrollbar::-webkit-scrollbar-track {
         background: gray;
+        border-radius: 100vh;
       }
     
       .scrollbar::-webkit-scrollbar-thumb {

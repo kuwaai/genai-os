@@ -17,12 +17,16 @@ class DuelController extends Controller
 {
     public function main(Request $request)
     {
-        $chat = DuelChat::findOrFail($request->route('duel_id'));
-        if ($chat->user_id != Auth::user()->id) {
-            return redirect()->route('duel');
-        } elseif (true){#LLMs::findOrFail($chat->llm_id)->enabled == true) {
-            return view('duel');
+        $duel_id = $request->route('duel_id');
+        if ($duel_id){
+            $chat = DuelChat::findOrFail($duel_id);
+            if ($chat->user_id != Auth::user()->id) {
+                return redirect()->route('duel');
+            } elseif (true){#LLMs::findOrFail($chat->llm_id)->enabled == true) {
+                return view('duel');
+            }
         }
+        return view('duel');
         #return redirect()->route('archives', $request->route('chat_id'));
     }
 
@@ -39,10 +43,8 @@ class DuelController extends Controller
                 $chat->fill(['name' => "Duel Chat", 'llm_id' => $LLM->id, 'user_id' => Auth::user()->id, "dcID"=>$Duel->id]);
                 $chat->save();
             }
-            #Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            #RequestChat::dispatch($history->id, $input, $llm->access_code, Auth::user()->id);
         }
-        return Redirect::route('duel');
+        return redirect()->to(route('duels', $Duel->id) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
     public function delete(Request $request): RedirectResponse
     {
@@ -52,8 +54,7 @@ class DuelController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error("Chat not found: " . $request->input('id'));
         }
-
-        return Redirect::route('duel');
+        return redirect()->to(route('duel') . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
 
     public function edit(Request $request): RedirectResponse
@@ -65,7 +66,7 @@ class DuelController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error("Chat not found: " . $request->input('id'));
         }
-        return redirect()->to(route('duels', $request->input('id')) . (request()->input('limit') ? "?limit=" . request()->input('limit') : ""));
+        return redirect()->to(route('duels', $request->input('id')) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
     
     public function request(Request $request): RedirectResponse
@@ -87,6 +88,6 @@ class DuelController extends Controller
                 }
             }
         }
-        return redirect()->to(route('duels', $duelId) . (request()->input('limit') ? "?limit=" . request()->input('limit') : ""));
+        return redirect()->to(route('duels', $duelId) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
 }

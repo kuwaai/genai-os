@@ -89,9 +89,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::delete('/archives/delete', [ArchiveController::class, 'delete'])->name('archive_delete_chat');
 
     #---Duel
-    Route::get('/duel', function () {
-        return view('duel');
-    })->name('duel');
+    Route::get('/duel', [DuelController::class, 'main'])->name('duel');
     
     # Create duel chat
     Route::post('/duel/create', [DuelController::class, 'create'])->name('duel_create_chat');
