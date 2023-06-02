@@ -65,7 +65,7 @@ class DuelController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error("Chat not found: " . $request->input('id'));
         }
-        return Redirect::route('duels', $request->input('id'));
+        return redirect()->to(route('duels', $request->input('id')) . (request()->input('limit') ? "?limit=" . request()->input('limit') : ""));
     }
     
     public function request(Request $request): RedirectResponse
@@ -74,17 +74,19 @@ class DuelController extends Controller
         $input = $request->input('input');
         if ($duelId && $input) {
             $chats = Chats::where("dcID",$request->input('duel_id'))->get();
-            foreach ($chats as $chat) {
-                $history = new Histories();
-                $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
-                $history->save();
-                $history = new Histories();
-                $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
-                $history->save();
-                RequestChat::dispatch($chat->id, $input, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id);
-                Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+            if (Chats::join("llms", 'llms.id', '=', 'llm_id')->where("dcID",$request->input('duel_id'))->get()->where("enabled",false)->count() == 0){
+                foreach ($chats as $chat) {
+                    $history = new Histories();
+                    $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
+                    $history->save();
+                    $history = new Histories();
+                    $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                    $history->save();
+                    RequestChat::dispatch($chat->id, $input, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id);
+                    Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                }
             }
         }
-        return Redirect::route('duels', $duelId);
+        return redirect()->to(route('duels', $duelId) . (request()->input('limit') ? "?limit=" . request()->input('limit') : ""));
     }
 }

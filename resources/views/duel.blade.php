@@ -83,35 +83,37 @@
                         </button>
                     </div>
                     @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
-                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                            <div class="flex px-2 pt-3">
-                                @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
-                                    <div
-                                        class="mx-1 flex-shrink-0 h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <a href="{{ $chat->link }}" target="_blank"><img
-                                                data-tooltip-target="llm_{{ $chat->llm_id }}"
-                                                data-tooltip-placement="top"
-                                                src="{{ asset(Storage::url($chat->image)) }}"></a>
-                                        <div id="llm_{{ $chat->llm_id }}" role="tooltip"
-                                            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
-                                            {{ $chat->name }}
-                                            <div class="tooltip-arrow" data-popper-arrow></div>
+                        @if (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('dcID', $DC->first()->id)->get()->where('enabled', false)->count() == 0)
+                            <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+                                <div class="flex px-2 pt-3">
+                                    @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
+                                        <div
+                                            class="mx-1 flex-shrink-0 h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            <a href="{{ $chat->link }}" target="_blank"><img
+                                                    data-tooltip-target="llm_{{ $chat->llm_id }}"
+                                                    data-tooltip-placement="top"
+                                                    src="{{ asset(Storage::url($chat->image)) }}"></a>
+                                            <div id="llm_{{ $chat->llm_id }}" role="tooltip"
+                                                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
+                                                {{ $chat->name }}
+                                                <div class="tooltip-arrow" data-popper-arrow></div>
+                                            </div>
                                         </div>
+                                    @endforeach
+                                </div>
+                                @foreach ($DC as $dc)
+                                    <div
+                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                                        <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                            href="{{ route('duels', $dc->id) }}">
+                                            <p
+                                                class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
+                                                {{ $dc->name }}</p>
+                                        </a>
                                     </div>
                                 @endforeach
                             </div>
-                            @foreach ($DC as $dc)
-                                <div
-                                    class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                    <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                        href="{{ route('duels', $dc->id) }}">
-                                        <p
-                                            class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                            {{ $dc->name }}</p>
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
+                        @endif
                     @endforeach
                 @endif
             </div>
@@ -138,7 +140,7 @@
                     <input name="new_name" />
                 </form>
                 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
-                    <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto scrollbar">
+                    <p class="flex-1 flex flex-wrap items-center mr-3 overflow-x-hidden overflow-y-auto scrollbar">
                         {{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->name }}</p>
 
                     <div class="flex">
@@ -181,22 +183,24 @@
                     @php
                         $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                     @endphp
-                    @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', "llms.name as name")->union(
+                    @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name')->union(
             App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', false)->where(
                     'chats.id',
                     App\Models\Chats::where('dcID', request()->route('duel_id'))->get()->first()->id,
-                )->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', "llms.name as name"),
+                )->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name'),
         )->get()->sortByDesc(function ($chat) {
             return [$chat->created_at, $chat->llm_id, -$chat->history_id];
         }) as $history)
                         @if (in_array($history->history_id, $tasks))
                             <div class="flex w-full mt-2 space-x-3">
-                                <div data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
+                                <div data-tooltip-target="llm_{{ $history->llm_id }}_chat"
+                                    data-tooltip-placement="top"
                                     class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                     <img src="{{ asset(Storage::url($history->image)) }}">
                                 </div>
                                 <div>
-                                    <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                    <div {{ request()->input('limit') > 0 ? 'style=max-height:' . 0.75 + 0.75 + 0.875 * 1.25 * request()->input('limit') . 'rem' : '' }}
+                                        class="flex flex-col-reverse scrollbar overflow-y-auto p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
                                         <p class="text-sm whitespace-pre-line break-all"
                                             id="task_{{ $history->history_id }}">{{ $history->msg }}</p>
                                     </div>
@@ -206,14 +210,15 @@
                             <div id="history_{{ $history->history_id }}"
                                 class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                 @if ($history->isbot)
-                                    <div data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
+                                    <div data-tooltip-target="llm_{{ $history->llm_id }}_chat"
+                                        data-tooltip-placement="top"
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                         <img src="{{ asset(Storage::url($history->image)) }}">
                                     </div>
                                 @endif
                                 <div>
-                                    <div
-                                        class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
+                                    <div {{ request()->input('limit') > 0 ? 'style=max-height:' . 0.75 + 0.75 + 0.875 * 1.25 * request()->input('limit') . 'rem' : '' }}
+                                        class="scrollbar overflow-y-auto p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
                                         <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
                                     </div>
                                 </div>
@@ -228,7 +233,9 @@
                     @endforeach
                 </div>
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
-                    <form method="post" action="{{ route('duel_request_chat') }}" id="create_chat">
+                    <form method="post"
+                        action="{{ route('duel_request_chat') . (request()->input('limit') == null ? '' : '?limit=' . request()->input('limit')) }}"
+                        id="create_chat">
                         <div class="flex">
                             @csrf
                             <input name="duel_id" value="{{ request()->route('duel_id') }}" style="display:none;">
