@@ -88,9 +88,9 @@ class RequestChat implements ShouldQueue
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
-                        if (strlen($tmp) > 1100) {
-                            break;
-                        }
+                        #if (strlen($tmp) > 1100) {
+                        #    break;
+                        #}
                     }
                     if (trim($tmp) == '') {
                         Redis::publish($this->history_id, 'New [Oops, seems like LLM given empty message as output!]');
