@@ -39,12 +39,16 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
+        if (Histories::findOrFail($this->history_id)->msg != "* ...thinking... *") {
+            Log::Debug("Hmmm");
+            return;
+        }
         Log::channel("analyze")->Info("In:" . $this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . strlen(trim($this->input)) . "|" . trim($this->input));
         $start = microtime(true); 
         $tmp = '';
         try {
             $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
-            $client = new Client();
+            $client = new Client(['timeout' => 300]);
             $response = $client->post($agent_location . 'status', [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
@@ -88,9 +92,9 @@ class RequestChat implements ShouldQueue
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
-                        #if (strlen($tmp) > 1100) {
-                        #    break;
-                        #}
+                        if (mb_strlen($tmp) > 1100) {
+                            break;
+                        }
                     }
                     if (trim($tmp) == '') {
                         Redis::publish($this->history_id, 'New [Oops, seems like LLM given empty message as output!]');

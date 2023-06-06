@@ -16,7 +16,6 @@ use App\Jobs\RequestChat;
 use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
-use Predis\Client;
 
 class ChatController extends Controller
 {
@@ -116,28 +115,24 @@ class ChatController extends Controller
             if (count($listening) > 0) {
                 $client = Redis::connection();
                 $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
-                    if (connection_aborted()) {
-                        $client->disconnect();
-                    }else{
-                        global $listening;
-                        [$type, $msg] = explode(' ', $message, 2);
-                        $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                        if ($type == 'Ended') {
-                            $key = array_search($history_id, $listening);
-                            if ($key !== false) {
-                                unset($listening[$key]);
-                            }
-                            if (count($listening) == 0) {
-                                echo "event: close\n\n";
-                                ob_flush();
-                                flush();
-                                $client->disconnect();
-                            }
-                        } elseif ($type == 'New') {
-                            echo 'data: ' . $history_id . ',' . str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $msg) . "\n\n";
+                    global $listening;
+                    [$type, $msg] = explode(' ', $message, 2);
+                    $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                    if ($type == 'Ended') {
+                        $key = array_search($history_id, $listening);
+                        if ($key !== false) {
+                            unset($listening[$key]);
+                        }
+                        if (count($listening) == 0) {
+                            echo "event: close\n\n";
                             ob_flush();
                             flush();
+                            $client->disconnect();
                         }
+                    } elseif ($type == 'New') {
+                        echo 'data: ' . $history_id . ',' . str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $msg) . "\n\n";
+                        ob_flush();
+                        flush();
                     }
                 });
             }

@@ -33,7 +33,7 @@ def api():
                 return Response(event_stream(dest, response), mimetype='text/event-stream')
             except requests.exceptions.ConnectionError as e:
                 #POST Failed, unregister this
-                data[llm_name] = [i for i in data[llm_name] if i[0] != endpoint]
+                data[llm_name] = [i for i in data[llm_name] if i[0] != dest[0]]
                 if data[llm_name] == []: del data[llm_name]
     return ""
     
@@ -42,7 +42,7 @@ def status():
     # This will check if any LLM that is READY, then return "READY", if every is busy, return "BUSY"
     # Parameters: name, history_id
     llm_name, history_id = request.form.get("name"), request.form.get("history_id")
-    if data.get(llm_name):
+    if llm_name and history_id and data.get(llm_name):
         for i in data[llm_name]:
             if i[1] == "READY" and i[2] == -1:
                 i[2] = history_id

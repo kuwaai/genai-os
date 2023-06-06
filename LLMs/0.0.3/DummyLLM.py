@@ -26,8 +26,8 @@ Ready = [True]
 def process(data):
     try:
         for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
-            yield i
             time.sleep(0.02)
+            yield i
     except Exception as e:
         print(e)
     finally:
