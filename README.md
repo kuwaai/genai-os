@@ -38,6 +38,9 @@ Nginx is recommanded, Since that is the only tested one,
 The configure file is provided under the repo and named `nginx_config`.
 Remember to use PHP-FPM, for the web I hosted in TWCC,
 I have configured it to use maximum of 2048 child processes.
+Also it's recommanded to modify this variable in php.ini
+`default_socket_timeout=60` from 60 to any higher value,
+So when the model took too long, it won't shows 504 gateway timeout
 
 ### How it works
 ![arch](demo/arch.png?raw=true "Architecture to complete jobs")
