@@ -50,13 +50,14 @@
 
         <div class="max-w-7xl mx-auto p-6 lg:p-8">
             <div class="flex items-center flex-col">
-                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">TAIDE Chat</h3>
+                <!--<h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">TAIDE Chat</h3>
                 <p class="text-lg dark:text-white text-black-600">(<span
                         class="text-red-600 dark:text-yellow-200">T</span>rustworthy <span
                         class="text-red-600 dark:text-yellow-200">AI</span> <span
                         class="text-red-600 dark:text-yellow-200">D</span>ialog <span
                         class="text-red-600 dark:text-yellow-200">E</span>ngine Chat)</p>
-                <p class="text-lg dark:text-cyan-200 text-blue-600">Free to chat with Open Source LLMs!</p>
+                <p class="text-lg dark:text-cyan-200 text-blue-600">Free to chat with Open Source LLMs!</p>-->
+                <img src="{{ asset('images/TAIDE_logo_outline-1.png') }}">
             </div>
 
 
@@ -87,8 +88,7 @@
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line">
-                                                台灣的開源資料數據可以從該國內的一些大型開源資料中心或與組織來尋找，例如國家圖書館、台灣大學、台灣科學院、政府機構和公共圖書館。這些地方提供可用於學習、研究和開發的開源資源，包括軟件，文檔，圖書，數據庫等。此外，也可以通過網上平臺或社交媒體獲取和瀏覽開開源資料。
+                                            <p class="text-sm whitespace-pre-line">台灣的開源資料數據可以從該國內的一些大型開源資料中心或與組織來尋找，例如國家圖書館、台灣大學、台灣科學院、政府機構和公共圖書館。這些地方提供可用於學習、研究和開發的開源資源，包括軟件，文檔，圖書，數據庫等。此外，也可以通過網上平臺或社交媒體獲取和瀏覽開開源資料。
                                             </p>
                                         </div>
                                     </div>
