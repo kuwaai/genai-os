@@ -1,4 +1,198 @@
 <x-app-layout>
+
+    <!-- Main modal -->
+    <div id="edit_llm" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+        class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <button type="button"
+                    class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                    data-modal-hide="edit_llm">
+                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                <div class="px-6 py-6 ml:px-8">
+                    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white"></h3>
+
+                    <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
+                        action="{{ route('update_LLM_by_id') }}" class="w-full max-w-xl">
+                        @csrf
+                        @method('patch')
+                        <input id="update_img" name="image" type="file" style="display:none">
+                        <input name="id" style="display:none">
+                        <div class="flex flex-wrap -mx-3 mb-2 items-center">
+                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                                <div class="flex flex-wrap -mx-3">
+                                    <div class="w-full px-3 flex flex-col items-center">
+                                        <label for="update_img">
+                                            <span
+                                                class="block uppercase tracking-wide text-white text-xs font-bold mb-2">
+                                                LLM Image
+                                            </span>
+                                            <img id="image"
+                                                class="rounded-full border border-gray-400 dark:border-gray-900 m-auto bg-black"
+                                                width="50px" height="50px" class="m-auto"
+                                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg==" />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full md:w-2/3 px-3">
+                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                    for="llm_name">
+                                    LLM Name
+                                </label>
+                                <input name="name" required
+                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    id="llm_name" placeholder="LLM Name">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap -mx-3 mb-2">
+                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                    for="version">
+                                    Version
+                                </label>
+                                <input name="version"
+                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    id="version" type="text" placeholder="Version">
+                            </div>
+                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                    for="access_code">
+                                    Access Code
+                                </label>
+                                <input name="access_code" required
+                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    id="access_code" type="text" placeholder="Access Code">
+                            </div>
+                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                    for="order">
+                                    Order
+                                </label>
+                                <input name="order"
+                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    id="order" type="text" placeholder="Order">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap -mx-3 mb-2">
+                            <div class="w-full px-3">
+                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                    for="link">
+                                    Link
+                                </label>
+                                <input name="link"
+                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    id="link" placeholder="Link for more information to this LLM" value="">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap -mx-3 mb-2">
+                            <div class="w-full px-3">
+                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                    for="description">
+                                    Description
+                                </label>
+                                <input name="description"
+                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    id="description" placeholder="Description for this LLM">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
+                                class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                Save
+                            </button>
+                            <div id="popup-modal2" data-modal-backdrop="static" tabindex="-2"
+                                class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                <div class="relative w-full max-w-md max-h-full">
+                                    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                                        <button type="button"
+                                            class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                                            data-modal-hide="popup-modal2">
+                                            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor"
+                                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span class="sr-only">Close modal</span>
+                                        </button>
+                                        <div class="p-6 text-center">
+                                            <svg aria-hidden="true"
+                                                class="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are
+                                                you sure you want to update this LLM?</h3>
+                                            <button data-modal-hide="popup-modal2" type="submit"
+                                                class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                                Yes, I'm sure
+                                            </button>
+                                            <button data-modal-hide="popup-modal2" type="button"
+                                                class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">No,
+                                                cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button data-modal-target="popup-modal" data-modal-toggle="popup-modal" type="button"
+                                id="delete_button"
+                                class="bg-red-500 hover:bg-red-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                Delete
+                            </button>
+                            <div id="popup-modal" data-modal-backdrop="static" tabindex="-2"
+                                class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                <div class="relative w-full max-w-md max-h-full">
+                                    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                                        <button type="button"
+                                            class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                                            data-modal-hide="popup-modal">
+                                            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor"
+                                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span class="sr-only">Close modal</span>
+                                        </button>
+                                        <div class="p-6 text-center">
+                                            <svg aria-hidden="true"
+                                                class="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are
+                                                you sure you want to delete this LLM?</h3>
+                                            <button id="delete_llm" data-modal-hide="popup-modal" type="button"
+                                                class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                                Yes, I'm sure
+                                            </button>
+                                            <button data-modal-hide="popup-modal" type="button"
+                                                class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">No,
+                                                cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="py-2">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -20,7 +214,8 @@
 
                                 <div>
                                     <x-input-label for="agent_location" :value="__('Agent API Location')" />
-                                    <x-text-input id="agent_location" name="agent_location" type="text" class="mt-1 block w-full"
+                                    <x-text-input id="agent_location" name="agent_location" type="text"
+                                        class="mt-1 block w-full"
                                         value="{{ \App\Models\SystemSetting::where('key', 'agent_location')->first()->value }}"
                                         required autocomplete="no" />
                                 </div>
@@ -29,8 +224,9 @@
                                     <x-primary-button>{{ __('Save') }}</x-primary-button>
 
                                     @if (session('status') === 'agent_location-updated')
-                                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                                            class="text-sm text-gray-600 dark:text-green-400">{{ __('Saved.') }}</p>
+                                        <p x-data="{ show: true }" x-show="show" x-transition
+                                            x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600 dark:text-green-400">
+                                            {{ __('Saved.') }}</p>
                                     @endif
                                 </div>
                             </form>
@@ -45,15 +241,31 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <section>
-                        <header>
-                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                {{ __('LLM Managements') }}
-                            </h2>
+                        <div class="flex">
+                            <header class="mr-auto">
+                                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                    {{ __('LLM Managements') }}
+                                </h2>
 
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                {{ __('Edit the LLM that is availables') }}
-                            </p>
-                        </header>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                    {{ __('Edit the LLM that is availables') }}
+                                </p>
+                            </header>
+
+                            <button onclick="CreateRow()" data-modal-target="edit_llm" data-modal-toggle="edit_llm"
+                                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4  rounded flex items-center justify-center">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li class="text-red-500">{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div
                             class="shadow overflow-hidden border dark:border-gray-900 sm:rounded-lg mt-3 overflow-x-auto scrollbar">
                             <form id="del_LLM_by_ID" method="post" action="{{ route('delete_LLM_by_id') }}"
@@ -61,28 +273,6 @@
                                 @csrf
                                 @method('delete')
                                 <input name="id">
-                            </form>
-                            <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data"
-                                action="{{ route('update_LLM_by_id') }}" style="display:none">
-                                @csrf
-                                @method('patch')
-                                <input id="update_img" name="image" type="file">
-                                <input name="name">
-                                <input name="link">
-                                <input name="order">
-                                <input name="access_code">
-                                <input name="id">
-                                <input name="limit_per_day">
-                            </form>
-                            <form id="create_new_LLM" method="post" enctype="multipart/form-data"
-                                action="{{ route('create_new_LLM') }}" style="display:none">
-                                @csrf
-                                <input id="new_img" name="image" type="file">
-                                <input name="name">
-                                <input name="link">
-                                <input name="order">
-                                <input name="access_code">
-                                <input name="limit_per_day">
                             </form>
                             <table class="whitespace-nowrap w-full">
                                 <thead class="bg-gray-200 dark:bg-gray-900">
@@ -94,14 +284,6 @@
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
                                             Name
-                                        </th>
-                                        <th scope="col"
-                                            class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                                            Link
-                                        </th>
-                                        <th scope="col"
-                                            class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                                            Order
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
@@ -117,18 +299,12 @@
                                     @foreach (App\Models\LLMs::orderby('order')->orderby('created_at')->get() as $LLM)
                                         <tr id="llm{{ $LLM->id }}">
                                             <td class="px-3 py-2 flex justify-center">
-                                                <img class="rounded-full border border-gray-400 dark:border-gray-900"
-                                                    width="40px" class="m-auto"
-                                                    src="{{ asset(Storage::url($LLM->image)) }}" />
+                                                <img class="rounded-full border border-gray-400 dark:border-gray-900 bg-black"
+                                                    width="40px" height="40px" class="m-auto"
+                                                    src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}" />
                                             </td>
                                             <td class="px-3 py-2">
                                                 <div class="text-sm font-medium">{{ $LLM->name }}</div>
-                                            </td>
-                                            <td class="px-3 py-2">
-                                                <div class="text-sm font-medium">{{ $LLM->link }}</div>
-                                            </td>
-                                            <td class="px-3 py-2">
-                                                <div class="text-sm font-medium">{{ $LLM->order }}</div>
                                             </td>
                                             <td class="px-3 py-2">
                                                 <div class="text-sm font-medium">{{ $LLM->access_code }}</div>
@@ -136,19 +312,22 @@
                                             <td class="px-3 py-2">
                                                 <div class="flex items-center space-x-4">
                                                     <button
-                                                        class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center"
-                                                        onclick="DeleteRow({{ $LLM->id }})">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                    <button
                                                         class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center"
-                                                        onclick="EditRow({{ $LLM->id }})">
+                                                        data-modal-target="edit_llm" data-modal-toggle="edit_llm"
+                                                        onclick='edit({!! json_encode(
+                                                            [
+                                                                strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)),
+                                                                $LLM->name,
+                                                                $LLM->link,
+                                                                $LLM->order,
+                                                                $LLM->access_code,
+                                                                $LLM->id,
+                                                                $LLM->description,
+                                                                $LLM->version,
+                                                            ],
+                                                            JSON_HEX_APOS,
+                                                        ) !!})'>
                                                         <i class="fas fa-pen"></i>
-                                                    </button>
-                                                    <button
-                                                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden"
-                                                        onclick="SaveRow({{ $LLM->id }})">
-                                                        <i class="fas fa-save"></i>
                                                     </button>
                                                     <a class="{{ $LLM->enabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600' }} text-white font-bold py-3 px-4 rounded flex items-center justify-center"
                                                         href="{{ route('toggle_LLM', $LLM->id) }}">
@@ -158,58 +337,6 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            <ul>
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif
-                                    <tr id="createLLM">
-                                        <td class="px-3 py-2">
-                                            <div class="flex items-center">
-                                                <label
-                                                    class="appearance-none m-auto border rounded py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    for="new_img">Upload</label>
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-2">
-                                            <div class="flex items-center">
-                                                <input
-                                                    class="appearance-none border rounded w-20 py-2 px-3 text-gray-700 border-gray-300 dark:border-gray-900 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    id="new-name" type="text" placeholder="Name">
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-2">
-                                            <div class="flex items-center">
-                                                <input
-                                                    class="appearance-none border rounded w-full py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    id="new-link" type="text" placeholder="Link">
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-2">
-                                            <div class="flex items-center">
-                                                <input
-                                                    class="appearance-none border rounded w-20 py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    id="new-order" type="text" placeholder="Order">
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-2">
-                                            <div class="flex items-center">
-                                                <input
-                                                    class="appearance-none border rounded w-full py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline"
-                                                    id="new-access_code" type="text" placeholder="Access Code">
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-2">
-                                            <button onclick="CreateRow()"
-                                                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4  rounded flex items-center justify-center">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -248,61 +375,53 @@
             $("#del_LLM_by_ID").submit();
         }
 
-        function EditRow(id) {
-            const row = $(`#llm${id}`);
-            row.find('.fa-pen').parent().addClass('hidden');
-            row.find('.fa-save').parent().removeClass('hidden');
-            row.find('td').each(function(index) {
-                const cell = $(this);
-                const value = cell.find('div').text();
-                if (index == 0) {
-                    cell.html(
-                        `<label class="appearance-none m-auto border rounded py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline" for="update_img" old="${cell.find("img").attr("src")}">Upload</label>`
-                    )
-                } else if (index < 5) {
-                    cell.html(
-                        `<input type="text" class="border rounded w-20 py-2 px-3 border-gray-300 dark:border-gray-900 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 leading-tight placeholder:text-gray-700 dark:placeholder:text-gray-300 focus:outline-none focus:shadow-outline form-input rounded-md ${index == 1 || index == 3 ? "w-20" : "w-full"}" old="${value}" value="${value}">`
-                    );
-                }
-            });
-        }
-
-        function SaveRow(id) {
-            const row = $(`#llm${id}`);
-            const vals = row.find('td').find("input");
-            let check = vals.toArray().some(input => input.value !== input.getAttribute('old'));
-            if (!check && $("#update_img").val()) check = true;
-            if (check && !vals.toArray().every(input => input.value !== "")) check = false;
-            if (check) {
-                $("#update_LLM_by_ID input").each(function(index) {
-                    if (index < 7 && index > 2) $(this).val($(vals[index - 3]).val())
-                    else if (index == 7) $(this).val(id);
-                    else if (index == 8) $(this).val(100);
-                });
-                $("#update_LLM_by_ID").submit();
-            }
-            row.find('.fa-save').parent().addClass('hidden');
-            row.find('.fa-pen').parent().removeClass('hidden');
-            row.find('td').each(function(index) {
-                const cell = $(this);
-                if (index == 0) {
-                    cell.html(
-                        `<img class="rounded-full border border-gray-400 dark:border-gray-900" width="40px" src="${cell.find("label").attr('old')}">`
-                    )
-                } else if (index < 5) {
-                    const value = cell.find("input").attr('old');
-                    cell.html(`<div class="text-sm font-medium">${value}</div>`);
-                }
-            });
-        }
-
         function CreateRow() {
-            datas = $("#createLLM input");
-            $("#create_new_LLM input").each(function(index) {
-                if (index > 1 && index < 6) $(this).val($(datas[index - 2]).val());
-                else if (index == 6) $(this).val(100);
-            })
-            $("#create_new_LLM").submit();
+            $("#edit_llm form").attr("action", "{{ route('create_new_LLM') }}");
+            $("#update_LLM_by_ID img").attr("src",
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg=="
+            )
+            $("#update_LLM_by_ID input:eq(1)").prop("disabled", true)
+            $("#update_LLM_by_ID input[name='name']").val("")
+            $("#update_LLM_by_ID input[name='link']").val("")
+            $("#update_LLM_by_ID input[name='order']").val("")
+            $("#update_LLM_by_ID input[name='access_code']").val("")
+            $("#update_LLM_by_ID input[name='id']").val("")
+            $("#update_LLM_by_ID input[name='description']").val("")
+            $("#update_LLM_by_ID input[name='version']").val("")
+            $("#edit_llm h3:eq(0)").text("Create LLM Profile")
+            $("#edit_llm h3:eq(1)").text("Are you sure you want to CREATE this LLM Profile?")
+            $("#delete_button").hide()
         }
+
+        function edit(data) {
+            console.log(data)
+            $("#update_LLM_by_ID img").attr("src", data[0])
+            $("#update_LLM_by_ID input[name='_method']").prop("disabled", false)
+            $("#update_LLM_by_ID input[name='name']").val(data[1])
+            $("#update_LLM_by_ID input[name='link']").val(data[2])
+            $("#update_LLM_by_ID input[name='order']").val(data[3])
+            $("#update_LLM_by_ID input[name='access_code']").val(data[4])
+            $("#update_LLM_by_ID input[name='id']").val(data[5])
+            $("#update_LLM_by_ID input[name='description']").val(data[6])
+            $("#update_LLM_by_ID input[name='version']").val(data[7])
+            $("#edit_llm form").attr("action", "{{ route('update_LLM_by_id') }}")
+            $("#delete_llm").off('click').on('click', function() {
+                DeleteRow(data[5]);
+            });
+            $("#edit_llm h3:eq(0)").text("Modify LLM Profile")
+            $("#edit_llm h3:eq(1)").text("Are you sure you want to UPDATE this LLM Profile?")
+            $("#edit_llm h3:eq(2)").text("Are you sure you want to DELETE this LLM Profile?")
+            $("#delete_button").show()
+        }
+        $('#update_img').on('change', function(event) {
+            var input = event.target;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $("#update_LLM_by_ID img").attr("src", e.target.result)
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        });
     </script>
 </x-app-layout>

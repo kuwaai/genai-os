@@ -20,6 +20,8 @@ class LLMController extends Controller
             Storage::delete($model->image);
             $validated['image'] = $file->store('public/images');
         }
+        if (is_null($validated['order']))  unset($validated['order']);
+        if (is_null($validated['version']))  unset($validated['version']);
         $model->fill($validated);
         $model->save();
         return Redirect::route('dashboard');
@@ -41,6 +43,8 @@ class LLMController extends Controller
         if ($file = $request->file('image')) {
             $validated['image'] = $file->store('public/images');
         }
+        if (is_null($validated['order']))  unset($validated['order']);
+        if (is_null($validated['version']))  unset($validated['version']);
         $model->fill($validated);
         $model->save();
         return Redirect::route('dashboard');

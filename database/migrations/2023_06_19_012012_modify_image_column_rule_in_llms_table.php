@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Models\SystemSetting;
 
 return new class extends Migration
 {
@@ -12,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-		$setting = new SystemSetting();
-		$setting->fill([
-			'key' => 'Web_Title',
-			'value' => 'TAIDE Chat',
-		]);
-		$setting->save();
+        Schema::table('llms', function (Blueprint $table) {
+			$table->string('image')->change()->nullable()->default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg==");
+        });
     }
 
     /**
