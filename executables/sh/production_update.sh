@@ -9,6 +9,7 @@ php artisan storage:link
 npm install
 composer dump-autoload --optimize
 php artisan config:cache
+php artisan config:clear
 php artisan route:cache
 php artisan view:cache
 php artisan optimize

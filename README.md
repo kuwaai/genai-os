@@ -31,7 +31,7 @@ screen -dmS llama bash -c "python3 ~/LLMs/0.0.3/LLaMA_TW1.py"
 ### How to update
 1. Pull the newest version of files by using `git pull`
 2. Go under the folder `cd executables/sh`
-3. Run the script `./install.sh` and `./startweb_public.sh`
+3. Run the script `./production_update.sh`
 
 ### For production
 Nginx is recommanded, Since that is the only tested one,
