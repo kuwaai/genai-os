@@ -44,7 +44,7 @@
                                         <div class="pl-2">
                                             <div class="w-full text-lg font-semibold leading-none">{{ $LLM->name }}
                                             </div>
-                                            <div class="w-full text-sm leading-none">Trained by blablabla</div>
+                                            <div class="w-full text-sm leading-none">{{ $LLM->description ? $LLM->description : "This LLM is currently available!" }}</div>
                                         </div>
                                     </div>
                                 </label>

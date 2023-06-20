@@ -11,8 +11,14 @@
                 @else
                     @foreach (App\Models\LLMs::where('enabled', true)->orderby('order')->orderby('created_at')->get() as $LLM)
                         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                            <div class="border-b border-white"><a href="{{ $LLM->link }}" target="_blank"
-                                    class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                            <div class="border-b border-white">
+                                @if ($LLM->link)
+                                    <a href="{{ $LLM->link }}" target="_blank"
+                                        class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                                @else
+                                    <span
+                                        class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                                @endif
                             </div>
                             <div class="max-h-[182px] overflow-y-auto scrollbar">
                                 <div

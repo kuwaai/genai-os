@@ -11,9 +11,22 @@ class SystemController extends Controller
 {
     public function update(Request $request): RedirectResponse
     {
+        $result = "setting_saved";
         $model = SystemSetting::where("key", "agent_location")->first();
         $model->value = $request->input("agent_location");
         $model->save();
-        return Redirect::route('dashboard')->with('status', 'agent_location-updated');
+
+        if ($request->input("allow_register") == "allow"){
+            if (in_array(null, [env("MAIL_MAILER", null), env("MAIL_HOST", null), env("MAIL_PORT", null), env("MAIL_USERNAME", null), env("MAIL_PASSWORD", null), env("MAIL_ENCRYPTION", null), env("MAIL_FROM_ADDRESS", null), env("MAIL_FROM_NAME", null)])){
+                $request->merge(['allow_register' => null]);
+                $result = "smtp_not_configured";
+            }
+        }
+
+        $model = SystemSetting::where("key", "allowRegister")->first();
+        $model->value = $request->input("allow_register") == "allow" ? "true" : "false";
+        $model->save();
+
+        return Redirect::route('dashboard')->with('status', $result);
     }
 }
