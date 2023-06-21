@@ -32,7 +32,7 @@
                                     <div class="w-full px-3 flex flex-col items-center">
                                         <label for="update_img">
                                             <span
-                                                class="block uppercase tracking-wide text-white text-xs font-bold mb-2">
+                                                class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
                                                 LLM Image
                                             </span>
                                             <img id="image"
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                             <div class="w-full md:w-2/3 px-3">
-                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="llm_name">
                                     LLM Name
                                 </label>
@@ -55,7 +55,7 @@
                         </div>
                         <div class="flex flex-wrap -mx-3 mb-2">
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="version">
                                     Version
                                 </label>
@@ -64,7 +64,7 @@
                                     id="version" type="text" placeholder="Version">
                             </div>
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="access_code">
                                     Access Code
                                 </label>
@@ -73,7 +73,7 @@
                                     id="access_code" type="text" placeholder="Access Code">
                             </div>
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="order">
                                     Order
                                 </label>
@@ -84,7 +84,7 @@
                         </div>
                         <div class="flex flex-wrap -mx-3 mb-2">
                             <div class="w-full px-3">
-                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="link">
                                     Link
                                 </label>
@@ -95,7 +95,7 @@
                         </div>
                         <div class="flex flex-wrap -mx-3 mb-2">
                             <div class="w-full px-3">
-                                <label class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="description">
                                     Description
                                 </label>
@@ -212,7 +212,7 @@
                                 </p>
                             </div>
                             <button type="submit"
-                                class="px-4 py-2 rounded bg-green-500 hover:bg-green-700 ml-auto"><i
+                                class="px-4 py-2 rounded bg-green-500 hover:bg-green-700 ml-auto text-white"><i
                                     class="fas fa-save"></i></button>
                         </header>
                         <div class="max-w-xl">

@@ -38,7 +38,7 @@
                                     class="inline-flex items-center justify-between w-full p-2 text-gray-300 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">
                                     <div class="flex items-center">
                                         <div
-                                            class="flex-shrink-0 h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            class="flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-gray-300 flex items-center justify-center overflow-hidden">
                                             <img src="{{ asset(Storage::url($LLM->image)) }}">
                                         </div>
                                         <div class="pl-2">
@@ -86,10 +86,10 @@
                     @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
                         @if (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('dcID', $DC->first()->id)->get()->where('enabled', false)->count() == 0)
                             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                                <div class="flex px-2 py-3 border-b border-white">
+                                <div class="flex px-2 py-3 border-b border-black dark:border-white">
                                     @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                                         <div
-                                            class="mx-1 flex-shrink-0 h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-gray-300 flex items-center justify-center overflow-hidden">
                                             <a href="{{ $chat->link }}" target="_blank"><img
                                                     data-tooltip-target="llm_{{ $chat->llm_id }}"
                                                     data-tooltip-placement="top"
