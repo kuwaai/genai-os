@@ -48,8 +48,7 @@ class ProfileController extends Controller
             $request
             ->user()
             ->tokens()
-            ->where('name', 'ChatGPT_Token')
-            ->accessToken->fill(['token' => ''])
+            ->where('name', 'ChatGPT_Token')->fill(['token' => ''])
             ->save();
         }
 
