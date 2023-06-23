@@ -49,13 +49,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  api_llama_01:
+  api_debug_01:
     runtime: nvidia
     image: api
     devices:
       - /dev/nvidia0:/dev/nvidia0
     volumes:
-      - ./api_llama:/API
+      - ./api_debug:/API
     environment:
       - CUDA_VISIBLE_DEVICES=0
     depends_on:
