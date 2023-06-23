@@ -34,9 +34,7 @@ sudo reboot
 Role | Developer | Demo1 | Demo2 | Demo3
 --- | --- | --- | --- | --- 
 Account | dev@chat.gai.tw | demo1@chat.gai.tw | demo2@chat.gai.tw | demo3@chat.gai.tw 
---- | --- | --- | --- | ---
 Password | develope | chatchat | chatchat | chatchat 
---- | --- | --- | --- | ---
 isDemo | False | True | True | True 
 8. Your web should goes online and you're able to view the web at `localhost:8080`
 9. This setup contain one default Debug LLM API, You need to add it to dashboard in order to use it, Just create a LLM Profile with `debug` as `ACCESS CODE`
