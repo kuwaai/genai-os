@@ -5,7 +5,7 @@ services:
     image: llmproject_web
     environment:
       TZ: 'Asia/Taipei'
-      WEBROOT: '/var/www/html/public'
+      WEBROOT: '/var/www/html/LLM_Project/public'
       PHP_REDIS_SESSION_HOST: 'redis'
       CREATE_LARAVEL_STORAGE: '1'
       COMPOSERMIRROR: 'https://mirrors.cloud.tencent.com/composer/'

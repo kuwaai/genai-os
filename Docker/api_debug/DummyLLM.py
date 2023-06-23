@@ -4,21 +4,28 @@ from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
 
 def sigterm_handler(signum, frame):
+    if registered:
+        try:
+            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            if response.text == "Failed":
+                print("Warning, Failed to unregister from agent")
+        except requests.exceptions.ConnectionError as e:
+            print("Warning, Failed to unregister from agent")
     sys.exit(0)
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 app = Flask(__name__)
-app.config["REDIS_URL"] = "redis://localhost:6379/0"
+app.config["REDIS_URL"] = "redis://redis:6379/0"
 sse = ServerSentEventsBlueprint('sse', __name__)
 app.register_blueprint(sse, url_prefix='/')
 # -- Configs --
-agent_endpoint = "http://localhost:9000/"
+agent_endpoint = "http://web:9000/"
 LLM_name = "debug"
 # This is the IP that will be stored in Agent, 
 # Make sure the IP address here are accessible by Agent
-public_ip = "localhost" 
+public_ip = "api_debug_01" 
 ignore_agent = False
 port = 9001 # By choosing None, it'll assign an unused port
 # -- Config ends --
