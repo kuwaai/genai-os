@@ -28,7 +28,7 @@ class ProfileController extends Controller
                 ->tokens()
                 ->where('name', 'API_Token')
                 ->delete();
-            $request->user()->createToken('API_Token', ['access_api']);
+            $request->user()->createToken('API_Token', ['access_api'])->save();
         }
         if (
             $request
