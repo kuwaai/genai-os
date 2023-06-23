@@ -38,6 +38,7 @@ Password | develope | chatchat | chatchat | chatchat
 --- | --- | --- | --- | ---
 isDemo | False | True | True | True 
 8. Your web should goes online and you're able to view the web at `localhost:8080`
+9. This setup contain one default Debug LLM API, You need to add it to dashboard in order to use it, Just create a LLM Profile with `debug` as `ACCESS CODE`
 
 ### Setup the web 
 1. Clone this project by using `git clone`
