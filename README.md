@@ -30,6 +30,7 @@ sudo reboot
 5. Back to `Docker` and run `./rebuild.sh` to start the docker-compose
 6. You can run `sudo docker container ls -a` to check if the 4 services are all alive and good
 7. Go inside the web and here's the 4 default accounts
+
 Role | Developer | Demo1 | Demo2 | Demo3
 --- | --- | --- | --- | --- 
 Account | dev@chat.gai.tw | demo1@chat.gai.tw | demo2@chat.gai.tw | demo3@chat.gai.tw 
