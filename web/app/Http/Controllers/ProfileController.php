@@ -44,12 +44,9 @@ class ProfileController extends Controller
                 ->delete();
             $request
                 ->user()
-                ->createToken('ChatGPT_Token', ['chatgpt_token']);
-            $request
-            ->user()
-            ->tokens()
-            ->where('name', 'ChatGPT_Token')->fill(['token' => ''])
-            ->save();
+                ->createToken('ChatGPT_Token', ['chatgpt_token'])
+                ->token->forceFill(['token' => ''])
+                ->save();
         }
 
         return view('profile.edit', [
@@ -78,7 +75,9 @@ class ProfileController extends Controller
     public function chatgpt_update(Request $request)
     {
         if (!$request->user()->forDemo) {
-            if ($request->input('chatgpt_api') == null) $request->merge(['chatgpt_api' => ""]);
+            if ($request->input('chatgpt_api') == null) {
+                $request->merge(['chatgpt_api' => '']);
+            }
             $request
                 ->user()
                 ->tokens()
