@@ -1,7 +1,20 @@
 # -#- coding: UTF-8 -*-
-import time, requests, sys, socket, os, openai
+import time, requests, sys, socket, os, openai, signal
 from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
+
+def sigterm_handler(signum, frame):
+    if registered:
+        try:
+            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            if response.text == "Failed":
+                print("Warning, Failed to unregister from agent")
+        except requests.exceptions.ConnectionError as e:
+            print("Warning, Failed to unregister from agent")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 app = Flask(__name__)
 app.config["REDIS_URL"] = "redis://localhost:6379/0"
