@@ -13,7 +13,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ../LLM_Project:/var/www/html/LLM_Project
+      - ../web:/var/www/html/LLM_Project
       - ./script:/script
     networks:
       - taide
