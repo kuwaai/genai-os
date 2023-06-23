@@ -28,21 +28,24 @@ if not dummy:
     # model part
     def process(data):
         try:
-            if len(data) > 0 and data[0] > 0:
-                if len(data) > 1 and 1 >= data[1] >= 0:
-                    if len(data) > 2 and data[2] > 0:
-                        yield openai.ChatCompletion.create(model=model,
-                              max_tokens=data[2],
-                              temperature=data[1],
-                              messages=[
-                              {"role": "user", "content": data[0]}
-                            ]).choices[0].message.content
-                    else:
-                        yield "You must use at least 1 token to use this LLM!"
+            msg = data.get("input")
+            chatgpt_apitoken = data.get("chatgpt_apitoken")
+            if msg and chatgpt_apitoken:
+                msg = msg.strip()
+                chatgpt_apitoken = chatgpt_apitoken.strip()
+                if len(msg) > 0 and len(chatgpt_apitoken) > 0:
+                    openai.api_key = chatgpt_apitoken
+                    yield openai.ChatCompletion.create(model=model,
+                          max_tokens=2000,
+                          temperature=0.5,
+                          messages=[
+                          {"role": "user", "content": msg}
+                        ]).choices[0].message.content
+                    openai.api_key = None
                 else:
-                    yield "Temperature out of range!"
+                    yield "No chatgpt token are received!" if len(msg) > 0 else "No input message are received!"
             else:
-                yield "No message received!"
+                yield "No chatgpt token are received!" if msg else "No input message are received!"
         except Exception as e:
             print(e)
         finally:
@@ -65,10 +68,9 @@ else:
 def api():
     if Ready[0]:
         Ready[0] = False
-        data = [request.form.get("input"), request.form.get("temperature"), request.form.get("max_tokens")]
-        resp = Response(process(data), mimetype='text/event-stream')
+        resp = Response(process(request.form), mimetype='text/event-stream')
         resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
-        if data: return resp
+        if request.form.get("input"): return resp
         print("I didn't see your input!")
         Ready[0] = True
     return ""
@@ -84,19 +86,11 @@ else:
     print("Registered")
 
 if __name__ == '__main__':
-    api_key = None
-    with open("chatgpt_api_token", "r") as file:
-        api_key = file.read()
-    if api_key and api_key.strip():
-        openai.api_key = api_key
-        del api_key
-        app.run(port=port, host="0.0.0.0")
-        if registered:
-            try:
-                response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
-                if response.text == "Failed":
-                    print("Warning, Failed to unregister from agent")
-            except requests.exceptions.ConnectionError as e:
+    app.run(port=port, host="0.0.0.0")
+    if registered:
+        try:
+            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            if response.text == "Failed":
                 print("Warning, Failed to unregister from agent")
-    else:
-        print("Setup failed, no API key founded!")
+        except requests.exceptions.ConnectionError as e:
+            print("Warning, Failed to unregister from agent")

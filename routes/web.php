@@ -48,6 +48,8 @@ Route::middleware('auth', 'verified')->group(function () {
     #---Profiles
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile/api', [ProfileController::class, 'renew'])->name('profile.api.renew');
+    Route::patch('/profile/chatgpt/api', [ProfileController::class, 'chatgpt_update'])->name('profile.chatgpt.api.update');
+    
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 

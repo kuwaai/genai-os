@@ -20,13 +20,33 @@ class ProfileController extends Controller
             $request
                 ->user()
                 ->tokens()
+                ->where('name', 'API_Token')
                 ->count() != 1
         ) {
             $request
                 ->user()
                 ->tokens()
+                ->where('name', 'API_Token')
                 ->delete();
             $request->user()->createToken('API_Token', ['access_api']);
+        }
+        if (
+            $request
+                ->user()
+                ->tokens()
+                ->where('name', 'ChatGPT_Token')
+                ->count() != 1
+        ) {
+            $request
+                ->user()
+                ->tokens()
+                ->where('name', 'ChatGPT_Token')
+                ->delete();
+            $request
+                ->user()
+                ->createToken('ChatGPT_Token', ['chatgpt_token'])
+                ->accessToken->fill(['token' => ''])
+                ->save();
         }
 
         return view('profile.edit', [
@@ -52,6 +72,27 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
     }
 
+    public function chatgpt_update(Request $request)
+    {
+        if (!$request->user()->forDemo) {
+            if ($request->input('chatgpt_api') == null) $request->merge(['chatgpt_api' => ""]);
+            $request
+                ->user()
+                ->tokens()
+                ->where('name', 'ChatGPT_Token')
+                ->delete();
+            $request
+                ->user()
+                ->createToken('ChatGPT_Token', ['chatgpt_token'])
+                ->accessToken->fill(['token' => $request->input('chatgpt_api')])
+                ->save();
+
+            $request->user()->save();
+            return Redirect::route('profile.edit')->with('status', 'chatgpt-token-updated');
+        }
+        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
+    }
+
     /**
      * Renew the user's API Token.
      */
@@ -61,6 +102,7 @@ class ProfileController extends Controller
             $request
                 ->user()
                 ->tokens()
+                ->where('name', 'API_Token')
                 ->delete();
             $request->user()->createToken('API_Token', ['access_api']);
 

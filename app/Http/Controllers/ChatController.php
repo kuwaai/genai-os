@@ -45,7 +45,10 @@ class ChatController extends Controller
             $history->save();
             $llm = LLMs::findOrFail($request->input('llm_id'));
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($chat->id, $input, $llm->access_code, Auth::user()->id, $history->id);
+            RequestChat::dispatch($chat->id, $input, $llm->access_code, Auth::user()->id, $history->id, Auth::user()
+            ->tokens()
+            ->where('name', 'ChatGPT_Token')
+            ->first()->token);
         }
         return Redirect::route('chats', $chat->id);
     }
@@ -63,7 +66,10 @@ class ChatController extends Controller
             $history->save();
             $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($chatId, $input, $access_code, Auth::user()->id, $history->id);
+            RequestChat::dispatch($chatId, $input, $access_code, Auth::user()->id, $history->id, Auth::user()
+            ->tokens()
+            ->where('name', 'ChatGPT_Token')
+            ->first()->token);
         }
         return Redirect::route('chats', $chatId);
     }

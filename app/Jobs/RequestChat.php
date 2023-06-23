@@ -18,13 +18,13 @@ use Carbon\Carbon;
 class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $access_code, $msgtime, $history_id, $user_id, $chat_id;
+    private $input, $access_code, $msgtime, $history_id, $user_id, $chat_id, $chatgpt_apitoken;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
     /**
      * Create a new job instance.
      */
-    public function __construct($chat_id, $input, $access_code, $user_id, $history_id)
+    public function __construct($chat_id, $input, $access_code, $user_id, $history_id, $chatgpt_apitoken)
     {
         $this->input = $input;
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
@@ -32,6 +32,7 @@ class RequestChat implements ShouldQueue
         $this->user_id = $user_id;
         $this->chat_id = $chat_id;
         $this->history_id = $history_id;
+        $this->chatgpt_apitoken = $chatgpt_apitoken;
     }
 
     /**
@@ -67,6 +68,7 @@ class RequestChat implements ShouldQueue
                             'input' => $this->input,
                             'name' => $this->access_code,
                             'history_id' => $this->history_id,
+                            "chatgpt_apitoken" => $this->chatgpt_apitoken
                         ],
                         'stream' => true,
                     ]);
