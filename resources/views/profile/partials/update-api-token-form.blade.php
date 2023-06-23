@@ -39,7 +39,7 @@
         @method('patch')
 
         <div>
-            <x-input-label for="chatgpt_api" :value="__('ChatGPT API Token')" />
+            <x-input-label for="chatgpt_api" :value="__('OpenAI API Token')" />
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('Please aware that each message might cause the usage up to 2000 tokens') }}
             </p>
