@@ -45,7 +45,7 @@ class ProfileController extends Controller
             $request
                 ->user()
                 ->createToken('ChatGPT_Token', ['chatgpt_token'])
-                ->token->forceFill(['token' => ''])
+                ->forceFill(['token' => ''])
                 ->save();
         }
 
