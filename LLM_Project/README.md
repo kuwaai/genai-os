@@ -1,4 +1,4 @@
-# TAIDE Chat 0.0.4.4
+# TAIDE Chat 0.0.4.5
 ### Basic Software Requirements
 * PostgreSQL 14
 * Nodejs 18

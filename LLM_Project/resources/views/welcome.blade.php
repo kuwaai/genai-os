@@ -221,7 +221,7 @@
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.4.4</a>
+                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.4.5</a>
                 </div>
             </div>
         </div>
