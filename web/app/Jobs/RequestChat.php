@@ -32,6 +32,7 @@ class RequestChat implements ShouldQueue
         $this->user_id = $user_id;
         $this->chat_id = $chat_id;
         $this->history_id = $history_id;
+        if ($chatgpt_apitoken == null)$chatgpt_apitoken = "";
         $this->chatgpt_apitoken = $chatgpt_apitoken;
     }
 
@@ -99,7 +100,7 @@ class RequestChat implements ShouldQueue
                         }
                     }
                     if (trim($tmp) == '') {
-                        Redis::publish($this->history_id, 'New [Oops, seems like LLM given empty message as output!]');
+                        Redis::publish($this->history_id, 'New [Oops, seems like LLM given empty message as output, Please try again!]');
                     } else {
                         Redis::publish($this->history_id, 'New ' . trim($tmp));
                     }

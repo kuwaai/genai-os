@@ -45,34 +45,13 @@ class ChatController extends Controller
             $history->save();
             $llm = LLMs::findOrFail($request->input('llm_id'));
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            if (
-                $request
-                    ->user()
-                    ->tokens()
-                    ->where('name', 'ChatGPT_Token')
-                    ->count() != 1
-            ) {
-                $request
-                    ->user()
-                    ->tokens()
-                    ->where('name', 'ChatGPT_Token')
-                    ->delete();
-                $request
-                    ->user()
-                    ->createToken('ChatGPT_Token', ['chatgpt_token'])
-                    ->accessToken->fill(['token' => ''])
-                    ->save();
-            }
             RequestChat::dispatch(
                 $chat->id,
                 $input,
                 $llm->access_code,
                 Auth::user()->id,
                 $history->id,
-                Auth::user()
-                    ->tokens()
-                    ->where('name', 'ChatGPT_Token')
-                    ->first()->token,
+                Auth::user()->openai_token,
             );
         }
         return Redirect::route('chats', $chat->id);
@@ -91,34 +70,13 @@ class ChatController extends Controller
             $history->save();
             $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            if (
-                $request
-                    ->user()
-                    ->tokens()
-                    ->where('name', 'ChatGPT_Token')
-                    ->count() != 1
-            ) {
-                $request
-                    ->user()
-                    ->tokens()
-                    ->where('name', 'ChatGPT_Token')
-                    ->delete();
-                $request
-                    ->user()
-                    ->createToken('ChatGPT_Token', ['chatgpt_token'])
-                    ->accessToken->fill(['token' => ''])
-                    ->save();
-            }
             RequestChat::dispatch(
                 $chatId,
                 $input,
                 $access_code,
                 Auth::user()->id,
                 $history->id,
-                Auth::user()
-                    ->tokens()
-                    ->where('name', 'ChatGPT_Token')
-                    ->first()->token,
+                Auth::user()->openai_token,
             );
         }
         return Redirect::route('chats', $chatId);

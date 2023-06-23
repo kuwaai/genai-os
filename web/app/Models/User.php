@@ -22,7 +22,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'isAdmin',
-		'forDemo'
+		'forDemo',
+		'openai_token'
     ];
 
     /**

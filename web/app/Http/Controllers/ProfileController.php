@@ -30,29 +30,6 @@ class ProfileController extends Controller
                 ->delete();
             $request->user()->createToken('API_Token', ['access_api']);
         }
-        if (
-            $request
-                ->user()
-                ->tokens()
-                ->where('name', 'ChatGPT_Token')
-                ->count() != 1
-        ) {
-            $request
-                ->user()
-                ->tokens()
-                ->where('name', 'ChatGPT_Token')
-                ->delete();
-            $request
-                ->user()
-                ->createToken('ChatGPT_Token', ['chatgpt_token']);
-            $request
-                ->user()
-                ->tokens()
-                ->where('name', 'ChatGPT_Token')
-                ->first()
-                ->fill(['token' => ''])
-                ->save();
-        }
 
         return view('profile.edit', [
             'user' => $request->user(),
@@ -80,21 +57,7 @@ class ProfileController extends Controller
     public function chatgpt_update(Request $request)
     {
         if (!$request->user()->forDemo) {
-            if ($request->input('chatgpt_api') == null) {
-                $request->merge(['chatgpt_api' => '']);
-            }
-            $request
-                ->user()
-                ->tokens()
-                ->where('name', 'ChatGPT_Token')
-                ->delete();
-            $request
-                ->user()
-                ->createToken('ChatGPT_Token', ['chatgpt_token'])
-                ->accessToken->fill(['token' => $request->input('chatgpt_api')])
-                ->save();
-
-            $request->user()->save();
+            $request->user()->fill(["openai_token"=> $request->input('openai_token')])->save();
             return Redirect::route('profile.edit')->with('status', 'chatgpt-token-updated');
         }
         return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');

@@ -61,6 +61,8 @@ if not dummy:
                 yield "No chatgpt token are received!" if msg else "No input message are received!"
         except Exception as e:
             print(e)
+            if str(e).startswith("Incorrect API key provided:"):
+                yield "Incorrect API Key, You should provide a correct API key to use this LLM!"
         finally:
             Ready[0] = True
             print("finished")

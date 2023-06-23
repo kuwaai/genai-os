@@ -39,14 +39,11 @@
         @method('patch')
 
         <div>
-            <x-input-label for="chatgpt_api" :value="__('OpenAI API Token')" />
+            <x-input-label for="openai_token" :value="__('OpenAI API Token')" />
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('Please aware that each message might cause the usage up to 2000 tokens') }}
             </p>
-            <x-text-input type="text" id="chatgpt_api" name="chatgpt_api" class="mt-1 block w-full" :value="$user
-                ->tokens()
-                ->where('name', 'ChatGPT_Token')
-                ->first()->token" />
+            <x-text-input type="text" id="openai_token" name="openai_token" class="mt-1 block w-full" :value="$user->openai_token" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
