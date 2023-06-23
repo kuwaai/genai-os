@@ -83,6 +83,24 @@ class DuelController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
                     $history->save();
+                    if (
+                        $request
+                            ->user()
+                            ->tokens()
+                            ->where('name', 'ChatGPT_Token')
+                            ->count() != 1
+                    ) {
+                        $request
+                            ->user()
+                            ->tokens()
+                            ->where('name', 'ChatGPT_Token')
+                            ->delete();
+                        $request
+                            ->user()
+                            ->createToken('ChatGPT_Token', ['chatgpt_token'])
+                            ->accessToken->fill(['token' => ''])
+                            ->save();
+                    }
                     RequestChat::dispatch($chat->id, $input, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()
                     ->tokens()
                     ->where('name', 'ChatGPT_Token')

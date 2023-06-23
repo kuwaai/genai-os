@@ -41,14 +41,39 @@ class ChatController extends Controller
             $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
             $history->save();
             $history = new Histories();
-            $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+            $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
             $history->save();
             $llm = LLMs::findOrFail($request->input('llm_id'));
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($chat->id, $input, $llm->access_code, Auth::user()->id, $history->id, Auth::user()
-            ->tokens()
-            ->where('name', 'ChatGPT_Token')
-            ->first()->token);
+            if (
+                $request
+                    ->user()
+                    ->tokens()
+                    ->where('name', 'ChatGPT_Token')
+                    ->count() != 1
+            ) {
+                $request
+                    ->user()
+                    ->tokens()
+                    ->where('name', 'ChatGPT_Token')
+                    ->delete();
+                $request
+                    ->user()
+                    ->createToken('ChatGPT_Token', ['chatgpt_token'])
+                    ->accessToken->fill(['token' => ''])
+                    ->save();
+            }
+            RequestChat::dispatch(
+                $chat->id,
+                $input,
+                $llm->access_code,
+                Auth::user()->id,
+                $history->id,
+                Auth::user()
+                    ->tokens()
+                    ->where('name', 'ChatGPT_Token')
+                    ->first()->token,
+            );
         }
         return Redirect::route('chats', $chat->id);
     }
@@ -62,14 +87,39 @@ class ChatController extends Controller
             $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
             $history = new Histories();
-            $history->fill(['msg' => "* ...thinking... *", 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+            $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
             $history->save();
             $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($chatId, $input, $access_code, Auth::user()->id, $history->id, Auth::user()
-            ->tokens()
-            ->where('name', 'ChatGPT_Token')
-            ->first()->token);
+            if (
+                $request
+                    ->user()
+                    ->tokens()
+                    ->where('name', 'ChatGPT_Token')
+                    ->count() != 1
+            ) {
+                $request
+                    ->user()
+                    ->tokens()
+                    ->where('name', 'ChatGPT_Token')
+                    ->delete();
+                $request
+                    ->user()
+                    ->createToken('ChatGPT_Token', ['chatgpt_token'])
+                    ->accessToken->fill(['token' => ''])
+                    ->save();
+            }
+            RequestChat::dispatch(
+                $chatId,
+                $input,
+                $access_code,
+                Auth::user()->id,
+                $history->id,
+                Auth::user()
+                    ->tokens()
+                    ->where('name', 'ChatGPT_Token')
+                    ->first()->token,
+            );
         }
         return Redirect::route('chats', $chatId);
     }
@@ -136,7 +186,7 @@ class ChatController extends Controller
                             $client->disconnect();
                         }
                     } elseif ($type == 'New') {
-                        echo 'data: ' . $history_id . ',' . str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $msg) . "\n\n";
+                        echo 'data: ' . $history_id . ',' . str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $msg) . "\n\n";
                         ob_flush();
                         flush();
                     }
