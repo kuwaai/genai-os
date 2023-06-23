@@ -6,6 +6,7 @@ WORKDIR /
 
 # Copy any setup files or scripts into the image
 COPY setup.sh /setup.sh
+COPY .env /.env
 
 # Run setup commands
 RUN chmod +x /setup.sh && /setup.sh

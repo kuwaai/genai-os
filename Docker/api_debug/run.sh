@@ -7,4 +7,4 @@ while ! curl -s http://web:9000/debug >/dev/null; do
 done
 
 echo "Connected to http://web:9000/debug"
-python3 LLaMA_TW1.py
+python3 DummyLLM.py

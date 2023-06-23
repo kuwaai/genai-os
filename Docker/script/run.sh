@@ -1,5 +1,6 @@
 cd /var/www/html
 # Install packages
+cp /.env /var/www/html/LLM_Project/
 cd /var/www/html/LLM_Project/executables/docker
 chmod +x install.sh
 ./install.sh
