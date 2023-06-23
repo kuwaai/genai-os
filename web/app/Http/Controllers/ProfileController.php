@@ -28,7 +28,7 @@ class ProfileController extends Controller
                 ->tokens()
                 ->where('name', 'API_Token')
                 ->delete();
-            $request->user()->createToken('API_Token', ['access_api'])->save();
+            $request->user()->createToken('API_Token', ['access_api']);
         }
         if (
             $request
@@ -44,9 +44,13 @@ class ProfileController extends Controller
                 ->delete();
             $request
                 ->user()
-                ->createToken('ChatGPT_Token', ['chatgpt_token'])
-                ->accessToken->fill(['token' => ''])
-                ->save();
+                ->createToken('ChatGPT_Token', ['chatgpt_token']);
+            $request
+            ->user()
+            ->tokens()
+            ->where('name', 'ChatGPT_Token')
+            ->accessToken->fill(['token' => ''])
+            ->save();
         }
 
         return view('profile.edit', [
