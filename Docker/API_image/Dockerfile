@@ -10,4 +10,4 @@ COPY requirements.txt /requirements.txt
 # Run setup commands
 RUN chmod +x /setup.sh && /setup.sh
 
-ENTRYPOINT ["/bin/bash", "-c", "chown -R root:root API && chmod +x /API/run.sh && /API/run.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "chown -R root:root API && chmod +x /API/run.sh && exec /API/run.sh"]
