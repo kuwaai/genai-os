@@ -11,4 +11,4 @@ COPY .env /.env
 # Run setup commands
 RUN chmod +x /setup.sh && /setup.sh
 
-CMD ["/bin/bash", "-c", "chown -R root:root script | chmod +x /script/run.sh | /script/run.sh"]
+CMD ["/bin/bash", "-c", "chown -R root:root script && chmod +x /script/run.sh && /script/run.sh"]
