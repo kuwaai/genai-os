@@ -2,12 +2,12 @@
 set -e
 function cleanup() {
     echo "Stopping Python program..."
-    kill -SIGINT $PYTHON_PID
+    kill -SIGTERM $PYTHON_PID
     wait $PYTHON_PID
     echo "Python program stopped."
     exit
 }
-trap cleanup SIGINT
+trap cleanup SIGTERM
 cd /API
 apt update
 apt install -y curl

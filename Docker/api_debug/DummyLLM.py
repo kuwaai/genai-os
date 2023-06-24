@@ -4,7 +4,7 @@ from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
 
 def handler(signum, frame):
-    print("Received SIGINT, exiting...")
+    print("Received SIGTERM, exiting...")
     if registered:
         try:
             response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
@@ -15,7 +15,7 @@ def handler(signum, frame):
     print("exited")
     sys.exit(0)
 
-signal.signal(signal.SIGINT, handler)
+signal.signal(signal.SIGTERM, handler)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 app = Flask(__name__)
