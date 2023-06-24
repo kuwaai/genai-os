@@ -77,4 +77,4 @@ Also it's recommanded to modify this variable in php.ini
 So when the model took too long, it won't shows 504 gateway timeout
 
 ### How it works
-![arch](demo/arch.png?raw=true "Architecture to complete jobs")
+![arch](web/demo/arch.png?raw=true "Architecture to complete jobs")
