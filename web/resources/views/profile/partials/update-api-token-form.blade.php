@@ -9,7 +9,7 @@
         </p>
     </header>
 
-    <form method="post" action="{{ route('profile.api.renew') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.api.renew') }}" class="mt-6 space-y-6" autocomplete="off">
         @csrf
         @method('patch')
 
@@ -34,7 +34,7 @@
     </form>
 
 
-    <form method="post" action="{{ route('profile.chatgpt.api.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.chatgpt.api.update') }}" class="mt-6 space-y-6" autocomplete="off">
         @csrf
         @method('patch')
 
@@ -43,7 +43,7 @@
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('Please aware that each message might cause the usage up to 2000 tokens') }}
             </p>
-            <x-text-input type="text" id="openai_token" name="openai_token" class="mt-1 block w-full" :value="$user->openai_token" />
+            <x-text-input type="password" id="openai_token" name="openai_token" class="mt-1 block w-full" :value="$user->openai_token" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
