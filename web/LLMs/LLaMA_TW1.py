@@ -3,7 +3,8 @@ import time, re, requests, sys, socket, os, torch, signal
 from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
 
-def sigterm_handler(signum, frame):
+def handler(signum, frame):
+    print("Received SIGTERM, exiting...")
     if registered:
         try:
             response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
@@ -11,9 +12,10 @@ def sigterm_handler(signum, frame):
                 print("Warning, Failed to unregister from agent")
         except requests.exceptions.ConnectionError as e:
             print("Warning, Failed to unregister from agent")
+    print("exited")
     sys.exit(0)
 
-signal.signal(signal.SIGTERM, sigterm_handler)
+signal.signal(signal.SIGTERM, handler)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 app = Flask(__name__)
