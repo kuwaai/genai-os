@@ -27,6 +27,6 @@ class SystemController extends Controller
         $model->value = $request->input("allow_register") == "allow" ? "true" : "false";
         $model->save();
 
-        return Redirect::route('dashboard')->with('status', $result);
+        return Redirect::route('dashboard.home')->with('status', $result);
     }
 }

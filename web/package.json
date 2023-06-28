@@ -2,7 +2,8 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "election": "node ai_election.js"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
@@ -15,6 +16,7 @@
         "vite": "^4.3.3"
     },
     "dependencies": {
-        "Carbon": "^0.3.6"
+        "Carbon": "^0.3.6",
+        "socket.io": "^4.7.0"
     }
 }

@@ -21,7 +21,7 @@ class DuelController extends Controller
         if ($duel_id){
             $chat = DuelChat::findOrFail($duel_id);
             if ($chat->user_id != Auth::user()->id) {
-                return redirect()->route('duel');
+                return redirect()->route('duel.home');
             } elseif (true){#LLMs::findOrFail($chat->llm_id)->enabled == true) {
                 return view('duel');
             }
@@ -44,7 +44,7 @@ class DuelController extends Controller
                 $chat->save();
             }
         }
-        return redirect()->to(route('duels', $Duel->id) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
+        return redirect()->to(route('duel.chat', $Duel->id) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
     public function delete(Request $request): RedirectResponse
     {
@@ -54,7 +54,7 @@ class DuelController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error("Chat not found: " . $request->input('id'));
         }
-        return redirect()->to(route('duel') . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
+        return redirect()->to(route('duel.home') . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
 
     public function edit(Request $request): RedirectResponse
@@ -66,7 +66,7 @@ class DuelController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error("Chat not found: " . $request->input('id'));
         }
-        return redirect()->to(route('duels', $request->input('id')) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
+        return redirect()->to(route('duel.chat', $request->input('id')) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
     
     public function request(Request $request): RedirectResponse
@@ -88,6 +88,6 @@ class DuelController extends Controller
                 }
             }
         }
-        return redirect()->to(route('duels', $duelId) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
+        return redirect()->to(route('duel.chat', $duelId) . ($request->input('limit') ? "?limit=" . $request->input('limit') : ""));
     }
 }

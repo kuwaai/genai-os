@@ -24,7 +24,7 @@
                                 <div
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                        href="{{ route('new_chat', $LLM->id) }}">
+                                        href="{{ route('chat.new', $LLM->id) }}">
                                         <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
                                     </a>
                                 </div>
@@ -32,7 +32,7 @@
                                     <div
                                         class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                         <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('chats', $chat->id) }}">
+                                            href="{{ route('chat.chat', $chat->id) }}">
                                             <p
                                                 class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
                                                 {{ $chat->name }}</p>
@@ -54,14 +54,14 @@
             <div id="histories"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
                 @if (request()->route('chat_id'))
-                    <form id="deleteChat" action="{{ route('chat_delete_chat') }}" method="post" class="hidden">
+                    <form id="deleteChat" action="{{ route('chat.delete') }}" method="post" class="hidden">
                         @csrf
                         @method('delete')
                         <input name="id"
                             value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
                     </form>
 
-                    <form id="editChat" action="{{ route('chat_edit_chat') }}" method="post" class="hidden">
+                    <form id="editChat" action="{{ route('chat.edit') }}" method="post" class="hidden">
                         @csrf
                         <input name="id"
                             value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
@@ -208,7 +208,7 @@
                         $("#chatHeader >p").text(input.val())
                     }
 
-                    task = new EventSource("{{ route('chat_sse') }}", {
+                    task = new EventSource("{{ route('chat.sse') }}", {
                         withCredentials: false
                     });
                     task.addEventListener('error', error => {

@@ -21,7 +21,7 @@
                     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white"></h3>
 
                     <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
-                        action="{{ route('update_LLM_by_id') }}" class="w-full max-w-xl">
+                        action="{{ route('dashboard.update') }}" class="w-full max-w-xl">
                         @csrf
                         @method('patch')
                         <input id="update_img" name="image" type="file" style="display:none">
@@ -197,7 +197,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form method="post" action="{{ route('System.update') }}" class="space-y-6">
+                    <form method="post" action="{{ route('dashboard.update') }}" class="space-y-6">
                         <header class="flex">
                             @csrf
                             @method('patch')
@@ -242,10 +242,10 @@
                                         class="text-sm text-gray-600 dark:text-green-400">
                                         {{ __('Saved.') }}</p>
                                 @elseif (session('status') === 'smtp_not_configured')
-                                    <p x-data="{ show: true }" x-show="show" 
+                                    <p x-data="{ show: true }" x-show="show"
                                         class="text-sm text-red-600 dark:text-red-400">
                                         {{ __("Failed to allow registering, SMTP haven't been configured!") }}</p>
-                                    <p x-data="{ show: true }" x-show="show" 
+                                    <p x-data="{ show: true }" x-show="show"
                                         class="text-sm text-gray-600 dark:text-green-400">
                                         {{ __('The rest of setting are saved.') }}</p>
                                 @endif
@@ -288,7 +288,7 @@
                         @endif
                         <div
                             class="shadow overflow-hidden border dark:border-gray-900 sm:rounded-lg mt-3 overflow-x-auto scrollbar">
-                            <form id="del_LLM_by_ID" method="post" action="{{ route('delete_LLM_by_id') }}"
+                            <form id="del_LLM_by_ID" method="post" action="{{ route('dashboard.llms.delete') }}"
                                 style="display:none">
                                 @csrf
                                 @method('delete')
@@ -350,7 +350,7 @@
                                                         <i class="fas fa-pen"></i>
                                                     </button>
                                                     <a class="{{ $LLM->enabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600' }} text-white font-bold py-3 px-4 rounded flex items-center justify-center"
-                                                        href="{{ route('toggle_LLM', $LLM->id) }}">
+                                                        href="{{ route('dashboard.llms.toggle', $LLM->id) }}">
                                                         <i class="fas fa-power-off"></i>
                                                     </a>
                                                 </div>
@@ -382,7 +382,7 @@
                         </header>
                         <div class="mt-3 mx-auto flex">
                             <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
-                                href="{{ route('reset_redis') }}">Reset<br>Redis<br>Caches</a>
+                                href="{{ route('dashboard.resetRedis') }}">Reset<br>Redis<br>Caches</a>
                         </div>
                     </section>
                 </div>
@@ -396,7 +396,7 @@
         }
 
         function CreateRow() {
-            $("#edit_llm form").attr("action", "{{ route('create_new_LLM') }}");
+            $("#edit_llm form").attr("action", "{{ route('dashboard.llms.create') }}");
             $("#update_LLM_by_ID img").attr("src",
                 "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg=="
             )
@@ -424,7 +424,7 @@
             $("#update_LLM_by_ID input[name='id']").val(data[5])
             $("#update_LLM_by_ID input[name='description']").val(data[6])
             $("#update_LLM_by_ID input[name='version']").val(data[7])
-            $("#edit_llm form").attr("action", "{{ route('update_LLM_by_id') }}")
+            $("#edit_llm form").attr("action", "{{ route('dashboard.update') }}")
             $("#delete_llm").off('click').on('click', function() {
                 DeleteRow(data[5]);
             });

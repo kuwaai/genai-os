@@ -13,24 +13,29 @@
                 <!-- Navigation Links -->
                 @if(Auth::user()->isAdmin)
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('dashboard.home')" :active="request()->routeIs('dashboard.*')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
                 @endif
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('duel')" :active="request()->routeIs('duel') || request()->routeIs('duels')">
+                    <x-nav-link :href="route('duel.home')" :active="request()->routeIs('duel.*')">
                         {{ __('Duel') }}
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('chat')" :active="request()->routeIs('chat') || request()->routeIs('chats') || request()->routeIs('new_chat')">
+                    <x-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
                         {{ __('Chat') }}
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('archive')" :active="request()->routeIs('archive') || request()->routeIs('archives')">
+                    <x-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
                         {{ __('Archive') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
+                        {{ __('Play') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -85,18 +90,21 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             @if(Auth::user()->isAdmin)
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+            <x-responsive-nav-link :href="route('dashboard.home')" :active="request()->routeIs('dashboard.*')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             @endif
-            <x-responsive-nav-link :href="route('chat')" :active="request()->routeIs('chat')">
+            <x-responsive-nav-link :href="route('duel.home')" :active="request()->routeIs('duel.*')">
+                {{ __('Duel') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
                 {{ __('Chats') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('archive')" :active="request()->routeIs('archive')">
+            <x-responsive-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
                 {{ __('Archives') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('duel')" :active="request()->routeIs('duel')">
-                {{ __('Duel') }}
+            <x-responsive-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
+                {{ __('Play') }}
             </x-responsive-nav-link>
         </div>
 

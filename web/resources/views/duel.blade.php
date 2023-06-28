@@ -23,7 +23,7 @@
                     </h3>
                 </div>
                 <!-- Modal body -->
-                <form method="post" action="{{ route('duel_create_chat') }}" class="p-6" id="create_duel"
+                <form method="post" action="{{ route('duel.create') }}" class="p-6" id="create_duel"
                     onsubmit="return checkForm()">
                     @csrf
                     <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
@@ -107,7 +107,7 @@
                                     <div
                                         class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                         <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('duels', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
+                                            href="{{ route('duel.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
                                             <p class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
                                                 {{ $dc->name }}</p>
                                         </a>
@@ -128,14 +128,14 @@
         @else
             <div id="histories"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
-                <form id="deleteChat" action="{{ route('duel_delete_chat') }}" method="post" class="hidden">
+                <form id="deleteChat" action="{{ route('duel.delete') }}" method="post" class="hidden">
                     @csrf
                     @method('delete')
                     <input name="id" value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
                     <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 </form>
 
-                <form id="editChat" action="{{ route('duel_edit_chat') }}" method="post" class="hidden">
+                <form id="editChat" action="{{ route('duel.edit') }}" method="post" class="hidden">
                     @csrf
                     <input name="id"
                         value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
@@ -237,7 +237,7 @@
                 </div>
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
                     <form method="post"
-                        action="{{ route('duel_request_chat') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
+                        action="{{ route('duel.request') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
                         id="create_chat">
                         <div class="flex">
                             @csrf
@@ -287,7 +287,7 @@
                     $("#chatHeader >p").text(input.val())
                 }
 
-                task = new EventSource("{{ route('chat_sse') }}", {
+                task = new EventSource("{{ route('chat.sse') }}", {
                     withCredentials: false
                 });
                 task.addEventListener('error', error => {

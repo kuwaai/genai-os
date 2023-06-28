@@ -6,6 +6,7 @@ use App\Http\Controllers\LLMController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\DuelController;
+use App\Http\Controllers\ElectionController;
 use BeyondCode\LaravelSSE\Facades\SSE;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -26,84 +27,96 @@ use App\Models\Chats;
 Route::get('/', function () {
     return view('welcome');
 })->name('/');
-Route::get('/chats/stream', [ChatController::class, 'SSE'])->name('chat_sse');
 
 # Admin routes, require admin permission
 Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-    Route::get('/resetRedis', [ChatController::class, 'ResetRedis'])->name('reset_redis');
-    Route::get('/LLMs/toggle/{llm_id}', [LLMController::class, 'toggle'])->name('toggle_LLM');
+    Route::group(['prefix' => 'dashboard'], function () {
+        Route::get('/', function () {
+            return view('dashboard');
+        })->name('dashboard.home');
+        Route::get('/resetRedis', [ChatController::class, 'ResetRedis'])->name('dashboard.resetRedis');
+        Route::patch('/update', [SystemController::class, 'update'])->name('dashboard.update');
 
-    Route::delete('/LLMs/delete', [LLMController::class, 'delete'])->name('delete_LLM_by_id');
-    Route::post('/LLMs/create', [LLMController::class, 'create'])->name('create_new_LLM');
-    Route::patch('/LLMs/update', [LLMController::class, 'update'])->name('update_LLM_by_id');
-
-    Route::patch('/System/update', [SystemController::class, 'update'])->name('System.update');
+        Route::group(['prefix' => 'LLMs'], function () {
+            Route::get('/toggle/{llm_id}', [LLMController::class, 'toggle'])->name('dashboard.llms.toggle');
+            Route::delete('/delete', [LLMController::class, 'delete'])->name('dashboard.llms.delete');
+            Route::post('/create', [LLMController::class, 'create'])->name('dashboard.llms.create');
+            Route::patch('/update', [LLMController::class, 'update'])->name('dashboard.llms.update');
+        });
+    });
 });
 
 # User routes, required email verified
 Route::middleware('auth', 'verified')->group(function () {
     #---Profiles
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile/api', [ProfileController::class, 'renew'])->name('profile.api.renew');
-    Route::patch('/profile/chatgpt/api', [ProfileController::class, 'chatgpt_update'])->name('profile.chatgpt.api.update');
-    
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::group(['prefix' => 'profile'], function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
+
+        Route::patch('/api', [ProfileController::class, 'renew'])->name('profile.api.renew');
+        Route::patch('/chatgpt/api', [ProfileController::class, 'chatgpt_update'])->name('profile.chatgpt.api.update');
+
+        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
 
     #---Chats
-    Route::get('/chats', function () {
-        return view('chat');
+    Route::group(['prefix' => 'chats'], function () {
+        Route::get('/', function () {
+            return view('chat');
+        })->name('chat.home');
+
+        Route::get('/new/{llm_id}', function ($llm_id) {
+            if (!LLMs::findOrFail($llm_id)->exists()) {
+                return redirect()->route('chat');
+            }
+            return view('chat');
+        })->name('chat.new');
+        Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
+        Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
+        Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
+        Route::post('/request', [ChatController::class, 'request'])->name('chat.request');
+        Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
+        Route::delete('/delete', [ChatController::class, 'delete'])->name('chat.delete');
     })->name('chat');
 
-    # Setup the create chat parameters
-    Route::get('/chats/new/{llm_id}', function ($llm_id) {
-        if (!LLMs::findOrFail($llm_id)->exists()) {
-            return redirect()->route('chat');
-        }
-        return view('chat');
-    })->name('new_chat');
-
-    # Create initial chat
-    Route::post('/chats/create', [ChatController::class, 'create'])->name('chat_create_chat');
-    # Continue chatting by POST to this route
-    Route::post('/chats/request', [ChatController::class, 'request'])->name('chat_request_chat');
-    # Edit chat name
-    Route::post('/chats/edit', [ChatController::class, 'edit'])->name('chat_edit_chat');
-    # Delete chat by this route
-    Route::delete('/chats/delete', [ChatController::class, 'delete'])->name('chat_delete_chat');
-    # SSE Listener for listen to generated texts
-
-    # Access to a chat's histories by this route
-    Route::get('/chats/{chat_id}',[ChatController::class, 'main'])->name('chats');
-    
     #---Archives
-    Route::get('/archive', function () {
-        return view('archive');
+    Route::group(['prefix' => 'archive'], function () {
+        Route::get('/', function () {
+            return view('archive');
+        })->name('archive.home');
+
+        Route::get('/{chat_id}', [ArchiveController::class, 'main'])->name('archive.chat');
+        Route::post('/edit', [ArchiveController::class, 'edit'])->name('archive.edit');
+        Route::delete('/delete', [ArchiveController::class, 'delete'])->name('archive.delete');
     })->name('archive');
-    # Access to a chat's histories by this route
-    Route::get('/archives/{chat_id}', [ArchiveController::class, 'main'])->name('archives');
-    # Edit chat name
-    Route::post('/archives/edit', [ArchiveController::class, 'edit'])->name('archive_edit_chat');
-    # Delete chat by this route
-    Route::delete('/archives/delete', [ArchiveController::class, 'delete'])->name('archive_delete_chat');
 
     #---Duel
-    Route::get('/duel', [DuelController::class, 'main'])->name('duel');
-    
-    # Create duel chat
-    Route::post('/duel/create', [DuelController::class, 'create'])->name('duel_create_chat');
-    # Access to a chat's histories by this route
-    Route::get('/duel/{duel_id}',[DuelController::class, 'main'])->name('duels');
-    # Edit chat name
-    Route::post('/duel/edit', [DuelController::class, 'edit'])->name('duel_edit_chat');
-    # Delete chat by this route
-    Route::delete('/duel/delete', [DuelController::class, 'delete'])->name('duel_delete_chat');
-    # Continue chatting by POST to this route
-    Route::post('/duel/request', [DuelController::class, 'request'])->name('duel_request_chat');
+    Route::prefix('duel')
+        ->group(function () {
+            Route::get('/', [DuelController::class, 'main'])->name('duel.home');
 
+            Route::post('/create', [DuelController::class, 'create'])->name('duel.create');
+            Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
+            Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
+            Route::delete('/delete', [DuelController::class, 'delete'])->name('duel.delete');
+            Route::post('/request', [DuelController::class, 'request'])->name('duel.request');
+        })
+        ->name('duel');
+
+    #---Play
+    Route::prefix('play')
+        ->group(function () {
+            Route::get('/', function () {
+                return view('play');
+            })->name('play.home');
+
+            Route::prefix('ai_election')
+                ->group(function () {
+                    Route::get('/', [ElectionController::class, 'home'])->name('play.ai_elections.home');
+                })
+                ->name('play.ai_elections');
+        })
+        ->name('play');
 });
 
 require __DIR__ . '/auth.php';
