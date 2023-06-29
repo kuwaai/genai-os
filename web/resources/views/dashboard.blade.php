@@ -21,7 +21,7 @@
                     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white"></h3>
 
                     <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
-                        action="{{ route('dashboard.update') }}" class="w-full max-w-xl">
+                        action="{{ route('dashboard.llms.update') }}" class="w-full max-w-xl">
                         @csrf
                         @method('patch')
                         <input id="update_img" name="image" type="file" style="display:none">
@@ -490,7 +490,7 @@
             $("#update_LLM_by_ID input[name='id']").val(data[5])
             $("#update_LLM_by_ID input[name='description']").val(data[6])
             $("#update_LLM_by_ID input[name='version']").val(data[7])
-            $("#edit_llm form").attr("action", "{{ route('dashboard.update') }}")
+            $("#edit_llm form").attr("action", "{{ route('dashboard.llms.update') }}")
             $("#delete_llm").off('click').on('click', function() {
                 DeleteRow(data[5]);
             });
