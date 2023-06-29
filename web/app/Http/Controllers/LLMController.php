@@ -24,7 +24,7 @@ class LLMController extends Controller
         if (is_null($validated['version']))  unset($validated['version']);
         $model->fill($validated);
         $model->save();
-        return Redirect::route('dashboard');
+        return Redirect::route('dashboard.home');
     }
 
     public function delete(Request $request): RedirectResponse
@@ -33,7 +33,7 @@ class LLMController extends Controller
         Storage::delete($model->image);
         $model->delete();
 
-        return Redirect::route('dashboard');
+        return Redirect::route('dashboard.home');
     }
 
     public function create(LLMCreateRequest $request): RedirectResponse
@@ -47,7 +47,7 @@ class LLMController extends Controller
         if (is_null($validated['version']))  unset($validated['version']);
         $model->fill($validated);
         $model->save();
-        return Redirect::route('dashboard');
+        return Redirect::route('dashboard.home');
     }
 
     public function toggle(Request $request): RedirectResponse
@@ -55,6 +55,6 @@ class LLMController extends Controller
         $model = LLMs::findOrFail($request->route('llm_id'));
         $model->enabled = !$model->enabled;
         $model->save();
-        return Redirect::route('dashboard');
+        return Redirect::route('dashboard.home');
     }
 }
