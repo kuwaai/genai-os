@@ -14,7 +14,11 @@
                             </p>
                         </header>
                         <div class="mt-3 mx-auto flex">
-                            <a class="text-blue-400 hover:text-blue-500" href="{{ route("play.ai_elections.home") }}">AI Election</a>
+                            @if (App\Models\SystemSetting::where('key', 'ai_election_enabled')->first()->value == 'true')
+                            <a class="text-blue-400 hover:text-blue-500" href="{{ route('play.ai_elections.home') }}">AI Election</a>
+                            @else
+                            <p>Sorry, No games availiable for now.</p>
+                            @endif
                         </div>
                     </section>
                 </div>

@@ -140,7 +140,7 @@
                 </div>
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
                     @if (request()->route('llm_id'))
-                        <form method="post" action="{{ route('chat_create_chat') }}" id="create_chat">
+                        <form method="post" action="{{ route('chat.create') }}" id="create_chat">
                             <div class="flex">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
@@ -158,7 +158,7 @@
                             </div>
                         </form>
                     @elseif(request()->route('chat_id'))
-                        <form method="post" action="{{ route('chat_request_chat') }}" id="create_chat">
+                        <form method="post" action="{{ route('chat.request') }}" id="create_chat">
                             <div class="flex">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">

@@ -27,9 +27,9 @@
                             <a href="{{ url('/dashboard') }}"
                                 class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</a>
                         @endif
-                        <a href="{{ route('duel') }}"
+                        <a href="{{ route('duel.home') }}"
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Duel</a>
-                        <a href="{{ route('chat') }}"
+                        <a href="{{ route('chat.home') }}"
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Chat</a>
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Log Out') }}</a>
@@ -50,14 +50,13 @@
 
         <div class="max-w-7xl mx-auto p-6 lg:p-8">
             <div class="flex items-center flex-col">
-                <!--<h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">TAIDE Chat</h3>
+                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">TAIDE Chat</h3>
                 <p class="text-lg dark:text-white text-black-600">(<span
                         class="text-red-600 dark:text-yellow-200">T</span>rustworthy <span
                         class="text-red-600 dark:text-yellow-200">AI</span> <span
                         class="text-red-600 dark:text-yellow-200">D</span>ialog <span
                         class="text-red-600 dark:text-yellow-200">E</span>ngine Chat)</p>
-                <p class="text-lg dark:text-cyan-200 text-blue-600">Free to chat with Open Source LLMs!</p>-->
-                <img src="{{ asset('images/TAIDE_logo_outline-1.png') }}">
+                <p class="text-lg dark:text-cyan-200 text-blue-600">Free to chat with Open Source LLMs!</p>
             </div>
 
 
@@ -221,7 +220,7 @@
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.4.5</a>
+                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.5</a>
                 </div>
             </div>
         </div>

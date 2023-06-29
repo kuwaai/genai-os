@@ -1,11 +1,23 @@
-# TAIDE Chat 0.0.4.5
+# TAIDE Chat 0.0.5
+### Implements
+* [Finished] Chatting with one LLMs
+* [Finished] Chatting with multiple LLMs at the same time
+* [Finished] LLM management and internal API with proxy
+* [Finished] User sign up & login, email auth
+* [WIP] First play ground game: AI Election
+* [Not Started] User account management
+* [Not Started] Better UI
+* [Not Started] Externel API
+* [Not Started] Combine Duel and Chat route
+
 ### Basic Software Requirements
 * PostgreSQL 14
 * Nodejs 18
 * PHP & PHP-FPM 8.1
 * Redis Server
 * Vite (Use `npm install -g vite`)
-### How to setup Docker enviroment
+
+### Steps to setup Docker enviroment
 1. Clone the whole project
 2. Run the commands below to download required packages on the machine you want to use
 ```shell

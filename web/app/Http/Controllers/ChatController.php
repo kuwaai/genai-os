@@ -23,11 +23,11 @@ class ChatController extends Controller
     {
         $chat = Chats::findOrFail($request->route('chat_id'));
         if ($chat->user_id != Auth::user()->id) {
-            return redirect()->route('chat');
+            return redirect()->route('chat.home');
         } elseif (LLMs::findOrFail($chat->llm_id)->enabled == true) {
             return view('chat');
         }
-        return redirect()->route('archives', $request->route('chat_id'));
+        return redirect()->route('archive.chat', $request->route('chat_id'));
     }
 
     public function create(ChatRequest $request): RedirectResponse
@@ -54,7 +54,7 @@ class ChatController extends Controller
                 Auth::user()->openai_token,
             );
         }
-        return Redirect::route('chats', $chat->id);
+        return Redirect::route('chat.chat', $chat->id);
     }
 
     public function request(Request $request): RedirectResponse
@@ -79,7 +79,7 @@ class ChatController extends Controller
                 Auth::user()->openai_token,
             );
         }
-        return Redirect::route('chats', $chatId);
+        return Redirect::route('chat.chat', $chatId);
     }
 
     public function delete(Request $request): RedirectResponse
@@ -88,11 +88,11 @@ class ChatController extends Controller
             $chat = Chats::findOrFail($request->input('id'));
         } catch (ModelNotFoundException $e) {
             // Handle the exception here, for example:
-            return Redirect::route('chat');
+            return Redirect::route('chat.home');
         }
 
         $chat->delete();
-        return Redirect::route('chat');
+        return Redirect::route('chat.home');
     }
 
     public function edit(Request $request): RedirectResponse
@@ -105,13 +105,13 @@ class ChatController extends Controller
         }
         $chat->fill(['name' => $request->input('new_name')]);
         $chat->save();
-        return Redirect::route('chats', $request->input('id'));
+        return Redirect::route('chat.chat', $request->input('id'));
     }
 
     public function ResetRedis(Request $request)
     {
         Redis::flushAll();
-        return Redirect::route('dashboard');
+        return Redirect::route('dashboard.home')->with('status', "resetRedis");
     }
 
     public function SSE(Request $request)

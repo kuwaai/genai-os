@@ -7,10 +7,12 @@
     width: 10px;
     height: 20px;
   }
+
   .scrollbar-2::-webkit-scrollbar {
     width: 20px;
     height: 10px;
   }
+
   .scrollbar-3::-webkit-scrollbar {
     width: 10px;
     height: 5px;
@@ -28,20 +30,20 @@
   .scrollbar::-webkit-scrollbar-thumb:hover {
     background: #c0a0b9;
   }
-    @media (prefers-color-scheme: dark) {
-      .scrollbar::-webkit-scrollbar-track {
-        background: gray;
-        border-radius: 100vh;
-      }
-    
-      .scrollbar::-webkit-scrollbar-thumb {
-        background: #f6f7ed;
-        border-radius: 100vh;
-      }
-    
-      .scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #c0a0b9;
-      }
+
+  @media (prefers-color-scheme: dark) {
+    .scrollbar::-webkit-scrollbar-track {
+      background: gray;
+      border-radius: 100vh;
+    }
+
+    .scrollbar::-webkit-scrollbar-thumb {
+      background: #f6f7ed;
+      border-radius: 100vh;
+    }
+
+    .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #c0a0b9;
     }
   }
-  
+}

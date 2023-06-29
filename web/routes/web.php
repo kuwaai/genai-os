@@ -6,7 +6,7 @@ use App\Http\Controllers\LLMController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\DuelController;
-use App\Http\Controllers\ElectionController;
+use App\Http\Controllers\PlayController;
 use BeyondCode\LaravelSSE\Facades\SSE;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -112,7 +112,8 @@ Route::middleware('auth', 'verified')->group(function () {
 
             Route::prefix('ai_election')
                 ->group(function () {
-                    Route::get('/', [ElectionController::class, 'home'])->name('play.ai_elections.home');
+                    Route::get('/', [PlayController::class, 'home'])->name('play.ai_elections.home');
+                    Route::patch('/update', [PlayController::class, 'update'])->name('play.ai_elections.update');
                 })
                 ->name('play.ai_elections');
         })
