@@ -16,11 +16,11 @@ class ArchiveController extends Controller
     {
         $chat = Chats::findOrFail($request->route('chat_id'));
         if ($chat->user_id != Auth::user()->id) {
-            return redirect()->route('archive');
+            return redirect()->route('archive.home');
         } elseif (LLMs::findOrFail($chat->llm_id)->enabled == false) {
             return view('archive');
         }
-        return redirect()->route('chats', $request->route('chat_id'));
+        return redirect()->route('chat.chat', $request->route('chat_id'));
     }
     public function delete(Request $request): RedirectResponse
     {
@@ -31,7 +31,7 @@ class ArchiveController extends Controller
             Log::error("Chat not found: " . $request->input('id'));
         }
 
-        return Redirect::route('archive');
+        return Redirect::route('archive.home');
     }
 
     public function edit(Request $request): RedirectResponse
@@ -43,6 +43,6 @@ class ArchiveController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error("Chat not found: " . $request->input('id'));
         }
-        return Redirect::route('archives', $request->input('id'));
+        return Redirect::route('archive.chat', $request->input('id'));
     }
 }
