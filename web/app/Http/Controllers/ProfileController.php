@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use DB;
 
 class ProfileController extends Controller
 {
@@ -57,7 +58,10 @@ class ProfileController extends Controller
     public function chatgpt_update(Request $request)
     {
         if (!$request->user()->forDemo) {
-            $request->user()->fill(["openai_token"=> $request->input('openai_token')])->save();
+            $request
+                ->user()
+                ->fill(['openai_token' => $request->input('openai_token')])
+                ->save();
             return Redirect::route('profile.edit')->with('status', 'chatgpt-token-updated');
         }
         return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
@@ -104,5 +108,36 @@ class ProfileController extends Controller
             return Redirect::to('/');
         }
         return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
+    }
+
+    public function api_auth(Request $request)
+    {
+        if (env('APP_KEY', null) == $request->input('key')) {
+            $result = DB::table('personal_access_tokens')
+                ->join('users', 'tokenable_id', '=', 'users.id')
+                ->where('token', $request->input('api_token'))
+                ->get();
+            if ($result->count() > 0) {
+                $user = $result->first();
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Authentication successful',
+                    'tokenable_id' => $user->tokenable_id,
+                    'openai_token' => $user->openai_token,
+                    'name' => $user->name,
+                ];
+                return response()->json($response);
+            }
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Token Authentication failed',
+            ];
+            return response()->json($errorResponse);
+        }
+        $errorResponse = [
+            'status' => 'error',
+            'message' => 'Safety Authentication failed',
+        ];
+        return response()->json($errorResponse);
     }
 }

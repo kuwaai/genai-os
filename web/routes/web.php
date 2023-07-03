@@ -28,6 +28,8 @@ Route::get('/', function () {
     return view('welcome');
 })->name('/');
 
+Route::get('/api_auth', [ProfileController::class, 'api_auth']);
+
 # Admin routes, require admin permission
 Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
     Route::group(['prefix' => 'dashboard'], function () {
@@ -112,7 +114,7 @@ Route::middleware('auth', 'verified')->group(function () {
 
             Route::prefix('ai_election')
                 ->group(function () {
-                    Route::get('/', [PlayController::class, 'home'])->name('play.ai_elections.home');
+                    Route::get('/', [PlayController::class, 'play'])->name('play.ai_elections.home');
                     Route::patch('/update', [PlayController::class, 'update'])->name('play.ai_elections.update');
                 })
                 ->name('play.ai_elections');

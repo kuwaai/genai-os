@@ -9,9 +9,9 @@ use App\Models\SystemSetting;
 
 class PlayController extends Controller
 {
-    function home(Request $request){
+    function play(Request $request){
         if (SystemSetting::where('key', 'ai_election_enabled')->first()->value == 'true'){
-            return view('ai_election.home');
+            return view('play.ai_election');
         }
         return Redirect::route('play.home');
     }
