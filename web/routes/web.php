@@ -29,6 +29,7 @@ Route::get('/', function () {
 })->name('/');
 
 Route::get('/api_auth', [ProfileController::class, 'api_auth']);
+Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
 
 # Admin routes, require admin permission
 Route::middleware('auth', 'verified', 'isAdmin')->group(function () {

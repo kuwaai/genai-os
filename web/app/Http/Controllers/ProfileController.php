@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Jobs\RequestChat;
+use GuzzleHttp\Client;
+use App\Models\LLMs;
 use DB;
 
 class ProfileController extends Controller
@@ -119,6 +124,7 @@ class ProfileController extends Controller
                 ->get();
             if ($result->count() > 0) {
                 $user = $result->first();
+
                 $response = [
                     'status' => 'success',
                     'message' => 'Authentication successful',
@@ -126,6 +132,24 @@ class ProfileController extends Controller
                     'openai_token' => $user->openai_token,
                     'name' => $user->name,
                 ];
+
+                if ($request->input('msg') && $request->input('llm_id')) {
+                    $llm = LLMs::findOrFail($request->input('llm_id'));
+                    $response['output'] = '';
+
+                    $client = new Client(['timeout' => 300]);
+                    RequestChat::dispatch($request->input('msg'), $llm->access_code, $user->id, -$user->id, $user->openai_token, 'aielection_' . $user->id);
+                    $req = $client->get(route("api.stream"), [
+                        'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                        'query' => [
+                            'key' => $request->input('key'),
+                            'channel' => 'aielection_' . $user->id,
+                        ],
+                        'stream' => true,
+                    ]);
+                    dd($req);
+                    $response['output'] = $req;
+                }
                 return response()->json($response);
             }
             $errorResponse = [
@@ -139,5 +163,40 @@ class ProfileController extends Controller
             'message' => 'Safety Authentication failed',
         ];
         return response()->json($errorResponse);
+    }
+
+    public function api_stream(Request $request)
+    {
+        $response = new StreamedResponse();
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        $response->headers->set('charset', 'utf-8');
+        $response->headers->set('Connection', 'close');
+
+        $response->setCallback(function () use ($response, $request) {
+            if (env('APP_KEY', null) == $request->input('key')) {
+                $channel = $request->input('channel');
+                if ($channel != null) {
+                    if (strpos($channel, 'aielection_') === 0) {
+                        $client = Redis::connection();
+                        $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
+                            [$type, $msg] = explode(' ', $message, 2);
+                            if ($type == 'Ended') {
+                                ob_flush();
+                                flush();
+                                $client->disconnect();
+                            } elseif ($type == 'New') {
+                                echo $msg;
+                                ob_flush();
+                                flush();
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+        return $response;
     }
 }

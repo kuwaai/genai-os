@@ -46,7 +46,6 @@ class ChatController extends Controller
             $llm = LLMs::findOrFail($request->input('llm_id'));
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
             RequestChat::dispatch(
-                $chat->id,
                 $input,
                 $llm->access_code,
                 Auth::user()->id,
@@ -71,7 +70,6 @@ class ChatController extends Controller
             $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
             RequestChat::dispatch(
-                $chatId,
                 $input,
                 $access_code,
                 Auth::user()->id,
@@ -124,6 +122,34 @@ class ChatController extends Controller
         $response->headers->set('Connection', 'close');
 
         $response->setCallback(function () use ($response) {
+            $channel = $request->input('channel');
+            if ($channel != null){
+                if (strpos($channel, "aielection_") === 0){
+                    $client = Redis::connection();
+                    $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
+                        global $listening;
+                        [$type, $msg] = explode(' ', $message, 2);
+                        $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                        if ($type == 'Ended') {
+                            $key = array_search($history_id, $listening);
+                            if ($key !== false) {
+                                unset($listening[$key]);
+                            }
+                            if (count($listening) == 0) {
+                                echo "event: close\n\n";
+                                ob_flush();
+                                flush();
+                                $client->disconnect();
+                            }
+                        } elseif ($type == 'New') {
+                            echo 'data: ' . $history_id . ',' . str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $msg) . "\n\n";
+                            ob_flush();
+                            flush();
+                        }
+                    });
+                    return;
+                }
+            }
             global $listening;
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
             if (count($listening) > 0) {

@@ -18,21 +18,22 @@ use Carbon\Carbon;
 class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $access_code, $msgtime, $history_id, $user_id, $chat_id, $chatgpt_apitoken;
+    private $input, $access_code, $msgtime, $history_id, $user_id, $chatgpt_apitoken, $channel;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
     /**
      * Create a new job instance.
      */
-    public function __construct($chat_id, $input, $access_code, $user_id, $history_id, $chatgpt_apitoken)
+    public function __construct($input, $access_code, $user_id, $history_id, $chatgpt_apitoken, $channel = null)
     {
         $this->input = $input;
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
         $this->access_code = $access_code;
         $this->user_id = $user_id;
-        $this->chat_id = $chat_id;
         $this->history_id = $history_id;
-        if ($chatgpt_apitoken == null)$chatgpt_apitoken = "";
+        if ($chatgpt_apitoken == null) $chatgpt_apitoken = "";
+        if ($channel == null) $channel = "";
+        $this->channel = $channel;
         $this->chatgpt_apitoken = $chatgpt_apitoken;
     }
 
@@ -41,10 +42,14 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
-        if (Histories::findOrFail($this->history_id)->msg != "* ...thinking... *") {
+        if ($this->channel == ""){
+            $this->channel += $this->history_id;
+        }
+        if ($this->history_id > 0){
+        if (Histories::findOrFail($this->channel)->msg != "* ...thinking... *") {
             Log::Debug("Hmmm");
             return;
-        }
+        }}
         Log::channel("analyze")->Info("In:" . $this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . strlen(trim($this->input)) . "|" . trim($this->input));
         $start = microtime(true); 
         $tmp = '';
@@ -91,7 +96,7 @@ class RequestChat implements ShouldQueue
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 $tmp .= $message;
-                                Redis::publish($this->history_id, 'New ' . $tmp);
+                                Redis::publish($this->channel, 'New ' . $tmp);
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
@@ -100,22 +105,24 @@ class RequestChat implements ShouldQueue
                         }
                     }
                     if (trim($tmp) == '') {
-                        Redis::publish($this->history_id, 'New [Oops, seems like LLM given empty message as output, Please try again!]');
+                        Redis::publish($this->channel, 'New [Oops, seems like LLM given empty message as output, Please try again!]');
                     } else {
-                        Redis::publish($this->history_id, 'New ' . trim($tmp));
+                        Redis::publish($this->channel, 'New ' . trim($tmp));
                     }
                 } catch (Exception $e) {
-                    Redis::publish($this->history_id, 'New ' . $tmp . "\n[Sorry, something is broken!]");
+                    Redis::publish($this->channel, 'New ' . $tmp . "\n[Sorry, something is broken!]");
                     Log::channel("analyze")->Debug("failJob " . $this->history_id);
                 } finally {
                     try {
-                        $history = Histories::findOrFail($this->history_id);
-                        $history->fill(['msg' => trim($tmp)]);
-                        $history->save();
+                        if ($this->channel == ""){
+                            $history = Histories::findOrFail($this->history_id);
+                            $history->fill(['msg' => trim($tmp)]);
+                            $history->save();
+                        }
                     } catch (Exception $e) {
                     }
-                    Redis::publish($this->history_id, 'Ended Ended');
-                    Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                    Redis::publish($this->channel, 'Ended Ended');
+                    if ($this->channel == $this->history_id + ""){Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);}
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
                     Log::channel("analyze")->Info("Out:" . $this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . $elapsed . "|" . strlen(trim($tmp)) . "|" . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . "|" . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)));

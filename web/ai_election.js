@@ -72,6 +72,29 @@ io.on('connection', client => {
 							client.emit('change','Play')
 						}
 					})
+					client.on("preview", (data)=>{
+						console.log(data.prompt)
+						console.log(data.llm_id)
+						$url = `http://localhost/api_auth?key=${process.env.APP_KEY}&api_token=${token}&msg=${data.prompt}&llm_id=${data.llm_id}`
+						console.log($url)
+						fetch($url)
+						.then((response) => {
+							if (!response.ok) {
+								client.disconnect();
+								throw new Error('Can\'t reach the auth server!');
+							}
+							return response.json(); // Assuming the response is in JSON format
+						})
+						.then((data) => {
+							client.emit("preview_result", data.output)
+						})
+						.catch((error) => {
+							logger('Error:' + error);
+						});
+					})
+					client.on("send", ()=>{
+						console.log("User decided the last preview result!")
+					})
 					client.emit('authed')
 				} else {
 					client.disconnect();

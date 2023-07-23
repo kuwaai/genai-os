@@ -11,10 +11,10 @@ data = {}
 @app.route("/", methods=["POST"])
 def api():
     # Forward SSE stream to the READY state LLM API, If no exist then return empty message
-    # Parameters: name, input, history_id
-    llm_name, inputs, history_id, chatgpt_apitoken = request.form.get("name"), request.form.get("input"), request.form.get("history_id"), request.form.get("chatgpt_apitoken")
+    # Parameters: name, input, history_id, user_id
+    llm_name, inputs, history_id, chatgpt_apitoken, user_id = request.form.get("name"), request.form.get("input"), request.form.get("history_id"), request.form.get("chatgpt_apitoken"), request.form.get("user_id")
     if data.get(llm_name):
-        dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == history_id]
+        dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == history_id and i[3] == user_id]
         if len(dest) > 0:
             dest = dest[0]
             try:
@@ -27,6 +27,7 @@ def api():
                     except Exception as e:
                         print('Error: {0}'.format(str(e)))
                     finally:
+                        dest[3] = -1
                         dest[2] = -1
                         dest[1] = "READY"
                         print("Done")
@@ -40,12 +41,13 @@ def api():
 @app.route("/status", methods=["POST"])
 def status():
     # This will check if any LLM that is READY, then return "READY", if every is busy, return "BUSY"
-    # Parameters: name, history_id
-    llm_name, history_id = request.form.get("name"), request.form.get("history_id")
+    # Parameters: name, history_id, user_id
+    llm_name, history_id, user_id = request.form.get("name"), request.form.get("history_id"), request.form.get("user_id")
     if llm_name and history_id and data.get(llm_name):
         for i in data[llm_name]:
-            if i[1] == "READY" and i[2] == -1:
+            if i[1] == "READY" and i[2] == -1 and i[3] == -1:
                 i[2] = history_id
+                i[3] = user_id
                 return "READY"
     return "BUSY"
    
@@ -55,7 +57,7 @@ def register():
     # Parameters: name, endpoint
     llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
     if endpoint == None or llm_name == None or endpoint in data.get(llm_name, []): return "Failed"
-    data.setdefault(llm_name, []).append([endpoint, "READY", -1])
+    data.setdefault(llm_name, []).append([endpoint, "READY", -1, -1])
     return "Success"
 
 @app.route("/unregister", methods=["POST"])
@@ -84,6 +86,7 @@ def reset():
         dest = [i for i in data[llm_name] if i[2] == history_id]
         if len(dest) > 0:
             dest = dest[0]
+            dest[3] = -1
             dest[2] = -1
             dest[1] = "READY"
     return "Success"
