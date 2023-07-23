@@ -181,14 +181,15 @@ class ProfileController extends Controller
                     if (strpos($channel, 'aielection_') === 0) {
                         $client = Redis::connection();
                         $client->subscribe($channel, function ($message, $raw_history_id) use ($client) {
+                            global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo "[ENDEDPLACEHOLDERUWU]";
+                                echo $result . "[ENDEDPLACEHOLDERUWU]";
                                 ob_flush();
                                 flush();
                                 $client->disconnect();
                             } elseif ($type == 'New') {
-                                echo $msg;
+                                $result = $msg;
                                 ob_flush();
                                 flush();
                             }

@@ -86,7 +86,7 @@
                                         </div>
                                         <div class="mx-auto">
                                             <button style="display: none;" onclick="send()"
-                                                class="ml-2 mb-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center">Send</button>
+                                                class="my-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center">Send</button>
                                         </div>
                                     </div>
                                     <div class="flex-1 flex-col"></div>
