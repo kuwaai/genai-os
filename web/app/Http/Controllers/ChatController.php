@@ -121,7 +121,7 @@ class ChatController extends Controller
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
 
-        $response->setCallback(function () use ($response) {
+        $response->setCallback(function () use ($response, $request) {
             $channel = $request->input('channel');
             if ($channel != null){
                 if (strpos($channel, "aielection_") === 0){

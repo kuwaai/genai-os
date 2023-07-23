@@ -31,8 +31,12 @@ class RequestChat implements ShouldQueue
         $this->access_code = $access_code;
         $this->user_id = $user_id;
         $this->history_id = $history_id;
-        if ($chatgpt_apitoken == null) $chatgpt_apitoken = "";
-        if ($channel == null) $channel = "";
+        if ($chatgpt_apitoken == null) {
+            $chatgpt_apitoken = '';
+        }
+        if ($channel == null) {
+            $channel = '';
+        }
         $this->channel = $channel;
         $this->chatgpt_apitoken = $chatgpt_apitoken;
     }
@@ -42,16 +46,18 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($this->channel == ""){
-            $this->channel += $this->history_id;
+        if ($this->channel == '') {
+            $this->channel .= $this->history_id;
         }
-        if ($this->history_id > 0){
-        if (Histories::findOrFail($this->channel)->msg != "* ...thinking... *") {
-            Log::Debug("Hmmm");
-            return;
-        }}
-        Log::channel("analyze")->Info("In:" . $this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . strlen(trim($this->input)) . "|" . trim($this->input));
-        $start = microtime(true); 
+        Log::channel('analyze')->Info($this->channel);
+        if ($this->history_id > 0 && $this->channel == $this->history_id . "") {
+            if (Histories::findOrFail($this->channel)->msg != '* ...thinking... *') {
+                Log::Debug('Hmmm');
+                return;
+            }
+        }
+        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+        $start = microtime(true);
         $tmp = '';
         try {
             $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
@@ -74,7 +80,7 @@ class RequestChat implements ShouldQueue
                             'input' => $this->input,
                             'name' => $this->access_code,
                             'history_id' => $this->history_id,
-                            "chatgpt_apitoken" => $this->chatgpt_apitoken
+                            'chatgpt_apitoken' => $this->chatgpt_apitoken,
                         ],
                         'stream' => true,
                     ]);
@@ -111,10 +117,10 @@ class RequestChat implements ShouldQueue
                     }
                 } catch (Exception $e) {
                     Redis::publish($this->channel, 'New ' . $tmp . "\n[Sorry, something is broken!]");
-                    Log::channel("analyze")->Debug("failJob " . $this->history_id);
+                    Log::channel('analyze')->Debug('failJob ' . $this->history_id);
                 } finally {
                     try {
-                        if ($this->channel == ""){
+                        if ($this->channel == '' . $this->history_id) {
                             $history = Histories::findOrFail($this->history_id);
                             $history->fill(['msg' => trim($tmp)]);
                             $history->save();
@@ -122,10 +128,12 @@ class RequestChat implements ShouldQueue
                     } catch (Exception $e) {
                     }
                     Redis::publish($this->channel, 'Ended Ended');
-                    if ($this->channel == $this->history_id + ""){Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);}
+                    if ($this->channel == '' . $this->history_id) {
+                        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                    }
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    Log::channel("analyze")->Info("Out:" . $this->access_code . "|" . $this->user_id . "|" . $this->history_id . "|" . $elapsed . "|" . strlen(trim($tmp)) . "|" . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . "|" . trim(str_replace("\n", "[NEWLINEPLACEHOLDERUWU]", $tmp)));
+                    Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . trim(str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $tmp)));
                 }
             }
         } catch (Exception $e) {

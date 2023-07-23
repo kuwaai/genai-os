@@ -147,8 +147,8 @@ class ProfileController extends Controller
                         ],
                         'stream' => true,
                     ]);
-                    dd($req);
-                    $response['output'] = $req;
+                    $req = $req->getBody()->getContents();
+                    $response['output'] = explode("[ENDEDPLACEHOLDERUWU]", $req)[0];
                 }
                 return response()->json($response);
             }
@@ -180,9 +180,10 @@ class ProfileController extends Controller
                 if ($channel != null) {
                     if (strpos($channel, 'aielection_') === 0) {
                         $client = Redis::connection();
-                        $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
+                        $client->subscribe($channel, function ($message, $raw_history_id) use ($client) {
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
+                                echo "[ENDEDPLACEHOLDERUWU]";
                                 ob_flush();
                                 flush();
                                 $client->disconnect();
