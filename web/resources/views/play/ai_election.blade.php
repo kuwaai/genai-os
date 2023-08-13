@@ -49,7 +49,7 @@
                                     <div class="flex-1 flex-col flex border-gray-700 rounded-lg border-2">
                                         <p class="text-center">{{ request()->user()->name }}</p>
                                         <button id="llm_select" data-dropdown-toggle="llm_dropdown"
-                                            class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-700 rounded-300 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
+                                            class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-700 rounded-300 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-500 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
                                             type="button">
                                             <p>Please choose a LLM to use</p>
                                         </button>
@@ -72,7 +72,7 @@
                                         </div>
                                         <div class="flex-1 flex flex-col">
                                             <textarea onchange="promptValidate()" oninput="promptValidate()" id="prompt"
-                                                class="flex-1 resize-none bg-transparent" placeholder="Prompt here"></textarea>
+                                                class="flex-1 resize-none bg-transparent border-red-600 focus:border-red-600" style="box-shadow:none;" placeholder="Prompt here"></textarea>
                                             <button id="last_llm"
                                                 class="flex-shrink-0 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-700 rounded-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
                                                 type="button" disabled>
@@ -81,6 +81,8 @@
                                             <div class="flex-1 flex relative">
                                                 <button style="display: none;" onclick="preview()"
                                                     class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg text-center">Preview</button>
+                                                <button style="display: none;" id="pending"
+                                                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-center">Pending...</button>
                                                 <textarea id="outcome" class="resize-none bg-transparent w-full" placeholder="Outcome" readonly></textarea>
                                             </div>
                                         </div>
@@ -91,6 +93,11 @@
                                     </div>
                                     <div class="flex-1 flex-col"></div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 border-gray-700 rounded border-2 hidden" id="Awaiting...">
+                            <div class="m-auto flex h-full flex-col justify-center">
+                                <p class="mx-auto mb-2">Waiting for players...</p>
                             </div>
                         </div>
                     </section>
@@ -137,7 +144,7 @@
 
             socket.on("preview_result", (data) => {
                 $("#outcome").val(data)
-                $("button[onclick='preview()']").hide()
+                $("#pending").hide()
                 $("button[onclick='send()']").show()
             })
         })
@@ -145,9 +152,19 @@
         var last_id = undefined;
 
         function promptValidate() {
+            $("#llm_select").removeClass("dark:bg-gray-500")
+            $("#llm_select").addClass("dark:bg-gray-700")
+            $("#prompt").removeClass("border-red-600 focus:border-red-600")
             if ($("#llm_select >p").attr("target") == undefined || $("#prompt").val() == "" || ($("#prompt").val() ==
                     last_prompt && $("#llm_select >p").attr("target") == last_id)) {
                 $("button[onclick='preview()']").hide()
+                if ($("#llm_select >p").attr("target") == undefined) {
+                    $("#llm_select").addClass("dark:bg-gray-500")
+                    $("#llm_select").removeClass("dark:bg-gray-700")
+                }
+                if ($("#prompt").val() == "") {
+                    $("#prompt").addClass("border-red-600 focus:border-red-600")
+                }
             } else {
                 $("button[onclick='preview()']").show()
             }
@@ -156,6 +173,9 @@
         function preview() {
             last_prompt = $("#prompt").val()
             last_id = $("#llm_select >p").attr("target")
+            $("button[onclick='preview()']").hide()
+            $("#pending").show()
+            $("#outcome").val("* thinking... *")
             $("#last_llm").html($("#llm_id_" + last_id).html());
             socket.emit("preview", {
                 "prompt": $("#prompt").val(),

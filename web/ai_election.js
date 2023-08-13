@@ -10,9 +10,10 @@ dotenv.config();
 tags = ["Info"]
 
 players = {}
+rooms = {}
 
-function findUserBySocket(socket){
-	for (userID in players){
+function findUserBySocket(socket) {
+	for (userID in players) {
 		if (players[userID].socket === socket) return userID;
 	}
 	return null;
@@ -28,7 +29,7 @@ function getCurrentDateTime() {
 	return `${dateStr} ${timeStr}`;
 }
 
-function logger(msg, tag = 0){
+function logger(msg, tag = 0) {
 	console.log(`[${tags[tag]}][${getCurrentDateTime()}] ${msg}`);
 }
 
@@ -37,7 +38,7 @@ io.on('connection', client => {
 	authTimeout = setTimeout(() => {
 		client.disconnect(); // Disconnect the client if the "auth" event is not received within 30 seconds
 		logger("An user timeout. automatically disconnected.");
-	}, 10000); 
+	}, 10000);
 
 	client.on("auth", (token) => {
 		logger("Doing auth on the client with API token: " + token)
@@ -59,41 +60,53 @@ io.on('connection', client => {
 						players[userID].socket.disconnect();
 					}
 					players[userID] = { "status": "Lobby", "socket": client, "openai_token": data.openai_token, "name": data.name };
-					
-					client.on("Action",(data)=>{
-						logger(`${userID},${players[userID].name}: Changed to ${data} State` )
-						if (data == "Queue"){
-							client.emit('change','Queue')
+
+					client.on("Action", (data) => {
+						logger(`${userID},${players[userID].name}: Changed to ${data} State`)
+						if (data == "Queue") {
+							client.emit('change', 'Queue')
 							players[userID].status = "Queue"
-						}else if (data == "Lobby"){
-							client.emit('change','Lobby')
+						} else if (data == "Lobby") {
+							client.emit('change', 'Lobby')
 							players[userID].status = "Lobby"
-						}else if (data == 'Play'){
-							client.emit('change','Play')
+						} else if (data == 'Play') {
+							rooms["solo_" + userID] = {"days":10,"score":{},"players":["user_" + userID, "AI_0", "AI_1"]}
+							rooms["solo_" + userID].players.forEach(i => {
+								rooms["solo_" + userID].score[i] = 0
+							});
+							players[userID].room = "solo_" + userID;
+							players[userID].status = "Play"
+							console.log(rooms)
+							client.emit('change', 'Play')
 						}
 					})
-					client.on("preview", (data)=>{
-						console.log(data.prompt)
-						console.log(data.llm_id)
+					client.on("preview", (data) => {
+						players[userID]["last_preview_llm"] = data.llm_id
 						$url = `http://localhost/api_auth?key=${process.env.APP_KEY}&api_token=${token}&msg=${data.prompt}&llm_id=${data.llm_id}`
-						console.log($url)
 						fetch($url)
-						.then((response) => {
-							if (!response.ok) {
-								client.disconnect();
-								throw new Error('Can\'t reach the auth server!');
-							}
-							return response.json(); // Assuming the response is in JSON format
-						})
-						.then((data) => {
-							client.emit("preview_result", data.output)
-						})
-						.catch((error) => {
-							logger('Error:' + error);
-						});
+							.then((response) => {
+								if (!response.ok) {
+									client.disconnect();
+									throw new Error('Can\'t reach the auth server!');
+								}
+								return response.json(); // Assuming the response is in JSON format
+							})
+							.then((data) => {
+								client.emit("preview_result", data.output)
+								players[userID]["last_preview_output"] = data.output
+							})
+							.catch((error) => {
+								logger('Error:' + error);
+							});
 					})
-					client.on("send", ()=>{
-						console.log("User decided the last preview result!")
+					client.on("send", () => {
+						console.log(`${players[userID]["last_preview_llm"]} ${players[userID]["last_preview_output"]}`)
+						if (players[userID].room.startsWith("solo_")){
+							//Solo game, generate the rest of AI's prompts, and calculate the score
+						}else{
+							//Check if everyone finished prompting
+							//if so, continue the next day and calculate the score
+						}
 					})
 					client.emit('authed')
 				} else {
@@ -109,12 +122,23 @@ io.on('connection', client => {
 	client.on('disconnect', () => {
 		logger("An user disconnected")
 		userID = findUserBySocket(client);
-		if (userID != null){
+		if (userID != null) {
+			if (players[userID].status == "Play") {
+				if (players[userID].room !== undefined) {
+					if (players[userID].room.startsWith("solo_")) {
+						console.log("A solo game just ended!")
+						delete rooms[players[userID].room]
+					} else {
+						//End the multiplayer game due to someone left the game.
+						//Or replace the person into AI so the game can continue to proceed
+					}
+				}
+			}
 			delete players[userID]
-		}else{
+		} else {
 			logger("Unauthed user disconnected")
 		}
-		
+
 	});
 });
 

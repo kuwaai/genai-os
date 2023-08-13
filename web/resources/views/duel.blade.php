@@ -86,7 +86,7 @@
                     @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
                         @if (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('dcID', $DC->first()->id)->get()->where('enabled', false)->count() == 0)
                             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                                <div class="flex px-2 py-3 border-b border-black dark:border-white">
+                                <div class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
                                     @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                                         <div
                                             class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-gray-300 flex items-center justify-center overflow-hidden">
