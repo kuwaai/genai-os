@@ -44,8 +44,20 @@
                                 <span class="text-center mx-2">You can select different LLM and modify the prompt to
                                     affact the
                                     outcome speech</span>
-                                <div class="flex-1 flex mb-2">
-                                    <div class="flex-1 flex-col"></div>
+                                <div class="flex-1 flex mb-0">
+                                    <div class="flex-1 flex-col flex border-gray-700 rounded-lg border-2">
+                                        <p class="text-center">AI Player 1</p>
+                                        <div class="flex-1 flex flex-col">
+                                            <button id="last_llm_AI_0"
+                                                class="flex-shrink-0 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-700 rounded-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
+                                                type="button" disabled>
+                                                <p>No LLM</p>
+                                            </button>
+                                            <div class="flex-1 flex relative">
+                                                <textarea id="AI_0_output" class="resize-none bg-transparent w-full" placeholder="Last day's speech" readonly></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="flex-1 flex-col flex border-gray-700 rounded-lg border-2">
                                         <p class="text-center">{{ request()->user()->name }}</p>
                                         <button id="llm_select" data-dropdown-toggle="llm_dropdown"
@@ -91,7 +103,19 @@
                                                 class="my-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center">Send</button>
                                         </div>
                                     </div>
-                                    <div class="flex-1 flex-col"></div>
+                                    <div class="flex-1 flex-col flex border-gray-700 rounded-lg border-2">
+                                        <p class="text-center">AI Player 2</p>
+                                        <div class="flex-1 flex flex-col">
+                                            <button id="last_llm_AI_1"
+                                                class="flex-shrink-0 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-700 rounded-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
+                                                type="button" disabled>
+                                                <p>No LLM</p>
+                                            </button>
+                                            <div class="flex-1 flex relative">
+                                                <textarea id="AI_1_output" class="resize-none bg-transparent w-full" placeholder="Last day's speech" readonly></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -146,6 +170,11 @@
                 $("#outcome").val(data)
                 $("#pending").hide()
                 $("button[onclick='send()']").show()
+            })
+
+            socket.on("ai_result", (data) => {
+                $(`#${data["who"]}_output`).val(data["msg"])
+                $(`#last_llm_${data["who"]}`).html($("#last_llm").html());
             })
         })
         var last_prompt = undefined;
