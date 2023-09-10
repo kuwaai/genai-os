@@ -4,5 +4,5 @@
 from typing import Generator
 
 class CompletionInterface:
-  def complete(input: str) -> Generator[str, None, None]:
+  def complete(self, text: str) -> Generator[str, None, None]:
     pass
