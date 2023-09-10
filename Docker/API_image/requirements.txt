@@ -1,5 +1,7 @@
-flask
-flask_sse
+uvicorn
+starlette
+sse-starlette
+python-multipart
 torch
 transformers
 accelerate

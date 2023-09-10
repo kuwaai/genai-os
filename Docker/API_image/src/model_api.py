@@ -4,14 +4,16 @@
 import sys, os, time, logging, atexit
 import requests, socket
 from urllib.parse import urljoin
-from flask import Flask, request, Response, abort, make_response, jsonify
-from flask_sse import ServerSentEventsBlueprint
+
+import asyncio
+import uvicorn
+from starlette.applications import Starlette
+from starlette.routing import Route
+from sse_starlette.sse import EventSourceResponse
+from starlette.responses import JSONResponse
+
 from models.reflect import ReflectModel
 from filters.chinese_translate import OpenCC
-
-app = Flask(__name__)
-app.config["REDIS_URL"] = os.environ.get("REDIS_URL", "redis://redis:6379/0")
-app.register_blueprint(ServerSentEventsBlueprint('sse', __name__), url_prefix='/')
 
 # The default value of configuration.
 # The value can be override by specifying environment variables.
@@ -29,6 +31,10 @@ CONFIG = {
 # Global state to indicate whether the model is processing another request.
 BUSY = False
 
+# Logger of this module
+logger = logging.getLogger(__name__) 
+logger.addHandler(logging.StreamHandler())
+
 def assign_unused_port():
     sock = socket.socket()
     sock.bind(('', 0))
@@ -37,7 +43,7 @@ def assign_unused_port():
     return port
 
 def process(data):
-    global BUSY
+    global BUSY, logger
     try:
         llm = ReflectModel()
         converter = OpenCC()
@@ -45,30 +51,29 @@ def process(data):
         for output_token in llm.complete(data):
             yield converter.filter(output_token)
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
     finally:
         BUSY = False
-        logging.debug('Finished.')
+        logger.debug('Finished.')
 
-@app.route(CONFIG['endpoint'], methods=['POST'])
-def api():
-    global BUSY
-    if BUSY: abort(make_response(jsonify(message='Processing another request'), 503))
+async def api(request):
+    global BUSY, logger
+    if BUSY: return JSONResponse({'message': 'Processing another request'}, 503)
     
-    data = request.form.get('input')
-    if data == None or data == '':
-        logging.debug("I didn't see your input!")
-        abort(make_response(jsonify(message="I didn't see your input!"), 400))
-        return
-    
-    BUSY = True
-    resp = Response(process(data), mimetype='text/event-stream')
-    resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
-    return resp
+    async with request.form() as form:
+        data = form.get('input')
+        if data == None or data == '':
+            logger.debug("I didn't see your input!")
+            return JSONResponse({'message': "I didn't see your input!"}, 400)
+        
+        BUSY = True
+        resp = EventSourceResponse(process(data))
+        # resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
+        return resp
 
 def register(retry_cnt, backoff_time=1):
-    global CONFIG
-    logging.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
+    global CONFIG, logger
+    logger.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
     try:
         response = requests.post(
             urljoin(CONFIG['agent_endpoint'], '/register'),
@@ -79,24 +84,24 @@ def register(retry_cnt, backoff_time=1):
         )
         if response.text == 'Failed': raise Exception
         else:
-            logging.info('Registered.')
+            logger.info('Registered.')
             atexit.register(unregister)
     except Exception as e:
-        logging.warning('The server failed to register to Agent. Cause: {}.'.format(str(e)))
+        logger.warning('The server failed to register to Agent. Cause: {}.'.format(str(e)))
 
         if retry_cnt == 0 and not CONFIG['ignore_agent']:
-            logging.info('The program will exit now.')
+            logger.info('The program will exit now.')
             sys.exit(0)
         
         if retry_cnt != 0:
-            logging.info('Will retry registration after {} seconds.'.format(backoff_time))
+            logger.info('Will retry registration after {} seconds.'.format(backoff_time))
             # Exponential backoff
             time.sleep(backoff_time)
             register(retry_cnt-1, backoff_time*2)
 
 def unregister():
-    global CONFIG
-    logging.info('Attempting to unregister with the Agent...')
+    global CONFIG, logger
+    logger.info('Attempting to unregister with the Agent...')
     try:
         response = requests.post(
             urljoin(CONFIG['agent_endpoint'], '/unregister'),
@@ -106,11 +111,30 @@ def unregister():
                 }
         )
         if response.text == 'Failed':
-            logging.warning('Failed to unregister from Agent. Refused by Agent.')
+            logger.warning('Failed to unregister from Agent. Refused by Agent.')
     except Exception as e:
-        logging.warning('Failed to unregister from Agent. Cause: {}.'.format(str(e)))
+        logger.warning('Failed to unregister from Agent. Cause: {}.'.format(str(e)))
 
-def configuration():
+def setup_logger():
+    global CONFIG
+    logging_format = '%(asctime)s [%(name)-5s] %(levelprefix)-4s %(message)s'
+    logging_date_format = '%Y-%m-%d %H:%M:%S' 
+    console_formatter = uvicorn.logging.ColourizedFormatter(
+        fmt=logging_format, datefmt=logging_date_format,
+        style="%", use_colors=True
+    )
+
+    loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+    for logger in [l for l in loggers if len(l.handlers) >= 1]:
+        logger.setLevel(CONFIG['logging_level'])
+        logger.handlers[0].setFormatter(console_formatter)
+        logger.handlers[0].setLevel(CONFIG['logging_level'])
+
+async def on_startup():
+    setup_logger()
+    register(CONFIG['retry_count'])
+
+def override_config():
     global CONFIG
 
     # Override default configuration is the corresponding environment variable exists.
@@ -120,13 +144,12 @@ def configuration():
     CONFIG['retry_count'] = int(CONFIG['retry_count'])
     
     os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-    logging.basicConfig(
-        format="[%(asctime)s][%(name)-5s][%(levelname)-5s] %(message)s (%(filename)s:%(lineno)d)",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        level = CONFIG['logging_level']
-    )
 
 if __name__ == '__main__':
-    configuration()
-    register(CONFIG['retry_count'])
-    app.run(port=CONFIG['port'], host='0.0.0.0')
+    override_config()
+    routes = [
+        Route(CONFIG['endpoint'], endpoint=api, methods=['POST'])
+    ]
+
+    app = Starlette(debug=True, routes=routes, on_startup=[on_startup])
+    uvicorn.run(app, host="0.0.0.0", port=CONFIG['port'], log_level=CONFIG['logging_level'])
