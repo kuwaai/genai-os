@@ -1,9 +1,7 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-import sys, os, time, logging, atexit
-import requests, socket
-from urllib.parse import urljoin
+import sys, os, socket, logging
 
 import asyncio
 import uvicorn
@@ -12,6 +10,7 @@ from starlette.routing import Route
 from sse_starlette.sse import EventSourceResponse
 from starlette.responses import JSONResponse
 
+from agent_client import AgentClient
 from models.reflect import ReflectModel
 from filters.chinese_translate import OpenCC
 
@@ -36,6 +35,11 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
 
 def assign_unused_port():
+    """
+    Probe the unused port.
+    The OS should assigned a unused port to this application.
+    """
+
     sock = socket.socket()
     sock.bind(('', 0))
     port = sock.getsockname()[1]
@@ -43,6 +47,12 @@ def assign_unused_port():
     return port
 
 def process(data):
+    """
+    Core part of the Model API server.
+    The processing flow:
+    [User input]->[Pre-processing filters]->[LLM]->[Post-processing filters]->[Output]
+    """
+
     global BUSY, logger
     try:
         llm = ReflectModel()
@@ -57,6 +67,14 @@ def process(data):
         logger.debug('Finished.')
 
 async def api(request):
+    """
+    The entrypoint of the public API.
+    This forward the result from the LLM and wrap them into an event source.
+
+    Arguments:
+        request: The Request object from the Starlette framework
+    """
+
     global BUSY, logger
     if BUSY: return JSONResponse({'message': 'Processing another request'}, 503)
     
@@ -68,54 +86,14 @@ async def api(request):
         
         BUSY = True
         resp = EventSourceResponse(process(data))
-        # resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
         return resp
 
-def register(retry_cnt, backoff_time=1):
-    global CONFIG, logger
-    logger.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
-    try:
-        response = requests.post(
-            urljoin(CONFIG['agent_endpoint'], '/register'),
-            data={
-                'name': CONFIG['LLM_name'],
-                'endpoint':'http://{0}:{1}{2}'.format(CONFIG['public_ip'], CONFIG['port'], CONFIG['endpoint'])
-                }
-        )
-        if response.text == 'Failed': raise Exception
-        else:
-            logger.info('Registered.')
-            atexit.register(unregister)
-    except Exception as e:
-        logger.warning('The server failed to register to Agent. Cause: {}.'.format(str(e)))
-
-        if retry_cnt == 0 and not CONFIG['ignore_agent']:
-            logger.info('The program will exit now.')
-            sys.exit(0)
-        
-        if retry_cnt != 0:
-            logger.info('Will retry registration after {} seconds.'.format(backoff_time))
-            # Exponential backoff
-            time.sleep(backoff_time)
-            register(retry_cnt-1, backoff_time*2)
-
-def unregister():
-    global CONFIG, logger
-    logger.info('Attempting to unregister with the Agent...')
-    try:
-        response = requests.post(
-            urljoin(CONFIG['agent_endpoint'], '/unregister'),
-            data={
-                'name': CONFIG['LLM_name'],
-                'endpoint':'http://{0}:{1}{2}'.format(CONFIG['public_ip'], CONFIG['port'], CONFIG['endpoint'])
-                }
-        )
-        if response.text == 'Failed':
-            logger.warning('Failed to unregister from Agent. Refused by Agent.')
-    except Exception as e:
-        logger.warning('Failed to unregister from Agent. Cause: {}.'.format(str(e)))
-
 def setup_logger():
+    """
+    Setup the format and the verbose level of each logger.
+    This function should be invoked after all of Loggers are initialized. 
+    """
+
     global CONFIG
     logging_format = '%(asctime)s [%(name)-5s] %(levelprefix)-4s %(message)s'
     logging_date_format = '%Y-%m-%d %H:%M:%S' 
@@ -131,13 +109,27 @@ def setup_logger():
         logger.handlers[0].setLevel(CONFIG['logging_level'])
 
 async def on_startup():
+    """
+    Setup the logger and register this Model API to the Agent.
+    This task will be automatically invoked when the application is starting.
+    """
+
+    global CONFIG
+    public_endpoint = 'http://{0}:{1}{2}'.format(CONFIG['public_ip'], CONFIG['port'], CONFIG['endpoint'])
+    agent_client = AgentClient(CONFIG['agent_endpoint'], CONFIG['LLM_name'], public_endpoint)
+    
     setup_logger()
-    register(CONFIG['retry_count'])
+
+    if not agent_client.register(CONFIG['retry_count']) and not CONFIG['ignore_agent']:
+        logger.info('Registration failed. The program will exit now.')
+        sys.exit(0)
 
 def override_config():
+    """
+    Override default configuration if the corresponding environment variable exists.
+    """
     global CONFIG
 
-    # Override default configuration is the corresponding environment variable exists.
     CONFIG = {key: os.environ.get(key.upper(), default) for key, default in CONFIG.items()}
     CONFIG['port'] = CONFIG['port'] or assign_unused_port()
     CONFIG['ignore_agent'] = bool(CONFIG['ignore_agent'])
