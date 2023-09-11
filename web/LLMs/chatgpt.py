@@ -65,6 +65,8 @@ if not dummy:
             print(e)
             if str(e).startswith("Incorrect API key provided:"):
                 yield "Incorrect API Key, You should provide a correct API key to use this LLM!"
+            else:
+                yield str(e)
         finally:
             Ready[0] = True
             print("finished")
