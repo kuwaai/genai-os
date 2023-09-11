@@ -1,7 +1,8 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-import sys, os, socket, logging
+import sys, os, socket
+import logging, yaml
 
 import asyncio
 import uvicorn
@@ -18,6 +19,9 @@ from filters.chinese_translate import OpenCC
 
 
 class ModelApiServer:
+    """
+    ModelApiServer is responsible to server the public endpoints.
+    """
 
     def __init__(self):
         # The default value of configuration.
@@ -29,14 +33,13 @@ class ModelApiServer:
             'port': None, # The public port number for this API. Leave it as None to have it assigned by the system.
             'endpoint': '/v1/completion', # The endpoint of this Model API to serve external requests.
             'ignore_agent': False, # Continue running regardless of whether register successfully with the Agent.
-            'logging_level': logging.INFO, # The log above this level will be display
             'retry_count': 5, # How may time should the API server try to register to the Agent
+            'logging_config': './logging.yaml', # The path of the configuration file of logging module 
         }
         self.override_config()
         
         # Logger of this module
         self.logger = logging.getLogger(__name__) 
-        self.logger.addHandler(logging.StreamHandler())
         
         # The Agent client to communicate with the Agent.
         public_endpoint = 'http://{0}:{1}{2}'.format(self.config['public_ip'], self.config['port'], self.config['endpoint'])
@@ -44,14 +47,20 @@ class ModelApiServer:
         
         # The layout to composite models and filters.
         self.model_layout = ModelLayout(ReflectModel(), [OpenCC()], [OpenCC()])
-        
+
+        # The web server to serve API endpoints 
         routes = [
             Route(self.config['endpoint'], endpoint=self.api, methods=['POST'])
         ]
-        self.web_server = Starlette(debug=True, routes=routes, on_startup=[self.on_web_startup])
+        self.web_server = Starlette(debug=True, routes=routes, on_startup=[self.register_with_agent])
     
     def start(self):
-        uvicorn.run(self.web_server, host="0.0.0.0", port=self.config['port'], log_level=self.config['logging_level'])
+        uvicorn.run(
+            self.web_server,
+            host='0.0.0.0',
+            port=self.config['port'],
+            log_config=self.config['logging_config']
+        )
     
     
     async def api(self, request):
@@ -78,53 +87,33 @@ class ModelApiServer:
         """
         Override default configuration if the corresponding environment variable exists.
         """
+        
+        def assign_unused_port():
+            """
+            Probe the unused port.
+            The OS should assigned a unused port to this application.
+            """
+
+            sock = socket.socket()
+            sock.bind(('', 0))
+            port = sock.getsockname()[1]
+            sock.close()
+            return port
 
         self.config = {key: os.environ.get(key.upper(), default) for key, default in self.config.items()}
-        self.config['port'] = self.config['port'] or self.assign_unused_port()
+        self.config['port'] = self.config['port'] or assign_unused_port()
         self.config['ignore_agent'] = bool(self.config['ignore_agent'])
         self.config['retry_count'] = int(self.config['retry_count'])
 
-    @staticmethod
-    def assign_unused_port():
+    async def register_with_agent(self):
         """
-        Probe the unused port.
-        The OS should assigned a unused port to this application.
-        """
-
-        sock = socket.socket()
-        sock.bind(('', 0))
-        port = sock.getsockname()[1]
-        sock.close()
-        return port
-
-    def setup_logger(self):
-        """
-        Setup the format and the verbose level of each logger.
-        This function should be invoked after all of Loggers are initialized. 
-        """
-
-        logging_format = '%(asctime)s [%(name)-5s] %(levelprefix)-4s %(message)s'
-        logging_date_format = '%Y-%m-%d %H:%M:%S' 
-        console_formatter = uvicorn.logging.ColourizedFormatter(
-            fmt=logging_format, datefmt=logging_date_format,
-            style="%", use_colors=True
-        )
-
-        loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
-        for logger in [l for l in loggers if len(l.handlers) >= 1]:
-            logger.setLevel(self.config['logging_level'])
-            logger.handlers[0].setFormatter(console_formatter)
-            logger.handlers[0].setLevel(self.config['logging_level'])
-
-    async def on_web_startup(self):
-        """
-        Setup the logger and register this Model API to the Agent.
+        Register this Model API to the Agent.
         This task will be automatically invoked when the application is starting.
         """
 
-        self.setup_logger()
+        register_result = self.agent_client.register(self.config['retry_count'])
 
-        if not self.agent_client.register(self.config['retry_count']) and not self.config['ignore_agent']:
+        if not register_result and not self.config['ignore_agent']:
             self.logger.info('Registration failed. The program will exit now.')
             sys.exit(0)
 

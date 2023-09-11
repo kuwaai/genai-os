@@ -1,0 +1,47 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  default:
+    "()": uvicorn.logging.ColourizedFormatter
+    format: '%(asctime)s [%(name)-5s] %(levelprefix)-4s %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S' 
+  access:
+    "()": uvicorn.logging.AccessFormatter
+    format: '%(asctime)s [%(name)-5s] %(levelprefix)-4s %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S' 
+
+handlers:
+  default:
+    formatter: default
+    class: logging.StreamHandler
+    stream: ext://sys.stderr
+  access:
+    formatter: access
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+
+root:
+    level: INFO
+    handlers: [default]
+
+loggers:
+  uvicorn.error:
+    level: INFO
+    handlers: [default]
+    propagate: no
+  uvicorn.access:
+    level: INFO
+    handlers: [access]
+    propagate: no
+  agent_client:
+    level: INFO
+    handlers: [default]
+    propagate: no
+  model_layout:
+    level: INFO
+    handlers: [default]
+    propagate: no
+  main:
+    level: INFO
+    handlers: [default]
+    propagate: no

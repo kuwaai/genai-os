@@ -8,6 +8,11 @@ import atexit
 import time
 
 class AgentClient:
+    """
+    Agent client is responsible to communicate the control signal of the Agent.
+    """
+
+
     def __init__(self, agent_endpoint, llm_name, public_endpoint):
         """
         Initialize the agent client.
@@ -17,11 +22,10 @@ class AgentClient:
             public_endpoint: The public endpoint URI that can be accessed by the Agent.
         """
 
+        self.logger = logging.getLogger(__name__)
         self.agent_endpoint = agent_endpoint
         self.llm_name = llm_name
         self.public_endpoint = public_endpoint
-        self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(logging.StreamHandler())
 
     def register(self, retry_cnt, backoff_time=1):
         """
@@ -78,5 +82,7 @@ class AgentClient:
             )
             if response.text == 'Failed':
                 self.logger.warning('Failed to unregister from Agent. Refused by Agent.')
+            else:
+                self.logger.info('Done.')
         except Exception as e:
             self.logger.warning('Failed to unregister from Agent. Cause: {}.'.format(str(e)))
