@@ -3,11 +3,20 @@
 
 import logging
 import asyncio
+import yaml
+import importlib
 from functools import reduce
 
-from models.completion_interface import CompletionInterface
-from filters.text_level_filtering_interface import TextLevelFilteringInterface
+from models import CompletionInterface
+from filters import TextLevelFilteringInterface
 
+def import_class(name: str):
+    """
+    Import class from specified module
+    """
+
+    module_name, class_name = name.rsplit('.', 1)
+    return getattr(importlib.import_module(module_name), class_name)
 
 class ModelLayout:
     """
@@ -16,22 +25,39 @@ class ModelLayout:
     [User input]->[Pre-processing filters]->[LLM]->[Post-processing filters]->[Output]
     """
 
-    def __init__(self, llm, pre_filters=[], post_filters=[]):
+    def __init__(self, layout_file):
 
         self.logger = logging.getLogger(__name__)
+
+        self.read_layout(layout_file)
         
-        # Check whether the modules implements correct interface
-        assert issubclass(type(llm), CompletionInterface)
-        for f in pre_filters:  assert issubclass(type(f), TextLevelFilteringInterface)
-        for f in post_filters: assert issubclass(type(f), TextLevelFilteringInterface)
-
-        self.llm = llm
-        self.pre_filters = pre_filters
-        self.post_filters = post_filters
-
         # State variable to indicate whether the model is processing another request
         self.busy = False
+
+    def read_layout(self, layout_file: str):
+
+        def read_function(function, check_class=None):
+            """
+            Read the function defined in the dictionary and check the class
+            """
+
+            class_name = import_class(function['class'])
+            args = dict(function['args'])
+            if check_class != None: assert issubclass(class_name, check_class)
+            return class_name(**args) if any(args) else class_name()
+
+        layout = {}
+        with open(layout_file, 'r') as f:
+            layout = yaml.safe_load(f)
         
+        assert layout['version'] == 1
+
+        self.llm = read_function(layout['llm'], CompletionInterface)
+        self.pre_filters  = [read_function(func, TextLevelFilteringInterface) for func in layout['pre-filters']]
+        self.post_filters = [read_function(func, TextLevelFilteringInterface) for func in layout['post-filters']]
+        
+        self.logger.info('LLM Class: {}'.format(type(self.llm).__name__))
+
     @staticmethod
     def apply_filters(data: str, filters: list[TextLevelFilteringInterface]):
         """

@@ -1,7 +1,7 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-from .text_level_filtering_interface import TextLevelFilteringInterface
+from . import TextLevelFilteringInterface
 import opencc
 
 class OpenCC(TextLevelFilteringInterface):

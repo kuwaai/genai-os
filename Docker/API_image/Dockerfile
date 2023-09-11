@@ -8,19 +8,18 @@ ENV IGNORE_AGENT="False"
 # Set working directory
 WORKDIR /
 
-# Copy any setup files or scripts into the image
+# Copy any setup files into the image
 COPY requirements.txt /requirements.txt
-COPY run.sh /run.sh
 
 # Run setup commands
-RUN apt update && \
-    apt install -y python3 python3-pip curl && \
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip curl && \
     pip install -r requirements.txt &&\
     rm -f requirements.txt
 
 RUN mkdir -p /API
 COPY src/* /API/
 
-RUN chmod +x /run.sh
+WORKDIR /API
 
-CMD ["/bin/bash", "/run.sh"]
+CMD ["/bin/python3", "main.py"]

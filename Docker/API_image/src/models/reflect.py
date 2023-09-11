@@ -1,7 +1,7 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-from .completion_interface import CompletionInterface
+from . import CompletionInterface
 from typing import Generator
 import time
 

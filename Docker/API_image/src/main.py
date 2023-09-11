@@ -14,8 +14,8 @@ from starlette.responses import JSONResponse
 from agent_client import AgentClient
 from model_layout import ModelLayout
 
-from models.reflect import ReflectModel
-from filters.chinese_translate import OpenCC
+# from models.reflect import ReflectModel
+# from filters.chinese_translate import OpenCC
 
 
 class ModelApiServer:
@@ -35,8 +35,13 @@ class ModelApiServer:
             'ignore_agent': False, # Continue running regardless of whether register successfully with the Agent.
             'retry_count': 5, # How may time should the API server try to register to the Agent
             'logging_config': './logging.yaml', # The path of the configuration file of logging module 
+            'layout_config': './layouts/reflect.yaml', #The layout configuration to arrange the models and the filters
         }
         self.override_config()
+
+        # Load logging configuration
+        with open(self.config['logging_config'], 'r') as f:
+            logging.config.dictConfig(yaml.safe_load(f))
         
         # Logger of this module
         self.logger = logging.getLogger(__name__) 
@@ -46,7 +51,7 @@ class ModelApiServer:
         self.agent_client = AgentClient(self.config['agent_endpoint'], self.config['LLM_name'], public_endpoint)
         
         # The layout to composite models and filters.
-        self.model_layout = ModelLayout(ReflectModel(), [OpenCC()], [OpenCC()])
+        self.model_layout = ModelLayout(self.config['layout_config'])
 
         # The web server to serve API endpoints 
         routes = [

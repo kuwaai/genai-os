@@ -1,0 +1,14 @@
+version: 1
+llm:
+  class: 'models.reflect.ReflectModel'
+  args: {}
+
+pre-filters:
+  - 
+    class: 'filters.chinese_translate.OpenCC'
+    args: {}
+
+post-filters:
+  - 
+    class: 'filters.chinese_translate.OpenCC'
+    args: {}

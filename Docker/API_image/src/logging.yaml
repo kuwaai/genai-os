@@ -3,11 +3,11 @@ disable_existing_loggers: False
 formatters:
   default:
     "()": uvicorn.logging.ColourizedFormatter
-    format: '%(asctime)s [%(name)-5s] %(levelprefix)-4s %(message)s'
+    format: '%(asctime)s [%(name)-13s] %(levelprefix)-4s %(message)s'
     datefmt: '%Y-%m-%d %H:%M:%S' 
   access:
     "()": uvicorn.logging.AccessFormatter
-    format: '%(asctime)s [%(name)-5s] %(levelprefix)-4s %(message)s'
+    format: '%(asctime)s [%(name)-13s] %(levelprefix)-4s %(message)s'
     datefmt: '%Y-%m-%d %H:%M:%S' 
 
 handlers:
