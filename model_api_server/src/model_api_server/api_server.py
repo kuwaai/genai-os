@@ -10,7 +10,7 @@ from starlette.requests import Request
 from sse_starlette.sse import EventSourceResponse
 from starlette.responses import JSONResponse
 
-from model_layout import ModelLayout
+from model_api_server.model_layout import ModelLayout
 
 class ModelApiServer:
     """

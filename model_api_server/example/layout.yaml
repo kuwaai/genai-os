@@ -5,10 +5,10 @@ llm:
 
 pre-filters:
   - 
-    class: 'filters.chinese_translate.OpenCC'
+    class: 'filters.opencc.OpenCC'
     args: {}
 
 post-filters:
   - 
-    class: 'filters.chinese_translate.OpenCC'
+    class: 'filters.opencc.OpenCC'
     args: {}

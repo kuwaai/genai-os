@@ -5,9 +5,13 @@ import logging
 import yaml
 import importlib
 from functools import reduce
+import sys, os
 
-from models import CompletionInterface
-from filters import TextLevelFilteringInterface
+from model_api_server.interfaces import CompletionInterface, TextLevelFilteringInterface
+
+# The modules may not in the default searching path.
+# Thus we append current working directory to the module searching path.
+sys.path.append(os.getcwd())
 
 def import_class(name: str):
     """

@@ -1,0 +1,7 @@
+version: 1
+llm:
+  class: 'model_api_server.dummy.DummyModel'
+  args: {}
+
+pre-filters: []
+post-filters: []

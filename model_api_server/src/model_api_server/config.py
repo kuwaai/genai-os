@@ -3,6 +3,8 @@
 
 import os, socket
 
+__file_dir__ = os.path.dirname(os.path.realpath(__file__)) + '/'
+
 class Config:
     """
     The configuration of model API component.
@@ -19,8 +21,8 @@ class Config:
         self.endpoint: str = '/v1/completion' # The endpoint of this Model API to serve external requests.
         self.ignore_agent: bool = False # Continue running regardless of whether register successfully with the Agent.
         self.retry_count: int = 5 # How may time should the API server try to register to the Agent
-        self.logging_config: str = './logging.yaml' # The path of the configuration file of logging module 
-        self.layout_config: str = './layouts/reflect.yaml' #The layout configuration to arrange the models and the filters
+        self.logging_config: str = __file_dir__ + './default_logging.yaml' # The path of the configuration file of logging module 
+        self.layout_config: str = __file_dir__ + './default_layout.yaml' #The layout configuration to arrange the models and the filters
 
         self.override_config()
 

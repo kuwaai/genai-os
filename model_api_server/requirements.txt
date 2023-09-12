@@ -2,9 +2,11 @@ uvicorn
 starlette
 sse-starlette
 python-multipart
-torch
-transformers
-accelerate
-sentencepiece
-openai
+pyyaml
+requests
+# torch
+# transformers
+# accelerate
+# sentencepiece
+# openai
 opencc

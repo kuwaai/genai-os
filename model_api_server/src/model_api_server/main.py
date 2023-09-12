@@ -4,10 +4,10 @@
 import sys, os
 import logging, yaml
 
-from config import Config
-from agent_client import AgentClient
-from model_layout import ModelLayout
-from api_server import ModelApiServer
+from model_api_server.config import Config
+from model_api_server.agent_client import AgentClient
+from model_api_server.model_layout import ModelLayout
+from model_api_server.api_server import ModelApiServer
 
 def get_registration_job(agent_client, retry_count: int, ignore_agent: bool):
     """
@@ -22,10 +22,7 @@ def get_registration_job(agent_client, retry_count: int, ignore_agent: bool):
 
     return register_with_agent
 
-if __name__ == '__main__':
-    
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-
+def main():
     config = Config()
     
     # Load logging configuration.

@@ -1,7 +1,7 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-from . import CompletionInterface
+from model_api_server.interfaces import CompletionInterface
 from typing import Generator
 import time
 
