@@ -2,8 +2,10 @@ FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
 ENV AGENT_ENDPOINT="http://web:9000/"
 ENV LLM_NAME="Unnamed_LLM"
-ENV PUBLIC_IP="model-api"
+ENV PUBLIC_ADDRESS="model-api"
+ENV ENDPOINT="/v1/completion"
 ENV IGNORE_AGENT="False"
+ENV RETRY_COUNT=5
 
 # Set working directory
 WORKDIR /

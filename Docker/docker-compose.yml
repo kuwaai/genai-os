@@ -49,15 +49,37 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  api_debug_01:
+  # api_debug_01:
+  #   runtime: nvidia
+  #   image: api
+  #   devices:
+  #     - /dev/nvidia0:/dev/nvidia0
+  #   volumes:
+  #     - ./api_debug:/API
+  #   environment:
+  #     - CUDA_VISIBLE_DEVICES=0
+  #   depends_on:
+  #     - web
+  #   networks:
+  #     - taide
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-X", "POST", "-f", "http://localhost:9001/"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  
+  api_demo_01:
     runtime: nvidia
     image: api
     devices:
       - /dev/nvidia0:/dev/nvidia0
-    volumes:
-      - ./api_debug:/API
     environment:
       - CUDA_VISIBLE_DEVICES=0
+      - AGENT_ENDPOINT=http://web:9000/
+      - LLM_NAME=demo
+      - PUBLIC_IP=api_demo_01
+      - PORT=9001
+      - IGNORE_AGENT=False
     depends_on:
       - web
     networks:
