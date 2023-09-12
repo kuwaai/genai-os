@@ -2,7 +2,6 @@
 # -#- coding: UTF-8 -*-
 
 import logging
-import asyncio
 import yaml
 import importlib
 from functools import reduce
@@ -71,7 +70,7 @@ class ModelLayout:
     def is_busy(self):
         return self.busy
 
-    def process(self, data):
+    def process(self, user_input: str):
         """
         Core part of the Model API server.
         The processing flow:
@@ -79,8 +78,8 @@ class ModelLayout:
         """
 
         try:
-            data = self.apply_filters(data, self.pre_filters)
-            for output_token in self.llm.complete(data):
+            user_input = self.apply_filters(user_input, self.pre_filters)
+            for output_token in self.llm.complete(user_input):
                 output_token = self.apply_filters(output_token, self.post_filters)
                 yield output_token
         except Exception as e:

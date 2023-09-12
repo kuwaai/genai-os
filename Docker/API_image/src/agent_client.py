@@ -13,7 +13,7 @@ class AgentClient:
     """
 
 
-    def __init__(self, agent_endpoint, llm_name, public_endpoint):
+    def __init__(self, agent_endpoint: str, llm_name: str, public_endpoint: str):
         """
         Initialize the agent client.
         Arguments:
@@ -27,7 +27,7 @@ class AgentClient:
         self.llm_name = llm_name
         self.public_endpoint = public_endpoint
 
-    def register(self, retry_cnt, backoff_time=1):
+    def register(self, retry_cnt: int, backoff_time: int = 1):
         """
         Try to registration with the Agent.
         Arguments:
