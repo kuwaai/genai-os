@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\GroupPermissions;
+use App\Models\Group;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -23,7 +25,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'isAdmin',
 		'forDemo',
-		'openai_token'
+		'openai_token',
+        'group_id'
     ];
 
     /**
@@ -44,4 +47,14 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function hasPerm($permission)
+    {
+        if($this->group_id){
+            $perm_id = Permissions::where("name","=",$permission)->first()->id;
+            return GroupPermissions::where("group_id",'=',$this->group_id)->where("perm_id", "=",$perm_id)->exists();
+        }
+        return false;
+    }
 }

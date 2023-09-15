@@ -7,11 +7,13 @@ use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\DuelController;
 use App\Http\Controllers\PlayController;
+use App\Http\Controllers\ManageController;
 use BeyondCode\LaravelSSE\Facades\SSE;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\LLMs;
 use App\Models\Chats;
+use App\Http\Middleware\AdminMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +34,7 @@ Route::get('/api_auth', [ProfileController::class, 'api_auth']);
 Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
 
 # Admin routes, require admin permission
-Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
+Route::middleware('auth', 'verified', AdminMiddleware::class . ':tab_Dashboard')->group(function () {
     Route::group(['prefix' => 'dashboard'], function () {
         Route::get('/', function () {
             return view('dashboard');
@@ -52,49 +54,58 @@ Route::middleware('auth', 'verified', 'isAdmin')->group(function () {
 # User routes, required email verified
 Route::middleware('auth', 'verified')->group(function () {
     #---Profiles
-    Route::group(['prefix' => 'profile'], function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::middleware(AdminMiddleware::class . ':tab_Profile')
+        ->prefix('profile')
+        ->group(function () {
+            Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
 
-        Route::patch('/api', [ProfileController::class, 'renew'])->name('profile.api.renew');
-        Route::patch('/chatgpt/api', [ProfileController::class, 'chatgpt_update'])->name('profile.chatgpt.api.update');
+            Route::middleware(AdminMiddleware::class . ':Profile_update_api_token')->patch('/api', [ProfileController::class, 'renew'])->name('profile.api.renew');
+            Route::middleware(AdminMiddleware::class . ':Profile_update_openai_token')->patch('/chatgpt/api', [ProfileController::class, 'chatgpt_update'])->name('profile.chatgpt.api.update');
 
-        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    });
+            Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+            Route::middleware(AdminMiddleware::class . ':Profile_delete_account')->delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        });
 
     #---Chats
-    Route::group(['prefix' => 'chats'], function () {
-        Route::get('/', function () {
-            return view('chat');
-        })->name('chat.home');
+    Route::middleware(AdminMiddleware::class . ':tab_Chat')
+        ->prefix('chats')
+        ->group(function () {
+            Route::get('/', function () {
+                return view('chat');
+            })->name('chat.home');
 
-        Route::get('/new/{llm_id}', function ($llm_id) {
-            if (!LLMs::findOrFail($llm_id)->exists()) {
-                return redirect()->route('chat');
-            }
-            return view('chat');
-        })->name('chat.new');
-        Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
-        Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
-        Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
-        Route::post('/request', [ChatController::class, 'request'])->name('chat.request');
-        Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-        Route::delete('/delete', [ChatController::class, 'delete'])->name('chat.delete');
-    })->name('chat');
+            Route::get('/new/{llm_id}', function ($llm_id) {
+                if (!LLMs::findOrFail($llm_id)->exists()) {
+                    return redirect()->route('chat');
+                }
+                return view('chat');
+            })->name('chat.new');
+            Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
+            Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
+            Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
+            Route::post('/request', [ChatController::class, 'request'])->name('chat.request');
+            Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
+            Route::delete('/delete', [ChatController::class, 'delete'])->name('chat.delete');
+        })
+        ->name('chat');
 
     #---Archives
-    Route::group(['prefix' => 'archive'], function () {
-        Route::get('/', function () {
-            return view('archive');
-        })->name('archive.home');
+    Route::middleware(AdminMiddleware::class . ':tab_Archive')
+        ->prefix('archive')
+        ->group(function () {
+            Route::get('/', function () {
+                return view('archive');
+            })->name('archive.home');
 
-        Route::get('/{chat_id}', [ArchiveController::class, 'main'])->name('archive.chat');
-        Route::post('/edit', [ArchiveController::class, 'edit'])->name('archive.edit');
-        Route::delete('/delete', [ArchiveController::class, 'delete'])->name('archive.delete');
-    })->name('archive');
+            Route::get('/{chat_id}', [ArchiveController::class, 'main'])->name('archive.chat');
+            Route::post('/edit', [ArchiveController::class, 'edit'])->name('archive.edit');
+            Route::delete('/delete', [ArchiveController::class, 'delete'])->name('archive.delete');
+        })
+        ->name('archive');
 
     #---Duel
-    Route::prefix('duel')
+    Route::middleware(AdminMiddleware::class . ':tab_Duel')
+        ->prefix('duel')
         ->group(function () {
             Route::get('/', [DuelController::class, 'main'])->name('duel.home');
 
@@ -107,7 +118,8 @@ Route::middleware('auth', 'verified')->group(function () {
         ->name('duel');
 
     #---Play
-    Route::prefix('play')
+    Route::middleware(AdminMiddleware::class . ':tab_Play')
+        ->prefix('play')
         ->group(function () {
             Route::get('/', function () {
                 return view('play');
@@ -119,6 +131,35 @@ Route::middleware('auth', 'verified')->group(function () {
                     Route::patch('/update', [PlayController::class, 'update'])->name('play.ai_elections.update');
                 })
                 ->name('play.ai_elections');
+        })
+        ->name('play');
+
+    #---Play
+    Route::middleware(AdminMiddleware::class . ':tab_Manage')
+        ->prefix('manage')
+        ->group(function () {
+            Route::get('/', function () {
+                return view('manage.home');
+            })->name('manage.home');
+
+            Route::prefix('group')
+                ->group(function () {
+                    Route::post('/create', [ManageController::class, 'group_create'])->name('manage.group.create');
+                    Route::patch('/update', [ManageController::class, 'group_update'])->name('manage.group.update');
+                    Route::delete('/delete', [ManageController::class, 'group_delete'])->name('manage.group.delete');
+                })
+                ->name('manage.group');
+
+            Route::prefix('user')
+                ->group(function () {
+                    Route::post('/create', [ManageController::class, 'user_create'])->name('manage.user.create');
+                    Route::patch('/update', [ManageController::class, 'user_update'])->name('manage.user.update');
+                    Route::delete('/delete', [ManageController::class, 'user_delete'])->name('manage.user.delete');
+                    Route::post('/search', [ManageController::class, 'search_user'])->name('manage.user.search');
+                })
+                ->name('manage.user');
+
+            Route::post('/tab', [ManageController::class, 'tab'])->name('manage.tab');
         })
         ->name('play');
 });

@@ -13,9 +13,9 @@ class AdminMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, $config): Response
     {
-		if (auth()->check() && auth()->user()->isAdmin) {
+		if (auth()->check() && auth()->user()->hasPerm($config)) {
 			return $next($request);
 		}
 

@@ -11,33 +11,48 @@
                 </div>
 
                 <!-- Navigation Links -->
-                @if(Auth::user()->isAdmin)
+                @if(Auth::user()->hasPerm('tab_Dashboard'))
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('dashboard.home')" :active="request()->routeIs('dashboard.*')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
                 @endif
+                @if(Auth::user()->hasPerm('tab_Duel'))
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('duel.home')" :active="request()->routeIs('duel.*')">
                         {{ __('Duel') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(Auth::user()->hasPerm('tab_Chat'))
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
                         {{ __('Chat') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(Auth::user()->hasPerm('tab_Archive'))
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
                         {{ __('Archive') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(Auth::user()->hasPerm('tab_Play'))
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
                         {{ __('Play') }}
                     </x-nav-link>
                 </div>
+                @endif
+                @if(Auth::user()->hasPerm('tab_Manage'))
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('manage.home')" :active="request()->routeIs('manage.*')">
+                        {{ __('Manage') }}
+                    </x-nav-link>
+                </div>
+                @endif
             </div>
 
             <!-- Settings Dropdown -->
@@ -56,9 +71,11 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if(Auth::user()->hasPerm('tab_Profile'))
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
+                        @endif
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -89,23 +106,36 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            @if(Auth::user()->isAdmin)
+            @if(Auth::user()->hasPerm('tab_Dashboard'))
             <x-responsive-nav-link :href="route('dashboard.home')" :active="request()->routeIs('dashboard.*')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             @endif
+            @if(Auth::user()->hasPerm('tab_Duel'))
             <x-responsive-nav-link :href="route('duel.home')" :active="request()->routeIs('duel.*')">
                 {{ __('Duel') }}
             </x-responsive-nav-link>
+            @endif
+            @if(Auth::user()->hasPerm('tab_Chat'))
             <x-responsive-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
                 {{ __('Chats') }}
             </x-responsive-nav-link>
+            @endif
+            @if(Auth::user()->hasPerm('tab_Archive'))
             <x-responsive-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
                 {{ __('Archives') }}
             </x-responsive-nav-link>
+            @endif
+            @if(Auth::user()->hasPerm('tab_Play'))
             <x-responsive-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
                 {{ __('Play') }}
             </x-responsive-nav-link>
+            @endif
+            @if(Auth::user()->hasPerm('tab_Manage'))
+            <x-responsive-nav-link :href="route('manage.home')" :active="request()->routeIs('manage.*')">
+                {{ __('Manage') }}
+            </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -116,9 +146,11 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @if(Auth::user()->hasPerm('tab_Profile'))
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
+                @endif
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

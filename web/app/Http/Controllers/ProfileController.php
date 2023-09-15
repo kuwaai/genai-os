@@ -47,17 +47,33 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        if (!$request->user()->forDemo) {
-            $request->user()->fill($request->validated());
-
-            if ($request->user()->isDirty('email')) {
-                $request->user()->email_verified_at = null;
+        $status = [];
+        if ($request->validated()) {
+            if ($request->validated()['name']) {
+                if ($request->user()->hasPerm('Profile_update_name')) {
+                    $request->user()->name = $request->validated()['name'];
+                } else {
+                    return Redirect::route('profile.edit')->with('status', 'no-changes');
+                }
+            }
+            if ($request->validated()['email']) {
+                if ($request->user()->hasPerm('Profile_update_email')) {
+                    $request->user()->email = $request->validated()['email'];
+                } else {
+                    return Redirect::route('profile.edit')->with('status', 'no-changes');
+                }
             }
 
-            $request->user()->save();
-            return Redirect::route('profile.edit')->with('status', 'profile-updated');
+            if ($request->user()->isDirty('email') || $request->user()->isDirty('name')) {
+                if ($request->user()->isDirty('email')) {
+                    $request->user()->email_verified_at = null;
+                }
+                $request->user()->save();
+                return Redirect::route('profile.edit')->with('status', 'profile-updated');
+            }
         }
-        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
+
+        return Redirect::route('profile.edit');
     }
 
     public function chatgpt_update(Request $request)
@@ -139,7 +155,7 @@ class ProfileController extends Controller
 
                     $client = new Client(['timeout' => 300]);
                     RequestChat::dispatch($request->input('msg'), $llm->access_code, $user->id, -$user->id, $user->openai_token, 'aielection_' . $user->id);
-                    $req = $client->get(route("api.stream"), [
+                    $req = $client->get(route('api.stream'), [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'query' => [
                             'key' => $request->input('key'),
@@ -148,7 +164,7 @@ class ProfileController extends Controller
                         'stream' => true,
                     ]);
                     $req = $req->getBody()->getContents();
-                    $response['output'] = explode("[ENDEDPLACEHOLDERUWU]", $req)[0];
+                    $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
                 }
                 return response()->json($response);
             }
@@ -184,7 +200,7 @@ class ProfileController extends Controller
                             global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo $result . "[ENDEDPLACEHOLDERUWU]";
+                                echo $result . '[ENDEDPLACEHOLDERUWU]';
                                 ob_flush();
                                 flush();
                                 $client->disconnect();

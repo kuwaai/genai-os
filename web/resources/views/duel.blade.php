@@ -1,5 +1,24 @@
 <x-app-layout>
-    <div id="crypto-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
+
+    @php
+    $result = DB::table(function ($query) {
+        $query
+            ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+            ->from('group_permissions')
+            ->join('permissions', 'perm_id', '=', 'permissions.id')
+            ->where('group_id', Auth()->user()->group_id)
+            ->where('name', 'like', 'model_%')
+            ->get();
+    }, 'tmp')
+        ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+        ->select('tmp.*', 'llms.*')
+        ->where('llms.enabled', true)
+        ->orderby('llms.order')
+        ->orderby('llms.created_at')
+        ->get();
+@endphp
+
+    <div id="create-model-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
         tabindex="-1" aria-hidden="true"
         class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-md max-h-full">
@@ -7,7 +26,7 @@
             <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
                 <button type="button"
                     class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
-                    data-modal-hide="crypto-modal">
+                    data-modal-hide="create-model-modal">
                     <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
@@ -30,7 +49,7 @@
                     <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Select the LLMs you want to use at
                         the same time.</p>
                     <ul class="my-4 space-y-3">
-                        @foreach (App\Models\LLMs::where('enabled', true)->orderby('order')->orderby('created_at')->get() as $LLM)
+                        @foreach ($result as $LLM)
                             <li>
                                 <input type="checkbox" name="llm[]" id="{{ $LLM->access_code }}"
                                     value="{{ $LLM->access_code }}" class="hidden peer">
@@ -69,7 +88,8 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 h-full overflow-y-auto scrollbar">
-                @if (App\Models\LLMs::where('enabled', true)->count() == 0)
+
+                @if ($result->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                         No available LLM to chat with<br>
@@ -77,14 +97,14 @@
                     </div>
                 @else
                     <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
-                        data-modal-target="crypto-modal" data-modal-toggle="crypto-modal">
+                        data-modal-target="create-model-modal" data-modal-toggle="create-model-modal">
                         <button
                             class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == 3 ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
                             <p class="flex-1 text-center text-gray-700 dark:text-white">Create Chat</p>
                         </button>
                     </div>
                     @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
-                        @if (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('dcID', $DC->first()->id)->get()->where('enabled', false)->count() == 0)
+                    @if (array_diff(explode(',',trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
                             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
                                 <div class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
                                     @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)

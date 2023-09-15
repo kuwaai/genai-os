@@ -23,14 +23,18 @@
                 @auth
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        @if (Auth::user()->isAdmin)
+                        @if (Auth::user()->hasPerm('tab_Dashboard'))
                             <a href="{{ url('/dashboard') }}"
                                 class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</a>
                         @endif
-                        <a href="{{ route('duel.home') }}"
-                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Duel</a>
-                        <a href="{{ route('chat.home') }}"
-                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Chat</a>
+                        @if (Auth::user()->hasPerm('tab_Duel'))
+                            <a href="{{ route('duel.home') }}"
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Duel</a>
+                        @endif
+                        @if (Auth::user()->hasPerm('tab_Chat'))
+                            <a href="{{ route('chat.home') }}"
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Chat</a>
+                        @endif
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Log Out') }}</a>
                     </form>
@@ -87,7 +91,8 @@
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line">台灣的開源資料數據可以從該國內的一些大型開源資料中心或與組織來尋找，例如國家圖書館、台灣大學、台灣科學院、政府機構和公共圖書館。這些地方提供可用於學習、研究和開發的開源資源，包括軟件，文檔，圖書，數據庫等。此外，也可以通過網上平臺或社交媒體獲取和瀏覽開開源資料。
+                                            <p class="text-sm whitespace-pre-line">
+                                                台灣的開源資料數據可以從該國內的一些大型開源資料中心或與組織來尋找，例如國家圖書館、台灣大學、台灣科學院、政府機構和公共圖書館。這些地方提供可用於學習、研究和開發的開源資源，包括軟件，文檔，圖書，數據庫等。此外，也可以通過網上平臺或社交媒體獲取和瀏覽開開源資料。
                                             </p>
                                         </div>
                                     </div>
@@ -220,7 +225,7 @@
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.5.1</a>
+                    <a href="https://www.twcc.ai/">Powered by TWCC, Version 0.0.6</a>
                 </div>
             </div>
         </div>
