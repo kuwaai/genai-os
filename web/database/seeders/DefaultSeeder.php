@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Permissions;
 use App\Models\GroupPermissions;
 use App\Models\Groups;
+use DB;
 
 class DefaultSeeder extends Seeder
 {
