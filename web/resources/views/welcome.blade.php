@@ -227,82 +227,6 @@
                         <div
                             class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div class="flex flex-col w-full">
-                                <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">文本翻譯
-                                </h2>
-                                <div id="chatroom"
-                                    class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
-                                    <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
-                                        <div>
-                                            <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                                <p class="text-sm whitespace-pre-line">請翻譯成繁體中文：The International Federation of the Phonographic Industry has announced it's latest Global Artist Chart, which features a Taiwanese artist in the top 10. Joining U.S. artists such as Taylor Swift and Drake, and K-Pop sensation BTS, was Taiwan's own Jay Chou, at No. 9 in the world, He's the first Taiwanese artist to appear on the chart, fresh off the release of his latest album last year titled "Greatest Works of Art."</p>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                            User
-                                        </div>
-                                    </div>
-                                    <div class="flex w-full mt-2 space-x-3 ">
-                                        <div
-                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                            <img src="{{ asset('images/TAIDE.png') }}">
-                                        </div>
-                                        <div>
-                                            <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                                <p class="text-sm whitespace-pre-line">國際唱片業協會公佈2020年上半年全球版稅收入報告，華語歌手排名前三，僅次於西洋天王后泰勒·斯威夫特（Taylor Swift）和英國天后艾黛·阿德金斯（Adele Adkins）。據報告顯示，斯威夫特在全球版稅上半年收入高達3,441萬美元，她的專輯《Fearless》也是全球收入最高的專載；而阿德金斯則以3,081萬美元位居第二名。而華語歌手的代表人物李宗盛、張學友和陶喆則分列第12名、第22名和第36名，顯示強勁的實力和超強的市場潛力。 Chou是亞洲歌手中唯一入選的歌手。這是他自2015年以來第四次上榜。Jay Chou在亞洲、歐洲和北美都有廣泛的粉絲群體。 他還開設了自己的Youtuber平台，在YouTube上擁有超過2200萬的關注者，是全球最成功的華語歌手之一。</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                        <div class="flex flex-col w-full">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">寫文章</h2>
-                            <div id="chatroom"
-                                class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
-                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
-                                    <div>
-                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm whitespace-pre-line">寫一篇文章關於你曾收到的一份特別的禮物。描述你在任何種情況下收到這份禮物，以及禮物的特別之處。題目：《一份特別的禮物》</p>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        User
-                                    </div>
-                                </div>
-                                <div class="flex w-full mt-2 space-x-3 ">
-                                    <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ asset('images/TAIDE.png') }}">
-                                    </div>
-                                    <div>
-                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line">對我而言，最特別的禮貌之一，是一份來自家人的禮物。在我人生中最難忘的一天，它送上了一份神秘的小包裹。當我打開它時，裡面有一張小紙條，上面寫著一個詞語：“生日快樂！”
-
-                                                這個小小的紙條帶給我一份無法形容的喜悅。這是我第一次收到家人的生日禮物，它讓我感到非常特別和被愛。我知道，在我生活中最重要的人們，那些真正能夠帶給無形快樂的人們，他們送上了這份特別的生日禮貌。
-                                                
-                                                當我回頭看，我發現家人為我做了其他的事情，但是這份小小的生日禮品，將永遠是我心中最珍貴的寶藏。它給了我一份特別而甜美的回憶，更是一個永遠不能忘記的時刻。
-                                                
-                                                當然，這份生日禮物不僅僅帶給了我甜美的回忆，它也提醒我們，儘管大多數的禮物都只能維持數日的時間，但是類似這樣尖銳、獨特、特別的回憶，將永遠留存在我的心中，甚至是我的生命。</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                        
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        <div
-                            class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                            <div class="flex flex-col w-full">
                                 <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">寫信
                                 </h2>
                                 <div id="chatroom"
@@ -327,19 +251,16 @@
                                         <div>
                                             <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
                                                 <p class="text-sm whitespace-pre-line">親愛的朋友，
-
-                                                    您好！我寫信給您，是想向您介紹一個非常值得一遊的地方——臺灣。臺灣地處亞洲中心地帶，擁有豐富的自然景觀和豐富的文化遺產。以下是我推薦給您的臺灣五大必去景點及其特色。
-                                                    
-                                                    1. 台北101大樓：位於台北的101大樂樂擁有全世界最高的觀光台，可以在這裡欣賞到絕美的台北風景。此外，還可以體驗一場高空觀光的刺激。
-                                                    2. 鹿野風景區：這裡是臺灣的著名茶鄉。您可以在此品味到美味的臺灣茶，並享受到美麗的茶園風光。
-                                                    3. 日月潭：這是臺灣最大的淡水湖，也是臺灣著名的觀光勝地之一。您可以乘坐電動船遊覽湖面，同時欣賞湖畔的美景。
-                                                    4. 玉山：玉山是臺灣最高峰，也是台灔八大奇景之一。您在這裏可以體體驗到踏上臺灣最高山峰的快感。
-                                                    5. 野柳地質公園：這裏的地質特殊，以其各種奇形怪狀的海岸景觀而聞名。您可以親身體驗各種不同的海蝕棧道景觀。
-                                                    
-                                                    以上是我推荐的臺灣五個必去的景點及其主要特色。臺灣有許多美麗的風景和豐富的人文景觀，這些景點都值得您一遊。希望您能在疫情過後實現這次旅遊之旅。祝您行遊愉快！
-                                                    祝好！
-                                                    
-                                                    您真誠的朋友</p>
+                                                    在這封信中，我將向您推薦五個台灣必去的景點，以及每個地方的特色。這些景點都值得您一遊，以下是我對它們的詳細介紹：
+                                                    1. 台北101：台北101曾經是世界上最高的摩天大樓，現在仍然是台灣的象徵之一。您可以搭乘快速電梯直達觀景台，俯瞰整個台北市的美景。在這裡，您還可以品嚐當地美食和購買紀念品。
+                                                    2. 九份老街：九份老街位於新北市瑞芳區，是一個充滿懷舊氛圍的街道。這禮有許多茶館、小吃攤和手工藝品店，讓您感受到台灣的歷史和文化。此外，九份老街的山海景觀也非常美麗。
+                                                    3. 日月潭：日月潭位於台中市和南投縣交界處，是台灣最著名的湖泊之一。這個地方以其美麗的自然風光和豐富的活動而聞名。您可以乘船遊覽湖泊，欣賞湖光山色，或者參加各種戶外活動，如划艇、划槳和徒步旅行。
+                                                    4. 墾丁國家公園：墾丁位於台灣南部，是台灣著名的海岸度假勝地。這裏有美麗的沙灘、清澈的海水和豐富的海洋生物。此外，墾丁還提供各種水上活動，如衝浪、潛水和獨木舟。
+                                                    5. 阿里山國家風景區：阿里山位於南部中心地帶，是台灣一個森林遊樂區。這座山脈擁有豐富的生態資源和多樣化的植被。您可以在這裏欣賞到壯觀的山林景色，並體驗臺灣原住民的生活和文化。
+                                                    以上五個景點都具有獨特的特色和魅力。無論您是尋求冒險還是感受文化氛圍，這些地方都值得您去探索。希望您在來台灣時能夠充分體驗，並在此停留一段時間。
+                                                    祝您旅途愉快！
+                                                    敬祝順心，
+                                                    [您的名字]</p>
                                             </div>
                                         </div>
                                     </div>
@@ -372,16 +293,87 @@
                                         </div>
                                         <div>
                                             <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                                <p class="text-sm whitespace-pre-line">1. 台灣人工智能實驗所開發出最新一代AI棄類高手ALPHACARO，利用增強學習漫算法和遊具規則進行自我博戰，學會圍棋、西洋棋和中日三棋，且在圍棒比賽中贏運原本的圍棋世界冠軍AlphaGo。
-                                                    2. 三星展示了用施超音波、数動放射攥、電腦掃描、核磁感共振影像等AI診施成像軟件，包括协助判诊乳房症變的S- Detect軟件、AI领内出血系统以及可叉对膝关节问题的农关系统。
-                                                    3. 台灣AI人工學校已正式開學，學員包括印電子業、制造業、金融业和生命医疗4大领域。
-                                                    4. 台灣RI人工實驗中心推出記快抄快预览版第一版，采用AI技术自动从PTT版热门文章中生成新闻，一天可生成大约500篇新闻。</p>
+                                                <p class="text-sm whitespace-pre-line">本文概述如下：
+                                                    1. 開發出一代新的AI棋高手AlphaZero
+                                                    2. 三星在放射學會展示了多項AI影像診斷軟體
+                                                    3. AI學校正式開學，密集技術培訓
+                                                    4. PTT版熱門文章可自動產出，每日500篇</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                        <div
+                            class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                            <div class="flex flex-col w-full">
+                                <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">文本翻譯
+                                </h2>
+                                <div id="chatroom"
+                                    class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+
+                                    <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                        <div>
+                                            <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                                <p class="text-sm whitespace-pre-line">請翻譯成繁體中文：The International Federation of the Phonographic Industry has announced it's latest Global Artist Chart, which features a Taiwanese artist in the top 10. Joining U.S. artists such as Taylor Swift and Drake, and K-Pop sensation BTS, was Taiwan's own Jay Chou, at No. 9 in the world, He's the first Taiwanese artist to appear on the chart, fresh off the release of his latest album last year titled "Greatest Works of Art."</p>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            User
+                                        </div>
+                                    </div>
+                                    <div class="flex w-full mt-2 space-x-3 ">
+                                        <div
+                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            <img src="{{ asset('images/TAIDE.png') }}">
+                                        </div>
+                                        <div>
+                                            <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                                <p class="text-sm whitespace-pre-line">國際唱片業協會公佈了最新的全球藝術家排行榜，其中一位臺灣藝術家上升至前十名。與美國藝術家泰勒·斯威夫特和韓國男子音樂團體BTS一同上榜的是臺灣歌手周杰倫，他的最新專輯《藝術家》在全球範圍內獲得了廣泛關注和好評。</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        <div class="flex flex-col w-full">
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">寫文章</h2>
+                            <div id="chatroom"
+                                class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm whitespace-pre-line">寫一篇文章關於你曾收到的一份特別的禮物。描述你在何種情況下收到這份禮物，以及禮物的特別之處。題目：《一份特別的禮物》</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/TAIDE.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm whitespace-pre-line">我曾經收到一份特別珍貴的禮物，那是我的朋友送我的。當時我們正在一個朋友的生日派對上，他突然走到我身旁，告訴我他有一個禮物想給我。我很驚訝，因為我不知他有什麼禮物可以送給我。當他拿出一個小盒子時，我簡直不敢相信自己的眼睛。那是一個非常精美的小盒子，上面鑲嵌著閃閃發光的水晶，看起來非常珍貴。他告訴我這是我的生日禮物，我非常感激他的體貼和慷慨。這是一份非常特別的禮品，因為它不僅僅是一個物質的禮物，而且還帶有他對我的關愛和友誼的深厚感激之情。這份寶貴的禮物讓我感到非常溫暖和幸福，也讓我更加珍惜我和我的朋友之間的友誼。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        
                     </div>
                 </div>
             @endif
