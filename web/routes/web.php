@@ -70,9 +70,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::middleware(AdminMiddleware::class . ':tab_Chat')
         ->prefix('chats')
         ->group(function () {
-            Route::get('/', function () {
-                return view('chat');
-            })->name('chat.home');
+            Route::get('/', [ChatController::class, 'home'])->name('chat.home');
 
             Route::get('/new/{llm_id}', function ($llm_id) {
                 if (!LLMs::findOrFail($llm_id)->exists()) {
