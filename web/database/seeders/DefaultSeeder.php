@@ -17,8 +17,7 @@ class DefaultSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::where('email', 'dev@chat.gai.tw')->first();
-        if ($user === null) {
+        if (!User::where('email', 'dev@chat.gai.tw')->exists() && !Groups::where('name','Admins')->orWhere('name','Demos')->exists()) {
             try {
                 DB::beginTransaction(); // Start a database transaction
                 // Assume not yet seeded, try seeding the database
