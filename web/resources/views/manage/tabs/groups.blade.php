@@ -98,19 +98,71 @@
                 <div class="w-full p-3">
                     <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tab
                         Permissions</span>
-                    @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
-                        <div class="my-3 flex items-center pl-4 border border-gray-200 rounded-lg dark:border-white ">
-                            <label for="create_checkbox_{{ $perm->id }}">
-                                <input id="create_checkbox_{{ $perm->id }}" type="checkbox"
-                                    value="{{ $perm->id }}" name="permissions[]"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-                                    style="box-shadow:none;">
-                                <span
-                                    class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ substr($perm->name, 4) }}</span>
-                            </label>
-
+                        <div id="edit_tab_permissions">
+                            @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
+                                <div
+                                    class="mt-4 pb-2 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
+                                    <div style="margin-top:-0.875rem;" class="bg-gray-500 pr-2 mr-auto">
+                                        <label for="create_checkbox_{{ $perm->id }}">
+                                            <span
+                                                class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                {{ substr($perm->name, 4) }}
+                                            </span>
+                                            <input id="create_checkbox_{{ $perm->id }}" type="checkbox"
+                                                onclick="$(this).closest('div').next().toggle();$(this).closest('div').next().next().toggle();$(this).closest('div').parent().find('input').prop('disabled',!$(this).prop('checked')).prop('checked',false); $(this).prop('checked',!$(this).prop('disabled')).prop('disabled',false)"
+                                                value="{{ $perm->id }}" name="permissions[]"
+                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                                style="box-shadow:none;">
+                                        </label>
+                                    </div>
+                                    <div class="mx-3">
+                                        <p>{{App\Models\Permissions::where('name', 'Like', substr($perm->name, 4) . '_%')->count() > 0 ? "..." : ""}}</p>
+                                    </div>
+                                    <div style="display:none;">
+                                        @foreach (['Update', 'Read', 'Delete'] as $action)
+                                            @php
+                                                $sub_perms = App\Models\Permissions::where('name', 'Like', substr($perm->name, 4) . '_' . strtolower($action) . '_%')->get();
+                                            @endphp
+                                            @if (count($sub_perms) > 0)
+                                                <div
+                                                    class="mt-4 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
+                                                    <div style="margin-top:-0.875rem;"
+                                                        class="bg-gray-500 pr-2 mr-auto disabled:text-gray-700 "><label
+                                                            for="quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
+                                                            <span
+                                                                class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                                {{ $action }}
+                                                            </span>
+                                                            <input type="checkbox"
+                                                                id="quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
+                                                                onclick='$(this).closest("div").next().find("input").prop("checked",$(this).prop("checked"))'
+                                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                                                style="box-shadow:none;" disabled>
+                                                        </label>
+                                                    </div>
+    
+                                                    <div
+                                                        class="grid gap-2 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 mb-2">
+                                                        @foreach ($sub_perms as $sub_perm)
+                                                            <div
+                                                                class="flex items-center pl-4 border border-gray-200 rounded-lg dark:border-white">
+                                                                <input id="create_checkbox_{{ $sub_perm->id }}"
+                                                                    type="checkbox" value="{{ $sub_perm->id }}"
+                                                                    name="permissions[]"
+                                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                                                    style="box-shadow:none;" disabled> <label
+                                                                    for="create_checkbox_{{ $sub_perm->id }}"
+                                                                    class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ substr($sub_perm->name, strlen(substr($perm->name, 4) . '_' . strtolower($action) . '_')) }}</label>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                    @endforeach
                 </div>
                 <div class="w-full px-3 mb-3">
                     <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Model
