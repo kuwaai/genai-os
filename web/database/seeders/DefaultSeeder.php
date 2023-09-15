@@ -5,6 +5,9 @@ namespace Database\Seeders;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\Permissions;
+use App\Models\GroupPermissions;
+use App\Models\Groups;
 
 class DefaultSeeder extends Seeder
 {

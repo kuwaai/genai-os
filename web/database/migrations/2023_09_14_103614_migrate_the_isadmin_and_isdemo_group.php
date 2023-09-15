@@ -7,6 +7,7 @@ use App\Models\Permissions;
 use App\Models\GroupPermissions;
 use App\Models\Groups;
 use App\Models\User;
+use DB;
 
 return new class extends Migration {
     /**
