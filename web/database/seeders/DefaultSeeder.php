@@ -60,7 +60,10 @@ class DefaultSeeder extends Seeder
                     'group_id' => $admin_group_id
                 ]);
                 $user->save();
-                \App\Models\User::factory(3)->create()->update(["group_id"=>$demo_group_id]);
+                $demousers = \App\Models\User::factory(3)->create();
+                $demousers->each(function ($user) use ($demo_group_id) {
+                    $user->update(['group_id' => $demo_group_id]);
+                });
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack(); // Rollback the transaction in case of an exception
