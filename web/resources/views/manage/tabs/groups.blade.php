@@ -128,13 +128,13 @@
                                                     class="mt-4 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
                                                     <div style="margin-top:-0.875rem;"
                                                         class="bg-gray-500 pr-2 mr-auto disabled:text-gray-700 "><label
-                                                            for="quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
+                                                            for="create_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                             <span
                                                                 class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
                                                                 {{ $action }}
                                                             </span>
                                                             <input type="checkbox"
-                                                                id="quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
+                                                                id="create_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
                                                                 onclick='$(this).closest("div").next().find("input").prop("checked",$(this).prop("checked"))'
                                                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                                                 style="box-shadow:none;" disabled>
@@ -276,13 +276,13 @@
                                                 class="mt-4 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
                                                 <div style="margin-top:-0.875rem;"
                                                     class="bg-gray-500 pr-2 mr-auto disabled:text-gray-700 "><label
-                                                        for="quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
+                                                        for="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                         <span
                                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
                                                             {{ $action }}
                                                         </span>
                                                         <input type="checkbox"
-                                                            id="quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
+                                                            id="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
                                                             onclick='$(this).closest("div").next().find("input").prop("checked",$(this).prop("checked"))'
                                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                                             style="box-shadow:none;" disabled>
