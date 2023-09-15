@@ -128,7 +128,7 @@ class ManageController extends Controller
         } else {
             $group_id = null;
         }
-        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'isAdmin' => false, 'forDemo' => false]);
+        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id]);
         if ($request->input('password')) {
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }

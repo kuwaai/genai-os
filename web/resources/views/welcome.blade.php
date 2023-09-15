@@ -63,7 +63,7 @@
                 <p class="text-lg dark:text-cyan-200 text-blue-600">Free to chat with Open Source LLMs!</p>
             </div>
 
-
+            @if (App::environment('develope'))
             <div class="mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <div
@@ -214,6 +214,158 @@
                     </div>
                 </div>
             </div>
+            @else
+            <div class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                    <div
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        <div class="flex flex-col w-full">
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">TAIDE
+                            </h2>
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm whitespace-pre-line">請問關於台灣的開放資料，我要去哪裡找？</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/MetaAI.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm whitespace-pre-line">
+                                                台灣的開源資料數據可以從該國內的一些大型開源資料中心或與組織來尋找，例如國家圖書館、台灣大學、台灣科學院、政府機構和公共圖書館。這些地方提供可用於學習、研究和開發的開源資源，包括軟件，文檔，圖書，數據庫等。此外，也可以通過網上平臺或社交媒體獲取和瀏覽開開源資料。
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        <div class="flex flex-col w-full">
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Dolly</h2>
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm whitespace-pre-line">Introduce yourself as a chatbot named
+                                                dolly, as long as possible</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/dolly.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm whitespace-pre-line">Hi everyone! I'm dolly, an
+                                                interactive AI chatbot. I'm here to help you with all your questions, no
+                                                matter how big or small they may be. I'm learning from you, so I can
+                                                become better at understanding and responding to your queries. What do
+                                                you think? Do you have any additional questions for me? I can handle any
+                                                of them!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                    <div
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        <div class="flex flex-col w-full">
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">Bloom
+                            </h2>
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm whitespace-pre-line">"I'm Bloom, a Large language model,
+                                                Is there anything you want to ask?" 翻譯為中文</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/bloom.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm whitespace-pre-line">你好，我是Bloom，一個具有回答能力的大型語言生成模型</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        <div class="flex flex-col w-full">
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">OPT</h2>
+                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm whitespace-pre-line">Tell me a list of 5 tallest building
+                                                in USA</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/MetaAI.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm whitespace-pre-line">5 tallest building in USA are:
+                                                The Sears Tower in Chicago
+                                                The Empire State Building in New York City
+                                                The Burj Al Arab in UAE
+                                                The Chrysler Building in New York City</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
             <div class="flex justify-center mt-4 px-0 sm:items-center sm:justify-between">
                 <div class="text-center text-sm text-gray-500 dark:text-gray-400 sm:text-left">
                     <div class="flex items-center gap-4">
