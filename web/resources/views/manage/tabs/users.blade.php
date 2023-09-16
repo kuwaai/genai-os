@@ -141,7 +141,7 @@
             </div>
         </div>
     </form>
-    <div class="flex flex-1">
+    <div class="flex flex-1 overflow-hidden">
         <div class="flex flex-1 flex-col">
             <div id="fuzzy_selector" class="flex flex-1 h-full flex-col p-3 w-64 bg-white dark:bg-gray-700"
                 style="{{ session('last_tool') == 'fuzzy_selector' ? '' : 'display:none;' }}">
@@ -194,7 +194,8 @@
                     @if ($fuzzy_result->count() == 0)
                         <p>Can't find any records</p>
                     @else
-                        @foreach ($fuzzy_result as $user)
+                        <div class="flex-1 overflow-y-auto scrollbar">
+                            @foreach ($fuzzy_result as $user)
                             <script>
                                 $users[{{ $user->id }}] = {!! json_encode([$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id], JSON_HEX_APOS) !!}
                             </script>
@@ -210,6 +211,7 @@
                                 </button>
                             </div>
                         @endforeach
+                        </div>
                     @endif
                 @else
                     <p>Press enter to search</p>
@@ -235,7 +237,8 @@
                         </button>
                     </div>
                     <hr class="mb-2">
-                    @foreach (App\Models\Groups::leftjoin('users', 'group_id', '=', 'groups.id')->selectRaw('groups.name as name, groups.id as id, count(users.id) as members')->groupby('groups.id')->get() as $group)
+                    <div class="flex-1 overflow-y-auto scrollbar">
+                        @foreach (App\Models\Groups::leftjoin('users', 'group_id', '=', 'groups.id')->selectRaw('groups.name as name, groups.id as id, count(users.id) as members')->groupby('groups.id')->get() as $group)
                         <script>
                             $groupnames[{{ $group->id }}] = "{{ $group->name }}"
                         </script>
@@ -250,6 +253,7 @@
                             </button>
                         </div>
                     @endforeach
+                    </div>
                 </div>
                 @if (session('list_group'))
                     <div id="group_userlist" style="{{ session('list_group') ? '' : 'display:none;' }}"
@@ -269,7 +273,8 @@
                         </form>
 
 
-                        @foreach (App\Models\User::where('group_id', '=', session('list_group') == -1 ? null : session('list_group'))->orderby('name')->get() as $user)
+                        <div class="flex-1 overflow-y-auto scrollbar">
+                            @foreach (App\Models\User::where('group_id', '=', session('list_group') == -1 ? null : session('list_group'))->orderby('name')->get() as $user)
                             <script>
                                 $users[{{ $user->id }}] = {!! json_encode([$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id], JSON_HEX_APOS) !!}
                             </script>
@@ -285,6 +290,7 @@
                                 </button>
                             </div>
                         @endforeach
+                        </div>
                     </div>
                 @endif
             </div>
@@ -370,8 +376,8 @@
     }
 
     function search_group(data) {
-        $("#group_userlist >div").hide();
-        $("#group_userlist >div").each(function() {
+        $("#group_userlist >div >div").hide();
+        $("#group_userlist >div >div").each(function() {
             var founds = false;
             $(this).find("span").each(function() {
                 if ($(this).text().toLowerCase().includes(data.toLowerCase())) {

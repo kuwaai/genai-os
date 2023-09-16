@@ -46,7 +46,8 @@
             </button>
         </div>
         <hr class="border-black dark:border-gray-300 mb-2">
-        @foreach (App\Models\Groups::get() as $group)
+        <div class="flex-1 overflow-y-auto scrollbar">
+            @foreach (App\Models\Groups::get() as $group)
             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                 <script>
                     $groups[{{ $group->id }}] = {!! json_encode(
@@ -66,6 +67,7 @@
                 </button>
             </div>
         @endforeach
+        </div>
     </div>
     <div
         class="flex-1 h-full flex flex-col w-full bg-gray-100 dark:bg-gray-500 shadow-xl items-center text-gray-700 dark:text-white">

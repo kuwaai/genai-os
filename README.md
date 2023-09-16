@@ -1,13 +1,14 @@
-# TAIDE Chat 0.0.5
+# TAIDE Chat 0.0.6
 ### Implements
 * [Finished] Chatting with one LLMs
 * [Finished] Chatting with multiple LLMs at the same time
 * [Finished] LLM management and internal API with proxy
 * [Finished] User sign up & login, email auth
+* [Finished] Group & Permission management
 * [WIP] First play ground game: AI Election
-* [Not Started] User account management
-* [Not Started] Better UI
-* [Not Started] Externel API
+* [WIP] User account management
+* [WIP] Better UI
+* [WIP] Externel API
 * [Not Started] Combine Duel and Chat route
 
 ### Basic Software Requirements
@@ -75,9 +76,11 @@ screen -dmS llama bash -c "python3 ~/LLMs/0.0.3/LLaMA_TW1.py"
 ```
 
 ### How to update
-1. Pull the newest version of files by using `git pull`
-2. Go under the folder `cd executables/sh`
-3. Run the script `./production_update.sh`
+1. Stash all your changes by using `git stash`
+2. Pull the newest version of files by using `git pull`
+3. Go under the folder `cd executables/sh`
+4. Run the script `./production_update.sh`
+(Some updates will required to do migration)
 
 ### For production
 Nginx is recommanded, Since that is the only tested one,
