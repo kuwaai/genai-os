@@ -1,26 +1,25 @@
 <x-app-layout>
+    @php
+        $result = DB::table(function ($query) {
+            $query
+                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                ->from('group_permissions')
+                ->join('permissions', 'perm_id', '=', 'permissions.id')
+                ->where('group_id', Auth()->user()->group_id)
+                ->where('name', 'like', 'model_%')
+                ->get();
+        }, 'tmp')
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->select('tmp.*', 'llms.*')
+            ->where('llms.enabled', true)
+            ->orderby('llms.order')
+            ->orderby('llms.created_at')
+            ->get();
+    @endphp
+
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
-            <div class="p-3 h-full overflow-y-auto scrollbar">
-                @php
-                    $result = DB::table(function ($query) {
-                        $query
-                            ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                            ->from('group_permissions')
-                            ->join('permissions', 'perm_id', '=', 'permissions.id')
-                            ->where('group_id', Auth()->user()->group_id)
-                            ->where('name', 'like', 'model_%')
-                            ->get();
-                    }, 'tmp')
-                        ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-                        ->select('tmp.*', 'llms.*')
-                        ->where('llms.enabled', true)
-                        ->orderby('llms.order')
-                        ->orderby('llms.created_at')
-                        ->get();
-                @endphp
-
-
+            <div class="p-3 {{ $result->count() == 1 ? 'flex' : '' }} h-full overflow-y-auto scrollbar">
                 @if ($result->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
@@ -29,7 +28,7 @@
                     </div>
                 @else
                     @foreach ($result as $LLM)
-                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+                        <div class="{{ $result->count() == 1 ? 'flex flex-1 flex-col' : 'mb-2' }} border border-black dark:border-white border-1 rounded-lg">
                             <div class="border-b border-black dark:border-white">
                                 @if ($LLM->link)
                                     <a href="{{ $LLM->link }}" target="_blank"
@@ -39,7 +38,7 @@
                                         class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
                                 @endif
                             </div>
-                            <div class="max-h-[182px] overflow-y-auto scrollbar">
+                            <div class="{{ $result->count() == 1 ? '' : 'max-h-[182px]' }} overflow-y-auto scrollbar">
                                 <div
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
