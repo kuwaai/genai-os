@@ -3,12 +3,12 @@ llm:
   class: 'models.reflect.ReflectModel'
   args: {}
 
-pre-filters:
+ingress-filters:
   - 
     class: 'filters.opencc.OpenCC'
     args: {}
 
-post-filters:
+egress-filters:
   - 
     class: 'filters.opencc.OpenCC'
     args: {}

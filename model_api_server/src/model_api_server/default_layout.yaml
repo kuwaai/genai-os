@@ -3,5 +3,5 @@ llm:
   class: 'model_api_server.dummy.DummyModel'
   args: {}
 
-pre-filters: []
-post-filters: []
+ingress-filters: []
+egress-filters: []

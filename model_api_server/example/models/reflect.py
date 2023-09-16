@@ -7,6 +7,4 @@ import time
 
 class ReflectModel(CompletionInterface):
   def complete(self, text: str) -> Generator[str, None, None]:
-    for i in text:
-      time.sleep(0.02)
-      yield i
+    yield text

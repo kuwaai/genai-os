@@ -56,8 +56,8 @@ class ModelLayout:
         assert layout['version'] == 1
 
         self.llm = read_function(layout['llm'], CompletionInterface)
-        self.pre_filters  = [read_function(func, TextLevelFilteringInterface) for func in layout['pre-filters']]
-        self.post_filters = [read_function(func, TextLevelFilteringInterface) for func in layout['post-filters']]
+        self.ingress_filters  = [read_function(func, TextLevelFilteringInterface) for func in layout['ingress-filters']]
+        self.egress_filters = [read_function(func, TextLevelFilteringInterface) for func in layout['egress-filters']]
         
         self.logger.info('LLM Class: {}'.format(type(self.llm).__name__))
 
@@ -82,9 +82,9 @@ class ModelLayout:
         """
 
         try:
-            user_input = self.apply_filters(user_input, self.pre_filters)
+            user_input = self.apply_filters(user_input, self.ingress_filters)
             for output_token in self.llm.complete(user_input):
-                output_token = self.apply_filters(output_token, self.post_filters)
+                output_token = self.apply_filters(output_token, self.egress_filters)
                 yield output_token
         except Exception as e:
             self.logger.error(e)

@@ -8,7 +8,7 @@ ENV RETRY_COUNT=5
 
 # Copy all files into the image
 RUN mkdir -p /model_api_server
-COPY * /model_api_server/
+COPY . /model_api_server/
 
 # Run setup commands
 WORKDIR /model_api_server

@@ -4,9 +4,3 @@ sse-starlette
 python-multipart
 pyyaml
 requests
-# torch
-# transformers
-# accelerate
-# sentencepiece
-# openai
-opencc
