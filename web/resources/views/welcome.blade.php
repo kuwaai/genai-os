@@ -111,9 +111,7 @@
                                     <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                         <div>
                                             <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                                <p class="text-sm">Introduce yourself as a chatbot<br>
-                                                    named<br>
-                                                    dolly, as long as possible</p>
+                                                <p class="text-sm">Introduce yourself as a chatbot named dolly, as long as possible</p>
                                             </div>
                                         </div>
                                         <div
@@ -128,15 +126,11 @@
                                         </div>
                                         <div>
                                             <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                                <p class="text-sm">Hi everyone! I'm dolly, an<br>
-                                                    interactive AI chatbot. I'm here to help you with all your<br>
-                                                    questions, no<br>
-                                                    matter how big or small they may be. I'm learning from you, so I can<br>
-                                                    become better at understanding and responding to your queries. What<br>
-                                                    do<br>
-                                                    you think? Do you have any additional questions for me? I can handle<br>
-                                                    any<br>
-                                                    of them!</p>
+                                                <p class="text-sm">Hi everyone! I'm dolly, an interactive AI chatbot.<br>
+                                                    I'm here to help you with all your questions,<br>
+                                                    no matter how big or small they may be. I'm learning from you, so I can<br>
+                                                    become better at understanding and responding to your queries. What do you think?<br>
+                                                    Do you have any additional questions for me? I can handle any of them!</p>
                                             </div>
                                         </div>
                                     </div>
@@ -158,9 +152,7 @@
                                     <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                         <div>
                                             <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                                <p class="text-sm">"I'm Bloom, a Large language<br>
-                                                    model,<br>
-                                                    Is there anything you want to ask?" 翻譯為中文</p>
+                                                <p class="text-sm">"I'm Bloom, a Large language model, Is there anything you want to ask?" 翻譯為中文</p>
                                             </div>
                                         </div>
                                         <div
@@ -193,9 +185,7 @@
                                     <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                         <div>
                                             <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                                <p class="text-sm">Tell me a list of 5 tallest<br>
-                                                    building<br>
-                                                    in USA</p>
+                                                <p class="text-sm">Tell me a list of 5 tallest building in USA</p>
                                             </div>
                                         </div>
                                         <div
