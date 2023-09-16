@@ -102,7 +102,7 @@ class RequestChat implements ShouldQueue
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 $tmp .= $message;
-                                Redis::publish($this->channel, 'New ' . $tmp);
+                                Redis::publish($this->channel, 'New ' . $tmp . '...');
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
@@ -111,12 +111,14 @@ class RequestChat implements ShouldQueue
                         }
                     }
                     if (trim($tmp) == '') {
-                        Redis::publish($this->channel, 'New [Oops, seems like LLM given empty message as output, Please try again!]');
+                        Redis::publish($this->channel, 'New [Oops, the LLM returned empty message, please try again later or report to admins!]');
+                        $tmp = "[Oops, the LLM returned empty message, please try again later or report to admins!]";
                     } else {
                         Redis::publish($this->channel, 'New ' . trim($tmp));
                     }
                 } catch (Exception $e) {
-                    Redis::publish($this->channel, 'New ' . $tmp . "\n[Sorry, something is broken!]");
+                    Redis::publish($this->channel, 'New ' . $tmp . "\n[Sorry, something is broken, please try again later!]");
+                    $tmp .= "\n[Sorry, something is broken, please try again later!]";
                     Log::channel('analyze')->Debug('failJob ' . $this->history_id);
                 } finally {
                     try {
