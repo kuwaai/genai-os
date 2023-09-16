@@ -228,7 +228,7 @@
                         href="https://www.twcc.ai/">Powered by TWCC</a>
                 </div>
             </div>
-            <span class="text-black dark:text-white flex justify-end text-sm">Version 0.0.6</span>
+            <span class="text-black dark:text-white flex justify-end text-sm">Version 0.0.6.1</span>
         </div>
     </div>
 </body>
