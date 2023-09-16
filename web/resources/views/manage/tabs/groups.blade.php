@@ -75,7 +75,7 @@
             action="{{ route('manage.group.create') }}">
             @csrf
             <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 text-white flex items-center justify-center">
-                <p class="text-lg mr-auto text-gray-700">Create a new Group</p>
+                <p class="text-lg mr-auto text-gray-700 dark:text-white">Create a new Group</p>
                 <button
                     class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">Create</button>
             </div>
@@ -191,7 +191,7 @@
             @method('patch')
             <input id="edit_group_id" name="id" hidden>
             <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 text-white flex items-center justify-center">
-                <p class="text-lg mr-auto text-gray-700">Edit NULL</p><a id="delete_group_btn" onclick="delete_group(undefined)"
+                <p class="text-lg mr-auto dark:text-white text-gray-700">Edit NULL</p><a id="delete_group_btn" onclick="delete_group(undefined)"
                     data-modal-target="delete_group_modal" data-modal-toggle="delete_group_modal"
                     class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">Delete</a>
                 <button
