@@ -8,7 +8,7 @@ from starlette.applications import Starlette
 from starlette.routing import Route
 from starlette.requests import Request
 from sse_starlette.sse import EventSourceResponse
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from model_api_server.model_layout import ModelLayout
 
@@ -64,4 +64,6 @@ class ModelApiServer:
                 return JSONResponse({'message': "I didn't see your input!"}, 400)
             
             self.busy = True
-            return EventSourceResponse(self.model_layout.process(user_input))
+
+            for t in self.model_layout.process(user_input):
+                return Response(t, media_type="text/plain")
