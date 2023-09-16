@@ -61,8 +61,8 @@
         </div>
     </div>
 @endif
-<div class="flex flex-1 flex-col overflow-hidden bg-gray-600">
-    <ol class="flex items-center w-full space-x-2 text-sm font-medium text-center text-gray-500 bg-gray-700 px-4">
+<div class="flex flex-1 flex-col overflow-hidden bg-gray-100 dark:bg-gray-600">
+    <ol class="flex items-center w-full space-x-2 text-sm font-medium text-center text-gray-500 bg-gray-200 dark:bg-gray-700 px-4">
         <li class="flex items-center text-blue-600 dark:text-blue-500">
             Menu
         </li>
@@ -90,10 +90,10 @@
     <form class="flex flex-1 flex-col h-full" style="display:none;" id="create_user_form" method="post"
         action="{{ route('manage.user.create') }}">
         @csrf
-        <div class="w-full bg-gray-600 p-3 flex items-center justify-center">
+        <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 flex items-center justify-center">
             <p class="text-lg mr-auto">Create a new User</p>
             <button type="submit"
-                class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">Create</button>
+                class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300 text-white">Create</button>
         </div>
 
         <div class="scrollbar overflow-y-auto w-full">
@@ -143,8 +143,11 @@
     </form>
     <div class="flex flex-1">
         <div class="flex flex-1 flex-col">
-            <div id="fuzzy_selector" class="flex flex-1 h-full flex-col p-3 w-64 bg-gray-700"
+            <div id="fuzzy_selector" class="flex flex-1 h-full flex-col p-3 w-64 bg-white dark:bg-gray-700"
                 style="{{ session('last_tool') == 'fuzzy_selector' ? '' : 'display:none;' }}">
+                <button class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
+                onclick="update_stepper(['Menu']);$('#fuzzy_selector').hide();$('#edit_user_form').hide(); $('#menu').show();">← Return to
+                Menu</button>
                 <form class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
                     action="{{ route('manage.user.search') }}" method="post">
                     @csrf
@@ -201,7 +204,7 @@
                                 <button onclick='edit_group_user({{ $user->id }})'
                                     class="flex menu-btn flex items-center justify-center w-full overflow-x-hidden break-all min-h-12 dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
                                     <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                        <span class="block border-white border-b">{{ $user->name }}</span>
+                                        <span class="block border-gray-700 dark:border-white border-b">{{ $user->name }}</span>
                                         <span>{{ $user->email }}</span>
                                     </p>
                                 </button>
@@ -217,7 +220,7 @@
                 <div id="group_selector_list"
                     class="flex flex-col bg-white dark:bg-gray-700 p-2 text-white w-48 flex-shrink-0 relative overflow-hidden"
                     style="{{ session('list_group') ? 'display:none;' : '' }}">
-                    <button class="text-center cursor-pointer hover:bg-gray-500 rounded p-2 mb-2"
+                    <button class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
                         onclick="update_stepper(['Menu']);$('#group_selector').hide(); $('#menu').show();">← Return to
                         Menu</button>
                     <div
@@ -241,7 +244,7 @@
                             <button onclick='update_tab("users","group_selector",{{ $group->id }})'
                                 class="flex menu-btn flex items-center justify-center w-full break-all min-h-12 dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
                                 <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                    <span class="block border-white border-b">{{ $group->name }}</span>
+                                    <span class="block border-gray-700 dark:border-white border-b">{{ $group->name }}</span>
                                     <span class="text-sm">{{ $group->members . ' Memebers' }}</span>
                                 </p>
                             </button>
@@ -250,11 +253,11 @@
                 </div>
                 @if (session('list_group'))
                     <div id="group_userlist" style="{{ session('list_group') ? '' : 'display:none;' }}"
-                        class="flex flex-col bg-white dark:bg-gray-700 p-2 text-white w-64 flex-shrink-0 relative overflow-hidden">
+                        class="flex flex-col bg-white dark:bg-gray-700 p-2 text-black dark:text-white w-64 flex-shrink-0 relative overflow-hidden">
                         <p></p>
-                        <button class="text-center cursor-pointer hover:bg-gray-500 rounded p-2 mb-2"
+                        <button class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
                             onclick="update_stepper(['Menu','Group Selector']);$('#group_userlist').hide(); $('#edit_user_form').hide(); $('#group_selector_list').show();">←
-                            Return to Menu</button>
+                            Return to Group List</button>
                         <form class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                             <div class="flex">
                                 <div class="relative w-full">
@@ -276,7 +279,7 @@
                                 <button onclick='edit_group_user({{ $user->id }})'
                                     class="flex menu-btn flex items-center justify-center w-full overflow-x-hidden break-all min-h-12 dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
                                     <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                        <span class="block border-white border-b">{{ $user->name }}</span>
+                                        <span class="block border-gray-700 dark:border-white border-b">{{ $user->name }}</span>
                                         <span>{{ $user->email }}</span>
                                     </p>
                                 </button>
@@ -292,8 +295,8 @@
             @method('patch')
             <input name="list_group_id" hidden value="{{ session('list_group') }}">
             <input name="id" hidden>
-            <div class="w-full bg-gray-600 p-3 flex items-center justify-center">
-                <p class="text-lg mr-auto">Edit User</p><a id="delete_user_btn" onclick="delete_user(undefined)"
+            <div class="w-full bg-gray-300 text-white dark:bg-gray-600 p-3 flex items-center justify-center">
+                <p class="text-lg mr-auto text-black dark:text-white">Edit User</p><a id="delete_user_btn" onclick="delete_user(undefined)"
                     data-modal-target="delete_user_modal" data-modal-toggle="delete_user_modal"
                     class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">Delete</a>
                 <button

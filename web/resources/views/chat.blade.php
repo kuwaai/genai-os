@@ -28,7 +28,8 @@
                     </div>
                 @else
                     @foreach ($result as $LLM)
-                        <div class="{{ $result->count() == 1 ? 'flex flex-1 flex-col' : 'mb-2' }} border border-black dark:border-white border-1 rounded-lg">
+                        <div
+                            class="{{ $result->count() == 1 ? 'flex flex-1 flex-col' : 'mb-2' }} border border-black dark:border-white border-1 rounded-lg">
                             <div class="border-b border-black dark:border-white">
                                 @if ($LLM->link)
                                     <a href="{{ $LLM->link }}" target="_blank"
@@ -167,10 +168,11 @@
                                     class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
                                 <button type="submit"
                                     class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M2.5 9.5L17.5 2.5V17.5L2.5 10.5V9.5Z">
-                                        </path>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                        <path
+                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                            fill="currentColor"></path>
                                     </svg>
                                 </button>
                             </div>
@@ -185,10 +187,11 @@
                                     class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
                                 <button type="submit"
                                     class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M2.5 9.5L17.5 2.5V17.5L2.5 10.5V9.5Z">
-                                        </path>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                        <path
+                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                            fill="currentColor"></path>
                                     </svg>
                                 </button>
                             </div>

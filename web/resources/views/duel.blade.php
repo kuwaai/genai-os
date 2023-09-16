@@ -1,25 +1,26 @@
 <x-app-layout>
 
     @php
-    $result = DB::table(function ($query) {
-        $query
-            ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-            ->from('group_permissions')
-            ->join('permissions', 'perm_id', '=', 'permissions.id')
-            ->where('group_id', Auth()->user()->group_id)
-            ->where('name', 'like', 'model_%')
+        $result = DB::table(function ($query) {
+            $query
+                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                ->from('group_permissions')
+                ->join('permissions', 'perm_id', '=', 'permissions.id')
+                ->where('group_id', Auth()->user()->group_id)
+                ->where('name', 'like', 'model_%')
+                ->get();
+        }, 'tmp')
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->select('tmp.*', 'llms.*')
+            ->where('llms.enabled', true)
+            ->orderby('llms.order')
+            ->orderby('llms.created_at')
             ->get();
-    }, 'tmp')
-        ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-        ->select('tmp.*', 'llms.*')
-        ->where('llms.enabled', true)
-        ->orderby('llms.order')
-        ->orderby('llms.created_at')
-        ->get();
-@endphp
+    @endphp
 
-    <div id="create-model-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
-        tabindex="-1" aria-hidden="true"
+    <div id="create-model-modal"
+        data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40" tabindex="-1"
+        aria-hidden="true"
         class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-md max-h-full">
             <!-- Modal content -->
@@ -27,11 +28,11 @@
                 <button type="button"
                     class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
                     data-modal-hide="create-model-modal">
-                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clip-rule="evenodd"></path>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                        <path
+                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                            fill="currentColor"></path>
                     </svg>
                     <span class="sr-only">Close modal</span>
                 </button>
@@ -45,7 +46,8 @@
                 <form method="post" action="{{ route('duel.create') }}" class="p-6" id="create_duel"
                     onsubmit="return checkForm()">
                     @csrf
-                    <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
+                    <input type="hidden" name="limit"
+                        value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                     <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Select the LLMs you want to use at
                         the same time.</p>
                     <ul class="my-4 space-y-3">
@@ -63,7 +65,9 @@
                                         <div class="pl-2">
                                             <div class="w-full text-lg font-semibold leading-none">{{ $LLM->name }}
                                             </div>
-                                            <div class="w-full text-sm leading-none">{{ $LLM->description ? $LLM->description : "This LLM is currently available!" }}</div>
+                                            <div class="w-full text-sm leading-none">
+                                                {{ $LLM->description ? $LLM->description : 'This LLM is currently available!' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </label>
@@ -104,9 +108,10 @@
                         </button>
                     </div>
                     @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
-                    @if (array_diff(explode(',',trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
+                        @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
                             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                                <div class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
+                                <div
+                                    class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
                                     @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                                         <div
                                             class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-gray-300 flex items-center justify-center overflow-hidden">
@@ -123,16 +128,17 @@
                                     @endforeach
                                 </div>
                                 <div class="max-h-[182px] overflow-y-auto scrollbar">
-                                @foreach ($DC as $dc)
-                                    <div
-                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                        <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('duel.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
-                                            <p class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                                {{ $dc->name }}</p>
-                                        </a>
-                                    </div>
-                                @endforeach
+                                    @foreach ($DC as $dc)
+                                        <div
+                                            class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                                            <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                                href="{{ route('duel.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
+                                                <p
+                                                    class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
+                                                    {{ $dc->name }}</p>
+                                            </a>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                         @endif
@@ -151,8 +157,10 @@
                 <form id="deleteChat" action="{{ route('duel.delete') }}" method="post" class="hidden">
                     @csrf
                     @method('delete')
-                    <input name="id" value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
-                    <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
+                    <input name="id"
+                        value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
+                    <input type="hidden" name="limit"
+                        value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 </form>
 
                 <form id="editChat" action="{{ route('duel.edit') }}" method="post" class="hidden">
@@ -160,7 +168,8 @@
                     <input name="id"
                         value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
                     <input name="new_name" />
-                    <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
+                    <input type="hidden" name="limit"
+                        value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 </form>
                 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
                     <p class="flex-1 flex flex-wrap items-center mr-3 overflow-x-hidden overflow-y-auto scrollbar">
@@ -267,14 +276,16 @@
                                 class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
                             <button type="submit"
                                 class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
-                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M2.5 9.5L17.5 2.5V17.5L2.5 10.5V9.5Z">
-                                    </path>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                    class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                    <path
+                                        d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                        fill="currentColor"></path>
                                 </svg>
                             </button>
                         </div>
-                        <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
+                        <input type="hidden" name="limit"
+                            value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                     </form>
                 </div>
             </div>

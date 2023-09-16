@@ -40,12 +40,12 @@
     <div class="flex flex-col bg-white dark:bg-gray-700 p-2 text-white w-48 flex-shrink-0 relative overflow-hidden">
         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
             <button onclick="edit_group(undefined)" id="new_group_btn"
-                class="flex menu-btn flex items-center justify-center w-full h-12 bg-green-600 hover:bg-green-700 transition duration-300">
-                <p class="flex-1 text-center text-gray-700 dark:text-white">New
+                class="flex menu-btn flex items-center justify-center w-full h-12 bg-green-400 hover:bg-green-500 dark:bg-green-600 dark:hover:bg-green-700 transition duration-300">
+                <p class="flex-1 text-center text-white">New
                     Group</p>
             </button>
         </div>
-        <hr class="border-gray-300 mb-2">
+        <hr class="border-black dark:border-gray-300 mb-2">
         @foreach (App\Models\Groups::get() as $group)
             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                 <script>
@@ -68,12 +68,12 @@
         @endforeach
     </div>
     <div
-        class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-500 shadow-xl items-center text-gray-700 dark:text-white">
+        class="flex-1 h-full flex flex-col w-full bg-gray-100 dark:bg-gray-500 shadow-xl items-center text-gray-700 dark:text-white">
         <form class="flex flex-col w-full h-full" style="display:none;" id="create_group_form" method="post"
             action="{{ route('manage.group.create') }}">
             @csrf
-            <div class="w-full bg-gray-600 p-3 flex items-center justify-center">
-                <p class="text-lg mr-auto">Create a new Group</p>
+            <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 text-white flex items-center justify-center">
+                <p class="text-lg mr-auto text-gray-700">Create a new Group</p>
                 <button
                     class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">Create</button>
             </div>
@@ -101,8 +101,8 @@
                         <div id="edit_tab_permissions">
                             @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
                                 <div
-                                    class="mt-4 pb-2 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
-                                    <div style="margin-top:-0.875rem;" class="bg-gray-500 pr-2 mr-auto">
+                                    class="mt-4 pb-2 flex flex-col justicfy-center px-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                    <div style="margin-top:-0.875rem;" class="bg-gray-100 dark:bg-gray-500 pr-2 mr-auto">
                                         <label for="create_checkbox_{{ $perm->id }}">
                                             <span
                                                 class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -125,9 +125,9 @@
                                             @endphp
                                             @if (count($sub_perms) > 0)
                                                 <div
-                                                    class="mt-4 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
+                                                    class="mt-4 flex flex-col justicfy-center px-2 border border-gray-500 rounded-lg dark:border-white">
                                                     <div style="margin-top:-0.875rem;"
-                                                        class="bg-gray-500 pr-2 mr-auto disabled:text-gray-700 "><label
+                                                        class="bg-gray-100 dark:bg-gray-500 pr-2 mr-auto disabled:text-gray-700 "><label
                                                             for="create_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                             <span
                                                                 class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -145,7 +145,7 @@
                                                         class="grid gap-2 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 mb-2">
                                                         @foreach ($sub_perms as $sub_perm)
                                                             <div
-                                                                class="flex items-center pl-4 border border-gray-200 rounded-lg dark:border-white">
+                                                                class="flex items-center pl-4 border border-gray-500 rounded-lg dark:border-white">
                                                                 <input id="create_checkbox_{{ $sub_perm->id }}"
                                                                     type="checkbox" value="{{ $sub_perm->id }}"
                                                                     name="permissions[]"
@@ -171,7 +171,7 @@
                         @foreach (DB::table(function ($query) {
         $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
     }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->select('p.id as id', 'llms.name as name')->get() as $LLM)
-                            <div class="flex items-center pl-4 border border-gray-200 rounded-lg dark:border-white">
+                            <div class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                                 <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
                                     value="{{ $LLM->id }}" name="permissions[]"
                                     class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
@@ -188,8 +188,8 @@
             @csrf
             @method('patch')
             <input id="edit_group_id" name="id" hidden>
-            <div class="w-full bg-gray-600 p-3 flex items-center justify-center">
-                <p class="text-lg mr-auto">Edit NULL</p><a id="delete_group_btn" onclick="delete_group(undefined)"
+            <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 text-white flex items-center justify-center">
+                <p class="text-lg mr-auto text-gray-700">Edit NULL</p><a id="delete_group_btn" onclick="delete_group(undefined)"
                     data-modal-target="delete_group_modal" data-modal-toggle="delete_group_modal"
                     class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">Delete</a>
                 <button
@@ -249,8 +249,8 @@
                     <div id="edit_tab_permissions">
                         @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
                             <div
-                                class="mt-4 pb-2 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
-                                <div style="margin-top:-0.875rem;" class="bg-gray-500 pr-2 mr-auto">
+                                class="mt-4 pb-2 flex flex-col justicfy-center px-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                <div style="margin-top:-0.875rem;" class="bg-gray-100 dark:bg-gray-500 pr-2 mr-auto">
                                     <label for="edit_checkbox_{{ $perm->id }}">
                                         <span
                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -273,9 +273,9 @@
                                         @endphp
                                         @if (count($sub_perms) > 0)
                                             <div
-                                                class="mt-4 flex flex-col justicfy-center px-2 border border-gray-200 rounded-lg dark:border-white">
+                                                class="mt-4 flex flex-col justicfy-center px-2 border border-gray-500 rounded-lg dark:border-white">
                                                 <div style="margin-top:-0.875rem;"
-                                                    class="bg-gray-500 pr-2 mr-auto disabled:text-gray-700 "><label
+                                                    class="bg-gray-100 dark:bg-gray-500 pr-2 mr-auto disabled:text-gray-700 "><label
                                                         for="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                         <span
                                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -293,7 +293,7 @@
                                                     class="grid gap-2 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 mb-2">
                                                     @foreach ($sub_perms as $sub_perm)
                                                         <div
-                                                            class="flex items-center pl-4 border border-gray-200 rounded-lg dark:border-white">
+                                                            class="flex items-center pl-4 border border-gray-500 rounded-lg dark:border-white">
                                                             <input id="edit_checkbox_{{ $sub_perm->id }}"
                                                                 type="checkbox" value="{{ $sub_perm->id }}"
                                                                 name="permissions[]"
@@ -319,7 +319,7 @@
         $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
     }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->select('p.id as id', 'llms.name as name')->get() as $LLM)
                                 <div
-                                    class="flex items-center pl-4 border border-gray-200 rounded-lg dark:border-white">
+                                    class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                                     <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
                                         value="{{ $LLM->id }}" name="permissions[]"
                                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
