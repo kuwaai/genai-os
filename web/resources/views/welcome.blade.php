@@ -75,10 +75,7 @@
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm">請翻譯成繁體中文：The International<br>
-                                                Federation of the Phonographic Industry has announced it's latest<br>
-                                                Global Artist Chart, which features a Taiwanese artist in the top<br>
-                                                10. ...</p>
+                                            <p class="text-sm">請翻譯成繁體中文：The International Federation of the Phonographic Industry has announced it's latest Global Artist Chart, which features a Taiwanese artist in the top 10. ...</p>
                                         </div>
                                     </div>
                                     <div
