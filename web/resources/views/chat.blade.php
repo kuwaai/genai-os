@@ -157,17 +157,19 @@
                         @endforeach
                     @endif
                 </div>
-                <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
+                <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
                     @if (request()->route('llm_id'))
-                        <form method="post" action="{{ route('chat.create') }}" id="create_chat">
-                            <div class="flex">
+                        <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
+                            <div class="flex items-end">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
-                                <input type="text" placeholder="Enter your text here" name="input" id="chat_input"
-                                    autocomplete="off"
-                                    class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
+                                <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
+                                    oninput="adjustTextareaRows()" id="chat_input" name="input"
+                                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+
+
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] right-[26px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
                                         <path
@@ -178,15 +180,17 @@
                             </div>
                         </form>
                     @elseif(request()->route('chat_id'))
-                        <form method="post" action="{{ route('chat.request') }}" id="create_chat">
+                        <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
                             <div class="flex">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
-                                <input type="text" placeholder="Enter your text here" name="input" id="chat_input"
-                                    autocomplete="off"
-                                    class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
+                                <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
+                                    oninput="adjustTextareaRows()" id="chat_input" name="input"
+                                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+
+
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] right-[26px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
                                         <path
@@ -245,7 +249,39 @@
                 </script>
             @endif
             <script>
-                $("#chat_input").focus();
+                if ("#chat_input") {
+                    $("#chat_input").focus();
+
+                    function adjustTextareaRows() {
+                        const textarea = $('#chat_input');
+                        const maxRows = parseInt(textarea.attr('max-rows')) || 5;
+                        const lineHeight = parseInt(textarea.css('line-height'));
+
+                        textarea.attr('rows', 1);
+
+                        const contentHeight = textarea[0].scrollHeight;
+                        const rowsToDisplay = Math.floor(contentHeight / lineHeight);
+
+                        textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+                    }
+                    $("#chat_input").on("keydown", function(event) {
+                        if (event.key === "Enter" && !event.shiftKey) {
+                            event.preventDefault();
+                            $("#prompt_area").submit();
+                        } else if (event.key === "Enter" && event.shiftKey) {
+                            event.preventDefault();
+                            var cursorPosition = this.selectionStart;
+                            $(this).val($(this).val().substring(0, cursorPosition) + "\n" + $(this).val().substring(
+                                cursorPosition));
+                            this.selectionStart = this.selectionEnd = cursorPosition + 1;
+                        }
+                        adjustTextareaRows();
+                    });
+                    adjustTextareaRows();
+                    $("html").on("keydown", function() {
+                        $("#chat_input").focus();
+                    })
+                }
             </script>
         @endif
     </div>
