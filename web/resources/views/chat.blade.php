@@ -278,9 +278,6 @@
                         adjustTextareaRows();
                     });
                     adjustTextareaRows();
-                    $("html").on("keydown", function() {
-                        $("#chat_input").focus();
-                    })
                 }
             </script>
         @endif
