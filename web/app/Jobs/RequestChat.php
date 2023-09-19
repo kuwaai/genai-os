@@ -131,6 +131,7 @@ class RequestChat implements ShouldQueue
                     if ($this->channel == '' . $this->history_id) {
                         Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     }
+                    sleep(2);
                     Redis::publish($this->channel, 'New ' . trim($tmp));
                     Redis::publish($this->channel, 'Ended Ended');
                     $end = microtime(true); // Record end time
