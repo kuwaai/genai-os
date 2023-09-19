@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\SystemSetting;
+use App\Models\Groups;
+use App\Models\User;
 
 class RegisteredUserController extends Controller
 {
@@ -31,7 +33,7 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         if (
-            \App\Models\SystemSetting::where('key', 'allowRegister')
+            SystemSetting::where('key', 'allowRegister')
                 ->where('value', 'true')
                 ->exists()
         ) {
@@ -39,15 +41,37 @@ class RegisteredUserController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                'invite_token' => ['max:32'],
             ]);
 
+            if (
+                SystemSetting::where('key', 'register_need_invite')
+                    ->where('value', 'true')
+                    ->exists()
+            ) {
+                $request->validate([
+                    'invite_token' => [
+                        'required',
+                        function ($attribute, $value, $fail) {
+                            if (!Groups::where('invite_token', '=', $value)->exists()) {
+                                $fail("This invite token doesn't exist");
+                            }
+                        },
+                    ],
+                ]);
+            }
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'isAdmin' => false,
-                'forDemo' => false,
             ]);
+            if ($request->invite_token) {
+                $group = Groups::where('invite_token', '=', $request->invite_token);
+                if ($group->exists()) {
+                    $user->group_id = $group->first()->id;
+                    $user->save();
+                }
+            }
 
             $user->tokens()->delete();
             $user->createToken('API_Token', ['access_api']);
@@ -58,7 +82,6 @@ class RegisteredUserController extends Controller
 
             return redirect(RouteServiceProvider::HOME);
         }
-
         return redirect(RouteServiceProvider::HOME);
     }
 }

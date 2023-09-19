@@ -16,7 +16,7 @@ class ManageController extends Controller
     {
         if ($request->input('name')) {
             $group = new Groups();
-            $group->fill(['name' => $request->input('name'), 'describe' => $request->input('describe')]);
+            $group->fill(['name' => $request->input('name'), 'describe' => $request->input('describe'), 'invite_token'=>$request->input('invite_code')]);
             $group->save();
             if ($request->input('permissions')) {
                 $currentTimestamp = now();
@@ -47,12 +47,7 @@ class ManageController extends Controller
             $group = Groups::find($id);
             $name = $request->input('name');
             $describe = $request->input('describe');
-            if ($name) {
-                $group->fill(['name' => $name]);
-            }
-            if ($describe) {
-                $group->fill(['describe' => $describe]);
-            }
+            $group->fill(['name' => $name, 'describe' => $describe, 'invite_token'=>$request->input('invite_code')]);
             $group->save();
             $permissions = $request->input('permissions');
             if ($permissions) {

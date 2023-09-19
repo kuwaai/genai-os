@@ -133,7 +133,7 @@ class ProfileController extends Controller
 
     public function api_auth(Request $request)
     {
-        if (env('API_Key', null) == $request->input('key')) {
+        if (config('app.API_Key') == $request->input('key')) {
             $result = DB::table('personal_access_tokens')
                 ->join('users', 'tokenable_id', '=', 'users.id')
                 ->where('token', $request->input('api_token'))
@@ -191,7 +191,7 @@ class ProfileController extends Controller
         $response->headers->set('Connection', 'close');
 
         $response->setCallback(function () use ($response, $request) {
-            if (env('API_Key', null) == $request->input('key')) {
+            if (config('app.API_Key') == $request->input('key')) {
                 $channel = $request->input('channel');
                 if ($channel != null) {
                     if (strpos($channel, 'aielection_') === 0) {

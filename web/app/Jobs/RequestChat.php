@@ -50,7 +50,7 @@ class RequestChat implements ShouldQueue
             $this->channel .= $this->history_id;
         }
         Log::channel('analyze')->Info($this->channel);
-        if ($this->history_id > 0 && $this->channel == $this->history_id . "") {
+        if ($this->history_id > 0 && $this->channel == $this->history_id . '') {
             if (Histories::findOrFail($this->channel)->msg != '* ...thinking... *') {
                 Log::Debug('Hmmm');
                 return;
@@ -111,10 +111,7 @@ class RequestChat implements ShouldQueue
                         }
                     }
                     if (trim($tmp) == '') {
-                        Redis::publish($this->channel, 'New [Oops, the LLM returned empty message, please try again later or report to admins!]');
-                        $tmp = "[Oops, the LLM returned empty message, please try again later or report to admins!]";
-                    } else {
-                        Redis::publish($this->channel, 'New ' . trim($tmp));
+                        $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
                     }
                 } catch (Exception $e) {
                     Redis::publish($this->channel, 'New ' . $tmp . "\n[Sorry, something is broken, please try again later!]");
@@ -129,10 +126,13 @@ class RequestChat implements ShouldQueue
                         }
                     } catch (Exception $e) {
                     }
+                    Redis::publish($this->channel, 'New ' . trim($tmp));
                     Redis::publish($this->channel, 'Ended Ended');
                     if ($this->channel == '' . $this->history_id) {
                         Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     }
+                    Redis::publish($this->channel, 'New ' . trim($tmp));
+                    Redis::publish($this->channel, 'Ended Ended');
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
                     Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . trim(str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $tmp)));

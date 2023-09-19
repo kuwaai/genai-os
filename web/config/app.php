@@ -3,7 +3,15 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-
+    'API_Key' => env('API_Key', null),
+    'MAIL_MAILER' => env('MAIL_MAILER', null),
+    'MAIL_HOST' => env('MAIL_HOST', null),
+    'MAIL_PORT' => env('MAIL_PORT', null),
+    'MAIL_USERNAME' => env('MAIL_USERNAME', null),
+    'MAIL_PASSWORD' => env('MAIL_PASSWORD', null),
+    'MAIL_ENCRYPTION' => env('MAIL_ENCRYPTION', null),
+    'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS', null),
+    'MAIL_FROM_NAME' => env('MAIL_FROM_NAME', null),
     /*
     |--------------------------------------------------------------------------
     | Application Name

@@ -39,8 +39,6 @@ Route::middleware('auth', 'verified', AdminMiddleware::class . ':tab_Dashboard')
         Route::get('/', function () {
             return view('dashboard');
         })->name('dashboard.home');
-        Route::get('/resetRedis', [ChatController::class, 'ResetRedis'])->name('dashboard.resetRedis');
-        Route::patch('/update', [SystemController::class, 'update'])->name('dashboard.update');
 
         Route::group(['prefix' => 'LLMs'], function () {
             Route::get('/toggle/{llm_id}', [LLMController::class, 'toggle'])->name('dashboard.llms.toggle');
@@ -59,11 +57,17 @@ Route::middleware('auth', 'verified')->group(function () {
         ->group(function () {
             Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
 
-            Route::middleware(AdminMiddleware::class . ':Profile_update_api_token')->patch('/api', [ProfileController::class, 'renew'])->name('profile.api.renew');
-            Route::middleware(AdminMiddleware::class . ':Profile_update_openai_token')->patch('/chatgpt/api', [ProfileController::class, 'chatgpt_update'])->name('profile.chatgpt.api.update');
+            Route::middleware(AdminMiddleware::class . ':Profile_update_api_token')
+                ->patch('/api', [ProfileController::class, 'renew'])
+                ->name('profile.api.renew');
+            Route::middleware(AdminMiddleware::class . ':Profile_update_openai_token')
+                ->patch('/chatgpt/api', [ProfileController::class, 'chatgpt_update'])
+                ->name('profile.chatgpt.api.update');
 
             Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
-            Route::middleware(AdminMiddleware::class . ':Profile_delete_account')->delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+            Route::middleware(AdminMiddleware::class . ':Profile_delete_account')
+                ->delete('/', [ProfileController::class, 'destroy'])
+                ->name('profile.destroy');
         });
 
     #---Chats
@@ -157,6 +161,14 @@ Route::middleware('auth', 'verified')->group(function () {
                 })
                 ->name('manage.user');
 
+            Route::prefix('setting')
+                ->group(function () {
+                    Route::get('/resetRedis', [SystemController::class, 'ResetRedis'])->name('manage.setting.resetRedis');
+                    Route::patch('/update', [SystemController::class, 'update'])->name('manage.setting.update');
+                })
+                ->name('manage.user');
+
+                
             Route::post('/tab', [ManageController::class, 'tab'])->name('manage.tab');
         })
         ->name('play');
