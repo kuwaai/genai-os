@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\SystemSetting;
 use App\Models\Groups;
@@ -20,9 +21,16 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create()
     {
-        return view('auth.register');
+        if (
+            SystemSetting::where('key', 'allowRegister')
+                ->where('value', 'true')
+                ->exists()
+        ) {
+            return view('auth.register');
+        }
+        return Redirect::route('/');
     }
 
     /**
