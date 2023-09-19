@@ -127,12 +127,12 @@ class RequestChat implements ShouldQueue
                     } catch (Exception $e) {
                     }
                     Redis::publish($this->channel, 'New ' . trim($tmp));
-                    if ($this->channel == '' . $this->history_id) {
-                        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
-                    }
                     for ($i = 0; $i < 5; $i++) {
                         sleep(1);
                         Redis::publish($this->channel, 'New ' . trim($tmp));
+                    }
+                    if ($this->channel == '' . $this->history_id) {
+                        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     }
                     Redis::publish($this->channel, 'Ended Ended');
                     $end = microtime(true); // Record end time
