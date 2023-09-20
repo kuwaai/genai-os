@@ -106,7 +106,7 @@ class RequestChat implements ShouldQueue
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
-                        if (mb_strlen($tmp) > 1100) {
+                        if (mb_strlen($tmp) > 3500) {
                             break;
                         }
                     }
