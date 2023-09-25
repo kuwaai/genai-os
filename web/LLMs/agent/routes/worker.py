@@ -21,7 +21,7 @@ def register():
     # Parameters: name, port
     llm_name, port = request.form.get("name"), request.form.get("port")
     if port == None or llm_name == None or port in data.get(llm_name, []): return "Failed"
-    data.setdefault(llm_name, []).append([request.remote_addr, "READY", -1, -1])
+    data.setdefault(llm_name, []).append([f"{request.remote_addr}:{port}", "READY", -1, -1])
     return "Success"
 
 @worker.route("/unregister", methods=["POST"])
@@ -31,7 +31,7 @@ def unregister():
     llm_name, port = request.form.get("name"), request.form.get("port")
     if llm_name in data:
         old = len(data[llm_name])
-        data[llm_name] = [i for i in data[llm_name] if i[0] != port]
+        data[llm_name] = [i for i in data[llm_name] if i[0] != f"{request.remote_addr}:{port}"]
         if data[llm_name] == []: del data[llm_name]
         if data.get(llm_name) == None or old == len(data[llm_name]):
             return "Success"
