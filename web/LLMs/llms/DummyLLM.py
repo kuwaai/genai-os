@@ -28,7 +28,8 @@ LLM_name = "dolly_v2_7b"
 version_code = "v1.0"
 # This is the IP that will be stored in Agent, 
 # Make sure the IP address here are accessible by Agent
-public_ip = "localhost" 
+public_ip = None
+if public_ip = None: public_ip = socket.gethostbyname(socket.gethostname())
 ignore_agent = False
 port = None # By choosing None, it'll assign an unused port
 # -- Config ends --

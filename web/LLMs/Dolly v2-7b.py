@@ -1,37 +1,25 @@
 # -#- coding: UTF-8 -*-
-import time, re, requests, sys, socket, os, torch, signal
-import numpy as np
+import time, re, requests, sys, socket, os, torch
 from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
-
-def handler(signum, frame):
-    print("Received SIGTERM, exiting...")
-    if registered:
-        try:
-            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
-            if response.text == "Failed":
-                print("Warning, Failed to unregister from agent")
-        except requests.exceptions.ConnectionError as e:
-            print("Warning, Failed to unregister from agent")
-    print("exited")
-    sys.exit(0)
-
-signal.signal(signal.SIGTERM, handler)
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app = Flask(__name__)
-app.config["REDIS_URL"] = "redis://localhost:6379/0"
+app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
 sse = ServerSentEventsBlueprint('sse', __name__)
 app.register_blueprint(sse, url_prefix='/')
 # -- Configs --
-agent_endpoint = "http://localhost:9000/"
-LLM_name = "dolly_v2_7b"
-# This is the IP that will be stored in Agent, 
+agent_endpoint = "http://192.168.211.4:9000/"
+LLM_name = "llama2-7b-chat-b1.0.0-tc"
+# This is the IP that will be stored in Agent,
 # Make sure the IP address here are accessible by Agent
-public_ip = "localhost" 
+public_ip = None
+if public_ip = None: public_ip = socket.gethostbyname(socket.gethostname())
 ignore_agent = False
 port = None # By choosing None, it'll assign an unused port
 dummy = False
+api_key = "uwU123DisApikEyiSASeCRetheHehee"
+usr_token = "92d1e9d60879348b8ed2f25f624012dcc596808dc40681d74c4965b8fff8a22a"
+tc_model = 26
 # -- Config ends --
 
 if port == None:
@@ -41,91 +29,80 @@ if port == None:
 Ready = [True]
 if not dummy:
     # model part
-    from transformers import (
-        AutoModelForCausalLM,
-        AutoTokenizer,
-        PreTrainedModel,
-        PreTrainedTokenizer
-    )
-    tokenizer = AutoTokenizer.from_pretrained("databricks/dolly-v2-7b", padding_side="left")
-    model = AutoModelForCausalLM.from_pretrained("databricks/dolly-v2-7b", device_map="auto", torch_dtype=torch.bfloat16)
-    eng_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{0}
-
-### Response:
-"""
-    chi_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{0}
-
-### Response:
-"""
-    endPrompts = ["### End"]
+    from transformers import LlamaForCausalLM, LlamaTokenizer, GenerationConfig
+    model = LlamaForCausalLM.from_pretrained("llama2-7b-chat-b1.0.0", device_map="auto",torch_dtype=torch.float16)
+    tokenizer = LlamaTokenizer.from_pretrained("llama2-7b-chat-b1.0.0", add_bos_token=False)
+    BOS = tokenizer.bos_token
+    EOS = tokenizer.eos_token
+    endPrompts = [EOS]
+    prompts = BOS + "Human\n" + "{0}" + EOS + "\n" + BOS + "Assistant\n"
     checklength = max([len(i) for i in endPrompts])
     def process(data):
         try:
-            prompt = eng_prompt
-            if "zh-TW" in data:
-                prompt = chi_prompt
-                data = data.replace("zh-TW", "")
-            inputs = tokenizer(prompt.format(data), return_tensors="pt").input_ids
-            buffer = None
+            tc_trans = False
             run = True
             counter = 0
             checker = True
             records = ""
-            regexs = [r'(.*\n)\1', r'(.{2,50})\1+', r': *.*\n', r".\n"]
-            repeat_limits = [5,5,2, 15]
+            prompt = data.strip()
+            segmenter = tokenizer.eos_token
+            inputs = tokenizer.encode(prompts.format(prompt), return_tensors='pt')
             repeat_detected = False
             last = ""
-            pos = 0
-            #tokenPos = len(inputs[0])
-            while checker and counter < 600:
+            pos = len(tokenizer.decode(inputs[0].cpu(), skip_special_tokens=False))
+            tokenPos = len(inputs[0])
+            while checker and len(records) < 600:
                 a = time.time()
-                outputs = model.generate(inputs.to("cuda:0"), pad_token_id=tokenizer.pad_token_id, eos_token_id=tokenizer.encode("### End")[0],
-                                    max_new_tokens=1, top_p=0.92, top_k=0, do_sample=True#, no_repeat_ngram_size=7, temperature=0.1, top_p=0.65, num_beams=4
+                outputs = model.generate(
+                    inputs.to("cuda:0"), max_new_tokens=2048, generation_config=
+                    GenerationConfig(
+                        top_p=0.92, top_k=0, do_sample=True, no_repeat_ngram_size=7
+                        ,temperature=0.2,repetition_penalty = 1.0,
+                        #top_p=0.65,
+                        #num_beams=4,
+                        #no_repeat_ngram_size=7,
+                    )
                 )
                 print(time.time() - a)
                 inputs = outputs
-                if counter % 4 == 0:
-                    for index in range(len(regexs)):
-                        #validate for repeating
-                        pattern = re.compile(regexs[index])
-                        matches = pattern.findall(records)
-                        if matches:
-                            most_common_substring = max({match:matches.count(match) for match in matches}.items(), key=lambda x:x[1])[0].strip()
-                            times = records.count(most_common_substring)
-                            print(most_common_substring, times, repeat_limits[index])
-                            if times >= repeat_limits[index] or len(most_common_substring) > 6:
-                                print("Repeat detected!\n", records)
-                                repeat_detected = True
-                                break
-                    if repeat_detected: break
-                #if buffer == None: buffer = outputs[0, tokenPos:].cpu()
-                #else: buffer = torch.cat((buffer,outputs[0, tokenPos:].cpu()))
-                if buffer == None: buffer = outputs[0, -1:].cpu()
-                else: buffer = torch.cat((buffer,outputs[0, -1:].cpu()))
-                #tokenPos = len(outputs[0])
-                outputs = tokenizer.decode(buffer)
-                while checker and len(outputs[pos:]) > checklength:
+                tokenPos = len(outputs[0])
+                outputs = tokenizer.decode(outputs[0].cpu(), skip_special_tokens=False).strip()
+
+                if len(outputs[pos:]) >= checklength:
+                    res = requests.get("https://chatdev.gai.tw/api_auth?key={0}&api_token={1}&llm_id={2}&msg={3}".format(api_key, usr_token, tc_model, outputs))
+                    if res.status_code == 200:
+                        res = res.json()
+                        if res["status"] == "success":
+                            print("Before trans:", outputs)
+                            outputs = res["output"]
+                            print("After trans:")
+                            tc_trans = True
+                            pos = outputs.index("<s>Assistant\n") + len("<s>Assistant\n") + len(records)
+                while checker and len(outputs[pos:]) >= checklength:
                     for i in endPrompts:
                         if outputs[pos:].startswith(i):
                             checker = False
                             break
                     if checker:
-                        if last == outputs[pos]:
-                            counter += 1
+                        counter += 1
+                        time.sleep(0.02)
+                        if outputs[pos:].startswith("\\n"):
+                            yield "\n"
+                            pos += len("\\n")-1
+                            print("\n", end="", flush=True)
+                        else:
                             yield outputs[pos].encode("utf-8")
                             print(outputs[pos], end="", flush=True)
-                            records += outputs[pos]
-                            pos+=1
-                        last = outputs[pos]
+
+                        records += outputs[pos]
+                        pos+=len(outputs[pos])
+
                 torch.cuda.empty_cache()
+            if tc_trans:
+                yield "\n\n[本訊息經過繁體翻譯]".encode("utf-8")
             del inputs
             del outputs
+
         except Exception as e:
             print(e)
         finally:
@@ -157,7 +134,7 @@ def api():
         Ready[0] = True
     return ""
 registered = True
-response = requests.post(agent_endpoint + "register", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+response = requests.post(agent_endpoint + "register", data={"name":LLM_name,"port":port})
 if response.text == "Failed":
     print("Warning, The server failed to register to agent")
     registered = False
@@ -171,7 +148,7 @@ if __name__ == '__main__':
     app.run(port=port, host="0.0.0.0")
     if registered:
         try:
-            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"port":port})
             if response.text == "Failed":
                 print("Warning, Failed to unregister from agent")
         except requests.exceptions.ConnectionError as e:

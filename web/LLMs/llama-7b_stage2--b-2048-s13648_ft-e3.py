@@ -12,7 +12,8 @@ agent_endpoint = "http://localhost:9000/"
 LLM_name = "llama-7b_stage2--b-2048-s13648_ft-e3"
 # This is the IP that will be stored in Agent, 
 # Make sure the IP address here are accessible by Agent
-public_ip = "localhost" 
+public_ip = None
+if public_ip = None: public_ip = socket.gethostbyname(socket.gethostname())
 ignore_agent = False
 port = None # By choosing None, it'll assign an unused port
 dummy = False

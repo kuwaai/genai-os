@@ -18,20 +18,20 @@ def status():
 @worker.route("/register", methods=["POST"])
 def register():
     # For Online LLM register themself
-    # Parameters: name, endpoint
-    llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
-    if endpoint == None or llm_name == None or endpoint in data.get(llm_name, []): return "Failed"
-    data.setdefault(llm_name, []).append([endpoint, "READY", -1, -1])
+    # Parameters: name, port
+    llm_name, port = request.form.get("name"), request.form.get("port")
+    if port == None or llm_name == None or port in data.get(llm_name, []): return "Failed"
+    data.setdefault(llm_name, []).append([request.remote_addr, "READY", -1, -1])
     return "Success"
 
 @worker.route("/unregister", methods=["POST"])
 def unregister():
     # For Offline LLM to unregister themself
-    # Parameters: name, endpoint
-    llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
+    # Parameters: name, port
+    llm_name, port = request.form.get("name"), request.form.get("port")
     if llm_name in data:
         old = len(data[llm_name])
-        data[llm_name] = [i for i in data[llm_name] if i[0] != endpoint]
+        data[llm_name] = [i for i in data[llm_name] if i[0] != port]
         if data[llm_name] == []: del data[llm_name]
         if data.get(llm_name) == None or old == len(data[llm_name]):
             return "Success"
