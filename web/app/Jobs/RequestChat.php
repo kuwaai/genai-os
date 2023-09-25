@@ -21,6 +21,7 @@ class RequestChat implements ShouldQueue
     private $input, $access_code, $msgtime, $history_id, $user_id, $chatgpt_apitoken, $channel;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
+    public $agent_version = "v1.0";
     /**
      * Create a new job instance.
      */
@@ -56,13 +57,13 @@ class RequestChat implements ShouldQueue
                 return;
             }
         }
-        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+        //Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
         $start = microtime(true);
         $tmp = '';
         try {
             $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
             $client = new Client(['timeout' => 300]);
-            $response = $client->post($agent_location . 'status', [
+            $response = $client->post($agent_location . $this->agent_version . '/worker/schedule', [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
                     'name' => $this->access_code,
@@ -74,7 +75,7 @@ class RequestChat implements ShouldQueue
                 $this->release(10);
             } else {
                 try {
-                    $response = $client->post($agent_location, [
+                    $response = $client->post($agent_location . $this->agent_version . '/chat/completions', [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'form_params' => [
                             'input' => $this->input,
@@ -137,7 +138,7 @@ class RequestChat implements ShouldQueue
                     Redis::publish($this->channel, 'Ended Ended');
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . trim(str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $tmp)));
+                    //Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . trim(str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $tmp)));
                 }
             }
         } catch (Exception $e) {

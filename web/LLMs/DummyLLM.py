@@ -7,7 +7,7 @@ def handler(signum, frame):
     print("Received SIGTERM, exiting...")
     if registered:
         try:
-            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            response = requests.post(agent_endpoint + f"{version_code}/worker/unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
             if response.text == "Failed":
                 print("Warning, Failed to unregister from agent")
         except requests.exceptions.ConnectionError as e:
@@ -25,6 +25,7 @@ app.register_blueprint(sse, url_prefix='/')
 # -- Configs --
 agent_endpoint = "http://localhost:9000/"
 LLM_name = "dolly_v2_7b"
+version_code = "v1.0"
 # This is the IP that will be stored in Agent, 
 # Make sure the IP address here are accessible by Agent
 public_ip = "localhost" 
@@ -61,7 +62,7 @@ def api():
         Ready[0] = True
     return ""
 registered = True
-response = requests.post(agent_endpoint + "register", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+response = requests.post(agent_endpoint + f"{version_code}/worker/register", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
 if response.text == "Failed":
     print("Warning, The server failed to register to agent")
     registered = False
@@ -75,7 +76,7 @@ if __name__ == '__main__':
     app.run(port=port, host="0.0.0.0")
     if registered:
         try:
-            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            response = requests.post(agent_endpoint + f"{version_code}/worker/unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
             if response.text == "Failed":
                 print("Warning, Failed to unregister from agent")
         except requests.exceptions.ConnectionError as e:

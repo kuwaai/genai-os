@@ -124,9 +124,9 @@
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                         <img src="{{ $botimgurl }}">
                                     </div>
-                                    <div>
+                                    <div class="overflow-hidden">
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line break-all"
+                                            <p class="text-sm whitespace-pre-line break-words"
                                                 id="task_{{ $history->id }}">{{ $history->msg }}</p>
                                         </div>
                                     </div>
@@ -140,10 +140,10 @@
                                             <img src="{{ $botimgurl }}">
                                         </div>
                                     @endif
-                                    <div>
+                                    <div class="overflow-hidden">
                                         <div
                                             class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                            <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
+                                            <p class="text-sm whitespace-pre-line break-words">{{ $history->msg }}</p>
                                         </div>
                                     </div>
                                     @if (!$history->isbot)
