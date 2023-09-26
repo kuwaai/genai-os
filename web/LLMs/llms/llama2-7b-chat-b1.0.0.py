@@ -10,7 +10,7 @@ sse = ServerSentEventsBlueprint('sse', __name__)
 app.register_blueprint(sse, url_prefix='/')
 # -- Configs --
 agent_endpoint = "http://192.168.211.4:9000/"
-LLM_name = "llama2-7b-chat-b1.0.0-tc"
+LLM_name = "llama2-7b-chat-b1.0.0"
 # This is the IP that will be stored in Agent,
 # Make sure the IP address here are accessible by Agent
 version_code = "v1.0"
@@ -58,14 +58,8 @@ if not dummy:
             history = [prompts.format(history[i], history[i + 1]) for i in range(0, len(history), 2)]
             history = "<s> " + "".join(history)
             result = pipe(history)[0]['generated_text']
-            print("Before trans:", result, "After trans:", sep="\n")
-            res = requests.get("https://chatdev.gai.tw/api_auth?key={0}&api_token={1}&llm_id={2}&msg={3}".format(api_key, usr_token, tc_model, result[len(history):]))
-            if res.status_code == 200:
-                res = res.json()
-                if res["status"] == "success":
-                    result = res["output"] + "\n\n[本訊息經過繁體翻譯]"
-            
-            for i in result:
+            print(result)
+            for i in result[len(history):]:
                 yield i
                 time.sleep(0.02)
 

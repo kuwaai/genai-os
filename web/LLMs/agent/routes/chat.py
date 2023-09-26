@@ -13,7 +13,7 @@ def completions():
         if len(dest) > 0:
             dest = dest[0]
             try:
-                response = requests.post(f"http://{dest[0]}", data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken}, stream=True)
+                response = requests.post(dest[0], data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken}, stream=True)
                 def event_stream(dest, response):
                     dest[1] = "BUSY"
                     try:

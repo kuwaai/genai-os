@@ -7,7 +7,7 @@ def handler(signum, frame):
     print("Received SIGTERM, exiting...")
     if registered:
         try:
-            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            response = requests.post(agent_endpoint + f"{version_code}/worker/unregister", data={"name":LLM_name,"port":port})
             if response.text == "Failed":
                 print("Warning, Failed to unregister from agent")
         except requests.exceptions.ConnectionError as e:
@@ -26,10 +26,12 @@ app.register_blueprint(sse, url_prefix='/')
 agent_endpoint = "http://localhost:9000/"
 LLM_name = "chatgpt"
 model = "gpt-3.5-turbo-0613"
+version_code = "v1.0"
+ignore_agent = False
+limit = 1024*3
+model_loc = "gpt-3.5-turbo-0613"
 # This is the IP that will be stored in Agent, 
 # Make sure the IP address here are accessible by Agent
-public_ip = None
-if public_ip = None: public_ip = socket.gethostbyname(socket.gethostname())
 ignore_agent = False
 port = None # By choosing None, it'll assign an unused port
 dummy = False
@@ -44,10 +46,11 @@ if not dummy:
     # model part
     def process(data):
         try:
-            msg = data.get("input")
             chatgpt_apitoken = data.get("chatgpt_apitoken")
+            msg = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
+            
             if msg and chatgpt_apitoken:
-                msg = msg.strip()
+                msg = msg[-1].strip()
                 chatgpt_apitoken = chatgpt_apitoken.strip()
                 if len(msg) > 0 and len(chatgpt_apitoken) > 0:
                     openai.api_key = chatgpt_apitoken
@@ -95,7 +98,7 @@ def api():
         Ready[0] = True
     return ""
 registered = True
-response = requests.post(agent_endpoint + "register", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+response = requests.post(agent_endpoint + f"{version_code}/worker/register", data={"name":LLM_name,"port":port})
 if response.text == "Failed":
     print("Warning, The server failed to register to agent")
     registered = False
@@ -109,7 +112,7 @@ if __name__ == '__main__':
     app.run(port=port, host="0.0.0.0")
     if registered:
         try:
-            response = requests.post(agent_endpoint + "unregister", data={"name":LLM_name,"endpoint":"http://{0}:{1}/".format(public_ip, port)})
+            response = requests.post(agent_endpoint + f"{version_code}/worker/unregister", data={"name":LLM_name,"port":port})
             if response.text == "Failed":
                 print("Warning, Failed to unregister from agent")
         except requests.exceptions.ConnectionError as e:
