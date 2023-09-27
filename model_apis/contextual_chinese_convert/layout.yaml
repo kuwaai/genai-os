@@ -1,0 +1,11 @@
+version: 1
+llm:
+  class: 'models.reflect.ReflectModel'
+  args: {}
+
+ingress-filters: []
+
+egress-filters:
+  - 
+    class: 'filters.contextual_cc.ContextualCC'
+    args: {}
