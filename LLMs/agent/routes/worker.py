@@ -54,7 +54,8 @@ def debug():
 @worker.route("/revoke", methods=["POST"])
 def reset():
     # Reset specific status
-    llm_name, history_id = request.form.get("name"), request.form.get("history_id")
+    llm_name =request.json.get("name")
+    history_id = request.form.get("history_id")
     if data.get(llm_name):
         dest = [i for i in data[llm_name] if i[2] == history_id]
         if len(dest) > 0:
@@ -62,4 +63,4 @@ def reset():
             dest[3] = -1
             dest[2] = -1
             dest[1] = "READY"
-    return "Success"
+    return Response(status=204)

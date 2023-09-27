@@ -40,14 +40,15 @@ class AgentClient:
         
         self.logger.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
         try:
+            print(self.agent_endpoint, urljoin(self.agent_endpoint, '/worker/register'))
             response = requests.post(
-                urljoin(self.agent_endpoint, '/register'),
-                data={
+                urljoin(self.agent_endpoint, './worker/register'),
+                json={
                     'name': self.llm_name,
                     'endpoint': self.public_endpoint
                     }
             )
-            if response.text == 'Failed': raise Exception
+            if not response.ok : raise Exception
             else:
                 self.logger.info('Registered.')
                 atexit.register(self.unregister)
@@ -74,13 +75,13 @@ class AgentClient:
         self.logger.info('Attempting to unregister with the Agent...')
         try:
             response = requests.post(
-                urljoin(self.agent_endpoint, '/unregister'),
-                data={
+                urljoin(self.agent_endpoint, './worker/unregister'),
+                json={
                     'name': self.llm_name,
                     'endpoint': self.public_endpoint
                     }
             )
-            if response.text == 'Failed':
+            if not response.ok:
                 self.logger.warning('Failed to unregister from Agent. Refused by Agent.')
             else:
                 self.logger.info('Done.')

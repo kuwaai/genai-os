@@ -14,7 +14,7 @@ class Config:
     def __init__(self):
         
         # Default configuration
-        self.agent_endpoint = 'http://localhost:9000/' # The root endpoint of the Agent.
+        self.agent_endpoint = 'http://localhost:9000/v1.0/' # The root endpoint of the Agent.
         self.llm_name: str = 'Unnamed_LLM' # The name of this model.
         self.public_address: str = 'localhost' # The address that can be accessed by the Agent.
         self.port: int = None # The public port number for this API. Leave it as None to have it assigned by the system.

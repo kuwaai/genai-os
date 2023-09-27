@@ -72,13 +72,7 @@ paths:
               $ref: '#/components/schemas/ScheduleInfo'
       responses:
         '204':
-          description: The scheduling request is revoked successfully.
-        '503':
-          description: The Agent is unable to revoke the scheduling request.
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/ErrorMsg'
+          description: Always success.
   
   /worker/debug:
     get:

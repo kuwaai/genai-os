@@ -1,6 +1,6 @@
 FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
-ENV AGENT_ENDPOINT="http://web:9000/"
+ENV AGENT_ENDPOINT="http://web:9000/v1.0/"
 ENV LLM_NAME="Unnamed_LLM"
 ENV PUBLIC_ADDRESS="model-api"
 ENV IGNORE_AGENT="False"
