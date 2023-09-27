@@ -265,10 +265,10 @@
                         textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
                     }
                     $("#chat_input").on("keydown", function(event) {
-                        if (event.key === "Enter" && !event.shiftKey) {
+                        if (event.code === "Enter" && !event.shiftKey) {
                             event.preventDefault();
                             $("#prompt_area").submit();
-                        } else if (event.key === "Enter" && event.shiftKey) {
+                        } else if (event.code === "Enter" && event.shiftKey) {
                             event.preventDefault();
                             var cursorPosition = this.selectionStart;
                             $(this).val($(this).val().substring(0, cursorPosition) + "\n" + $(this).val().substring(
