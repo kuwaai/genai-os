@@ -1,11 +1,11 @@
-import socket, os
+import socket, os, openai
 from base import *
 
 # -- Configs --
 app.config["REDIS_URL"] = "redis://localhost:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://localhost:9000/"
-app.LLM_name = "gpt-3.5-turbo-0613"
+app.LLM_name = "chatgpt"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
@@ -28,19 +28,18 @@ tc_model = None
 def llm_compute(data): 
     try:
         chatgpt_apitoken = data.get("chatgpt_apitoken")
-        msg = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
+        msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in eval(data.get("input").replace("true","True").replace("false","False"))]
         
         if msg and chatgpt_apitoken:
-            msg = msg[-1].strip()
             chatgpt_apitoken = chatgpt_apitoken.strip()
             if len(msg) > 0 and len(chatgpt_apitoken) > 0:
                 openai.api_key = chatgpt_apitoken
-                yield openai.ChatCompletion.create(model="gpt-3.5-turbo-0613",
-                      max_tokens=2000,
+                for i in openai.ChatCompletion.create(model="gpt-3.5-turbo",
+                      max_tokens=limit,
                       temperature=0.5,
-                      messages=[
-                      {"role": "user", "content": msg}
-                    ]).choices[0].message.content
+                      messages=msg).choices[0].message.content:
+                    yield i
+                    time.sleep(0.02)
                 openai.api_key = None
             else:
                 yield "No chatgpt token are received!" if len(msg) > 0 else "No input message are received!"
@@ -53,7 +52,7 @@ def llm_compute(data):
         else:
             yield str(e)
     finally:
-        Ready[0] = True
+        app.Ready[0] = True
         print("finished")
 app.llm_compute = llm_compute
 start()
