@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: Agent API - Model Worker
+  description: The API provided by the Agent that is accessed by the Model Worker (hereafter called the "Worker") or used to operate Workers. This API follows the hybrid style of both RPC and RESTful.
+  version: 1.0.0
+
+servers:
+  - url: "{apiRoot}/v1.0"
+    variables:
+      apiRoot:
+        default: http://localhost
+paths:
+  /worker/register:
+    post:
+      description: Register a Worker to Agent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkerInfo'
+      responses:
+        '201':
+          description: The Worker registered successfully.
+        '400':
+          description: The Agent denied to register the Worker.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMsg'
+                
+  /worker/unregister:
+    post:
+      description: Unregister a Worker from Agent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkerInfo'
+      responses:
+        '201':
+          description: The Worker registered successfully.
+        '400':
+          description: The Agent denied to register the Worker.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMsg'
+                
+  /worker/schedule:
+    post:
+      description: Ask the Agent to check the availability of LLMs. This API should invoked by the Web server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleInfo'
+      responses:
+        '202':
+          description: The scheduling request is accepted and the LLM is reserved.
+        '503':
+          description: The Agent denied the scheduling request.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMsg'
+                
+  /worker/revoke:
+    post:
+      description: Revoke a scheduling request.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleInfo'
+      responses:
+        '204':
+          description: The scheduling request is revoked successfully.
+        '503':
+          description: The Agent is unable to revoke the scheduling request.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMsg'
+  
+  /worker/debug:
+    get:
+      description: Query the internal state of the Agent.
+      responses:
+        '200':
+          description: Always success.
+              
+components:
+  schemas:
+    WorkerInfo:
+      type: object
+      description: The information that the Agent used to identify Workers
+      properties:
+        name:
+          type: string
+          description: The model name of this Worker. Note that multiple workers can have the same model name.
+          example: llama
+        endpoint:
+          type: string
+          format: url
+          description: The serving endpoint of the Worker is accessible by the Agent.
+          example: http://localhost:9000/v1/completetion
+      required:
+        - name
+        - endpoint
+    
+    ScheduleInfo:
+      type: object
+      description: The scheduling infomation that the web server sends to the Agent.
+      properties:
+        name:
+          type: string
+          description: The requested model name.
+          example: llama
+        history_id:
+          type: string
+          description: The ID that the Agent used to discriminate scheduling requests.
+          example: 202cb962ac59075b964b07152d234b70
+        user_id:
+          type: string
+          description: The UUID of the user.
+          example: user
+      required:
+        - name
+        - history_id
+    
+    ErrorMsg:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The detailed reason of failure.
+          example: Some detailed reason.
