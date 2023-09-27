@@ -1,5 +1,5 @@
-from flask imendpoint Blueprint, request
-from src.variable imendpoint *
+from flask import Blueprint, request
+from src.variable import *
 worker = Blueprint('worker', __name__)
 
 @worker.route("/schedule", methods=["POST"])
@@ -21,7 +21,7 @@ def register():
     # Parameters: name, endpoint
     llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
     if endpoint == None or llm_name == None or endpoint in data.get(llm_name, []): return "Failed"
-    data.setdefault(llm_name, []).append([f"{request.remote_addr}:{endpoint}", "READY", -1, -1])
+    data.setdefault(llm_name, []).append([endpoint, "READY", -1, -1])
     return "Success"
 
 @worker.route("/unregister", methods=["POST"])
@@ -31,7 +31,7 @@ def unregister():
     llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
     if llm_name in data:
         old = len(data[llm_name])
-        data[llm_name] = [i for i in data[llm_name] if i[0] != f"{request.remote_addr}:{endpoint}"]
+        data[llm_name] = [i for i in data[llm_name] if i[0] != endpoint]
         if data[llm_name] == []: del data[llm_name]
         if data.get(llm_name) == None or old == len(data[llm_name]):
             return "Success"
