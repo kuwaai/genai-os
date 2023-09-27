@@ -17,7 +17,7 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://www.gaide.tw/"
+"Homepage" = "https://www.taide.tw/"
 "Bug Tracker" = ""
 
 [project.scripts]
