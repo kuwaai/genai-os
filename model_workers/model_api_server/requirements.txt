@@ -4,3 +4,4 @@ sse-starlette
 python-multipart
 pyyaml
 requests
+dacite

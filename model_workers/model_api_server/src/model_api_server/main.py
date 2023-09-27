@@ -45,5 +45,9 @@ def main():
     
     # Initialize the Model API server.
     model_layout = ModelLayout(config.layout_config)
-    server = ModelApiServer(config.endpoint, model_layout, on_startup=[registration_job.schedule])
+    server = ModelApiServer(
+        config.endpoint, model_layout,
+        on_startup=[registration_job.schedule],
+        debug=config.debug
+    )
     server.start(config.port, config.logging_config)

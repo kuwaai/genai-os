@@ -6,7 +6,9 @@ import yaml
 import importlib
 from functools import reduce
 import sys, os
+from typing import Generator
 
+from model_api_server.datatype import ChatRecord, Role
 from model_api_server.interfaces import CompletionInterface, TextLevelFilteringInterface
 
 # The modules may not in the default searching path.
@@ -62,7 +64,7 @@ class ModelLayout:
         self.logger.info('LLM Class: {}'.format(type(self.llm).__name__))
 
     @staticmethod
-    def apply_filters(data: str, filters: list[TextLevelFilteringInterface]):
+    def apply_filters(data: [ChatRecord], filters: list[TextLevelFilteringInterface]) -> [ChatRecord]:
         """
         Sequentially apply filters to the data
         Arguments:
@@ -74,7 +76,7 @@ class ModelLayout:
     def is_busy(self):
         return self.busy
 
-    def process(self, user_input: str):
+    def process(self, user_input: [ChatRecord]) -> Generator[str, None, None]:
         """
         Core part of the Model API server.
         The processing flow:
@@ -82,10 +84,12 @@ class ModelLayout:
         """
 
         try:
-            user_input = self.apply_filters(user_input, self.ingress_filters)
-            for output_token in self.llm.complete(user_input):
-                output_token = self.apply_filters(output_token, self.egress_filters)
-                yield output_token
+            processed_input = self.apply_filters(user_input, self.ingress_filters)
+            for output_token in self.llm.complete(processed_input):
+                processed_output_token = self.apply_filters([output_token], self.egress_filters)
+                for t in processed_output_token:
+                    if t.role == Role.USER: continue
+                    yield t.msg
         except Exception as e:
             self.logger.error(e)
         finally:

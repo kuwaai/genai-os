@@ -3,23 +3,12 @@
 
 from typing import Generator
 import time
+from model_api_server.datatype import ChatRecord
 
 class CompletionInterface:
-  def complete(self, text: str) -> Generator[str, None, None]:
+  def complete(self, msg: [ChatRecord]) -> Generator[ChatRecord, None, None]:
     pass
 
 class TextLevelFilteringInterface:
-  def filter(self, text: str) -> str:
+  def filter(self, msg: [ChatRecord]) -> [ChatRecord]:
     pass
-
-class DummyModel(CompletionInterface):
-  """
-  DummyModel for default 
-  """
-  def __init__(self, content="I'm a dummy model."):
-    self.content = content
-
-  def complete(self, text: str) -> Generator[str, None, None]:
-    for i in self.content:
-      time.sleep(0.02)
-      yield i

@@ -1,6 +1,7 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
+from model_api_server.datatype import ChatRecord
 from model_api_server.interfaces import TextLevelFilteringInterface
 import opencc
 from ckip_transformers.nlp import CkipWordSegmenter
@@ -47,12 +48,20 @@ class ContextualCC(TextLevelFilteringInterface):
     else:
       return self.converter.convert(text)
 
-  def filter(self, text: str) -> str:
+  def filter(self, records: [ChatRecord]) -> [ChatRecord]:
 
-    if self.is_dst_code(text): return text
+    result = []
 
-    # The segmenter work better on Traditional Chinese
-    words = self.ws_driver(input_text=[text], show_progress=False)[0]
-    result = reduce(lambda sum, t: sum+self.convert(t), words, '')
+    for record in records:
+
+      text = record.msg
+      if self.is_dst_code(text):
+        result.append(record)
+      else:
+        # The segmenter work better on Traditional Chinese
+        words = self.ws_driver(input_text=[text], show_progress=False)[0]
+        converted_text = reduce(lambda sum, t: sum+self.convert(t), words, '')
+
+        result.append(ChatRecord(converted_text, record.role))
 
     return result

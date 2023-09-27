@@ -4,12 +4,16 @@
 import logging
 import asyncio
 import uvicorn
+import json
+from functools import reduce
+from dacite import from_dict, Config
 from starlette.applications import Starlette
 from starlette.routing import Route
 from starlette.requests import Request
 from sse_starlette.sse import EventSourceResponse
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse, Response, StreamingResponse
 
+from model_api_server.datatype import ChatRecord, Role
 from model_api_server.model_layout import ModelLayout
 
 class ModelApiServer:
@@ -17,10 +21,11 @@ class ModelApiServer:
     ModelApiServer is responsible to server the public endpoints.
     """
 
-    def __init__(self, endpoint: str, model_layout: ModelLayout, on_startup: list = []):
+    def __init__(self, endpoint: str, model_layout: ModelLayout, on_startup: list = [], debug = False):
 
         # Logger of this module
         self.logger = logging.getLogger(__name__) 
+        self.debug = debug
 
         self.model_layout = model_layout
         
@@ -28,7 +33,7 @@ class ModelApiServer:
         routes = [
             Route(endpoint, endpoint=self.api, methods=['POST'])
         ]
-        self.web_server = Starlette(debug=True, routes=routes, on_startup=on_startup)
+        self.web_server = Starlette(debug=self.debug, routes=routes, on_startup=on_startup)
 
     def start(self, port: int, logging_config: str):
         """
@@ -58,12 +63,22 @@ class ModelApiServer:
         if self.model_layout.is_busy(): return JSONResponse({'message': 'Processing another request'}, 503)
         
         async with request.form() as form:
-            user_input = form.get('input')
-            if user_input == None or user_input == '':
+            user_input = []
+            try:
+                user_input = json.loads(form.get('input'))
+                user_input = [{**d, 'role': Role.BOT if d['isbot'] else Role.USER} for d in user_input]
+                user_input = [from_dict(data_class=ChatRecord, data=d) for d in user_input]
+            except Exception as e:
+                self.logger.error(e)
+                return JSONResponse({'message': "Bad request"}, 400)
+
+            if self.debug: self.logger.info('Input: {}'.format(user_input))
+            
+            if user_input == [] or user_input[-1].msg == '':
                 self.logger.debug("I didn't see your input!")
                 return JSONResponse({'message': "I didn't see your input!"}, 400)
             
             self.busy = True
 
-            for t in self.model_layout.process(user_input):
-                return Response(t, media_type="text/plain")
+            response = StreamingResponse(self.model_layout.process(user_input), media_type="text/plain")
+            return response

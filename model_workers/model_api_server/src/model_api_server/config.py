@@ -23,6 +23,7 @@ class Config:
         self.retry_count: int = 5 # How may time should the API server try to register to the Agent
         self.logging_config: str = __file_dir__ + './default_logging.yaml' # The path of the configuration file of logging module 
         self.layout_config: str = __file_dir__ + './default_layout.yaml' #The layout configuration to arrange the models and the filters
+        self.debug: bool = False # Display more messages
 
         self.override_config()
 
@@ -49,3 +50,4 @@ class Config:
         self.port = int(self.port or assign_unused_port())
         self.ignore_agent = bool(self.ignore_agent)
         self.retry_count = int(self.retry_count)
+        self.debug = bool(self.debug)

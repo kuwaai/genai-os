@@ -16,6 +16,7 @@ ENV PUBLIC_ADDRESS="localhost"
 ENV PORT="9001"
 ENV AGENT_ENDPOINT="http://localhost:9000/v1.0/"
 # ENV ENDPOINT="/"
+ENV DEBUG="False"
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["./run.sh"]

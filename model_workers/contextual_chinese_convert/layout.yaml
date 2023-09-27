@@ -3,7 +3,10 @@ llm:
   class: 'models.reflect.ReflectModel'
   args: {}
 
-ingress-filters: []
+ingress-filters:
+  - 
+    class: 'filters.final_user_filter.FinalUserFilter'
+    args: {}
 
 egress-filters:
   - 

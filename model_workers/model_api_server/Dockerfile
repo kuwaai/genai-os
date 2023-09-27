@@ -5,6 +5,7 @@ ENV LLM_NAME="Unnamed_LLM"
 ENV PUBLIC_ADDRESS="model-api"
 ENV IGNORE_AGENT="False"
 ENV RETRY_COUNT=5
+ENV DEBUG=False
 
 # Copy all files into the image
 RUN mkdir -p /model_api_server
