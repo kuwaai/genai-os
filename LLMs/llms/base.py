@@ -11,7 +11,7 @@ app.Ready = [True]
 def api():
     if app.Ready[0]:
         app.Ready[0] = False
-        data = request.form.get("input")
+        data = request.form
         resp = Response(app.llm_compute(data), mimetype='text/event-stream')
         resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
         if data: return resp
