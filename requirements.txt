@@ -1,3 +1,4 @@
 gevent
 flask
 flask_sse
+requests
