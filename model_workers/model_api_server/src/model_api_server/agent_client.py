@@ -40,7 +40,6 @@ class AgentClient:
         
         self.logger.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
         try:
-            print(self.agent_endpoint, urljoin(self.agent_endpoint, '/worker/register'))
             def do_req():
                 return requests.post(
                     urljoin(self.agent_endpoint, './worker/register'),
