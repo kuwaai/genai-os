@@ -39,14 +39,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WorkerInfo'
       responses:
-        '201':
-          description: The Worker registered successfully.
-        '400':
-          description: The Agent denied to register the Worker.
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/ErrorMsg'
+        '204':
+          description: Failure means the Worker is not registered. Thus, unregister is always successful.
                 
   /worker/schedule:
     post:
