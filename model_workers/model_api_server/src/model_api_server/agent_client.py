@@ -5,7 +5,7 @@ import logging
 import requests
 from urllib.parse import urljoin
 import atexit
-import time
+import asyncio
 
 class AgentClient:
     """
@@ -27,7 +27,7 @@ class AgentClient:
         self.llm_name = llm_name
         self.public_endpoint = public_endpoint
 
-    def register(self, retry_cnt: int, backoff_time: int = 1):
+    async def register(self, retry_cnt: int, backoff_time: int = 1):
         """
         Try to registration with the Agent.
         Arguments:
@@ -41,13 +41,16 @@ class AgentClient:
         self.logger.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
         try:
             print(self.agent_endpoint, urljoin(self.agent_endpoint, '/worker/register'))
-            response = requests.post(
-                urljoin(self.agent_endpoint, './worker/register'),
-                json={
-                    'name': self.llm_name,
-                    'endpoint': self.public_endpoint
-                    }
-            )
+            def do_req():
+                return requests.post(
+                    urljoin(self.agent_endpoint, './worker/register'),
+                    json={
+                        'name': self.llm_name,
+                        'endpoint': self.public_endpoint
+                        }
+                    )
+            event_loop = asyncio.get_event_loop()
+            response = await event_loop.run_in_executor(None, do_req)
             if not response.ok : raise Exception
             else:
                 self.logger.info('Registered.')
@@ -58,8 +61,8 @@ class AgentClient:
             if retry_cnt != 0:
                 self.logger.info('Will retry registration after {} seconds.'.format(backoff_time))
                 # Exponential backoff
-                time.sleep(backoff_time)
-                return self.register(retry_cnt-1, backoff_time*2)
+                await asyncio.sleep(backoff_time)
+                return await self.register(retry_cnt-1, backoff_time*2)
             
             else:
                 return False
