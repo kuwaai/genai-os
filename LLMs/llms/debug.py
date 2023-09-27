@@ -27,11 +27,11 @@ tc_model = None
 
 def llm_compute(data): 
     try:
-        yield data
+        yield [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))][-1].strip()
     except Exception as e:
         print(e)
     finally:
-        Ready[0] = True
+        app.Ready[0] = True
         print("finished")
 app.llm_compute = llm_compute
 start()

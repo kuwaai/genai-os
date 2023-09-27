@@ -1,6 +1,6 @@
 # -#- coding: UTF-8 -*-
 # This demonstrated how to pipe the output of llm into another llm before returning the result.
-import time, re, requests, sys, torch
+import time, re, requests, sys, torch, signal
 from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
 app = Flask(__name__)
@@ -11,7 +11,7 @@ app.Ready = [True]
 def api():
     if app.Ready[0]:
         app.Ready[0] = False
-        data = request.form.get("input")
+        data = request.form
         resp = Response(app.llm_compute(data), mimetype='text/event-stream')
         resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
         if data: return resp
@@ -28,6 +28,12 @@ def shut():
                 print("Warning, Failed to unregister from agent")
         except requests.exceptions.ConnectionError as e:
             print("Warning, Failed to unregister from agent")
+
+def handler(signum, frame):
+    print("Received SIGTERM, exiting...")
+    shut()
+    sys.exit(0)
+signal.signal(signal.SIGTERM, handler)
 
 def start():
     app.registered = True
