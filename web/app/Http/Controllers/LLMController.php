@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\LLMs;
+use App\Models\Permissions;
 
 class LLMController extends Controller
 {
@@ -32,7 +33,7 @@ class LLMController extends Controller
         $model = LLMs::findOrFail($request->input("id")); 
         Storage::delete($model->image);
         $model->delete();
-
+        Permissions::where("name","=","model_" . $request->input("id"))->delete();
         return Redirect::route('dashboard.home');
     }
 
@@ -47,6 +48,9 @@ class LLMController extends Controller
         if (is_null($validated['version']))  unset($validated['version']);
         $model->fill($validated);
         $model->save();
+        $perm = new Permissions;
+        $perm->fill(["name" => "model_" . $model->id,"describe"=>"Permission for model id " . $model->id]);
+        $perm->save();
         return Redirect::route('dashboard.home');
     }
 

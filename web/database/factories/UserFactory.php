@@ -23,9 +23,7 @@ class UserFactory extends Factory
 			'name' => 'demo' . $count++,
 			'email' => 'demo' . ($count - 1) . '@chat.gai.tw',
 			'email_verified_at' => now(),
-			'password' => Hash::make("chatchat"),
-			'isAdmin' => false,
-			'forDemo' => true
+			'password' => Hash::make("chatchat")
 		];
 	}
 }

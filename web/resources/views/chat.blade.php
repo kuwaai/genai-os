@@ -1,16 +1,35 @@
 <x-app-layout>
+    @php
+        $result = DB::table(function ($query) {
+            $query
+                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                ->from('group_permissions')
+                ->join('permissions', 'perm_id', '=', 'permissions.id')
+                ->where('group_id', Auth()->user()->group_id)
+                ->where('name', 'like', 'model_%')
+                ->get();
+        }, 'tmp')
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->select('tmp.*', 'llms.*')
+            ->where('llms.enabled', true)
+            ->orderby('llms.order')
+            ->orderby('llms.created_at')
+            ->get();
+    @endphp
+
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
-            <div class="p-3 h-full overflow-y-auto scrollbar">
-                @if (App\Models\LLMs::where('enabled', true)->count() == 0)
+            <div class="p-3 {{ $result->count() == 1 ? 'flex' : '' }} h-full overflow-y-auto scrollbar">
+                @if ($result->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                         No available LLM to chat with<br>
                         Please come back later!
                     </div>
                 @else
-                    @foreach (App\Models\LLMs::where('enabled', true)->orderby('order')->orderby('created_at')->get() as $LLM)
-                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+                    @foreach ($result as $LLM)
+                        <div
+                            class="{{ $result->count() == 1 ? 'flex flex-1 flex-col' : 'mb-2' }} border border-black dark:border-white border-1 rounded-lg">
                             <div class="border-b border-black dark:border-white">
                                 @if ($LLM->link)
                                     <a href="{{ $LLM->link }}" target="_blank"
@@ -20,7 +39,7 @@
                                         class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
                                 @endif
                             </div>
-                            <div class="max-h-[182px] overflow-y-auto scrollbar">
+                            <div class="{{ $result->count() == 1 ? '' : 'max-h-[182px]' }} overflow-y-auto scrollbar">
                                 <div
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
@@ -105,9 +124,9 @@
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                         <img src="{{ $botimgurl }}">
                                     </div>
-                                    <div>
+                                    <div class="overflow-hidden">
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm whitespace-pre-line break-all"
+                                            <p class="text-sm whitespace-pre-line break-words"
                                                 id="task_{{ $history->id }}">{{ $history->msg }}</p>
                                         </div>
                                     </div>
@@ -121,10 +140,10 @@
                                             <img src="{{ $botimgurl }}">
                                         </div>
                                     @endif
-                                    <div>
+                                    <div class="overflow-hidden">
                                         <div
                                             class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                            <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
+                                            <p class="text-sm whitespace-pre-line break-words">{{ $history->msg }}</p>
                                         </div>
                                     </div>
                                     @if (!$history->isbot)
@@ -138,39 +157,45 @@
                         @endforeach
                     @endif
                 </div>
-                <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
+                <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
                     @if (request()->route('llm_id'))
-                        <form method="post" action="{{ route('chat.create') }}" id="create_chat">
-                            <div class="flex">
+                        <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
+                            <div class="flex items-end">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
-                                <input type="text" placeholder="Enter your text here" name="input" id="chat_input"
-                                    autocomplete="off"
-                                    class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
+                                <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
+                                    oninput="adjustTextareaRows()" id="chat_input" name="input"
+                                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+
+
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M2.5 9.5L17.5 2.5V17.5L2.5 10.5V9.5Z">
-                                        </path>
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] right-[26px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                        <path
+                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                            fill="currentColor"></path>
                                     </svg>
                                 </button>
                             </div>
                         </form>
                     @elseif(request()->route('chat_id'))
-                        <form method="post" action="{{ route('chat.request') }}" id="create_chat">
+                        <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
                             <div class="flex">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
-                                <input type="text" placeholder="Enter your text here" name="input" id="chat_input"
-                                    autocomplete="off"
-                                    class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
+                                <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
+                                    oninput="adjustTextareaRows()" id="chat_input" name="input"
+                                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+
+
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M2.5 9.5L17.5 2.5V17.5L2.5 10.5V9.5Z">
-                                        </path>
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] right-[26px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                        <path
+                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                            fill="currentColor"></path>
                                     </svg>
                                 </button>
                             </div>
@@ -216,7 +241,6 @@
                     });
                     task.addEventListener('message', event => {
                         data = event.data.replace(/\[NEWLINEPLACEHOLDERUWU\]/g, "\n");
-                        console.log(data);
                         const commaIndex = data.indexOf(",");
                         const number = data.slice(0, commaIndex);
                         const msg = data.slice(commaIndex + 1);
@@ -225,7 +249,36 @@
                 </script>
             @endif
             <script>
-                $("#chat_input").focus();
+                if ("#chat_input") {
+                    $("#chat_input").focus();
+
+                    function adjustTextareaRows() {
+                        const textarea = $('#chat_input');
+                        const maxRows = parseInt(textarea.attr('max-rows')) || 5;
+                        const lineHeight = parseInt(textarea.css('line-height'));
+
+                        textarea.attr('rows', 1);
+
+                        const contentHeight = textarea[0].scrollHeight;
+                        const rowsToDisplay = Math.floor(contentHeight / lineHeight);
+
+                        textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+                    }
+                    $("#chat_input").on("keydown", function(event) {
+                        if (event.key === "Enter" && !event.shiftKey) {
+                            event.preventDefault();
+                            $("#prompt_area").submit();
+                        } else if (event.key === "Enter" && event.shiftKey) {
+                            event.preventDefault();
+                            var cursorPosition = this.selectionStart;
+                            $(this).val($(this).val().substring(0, cursorPosition) + "\n" + $(this).val().substring(
+                                cursorPosition));
+                            this.selectionStart = this.selectionEnd = cursorPosition + 1;
+                        }
+                        adjustTextareaRows();
+                    });
+                    adjustTextareaRows();
+                }
             </script>
         @endif
     </div>

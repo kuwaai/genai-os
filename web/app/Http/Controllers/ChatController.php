@@ -16,9 +16,34 @@ use App\Jobs\RequestChat;
 use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
+use DB;
 
 class ChatController extends Controller
 {
+    public function home(Request $request)
+    {
+        $result = DB::table(function ($query) {
+            $query
+                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                ->from('group_permissions')
+                ->join('permissions', 'perm_id', '=', 'permissions.id')
+                ->where('group_id', Auth()->user()->group_id)
+                ->where('name', 'like', 'model_%')
+                ->get();
+        }, 'tmp')
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->select('tmp.*', 'llms.*')
+            ->where('llms.enabled', true)
+            ->orderby('llms.order')
+            ->orderby('llms.created_at')
+            ->first();
+        if ($result) {
+            return redirect()->route('chat.new', $result->id);
+        } else {
+            return view('chat');
+        }
+    }
+
     public function main(Request $request)
     {
         $chat = Chats::findOrFail($request->route('chat_id'));
@@ -40,18 +65,13 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
             $history->save();
+            $tmp = Histories::where("chat_id","=",$chat->id)->select('msg','isbot')->get()->toJson();
             $history = new Histories();
             $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
             $history->save();
             $llm = LLMs::findOrFail($request->input('llm_id'));
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch(
-                $input,
-                $llm->access_code,
-                Auth::user()->id,
-                $history->id,
-                Auth::user()->openai_token,
-            );
+            RequestChat::dispatch($tmp, $llm->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
         }
         return Redirect::route('chat.chat', $chat->id);
     }
@@ -64,18 +84,13 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
+            $tmp = Histories::where("chat_id","=",$chatId)->select('msg','isbot')->orderby('created_at')->orderby('id', "desc")->get()->toJson();
             $history = new Histories();
             $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
             $history->save();
             $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch(
-                $input,
-                $access_code,
-                Auth::user()->id,
-                $history->id,
-                Auth::user()->openai_token,
-            );
+            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
         }
         return Redirect::route('chat.chat', $chatId);
     }
@@ -106,12 +121,6 @@ class ChatController extends Controller
         return Redirect::route('chat.chat', $request->input('id'));
     }
 
-    public function ResetRedis(Request $request)
-    {
-        Redis::flushAll();
-        return Redirect::route('dashboard.home')->with('status', "resetRedis");
-    }
-
     public function SSE(Request $request)
     {
         $response = new StreamedResponse();
@@ -123,8 +132,8 @@ class ChatController extends Controller
 
         $response->setCallback(function () use ($response, $request) {
             $channel = $request->input('channel');
-            if ($channel != null){
-                if (strpos($channel, "aielection_") === 0){
+            if ($channel != null) {
+                if (strpos($channel, 'aielection_') === 0) {
                     $client = Redis::connection();
                     $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
                         global $listening;

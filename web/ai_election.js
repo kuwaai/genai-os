@@ -34,7 +34,8 @@ function logger(msg, tag = 0) {
 }
 
 async function api_send(token, msg, llm_id){
-	$url = `http://localhost/api_auth?key=${process.env.APP_KEY}&api_token=${token}&msg=${msg}&llm_id=${llm_id}`
+	$url = `http://localhost/api_auth?key=${encodeURIComponent(process.env.API_Key)}&api_token=${token}&msg=${msg}&llm_id=${llm_id}`
+	console.log($url)
 	console.log(`sending msg: ${msg} ...`)
 	response = await fetch($url)
 	if (!response.ok) {
@@ -54,7 +55,7 @@ io.on('connection', client => {
 
 	client.on("auth", (token) => {
 		logger("Doing auth on the client with API token: " + token)
-		fetch(`http://localhost/api_auth?key=${process.env.APP_KEY}&api_token=${token}`)
+		fetch(`http://localhost/api_auth?key=${encodeURIComponent(process.env.API_Key)}&api_token=${token}`)
 			.then((response) => {
 				if (!response.ok) {
 					client.disconnect();
