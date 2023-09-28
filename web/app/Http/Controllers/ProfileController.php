@@ -164,7 +164,7 @@ class ProfileController extends Controller
                         'stream' => true,
                     ]);
                     $req = $req->getBody()->getContents();
-                    $response['output'] = json_decode(explode('[ENDEDPLACEHOLDERUWU]', $req)[0])->msg;
+                    $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
                 }
                 return response()->json($response);
             }
