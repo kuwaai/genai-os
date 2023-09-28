@@ -103,7 +103,7 @@ class RequestChat implements ShouldQueue
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 $tmp .= $message;
-                                Redis::publish($this->channel, 'New ' . $tmp . '...');
+                                Redis::publish($this->channel, 'New ' . json_encode(["msg" => $tmp . '...']));
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
@@ -115,7 +115,7 @@ class RequestChat implements ShouldQueue
                         $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
                     }
                 } catch (Exception $e) {
-                    Redis::publish($this->channel, 'New ' . $tmp . "\n[Sorry, something is broken, please try again later!]");
+                    Redis::publish($this->channel, 'New ' . json_encode(["msg" => $tmp . '\n[Sorry, something is broken, please try again later!]']));
                     $tmp .= "\n[Sorry, something is broken, please try again later!]";
                     Log::channel('analyze')->Debug('failJob ' . $this->history_id);
                 } finally {
@@ -127,10 +127,10 @@ class RequestChat implements ShouldQueue
                         }
                     } catch (Exception $e) {
                     }
-                    Redis::publish($this->channel, 'New ' . trim($tmp));
+                    Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
                     for ($i = 0; $i < 5; $i++) {
                         sleep(1);
-                        Redis::publish($this->channel, 'New ' . trim($tmp));
+                        Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
                     }
                     if ($this->channel == '' . $this->history_id) {
                         Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
