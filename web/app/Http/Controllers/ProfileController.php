@@ -205,6 +205,7 @@ class ProfileController extends Controller
                                 flush();
                                 $client->disconnect();
                             } elseif ($type == 'New') {
+                                echo json_decode($msg)->msg . "\n";
                                 $result .= json_decode($msg)->msg;
                                 ob_flush();
                                 flush();
