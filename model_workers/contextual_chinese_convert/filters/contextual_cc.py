@@ -24,13 +24,13 @@ class ContextualCC(TextLevelFilteringInterface):
   def __init__(self, dst_region='tw'):
     if dst_region == 'tw':
       # self.is_dst_code = lambda t: not hanzidentifier.is_simplified(t)
-      self.is_dst_code = lambda t: not is_code(t, 'gb2312')
+      self.is_dst_code = lambda t: is_code(t, 'big5') and not is_code(t, 'gb2312')
       opencc_config = 's2twp.json'
       self.ws_driver = JiebaWordSegmenter()
 
     elif dst_region == 'cn':
       # self.is_dst_code = lambda t: not hanzidentifier.is_traditional(t)
-      self.is_dst_code = lambda t: not is_code(t, 'big5')
+      self.is_dst_code = lambda t: is_code(t, 'gb2312') and not is_code(t, 'big5')
       opencc_config = 'tw2sp.json'
       self.ws_driver = CkipWordSegmenter(model="albert-tiny")
       
