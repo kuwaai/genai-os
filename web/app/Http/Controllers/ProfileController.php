@@ -164,7 +164,7 @@ class ProfileController extends Controller
                         'stream' => true,
                     ]);
                     $req = $req->getBody()->getContents();
-                    $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
+                    $response['output'] = json_decode(explode('[ENDEDPLACEHOLDERUWU]', $req)[0])->msg;
                 }
                 return response()->json($response);
             }
@@ -200,12 +200,11 @@ class ProfileController extends Controller
                             global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo json_encode(["msg"=>$result . "\n"]);
+                                echo json_encode(["msg"=>$result . "\n"]) . "[ENDEDPLACEHOLDERUWU]";
                                 ob_flush();
                                 flush();
                                 $client->disconnect();
                             } elseif ($type == 'New') {
-                                echo json_decode($msg)->msg . "\n";
                                 $result .= json_decode($msg)->msg;
                                 ob_flush();
                                 flush();
