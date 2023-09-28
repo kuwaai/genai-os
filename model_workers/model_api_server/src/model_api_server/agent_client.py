@@ -13,7 +13,7 @@ class AgentClient:
     """
 
 
-    def __init__(self, agent_endpoint: str, llm_name: str, public_endpoint: str):
+    def __init__(self, agent_endpoint: str, llm_name: str, public_endpoint: str, debug: bool = False):
         """
         Initialize the agent client.
         Arguments:
@@ -23,6 +23,8 @@ class AgentClient:
         """
 
         self.logger = logging.getLogger(__name__)
+        if debug: self.logger.setLevel(logging.DEBUG)
+
         self.agent_endpoint = agent_endpoint
         self.llm_name = llm_name
         self.public_endpoint = public_endpoint
@@ -41,13 +43,13 @@ class AgentClient:
         self.logger.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
         try:
             def do_req():
-                return requests.post(
-                    urljoin(self.agent_endpoint, './worker/register'),
-                    json={
-                        'name': self.llm_name,
-                        'endpoint': self.public_endpoint
-                        }
-                    )
+                url = urljoin(self.agent_endpoint, './worker/register')
+                data={
+                    'name': self.llm_name,
+                    'endpoint': self.public_endpoint
+                }
+                self.logger.debug('"POST {}", data={}'.format(url, data))
+                return requests.post(url, json=data)
             event_loop = asyncio.get_event_loop()
             response = await event_loop.run_in_executor(None, do_req)
             if not response.ok : raise Exception
@@ -76,13 +78,13 @@ class AgentClient:
 
         self.logger.info('Attempting to unregister with the Agent...')
         try:
-            response = requests.post(
-                urljoin(self.agent_endpoint, './worker/unregister'),
-                json={
-                    'name': self.llm_name,
-                    'endpoint': self.public_endpoint
-                    }
-            )
+            url = urljoin(self.agent_endpoint, './worker/unregister')
+            data={
+                'name': self.llm_name,
+                'endpoint': self.public_endpoint
+            }
+            self.logger.debug('"POST {}", data={}'.format(url, data))
+            response = requests.post(url, json=data)
             if not response.ok:
                 self.logger.warning('Failed to unregister from Agent. Refused by Agent.')
             else:

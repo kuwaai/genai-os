@@ -39,12 +39,12 @@ def main():
 
     # Create a job that will register with the Agent after the Model API server started.
     public_endpoint = 'http://{0}:{1}{2}'.format(config.public_address, config.port, config.endpoint)
-    agent_client = AgentClient(config.agent_endpoint, config.llm_name, public_endpoint)
+    agent_client = AgentClient(config.agent_endpoint, config.llm_name, public_endpoint, config.debug)
     logging.info('Public endpoint: {}'.format(public_endpoint))
     registration_job = RegistrationJob(agent_client, config.retry_count, config.ignore_agent)
     
     # Initialize the Model API server.
-    model_layout = ModelLayout(config.layout_config)
+    model_layout = ModelLayout(config.layout_config, config.debug)
     server = ModelApiServer(
         config.endpoint, model_layout,
         on_startup=[registration_job.schedule],

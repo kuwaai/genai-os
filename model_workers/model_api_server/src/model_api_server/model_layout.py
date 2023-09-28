@@ -30,12 +30,13 @@ class ModelLayout:
     [User input]->[Pre-processing filters]->[LLM]->[Post-processing filters]->[Output]
     """
 
-    def __init__(self, layout_file):
+    def __init__(self, layout_file: str, debug: bool = False):
 
         self.logger = logging.getLogger(__name__)
+        if debug: self.logger.setLevel(logging.DEBUG)
 
         self.read_layout(layout_file)
-        
+
         # State variable to indicate whether the model is processing another request
         self.busy = False
 
@@ -85,8 +86,11 @@ class ModelLayout:
 
         try:
             processed_input = self.apply_filters(user_input, self.ingress_filters)
+            self.logger.debug('Processed input: {}'.format(processed_input))
             for output_token in self.llm.complete(processed_input):
+                self.logger.debug('Model output: {}'.format(output_token))
                 processed_output_token = self.apply_filters([output_token], self.egress_filters)
+                self.logger.debug('Processed output: {}'.format(processed_output_token))
                 for t in processed_output_token:
                     if t.role == Role.USER: continue
                     yield t.msg

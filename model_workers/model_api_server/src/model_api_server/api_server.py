@@ -25,7 +25,7 @@ class ModelApiServer:
 
         # Logger of this module
         self.logger = logging.getLogger(__name__) 
-        self.debug = debug
+        if debug: self.logger.setLevel(logging.DEBUG)
 
         self.model_layout = model_layout
         
@@ -33,7 +33,7 @@ class ModelApiServer:
         routes = [
             Route(endpoint, endpoint=self.api, methods=['POST'])
         ]
-        self.web_server = Starlette(debug=self.debug, routes=routes, on_startup=on_startup)
+        self.web_server = Starlette(debug=debug, routes=routes, on_startup=on_startup)
 
     def start(self, port: int, logging_config: str):
         """
@@ -71,8 +71,7 @@ class ModelApiServer:
             except Exception as e:
                 self.logger.error(e)
                 return JSONResponse({'message': "Bad request"}, 400)
-
-            if self.debug: self.logger.info('Input: {}'.format(user_input))
+            self.logger.debug('Input: {}'.format(user_input))
             
             if user_input == [] or user_input[-1].msg == '':
                 self.logger.debug("I didn't see your input!")
