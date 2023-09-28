@@ -200,7 +200,7 @@ class ProfileController extends Controller
                             global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo json_encode(["msg"=>$result . json_encode(["msg"=>"\n"])]);
+                                echo json_encode(["msg"=>$result . "\n"]);
                                 ob_flush();
                                 flush();
                                 $client->disconnect();
