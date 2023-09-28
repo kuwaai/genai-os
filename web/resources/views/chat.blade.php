@@ -240,10 +240,9 @@
                         task.close();
                     });
                     task.addEventListener('message', event => {
-                        data = event.data.replace(/\[NEWLINEPLACEHOLDERUWU\]/g, "\n");
-                        const commaIndex = data.indexOf(",");
-                        const number = data.slice(0, commaIndex);
-                        const msg = data.slice(commaIndex + 1);
+                        data = JSON.parse(event.data)
+                        const number = data["history_id"];
+                        const msg = data["msg"];
                         $('#task_' + number).text(msg);
                     });
                 </script>
