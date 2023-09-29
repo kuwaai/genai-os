@@ -1,4 +1,3 @@
-# opencc
 langchain
 torch
 transformers
@@ -7,3 +6,5 @@ textract
 bs4
 # faiss-gpu # Since the count of fetched document is relatively small, CPU is enough.
 faiss-cpu
+chevron
+accelerate

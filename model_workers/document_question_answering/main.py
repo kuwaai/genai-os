@@ -6,9 +6,12 @@ from model_api_server.interfaces import GeneralProcessInterface
 from typing import Generator
 from recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from document_store import DocumentStore
+from taide_llm import TaideLlm
+from pathlib import Path
 
 import re
 import logging
+import chevron
 
 def extract_last_url(chat_history: [ChatRecord]):
     """
@@ -25,6 +28,7 @@ def extract_last_url(chat_history: [ChatRecord]):
 class DocumentQaProcess(GeneralProcessInterface):
   def __init__(self):
     self.logger = logging.getLogger(__name__)
+    self.llm = TaideLlm()
 
   async def process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
     
@@ -47,8 +51,33 @@ class DocumentQaProcess(GeneralProcessInterface):
     document_store = DocumentStore()
     document_store.from_documents(docs)
     
-    question = "碩士班畢業條件為何？"
+    # Summarize question
+    question = final_user_input.msg
+#     question = await self.llm.complete(
+#       chat_history,
+#       system_prompt="""
+# 請根據談話內容，改寫使用者的問題。
+# """
+#     )
+
+    # Retrieve
     related_docs = document_store.retrieve(question)
     
-    for doc in related_docs:
-      yield str(doc)+'\n'
+    # Generation
+    context_template = Path('prompt_template/context.mustache').read_text()
+    context = chevron.render(context_template, {
+      'docs': related_docs,
+      'question': question
+    })
+    self.logger.info('Context: {}'.format(context))
+    modified_chat_history = chat_history[:-1] + [ChatRecord(context, Role.USER)]
+    result = await self.llm.complete(
+      modified_chat_history,
+      system_prompt="你的名子是 TAIDE, 你是個能夠理解使用者的大語言模型AI，能流暢的以繁體中文溝通，能專業且流利的回答使用者，專長在文本翻譯、寫文章、寫信、自動摘要上"
+      # system_prompt="""
+# 你是一個有幫助且精準的大語言模型。
+# 請使用繁體中文，根據所提供的資料回答使用者的問題。
+# 若資料內容無法回答使用者問題就回答不知道。
+# """
+    )
+    yield result
