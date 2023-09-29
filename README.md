@@ -1,4 +1,4 @@
-# TAIDE Chat 0.0.6.2
+# TAIDE Chat 0.0.6.3
 ### Implements
 * [Finished] Chatting with one LLMs
 * [Finished] Chatting with multiple LLMs at the same time
