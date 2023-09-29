@@ -154,7 +154,7 @@ class ProfileController extends Controller
                     $response['output'] = '';
 
                     $client = new Client(['timeout' => 300]);
-                    RequestChat::dispatch(json_encode(["msg"=>$request->input('msg'), "isbot"=>false]), $llm->access_code, $user->id, -$user->id, $user->openai_token, 'aielection_' . $user->id);
+                    RequestChat::dispatch(json_encode([["msg"=>$request->input('msg'), "isbot"=>false]]), $llm->access_code, $user->id, -$user->id, $user->openai_token, 'aielection_' . $user->id);
                     $req = $client->get(route('api.stream'), [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'query' => [
