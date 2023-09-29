@@ -169,7 +169,7 @@
 
 
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
                                         <path
@@ -190,7 +190,7 @@
 
 
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
                                         <path
