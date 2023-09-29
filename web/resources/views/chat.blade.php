@@ -160,7 +160,7 @@
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
                     @if (request()->route('llm_id'))
                         <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
-                            <div class="flex items-end justify-right">
+                            <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
                                 <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
@@ -181,7 +181,7 @@
                         </form>
                     @elseif(request()->route('chat_id'))
                         <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
-                            <div class="flex items-end justify-right">
+                            <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
                                 <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
