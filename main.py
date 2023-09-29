@@ -15,5 +15,5 @@ if __name__ == '__main__':
     app.register_blueprint(worker, url_prefix=f'/{version}/worker')
     app.register_blueprint(chat, url_prefix=f'/{version}/chat')
     print("Route list:\n","\n".join([str(i) for i in app.url_map.iter_rules()]))
-    app.run(port=9000, host="0.0.0.0")
+    app.run(port=9000, host="0.0.0.0", threaded=True)
     print("\n\nServer started")
