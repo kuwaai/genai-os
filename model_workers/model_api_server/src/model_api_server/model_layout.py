@@ -9,7 +9,7 @@ import sys, os
 from typing import Generator
 
 from model_api_server.datatype import ChatRecord, Role
-from model_api_server.interfaces import CompletionInterface, TextLevelFilteringInterface
+from model_api_server.interfaces import CompletionInterface, TextLevelFilteringInterface, GeneralProcessInterface
 
 # The modules may not in the default searching path.
 # Thus we append current working directory to the module searching path.
@@ -58,11 +58,16 @@ class ModelLayout:
         
         assert layout['version'] == 1
 
-        self.llm = read_function(layout['llm'], CompletionInterface)
-        self.ingress_filters  = [read_function(func, TextLevelFilteringInterface) for func in layout['ingress-filters']]
-        self.egress_filters = [read_function(func, TextLevelFilteringInterface) for func in layout['egress-filters']]
+        if layout.get('override-process') != None:
+            self.override_process = read_function(layout['override-process'], GeneralProcessInterface)
+            self.logger.info('Override process class: {}'.format(type(self.override_process).__name__))
+        else:
+            self.override_process = None
+            self.llm = read_function(layout['llm'], CompletionInterface)
+            self.ingress_filters  = [read_function(func, TextLevelFilteringInterface) for func in layout['ingress-filters']]
+            self.egress_filters = [read_function(func, TextLevelFilteringInterface) for func in layout['egress-filters']]
         
-        self.logger.info('LLM Class: {}'.format(type(self.llm).__name__))
+            self.logger.info('LLM class: {}'.format(type(self.llm).__name__))
 
     @staticmethod
     def apply_filters(data: [ChatRecord], filters: list[TextLevelFilteringInterface]) -> [ChatRecord]:
@@ -85,15 +90,19 @@ class ModelLayout:
         """
 
         try:
-            processed_input = self.apply_filters(user_input, self.ingress_filters)
-            self.logger.debug('Processed input: {}'.format(processed_input))
-            for output_token in self.llm.complete(processed_input):
-                self.logger.debug('Model output: {}'.format(output_token))
-                processed_output_token = self.apply_filters([output_token], self.egress_filters)
-                self.logger.debug('Processed output: {}'.format(processed_output_token))
-                for t in processed_output_token:
-                    if t.role == Role.USER: continue
-                    yield t.msg
+            if self.override_process != None:
+                for t in self.override_process.process(user_input):
+                    yield t
+            else:
+                processed_input = self.apply_filters(user_input, self.ingress_filters)
+                self.logger.debug('Processed input: {}'.format(processed_input))
+                for output_token in self.llm.complete(processed_input):
+                    self.logger.debug('Model output: {}'.format(output_token))
+                    processed_output_token = self.apply_filters([output_token], self.egress_filters)
+                    self.logger.debug('Processed output: {}'.format(processed_output_token))
+                    for t in processed_output_token:
+                        if t.role == Role.USER: continue
+                        yield t.msg
         except Exception as e:
             self.logger.error(e)
         finally:

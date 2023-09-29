@@ -12,3 +12,7 @@ class CompletionInterface:
 class TextLevelFilteringInterface:
   def filter(self, msg: [ChatRecord]) -> [ChatRecord]:
     pass
+
+class GeneralProcessInterface:
+    def process(self, user_input: [ChatRecord]) -> Generator[str, None, None]:
+      pass

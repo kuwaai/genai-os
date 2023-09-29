@@ -13,7 +13,7 @@ class DummyModel(CompletionInterface):
   def __init__(self, content="I'm a dummy model."):
     self.content = content
 
-  def complete(self, mag: [ChatRecord]) -> Generator[ChatRecord, None, None]:
+  def complete(self, msg: [ChatRecord]) -> Generator[ChatRecord, None, None]:
     for i in self.content:
       time.sleep(0.02)
       yield ChatRecord(i, Role.BOT)
