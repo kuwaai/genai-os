@@ -1,4 +1,3 @@
 requests
 flask
 flask_sse
-gevent
