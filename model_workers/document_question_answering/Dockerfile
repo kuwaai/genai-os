@@ -9,7 +9,7 @@ RUN pip install -r requirements.txt
 
 RUN chmod +x run.sh
 
-ENV LLM_NAME="slow_reflect"
+ENV LLM_NAME="doc-qa"
 ENV PUBLIC_ADDRESS="localhost"
 ENV PORT="9001"
 ENV AGENT_ENDPOINT="http://localhost:9000/v1.0/"

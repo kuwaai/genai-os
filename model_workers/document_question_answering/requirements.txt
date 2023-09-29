@@ -1,0 +1,7 @@
+# opencc
+langchain
+torch
+transformers
+sentenct-transformers
+textract
+bs4
