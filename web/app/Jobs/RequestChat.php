@@ -68,6 +68,7 @@ class RequestChat implements ShouldQueue
                 'form_params' => [
                     'name' => $this->access_code,
                     'history_id' => $this->history_id,
+                    'user_id' => $this->user_id
                 ],
                 'stream' => true,
             ]);
