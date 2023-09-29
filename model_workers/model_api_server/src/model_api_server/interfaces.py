@@ -14,5 +14,5 @@ class TextLevelFilteringInterface:
     pass
 
 class GeneralProcessInterface:
-    def process(self, user_input: [ChatRecord]) -> Generator[str, None, None]:
+    async def process(self, user_input: [ChatRecord]) -> Generator[str, None, None]:
       pass

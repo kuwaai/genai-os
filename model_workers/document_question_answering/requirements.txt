@@ -2,6 +2,6 @@
 langchain
 torch
 transformers
-sentenct-transformers
+sentence-transformers
 textract
 bs4

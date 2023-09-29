@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import asyncio
 import logging
 import re
@@ -14,56 +12,104 @@ from typing import (
     Union,
 )
 
+import os
 import requests
+import mimetypes
+from pathlib import Path
+from urllib.parse import urlparse, unquote
 
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
 from langchain.utils.html import extract_sub_links
+import aiohttp
+import textract
 
 if TYPE_CHECKING:
     import aiohttp
 
 logger = logging.getLogger(__name__)
 
-
-def _metadata_extractor(raw_html: str, url: str) -> dict:
-    """Extract metadata from raw html using BeautifulSoup."""
-    metadata = {"source": url}
-
+async def _extractor(content: str, url: str, content_type: str) -> str:
+    """
+    Extract text contents from the retrieved file.
+    """
+    data_dir = Path('web_data')
+    
+    is_text = 'text/' in content_type
+    
+    # Create local path for file storage
+    url = urlparse(url)
+    file_path = data_dir / Path('{}/{}'.format(url.netloc.replace('.', '_'), url.path))
+    if url.path == '' or url.path[-1] == '/':
+        file_path = file_path / 'index'
+    if file_path.suffix == '':
+        guessed_suffixes = mimetypes.guess_all_extensions(content_type.split(';', 1)[0])
+        file_path = file_path.with_suffix(guessed_suffixes[0])
+    
+    # Make directory and write the file
+    # Note that in most of OS, file operation is synchronous.
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(file_path, 'wb') as f:
+        f.write(content.encode('utf-8') if is_text else content)
+        f.flush()
+    
+    # Asynchronous extract text from fetched files.
+    text = ''
     try:
-        from bs4 import BeautifulSoup
-    except ImportError:
-        logger.warning(
-            "The bs4 package is required for default metadata extraction. "
-            "Please install it with `pip install bs4`."
+        loop = asyncio.get_event_loop()
+        text = await loop.run_in_executor(
+            None,
+            textract.process,
+            str(file_path)
         )
-        return metadata
-    soup = BeautifulSoup(raw_html, "html.parser")
-    if title := soup.find("title"):
-        metadata["title"] = title.get_text()
-    if description := soup.find("meta", attrs={"name": "description"}):
-        metadata["description"] = description.get("content", None)
-    if html := soup.find("html"):
-        metadata["language"] = html.get("lang", None)
+    except Exception as e:
+        print("Failed to extract text. Reason:", str(e))
+    
+    return text
+
+def _metadata_extractor(raw_html: str, url: str, content_type: str) -> dict:
+    """Extract metadata from raw html using BeautifulSoup."""
+    metadata = {"source": url, "content-type": content_type}
+
+    if not 'text/' in content_type:
+        metadata["filename"] = unquote(os.path.basename(url))
+    else:
+        try:
+            from bs4 import BeautifulSoup
+        except ImportError:
+            logger.warning(
+                "The bs4 package is required for default metadata extraction. "
+                "Please install it with `pip install bs4`."
+            )
+            return metadata
+        soup = BeautifulSoup(raw_html, "html.parser")
+        if title := soup.find("title"):
+            metadata["title"] = title.get_text()
+        if description := soup.find("meta", attrs={"name": "description"}):
+            metadata["description"] = description.get("content", None)
+        if html := soup.find("html"):
+            metadata["language"] = html.get("lang", None)
     return metadata
 
-
-class RecursiveUrlLoader(BaseLoader):
-    """Load all child links from a URL page."""
+class RecursiveUrlMultimediaLoader(BaseLoader):
+    """
+    Load all child links from a URL page with
+    exposed content-type information to the extractor.
+    """
 
     def __init__(
         self,
         url: str,
         max_depth: Optional[int] = 2,
         use_async: Optional[bool] = None,
-        extractor: Optional[Callable[[str], str]] = None,
-        metadata_extractor: Optional[Callable[[str, str], str]] = None,
+        extractor: Optional[Callable[[str, str, str], str]] = None,
+        metadata_extractor: Optional[Callable[[str, str, str], str]] = None,
         exclude_dirs: Optional[Sequence[str]] = (),
         timeout: Optional[int] = 10,
         prevent_outside: Optional[bool] = True,
         link_regex: Union[str, re.Pattern, None] = None,
         headers: Optional[dict] = None,
-        check_response_status: bool = False,
+        check_response_status: bool = False
     ) -> None:
         """Initialize with URL to crawl and any subdirectories to exclude.
         Args:
@@ -92,7 +138,7 @@ class RecursiveUrlLoader(BaseLoader):
         self.url = url
         self.max_depth = max_depth if max_depth is not None else 2
         self.use_async = use_async if use_async is not None else False
-        self.extractor = extractor if extractor is not None else lambda x: x
+        self.extractor = extractor if extractor is not None else _extractor
         self.metadata_extractor = (
             metadata_extractor
             if metadata_extractor is not None
@@ -130,7 +176,12 @@ class RecursiveUrlLoader(BaseLoader):
         # Get all links that can be accessed from the current URL
         visited.add(url)
         try:
-            response = requests.get(url, timeout=self.timeout, headers=self.headers)
+            response = requests.get(url, timeout=self.timeout, headers=self.headers, proxies=proxies)
+            content_type = response.headers.get('content-type')
+            if 'text/' in content_type:
+                raw_content = response.text
+            else:
+                raw_content = response.content
             if self.check_response_status and 400 <= response.status_code <= 599:
                 raise ValueError(f"Received HTTP status {response.status_code}")
         except Exception as e:
@@ -139,28 +190,29 @@ class RecursiveUrlLoader(BaseLoader):
                 f"{e.__class__.__name__}"
             )
             return
-        content = self.extractor(response.text)
+        content = self.extractor(raw_content, url, content_type)
         if content:
             yield Document(
                 page_content=content,
-                metadata=self.metadata_extractor(response.text, url),
+                metadata=self.metadata_extractor(raw_content, url, content_type),
             )
-
-        # Store the visited links and recursively visit the children
-        sub_links = extract_sub_links(
-            response.text,
-            url,
-            base_url=self.url,
-            pattern=self.link_regex,
-            prevent_outside=self.prevent_outside,
-            exclude_prefixes=self.exclude_dirs,
-        )
-        for link in sub_links:
-            # Check all unvisited links
-            if link not in visited:
-                yield from self._get_child_links_recursive(
-                    link, visited, depth=depth + 1
-                )
+        
+        if 'text/' in content_type:
+            # Store the visited links and recursively visit the children
+            sub_links = extract_sub_links(
+                raw_content,
+                url,
+                base_url=self.url,
+                pattern=self.link_regex,
+                prevent_outside=self.prevent_outside,
+                exclude_prefixes=self.exclude_dirs,
+            )
+            for link in sub_links:
+                # Check all unvisited links
+                if link not in visited:
+                    yield from self._get_child_links_recursive(
+                        link, visited, depth=depth + 1
+                    )
 
     async def _async_get_child_links_recursive(
         self,
@@ -197,13 +249,18 @@ class RecursiveUrlLoader(BaseLoader):
                 connector=aiohttp.TCPConnector(ssl=False),
                 timeout=aiohttp.ClientTimeout(total=self.timeout),
                 headers=self.headers,
+                trust_env=True,
             )
         )
         async with self._lock:  # type: ignore
             visited.add(url)
         try:
             async with session.get(url) as response:
-                text = await response.text()
+                content_type = response.headers.get('content-type')
+                if 'text/' in content_type:
+                    raw_content = await response.text()
+                else:
+                    raw_content = await response.read()
                 if self.check_response_status and 400 <= response.status <= 599:
                     raise ValueError(f"Received HTTP status {response.status}")
         except (aiohttp.client_exceptions.InvalidURL, Exception) as e:
@@ -215,17 +272,17 @@ class RecursiveUrlLoader(BaseLoader):
                 await session.close()
             return []
         results = []
-        content = self.extractor(text)
+        content = await self.extractor(raw_content, url, content_type)
         if content:
             results.append(
                 Document(
                     page_content=content,
-                    metadata=self.metadata_extractor(text, url),
+                    metadata=self.metadata_extractor(content, url, content_type),
                 )
             )
-        if depth < self.max_depth - 1:
+        if 'text/' in content_type and depth < self.max_depth - 1:
             sub_links = extract_sub_links(
-                text,
+                raw_content,
                 url,
                 base_url=self.url,
                 pattern=self.link_regex,
@@ -271,3 +328,8 @@ class RecursiveUrlLoader(BaseLoader):
     def load(self) -> List[Document]:
         """Load web pages."""
         return list(self.lazy_load())
+    
+    async def async_load(self) -> List[Document]:
+        visited: Set[str] = set()
+        results = await self._async_get_child_links_recursive(self.url, visited)
+        return results

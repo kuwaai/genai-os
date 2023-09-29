@@ -2,10 +2,11 @@ FROM model-api
 
 RUN mkdir -p /model_api
 
+COPY requirements.txt /model_api/
+RUN pip install -r /model_api/requirements.txt
+
 COPY . /model_api/
 WORKDIR /model_api/
-
-RUN pip install -r requirements.txt
 
 RUN chmod +x run.sh
 

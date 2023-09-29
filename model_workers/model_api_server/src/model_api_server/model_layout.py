@@ -82,7 +82,7 @@ class ModelLayout:
     def is_busy(self):
         return self.busy
 
-    def process(self, user_input: [ChatRecord]) -> Generator[str, None, None]:
+    async def process(self, user_input: [ChatRecord]) -> Generator[str, None, None]:
         """
         Core part of the Model API server.
         The processing flow:
@@ -91,7 +91,7 @@ class ModelLayout:
 
         try:
             if self.override_process != None:
-                for t in self.override_process.process(user_input):
+                async for t in self.override_process.process(user_input):
                     yield t
             else:
                 processed_input = self.apply_filters(user_input, self.ingress_filters)
