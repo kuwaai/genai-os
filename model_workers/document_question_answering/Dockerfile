@@ -2,6 +2,10 @@ FROM model-api
 
 RUN mkdir -p /model_api
 
+RUN apt-get update &&\
+    apt-get install -y libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr \
+            flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig
+
 COPY requirements.txt /model_api/
 RUN pip install -r /model_api/requirements.txt
 
