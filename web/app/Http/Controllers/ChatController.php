@@ -136,7 +136,7 @@ class ChatController extends Controller
                 $client = Redis::connection();
                 $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
                     [$type, $msg] = explode(' ', $message, 2);
-                    dd(raw_history_id);
+                    dd($raw_history_id);
                     $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
                     if ($type == 'Ended') {
                         if (count($listening) == 0) {
