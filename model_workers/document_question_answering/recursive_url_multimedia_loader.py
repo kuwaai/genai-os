@@ -109,7 +109,8 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         prevent_outside: Optional[bool] = True,
         link_regex: Union[str, re.Pattern, None] = None,
         headers: Optional[dict] = None,
-        check_response_status: bool = False
+        check_response_status: bool = False,
+        cache_proxy_url: bool = None
     ) -> None:
         """Initialize with URL to crawl and any subdirectories to exclude.
         Args:
@@ -158,6 +159,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         self._lock = asyncio.Lock() if self.use_async else None
         self.headers = headers
         self.check_response_status = check_response_status
+        self.cache_proxy_url = cache_proxy_url
 
     def _get_child_links_recursive(
         self, url: str, visited: Set[str], *, depth: int = 0
@@ -176,6 +178,10 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         # Get all links that can be accessed from the current URL
         visited.add(url)
         try:
+            proxies = {
+                'http': self.cache_proxy_url,
+                'https': self.cache_proxy_url
+            } if self.cache_proxy_url != None else None
             response = requests.get(url, timeout=self.timeout, headers=self.headers, proxies=proxies)
             content_type = response.headers.get('content-type')
             if 'text/' in content_type:
@@ -249,13 +255,12 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
                 connector=aiohttp.TCPConnector(ssl=False),
                 timeout=aiohttp.ClientTimeout(total=self.timeout),
                 headers=self.headers,
-                trust_env=True,
             )
         )
         async with self._lock:  # type: ignore
             visited.add(url)
         try:
-            async with session.get(url) as response:
+            async with session.get(url, proxy=self.cache_proxy_url) as response:
                 content_type = response.headers.get('content-type')
                 if 'text/' in content_type:
                     raw_content = await response.text()

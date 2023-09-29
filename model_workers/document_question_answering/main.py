@@ -32,7 +32,8 @@ class DocumentQaProcess(GeneralProcessInterface):
         url=url,
         max_depth=2,
         prevent_outside=False,
-        use_async = True
+        use_async = True,
+        cache_proxy_url = 'http://web_cache:10250'
     ) 
     docs = await loader.async_load()
     

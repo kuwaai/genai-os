@@ -16,13 +16,16 @@ services:
       - DEBUG=True
     networks:
       - taide_backend
+      - squid_backend
     healthcheck:
       test: ["CMD", "curl", "-X", "POST", "-f", "http://localhost:9001/"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-# Connect to the network created by web_agent
+# Connect to the network created by web_agent and squid
 networks:
   taide_backend:
+    external: true
+  squid_backend:
     external: true
