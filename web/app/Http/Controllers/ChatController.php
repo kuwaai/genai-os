@@ -151,7 +151,7 @@ class ChatController extends Controller
                                 $client->disconnect();
                             }
                         } elseif ($type == 'New') {
-                            echo 'data: ' . json_encode(["history_id"=>$history_id, "msg"=>json_decode($msg)['msg']])  . "\n\n";
+                            echo 'data: ' . json_encode(["history_id"=>$history_id, "msg"=>json_decode($msg)->msg])  . "\n\n";
                             ob_flush();
                             flush();
                         }
