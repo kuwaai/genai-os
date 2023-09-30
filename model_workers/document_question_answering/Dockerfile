@@ -9,6 +9,9 @@ RUN apt-get update &&\
 COPY requirements.txt /model_api/
 RUN pip install -r /model_api/requirements.txt
 
+COPY pre_cache_models.py /
+RUN python3 /pre_cache_models.py
+
 COPY . /model_api/
 WORKDIR /model_api/
 
