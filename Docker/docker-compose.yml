@@ -3,6 +3,11 @@ version: '3'
 services:
   web:
     image: llmproject_web
+    build:
+      context: ./images/llmproject_image
+      dockerfile: ${PWD}/images/llmproject_image/Dockerfile
+    logging:
+      driver: "json-file"
     environment:
       TZ: 'Asia/Taipei'
       WEBROOT: '/var/www/html/LLM_Project/public'
@@ -11,10 +16,14 @@ services:
       COMPOSERMIRROR: 'https://mirrors.cloud.tencent.com/composer/'
       NPMMIRROR: 'https://registry.npmmirror.com'
     ports:
-      - "8080:80"
+      - "8081:80"
+      # - "443:443"
+      # - "9000:9000"
     volumes:
       - ../web:/var/www/html/LLM_Project
       - ./script:/script
+      - ./ssl:/ssl
+      - ../LLMs/agent:/agent
     networks:
       - taide
     depends_on:
@@ -52,6 +61,9 @@ services:
   api_debug_01:
     runtime: nvidia
     image: api
+    build:
+      context: ./images/API_image
+      dockerfile: ${PWD}/images/API_image/Dockerfile
     devices:
       - /dev/nvidia0:/dev/nvidia0
     volumes:
