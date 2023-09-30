@@ -132,10 +132,28 @@ class ChatController extends Controller
 
         $response->setCallback(function () use ($response, $request) {
             $channel = $request->input('channel');
-            if ($channel != null) {
-                if (strpos($channel, 'aielection_') === 0) {
+            if ($channel != null && strpos($channel, 'aielection_') === 0) {
+                $client = Redis::connection();
+                $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
+                    [$type, $msg] = explode(' ', $message, 2);
+                    if ($type == 'Ended') {
+                        echo "event: close\n\n";
+                        ob_flush();
+                        flush();
+                        $client->disconnect();
+                    } elseif ($type == 'New') {
+                        echo 'data: ' . json_encode(["msg"=>json_decode($msg)->msg])  . "\n\n";
+                        ob_flush();
+                        flush();
+                    }
+                });
+            }
+            else{
+                global $listening;
+                $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+                if (count($listening) > 0) {
                     $client = Redis::connection();
-                    $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
+                    $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
                         global $listening;
                         [$type, $msg] = explode(' ', $message, 2);
                         $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
@@ -151,39 +169,12 @@ class ChatController extends Controller
                                 $client->disconnect();
                             }
                         } elseif ($type == 'New') {
-                            echo 'data: ' . json_encode(["history_id"=>$history_id, "msg"=>json_decode($msg)['msg']])  . "\n\n";
+                            echo 'data: ' . json_encode(["history_id"=>$history_id, "msg"=>json_decode($msg)->msg])  . "\n\n";
                             ob_flush();
                             flush();
                         }
                     });
-                    return;
                 }
-            }
-            global $listening;
-            $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-            if (count($listening) > 0) {
-                $client = Redis::connection();
-                $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
-                    global $listening;
-                    [$type, $msg] = explode(' ', $message, 2);
-                    $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                    if ($type == 'Ended') {
-                        $key = array_search($history_id, $listening);
-                        if ($key !== false) {
-                            unset($listening[$key]);
-                        }
-                        if (count($listening) == 0) {
-                            echo "event: close\n\n";
-                            ob_flush();
-                            flush();
-                            $client->disconnect();
-                        }
-                    } elseif ($type == 'New') {
-                        echo 'data: ' . json_encode(["history_id"=>$history_id, "msg"=>json_decode($msg)->msg])  . "\n\n";
-                        ob_flush();
-                        flush();
-                    }
-                });
             }
         });
 

@@ -5,7 +5,7 @@ from base import *
 app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://192.168.211.4:9000/"
-app.LLM_name = "llama2-7b-chat-b1.0.0"
+app.LLM_name = "llama2-7b-chat-b1.0.0-tc"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
@@ -20,9 +20,9 @@ path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*3
 model_loc = "llama2-7b-chat-b1.0.0"
-api_key = None
-usr_token = None
-tc_model = None
+api_key = "uwU123DisApikEyiSASeCRetheHehee"
+usr_token = "92d1e9d60879348b8ed2f25f624012dcc596808dc40681d74c4965b8fff8a22a"
+tc_model = 26
 # -- Config ends --
 
 from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer, StoppingCriteria, StoppingCriteriaList, pipeline
@@ -58,9 +58,23 @@ def llm_compute(data):
             history = [prompts.format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
             history = "".join(history)
             result = pipe(history)[0]['generated_text']
-            print(result)
-            for i in result[len(history):]:
+            print("https://chatdev.gai.tw/api_auth?key={0}&api_token={1}&llm_id={2}&msg={3}".format(api_key, usr_token, tc_model, result[len(history):]))
+            res = requests.get("https://chatdev.gai.tw/api_auth?key={0}&api_token={1}&llm_id={2}&msg={3}".format(api_key, usr_token, tc_model, result[len(history):]))
+            if res.status_code == 200:
+                res = res.json()
+                if res["status"] == "success":
+                    print("Before trans:", result, "After trans:", sep="\n")
+                    result = res["output"] + "\n\n[本訊息經過繁體翻譯]"
+                else:
+                    result = result[len(history):]
+                    print("Failed to auth API!")
+            else:
+                print("Translate error!",res.status_code)
+                result = result[len(history):]
+            
+            for i in result:
                 yield i
+                print(end=i)
                 time.sleep(0.02)
 
             torch.cuda.empty_cache()

@@ -160,7 +160,7 @@
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
                     @if (request()->route('llm_id'))
                         <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
-                            <div class="flex items-end">
+                            <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
                                 <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
@@ -169,7 +169,7 @@
 
 
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] right-[26px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
                                         <path
@@ -181,7 +181,7 @@
                         </form>
                     @elseif(request()->route('chat_id'))
                         <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
-                            <div class="flex">
+                            <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
                                 <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
@@ -190,7 +190,7 @@
 
 
                                 <button type="submit"
-                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] m-[4px] right-[26px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
                                         <path
