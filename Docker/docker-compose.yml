@@ -16,9 +16,9 @@ services:
       COMPOSERMIRROR: 'https://mirrors.cloud.tencent.com/composer/'
       NPMMIRROR: 'https://registry.npmmirror.com'
     ports:
-      - "8081:80"
-      # - "443:443"
-      # - "9000:9000"
+      - "8080:80"
+      - "443:443"
+      - "9000:9000"
     volumes:
       - ../web:/var/www/html/LLM_Project
       - ./script:/script
@@ -64,12 +64,39 @@ services:
     build:
       context: ./images/API_image
       dockerfile: ${PWD}/images/API_image/Dockerfile
-    devices:
-      - /dev/nvidia0:/dev/nvidia0
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
     volumes:
       - ./api_debug:/API
-    environment:
-      - CUDA_VISIBLE_DEVICES=0
+    depends_on:
+      - web
+    networks:
+      - taide
+    healthcheck:
+      test: ["CMD", "curl", "-X", "POST", "-f", "http://localhost:9001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  api:
+    runtime: nvidia
+    image: api
+    build:
+      context: ./images/API_image
+      dockerfile: ${PWD}/images/API_image/Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+    volumes:
+      - ./APIs:/API
     depends_on:
       - web
     networks:
