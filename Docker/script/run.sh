@@ -25,4 +25,4 @@ chmod +x /var/www/html/LLM_Project/executables/docker/work.sh
 screen -L -dmS worker1 bash -c "cd /var/www/html/LLM_Project/executables/docker/ && ./work.sh"
 # Start agent
 cd /agent
-python3 agent.py
+python3 main.py

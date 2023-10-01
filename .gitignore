@@ -20,3 +20,4 @@
 
 ssl/
 screenlog.0
+*__pycache__

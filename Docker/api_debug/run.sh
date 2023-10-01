@@ -11,13 +11,14 @@ trap cleanup SIGTERM
 cd /API
 apt update
 apt install -y curl
-while ! curl -s http://web:9000/debug >/dev/null; do
-  echo "Waiting for connection to http://web:9000/debug ..."
+while ! curl -s http://web:9000/v1.0/worker/debug >/dev/null; do
+  echo "Waiting for connection to http://web:9000/v1.0/worker/debug ..."
   sleep 1
 done
 
-echo "Connected to http://web:9000/debug"
-python3 DummyLLM.py &
+echo "Connected to http://web:9000/v1.0/worker/debug"
+export CUDA_VISIBLE_DEVICES=0 
+python3 dummy.py &
 PYTHON_PID=$!
 
 wait $PYTHON_PID
