@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  web:
+    image: llmproject_web
+    build:
+      context: ./llmproject_image
+    environment:
+      TZ: 'Asia/Taipei'
+      WEBROOT: '/var/www/html/LLM_Project/public'
+      PHP_REDIS_SESSION_HOST: 'redis'
+      CREATE_LARAVEL_STORAGE: '1'
+      COMPOSERMIRROR: 'https://mirrors.cloud.tencent.com/composer/'
+      NPMMIRROR: 'https://registry.npmmirror.com'
+    ports:
+      - "8080:80"
+    volumes:
+      - ../web:/var/www/html/LLM_Project/
+      - ./script:/script
+      - ./agent:/agent
+    networks:
+      - taide
+    depends_on:
+      - db
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/v1.0/worker/debug"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: LLMProject
+      POSTGRES_USER: llmprojectroot
+      POSTGRES_DB: llm_project
+    networks:
+      - taide
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U llmprojectroot -d llm_project -t 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7.0-alpine
+    restart: always
+    networks:
+      - taide
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  api_debug_01:
+    runtime: nvidia
+    image: api
+    build:
+      context: ./API_image
+    devices:
+      - /dev/nvidia0:/dev/nvidia0
+    volumes:
+      - ./api_debug:/API
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    depends_on:
+      - web
+    networks:
+      - taide
+    healthcheck:
+      test: ["CMD", "curl", "-X", "POST", "-f", "http://localhost:9001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+networks:
+  taide:
