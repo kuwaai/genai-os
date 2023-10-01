@@ -7,6 +7,7 @@ WORKDIR /
 # Copy any setup files or scripts into the image
 COPY setup.sh /setup.sh
 COPY .env /.env
+COPY nginx_config /nginx_config
 
 # Run setup commands
 RUN chmod +x /setup.sh && /setup.sh
