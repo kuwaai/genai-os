@@ -52,7 +52,7 @@ def process(data):
     try:
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
         while len(history) > limit:
-            del history[0]
+            # del history[0]
             del history[0]
         if len(history) != 0:
             prompt = eng_prompt
