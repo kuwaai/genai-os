@@ -84,7 +84,8 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
-            $tmp = Histories::where("chat_id","=",$chatId)->select('msg','isbot')->orderby('created_at')->orderby('id', "desc")->get()->toJson();
+            $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
+            // $tmp = Histories::where("chat_id","=",$chatId)->select('msg','isbot')->orderby('created_at')->orderby('id', "desc")->get()->toJson();
             $history = new Histories();
             $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
             $history->save();
