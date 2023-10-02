@@ -17,9 +17,16 @@ use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
 use DB;
+use Session;
 
 class ChatController extends Controller
 {
+    public function update_chain(Request $request)
+    {
+        $state = $request->input('switch') == "true";
+        Session::put("chained",$state);
+    }
+
     public function home(Request $request)
     {
         $result = DB::table(function ($query) {
@@ -83,7 +90,7 @@ class ChatController extends Controller
     {
         $chatId = $request->input('chat_id');
         $input = $request->input('input');
-        $chained = $request->input('chained');
+        $chained = Session::get('chained') == "true";
         if ($chatId && $input) {
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
@@ -96,7 +103,7 @@ class ChatController extends Controller
                     ->get()
                     ->toJson();
             } else {
-                $tmp = json_encode([["msg"=>$request->input('input'), 'isbot'=>false]]);
+                $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
             }
             $history = new Histories();
             $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);

@@ -82,6 +82,8 @@ Route::middleware('auth', 'verified')->group(function () {
                 }
                 return view('chat');
             })->name('chat.new');
+            
+            Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
             Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
             Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
             Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
