@@ -6,6 +6,7 @@ services:
     build: .
     devices:
       - /dev/nvidia0:/dev/nvidia0
+    restart: always
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - AGENT_ENDPOINT=http://web_agent:9000/v1.0/

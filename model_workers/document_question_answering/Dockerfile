@@ -1,4 +1,5 @@
-FROM model-api
+ARG MODEL_API_SERVER_VERSION=latest
+FROM model-api:${MODEL_API_SERVER_VERSION}
 
 RUN mkdir -p /model_api
 
