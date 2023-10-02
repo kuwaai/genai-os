@@ -5,7 +5,9 @@ import torch, accelerate, time
 import chevron
 import logging
 from pathlib import Path
-from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer, StoppingCriteria, StoppingCriteriaList, pipeline
+from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer, \
+                         StoppingCriteria, StoppingCriteriaList, \
+                         pipeline, GenerationConfig
 
 from model_api_server.datatype import ChatRecord, Role
 
@@ -13,7 +15,7 @@ class StopOnTokens(StoppingCriteria):
     def __init__(self, tokenizer: AutoTokenizer):
         stop_list = ['<s>', '</s>', '[INST]', '\nQuestion:', "[INST: ]"]
         to_token_id = lambda x: torch.LongTensor(tokenizer(x)['input_ids']).to('cuda')
-        self.stop_token_ids = [to_token_id(x) for x in stop_list]
+        self.stop_token_ids = map(to_token_id, stop_list)
     
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
         for stop_ids in self.stop_token_ids:
@@ -37,12 +39,20 @@ class TaideLlm:
             torch_dtype=torch.float16
         )
         model.eval()
+
         tokenizer = AutoTokenizer.from_pretrained(model_path)
+        generation_config = GenerationConfig.from_pretrained(
+            model_path,
+            do_sample=True,
+            temperature=0.2,
+            max_new_tokens=2048,
+            repetition_penalty = 1.0,
+        )
 
         self.pipe = pipeline(
             model=model,
             tokenizer=tokenizer,
-            return_full_text=True,
+            return_full_text=False,
             task='text-generation',
             stopping_criteria=StoppingCriteriaList([StopOnTokens(tokenizer)]),
             temperature=0.2,
@@ -53,7 +63,6 @@ class TaideLlm:
 
         prompt_template_file = Path(prompt_template_path)
         self.prompt_template = prompt_template_file.read_text()
-        self.logger.info('Prompt template: {}'.format(self.prompt_template))
 
     async def complete(self, chat_history: [ChatRecord], system_prompt: str): 
         result = ''
@@ -70,14 +79,20 @@ class TaideLlm:
             prompt = ''
             
             # Trim the over-length history
+            system_data = {
+                    'system': system_prompt,
+                    'user': '請用中文回答我',
+                    'bot': '好! 我樂於助人,是你的好助手。'
+                }
             while True:
-                data[0]['system'] = system_prompt
-                prompt = chevron.render(self.prompt_template, {'history': data})
-                self.logger.info('Prompt: {}'.format(prompt))
+                prompt = chevron.render(
+                    self.prompt_template,
+                    {'history': [system_data] + data}
+                )
                 if len(prompt) < self.token_limit: break
                 data = data[1:]
             
-            self.logger.info('Prompt: {}'.format(prompt))
+            self.logger.info('Final Prompt: {}'.format(prompt))
             
             self.logger.info('Generating...')
             result = self.pipe(prompt)[0]['generated_text']
@@ -85,7 +100,7 @@ class TaideLlm:
             
         except Exception as e:
             result = ''
-            print(e)
+            self.logger.error(e)
         finally:
             torch.cuda.empty_cache()
             self.logger.info('Generation finished.')

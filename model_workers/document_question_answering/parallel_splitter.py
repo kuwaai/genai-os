@@ -34,11 +34,8 @@ class ParallelSplitter:
 
     # Disable original tokenizer since they may cause deadlock
     # Ref: https://stackoverflow.com/a/67254879
-    # os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+    os.environ['TOKENIZERS_PARALLELISM'] = 'false'
     chunked_docs = thread_pool.map(SplitDocumentJob(self.chunk_size, self.chunk_overlap), docs)
-    # chunked_docs = []
-    # for doc in docs:
-        # chunked_docs.append(SplitDocumentJob(self.chunk_size, self.chunk_overlap)(doc))
     chunks = list(itertools.chain(*chunked_docs)) # Flatten
 
     return chunks
