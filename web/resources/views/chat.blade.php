@@ -184,6 +184,9 @@
                             <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
+                                <input id="chained" name="chained" value="1" style="display:none;" disabled>
+                                <button type="button" onclick="$('#chained').prop('disabled', !$('#chained').prop('disabled'));$(this).toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700'); $(this).text($('#chained').prop('disabled') ? 'Unchain' : 'Chained')"
+                                    class="my-auto text-white mr-3 bg-red-600 hover:bg-red-700 px-3 py-2 rounded">Unchain</button>
                                 <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
                                     oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>

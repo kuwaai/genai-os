@@ -65,7 +65,10 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
             $history->save();
-            $tmp = Histories::where("chat_id","=",$chat->id)->select('msg','isbot')->get()->toJson();
+            $tmp = Histories::where('chat_id', '=', $chat->id)
+                ->select('msg', 'isbot')
+                ->get()
+                ->toJson();
             $history = new Histories();
             $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
             $history->save();
@@ -80,11 +83,21 @@ class ChatController extends Controller
     {
         $chatId = $request->input('chat_id');
         $input = $request->input('input');
+        $chained = $request->input('chained');
         if ($chatId && $input) {
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
-            $tmp = Histories::where("chat_id","=",$chatId)->select('msg','isbot')->orderby('created_at')->orderby('id', "desc")->get()->toJson();
+            if ($chained) {
+                $tmp = Histories::where('chat_id', '=', $chatId)
+                    ->select('msg', 'isbot')
+                    ->orderby('created_at')
+                    ->orderby('id', 'desc')
+                    ->get()
+                    ->toJson();
+            } else {
+                $tmp = json_encode([["msg"=>$request->input('input'), 'isbot'=>false]]);
+            }
             $history = new Histories();
             $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
             $history->save();
@@ -142,13 +155,12 @@ class ChatController extends Controller
                         flush();
                         $client->disconnect();
                     } elseif ($type == 'New') {
-                        echo 'data: ' . json_encode(["msg"=>json_decode($msg)->msg])  . "\n\n";
+                        echo 'data: ' . json_encode(['msg' => json_decode($msg)->msg]) . "\n\n";
                         ob_flush();
                         flush();
                     }
                 });
-            }
-            else{
+            } else {
                 global $listening;
                 $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 if (count($listening) > 0) {
@@ -169,7 +181,7 @@ class ChatController extends Controller
                                 $client->disconnect();
                             }
                         } elseif ($type == 'New') {
-                            echo 'data: ' . json_encode(["history_id"=>$history_id, "msg"=>json_decode($msg)->msg])  . "\n\n";
+                            echo 'data: ' . json_encode(['history_id' => $history_id, 'msg' => json_decode($msg)->msg]) . "\n\n";
                             ob_flush();
                             flush();
                         }
