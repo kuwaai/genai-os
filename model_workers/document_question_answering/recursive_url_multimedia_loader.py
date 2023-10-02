@@ -42,9 +42,10 @@ async def _extractor(content: str, url: str, content_type: str) -> str:
     file_path = data_dir / Path('{}/{}'.format(url.netloc.replace('.', '_'), url.path))
     if url.path == '' or url.path[-1] == '/':
         file_path = file_path / 'index'
-    if file_path.suffix == '':
-        guessed_suffixes = mimetypes.guess_all_extensions(content_type.split(';', 1)[0])
-        file_path = file_path.with_suffix(guessed_suffixes[0])
+    
+    # Correct the suffix
+    guessed_suffixes = mimetypes.guess_all_extensions(content_type.split(';', 1)[0])
+    file_path = file_path.with_suffix('').with_suffix(guessed_suffixes[0])
     
     # Make directory and write the file
     # Note that in most of OS, file operation is synchronous.
