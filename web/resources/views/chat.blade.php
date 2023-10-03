@@ -50,7 +50,7 @@
                                 @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
                                     <div
                                         class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                        <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                        <a style="word-break:break-all" class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto overflow-x-hidden scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                             href="{{ route('chat.chat', $chat->id) }}">
                                             <p
                                                 class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
@@ -92,7 +92,7 @@
                         <p class="flex items-center">New Chat with
                             {{ App\Models\LLMs::findOrFail(request()->route('llm_id'))->name }}</p>
                     @elseif(request()->route('chat_id'))
-                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto scrollbar">
+                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar" style='word-break:break-word'>
                             {{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</p>
 
                         <div class="flex">
@@ -166,8 +166,6 @@
                                 <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
                                     oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-
-
                                 <button type="submit"
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
@@ -184,11 +182,13 @@
                             <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
+                                <input id="chained" style="display:none;"
+                                    {{ \Session::get('chained') ? '' : 'disabled' }}>
+                                <button type="button" onclick="chain_toggle()" id="chain_btn"
+                                    class="my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? 'Chained' : 'Unchain' }}</button>
                                 <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
                                     oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-
-
                                 <button type="submit"
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
@@ -205,6 +205,16 @@
             </div>
             @if (request()->route('chat_id'))
                 <script>
+                    function chain_toggle() {
+                        $.get("{{ route('chat.chain') }}", {
+                            switch: $('#chained').prop('disabled')
+                        }, function() {
+                            $('#chained').prop('disabled', !$('#chained').prop('disabled'));
+                            $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
+                            $('#chain_btn').text($('#chained').prop('disabled') ? 'Unchain' : 'Chained')
+                        })
+                    }
+
                     function deleteChat() {
                         $("#deleteChat").submit();
                     }
