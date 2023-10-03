@@ -168,7 +168,7 @@
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
 
 
-                                <button type="submit"
+                                <button type="submit" id="chat_submit"
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
@@ -189,7 +189,7 @@
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
 
 
-                                <button type="submit"
+                                <button type="submit" id="chat_submit"
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
@@ -232,14 +232,35 @@
                         $("#chatHeader button").find('.fa-save').parent().addClass('hidden');
                         $("#chatHeader >p").text(input.val())
                     }
+                    const chat_input = document.getElementById('chat_input');
+                    const chat_submit = document.getElementById('chat_submit');
+
+                    function preventEnterKey(event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            chat_input.disabled = true;
+                            chat_submit.disabled = true;
+                            chat_input.value = "Waiting...";
+                        }
+                    }
 
                     task = new EventSource("{{ route('chat.sse') }}", {
                         withCredentials: false
                     });
                     task.addEventListener('error', error => {
-                        task.close();
+                        if (event.eventPhase === EventSource.CLOSED) {
+                            chat_input.disabled = false;
+                            chat_submit.disabled = false;
+                            chat_input.value = "";
+                            chat_input.removeEventListener('keydown', preventEnterKey);
+                            task.close();
+                        }
                     });
                     task.addEventListener('message', event => {
+                        chat_input.disabled = true;
+                        chat_submit.disabled = true;
+                        chat_input.value = "Waiting...";
+                        chat_input.addEventListener('keydown', preventEnterKey);
                         data = JSON.parse(event.data)
                         const number = data["history_id"];
                         const msg = data["msg"];
@@ -247,8 +268,9 @@
                     });
                 </script>
             @endif
-            <script>
+            <script>         
                 if ("#chat_input") {
+                    
                     $("#chat_input").focus();
 
                     function adjustTextareaRows() {
@@ -267,6 +289,11 @@
                         if (event.key === "Enter" && !event.shiftKey) {
                             event.preventDefault();
                             $("#prompt_area").submit();
+                            const chat_input = document.getElementById('chat_input');
+                            const chat_submit = document.getElementById('chat_submit');
+                            chat_input.disabled = true;
+                            chat_submit.disabled = true;
+                            chat_input.value = "Waiting...";
                         } else if (event.key === "Enter" && event.shiftKey) {
                             event.preventDefault();
                             var cursorPosition = this.selectionStart;
