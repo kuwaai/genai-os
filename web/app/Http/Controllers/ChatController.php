@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
 use App\Models\Histories;
@@ -23,8 +24,8 @@ class ChatController extends Controller
 {
     public function update_chain(Request $request)
     {
-        $state = $request->input('switch') == "true";
-        Session::put("chained",$state);
+        $state = $request->input('switch') == 'true';
+        Session::put('chained', $state);
     }
 
     public function home(Request $request)
@@ -49,6 +50,49 @@ class ChatController extends Controller
         } else {
             return view('chat');
         }
+    }
+
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:pdf|max:16384',
+        ]);
+        $llm_id = $request->input('llm_id');
+
+        if ($llm_id && LLMs::find($llm_id)->exists() && $request->file()) {
+            // Start uploading the file
+            $user = $request->user();
+            $userId = $user->id;
+            $directory = 'pdfs/' . $userId; // Directory relative to 'public/storage/'
+            $storagePath = public_path('storage/' . $directory); // Adjusted path
+
+            $fileName = time() . '_' . $request->file->getClientOriginalName();
+            $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
+
+            $files = File::files($storagePath);
+
+            if (count($files) > 5) {
+                usort($files, function ($a, $b) {
+                    return filectime($a) - filectime($b);
+                });
+
+                while (count($files) > 5) {
+                    $oldestFile = array_shift($files);
+                    File::delete($storagePath . '/' . $oldestFile->getFilename());
+                }
+            }
+            //Create a chat and send that url into the llm
+            $msg = '/url ' . url('storage/' . $directory . '/' . $fileName);
+            $chat = new Chats();
+            $chat->fill(['name' => $msg, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+            $chat->save();
+            $history = new Histories();
+            $history->fill(['msg' => $msg, 'chat_id' => $chat->id, 'isbot' => false]);
+            $history->save();
+            RequestChat::dispatch(json_encode([['msg'=>$llm_id, 'isbot'=>false]]), LLMs::find($llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+            return Redirect::route('chat.chat', $chat->id);
+        }
+        return back();
     }
 
     public function main(Request $request)
@@ -90,12 +134,12 @@ class ChatController extends Controller
     {
         $chatId = $request->input('chat_id');
         $input = $request->input('input');
-        $chained = Session::get('chained') == "true";
+        $chained = Session::get('chained') == 'true';
         if ($chatId && $input) {
             $history = new Histories();
             $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
             $history->save();
-            if ($chained) {
+            if (LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code == "doc_qa" || $chained) {
                 $tmp = Histories::where('chat_id', '=', $chatId)
                     ->select('msg', 'isbot')
                     ->orderby('created_at')
@@ -172,27 +216,31 @@ class ChatController extends Controller
                 $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 if (count($listening) > 0) {
                     $client = Redis::connection();
-                    $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
-                        global $listening;
-                        [$type, $msg] = explode(' ', $message, 2);
-                        $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                        if ($type == 'Ended') {
-                            $key = array_search($history_id, $listening);
-                            if ($key !== false) {
-                                unset($listening[$key]);
-                            }
-                            if (count($listening) == 0) {
-                                echo "event: close\n\n";
+                    try{
+                        $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
+                            global $listening;
+                            [$type, $msg] = explode(' ', $message, 2);
+                            $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                            if ($type == 'Ended') {
+                                $key = array_search($history_id, $listening);
+                                if ($key !== false) {
+                                    unset($listening[$key]);
+                                }
+                                if (count($listening) == 0) {
+                                    echo "data: finished\n\n";
+                                    echo "event: close\n\n";
+                                    ob_flush();
+                                    flush();
+                                    $client->disconnect();
+                                }
+                            } elseif ($type == 'New') {
+                                echo 'data: ' . json_encode(['history_id' => $history_id, 'msg' => json_decode($msg)->msg]) . "\n\n";
                                 ob_flush();
                                 flush();
-                                $client->disconnect();
                             }
-                        } elseif ($type == 'New') {
-                            echo 'data: ' . json_encode(['history_id' => $history_id, 'msg' => json_decode($msg)->msg]) . "\n\n";
-                            ob_flush();
-                            flush();
-                        }
-                    });
+                        });
+                    }catch(RedisException){
+                    }
                 }
             }
         });

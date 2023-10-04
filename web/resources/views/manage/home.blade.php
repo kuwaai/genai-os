@@ -19,25 +19,25 @@
                                     <li class="mr-2" role="presentation">
                                         <button class="inline-block p-4 border-b-2 rounded-t-lg" id="groups-tab"
                                             data-tabs-target="#groups" type="button" role="tab"
-                                            aria-controls="groups" aria-selected="{{session('last_tab') ? 'false' : 'true'}}">Groups</button>
+                                            aria-controls="groups" aria-selected="{{session('last_tab') ? 'false' : 'true'}}">{{__("Groups")}}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
                                         <button
                                             class="inline-block p-4 border-b-2 rounded-t-lg"
                                             id="users-tab" data-tabs-target="#users" type="button" role="tab"
-                                            aria-controls="users" aria-selected="{{session('last_tab') == 'users' ? 'true' : 'false'}}">Users</button>
+                                            aria-controls="users" aria-selected="{{session('last_tab') == 'users' ? 'true' : 'false'}}">{{__("Users")}}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
                                         <button
                                             class="inline-block p-4 border-b-2 rounded-t-lg"
                                             id="llms-tab" data-tabs-target="#llms" type="button" role="tab"
-                                            aria-controls="llms" aria-selected="{{session('last_tab') == 'llms' ? 'true' : 'false'}}">LLMs</button>
+                                            aria-controls="llms" aria-selected="{{session('last_tab') == 'llms' ? 'true' : 'false'}}">{{__("LLMs")}}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
                                         <button
                                             class="inline-block p-4 border-b-2 rounded-t-lg"
                                             id="settings-tab" data-tabs-target="#settings" type="button" role="tab"
-                                            aria-controls="settings" aria-selected="{{session('last_tab') == 'settings' ? 'true' : 'false'}}">Settings</button>
+                                            aria-controls="settings" aria-selected="{{session('last_tab') == 'settings' ? 'true' : 'false'}}">{{__("Settings")}}</button>
                                     </li>
                                 </ul>
                             </div>

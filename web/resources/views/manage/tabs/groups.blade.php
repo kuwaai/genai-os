@@ -41,8 +41,7 @@
         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
             <button onclick="edit_group(undefined)" id="new_group_btn"
                 class="flex menu-btn flex items-center justify-center w-full h-12 bg-green-400 hover:bg-green-500 dark:bg-green-600 dark:hover:bg-green-700 transition duration-300">
-                <p class="flex-1 text-center text-white">New
-                    Group</p>
+                <p class="flex-1 text-center text-white">{{__("New Group")}}</p>
             </button>
         </div>
         <hr class="border-black dark:border-gray-300 mb-2">
@@ -76,7 +75,7 @@
             action="{{ route('manage.group.create') }}">
             @csrf
             <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 text-white flex items-center justify-center">
-                <p class="text-lg mr-auto text-gray-700 dark:text-white">Create a new Group</p>
+                <p class="text-lg mr-auto text-gray-700 dark:text-white">{{__("Create a new Group")}}</p>
                 <button
                     class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">Create</button>
             </div>
@@ -294,7 +293,7 @@
                     </div>
                 </div>
                 <div class="w-full p-3">
-                    <span class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">Tab Permissions</span>
+                    <span class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">{{__("Tab Permissions")}}</span>
                     <div id="edit_tab_permissions">
                         @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
                             <div

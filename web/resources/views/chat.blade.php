@@ -44,13 +44,15 @@
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                         href="{{ route('chat.new', $LLM->id) }}">
-                                        <p class="flex-1 text-center text-gray-700 dark:text-white">New Chat</p>
+                                        <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('New Chat') }}
+                                        </p>
                                     </a>
                                 </div>
                                 @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
                                     <div
                                         class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                        <a style="word-break:break-all" class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto overflow-x-hidden scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                        <a style="word-break:break-all"
+                                            class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto overflow-x-hidden scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                             href="{{ route('chat.chat', $chat->id) }}">
                                             <p
                                                 class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
@@ -89,10 +91,11 @@
                 @endif
                 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
                     @if (request()->route('llm_id'))
-                        <p class="flex items-center">New Chat with
+                        <p class="flex items-center">{{ __('New Chat with') }}
                             {{ App\Models\LLMs::findOrFail(request()->route('llm_id'))->name }}</p>
                     @elseif(request()->route('chat_id'))
-                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar" style='word-break:break-word'>
+                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar"
+                            style='word-break:break-word'>
                             {{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</p>
 
                         <div class="flex">
@@ -155,15 +158,29 @@
                                 </div>
                             @endif
                         @endforeach
+                    @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
+                        <p class="m-auto text-white">{!!__("A PDF document is required in order to use this LLM, <br>Please upload a PDF file first.")!!}</p>
                     @endif
                 </div>
-                <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
-                    @if (request()->route('llm_id'))
+                <div
+                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa' ? 'overflow-x-hidden' : '' }}">
+                    @if (request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
+                        <form method="post" action="{{ route('chat.upload') }}" class="m-auto"
+                            enctype="multipart/form-data">
+                            @csrf
+                            <input name='llm_id' style='display:none;' value='{{ request()->route('llm_id') }}'>
+                            <input id="upload" type="file" name="file" style="display: none;"
+                                onchange='$(this).parent().submit();'>
+                            <label for="upload"
+                                class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">Upload
+                                PDF</label>
+                        </form>
+                    @elseif (request()->route('llm_id'))
                         <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
                             <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
-                                <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
+                                <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
                                     oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                                 <button type="submit"
@@ -181,12 +198,15 @@
                         <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
                             <div class="flex items-end justify-end">
                                 @csrf
-                                <input name="chat_id" value="{{ request()->route('chat_id') }}" style="display:none;">
+                                <input name="chat_id" value="{{ request()->route('chat_id') }}"
+                                    style="display:none;">
                                 <input id="chained" style="display:none;"
                                     {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                <button type="button" onclick="chain_toggle()" id="chain_btn"
-                                    class="my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? 'Chained' : 'Unchain' }}</button>
-                                <textarea tabindex="0" data-id="root" placeholder="Send a message" rows="1" max-rows="5"
+                                @if (App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code != 'doc_qa')
+                                    <button type="button" onclick="chain_toggle()" id="chain_btn"
+                                        class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
+                                @endif
+                                <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
                                     oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                                 <button type="submit"
@@ -211,7 +231,8 @@
                         }, function() {
                             $('#chained').prop('disabled', !$('#chained').prop('disabled'));
                             $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
-                            $('#chain_btn').text($('#chained').prop('disabled') ? 'Unchain' : 'Chained')
+                            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
+                                '{{ __('Chained') }}')
                         })
                     }
 
@@ -250,10 +271,14 @@
                         task.close();
                     });
                     task.addEventListener('message', event => {
-                        data = JSON.parse(event.data)
-                        const number = data["history_id"];
-                        const msg = data["msg"];
-                        $('#task_' + number).text(msg);
+                        if (event.data == "finished") {
+                            console.log("finished!")
+                        } else {
+                            data = JSON.parse(event.data)
+                            const number = data["history_id"];
+                            const msg = data["msg"];
+                            $('#task_' + number).text(msg);
+                        }
                     });
                 </script>
             @endif
@@ -262,16 +287,18 @@
                     $("#chat_input").focus();
 
                     function adjustTextareaRows() {
-                        const textarea = $('#chat_input');
-                        const maxRows = parseInt(textarea.attr('max-rows')) || 5;
-                        const lineHeight = parseInt(textarea.css('line-height'));
+                        if ($('#chat_input').length) {
+                            const textarea = $('#chat_input');
+                            const maxRows = parseInt(textarea.attr('max-rows')) || 5;
+                            const lineHeight = parseInt(textarea.css('line-height'));
 
-                        textarea.attr('rows', 1);
+                            textarea.attr('rows', 1);
 
-                        const contentHeight = textarea[0].scrollHeight;
-                        const rowsToDisplay = Math.floor(contentHeight / lineHeight);
+                            const contentHeight = textarea[0].scrollHeight;
+                            const rowsToDisplay = Math.floor(contentHeight / lineHeight);
 
-                        textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+                            textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+                        }
                     }
                     $("#chat_input").on("keydown", function(event) {
                         if (event.key === "Enter" && !event.shiftKey) {

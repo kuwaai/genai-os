@@ -28,18 +28,18 @@
                 <button type="button"
                     class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
                     data-modal-hide="create-model-modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
-                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
-                        <path
-                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
-                            fill="currentColor"></path>
+                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd"></path>
                     </svg>
                     <span class="sr-only">Close modal</span>
                 </button>
                 <!-- Modal header -->
                 <div class="px-6 py-4 border-b rounded-t dark:border-gray-600">
                     <h3 class="text-base font-semibold text-gray-900 lg:text-xl dark:text-white">
-                        Create Duel Chat
+                        {{ __('Create Duel Chat') }}
                     </h3>
                 </div>
                 <!-- Modal body -->
@@ -48,8 +48,8 @@
                     @csrf
                     <input type="hidden" name="limit"
                         value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
-                    <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Select the LLMs you want to use at
-                        the same time.</p>
+                    <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        {{ __('Select the LLMs you want to use at the same time.') }}</p>
                     <ul class="my-4 space-y-3">
                         @foreach ($result as $LLM)
                             <li>
@@ -66,7 +66,7 @@
                                             <div class="w-full text-lg font-semibold leading-none">{{ $LLM->name }}
                                             </div>
                                             <div class="w-full text-sm leading-none">
-                                                {{ $LLM->description ? $LLM->description : 'This LLM is currently available!' }}
+                                                {{ $LLM->description ? $LLM->description : __("This LLM is currently available!") }}
                                             </div>
                                         </div>
                                     </div>
@@ -78,12 +78,12 @@
                         <div class="border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                             <button type="submit"
                                 class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-500 hover:bg-gray-400 transition duration-300">
-                                <p class="flex-1 text-center text-gray-700 dark:text-white">Create Chat</p>
+                                <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create Chat') }}</p>
                             </button>
                         </div>
                     </div>
                     <span id="create_error" class="font-medium text-sm text-red-800 rounded-lg dark:text-red-400 hidden"
-                        role="alert">You must select at least 2 LLMs</span>
+                        role="alert">{{__("You must select at least 2 LLMs")}}</span>
                 </form>
             </div>
         </div>
@@ -104,7 +104,7 @@
                         data-modal-target="create-model-modal" data-modal-toggle="create-model-modal">
                         <button
                             class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == 3 ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
-                            <p class="flex-1 text-center text-gray-700 dark:text-white">Create Chat</p>
+                            <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create Chat') }}</p>
                         </button>
                     </div>
                     @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
@@ -149,7 +149,7 @@
         @if (!request()->route('duel_id'))
             <div id="histories_hint"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                Select a chatroom to begin with
+                {{ __('Select a chatroom to begin with') }}
             </div>
         @else
             <div id="histories"
