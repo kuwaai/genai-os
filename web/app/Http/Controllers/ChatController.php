@@ -89,7 +89,7 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $msg, 'chat_id' => $chat->id, 'isbot' => false]);
             $history->save();
-            RequestChat::dispatch(json_encode([['msg'=>$llm_id, 'isbot'=>false]]), LLMs::find($llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+            RequestChat::dispatch(json_encode([['msg'=>$msg, 'isbot'=>false]]), LLMs::find($llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
             return Redirect::route('chat.chat', $chat->id);
         }
         return back();
