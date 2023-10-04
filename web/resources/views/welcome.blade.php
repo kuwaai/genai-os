@@ -214,7 +214,7 @@
                     <div class="flex items-center gap-4">
                         <a href="https://www.nuk.edu.tw/" target="_blank"
                             class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
-                            {{__("Developed by NUK")}}
+                            {!!__("Developed by NUK")!!}
                         </a>
                     </div>
                 </div>
