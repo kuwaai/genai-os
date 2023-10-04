@@ -89,6 +89,9 @@ class ChatController extends Controller
             $history = new Histories();
             $history->fill(['msg' => $msg, 'chat_id' => $chat->id, 'isbot' => false]);
             $history->save();
+            $history = new Histories();
+            $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+            $history->save();
             Redis::rpush('usertask_' . Auth::user()->id, $history->id);
             RequestChat::dispatch(json_encode([['msg'=>$msg, 'isbot'=>false]]), LLMs::find($llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
             return Redirect::route('chat.chat', $chat->id);
