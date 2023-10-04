@@ -26,7 +26,7 @@
                     <input name="id" type="hidden">
                     <button type="submit"
                         class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                        Delete
+                        {{__("Delete")}}
                     </button>
                 </form>
                 <button data-modal-hide="delete_group_modal" type="button"
@@ -77,21 +77,21 @@
             <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 text-white flex items-center justify-center">
                 <p class="text-lg mr-auto text-gray-700 dark:text-white">{{__("Create a new Group")}}</p>
                 <button
-                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">Create</button>
+                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{__("Create")}}</button>
             </div>
             <div class="scrollbar overflow-y-auto w-full">
                 <div class="grid gap-3 grid-cols-1 xl:grid-cols-4 md:grid-cols-2 w-full px-3 pt-2">
                     <div>
                         <label for="create_group_name"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Name")}}
                             <span class="text-red-500">*</span></label>
                         <input type="text" id="create_group_name" name="name" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Group name" required>
+                            placeholder="{{__('Group name')}}" required>
                     </div>
                     <div>
                         <label for="create_group_invite_code"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Invite Code</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Invite Code")}}</label>
                         <div class="flex rounded-lg overflow-hidden">
                             <label class="bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
                                 for="create_enable_invite_code">
@@ -100,7 +100,7 @@
                             </label>
                             <input type="text" id="create_group_invite_code" name="invite_code" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Invite code" required disabled>
+                                placeholder="{{__('Invite Code')}}" required disabled>
                             <div class="p-3 rounded-r-lg bg-green-500 hover:bg-green-600 cursor-pointer"
                                 style="display:none" onclick="$(this).prev().val(generateRandomString(12))"><svg
                                     xmlns="http://www.w3.org/2000/svg" height="1em" style="fill:white"
@@ -112,15 +112,14 @@
                     </div>
                     <div class="md:col-span-2">
                         <label for="create_group_describe"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Describe</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Describe")}}</label>
                         <input type="text" id="create_group_describe" name="describe" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Details for the group">
+                            placeholder="{{__('Details for the group')}}">
                     </div>
                 </div>
                 <div class="w-full p-3">
-                    <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tab
-                        Permissions</span>
+                    <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Tab Permissions")}}</span>
                     <div id="edit_tab_permissions">
                         @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
                             <div
@@ -129,7 +128,7 @@
                                     <label for="create_checkbox_{{ $perm->id }}">
                                         <span
                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ substr($perm->name, 4) }}
+                                            {{ __(substr($perm->name, 4)) }}
                                         </span>
                                         <input id="create_checkbox_{{ $perm->id }}" type="checkbox"
                                             onclick="$(this).closest('div').next().toggle();$(this).closest('div').next().next().toggle();$(this).closest('div').parent().find('input').prop('disabled',!$(this).prop('checked')).prop('checked',false); $(this).prop('checked',!$(this).prop('disabled')).prop('disabled',false)"
@@ -156,7 +155,7 @@
                                                         for="create_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                         <span
                                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                            {{ $action }}
+                                                            {{ __($action) }}
                                                         </span>
                                                         <input type="checkbox"
                                                             id="create_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
@@ -190,8 +189,7 @@
                     </div>
                 </div>
                 <div class="w-full px-3 mb-3">
-                    <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Model
-                        Permissions</span>
+                    <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Model Permissions")}}</span>
                     <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
                         @foreach (DB::table(function ($query) {
         $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
@@ -218,9 +216,9 @@
                 <p class="text-lg mr-auto dark:text-white text-gray-700">Edit NULL</p><a id="delete_group_btn"
                     onclick="delete_group(undefined)" data-modal-target="delete_group_modal"
                     data-modal-toggle="delete_group_modal"
-                    class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">Delete</a>
+                    class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">{{__("Delete")}}</a>
                 <button
-                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">Update</button>
+                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{__("Update")}}</button>
             </div>
             <div class="scrollbar overflow-y-auto w-full">
                 @if (session('last_action') === 'update')
@@ -234,7 +232,7 @@
                                 <path
                                     d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                             </svg>
-                            <div class="ml-3 text-sm font-medium">Group Updated!
+                            <div class="ml-3 text-sm font-medium">{{__("Group Updated!")}}
                             </div>
                         </div>
                     @endif
@@ -249,7 +247,7 @@
                                 <path
                                     d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                             </svg>
-                            <div class="ml-3 text-sm font-medium">Group Created!
+                            <div class="ml-3 text-sm font-medium">{{__("Group Created!")}}
                             </div>
                         </div>
                     @endif
@@ -257,15 +255,15 @@
                 <div class="grid gap-3 grid-cols-1 xl:grid-cols-4 md:grid-cols-2 w-full px-3 pt-2">
                     <div>
                         <label for="edit_group_name"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Name")}}
                             <span class="text-red-500">*</span></label>
                         <input type="text" id="edit_group_name" name="name" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Group name" required>
+                            placeholder="{{__('Group name')}}" required>
                     </div>
                     <div>
                         <label for="edit_group_invite_code"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Invite Code</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Invite Code")}}</label>
                         <div class="flex rounded-lg overflow-hidden">
                             <label class="bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
                                 for="edit_enable_invite_code">
@@ -274,7 +272,7 @@
                             </label>
                             <input type="text" id="edit_group_invite_code" name="invite_code" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Invite code" required disabled>
+                                placeholder="{{__('Invite Code')}}" required disabled>
                             <div class="p-3 rounded-r-lg bg-green-500 hover:bg-green-600 cursor-pointer"
                                 style="display:none" onclick="$(this).prev().val(generateRandomString(12))"><svg
                                     xmlns="http://www.w3.org/2000/svg" height="1em" style="fill:white"
@@ -286,10 +284,10 @@
                     </div>
                     <div class="md:col-span-2">
                         <label for="edit_group_describe"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Describe</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Describe")}}</label>
                         <input type="text" id="edit_group_describe" name="describe" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Details for the group">
+                            placeholder="{{__('Details for the group')}}">
                     </div>
                 </div>
                 <div class="w-full p-3">
@@ -302,7 +300,7 @@
                                     <label for="edit_checkbox_{{ $perm->id }}">
                                         <span
                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ substr($perm->name, 4) }}
+                                            {{ __(substr($perm->name, 4)) }}
                                         </span>
                                         <input id="edit_checkbox_{{ $perm->id }}" type="checkbox"
                                             onclick="$(this).closest('div').next().toggle();$(this).closest('div').next().next().toggle();$(this).closest('div').parent().find('input').prop('disabled',!$(this).prop('checked')).prop('checked',false); $(this).prop('checked',!$(this).prop('disabled')).prop('disabled',false)"
@@ -329,7 +327,7 @@
                                                         for="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                         <span
                                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                            {{ $action }}
+                                                            {{ __($action) }}
                                                         </span>
                                                         <input type="checkbox"
                                                             id="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
@@ -362,8 +360,7 @@
                         @endforeach
                     </div>
                     <div class="w-full mb-3">
-                        <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Model
-                            Permissions</span>
+                        <span class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Model Permissions")}}</span>
                         <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
                             @foreach (DB::table(function ($query) {
         $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
@@ -416,7 +413,7 @@
             $('#create_group_form').hide();
             $('#new_group_btn').addClass("bg-green-600 hover:bg-green-700")
             $('#new_group_btn').removeClass("hover:bg-gray-600")
-            $("#edit_group_form >div >p").text("Edit group " + data[0])
+            $("#edit_group_form >div >p").text("{{__('Edit group')}} " + data[0])
             $("#edit_group_form input[type=checkbox]").prop("checked", false)
             $("#edit_group_id").val(index)
             $("#edit_group_name").val(data[0])

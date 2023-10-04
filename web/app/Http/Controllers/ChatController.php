@@ -55,7 +55,7 @@ class ChatController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:pdf|max:16384',
+            'file' => 'required|max:16384',
         ]);
         $llm_id = $request->input('llm_id');
 
@@ -241,6 +241,12 @@ class ChatController extends Controller
                         });
                     }catch(RedisException){
                     }
+                }else{
+                    echo "data: finished\n\n";
+                    echo "event: close\n\n";
+                    ob_flush();
+                    flush();
+                    $client->disconnect();
                 }
             }
         });

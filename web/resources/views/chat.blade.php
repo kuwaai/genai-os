@@ -159,7 +159,7 @@
                             @endif
                         @endforeach
                     @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
-                        <p class="m-auto text-white">{!!__("A PDF document is required in order to use this LLM, <br>Please upload a PDF file first.")!!}</p>
+                        <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
                     @endif
                 </div>
                 <div
@@ -172,8 +172,7 @@
                             <input id="upload" type="file" name="file" style="display: none;"
                                 onchange='$(this).parent().submit();'>
                             <label for="upload"
-                                class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">Upload
-                                PDF</label>
+                                class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
                         </form>
                     @elseif (request()->route('llm_id'))
                         <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
@@ -207,9 +206,9 @@
                                         class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
                                 @endif
                                 <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
-                                    oninput="adjustTextareaRows()" id="chat_input" name="input"
+                                    oninput="adjustTextareaRows()" id="chat_input" name="input" readonly
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                                <button type="submit"
+                                <button type="submit" id='submit_msg' style='display:none;'
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                         class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
@@ -264,6 +263,18 @@
                         $("#chatHeader >p").text(input.val())
                     }
 
+                    $("#chat_input").val("訊息處理中...請稍後...")
+                    $chattable = false
+                    $("#prompt_area").submit(function(event) {
+                        event.preventDefault();
+                        if ($chattable) {
+                            this.submit();
+                            $chattable = false
+                        }
+                        $("#submit_msg").hide()
+                        $("#chat_input").val("訊息處理中...請稍後...")
+                        $("#chat_input").prop("readonly", true)
+                    })
                     task = new EventSource("{{ route('chat.sse') }}", {
                         withCredentials: false
                     });
@@ -272,7 +283,10 @@
                     });
                     task.addEventListener('message', event => {
                         if (event.data == "finished") {
-                            console.log("finished!")
+                            $chattable = true
+                            $("#submit_msg").show()
+                            $("#chat_input").val("")
+                            $("#chat_input").prop("readonly", false)
                         } else {
                             data = JSON.parse(event.data)
                             const number = data["history_id"];

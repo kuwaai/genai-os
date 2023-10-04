@@ -73,7 +73,9 @@ class RequestChat implements ShouldQueue
             ]);
             if ($response->getBody()->getContents() == 'BUSY') {
                 $this->release(10);
-            } else {
+            } else if ($response->getBody()->getContents() == "NOMACHINE"){
+                Log::channel('analyze')->Info("NOMACHINE: " . $this->access_code . " | " . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+            } else if ($response->getBody()->getContents() == "READY") {
                 try {
                     $response = $client->post($agent_location . $this->agent_version . '/chat/completions', [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
