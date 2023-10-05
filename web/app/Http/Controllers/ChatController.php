@@ -73,7 +73,7 @@ class ChatController extends Controller
             $llm_id = $request->input('llm_id');
 
             $request->validate([
-                'file' => 'required|max:16384',
+                'file' => 'required|max:10240',
             ]);
 
             if ($llm_id && in_array($llm_id, $result) && $request->file()) {

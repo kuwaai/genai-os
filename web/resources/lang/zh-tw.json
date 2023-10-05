@@ -93,7 +93,7 @@
 "Invite Token":"邀請碼",
 "Register":"註冊",
 "Already registered?":"已經註冊了？登入",
-"A document is required in order to use this LLM, <br>Please upload a file first.":"需要由一個文件起頭才能使用該模型，<br>請先上傳一個文件檔案。",
+"A document is required in order to use this LLM, <br>Please upload a file first.":"需要由一個文件起頭才能使用該模型，<br>請先上傳一個文件檔案(上限10MB)。",
 "Invite Code":"邀請碼",
 "Describe":"介紹",
 "Edit group":"編輯群組",
