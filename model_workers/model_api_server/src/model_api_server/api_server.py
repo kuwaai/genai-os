@@ -16,6 +16,11 @@ from starlette.responses import JSONResponse, Response, StreamingResponse
 from model_api_server.datatype import ChatRecord, Role
 from model_api_server.model_layout import ModelLayout
 
+health_check_endpoint = '/health'
+
+class HealthCheckFilter(logging.Filter):
+    def filter(self, record):
+        return record.getMessage().find(health_check_endpoint) == -1
 class ModelApiServer:
     """
     ModelApiServer is responsible to server the public endpoints.
@@ -31,7 +36,8 @@ class ModelApiServer:
         
         # The web server to serve API endpoints 
         routes = [
-            Route(endpoint, endpoint=self.api, methods=['POST'])
+            Route(endpoint, endpoint=self.api, methods=['POST']),
+            Route(health_check_endpoint, endpoint=self.health_check, methods=['GET'])
         ]
         self.web_server = Starlette(debug=debug, routes=routes, on_startup=on_startup)
 
@@ -81,3 +87,6 @@ class ModelApiServer:
 
             response = StreamingResponse(self.model_layout.process(user_input), media_type="text/plain")
             return response
+
+    async def health_check(self, request: Request):
+        return Response(status_code=204)

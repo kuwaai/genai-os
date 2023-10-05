@@ -10,6 +10,10 @@ formatters:
     format: '%(asctime)s [%(name)-13s] %(levelprefix)-4s %(message)s'
     datefmt: '%Y-%m-%d %H:%M:%S' 
 
+filters:
+  health_check_filter:
+    "()": model_api_server.api_server.HealthCheckFilter
+
 handlers:
   default:
     formatter: default
@@ -17,6 +21,7 @@ handlers:
     stream: ext://sys.stderr
   access:
     formatter: access
+    filters: ["health_check_filter"]
     class: logging.StreamHandler
     stream: ext://sys.stdout
 

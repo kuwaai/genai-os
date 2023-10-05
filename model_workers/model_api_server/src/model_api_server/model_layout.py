@@ -104,7 +104,7 @@ class ModelLayout:
                         if t.role == Role.USER: continue
                         yield t.msg
         except Exception as e:
-            self.logger.error(e)
+            self.logger.error(str(e))
         finally:
             self.busy = False
             self.logger.debug('Finished.')

@@ -35,7 +35,12 @@ def main():
     
     # Load logging configuration.
     with open(config.logging_config, 'r') as f:
-        logging.config.dictConfig(yaml.safe_load(f))
+        logging_config = yaml.safe_load(f)
+        if config.debug:
+            logging_config['root']['level'] = 'DEBUG'
+            for k in logging_config['loggers']:
+                logging_config['loggers'][k]['level'] = 'DEBUG'
+        logging.config.dictConfig(logging_config)
 
     # Create a job that will register with the Agent after the Model API server started.
     public_endpoint = 'http://{0}:{1}{2}'.format(config.public_address, config.port, config.endpoint)

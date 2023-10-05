@@ -19,7 +19,7 @@ services:
       - taide_backend
       - squid_backend
     healthcheck:
-      test: ["CMD", "curl", "-X", "POST", "-f", "http://localhost:9001/"]
+      test: "curl --fail http://localhost:9001/health || exit 1"
       interval: 10s
       timeout: 5s
       retries: 5
