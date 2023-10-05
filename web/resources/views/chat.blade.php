@@ -300,13 +300,16 @@
             @endif
             <script>
                 function uploadcheck(){
-                    if ($(this)[0].files[0].size <= 10*1024*1024){
+                    if ($(this)[0].files.length > 0 && $(this)[0].files[0].size <= 10*1024*1024){
                         $(this).parent().submit();
                     }
-                    $("#upload_btn").val('').text('{{__("File Too Large")}}').toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
+                    $(this).val('');
+                    $("#upload_btn").text('{{__("File Too Large")}}')
+                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
                 
                     setTimeout(function () {
-                        $(this).text('{{__("Upload file")}}').toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
+                        $("#upload_btn").text('{{__("Upload file")}}')
+                        $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
                     }, 3000);
                 }
 
