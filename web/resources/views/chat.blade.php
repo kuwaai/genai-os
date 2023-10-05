@@ -303,9 +303,10 @@
                     if ($(this)[0].files && $(this)[0].files.length > 0 && $(this)[0].files[0].size <= 10*1024*1024){
                         $(this).parent().submit();
                     }
-                    $(this).val('');
                     $("#upload_btn").text('{{__("File Too Large")}}')
                     $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
+                        $("#upload").val("");
+                    
                 
                     setTimeout(function () {
                         $("#upload_btn").text('{{__("Upload file")}}')
