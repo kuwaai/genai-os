@@ -66,7 +66,7 @@
                                             <div class="w-full text-lg font-semibold leading-none">{{ $LLM->name }}
                                             </div>
                                             <div class="w-full text-sm leading-none">
-                                                {{ $LLM->description ? $LLM->description : __("This LLM is currently available!") }}
+                                                {{ $LLM->description ? $LLM->description : __('This LLM is currently available!') }}
                                             </div>
                                         </div>
                                     </div>
@@ -83,7 +83,7 @@
                         </div>
                     </div>
                     <span id="create_error" class="font-medium text-sm text-red-800 rounded-lg dark:text-red-400 hidden"
-                        role="alert">{{__("You must select at least 2 LLMs")}}</span>
+                        role="alert">{{ __('You must select at least 2 LLMs') }}</span>
                 </form>
             </div>
         </div>
@@ -264,18 +264,23 @@
                         @endif
                     @endforeach
                 </div>
-                <div class="bg-gray-300 dark:bg-gray-500 p-4 h-20">
+                <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
                     <form method="post"
                         action="{{ route('duel.request') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
-                        id="create_chat">
-                        <div class="flex">
+                        id="prompt_area">
+                        <div class="flex items-end justify-end">
                             @csrf
                             <input name="duel_id" value="{{ request()->route('duel_id') }}" style="display:none;">
-                            <input type="text" placeholder="Enter your text here" name="input" id="chat_input"
-                                autocomplete="off"
-                                class="w-full px-4 py-2 text-black dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md">
-                            <button type="submit"
-                                class="inline-flex items-center justify-center w-12 h-12 bg-blue-400 dark:bg-blue-500 rounded-r-md hover:bg-blue-500 dark:hover:bg-blue-700">
+                            <input id="chained" style="display:none;"
+                                {{ \Session::get('chained') ? '' : 'disabled' }}>
+
+                            <button type="button" onclick="chain_toggle()" id="chain_btn"
+                                class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
+                            <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
+                                oninput="adjustTextareaRows()" id="chat_input" name="input" readonly
+                                class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+                            <button type="submit" id='submit_msg' style='display:none;'
+                                class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
                                     class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
                                     <path
@@ -317,7 +322,18 @@
                     $("#chatHeader button").find('.fa-save').parent().addClass('hidden');
                     $("#chatHeader >p").text(input.val())
                 }
-
+                $("#chat_input").val("訊息處理中...請稍後...")
+                $chattable = false
+                $("#prompt_area").submit(function(event) {
+                    event.preventDefault();
+                    if ($chattable) {
+                        this.submit();
+                        $chattable = false
+                    }
+                    $("#submit_msg").hide()
+                    $("#chat_input").val("訊息處理中...請稍後...")
+                    $("#chat_input").prop("readonly", true)
+                })
                 task = new EventSource("{{ route('chat.sse') }}", {
                     withCredentials: false
                 });
@@ -325,17 +341,71 @@
                     task.close();
                 });
                 task.addEventListener('message', event => {
-                    data = event.data.replace(/\[NEWLINEPLACEHOLDERUWU\]/g, "\n");
-                    console.log(data);
-                    const commaIndex = data.indexOf(",");
-                    const number = data.slice(0, commaIndex);
-                    const msg = data.slice(commaIndex + 1);
-                    $('#task_' + number).text(msg);
+                    if (event.data == "finished") {
+                        $chattable = true
+                        $("#submit_msg").show()
+                        $("#chat_input").val("")
+                        $("#chat_input").prop("readonly", false)
+                    } else {
+                        data = JSON.parse(event.data)
+                        number = data["history_id"];
+                        msg = data["msg"];
+                        msg = msg.replace(
+                            "[Oops, the LLM returned empty message, please try again later or report to admins!]",
+                            "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}"
+                        )
+                        msg = msg.replace("[Sorry, something is broken, please try again later!]",
+                            "{{ __('[Sorry, something is broken, please try again later!]') }}")
+                        $('#task_' + number).text(msg);
+                    }
                 });
-                $("#chat_input").focus();
             </script>
         @endif
         <script>
+            if ($("#chat_input")) {
+                $("#chat_input").focus();
+
+                function chain_toggle() {
+                    $.get("{{ route('chat.chain') }}", {
+                        switch: $('#chained').prop('disabled')
+                    }, function() {
+                        $('#chained').prop('disabled', !$('#chained').prop('disabled'));
+                        $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
+                        $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
+                            '{{ __('Chained') }}')
+                    })
+                }
+
+                function adjustTextareaRows() {
+                    if ($('#chat_input').length) {
+                        const textarea = $('#chat_input');
+                        const maxRows = parseInt(textarea.attr('max-rows')) || 5;
+                        const lineHeight = parseInt(textarea.css('line-height'));
+
+                        textarea.attr('rows', 1);
+
+                        const contentHeight = textarea[0].scrollHeight;
+                        const rowsToDisplay = Math.floor(contentHeight / lineHeight);
+
+                        textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+                    }
+                }
+                $("#chat_input").on("keydown", function(event) {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        $("#prompt_area").submit();
+                    } else if (event.key === "Enter" && event.shiftKey) {
+                        event.preventDefault();
+                        var cursorPosition = this.selectionStart;
+                        $(this).val($(this).val().substring(0, cursorPosition) + "\n" + $(this).val().substring(
+                            cursorPosition));
+                        this.selectionStart = this.selectionEnd = cursorPosition + 1;
+                    }
+                    adjustTextareaRows();
+                });
+                adjustTextareaRows();
+            }
+
             function checkForm() {
                 if ($("#create_duel input[name='llm[]']:checked").length > 1) {
                     return true;

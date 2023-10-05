@@ -201,7 +201,11 @@
                                     style="display:none;">
                                 <input id="chained" style="display:none;"
                                     {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                @if (!in_array(App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code , ["doc_qa","web_qa"]))
+                                @if (
+                                    !in_array(App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code, [
+                                        'doc_qa',
+                                        'web_qa',
+                                    ]))
                                     <button type="button" onclick="chain_toggle()" id="chain_btn"
                                         class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
                                 @endif
@@ -291,26 +295,30 @@
                             data = JSON.parse(event.data)
                             number = data["history_id"];
                             msg = data["msg"];
-                            msg = msg.replace("[Oops, the LLM returned empty message, please try again later or report to admins!]","{{__('[Oops, the LLM returned empty message, please try again later or report to admins!]')}}")
-                            msg = msg.replace("[Sorry, something is broken, please try again later!]","{{__('[Sorry, something is broken, please try again later!]')}}")
+                            msg = msg.replace(
+                                "[Oops, the LLM returned empty message, please try again later or report to admins!]",
+                                "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}"
+                                )
+                            msg = msg.replace("[Sorry, something is broken, please try again later!]",
+                                "{{ __('[Sorry, something is broken, please try again later!]') }}")
                             $('#task_' + number).text(msg);
                         }
                     });
                 </script>
             @endif
             <script>
-                function uploadcheck(){
-                    if ($(this)[0].files && $(this)[0].files.length > 0 && $(this)[0].files[0].size <= 10*1024*1024){
+                function uploadcheck() {
+                    if ($(this)[0].files && $(this)[0].files.length > 0 && $(this)[0].files[0].size <= 10 * 1024 * 1024) {
                         $(this).parent().submit();
                     }
-                    $("#upload_btn").text('{{__("File Too Large")}}')
-                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
-                        $("#upload").val("");
-                    
-                
-                    setTimeout(function () {
-                        $("#upload_btn").text('{{__("Upload file")}}')
-                        $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
+                    $("#upload_btn").text('{{ __('File Too Large') }}')
+                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+                    $("#upload").val("");
+
+
+                    setTimeout(function() {
+                        $("#upload_btn").text('{{ __('Upload file') }}')
+                        $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
                     }, 3000);
                 }
 
