@@ -170,7 +170,7 @@
                             @csrf
                             <input name='llm_id' style='display:none;' value='{{ request()->route('llm_id') }}'>
                             <input id="upload" type="file" name="file" style="display: none;"
-                                onchange='$(this).parent().submit();'>
+                                onchange='uploadcheck()'>
                             <label for="upload"
                                 class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
                         </form>
@@ -299,7 +299,13 @@
                 </script>
             @endif
             <script>
-                if ("#chat_input") {
+                function uploadcheck(){
+                    if ($(this)[0].files[0].size <= 10*1024*1024){
+                        $(this).parent().submit();
+                    }
+                }
+
+                if ($("#chat_input")) {
                     $("#chat_input").focus();
 
                     function adjustTextareaRows() {
