@@ -75,8 +75,11 @@ class ChatController extends Controller
             $request->validate([
                 'file' => 'required|max:10240',
             ]);
-
-            if ($llm_id && in_array($llm_id, $result) && $request->file()) {
+            $file = $request->file();
+            if ($file->getSize() > $maxFileSize) {
+                return redirect()->back()->withErrors(['file' => 'The file size must be less than or equal to 10MB.']);
+            }
+            if ($llm_id && in_array($llm_id, $result) && $file) {
                 // Start uploading the file
                 $user = $request->user();
                 $userId = $user->id;
