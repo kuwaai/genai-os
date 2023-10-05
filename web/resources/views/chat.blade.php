@@ -171,7 +171,7 @@
                             <input name='llm_id' style='display:none;' value='{{ request()->route('llm_id') }}'>
                             <input id="upload" type="file" name="file" style="display: none;"
                                 onchange='uploadcheck()'>
-                            <label for="upload"
+                            <label for="upload" id="upload_btn"
                                 class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
                         </form>
                     @elseif (request()->route('llm_id'))
@@ -303,6 +303,11 @@
                     if ($(this)[0].files[0].size <= 10*1024*1024){
                         $(this).parent().submit();
                     }
+                    $("#upload_btn").val('').text('{{__("File Too Large")}}').toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
+                
+                    setTimeout(function () {
+                        $(this).text('{{__("Upload file")}}').toggleClass("bg-green-500 hover:bg-green-600 bg-red-400 hover:bg-red-500")
+                    }, 3000);
                 }
 
                 if ($("#chat_input")) {

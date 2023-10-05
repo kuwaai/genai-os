@@ -133,5 +133,6 @@
 "[Oops, the LLM returned empty message, please try again later or report to admins!]":"[很抱歉目前模型忙碌中，請稍後再試，若問題一直持續再請回報]",
 "[Sorry, something is broken, please try again later!]":"[很抱歉，有東西壞掉了，請稍後再試]",
 "* ...thinking... *":"* ...思考中... *",
-"Language":"語言切換"
+"Language":"語言切換",
+"File Too Large":"檔案過大"
 }
