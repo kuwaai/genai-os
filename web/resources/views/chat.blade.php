@@ -300,7 +300,7 @@
             @endif
             <script>
                 function uploadcheck(){
-                    if ($(this)[0].files.length > 0 && $(this)[0].files[0].size <= 10*1024*1024){
+                    if ($(this)[0].files && $(this)[0].files.length > 0 && $(this)[0].files[0].size <= 10*1024*1024){
                         $(this).parent().submit();
                     }
                     $(this).val('');
