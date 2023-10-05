@@ -133,18 +133,13 @@ class RequestChat implements ShouldQueue
                         }
                     } catch (Exception $e) {
                     }
+                    if ($this->channel == '' . $this->history_id) {
+                        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                    }
                     Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
                     Redis::publish($this->channel, 'Ended Ended');
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    for ($i = 0; $i < 5; $i++) {
-                        sleep(1);
-                        Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
-                        Redis::publish($this->channel, 'Ended Ended');
-                    }
-                    if ($this->channel == '' . $this->history_id) {
-                        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
-                    }
                     Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . $tmp);
                 }
             }

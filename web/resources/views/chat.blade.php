@@ -130,7 +130,7 @@
                                     <div class="overflow-hidden">
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
                                             <p class="text-sm whitespace-pre-line break-words"
-                                                id="task_{{ $history->id }}">{{ $history->msg }}</p>
+                                                id="task_{{ $history->id }}">{{ __($history->msg) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -201,7 +201,7 @@
                                     style="display:none;">
                                 <input id="chained" style="display:none;"
                                     {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                @if (App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code != 'doc_qa')
+                                @if (!in_array(App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code , ["doc_qa","web_qa"]))
                                     <button type="button" onclick="chain_toggle()" id="chain_btn"
                                         class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
                                 @endif
@@ -289,8 +289,10 @@
                             $("#chat_input").prop("readonly", false)
                         } else {
                             data = JSON.parse(event.data)
-                            const number = data["history_id"];
-                            const msg = data["msg"];
+                            number = data["history_id"];
+                            msg = data["msg"];
+                            msg = msg.replace("[Oops, the LLM returned empty message, please try again later or report to admins!]","{{__('[Oops, the LLM returned empty message, please try again later or report to admins!]')}}")
+                            msg = msg.replace("[Sorry, something is broken, please try again later!]","{{__('[Sorry, something is broken, please try again later!]')}}")
                             $('#task_' + number).text(msg);
                         }
                     });

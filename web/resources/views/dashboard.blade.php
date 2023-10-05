@@ -253,7 +253,7 @@
                                 onclick="$('#llm_table').slideToggle();$('#collapse_llm_table_btn').toggleClass('rotate-180');"
                                 class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4  rounded flex items-center justify-center">
                                 <i id="collapse_llm_table_btn"
-                                    class="fas fa-chevron-up transform transition duration-500"></i>
+                                    class="fas fa-chevron-up transform transition duration-500 rotate-180"></i>
                             </button>
                             <button onclick="CreateRow()" data-modal-target="edit_llm" data-modal-toggle="edit_llm"
                                 class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 ml-2 rounded flex items-center justify-center">

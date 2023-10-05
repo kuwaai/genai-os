@@ -32,11 +32,10 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return view('welcome');
     })->name('/');
 
-    Route::get('/lang/{locale?}', function ($locale = null) {
-        if (isset($locale)) {
-            session()->put('locale', $locale);
-        }
-        return redirect()->route('/');
+    Route::get('/lang', function () {
+        session()->put('locale', session()->get("locale") ? (session()->get("locale") == 'en-us' ? 'zh-tw' : 'en-us') : "en-us");
+
+        return back();
     })->name('lang');
 
     Route::get('/api_auth', [ProfileController::class, 'api_auth']);

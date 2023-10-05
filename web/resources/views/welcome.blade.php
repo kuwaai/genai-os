@@ -25,28 +25,33 @@
                         @csrf
                         @if (Auth::user()->hasPerm('tab_Dashboard'))
                             <a href="{{ url('/dashboard') }}"
-                                class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{__("Dashboard")}}</a>
+                                class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Dashboard') }}</a>
                         @endif
                         @if (Auth::user()->hasPerm('tab_Duel'))
                             <a href="{{ route('duel.home') }}"
-                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{__("Duel")}}</a>
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Duel') }}</a>
                         @endif
                         @if (Auth::user()->hasPerm('tab_Chat'))
                             <a href="{{ route('chat.home') }}"
-                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{__("Chat")}}</a>
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Chat') }}</a>
                         @endif
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign out') }}</a>
+                        <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                            href="{{ route('lang') }}">{{ __('Language') }}</a>
                     </form>
                 @else
                     <a href="{{ route('login') }}"
-                        class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{__("Sign in")}}</a>
+                        class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign in') }}</a>
 
                     @if (Route::has('register') &&
                             \App\Models\SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists())
                         <a href="{{ route('register') }}"
-                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{__("Sign up")}}</a>
-                    @endif
+                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign up') }}</a>
+                    @endif <a
+                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                        href="{{ route('lang') }}">{{ __('Language') }}</a>
+
                 @endauth
             </div>
         @endif
@@ -67,14 +72,17 @@
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">{{__("Text Translate")}}
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                {{ __('Text Translate') }}
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm">請翻譯成繁體中文：The International Federation of the Phonographic Industry has announced it's latest Global Artist Chart, which features a Taiwanese artist in the top 10. ...</p>
+                                            <p class="text-sm">請翻譯成繁體中文：The International Federation of the Phonographic
+                                                Industry has announced it's latest Global Artist Chart, which features a
+                                                Taiwanese artist in the top 10. ...</p>
                                         </div>
                                     </div>
                                     <div
@@ -100,7 +108,8 @@
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">{{__("Writing post")}}</h2>
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                {{ __('Writing post') }}</h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -138,7 +147,8 @@
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">{{__("Writing letter")}}
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                {{ __('Writing letter') }}
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
@@ -174,7 +184,8 @@
                     <div
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
-                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">{{__("Summarize")}}</h2>
+                            <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                {{ __('Summarize') }}</h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -214,17 +225,19 @@
                     <div class="flex items-center gap-4">
                         <a href="https://www.nuk.edu.tw/" target="_blank"
                             class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
-                            {!!__("Developed by NUK")!!}
+                            {!! __('Developed by NUK') !!}
                         </a>
                     </div>
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                        href="https://www.twcc.ai/" target="_blank">{{__("Powered by TWCC")}}</a>
+                        href="https://www.twcc.ai/" target="_blank">{{ __('Powered by TWCC') }}</a>
+                    <span class="text-black dark:text-white flex justify-end text-sm">{{ __('Version') }}
+                        0.0.6.5</span>
                 </div>
             </div>
-            <span class="text-black dark:text-white flex justify-end text-sm">{{__("Version")}} 0.0.6.4</span>
+
         </div>
     </div>
 </body>
