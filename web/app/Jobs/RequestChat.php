@@ -75,11 +75,12 @@ class RequestChat implements ShouldQueue
             if ($state == 'BUSY') {
                 $this->release(10);
             } else if ($state == "NOMACHINE"){
+                $tmp = "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]";
                 try {
                     if ($this->channel == '' . $this->history_id) {
                         $history = Histories::find($this->history_id);
                         if ($history != null){
-                            $history->fill(['msg' => "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"]);
+                            $history->fill(['msg' => $tmp]);
                             $history->save();
                         }
                     }
