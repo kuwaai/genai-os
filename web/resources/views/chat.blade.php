@@ -302,7 +302,7 @@
                             msg = msg.replace("[Sorry, something is broken, please try again later!]",
                                 "{{ __('[Sorry, something is broken, please try again later!]') }}")
                             msg = msg.replace("[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]",
-                                "{{__('[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]')}}")
+                                "{{__('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]')}}")
                             $('#task_' + number).text(msg);
                         }
                     });
