@@ -87,6 +87,7 @@ class RequestChat implements ShouldQueue
                 }
                 Log::channel('analyze')->Info("NOMACHINE: " . $this->access_code . " | " . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
                 Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                sleep(1);
                 Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
                 Redis::publish($this->channel, 'Ended Ended');
             } else if ($state == "READY") {

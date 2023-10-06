@@ -146,7 +146,7 @@
                                     <div class="overflow-hidden">
                                         <div
                                             class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                            <p class="text-sm whitespace-pre-line break-words">{{ $history->msg }}</p>
+                                            <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}</p>
                                         </div>
                                     </div>
                                     @if (!$history->isbot)
