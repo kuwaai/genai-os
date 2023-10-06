@@ -24,7 +24,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ../../../llama2-7b-chat-b1.0.0:/llm/llama2-7b-chat-b1.0.0:ro
+      - /var/models/:/llm/:ro
 
 # Connect to the network created by web_agent and squid
 networks:

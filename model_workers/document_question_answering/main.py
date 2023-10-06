@@ -44,13 +44,19 @@ class DocumentQaProcess(GeneralProcessInterface):
 
   def generate_llm_input(self, question, related_docs):
       
-      llm_input_template = Path('prompt_template/llm_input.mustache').read_text()
-      llm_input = chevron.render(llm_input_template, {
-        'docs': related_docs,
-        'question': question
-      })
+    llm_input_template = Path('prompt_template/llm_input.mustache').read_text()
+    llm_input = chevron.render(llm_input_template, {
+      'docs': related_docs,
+      'question': question
+    })
 
-      return llm_input
+    return llm_input
+
+  def replace_chat_history(self, chat_history, question, related_docs):
+    llm_input = self.generate_llm_input(question, related_docs)
+    modified_chat_history = chat_history[:-1] + [ChatRecord(llm_input, Role.USER)]
+
+    return modified_chat_history
 
   async def process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
 
@@ -86,17 +92,19 @@ class DocumentQaProcess(GeneralProcessInterface):
         question = final_user_input.msg
         llm_question = question
 
-      # Retrieve
-      related_docs = document_store.retrieve(question)
+      # Shortcut
+      related_docs = docs
+      modified_chat_history = self.replace_chat_history(chat_history, llm_question, related_docs)
+
+      if self.llm.is_too_long(modified_chat_history):
+        # Retrieve
+        related_docs = document_store.retrieve(question)
+        modified_chat_history = self.replace_chat_history(chat_history, llm_question, related_docs)
 
       # Generate
-      llm_input = self.generate_llm_input(llm_question, related_docs)
+      llm_input = self.generate_llm_input(question, related_docs)
       self.logger.info('LLM input: {}'.format(llm_input))
-      modified_chat_history = chat_history[:-1] + [ChatRecord(llm_input, Role.USER)]
-      result = await self.llm.complete(
-        modified_chat_history,
-        system_prompt='You are a helpful assistant. 你是一個樂於助人的助手。'
-      )
+      result = await self.llm.complete(modified_chat_history)
       yield result
     
     except NoUrlException:
