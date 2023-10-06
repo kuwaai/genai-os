@@ -82,6 +82,10 @@ class DuelController extends Controller
     {
         try {
             $chat = DuelChat::findOrFail($request->input('id'));
+            foreach (Chats::where("dcID","=",$chat->id)->get()->pluck("id") as $chat_id){
+                Histories::where("chat_id","=",$chat_id)->delete();
+            }
+            Chats::where("dcID","=",$chat->id)->delete();
             $chat->delete();
         } catch (ModelNotFoundException $e) {
             Log::error('Chat not found: ' . $request->input('id'));
