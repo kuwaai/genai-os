@@ -298,7 +298,7 @@
                             msg = msg.replace(
                                 "[Oops, the LLM returned empty message, please try again later or report to admins!]",
                                 "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}"
-                                )
+                            )
                             msg = msg.replace("[Sorry, something is broken, please try again later!]",
                                 "{{ __('[Sorry, something is broken, please try again later!]') }}")
                             $('#task_' + number).text(msg);
@@ -308,18 +308,20 @@
             @endif
             <script>
                 function uploadcheck() {
-                    if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 * 1024) {
+                    if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
+                        1024) {
                         $("#upload").parent().submit();
-                    }
-                    $("#upload_btn").text('{{ __("File Too Large") }}')
-                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                    $("#upload").val("");
-
-
-                    setTimeout(function() {
-                        $("#upload_btn").text('{{ __("Upload file") }}')
+                    } else {
+                        $("#upload_btn").text('{{ __('File Too Large') }}')
                         $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                    }, 3000);
+                        $("#upload").val("");
+
+
+                        setTimeout(function() {
+                            $("#upload_btn").text('{{ __('Upload file') }}')
+                            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+                        }, 3000);
+                    }
                 }
 
                 if ($("#chat_input")) {
