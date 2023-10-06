@@ -134,5 +134,6 @@
 "[Sorry, something is broken, please try again later!]":"[很抱歉，有東西壞掉了，請稍後再試]",
 "* ...thinking... *":"* ...思考中... *",
 "Language":"語言切換",
-"File Too Large":"檔案過大"
+"File Too Large":"檔案過大",
+"[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]":"[很抱歉，目前沒有可處理該訊息的機器，請回報給管理員或稍後再試！]"
 }

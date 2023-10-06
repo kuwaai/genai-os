@@ -75,7 +75,20 @@ class RequestChat implements ShouldQueue
             if ($state == 'BUSY') {
                 $this->release(10);
             } else if ($state == "NOMACHINE"){
+                try {
+                    if ($this->channel == '' . $this->history_id) {
+                        $history = Histories::find($this->history_id);
+                        if ($history != null){
+                            $history->fill(['msg' => "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"]);
+                            $history->save();
+                        }
+                    }
+                } catch (Exception $e) {
+                }
                 Log::channel('analyze')->Info("NOMACHINE: " . $this->access_code . " | " . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+                Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
+                Redis::publish($this->channel, 'Ended Ended');
             } else if ($state == "READY") {
                 try {
                     $response = $client->post($agent_location . $this->agent_version . '/chat/completions', [
