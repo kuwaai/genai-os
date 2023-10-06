@@ -166,6 +166,8 @@ class ChatController extends Controller
                 RequestChat::dispatch($tmp, $llm->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
                 return Redirect::route('chat.chat', $chat->id);
             }
+        }else{
+            Log::channel("analyze")->info("User " . Auth::user()->id . " with " . implode(",",Redis::lrange('usertask_' . Auth::user()->id, 0, -1)));
         }
         return back();
     }

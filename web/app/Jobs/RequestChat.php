@@ -78,7 +78,6 @@ class RequestChat implements ShouldQueue
                 Log::channel('analyze')->Info("NOMACHINE: " . $this->access_code . " | " . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
             } else if ($state == "READY") {
                 try {
-                    Log::channel("analyze")->info("a");
                     $response = $client->post($agent_location . $this->agent_version . '/chat/completions', [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'form_params' => [
