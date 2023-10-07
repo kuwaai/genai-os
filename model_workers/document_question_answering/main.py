@@ -82,7 +82,7 @@ class DocumentQaProcess(GeneralProcessInterface):
       self.logger.info('Fetched {} documents.'.format(len(docs)))
       
       document_store = DocumentStore()
-      document_store.from_documents(docs)
+      await document_store.from_documents(docs)
       
       if len(chat_history) == 1:
         question = '時間、地點、目的、結論、摘要'
@@ -111,5 +111,5 @@ class DocumentQaProcess(GeneralProcessInterface):
       yield self.usage
 
     except Exception as e:
-      self.logger.error(str(e))
-      yield "發生錯誤，請再試一次。"
+      self.logger.exception('Unexpected error')
+      yield '發生錯誤，請再試一次。'

@@ -30,11 +30,11 @@ class DocumentStore:
     # self.coarse_retriever:BM25Retriever = None
     # self.ensemble_retriever:EnsembleRetriever = None
   
-  def from_documents(self, docs: [Document]):
+  async def from_documents(self, docs: [Document]):
     
     # Chunking
     self.logger.info('Chunking...')
-    chunks = self.splitter.split(docs)
+    chunks = await self.splitter.split(docs)
     self.logger.info('Got {} chunks.'.format(len(chunks)))
 
     # Embedding

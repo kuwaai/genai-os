@@ -142,11 +142,11 @@ class TaideLlm:
             
             self.logger.info('Generating...')
             result = self.pipe(prompt)[0]['generated_text']
+            self.logger.info('Generation finished.')
             
         except Exception as e:
             result = ''
-            self.logger.error(e)
+            self.logger.exception('Generation failed.')
         finally:
-            torch.cuda.empty_cache()
-            self.logger.info('Generation finished.')
+            # torch.cuda.empty_cache()
             return result
