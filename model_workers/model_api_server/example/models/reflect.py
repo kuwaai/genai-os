@@ -6,5 +6,6 @@ from model_api_server.interfaces import CompletionInterface
 from typing import Generator
 
 class ReflectModel(CompletionInterface):
-  def complete(self, msg: [ChatRecord]) -> Generator[ChatRecord, None, None]:
-    yield ChatRecord(msg[-1].msg, Role.BOT)
+  def complete(self, chat_history: [ChatRecord]) -> Generator[ChatRecord, None, None]:
+    final_user_input = next(filter(lambda x: x.role == Role.USER, reversed(chat_history)))
+    yield ChatRecord(final_user_input.msg, Role.BOT)

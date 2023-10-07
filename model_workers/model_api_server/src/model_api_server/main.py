@@ -4,7 +4,9 @@
 import sys, os
 import logging, yaml
 import asyncio
+import prometheus_client
 
+from importlib.metadata import version
 from model_api_server.config import Config
 from model_api_server.agent_client import AgentClient
 from model_api_server.model_layout import ModelLayout
@@ -41,6 +43,12 @@ def main():
             for k in logging_config['loggers']:
                 logging_config['loggers'][k]['level'] = 'DEBUG'
         logging.config.dictConfig(logging_config)
+
+    # Print version
+    framework_version = version('model_api_server')
+    logging.info('Version of framework: {}'.format(framework_version))
+    version_info = prometheus_client.Info('framework_version', 'The version of model_api_server framework.')
+    version_info.info({'version': framework_version})
 
     # Create a job that will register with the Agent after the Model API server started.
     public_endpoint = 'http://{0}:{1}{2}'.format(config.public_address, config.port, config.endpoint)

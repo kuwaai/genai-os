@@ -7,7 +7,10 @@ import importlib
 from functools import reduce
 import sys, os
 from typing import Generator
+import prometheus_client
+import time
 
+import model_api_server.metrics_helper as metrics_helper
 from model_api_server.datatype import ChatRecord, Role
 from model_api_server.interfaces import CompletionInterface, TextLevelFilteringInterface, GeneralProcessInterface
 
@@ -25,9 +28,10 @@ def import_class(name: str):
 
 class ModelLayout:
     """
-    ModelLayout is responsible arranging the models and models.
-    The processing flow:
-    [User input]->[Pre-processing filters]->[LLM]->[Post-processing filters]->[Output]
+    ModelLayout is responsible arranging the models and filters.
+    The default processing flow:
+    [User input]->[Ingress filters]->[LLM]->[Egress filters]->[Output]
+    This flow can be override with custom flow, e.g. LangChain, by configuration.
     """
 
     def __init__(self, layout_file: str, debug: bool = False):
@@ -39,6 +43,48 @@ class ModelLayout:
 
         # State variable to indicate whether the model is processing another request
         self.busy = False
+
+        metric_prefix = 'layout'
+        default_buckets = prometheus_client.Histogram.DEFAULT_BUCKETS
+        process_time_buckets = default_buckets[:-1] + (20, 30, 40, 50, 60) + default_buckets[-1:]
+        output_length_buckets =  tuple(i*10 for i in range(1, 10))
+        output_length_buckets += tuple(i*100 for i in range(1, 20))
+        output_length_buckets += (float('inf'),)
+        self.metrics = metrics_helper.get_instance_with_prefix(metric_prefix, {
+            'config': {
+                'type': prometheus_client.Info,
+                'description': 'The configuration of layout.',
+            },
+            'state': {
+                'type': prometheus_client.Enum,
+                'description': 'The state of the layout.',
+                'states': ['idle', 'busy']
+            },
+            'failed': {
+                'type': prometheus_client.Counter,
+                'description': 'Number of failed requests.',
+            },
+            'process_time_seconds': {
+                'type': prometheus_client.Histogram,
+                'description': 'Time consumed to process single request with unit: Seconds.',
+                'buckets': process_time_buckets,
+            },
+            'output_length_charters':{
+                'type': prometheus_client.Histogram,
+                'description': 'The length of the output text with unit: Charters.',
+                'buckets': output_length_buckets,
+            },
+            'output_throughput_charters_per_second':{
+                'type': prometheus_client.Histogram,
+                'description': 'The throughput of output text with unit: Charters/Second.',
+                'buckets': output_length_buckets,
+            },
+        })
+        self.metrics['config'].info({
+            'default_layout': str(self.override_process == None),
+            'main_class': type(self.override_process or self.llm).__name__
+        })
+        self.metrics['state'].state('idle')
 
     def read_layout(self, layout_file: str):
 
@@ -70,7 +116,7 @@ class ModelLayout:
             self.logger.info('LLM class: {}'.format(type(self.llm).__name__))
 
     @staticmethod
-    def apply_filters(data: [ChatRecord], filters: list[TextLevelFilteringInterface]) -> [ChatRecord]:
+    def _apply_filters(data: [ChatRecord], filters: list[TextLevelFilteringInterface]) -> [ChatRecord]:
         """
         Sequentially apply filters to the data
         Arguments:
@@ -82,30 +128,62 @@ class ModelLayout:
     def is_busy(self):
         return self.busy
 
-    async def process(self, user_input: [ChatRecord]) -> Generator[str, None, None]:
+    async def default_process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
         """
-        Core part of the Model API server.
-        The processing flow:
-        [User input]->[Pre-processing filters]->[LLM]->[Post-processing filters]->[Output]
+        The default processing flow:
+        [User input]->[Ingress filters]->[LLM]->[Egress filters]->[Output]
         """
 
+        processed_input = ModelLayout._apply_filters(chat_history, self.ingress_filters)
+        self.logger.debug('Processed input: {}'.format(processed_input))
+        for output_token in self.llm.complete(processed_input):
+            self.logger.debug('Model output: {}'.format(output_token))
+            processed_output_token = ModelLayout._apply_filters([output_token], self.egress_filters)
+            self.logger.debug('Processed output: {}'.format(processed_output_token))
+            for t in processed_output_token:
+                if t.role == Role.USER: continue
+                yield t.msg
+
+    def _update_statistics(self, duration_sec: float, total_output_length: int):
+        """
+        Update the internal statistical metrics.
+        """
+
+        throughput = total_output_length/duration_sec
+        self.metrics['process_time_seconds'].observe(duration_sec)
+        self.metrics['output_length_charters'].observe(total_output_length)
+        self.metrics['output_throughput_charters_per_second'].observe(throughput)
+
+    async def process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
+        """
+        Core part of the Model API server.
+        """
+
+        process = self.default_process
+        if self.override_process != None:
+            process = self.override_process.process
+
+        total_output_length = 0
+        start_time = 0
+        self.busy = True
+        self.metrics['state'].state('busy')
+            
         try:
-            if self.override_process != None:
-                async for t in self.override_process.process(user_input):
-                    yield t
-            else:
-                processed_input = self.apply_filters(user_input, self.ingress_filters)
-                self.logger.debug('Processed input: {}'.format(processed_input))
-                for output_token in self.llm.complete(processed_input):
-                    self.logger.debug('Model output: {}'.format(output_token))
-                    processed_output_token = self.apply_filters([output_token], self.egress_filters)
-                    self.logger.debug('Processed output: {}'.format(processed_output_token))
-                    for t in processed_output_token:
-                        if t.role == Role.USER: continue
-                        yield t.msg
+            start_time = time.time()
+            result = process(chat_history)
+            async for msg in result:
+                total_output_length += len(msg)
+                yield msg
+            duration_sec = time.time() - start_time
+            self._update_statistics(duration_sec, total_output_length)
+
         except Exception as e:
-            self.logger.error(str(e))
+            self.logger.exception('Error occurs when processing model layout.')
+            self.metrics['failed'].inc()
+            yield 'Error occurred. Please consult support.'
+
         finally:
             self.busy = False
+            self.metrics['state'].state('idle')
             self.logger.debug('Finished.')
     

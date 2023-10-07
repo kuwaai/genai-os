@@ -6,6 +6,8 @@ import requests
 from urllib.parse import urljoin
 import atexit
 import asyncio
+import prometheus_client
+import model_api_server.metrics_helper as metrics_helper
 
 class AgentClient:
     """
@@ -29,6 +31,28 @@ class AgentClient:
         self.llm_name = llm_name
         self.public_endpoint = public_endpoint
 
+        metric_prefix = 'agc'
+        self.metrics = metrics_helper.get_instance_with_prefix(metric_prefix, {
+            'registration': {
+                'type': prometheus_client.Info,
+                'description': 'Information exposed to the Agent.',
+            },
+            'state': {
+                'type': prometheus_client.Enum,
+                'description': 'The state of the agent client.',
+                'states': ['uninitialized', 'trying', 'registered', 'failed']
+            },
+            'attempts':{
+                'type': prometheus_client.Counter,
+                'description': 'Number of attempts that register with the Agent.'
+            }
+        })
+        self.metrics['registration'].info({
+            'llm_name': self.llm_name,
+            'public_endpoint': self.public_endpoint
+        })
+        self.metrics['state'].state('uninitialized')
+
     async def register(self, retry_cnt: int, backoff_time: int = 1):
         """
         Try to registration with the Agent.
@@ -40,6 +64,8 @@ class AgentClient:
             Return a boolean indicating whether successfully registered.
         """
         
+        self.metrics['state'].state('trying')
+        self.metrics['attempts'].inc()
         self.logger.info('Attempting registration with the Agent... {} times left.'.format(retry_cnt))
         try:
             def do_req():
@@ -56,6 +82,7 @@ class AgentClient:
             else:
                 self.logger.info('Registered.')
                 atexit.register(self.unregister)
+                self.metrics['state'].state('registered')
         except Exception as e:
             self.logger.warning('The server failed to register to Agent. Cause: {}.'.format(str(e)))
             
@@ -66,6 +93,7 @@ class AgentClient:
                 return await self.register(retry_cnt-1, backoff_time*2)
             
             else:
+                self.metrics['state'].state('failed')
                 return False
 
         return True
