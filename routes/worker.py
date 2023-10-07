@@ -9,12 +9,15 @@ def status():
     # This will check if any LLM that is READY, then return "READY", if every is busy, return "BUSY"
     # Parameters: name, history_id, user_id
     llm_name, history_id, user_id = request.form.get("name"), request.form.get("history_id"), request.form.get("user_id")
-    if llm_name and history_id and data.get(llm_name):
-        for i in data[llm_name]:
-            if i[1] == "READY" and i[2] == -1 and i[3] == -1:
-                i[2] = history_id
-                i[3] = user_id
-                return "READY"
+    if llm_name and history_id:
+        if data.get(llm_name):
+            for i in data[llm_name]:
+                if i[1] == "READY" and i[2] == -1 and i[3] == -1:
+                    i[2] = history_id
+                    i[3] = user_id
+                    return "READY"
+        else:
+            return "NOMACHINE"
     return "BUSY"
    
 @worker.route("/register", methods=["POST"])
