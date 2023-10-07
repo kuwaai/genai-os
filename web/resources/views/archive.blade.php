@@ -33,7 +33,7 @@
                 @if (!$have)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        No disabled LLM history found!
+                        {{__("No disabled LLM history found!")}}
                     </div>
                 @endif
             </div>
@@ -41,9 +41,7 @@
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                This is where disabled LLM history located<br>
-                They might back to online soon or just gone forever<br>
-                You're still able to view the history or delete them
+                {!!__("This is where disabled LLM history located<br>They might back to online soon or just gone forever<br>You're still able to view the history or delete them")!!}
             </div>
         @else
             <div id="histories"
@@ -64,28 +62,23 @@
                     </form>
                 @endif
                 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
-                    @if (request()->route('llm_id'))
-                        <p class="flex items-center">New Chat with
-                            {{ App\Models\LLMs::findOrFail(request()->route('llm_id'))->name }}</p>
-                    @elseif(request()->route('chat_id'))
-                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto scrollbar">
-                            {{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</p>
+                    <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto scrollbar">
+                        {{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</p>
 
-                        <div class="flex">
-                            <button onclick="saveChat()"
-                                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
-                                <i class="fas fa-save"></i>
-                            </button>
-                            <button onclick="editChat()"
-                                class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <button onclick="deleteChat()"
-                                class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    @endif
+                    <div class="flex">
+                        <button onclick="saveChat()"
+                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
+                            <i class="fas fa-save"></i>
+                        </button>
+                        <button onclick="editChat()"
+                            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button onclick="deleteChat()"
+                            class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
                     @if (request()->route('chat_id'))

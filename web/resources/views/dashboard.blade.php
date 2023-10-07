@@ -33,7 +33,7 @@
                                         <label for="update_img">
                                             <span
                                                 class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
-                                                LLM Image
+                                                {{__("LLM Image")}}
                                             </span>
                                             <img id="image"
                                                 class="rounded-full border border-gray-400 dark:border-gray-900 m-auto bg-black"
@@ -46,62 +46,62 @@
                             <div class="w-full md:w-2/3 px-3">
                                 <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="llm_name">
-                                    LLM Name
+                                    {{__("LLM Name")}}
                                 </label>
                                 <input name="name" required
                                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                    id="llm_name" placeholder="LLM Name">
+                                    id="llm_name" placeholder="{{__("LLM Name")}}">
                             </div>
                         </div>
                         <div class="flex flex-wrap -mx-3 mb-2">
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                                 <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="version">
-                                    Version
+                                    {{__("Version")}}
                                 </label>
                                 <input name="version"
                                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                    id="version" type="text" placeholder="Version">
+                                    id="version" type="text" placeholder="{{__("Version")}}">
                             </div>
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                                 <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="access_code">
-                                    Access Code
+                                    {{__("Access Code")}}
                                 </label>
                                 <input name="access_code" required
                                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                    id="access_code" type="text" placeholder="Access Code">
+                                    id="access_code" type="text" placeholder="{{__("Access Code")}}">
                             </div>
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                                 <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="order">
-                                    Order
+                                    {{__("Order")}}
                                 </label>
                                 <input name="order"
                                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                    id="order" type="text" placeholder="Order">
+                                    id="order" type="text" placeholder="{{__("Order")}}">
                             </div>
                         </div>
                         <div class="flex flex-wrap -mx-3 mb-2">
                             <div class="w-full px-3">
                                 <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="link">
-                                    Link
+                                    {{__("Link")}}
                                 </label>
                                 <input name="link"
                                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                    id="link" placeholder="Link for more information to this LLM" value="">
+                                    id="link" placeholder="{{__("Link for more information to this LLM")}}" value="">
                             </div>
                         </div>
                         <div class="flex flex-wrap -mx-3 mb-2">
                             <div class="w-full px-3">
                                 <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                     for="description">
-                                    Description
+                                    {{__("Description")}}
                                 </label>
                                 <input name="description"
                                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                    id="description" placeholder="Description for this LLM">
+                                    id="description" placeholder="{{__("Description for this LLM")}}">
                             </div>
                         </div>
                         <div class="text-center">
@@ -133,14 +133,13 @@
                                                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are
-                                                you sure you want to update this LLM?</h3>
+                                                {{__("you sure you want to update this LLM?")}}</h3>
                                             <button data-modal-hide="popup-modal2" type="submit"
                                                 class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                                Yes, I'm sure
+                                                {{__("Yes, I'm sure")}}
                                             </button>
                                             <button data-modal-hide="popup-modal2" type="button"
-                                                class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">No,
-                                                cancel</button>
+                                                class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{__("No, cancel")}}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -148,7 +147,7 @@
                             <button data-modal-target="popup-modal" data-modal-toggle="popup-modal" type="button"
                                 id="delete_button"
                                 class="bg-red-500 hover:bg-red-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                Delete
+                                {{__("Delete")}}
                             </button>
                             <div id="popup-modal" data-modal-backdrop="static" tabindex="-2"
                                 class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -210,7 +209,7 @@
                     <span class="sr-only">Close modal</span>
                 </button>
                 <div class="px-6 py-6 ml:px-8">
-                    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">AI Election Configure</h3>
+                    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">{{__("AI Election Configure")}}</h3>
 
                     <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
                         action="{{ route('play.ai_elections.update') }}" class="w-full max-w-xl">
@@ -222,8 +221,7 @@
                             <div
                                 class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-600 peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600">
                             </div>
-                            <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enable the
-                                game</span>
+                            <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{{__("Enable the game")}}</span>
                         </label>
                         <div class="text-center">
                             <button type="submit"
@@ -255,7 +253,7 @@
                                 onclick="$('#llm_table').slideToggle();$('#collapse_llm_table_btn').toggleClass('rotate-180');"
                                 class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4  rounded flex items-center justify-center">
                                 <i id="collapse_llm_table_btn"
-                                    class="fas fa-chevron-up transform transition duration-500"></i>
+                                    class="fas fa-chevron-up transform transition duration-500 rotate-180"></i>
                             </button>
                             <button onclick="CreateRow()" data-modal-target="edit_llm" data-modal-toggle="edit_llm"
                                 class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 ml-2 rounded flex items-center justify-center">
@@ -285,19 +283,19 @@
                                     <tr>
                                         <th scope="col"
                                             class="px-4 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                                            Image
+                                            {{__("Image")}}
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                                            Name
+                                            {{__("Name")}}
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                                            Access Code
+                                            {{__("Access Code")}}
                                         </th>
                                         <th scope="col"
                                             class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                                            Actions
+                                            {{__("Actions")}}
                                         </th>
                                     </tr>
                                 </thead>
@@ -368,8 +366,7 @@
                         </header>
                         <div class="mt-3 mx-auto flex">
                             <button data-modal-target="ai_election_modal" data-modal-toggle="ai_election_modal"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center">AI
-                                Election[WIP]</button>
+                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center">{{__("AI Election") . __("[WIP]")}}</button>
                         </div>
                         <div class="flex items-center gap-4">
                             @if (session('status') === 'play_setting_saved')
@@ -402,8 +399,8 @@
             $("#update_LLM_by_ID input[name='id']").val("")
             $("#update_LLM_by_ID input[name='description']").val("")
             $("#update_LLM_by_ID input[name='version']").val("")
-            $("#edit_llm h3:eq(0)").text("Create LLM Profile")
-            $("#edit_llm h3:eq(1)").text("Are you sure you want to CREATE this LLM Profile?")
+            $("#edit_llm h3:eq(0)").text("{{__('Create LLM Profile')}}")
+            $("#edit_llm h3:eq(1)").text("{{__('Are you sure you want to CREATE this LLM Profile?')}}")
             $("#delete_button").hide()
         }
 
@@ -422,9 +419,9 @@
             $("#delete_llm").off('click').on('click', function() {
                 DeleteRow(data[5]);
             });
-            $("#edit_llm h3:eq(0)").text("Modify LLM Profile")
-            $("#edit_llm h3:eq(1)").text("Are you sure you want to UPDATE this LLM Profile?")
-            $("#edit_llm h3:eq(2)").text("Are you sure you want to DELETE this LLM Profile?")
+            $("#edit_llm h3:eq(0)").text("{{__('Modify LLM Profile')}}")
+            $("#edit_llm h3:eq(1)").text("{{__('Are you sure you want to UPDATE this LLM Profile?')}}")
+            $("#edit_llm h3:eq(2)").text("{{__('Are you sure you want to DELETE this LLM Profile?')}}")
             $("#delete_button").show()
         }
         $('#update_img').on('change', function(event) {

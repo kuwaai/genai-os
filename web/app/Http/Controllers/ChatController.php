@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
 use App\Models\Histories;
@@ -23,8 +24,8 @@ class ChatController extends Controller
 {
     public function update_chain(Request $request)
     {
-        $state = $request->input('switch') == "true";
-        Session::put("chained",$state);
+        $state = $request->input('switch') == 'true';
+        Session::put('chained', $state);
     }
 
     public function home(Request $request)
@@ -51,6 +52,70 @@ class ChatController extends Controller
         }
     }
 
+    public function upload(Request $request)
+    {
+        if (count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
+            $result = DB::table(function ($query) {
+                $query
+                    ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                    ->from('group_permissions')
+                    ->join('permissions', 'perm_id', '=', 'permissions.id')
+                    ->where('group_id', Auth()->user()->group_id)
+                    ->where('name', 'like', 'model_%')
+                    ->get();
+            }, 'tmp')
+                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+                ->select('llms.id')
+                ->where('llms.enabled', true)
+                ->get()
+                ->pluck('id')
+                ->toarray();
+            $llm_id = $request->input('llm_id');
+
+            $request->validate([
+                'file' => 'required|max:10240',
+            ]);
+            if ($llm_id && in_array($llm_id, $result) && $request->file()) {
+                // Start uploading the file
+                $user = $request->user();
+                $userId = $user->id;
+                $directory = 'pdfs/' . $userId; // Directory relative to 'public/storage/'
+                $storagePath = public_path('storage/' . $directory); // Adjusted path
+
+                $fileName = time() . '_' . $request->file->getClientOriginalName();
+                $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
+
+                $files = File::files($storagePath);
+
+                if (count($files) > 5) {
+                    usort($files, function ($a, $b) {
+                        return filectime($a) - filectime($b);
+                    });
+
+                    while (count($files) > 5) {
+                        $oldestFile = array_shift($files);
+                        File::delete($storagePath . '/' . $oldestFile->getFilename());
+                    }
+                }
+                //Create a chat and send that url into the llm
+                $msg = '/url ' . url('storage/' . $directory . '/' . rawurlencode($fileName));
+                $chat = new Chats();
+                $chat->fill(['name' => $msg, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+                $chat->save();
+                $history = new Histories();
+                $history->fill(['msg' => $msg, 'chat_id' => $chat->id, 'isbot' => false]);
+                $history->save();
+                $history = new Histories();
+                $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->save();
+                Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                RequestChat::dispatch(json_encode([['msg' => $msg, 'isbot' => false]]), LLMs::find($llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                return Redirect::route('chat.chat', $chat->id);
+            }
+        }
+        return back();
+    }
+
     public function main(Request $request)
     {
         $chat = Chats::findOrFail($request->route('chat_id'));
@@ -64,55 +129,98 @@ class ChatController extends Controller
 
     public function create(ChatRequest $request): RedirectResponse
     {
-        $input = $request->input('input');
-        if ($input) {
-            $chat = new Chats();
-            $chat->fill(['name' => $input, 'llm_id' => $request->input('llm_id'), 'user_id' => $request->user()->id]);
-            $chat->save();
-            $history = new Histories();
-            $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
-            $history->save();
-            $tmp = Histories::where('chat_id', '=', $chat->id)
-                ->select('msg', 'isbot')
+        if (count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
+            $result = DB::table(function ($query) {
+                $query
+                    ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                    ->from('group_permissions')
+                    ->join('permissions', 'perm_id', '=', 'permissions.id')
+                    ->where('group_id', Auth()->user()->group_id)
+                    ->where('name', 'like', 'model_%')
+                    ->get();
+            }, 'tmp')
+                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+                ->select('llms.id')
+                ->where('llms.enabled', true)
                 ->get()
-                ->toJson();
-            $history = new Histories();
-            $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
-            $history->save();
-            $llm = LLMs::findOrFail($request->input('llm_id'));
-            Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($tmp, $llm->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                ->pluck('id')
+                ->toarray();
+            $input = $request->input('input');
+            $llm_id = $request->input('llm_id');
+            if ($input && $llm_id && in_array($llm_id, $result)) {
+                $chat = new Chats();
+                $chat->fill(['name' => $input, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+                $chat->save();
+                $history = new Histories();
+                $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
+                $history->save();
+                $tmp = Histories::where('chat_id', '=', $chat->id)
+                    ->select('msg', 'isbot')
+                    ->get()
+                    ->toJson();
+                $history = new Histories();
+                $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->save();
+                $llm = LLMs::findOrFail($llm_id);
+                Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                RequestChat::dispatch($tmp, $llm->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                return Redirect::route('chat.chat', $chat->id);
+            }
+        }else{
+            Log::channel("analyze")->info("User " . Auth::user()->id . " with " . implode(",",Redis::lrange('usertask_' . Auth::user()->id, 0, -1)));
         }
-        return Redirect::route('chat.chat', $chat->id);
+        return back();
     }
 
     public function request(Request $request): RedirectResponse
     {
-        $chatId = $request->input('chat_id');
-        $input = $request->input('input');
-        $chained = Session::get('chained') == "true";
-        if ($chatId && $input) {
-            $history = new Histories();
-            $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
-            $history->save();
-            if ($chained) {
-                $tmp = Histories::where('chat_id', '=', $chatId)
-                    ->select('msg', 'isbot')
-                    ->orderby('created_at')
-                    ->orderby('id', 'desc')
-                    ->get()
-                    ->toJson();
-            } else {
-                $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
+        if (count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
+            $result = DB::table(function ($query) {
+                $query
+                    ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                    ->from('group_permissions')
+                    ->join('permissions', 'perm_id', '=', 'permissions.id')
+                    ->where('group_id', Auth()->user()->group_id)
+                    ->where('name', 'like', 'model_%')
+                    ->get();
+            }, 'tmp')
+                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+                ->select('llms.id')
+                ->where('llms.enabled', true)
+                ->get()
+                ->pluck('id')
+                ->toarray();
+            $chatId = $request->input('chat_id');
+            $llm_id = Chats::find($request->input('chat_id'));
+            if ($llm_id) {
+                $llm_id = $llm_id->llm_id;
             }
-            $history = new Histories();
-            $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
-            $history->save();
-            $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
-            Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+            $input = $request->input('input');
+            $chained = Session::get('chained') == 'true';
+            if ($chatId && $input && $llm_id && in_array($llm_id, $result)) {
+                $history = new Histories();
+                $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
+                $history->save();
+                if (in_array(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, ['doc_qa', 'web_qa']) || $chained) {
+                    $tmp = Histories::where('chat_id', '=', $chatId)
+                        ->select('msg', 'isbot')
+                        ->orderby('created_at')
+                        ->orderby('id', 'desc')
+                        ->get()
+                        ->toJson();
+                } else {
+                    $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
+                }
+                $history = new Histories();
+                $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->save();
+                $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
+                Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                return Redirect::route('chat.chat', $chatId);
+            }
         }
-        return Redirect::route('chat.chat', $chatId);
+        return back();
     }
 
     public function delete(Request $request): RedirectResponse
@@ -171,28 +279,57 @@ class ChatController extends Controller
                 global $listening;
                 $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                 if (count($listening) > 0) {
-                    $client = Redis::connection();
-                    $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
-                        global $listening;
-                        [$type, $msg] = explode(' ', $message, 2);
-                        $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                        if ($type == 'Ended') {
-                            $key = array_search($history_id, $listening);
-                            if ($key !== false) {
-                                unset($listening[$key]);
-                            }
-                            if (count($listening) == 0) {
-                                echo "event: close\n\n";
-                                ob_flush();
-                                flush();
-                                $client->disconnect();
-                            }
-                        } elseif ($type == 'New') {
-                            echo 'data: ' . json_encode(['history_id' => $history_id, 'msg' => json_decode($msg)->msg]) . "\n\n";
+                    foreach ($listening as $i) {
+                        $history = Histories::find($i);
+                        if (!$history) {
+                            unset($listening[array_search($i, $listening)]);
+                        } elseif ($history && $history->msg !== '* ...thinking... *') {
+                            echo 'data: ' . json_encode(['history_id' => $i, 'msg' => $history->msg]) . "\n\n";
                             ob_flush();
                             flush();
+                            unset($listening[array_search($i, $listening)]);
                         }
-                    });
+                    }
+                    if (count($listening) == 0) {
+                        echo "data: finished\n\n";
+                        echo "event: close\n\n";
+                        ob_flush();
+                        flush();
+                        $client->disconnect();
+                    }
+
+                    $client = Redis::connection();
+                    try {
+                        $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
+                            global $listening;
+                            [$type, $msg] = explode(' ', $message, 2);
+                            $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                            if ($type == 'Ended') {
+                                $key = array_search($history_id, $listening);
+                                if ($key !== false) {
+                                    unset($listening[$key]);
+                                }
+                                if (count($listening) == 0) {
+                                    echo "data: finished\n\n";
+                                    echo "event: close\n\n";
+                                    ob_flush();
+                                    flush();
+                                    $client->disconnect();
+                                }
+                            } elseif ($type == 'New') {
+                                echo 'data: ' . json_encode(['history_id' => $history_id, 'msg' => json_decode($msg)->msg]) . "\n\n";
+                                ob_flush();
+                                flush();
+                            }
+                        });
+                    } catch (RedisException) {
+                    }
+                } else {
+                    echo "data: finished\n\n";
+                    echo "event: close\n\n";
+                    ob_flush();
+                    flush();
+                    $client->disconnect();
                 }
             }
         });

@@ -52,12 +52,12 @@ class RequestChat implements ShouldQueue
         }
         Log::channel('analyze')->Info($this->channel);
         if ($this->history_id > 0 && $this->channel == $this->history_id . '') {
-            if (Histories::findOrFail($this->channel)->msg != '* ...thinking... *') {
+            if (Histories::find($this->channel) && Histories::find($this->channel)->msg != '* ...thinking... *') {
                 Log::Debug('Hmmm');
                 return;
             }
         }
-        //Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
         $start = microtime(true);
         $tmp = '';
         try {
@@ -71,9 +71,27 @@ class RequestChat implements ShouldQueue
                 ],
                 'stream' => true,
             ]);
-            if ($response->getBody()->getContents() == 'BUSY') {
+            $state = trim($response->getBody()->getContents());
+            if ($state == 'BUSY') {
                 $this->release(10);
-            } else {
+            } else if ($state == "NOMACHINE"){
+                $tmp = "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]";
+                try {
+                    if ($this->channel == '' . $this->history_id) {
+                        $history = Histories::find($this->history_id);
+                        if ($history != null){
+                            $history->fill(['msg' => $tmp]);
+                            $history->save();
+                        }
+                    }
+                } catch (Exception $e) {
+                }
+                Log::channel('analyze')->Info("NOMACHINE: " . $this->access_code . " | " . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+                Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                sleep(1);
+                Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
+                Redis::publish($this->channel, 'Ended Ended');
+            } else if ($state == "READY") {
                 try {
                     $response = $client->post($agent_location . $this->agent_version . '/chat/completions', [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
@@ -121,24 +139,22 @@ class RequestChat implements ShouldQueue
                 } finally {
                     try {
                         if ($this->channel == '' . $this->history_id) {
-                            $history = Histories::findOrFail($this->history_id);
-                            $history->fill(['msg' => trim($tmp)]);
-                            $history->save();
+                            $history = Histories::find($this->history_id);
+                            if ($history != null){
+                                $history->fill(['msg' => trim($tmp)]);
+                                $history->save();
+                            }
                         }
                     } catch (Exception $e) {
-                    }
-                    Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
-                    for ($i = 0; $i < 5; $i++) {
-                        sleep(1);
-                        Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
                     }
                     if ($this->channel == '' . $this->history_id) {
                         Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     }
+                    Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
                     Redis::publish($this->channel, 'Ended Ended');
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    //Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . trim(str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $tmp)));
+                    Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . $tmp);
                 }
             }
         } catch (Exception $e) {
