@@ -3,10 +3,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "model_api_server"
-version = "0.0.2"
+name = "worker_framework"
+version = "0.0.3"
 authors = [
-  { name="Example Author", email="author@example.com" },
+  { name="Yung-Hsiang Hu", email="iftnt1999@gmail.com" },
 ]
 description = "A framework to serve and compose LLMs."
 readme = "README.md"
@@ -31,4 +31,4 @@ dependencies=[
 "Bug Tracker" = ""
 
 [project.scripts]
-model-api-server = "model_api_server.main:main"
+worker-server = "worker_framework.main:main"

@@ -10,9 +10,9 @@ from typing import Generator
 import prometheus_client
 import time
 
-import model_api_server.metrics_helper as metrics_helper
-from model_api_server.datatype import ChatRecord, Role
-from model_api_server.interfaces import CompletionInterface, TextLevelFilteringInterface, GeneralProcessInterface
+import worker_framework.metrics_helper as metrics_helper
+from worker_framework.datatype import ChatRecord, Role
+from worker_framework.interfaces import CompletionInterface, TextLevelFilteringInterface, GeneralProcessInterface
 
 # The modules may not in the default searching path.
 # Thus we append current working directory to the module searching path.

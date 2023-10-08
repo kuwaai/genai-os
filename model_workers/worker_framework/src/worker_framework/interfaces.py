@@ -3,7 +3,7 @@
 
 from typing import Generator
 import time
-from model_api_server.datatype import ChatRecord
+from worker_framework.datatype import ChatRecord
 
 class CompletionInterface:
   def complete(self, msg: [ChatRecord]) -> Generator[ChatRecord, None, None]:

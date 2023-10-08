@@ -2,7 +2,7 @@ FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
 ENV AGENT_ENDPOINT="http://web:9000/v1.0/"
 ENV LLM_NAME="Unnamed_LLM"
-ENV PUBLIC_ADDRESS="model-api"
+ENV PUBLIC_ADDRESS="api_dummy"
 ENV IGNORE_AGENT="False"
 ENV RETRY_COUNT=5
 ENV DEBUG=False
@@ -16,16 +16,16 @@ RUN pip install -r /requirements.txt &&\
     rm -f /requirements.txt
 
 # Copy all files into the image
-RUN mkdir -p /model_api_server
-COPY . /model_api_server/
+RUN mkdir -p /worker_framework
+COPY . /worker_framework/
 
-# Install model_api_server framework
-WORKDIR /model_api_server
+# Install worker_framework framework
+WORKDIR /worker_framework
 RUN pip install .
 
 # Cleanup
-RUN rm -rf /model_api_server
+RUN rm -rf /worker_framework
 
 WORKDIR /
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["model-api-server"]
+CMD ["worker-server"]

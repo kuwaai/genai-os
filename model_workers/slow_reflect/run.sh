@@ -2,4 +2,4 @@
 
 export LAYOUT_CONFIG="./layout.yaml"
 
-exec model-api-server
+exec worker-server

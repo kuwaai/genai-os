@@ -11,7 +11,7 @@ from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer, \
                          StoppingCriteria, StoppingCriteriaList, \
                          pipeline, GenerationConfig
 
-from model_api_server.datatype import ChatRecord, Role
+from worker_framework.datatype import ChatRecord, Role
 
 @dataclass
 class ChatTuple:

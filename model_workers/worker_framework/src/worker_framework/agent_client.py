@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 import atexit
 import asyncio
 import prometheus_client
-import model_api_server.metrics_helper as metrics_helper
+import worker_framework.metrics_helper as metrics_helper
 
 class AgentClient:
     """

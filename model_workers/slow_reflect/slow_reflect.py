@@ -1,8 +1,8 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-from model_api_server.datatype import ChatRecord, Role
-from model_api_server.interfaces import GeneralProcessInterface
+from worker_framework.datatype import ChatRecord, Role
+from worker_framework.interfaces import GeneralProcessInterface
 from typing import Generator
 import asyncio
 

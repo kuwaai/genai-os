@@ -1,4 +1,4 @@
-FROM model-api
+FROM worker-framework
 
 RUN mkdir -p /model_api
 
@@ -15,7 +15,6 @@ ENV LLM_NAME="chinese-convert"
 ENV PUBLIC_ADDRESS="localhost"
 ENV PORT="9001"
 ENV AGENT_ENDPOINT="http://localhost:9000/v1.0/"
-# ENV ENDPOINT="/"
 ENV DEBUG="False"
 
 ENTRYPOINT ["/bin/bash", "-c"]

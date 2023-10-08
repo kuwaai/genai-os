@@ -1,8 +1,8 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-from model_api_server.datatype import ChatRecord
-from model_api_server.interfaces import TextLevelFilteringInterface
+from worker_framework.datatype import ChatRecord
+from worker_framework.interfaces import TextLevelFilteringInterface
 import opencc
 from ckip_transformers.nlp import CkipWordSegmenter
 from functools import reduce

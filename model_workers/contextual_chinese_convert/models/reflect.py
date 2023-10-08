@@ -1,8 +1,8 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-from model_api_server.interfaces import CompletionInterface
-from model_api_server.datatype import ChatRecord, Role
+from worker_framework.interfaces import CompletionInterface
+from worker_framework.datatype import ChatRecord, Role
 from typing import Generator
 
 class ReflectModel(CompletionInterface):

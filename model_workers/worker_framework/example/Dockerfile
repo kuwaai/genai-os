@@ -1,4 +1,4 @@
-FROM model-api
+FROM worker-framework
 
 RUN mkdir -p /model_api
 
@@ -9,7 +9,7 @@ RUN pip install -r requirements.txt
 
 RUN chmod +x run.sh
 
-ENV LLM_NAME="chinese-convert"
+ENV LLM_NAME="example"
 ENV PUBLIC_ADDRESS="localhost"
 ENV PORT="9001"
 ENV AGENT_ENDPOINT="http://localhost:9000/v1.0/"

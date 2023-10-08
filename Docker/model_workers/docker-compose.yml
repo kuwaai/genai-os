@@ -3,7 +3,7 @@ version: '3'
 services:
   api_cc:
     # runtime: nvidia
-    image: model-api-chinese-convert:latest
+    image: worker-chinese-convert:latest
     # devices:
       # - /dev/nvidia0:/dev/nvidia0
     environment:

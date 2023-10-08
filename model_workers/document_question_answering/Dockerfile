@@ -1,5 +1,5 @@
-ARG MODEL_API_SERVER_VERSION=latest
-FROM model-api:${MODEL_API_SERVER_VERSION}
+ARG WORKER_FRAMEWORK_VERSION=latest
+FROM worker-framework:${WORKER_FRAMEWORK_VERSION}
 
 RUN mkdir -p /model_api
 
@@ -22,7 +22,6 @@ ENV LLM_NAME="doc-qa"
 ENV PUBLIC_ADDRESS="localhost"
 ENV PORT="9001"
 ENV AGENT_ENDPOINT="http://localhost:9000/v1.0/"
-# ENV ENDPOINT="/"
 ENV DEBUG="False"
 
 ENTRYPOINT ["/bin/bash", "-c"]

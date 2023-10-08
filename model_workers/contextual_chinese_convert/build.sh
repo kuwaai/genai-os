@@ -1,1 +1,1 @@
-sudo docker build -t model-api-chinese-convert .
+sudo docker build -t worker-chinese-convert .

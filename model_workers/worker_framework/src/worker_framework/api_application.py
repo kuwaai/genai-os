@@ -13,9 +13,9 @@ from starlette.requests import Request
 from sse_starlette.sse import EventSourceResponse
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
-import model_api_server.metrics_helper as metrics_helper
-from model_api_server.datatype import ChatRecord, Role
-from model_api_server.model_layout import ModelLayout
+import worker_framework.metrics_helper as metrics_helper
+from worker_framework.datatype import ChatRecord, Role
+from worker_framework.model_layout import ModelLayout
 
 health_check_endpoint = '/health'
 prometheus_endpoint ='/metrics'
@@ -45,6 +45,15 @@ class InternalEndpointFilter(logging.Filter):
             True
         )
         return result
+
+class ChatHistoryParser:
+
+    @staticmethod
+    def from_json(raw_chat_history: str) -> [ChatRecord]:
+        raw_chat_history = json.loads(raw_chat_history)
+        chat_history = [{**d, 'role': Role.BOT if d['isbot'] else Role.USER} for d in raw_chat_history]
+        chat_history = [from_dict(data_class=ChatRecord, data=d) for d in chat_history]
+        return chat_history
 
 class ModelApiApplication:
     """
@@ -83,12 +92,6 @@ class ModelApiApplication:
             },
         })
 
-    def _get_chat_history(self, raw_chat_history: str) -> [ChatRecord]:
-        raw_chat_history = json.loads(raw_chat_history)
-        chat_history = [{**d, 'role': Role.BOT if d['isbot'] else Role.USER} for d in raw_chat_history]
-        chat_history = [from_dict(data_class=ChatRecord, data=d) for d in chat_history]
-        return chat_history
-    
     async def api(self, request: Request):
         """
         The entrypoint of the public API.
@@ -108,7 +111,7 @@ class ModelApiApplication:
         chat_history = []
         async with request.form() as form:
             try:
-                chat_history = self._get_chat_history(form.get('input'))
+                chat_history = ChatHistoryParser.from_json(form.get('input'))
             except Exception as e:
                 self.logger.exception('Error occurs when getting chat history.')
                 self.metrics['rejected_requests'].inc()

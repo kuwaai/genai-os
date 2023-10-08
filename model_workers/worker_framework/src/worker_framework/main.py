@@ -8,10 +8,10 @@ import prometheus_client
 import uvicorn
 
 from importlib.metadata import version
-from model_api_server.config import Config
-from model_api_server.agent_client import AgentClient
-from model_api_server.model_layout import ModelLayout
-from model_api_server.api_application import ModelApiApplication
+from worker_framework.config import Config
+from worker_framework.agent_client import AgentClient
+from worker_framework.model_layout import ModelLayout
+from worker_framework.api_application import ModelApiApplication
 
 class RegistrationJob:
     """
@@ -46,9 +46,9 @@ def main():
         logging.config.dictConfig(logging_config)
 
     # Print version
-    framework_version = version('model_api_server')
+    framework_version = version('worker_framework')
     logging.info('Version of framework: {}'.format(framework_version))
-    version_info = prometheus_client.Info('framework_version', 'The version of model_api_server framework.')
+    version_info = prometheus_client.Info('framework_version', 'The version of worker_framework framework.')
     version_info.info({'version': framework_version})
 
     # Create a job that will register with the Agent after the Model API server started.
