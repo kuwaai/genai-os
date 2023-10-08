@@ -3,7 +3,6 @@
 
 import logging
 import asyncio
-import uvicorn
 import json
 import prometheus_client
 from functools import reduce
@@ -22,6 +21,11 @@ health_check_endpoint = '/health'
 prometheus_endpoint ='/metrics'
 
 class InternalEndpointFilter(logging.Filter):
+    """
+    Filter out internal endpoint from access log.
+    """
+
+
     def filter(self, record):
         # Aligned with uvicorn.logging.AccessFormatter
         (
@@ -41,9 +45,10 @@ class InternalEndpointFilter(logging.Filter):
             True
         )
         return result
-class ModelApiServer:
+
+class ModelApiApplication:
     """
-    ModelApiServer is responsible to server the public endpoints.
+    ModelApiApplication encapsulates application logic of both the public endpoints and internal endpoints.
     """
 
     def __init__(self, endpoint: str, model_layout: ModelLayout, on_startup: list = [], debug = False):
@@ -60,7 +65,7 @@ class ModelApiServer:
             Route(health_check_endpoint, endpoint=self.health_check, methods=['GET']),
             Mount(prometheus_endpoint, app=prometheus_client.make_asgi_app())
         ]
-        self.web_server = Starlette(debug=debug, routes=routes, on_startup=on_startup)
+        self.app = Starlette(debug=debug, routes=routes, on_startup=on_startup)
         
         metric_prefix = 'api'
         self.metrics = metrics_helper.get_instance_with_prefix(metric_prefix, {
@@ -78,22 +83,6 @@ class ModelApiServer:
             },
         })
 
-    def start(self, port: int, logging_config: str):
-        """
-        Start the web server.
-
-        Arguments:
-            port: Port number to serve web requests.
-            logging_config: The path of logging configuration file.
-        """
-
-        uvicorn.run(
-            self.web_server,
-            host='0.0.0.0',
-            port=port,
-            log_config=logging_config
-        )
-
     def _get_chat_history(self, raw_chat_history: str) -> [ChatRecord]:
         raw_chat_history = json.loads(raw_chat_history)
         chat_history = [{**d, 'role': Role.BOT if d['isbot'] else Role.USER} for d in raw_chat_history]
@@ -103,7 +92,8 @@ class ModelApiServer:
     async def api(self, request: Request):
         """
         The entrypoint of the public API.
-        This forward the result from the LLM and wrap them into an event source.
+        This function preprocesses the request and wraps the result from the LLM
+        into a string stream.
 
         Arguments:
             request: The Request object from the Starlette framework

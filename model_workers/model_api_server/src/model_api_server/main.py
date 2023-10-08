@@ -5,12 +5,13 @@ import sys, os
 import logging, yaml
 import asyncio
 import prometheus_client
+import uvicorn
 
 from importlib.metadata import version
 from model_api_server.config import Config
 from model_api_server.agent_client import AgentClient
 from model_api_server.model_layout import ModelLayout
-from model_api_server.api_server import ModelApiServer
+from model_api_server.api_application import ModelApiApplication
 
 class RegistrationJob:
     """
@@ -58,9 +59,16 @@ def main():
     
     # Initialize the Model API server.
     model_layout = ModelLayout(config.layout_config, config.debug)
-    server = ModelApiServer(
+    api = ModelApiApplication(
         config.endpoint, model_layout,
         on_startup=[registration_job.schedule],
         debug=config.debug
     )
-    server.start(config.port, config.logging_config)
+    
+    # Start the web server
+    uvicorn.run(
+        api.app,
+        host='0.0.0.0',
+        port=config.port,
+        log_config=logging_config
+    )

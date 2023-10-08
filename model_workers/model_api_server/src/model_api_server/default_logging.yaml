@@ -13,7 +13,7 @@ formatters:
 
 filters:
   internal_endpoint_filter:
-    "()": model_api_server.api_server.InternalEndpointFilter
+    "()": model_api_server.api_application.InternalEndpointFilter
 
 handlers:
   default:
