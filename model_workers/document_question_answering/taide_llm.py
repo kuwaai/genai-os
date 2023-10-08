@@ -4,6 +4,7 @@
 import torch, accelerate, time
 import chevron
 import logging
+import asyncio
 from functools import reduce
 from pathlib import Path
 from dataclasses import dataclass
@@ -141,7 +142,9 @@ class TaideLlm:
             self.logger.info('Final Prompt: {}'.format(prompt))
             
             self.logger.info('Generating...')
-            result = self.pipe(prompt)[0]['generated_text']
+            loop = asyncio.get_running_loop()
+            result = await loop.run_in_executor(None, self.pipe, prompt)
+            result = result[0]['generated_text']
             self.logger.info('Generation finished.')
             
         except Exception as e:

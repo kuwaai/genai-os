@@ -1,4 +1,6 @@
 import logging
+import asyncio
+import functools
 from langchain.docstore.document import Document
 from parallel_splitter import ParallelSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
@@ -24,7 +26,7 @@ class DocumentStore:
     # self.corase_k = 2
 
     self.splitter = ParallelSplitter(chunk_size=128, chunk_overlap=16)
-    self.embeddings = HuggingFaceEmbeddings(model_name=embedding_model)
+    self.embedding_model = embedding_model
     self.vector_store:FAISS = None
     self.fine_retriever:VectorStoreRetriever = None
     # self.coarse_retriever:BM25Retriever = None
@@ -39,7 +41,19 @@ class DocumentStore:
 
     # Embedding
     self.logger.info('Calculating embeddings...')
-    self.vector_store = FAISS.from_documents(chunks, self.embeddings)
+    loop = asyncio.get_running_loop()
+    self.embeddings = await loop.run_in_executor(
+      None,
+      functools.partial(HuggingFaceEmbeddings, model_name=self.embedding_model)
+    )
+    self.logger.info('Embedding model loaded.')
+
+    self.vector_store = await loop.run_in_executor(
+      None,
+      FAISS.from_documents,
+      chunks,
+      self.embeddings
+    )
     self.logger.info('Embedding calculated.')
 
     # self.coarse_retriever = BM25Retriever.from_texts(chunks)
@@ -53,5 +67,11 @@ class DocumentStore:
     #   weights=[0.5, 0.5]
     # )
   
-  def retrieve(self, question:str) -> [Document]:
-    return self.fine_retriever.get_relevant_documents(question)
+  async def retrieve(self, question:str) -> [Document]:
+    loop = asyncio.get_running_loop()
+    related_docs = await loop.run_in_executor(
+      None,
+      self.fine_retriever.get_relevant_documents,
+      question
+    )
+    return related_docs

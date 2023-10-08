@@ -1,7 +1,7 @@
 import os
 import asyncio
 import itertools
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, Iterable
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import SentenceTransformersTokenTextSplitter
@@ -9,7 +9,7 @@ from langchain.docstore.document import Document
 
 async def async_pool_map(fn: Callable, data: Iterable, max_workers=None) -> Iterable:
   """
-  Emulate the multithread map operation asynchronously.
+  Emulate the parallel map operation asynchronously.
   Equivalent to:
   thread_pool = multiprocessing.Pool(max_workers)
   return thread_pool.map(fn, data)
@@ -22,7 +22,7 @@ async def async_pool_map(fn: Callable, data: Iterable, max_workers=None) -> Iter
   
   loop = asyncio.get_event_loop()
   result = []
-  with ThreadPoolExecutor(max_workers=max_workers) as executor:
+  with ProcessPoolExecutor(max_workers=max_workers) as executor:
     futures = [loop.run_in_executor(executor, fn, x) for x in data]
     result = await asyncio.gather(*futures)
   return result

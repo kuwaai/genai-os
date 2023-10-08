@@ -1,4 +1,4 @@
-uvicorn
+uvicorn[standard]
 starlette
 sse-starlette
 python-multipart

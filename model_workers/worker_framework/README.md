@@ -81,6 +81,53 @@ However, we recommend using the container environment to isolate each worker in 
 
 ### Best-Practice
 
+As the framework operates asynchronously, it's essential to ensure that any blocking function, whether it's I/O-blocking or CPU-blocking, is invoked within an executor to facilitate concurrency [1] [3]. The official Python documentation presents three options for achieving concurrency within the asyncio framework [2], as illustrated in the code snippets below.
+
+In many scenarios, executing a blocking function within the default event loop's executor or within a tailored thread pool suffices. However, when dealing with a CPU-intensive function, it's advisable to run it in a separate process to prevent it from stalling the event loop.
+
+```python
+def blocking_fn(x):
+    # Blocking operations.
+    # E.g. file I/O, downloading files, loading models, inferencing.
+    # ...
+    return x
+
+def cpu_bound(x):
+    # CPU bound operations.
+    # E.g. batch splitting, mapping with CPU.
+    # ...
+    return x
+
+async def main():
+    """
+    The entry point of your filter/model/layout.
+    """
+
+    loop = asyncio.get_running_loop()
+
+    ## Options:
+
+    # 1. Run in the default loop's executor:
+    result = await loop.run_in_executor(None, blocking_fn)
+    print('default thread pool', result)
+
+    # 2. Run in a custom thread pool:
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        result = await loop.run_in_executor(pool, blocking_fn)
+        print('custom thread pool', result)
+
+    # 3. Run in a custom process pool:
+    with concurrent.futures.ProcessPoolExecutor() as pool:
+        result = await loop.run_in_executor(pool, cpu_bound)
+        print('custom process pool', result)
+```
+
+References:  
+[1] [_Python documentation_, "Developing with asyncio - Running Blocking Code"](https://docs.python.org/3/library/asyncio-dev.html#running-blocking-code)  
+[2] [_Python documentation_, "Event Loop - Executing Code in Thread or Process Pools"](https://docs.python.org/3/library/asyncio-eventloop.html#executing-code-in-thread-or-process-pools)  
+[3] [A.A. Masnun, "Async Python: The Different Forms of Concurrency"](http://masnun.rocks/2016/10/06/async-python-the-different-forms-of-concurrency/)  
+
+
 ### Interfaces of Default Layout
 #### LLM
 

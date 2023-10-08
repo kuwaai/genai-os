@@ -16,7 +16,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies=[
-  'uvicorn==0.23.2',
+  'uvicorn[standard]==0.23.2',
   'starlette==0.31.1',
   'sse-starlette==1.6.5',
   'python-multipart==0.0.6',

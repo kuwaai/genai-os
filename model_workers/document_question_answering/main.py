@@ -98,7 +98,7 @@ class DocumentQaProcess(GeneralProcessInterface):
 
       if self.llm.is_too_long(modified_chat_history):
         # Retrieve
-        related_docs = document_store.retrieve(question)
+        related_docs = await document_store.retrieve(question)
         modified_chat_history = self.replace_chat_history(chat_history, llm_question, related_docs)
 
       # Generate
