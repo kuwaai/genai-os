@@ -9,6 +9,7 @@ import uvicorn
 
 from importlib.metadata import version
 from worker_framework.config import Config
+from worker_framework.metrics_manager import get_class_metrics
 from worker_framework.agent_client import AgentClient
 from worker_framework.model_layout import ModelLayout
 from worker_framework.api_application import ModelApiApplication
@@ -48,8 +49,8 @@ def main():
     # Print version
     framework_version = version('worker_framework')
     logging.info('Version of framework: {}'.format(framework_version))
-    version_info = prometheus_client.Info('framework_version', 'The version of worker_framework framework.')
-    version_info.info({'version': framework_version})
+    metrics = get_class_metrics(None)
+    metrics['version'].info({'version': framework_version})
 
     # Create a job that will register with the Agent after the Model API server started.
     public_endpoint = 'http://{0}:{1}{2}'.format(config.public_address, config.port, config.endpoint)

@@ -13,7 +13,7 @@ from starlette.requests import Request
 from sse_starlette.sse import EventSourceResponse
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
-import worker_framework.metrics_helper as metrics_helper
+from worker_framework.metrics_manager import get_class_metrics
 from worker_framework.datatype import ChatRecord, Role
 from worker_framework.model_layout import ModelLayout
 
@@ -76,21 +76,7 @@ class ModelApiApplication:
         ]
         self.app = Starlette(debug=debug, routes=routes, on_startup=on_startup)
         
-        metric_prefix = 'api'
-        self.metrics = metrics_helper.get_instance_with_prefix(metric_prefix, {
-            'received_requests': {
-                'type': prometheus_client.Counter,
-                'description': 'Number of received requests.',
-            },
-            'accepted_requests': {
-                'type': prometheus_client.Counter,
-                'description': 'Number of accepted requests.',
-            },
-            'rejected_requests': {
-                'type': prometheus_client.Counter,
-                'description': 'Number of rejected requests.',
-            },
-        })
+        self.metrics = get_class_metrics(self)
 
     async def api(self, request: Request):
         """

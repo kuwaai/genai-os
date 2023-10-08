@@ -10,7 +10,7 @@ from typing import Generator
 import prometheus_client
 import time
 
-import worker_framework.metrics_helper as metrics_helper
+from worker_framework.metrics_manager import get_class_metrics
 from worker_framework.datatype import ChatRecord, Role
 from worker_framework.interfaces import CompletionInterface, TextLevelFilteringInterface, GeneralProcessInterface
 
@@ -44,42 +44,7 @@ class ModelLayout:
         # State variable to indicate whether the model is processing another request
         self.busy = False
 
-        metric_prefix = 'layout'
-        default_buckets = prometheus_client.Histogram.DEFAULT_BUCKETS
-        process_time_buckets = default_buckets[:-1] + (20, 30, 40, 50, 60) + default_buckets[-1:]
-        output_length_buckets =  tuple(i*10 for i in range(1, 10))
-        output_length_buckets += tuple(i*100 for i in range(1, 20))
-        output_length_buckets += (float('inf'),)
-        self.metrics = metrics_helper.get_instance_with_prefix(metric_prefix, {
-            'config': {
-                'type': prometheus_client.Info,
-                'description': 'The configuration of layout.',
-            },
-            'state': {
-                'type': prometheus_client.Enum,
-                'description': 'The state of the layout.',
-                'states': ['idle', 'busy']
-            },
-            'failed': {
-                'type': prometheus_client.Counter,
-                'description': 'Number of failed requests.',
-            },
-            'process_time_seconds': {
-                'type': prometheus_client.Histogram,
-                'description': 'Time consumed to process single request with unit: Seconds.',
-                'buckets': process_time_buckets,
-            },
-            'output_length_charters':{
-                'type': prometheus_client.Histogram,
-                'description': 'The length of the output text with unit: Charters.',
-                'buckets': output_length_buckets,
-            },
-            'output_throughput_charters_per_second':{
-                'type': prometheus_client.Histogram,
-                'description': 'The throughput of output text with unit: Charters/Second.',
-                'buckets': output_length_buckets,
-            },
-        })
+        self.metrics = get_class_metrics(self)
         self.metrics['config'].info({
             'default_layout': str(self.override_process == None),
             'main_class': type(self.override_process or self.llm).__name__

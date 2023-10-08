@@ -6,8 +6,7 @@ import requests
 from urllib.parse import urljoin
 import atexit
 import asyncio
-import prometheus_client
-import worker_framework.metrics_helper as metrics_helper
+from worker_framework.metrics_manager import get_class_metrics
 
 class AgentClient:
     """
@@ -31,22 +30,7 @@ class AgentClient:
         self.llm_name = llm_name
         self.public_endpoint = public_endpoint
 
-        metric_prefix = 'agc'
-        self.metrics = metrics_helper.get_instance_with_prefix(metric_prefix, {
-            'registration': {
-                'type': prometheus_client.Info,
-                'description': 'Information exposed to the Agent.',
-            },
-            'state': {
-                'type': prometheus_client.Enum,
-                'description': 'The state of the agent client.',
-                'states': ['uninitialized', 'trying', 'registered', 'failed']
-            },
-            'attempts':{
-                'type': prometheus_client.Counter,
-                'description': 'Number of attempts that register with the Agent.'
-            }
-        })
+        self.metrics = get_class_metrics(self)
         self.metrics['registration'].info({
             'llm_name': self.llm_name,
             'public_endpoint': self.public_endpoint
