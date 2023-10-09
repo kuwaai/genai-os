@@ -151,5 +151,5 @@ class TaideLlm:
             result = ''
             self.logger.exception('Generation failed.')
         finally:
-            # torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
             return result
