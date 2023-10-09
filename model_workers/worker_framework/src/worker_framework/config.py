@@ -10,9 +10,8 @@ class Config:
     The configuration of model API component.
     The value can be override by specifying environment variables.
     """
-
     def __init__(self):
-        
+
         # Default configuration
         self.agent_endpoint = 'http://localhost:9000/v1.0/' # The root endpoint of the Agent.
         self.llm_name: str = 'Unnamed_LLM' # The name of this model.
@@ -51,3 +50,7 @@ class Config:
         self.ignore_agent = bool(self.ignore_agent)
         self.retry_count = int(self.retry_count)
         self.debug = bool(self.debug)
+
+# Public endpoint
+def get_config(_config = Config()):
+    return _config

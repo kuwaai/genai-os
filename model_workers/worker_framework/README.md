@@ -83,7 +83,9 @@ However, we recommend using the container environment to isolate each worker in 
 
 As the framework operates asynchronously, it's essential to ensure that any blocking function, whether it's I/O-blocking or CPU-blocking, is invoked within an executor to facilitate concurrency [1] [3]. The official Python documentation presents three options for achieving concurrency within the asyncio framework [2], as illustrated in the code snippets below.
 
-In many scenarios, executing a blocking function within the default event loop's executor or within a tailored thread pool suffices. However, when dealing with a CPU-intensive function, it's advisable to run it in a separate process to prevent it from stalling the event loop.
+In many scenarios, executing a blocking function within the default event loop's executor or within a tailored thread pool suffices.
+However, when dealing with a CPU-intensive function, it's advisable to run it in a separate process to prevent it from stalling the event loop.
+It's also important to note that using the `multiprocessing` library within the asyncio framework may terminate the HTTP server unexpectedly since the signal file descriptor is shared between the parent and child process [4].
 
 ```python
 def blocking_fn(x):
@@ -126,6 +128,7 @@ References:
 [1] [_Python documentation_, "Developing with asyncio - Running Blocking Code"](https://docs.python.org/3/library/asyncio-dev.html#running-blocking-code)  
 [2] [_Python documentation_, "Event Loop - Executing Code in Thread or Process Pools"](https://docs.python.org/3/library/asyncio-eventloop.html#executing-code-in-thread-or-process-pools)  
 [3] [A.A. Masnun, "Async Python: The Different Forms of Concurrency"](http://masnun.rocks/2016/10/06/async-python-the-different-forms-of-concurrency/)  
+[4] [FastAPI gets terminated when child multiprocessing process terminated #1487](https://github.com/tiangolo/fastapi/issues/1487#issuecomment-1157066306)  
 
 
 ### Interfaces of Default Layout

@@ -8,7 +8,7 @@ import prometheus_client
 import uvicorn
 
 from importlib.metadata import version
-from worker_framework.config import Config
+from worker_framework.config import get_config
 from worker_framework.metrics_manager import get_class_metrics
 from worker_framework.agent_client import AgentClient
 from worker_framework.model_layout import ModelLayout
@@ -35,7 +35,7 @@ class RegistrationJob:
         asyncio.create_task(self.register_with_agent())
 
 def main():
-    config = Config()
+    config = get_config()
     
     # Load logging configuration.
     with open(config.logging_config, 'r') as f:
