@@ -2,12 +2,13 @@ import logging
 import asyncio
 import functools
 from langchain.docstore.document import Document
-from parallel_splitter import ParallelSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.retrievers.bm25 import BM25Retriever
 from langchain.schema.vectorstore import VectorStoreRetriever
 from langchain.retrievers.ensemble import EnsembleRetriever
+
+from .parallel_splitter import ParallelSplitter
 
 class DocumentStore:
   def __init__(self, embedding_model = 'infgrad/stella-base-zh', mmr_k = 6, mmr_fetch_k = 12):

@@ -3,11 +3,12 @@
 
 from worker_framework.datatype import ChatRecord, Role
 from typing import Generator
-from recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
-from document_store import DocumentStore
-from taide_llm import TaideLlm
 from pathlib import Path
 from urllib.error import HTTPError
+
+from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
+from .document_store import DocumentStore
+from .taide_llm import TaideLlm
 
 import re
 import logging

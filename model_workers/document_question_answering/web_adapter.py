@@ -4,7 +4,7 @@
 from worker_framework.datatype import ChatRecord, Role
 from worker_framework.interfaces import GeneralProcessInterface
 from typing import Generator
-from document_qa import DocumentQa
+from docqa.docqa import DocumentQa
 
 import re
 import logging
