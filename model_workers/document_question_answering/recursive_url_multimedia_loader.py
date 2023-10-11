@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import re
+import functools
 from typing import (
     TYPE_CHECKING,
     Callable,
@@ -23,6 +24,7 @@ from langchain.document_loaders.base import BaseLoader
 from langchain.utils.html import extract_sub_links
 import aiohttp
 import textract
+import trafilatura
 
 if TYPE_CHECKING:
     import aiohttp
@@ -30,6 +32,44 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 async def _extractor(content: str, url: str, content_type: str) -> str:
+    mime_extractor = {
+        'text/html': html_extractor,
+        'multipart/related':  html_extractor,
+        'application/xhtml+xml': html_extractor,
+    }
+    fallback_extractor = file_extractor
+
+    mime_type = content_type.split(';', 1)[0]
+    extractor = fallback_extractor
+    if mime_type in mime_extractor:
+        extractor = mime_extractor[mime_type]
+    
+    return await extractor(content, url, content_type)
+
+async def html_extractor(content: str, url: str, content_type: str) -> str:
+    """
+    Asynchronous extract main text from web page.
+    """
+    text = ''
+    try:
+        config = trafilatura.settings.use_config()
+        config.set("DEFAULT", "EXTRACTION_TIMEOUT", "0")
+        
+        loop = asyncio.get_event_loop()
+        text = await loop.run_in_executor(
+            None,
+            functools.partial(
+                trafilatura.extract,
+                content,
+                config=config,
+            )
+        )
+    except Exception as e:
+        logger.exception('Failed to extract text.')
+    
+    return text
+
+async def file_extractor(content: str, url: str, content_type: str) -> str:
     """
     Extract text contents from the retrieved file.
     """
@@ -64,7 +104,7 @@ async def _extractor(content: str, url: str, content_type: str) -> str:
             str(file_path)
         )
     except Exception as e:
-        print("Failed to extract text. Reason:", str(e))
+        logger.exception('Failed to extract text.')
     
     return text
 

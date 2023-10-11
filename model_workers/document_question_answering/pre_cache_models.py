@@ -6,7 +6,8 @@ def main():
     models = [
         {
             'class': HuggingFaceEmbeddings,
-            'name': 'paraphrase-multilingual-MiniLM-L12-v2' 
+            # 'name': 'paraphrase-multilingual-MiniLM-L12-v2' 
+            'name': 'infgrad/stella-base-zh' 
         }
     ]
 

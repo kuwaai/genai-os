@@ -5,6 +5,7 @@ import torch, accelerate, time
 import chevron
 import logging
 import asyncio
+import re
 from functools import reduce
 from pathlib import Path
 from dataclasses import dataclass
@@ -76,10 +77,12 @@ class TaideLlm:
             return_full_text=False,
             task='text-generation',
             stopping_criteria=StoppingCriteriaList([StopOnTokens(self.tokenizer)]),
+            max_length=4096,
+            # max_new_tokens2048,
+            do_sample=True,
             temperature=0.2,
-            max_new_tokens=2048,
-            repetition_penalty = 1.0,
-            do_sample=True
+            top_p=0.95,
+            repetition_penalty=1.0,
         )
 
         prompt_template_file = Path(prompt_template_path)
@@ -93,7 +96,7 @@ class TaideLlm:
         
         chat_history = ChatTupleFactory.from_chat_history(chat_history)
         prompt = self.gen_prompt(chat_history)
-        return self._is_too_long(prompt)
+        return self._is_too_long(prompt)[0]
     
     def _is_too_long(self, sentence: str) -> bool:
         """
@@ -101,7 +104,7 @@ class TaideLlm:
         """
 
         num_tokens = len(self.tokenizer.tokenize(sentence))
-        return num_tokens >= self.input_token_limit
+        return num_tokens >= self.input_token_limit, num_tokens
 
     def gen_prompt(self, chat_history: [ChatTuple], append_system: bool = True) -> str:
         """
@@ -123,7 +126,6 @@ class TaideLlm:
         )
 
         return prompt
-    
 
     async def complete(self, chat_history: [ChatRecord]): 
         result = ''
@@ -134,12 +136,14 @@ class TaideLlm:
             
             # Trim the over-length history
             prompt = ''
+            tokens = 0
             while True:
                 prompt = self.gen_prompt(chat_history)
-                if not self._is_too_long(prompt): break
+                too_long, tokens = self._is_too_long(prompt)
+                if not too_long: break
                 chat_history = chat_history[1:]
             
-            self.logger.info('Final Prompt: {}'.format(prompt))
+            self.logger.info('Final Prompt ({} tokens):\n{}'.format(tokens, prompt))
             
             self.logger.info('Generating...')
             loop = asyncio.get_running_loop()

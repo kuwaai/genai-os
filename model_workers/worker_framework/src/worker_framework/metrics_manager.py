@@ -17,7 +17,6 @@ class MetricsManager:
         self.label = {'app_name': app_name}
         
         self.metrics_config = {}
-        print(MetricsManager.config_path)
         with open(MetricsManager.config_path, 'r') as f:
             self.metrics_config = yaml.safe_load(f)
             assert self.metrics_config['version'] == 1
@@ -57,7 +56,6 @@ class MetricsManager:
                 documentation = description,
                 **spec
             ).labels(*list(self.label.values()))
-        print(metrics)
         return metrics
 
 # Public endpoint

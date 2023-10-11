@@ -10,12 +10,13 @@ from langchain.schema.vectorstore import VectorStoreRetriever
 from langchain.retrievers.ensemble import EnsembleRetriever
 
 class DocumentStore:
-  def __init__(self, embedding_model = 'paraphrase-multilingual-MiniLM-L12-v2', mmr_k = 10, mmr_fetch_k = 15):
+  def __init__(self, embedding_model = 'infgrad/stella-base-zh', mmr_k = 6, mmr_fetch_k = 12):
     """
     Initialize the document store.
     embedding_model: The sentence-transformers pre-trained model
       - 'paraphrase-multilingual-mpnet-base-v2' // Size: ~1.11GB
       - 'paraphrase-multilingual-MiniLM-L12-v2' // Size: ~471MB
+      - 'infgrad/stella-base-zh' // Chinese embedding model // Size: ~210MB
     """
     self.logger = logging.getLogger(__name__)
     
@@ -25,7 +26,7 @@ class DocumentStore:
     }
     # self.corase_k = 2
 
-    self.splitter = ParallelSplitter(chunk_size=128, chunk_overlap=16)
+    self.splitter = ParallelSplitter(chunk_size=512, chunk_overlap=128)
     self.embedding_model = embedding_model
     self.vector_store:FAISS = None
     self.fine_retriever:VectorStoreRetriever = None

@@ -13,8 +13,6 @@ import re
 import logging
 import chevron
 
-
-
 class NoUrlException(Exception):
     pass
 
@@ -42,9 +40,10 @@ class DocumentQaProcess(GeneralProcessInterface):
 
     return url, chat_history[begin_index:]
 
-  def generate_llm_input(self, question, related_docs):
-      
-    llm_input_template = Path('prompt_template/llm_input.mustache').read_text()
+  def generate_llm_input(self, task, question, related_docs):
+    
+    template_path = 'prompt_template/' + f'llm_input_{task}.mustache'
+    llm_input_template = Path(template_path).read_text()
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
       'question': question
@@ -52,11 +51,17 @@ class DocumentQaProcess(GeneralProcessInterface):
 
     return llm_input
 
-  def replace_chat_history(self, chat_history, question, related_docs):
-    llm_input = self.generate_llm_input(question, related_docs)
+  def replace_chat_history(self, chat_history, task, question, related_docs):
+    llm_input = self.generate_llm_input(task, question, related_docs)
     modified_chat_history = chat_history[:-1] + [ChatRecord(llm_input, Role.USER)]
 
     return modified_chat_history
+  
+  def is_english(self, paragraph:str, threshold=0.8):
+    total_count = len(paragraph)
+    english_charter_count = len(paragraph.encode("ascii", "ignore"))
+
+    return english_charter_count / total_count >= threshold
 
   async def process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
 
@@ -84,27 +89,42 @@ class DocumentQaProcess(GeneralProcessInterface):
       document_store = DocumentStore()
       await document_store.from_documents(docs)
       
+      task = ''
       if len(chat_history) == 1:
         question = '時間、地點、目的、結論、摘要'
-        llm_question = '請提供這篇文章的要點概述。'
+        llm_question = None
+        task = 'summary'
         yield '以下是這篇文章的摘要：\n'
       else:
         question = final_user_input.msg
         llm_question = question
+        task = 'qa'
 
       # Shortcut
       related_docs = docs
-      modified_chat_history = self.replace_chat_history(chat_history, llm_question, related_docs)
+      modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
 
       if self.llm.is_too_long(modified_chat_history):
         # Retrieve
         related_docs = await document_store.retrieve(question)
-        modified_chat_history = self.replace_chat_history(chat_history, llm_question, related_docs)
+        modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
 
       # Generate
-      llm_input = self.generate_llm_input(question, related_docs)
+      llm_input = self.generate_llm_input(task, llm_question, related_docs)
       self.logger.info('LLM input: {}'.format(llm_input))
       result = await self.llm.complete(modified_chat_history)
+
+      # Egress filter
+      is_english = self.is_english(result)
+      self.logger.info(f'Is English: {is_english}')
+      if is_english:
+        result = await self.llm.complete([
+          ChatRecord(
+            role=Role.USER,
+            msg=self.generate_llm_input('translate', result, [])
+            ),
+        ])
+
       yield result
     
     except NoUrlException:
