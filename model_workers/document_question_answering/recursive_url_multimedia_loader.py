@@ -18,6 +18,7 @@ import requests
 import mimetypes
 from pathlib import Path
 from urllib.parse import urlparse, unquote
+from urllib.error import HTTPError
 
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
@@ -150,7 +151,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         prevent_outside: Optional[bool] = True,
         link_regex: Union[str, re.Pattern, None] = None,
         headers: Optional[dict] = None,
-        check_response_status: bool = False,
+        check_response_status: bool = True,
         cache_proxy_url: bool = None
     ) -> None:
         """Initialize with URL to crawl and any subdirectories to exclude.
@@ -230,13 +231,13 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
             else:
                 raw_content = response.content
             if self.check_response_status and 400 <= response.status_code <= 599:
-                raise ValueError(f"Received HTTP status {response.status_code}")
-        except Exception as e:
+                raise HTTPError(url, response.status_code, response.reason, None, None)
+        except (HTTPError, Exception) as e:
             logger.warning(
                 f"Unable to load from {url}. Received error {e} of type "
                 f"{e.__class__.__name__}"
             )
-            return
+            raise
         content = self.extractor(raw_content, url, content_type)
         if content:
             yield Document(
@@ -308,15 +309,15 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
                 else:
                     raw_content = await response.read()
                 if self.check_response_status and 400 <= response.status <= 599:
-                    raise ValueError(f"Received HTTP status {response.status}")
-        except (aiohttp.client_exceptions.InvalidURL, Exception) as e:
+                    raise HTTPError(url, response.status, response.reason, None, None)
+        except (aiohttp.client_exceptions.InvalidURL, HTTPError, Exception) as e:
             logger.warning(
                 f"Unable to load {url}. Received error {e} of type "
                 f"{e.__class__.__name__}"
             )
             if close_session:
                 await session.close()
-            return []
+            raise
         results = []
         content = await self.extractor(raw_content, url, content_type)
         if content:

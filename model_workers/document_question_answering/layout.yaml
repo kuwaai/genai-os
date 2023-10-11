@@ -1,4 +1,4 @@
 version: 1
 override-process:
-  class: 'main.DocumentQaProcess'
+  class: 'web_adapter.DocumentQaProcess'
   args: {}
