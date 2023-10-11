@@ -62,6 +62,7 @@ async def html_extractor(content: str, url: str, content_type: str) -> str:
             functools.partial(
                 trafilatura.extract,
                 content,
+                favor_precision=True,
                 config=config,
             )
         )
