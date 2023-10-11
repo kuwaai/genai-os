@@ -1,0 +1,38 @@
+version: '3'
+name: doc-qa
+
+services:
+  api:
+    runtime: nvidia
+    build:
+      context: .
+      args:
+        WORKER_FRAMEWORK_VERSION: legacy-api
+    container_name: ${LLM_NAME:-doc_qa}-api-${PORT}
+    devices:
+      - /dev/nvidia0:/dev/nvidia0
+    restart: always
+    environment:
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+      - AGENT_ENDPOINT=${AGENT_ENDPOINT:-http://localhost:9000/v1.0/}
+      - LLM_NAME=${LLM_NAME:-doc_qa}
+      - PUBLIC_ADDRESS=${PUBLIC_ADDRESS:-localhost}
+      - PORT=${PORT} # PORT is manaul specified or assigned by the Host OS
+      - IGNORE_AGENT=False
+      - DEBUG=False
+    networks:
+      - squid_backend
+    ports:
+      - ${PORT}:${PORT}
+    healthcheck:
+      test: "curl --fail http://localhost:${PORT}/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /var/models/:/llm/:ro
+
+# Connect to the network created by web_agent and squid
+networks:
+  squid_backend:
+    external: true
