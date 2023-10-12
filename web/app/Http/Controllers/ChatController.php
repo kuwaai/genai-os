@@ -98,7 +98,7 @@ class ChatController extends Controller
                     }
                 }
                 //Create a chat and send that url into the llm
-                $msg = '/url ' . url('storage/' . $directory . '/' . rawurlencode($fileName));
+                $msg = url('storage/' . $directory . '/' . rawurlencode($fileName));
                 $chat = new Chats();
                 $chat->fill(['name' => $msg, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
