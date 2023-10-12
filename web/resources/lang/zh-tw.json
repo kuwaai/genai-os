@@ -86,7 +86,7 @@
 "Users":"使用者",
 "LLMs":"語言模型",
 "Settings":"系統設定",
-"New Group":"新群組",
+"New Group":"新增群組",
 "Create a new Group":"創建一個新群組",
 "Tab Permissions":"頁面權限",
 "Description":"模型敘述",
@@ -135,5 +135,15 @@
 "* ...thinking... *":"* ...思考中... *",
 "Language":"語言切換",
 "File Too Large":"檔案過大",
-"[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]":"[很抱歉，目前沒有可處理該訊息的機器，請回報給管理員或稍後再試！]"
+"[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]":"[很抱歉，目前沒有可處理該訊息的機器，請回報給管理員或稍後再試！]",
+"Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.":"忘記你的密碼了？請填寫你的Email，我們可以給你寄一封密碼重置信！",
+"Email Password Reset Link":"送出密碼重置信",
+"passwords.sent":"信件已送出",
+"passwords.throttled":"操作頻繁，請稍後再嘗試",
+"Reset Password":"重設密碼",
+"An URL is required to create a chatroom":"該模型需由URL連結作為開頭",
+"The first message for this LLM allows URL only!":"該模型僅允許由一個URL連結作為開頭！",
+"New LLM":"新增語言模型",
+"Enabled Models":"已啟用模型",
+"Disabled Models":"已停用模型"
 }

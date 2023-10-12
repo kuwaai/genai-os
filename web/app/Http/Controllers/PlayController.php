@@ -22,6 +22,9 @@ class PlayController extends Controller
         $model->value = $request->input("ai_election_enabled") == "allow" ? "true" : "false";
         $model->save();
 
-        return Redirect::route('dashboard.home')->with('status', $result);
+        return Redirect::route('manage.home')
+        ->with('last_tab', 'settings')
+        ->with('last_action', 'update')
+        ->with('status', $result);
     }
 }

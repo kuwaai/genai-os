@@ -1,6 +1,7 @@
 import requests
 from flask import Blueprint, request, Response
 from src.variable import *
+from src.functions import *
 chat = Blueprint('chat', __name__)
 
 @chat.route("/completions", methods=["POST"])

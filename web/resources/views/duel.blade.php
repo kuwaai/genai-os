@@ -59,8 +59,8 @@
                                     class="inline-flex items-center justify-between w-full p-2 text-gray-300 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">
                                     <div class="flex items-center">
                                         <div
-                                            class="flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-gray-300 flex items-center justify-center overflow-hidden">
-                                            <img src="{{ asset(Storage::url($LLM->image)) }}">
+                                            class="flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
+                                            <img src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
                                         </div>
                                         <div class="pl-2">
                                             <div class="w-full text-lg font-semibold leading-none">{{ $LLM->name }}

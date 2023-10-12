@@ -1,1 +1,4 @@
-{}
+{
+    "passwords.sent":"Password reset link sent.",
+    "passwords.throttled":"Too many attmpt, Please try again later!"
+}
