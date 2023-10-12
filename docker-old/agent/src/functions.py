@@ -1,4 +1,5 @@
 import os, logging, re, gzip, pickle, requests
+from urllib.parse import urlparse
 from flask import make_response
 from json import dumps
 from src.variable import *
