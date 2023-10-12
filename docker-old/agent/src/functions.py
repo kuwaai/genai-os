@@ -36,13 +36,19 @@ def load_variable_from_file(filename):
 def endpoint_formatter(endpoint):
     return endpoint[:-1] if endpoint.endswith("/") else endpoint
         
+        
+def get_base_url(url):
+    parsed_url = urlparse(url)
+    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    return base_url
+    
 def loadRecords(var, keep_state = False):
     log(0,"Loading records, Here's before\n",data)
     for i,o in var.items():
         data[i] = []
         for k in o:
             try:
-                resp = requests.get(endpoint_formatter(k[0]) + "/health")
+                resp = requests.get(get_base_url(k[0]) + "/health")
                 if resp.status_code == 204:
                     data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1])
                 else:
