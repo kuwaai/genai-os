@@ -117,14 +117,15 @@
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
                     @if (request()->route('chat_id'))
                         @php
-                            $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
+                            $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image;
+                            $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img: asset(Storage::url($img));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
                             @if (in_array($history->id, $tasks))
                                 <div class="flex w-full mt-2 space-x-3">
                                     <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                                         <img src="{{ $botimgurl }}">
                                     </div>
                                     <div class="overflow-hidden">
@@ -139,14 +140,15 @@
                                     class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
                                     @if ($history->isbot)
                                         <div
-                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                                             <img src="{{ $botimgurl }}">
                                         </div>
                                     @endif
                                     <div class="overflow-hidden">
                                         <div
                                             class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                            <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}</p>
+                                            <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}
+                                            </p>
                                         </div>
                                     </div>
                                     @if (!$history->isbot)
@@ -160,6 +162,11 @@
                         @endforeach
                     @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
                         <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
+                    @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa')
+                        <div style="display:none;" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" id="url_only_alert"
+                            role="alert">
+                            <span class="block sm:inline">{{__("The first message for this LLM allows URL only!")}}</span>
+                        </div>
                     @endif
                 </div>
                 <div
@@ -179,8 +186,9 @@
                             <div class="flex items-end justify-end">
                                 @csrf
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
-                                <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
-                                    oninput="adjustTextareaRows()" id="chat_input" name="input"
+                                <textarea tabindex="0" data-id="root"
+                                    placeholder="{{ request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa' ? __('An URL is required to create a chatroom') : __('Send a message') }}"
+                                    rows="1" max-rows="5" oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                                 <button type="submit"
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
@@ -201,14 +209,8 @@
                                     style="display:none;">
                                 <input id="chained" style="display:none;"
                                     {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                @if (
-                                    !in_array(App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code, [
-                                        'doc_qa',
-                                        'web_qa',
-                                    ]))
-                                    <button type="button" onclick="chain_toggle()" id="chain_btn"
-                                        class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
-                                @endif
+                                <button type="button" onclick="chain_toggle()" id="chain_btn"
+                                    class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
                                 <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
                                     oninput="adjustTextareaRows()" id="chat_input" name="input" readonly
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
@@ -301,14 +303,22 @@
                             )
                             msg = msg.replace("[Sorry, something is broken, please try again later!]",
                                 "{{ __('[Sorry, something is broken, please try again later!]') }}")
-                            msg = msg.replace("[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]",
-                                "{{__('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]')}}")
+                            msg = msg.replace(
+                                "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]",
+                                "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
+                            )
                             $('#task_' + number).text(msg);
                         }
                     });
                 </script>
             @endif
             <script>
+                function isValidURL(url) {
+                    // Regular expression for a simple URL pattern (you can make it more complex if needed)
+                    var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
+                    return urlPattern.test(url);
+                }
+
                 function uploadcheck() {
                     if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
                         1024) {
@@ -358,6 +368,21 @@
                     });
                     adjustTextareaRows();
                 }
+                @if (request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa')
+                    if ($("#prompt_area")) {
+                        $("#prompt_area").on("submit", function(event) {
+                            event.preventDefault();
+                            if (isValidURL($("#chat_input").val().trim())) {
+                                $("#prompt_area")[0].submit()
+                            } else {
+                                $("#url_only_alert").fadeIn();
+                                setTimeout(function() {
+                                    $("#url_only_alert").fadeOut();
+                                }, 3000);
+                            }
+                        })
+                    }
+                @endif
             </script>
         @endif
     </div>

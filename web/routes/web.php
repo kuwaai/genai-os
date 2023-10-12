@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\LLMController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\DuelController;
@@ -33,7 +32,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     })->name('/');
 
     Route::get('/lang', function () {
-        session()->put('locale', session()->get("locale") ? (session()->get("locale") == 'en-us' ? 'zh-tw' : 'en-us') : "en-us");
+        session()->put('locale', session()->get('locale') ? (session()->get('locale') == 'en-us' ? 'zh-tw' : 'en-us') : 'en-us');
 
         return back();
     })->name('lang');
@@ -47,13 +46,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             Route::get('/', function () {
                 return view('dashboard');
             })->name('dashboard.home');
-
-            Route::group(['prefix' => 'LLMs'], function () {
-                Route::get('/toggle/{llm_id}', [LLMController::class, 'toggle'])->name('dashboard.llms.toggle');
-                Route::delete('/delete', [LLMController::class, 'delete'])->name('dashboard.llms.delete');
-                Route::post('/create', [LLMController::class, 'create'])->name('dashboard.llms.create');
-                Route::patch('/update', [LLMController::class, 'update'])->name('dashboard.llms.update');
-            });
         });
     });
 
@@ -94,7 +86,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
                 Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
                 Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
-                
+
                 Route::post('/upload', [ChatController::class, 'upload'])->name('chat.upload');
                 Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
                 Route::post('/request', [ChatController::class, 'request'])->name('chat.request');
@@ -179,6 +171,13 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::patch('/update', [SystemController::class, 'update'])->name('manage.setting.update');
                     })
                     ->name('manage.user');
+
+                Route::prefix('LLMs')->group(function () {
+                    Route::get('/toggle/{llm_id}', [ManageController::class, 'llm_toggle'])->name('manage.llms.toggle');
+                    Route::delete('/delete', [ManageController::class, 'llm_delete'])->name('manage.llms.delete');
+                    Route::post('/create', [ManageController::class, 'llm_create'])->name('manage.llms.create');
+                    Route::patch('/update', [ManageController::class, 'llm_update'])->name('manage.llms.update');
+                })->name('manage.llms');
 
                 Route::post('/tab', [ManageController::class, 'tab'])->name('manage.tab');
             })

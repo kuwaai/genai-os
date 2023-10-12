@@ -148,6 +148,12 @@ class ChatController extends Controller
             $input = $request->input('input');
             $llm_id = $request->input('llm_id');
             if ($input && $llm_id && in_array($llm_id, $result)) {
+                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa'])) {
+                    # Validate first message is exactly URL
+                    if (!filter_var($input, FILTER_VALIDATE_URL)) {
+                        return back();
+                    }
+                }
                 $chat = new Chats();
                 $chat->fill(['name' => $input, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
@@ -166,8 +172,8 @@ class ChatController extends Controller
                 RequestChat::dispatch($tmp, $llm->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
                 return Redirect::route('chat.chat', $chat->id);
             }
-        }else{
-            Log::channel("analyze")->info("User " . Auth::user()->id . " with " . implode(",",Redis::lrange('usertask_' . Auth::user()->id, 0, -1)));
+        } else {
+            Log::channel('analyze')->info('User ' . Auth::user()->id . ' with ' . implode(',', Redis::lrange('usertask_' . Auth::user()->id, 0, -1)));
         }
         return back();
     }
@@ -201,7 +207,20 @@ class ChatController extends Controller
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
                 $history->save();
-                if (in_array(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, ['doc_qa', 'web_qa']) || $chained) {
+                if (in_array(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, ['doc_qa', 'web_qa']) && !$chained) {
+                    $tmp = json_encode([
+                        [
+                            'msg' => Histories::where('chat_id', '=', $chatId)
+                                ->select('msg')
+                                ->orderby('created_at')
+                                ->orderby('id', 'desc')
+                                ->get()
+                                ->first()->msg,
+                            'isbot' => false,
+                        ],
+                        ['msg' => $request->input('input'), 'isbot' => false],
+                    ]);
+                } elseif ($chained) {
                     $tmp = Histories::where('chat_id', '=', $chatId)
                         ->select('msg', 'isbot')
                         ->orderby('created_at')
