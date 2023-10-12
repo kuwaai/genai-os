@@ -118,7 +118,7 @@
                     @if (request()->route('chat_id'))
                         @php
                             $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image;
-                            $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img: asset(Storage::url($img));
+                            $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
@@ -163,9 +163,11 @@
                     @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
                         <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
                     @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa')
-                        <div style="display:none;" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" id="url_only_alert"
-                            role="alert">
-                            <span class="block sm:inline">{{__("The first message for this LLM allows URL only!")}}</span>
+                        <div style="display:none;"
+                            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                            id="url_only_alert" role="alert">
+                            <span
+                                class="block sm:inline">{{ __('The first message for this LLM allows URL only!') }}</span>
                         </div>
                     @endif
                 </div>

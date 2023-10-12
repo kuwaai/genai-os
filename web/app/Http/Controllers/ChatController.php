@@ -101,41 +101,7 @@ class ChatController extends Controller
                 $msg = url('storage/' . $directory . '/' . rawurlencode($fileName));
                 $chat = new Chats();
 
-                $chatname = $msg;
-                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa'])){
-                    function getWebPageTitle($url) {
-                        // Try to fetch the HTML content of the URL
-                        $html = @file_get_contents($url);
-
-                        // If the URL is not accessible, return an empty string
-                        if ($html === false) {
-                            return '';
-                        }
-
-                        // Use regular expressions to extract the title from the HTML
-                        if (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
-                            return $matches[1];
-                        } else {
-                            // If no title is found, return an empty string
-                            return '';
-                        }
-                    }
-                    function getFilenameFromURL($url) {
-                        $urlParts = parse_url($url);
-                        
-                        if (isset($urlParts['path'])) {
-                            return basename($urlParts['path']);
-                        } else {
-                            return "";
-                        }
-                    }
-                    $tmp = getWebPageTitle($msg);
-                    if ($tmp != "") $chatname = $tmp;
-                    else{
-                        $tmp = getFilenameFromURL($msg);
-                        if ($tmp != "") $chatname = $tmp;
-                    }
-                }
+                $chatname = explode("_", $fileName)[1];
                 $chat->fill(['name' => $chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
                 $history = new Histories();
