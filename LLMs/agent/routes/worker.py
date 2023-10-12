@@ -1,6 +1,4 @@
-from flask import Blueprint, request, Response
-import json
-from functools import reduce
+from flask import Blueprint, request
 from src.variable import *
 worker = Blueprint('worker', __name__)
 
@@ -24,41 +22,33 @@ def status():
 def register():
     # For Online LLM register themself
     # Parameters: name, endpoint
-    llm_name = request.json.get("name")
-    endpoint = request.json.get("endpoint")
-    if endpoint == None or llm_name == None:
-        return Response(json.dumps({'message': 'Missing required field.'}), status=400)
-    if reduce(lambda sum, d: sum or d[0]==endpoint, data.get(llm_name, []), False):
-        return Response(json.dumps({'message': 'Duplicated worker endpoint.'}), status=400) 
-    
+    llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
+    if endpoint == None or llm_name == None or endpoint in data.get(llm_name, []): return "Failed"
     data.setdefault(llm_name, []).append([endpoint, "READY", -1, -1])
-    return Response(status=201)
+    return "Success"
 
 @worker.route("/unregister", methods=["POST"])
 def unregister():
     # For Offline LLM to unregister themself
     # Parameters: name, endpoint
-    llm_name = request.json.get("name")
-    endpoint = request.json.get("endpoint")
+    llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
     if llm_name in data:
         old = len(data[llm_name])
         data[llm_name] = [i for i in data[llm_name] if i[0] != endpoint]
         if data[llm_name] == []: del data[llm_name]
-    
-    # Failure means the Worker is not registered.
-    # Thus, unregister is always successful.
-    return Response(status=204)
+        if data.get(llm_name) == None or old == len(data[llm_name]):
+            return "Success"
+    return "Failed"
     
 @worker.route("/debug", methods=["GET"])
 def debug():
     # This route is for debugging
     return data
     
-@worker.route("/revoke", methods=["POST"])
+@worker.route("/reset", methods=["GET"])
 def reset():
     # Reset specific status
-    llm_name =request.json.get("name")
-    history_id = request.form.get("history_id")
+    llm_name, history_id = request.form.get("name"), request.form.get("history_id")
     if data.get(llm_name):
         dest = [i for i in data[llm_name] if i[2] == history_id]
         if len(dest) > 0:
@@ -66,4 +56,4 @@ def reset():
             dest[3] = -1
             dest[2] = -1
             dest[1] = "READY"
-    return Response(status=204)
+    return "Success"

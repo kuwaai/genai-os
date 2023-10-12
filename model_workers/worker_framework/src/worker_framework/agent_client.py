@@ -59,10 +59,10 @@ class AgentClient:
                     'endpoint': self.public_endpoint
                 }
                 self.logger.debug('"POST {}", data={}'.format(url, data))
-                return requests.post(url, json=data)
+                return requests.post(url, data=data)
             event_loop = asyncio.get_event_loop()
             response = await event_loop.run_in_executor(None, do_req)
-            if not response.ok : raise Exception
+            if response.text == "Failed" : raise Exception
             else:
                 self.logger.info('Registered.')
                 atexit.register(self.unregister)
@@ -96,8 +96,8 @@ class AgentClient:
                 'endpoint': self.public_endpoint
             }
             self.logger.debug('"POST {}", data={}'.format(url, data))
-            response = requests.post(url, json=data)
-            if not response.ok:
+            response = requests.post(url, data=data)
+            if response.text == "Failed":
                 self.logger.warning('Failed to unregister from Agent. Refused by Agent.')
             else:
                 self.logger.info('Done.')
