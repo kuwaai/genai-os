@@ -15,10 +15,25 @@ def api():
         resp = Response(app.llm_compute(data), mimetype='text/event-stream')
         resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
         if data: return resp
+        print("Request received, but no data is here!")
+        app.Ready[0] = True
+    return "",404
+    
+@app.route('/health')
+def health_check():
+    return "", 204
+    
+@app.route("/health", methods=["GET"])
+def api():
+    if app.Ready[0]:
+        app.Ready[0] = False
+        data = request.form
+        resp = Response(app.llm_compute(data), mimetype='text/event-stream')
+        resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
+        if data: return resp
         print("I didn't see your input!")
         app.Ready[0] = True
     return ""
-
 
 def shut():
     if app.registered:
@@ -46,5 +61,5 @@ def start():
             sys.exit(0)
     else:
         print("Registered")
-    app.run(port=app.port, host="0.0.0.0")
+    app.run(port=app.port, host="0.0.0.0", threaded=True)
     shut()

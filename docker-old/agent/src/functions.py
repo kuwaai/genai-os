@@ -32,6 +32,9 @@ def save_variable_to_file(filename, data):
 def load_variable_from_file(filename):
     with gzip.open(filename, 'rb') as file:
         return pickle.load(file)
+
+def endpoint_formatter(endpoint):
+    return endpoint if endpoint.endswith("/") else endpoint[:-1]
         
 def loadRecords(var, keep_state = False):
     log(0,"Loading records, Here's before\n",data)
@@ -39,9 +42,9 @@ def loadRecords(var, keep_state = False):
         data[i] = []
         for k in o:
             try:
-                resp = requests.post(k[0])
-                if resp.status_code == 200:
-                    data[i].append(k if keep_state else [k[0],"READY",-1,-1])
+                resp = requests.post(endpoint_formatter(k[0]) + "/healthy")
+                if resp.status_code == 204:
+                    data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1])
             except requests.exceptions.ConnectionError as e:
                 log(0,f"Healthy check failed in {i} at {k[0]}, removed")
         if len(data[i]) == 0: del data[i]
