@@ -205,9 +205,9 @@
                                 </div>
                             @endif
                         @endforeach
-                    @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
+                    @elseif(request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa','doc_qa_b5']))
                         <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
-                    @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa')
+                    @elseif(request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa','web_qa_b5']))
                         <div style="display:none;"
                             class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
                             id="url_only_alert" role="alert">
@@ -217,8 +217,8 @@
                     @endif
                 </div>
                 <div
-                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa' ? 'overflow-x-hidden' : '' }}">
-                    @if (request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
+                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa','doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
+                    @if (request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
                         <form method="post" action="{{ route('chat.upload') }}" class="m-auto"
                             enctype="multipart/form-data">
                             @csrf
@@ -235,7 +235,7 @@
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}"
                                     style="display:none;">
                                 <textarea tabindex="0" data-id="root"
-                                    placeholder="{{ request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa' ? __('An URL is required to create a chatroom') : __('Send a message') }}"
+                                    placeholder="{{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa','web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
                                     rows="1" max-rows="5" oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                                 <button type="submit"
@@ -438,7 +438,7 @@
                     });
                     adjustTextareaRows();
                 }
-                @if (request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa')
+                @if (request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code,['web_qa','web_qa_b5']))
                     if ($("#prompt_area")) {
                         $("#prompt_area").on("submit", function(event) {
                             event.preventDefault();
