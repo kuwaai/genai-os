@@ -1,4 +1,4 @@
-# TAIDE Chat 0.0.6.6
+# TAIDE Chat 0.0.6.7
 ### Implements
 * [Finished] Basic Chatting with just one LLM
 * [Finished] Duel Chatting with multiple LLMs
