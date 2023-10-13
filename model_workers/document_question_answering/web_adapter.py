@@ -49,10 +49,10 @@ class DocumentQaProcess(GeneralProcessInterface):
         yield reply
 
     except NoUrlException as e:
-      asyncio.sleep(2) # To prevent SSE error of web page.
+      await asyncio.sleep(2) # To prevent SSE error of web page.
       yield str(e)
 
     except Exception as e:
-      asyncio.sleep(2) # To prevent SSE error of web page.
+      await asyncio.sleep(2) # To prevent SSE error of web page.
       self.logger.exception('Unexpected error')
       yield '發生錯誤，請再試一次或是聯絡管理員。'

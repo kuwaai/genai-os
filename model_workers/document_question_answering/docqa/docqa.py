@@ -11,9 +11,12 @@ from .document_store import DocumentStore
 from .taide_llm import TaideLlm
 
 import re
+import gc
+import torch
 import logging
 import chevron
 import asyncio
+import copy
 
 class DocumentQa:
   def __init__(self):
@@ -63,7 +66,7 @@ class DocumentQa:
       ) 
       docs = await loader.async_load()
     except HTTPError as e:
-      asyncio.sleep(2) # To prevent SSE error of web page.
+      await asyncio.sleep(2) # To prevent SSE error of web page.
       yield f'獲取文件時發生錯誤 {str(e)}，請確認所提供文件存在且可被公開存取。'
       return
 
@@ -77,7 +80,7 @@ class DocumentQa:
       question = '時間、地點、目的、結論、摘要'
       llm_question = None
       task = 'summary'
-      asyncio.sleep(2) # To prevent SSE error of web page.
+      await asyncio.sleep(2) # To prevent SSE error of web page.
       yield '以下是這篇文章的摘要：\n'
     else:
       question = final_user_input
@@ -90,8 +93,13 @@ class DocumentQa:
 
     if self.llm.is_too_long(modified_chat_history):
       # Retrieve
-      related_docs = await document_store.retrieve(question)
+      related_docs = copy.deepcopy(await document_store.retrieve(question))
       modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
+
+    # Free the unused VRAM
+    del document_store
+    gc.collect()
+    torch.cuda.empty_cache()
 
     # Generate
     llm_input = self.generate_llm_input(task, llm_question, related_docs)
@@ -101,7 +109,7 @@ class DocumentQa:
     # Egress filter
     is_english = self.is_english(result)
     self.logger.info(f'Is English: {is_english}')
-    if is_english:
+    if task == 'summary' and is_english:
       result = await self.llm.complete([
         ChatRecord(
           role=Role.USER,

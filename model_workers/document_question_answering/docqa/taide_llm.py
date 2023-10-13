@@ -55,7 +55,7 @@ class StopOnTokens(StoppingCriteria):
 class TaideLlm:
     def __init__(self,
                  token_limit = 3500,
-                 model_path = '/llm/llama2-7b-chat-b1.0.0',
+                 model_path = '/llm/llama2-7b-chat-b5.0.0',
                  prompt_template_path = 'prompt_template/taide.mustache'):
         self.logger = logging.getLogger(__name__)
         
@@ -78,10 +78,10 @@ class TaideLlm:
             task='text-generation',
             stopping_criteria=StoppingCriteriaList([StopOnTokens(self.tokenizer)]),
             max_length=4096,
-            # max_new_tokens2048,
-            do_sample=True,
-            temperature=0.2,
-            top_p=0.95,
+            # max_new_tokens=2048,
+            # num_beams=2, early_stopping=True, # Beam search
+            do_sample=True, temperature=0.2, top_p=0.95, # Top-p (nucleus) sampling
+            # penalty_alpha=0.6, top_k=3, low_memory=True, # Contrastive search
             repetition_penalty=1.0,
         )
 
@@ -114,7 +114,8 @@ class TaideLlm:
         system_chat_tuple = ChatTuple(
             system = 'You are a helpful assistant. 你是一個樂於助人的助手。',
             user = '請用中文回答我',
-            bot = '好! 我樂於助人,是你的好助手。'
+            # bot = '好! 我樂於助人,是你的好助手。' # b1.0.0
+            bot = '當然!為方便溝通,我使用的是傳統中文語言。您有何請求或疑問,請慷慨請教我?'
         )
 
         if append_system:
@@ -149,7 +150,9 @@ class TaideLlm:
             loop = asyncio.get_running_loop()
             result = await loop.run_in_executor(None, self.pipe, prompt)
             result = result[0]['generated_text']
-            self.logger.info('Generation finished.')
+            output_tokens = len(self.tokenizer.tokenize(result))
+            self.logger.info(f'Generation finished. Generated {output_tokens} tokens.')
+            self.logger.debug(f'Reply: {result}')
             
         except Exception as e:
             result = ''
