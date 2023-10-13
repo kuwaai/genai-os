@@ -268,7 +268,7 @@ class ChatController extends Controller
                     $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
                 }
                 $history = new Histories();
-                $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->fill(['chained'=>$chained,'msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
                 $history->save();
                 $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
