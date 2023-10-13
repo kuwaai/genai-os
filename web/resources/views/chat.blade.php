@@ -172,7 +172,7 @@
                                                             <polyline points="20 6 9 17 4 12"></polyline>
                                                         </svg>
                                                     </button>
-                                                    <button class="flex text-black hover:bg-gray-400 p-2">
+                                                    <!--<button class="flex text-black hover:bg-gray-400 p-2">
                                                         <svg stroke="currentColor" fill="none" stroke-width="2"
                                                             viewBox="0 0 24 24" stroke-linecap="round"
                                                             stroke-linejoin="round" class="icon-sm" height="1em"
@@ -191,7 +191,7 @@
                                                                 d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
                                                             </path>
                                                         </svg>
-                                                    </button>
+                                                    </button>-->
                                                 </div>
                                             @endif
                                         </div>
