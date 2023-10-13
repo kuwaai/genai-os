@@ -6,6 +6,13 @@
 
 ## Build
 
-```bash
-docker-compose up -d
-```
+1. Create the self-signed CA certification
+    ```bash
+    pushd ./cert
+    ./gen_ca.sh # Wait for a while...
+    popd # Back to this directory
+    ```
+2. Run the service
+    ```bash
+    sudo docker compose up -d
+    ```

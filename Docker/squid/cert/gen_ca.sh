@@ -1,6 +1,6 @@
 #!/bin/bash
 
-openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -extensions v3_ca -keyout squid-self-signed.key -out squid-self-signed.crt
+openssl req -batch -new -newkey rsa:2048 -days 365 -nodes -x509 -extensions v3_ca -keyout squid-self-signed.key -out squid-self-signed.crt
 
 # Convert the cert into a trusted certificate in DER format.
 openssl x509 -in squid-self-signed.crt -outform DER -out squid-self-signed.der

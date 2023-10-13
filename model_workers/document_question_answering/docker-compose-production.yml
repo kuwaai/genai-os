@@ -4,22 +4,20 @@ name: doc-qa
 services:
   api:
     runtime: nvidia
-    build:
-      context: .
-      args:
-        WORKER_FRAMEWORK_VERSION: legacy-api
-    container_name: ${LLM_NAME:-doc_qa}-api-${PORT}
-    devices:
-      - /dev/nvidia0:/dev/nvidia0
-    restart: always
+    build: .
+    container_name: ${LLM_NAME}-api-${PORT}
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ["${GPU_ID}"]
+            capabilities: [gpu]
+    env_file: .env.prod
     environment:
-      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
-      - AGENT_ENDPOINT=${AGENT_ENDPOINT:-http://localhost:9000/v1.0/}
-      - LLM_NAME=${LLM_NAME:-doc_qa}
-      - PUBLIC_ADDRESS=${PUBLIC_ADDRESS:-localhost}
-      - PORT=${PORT} # PORT is manaul specified or assigned by the Host OS
-      - IGNORE_AGENT=False
-      - DEBUG=False
+      - LLM_NAME=${LLM_NAME}
+      - PORT=${PORT}
     networks:
       - squid_backend
     ports:
