@@ -60,12 +60,18 @@ class DocumentQaProcess(GeneralProcessInterface):
 class DatabaseQaProcess(GeneralProcessInterface):
   def __init__(self, database_path=''):
     self.logger = logging.getLogger(__name__)
-    self.app = DocumentQa(database_path)
+    self.database_path = database_path
+    self.app = DocumentQa(self.database_path)
 
   async def process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
 
     try:
-    
+      
+      if len(chat_history) > 0 and chat_history[-1].msg == '/reload':
+        self.app = DocumentQa(self.database_path)
+        yield '資料庫已重新載入。'
+        return
+
       async for reply in self.app.process(None, chat_history):
         yield reply
 

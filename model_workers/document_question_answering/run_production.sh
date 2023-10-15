@@ -7,6 +7,7 @@ PORT=${PORT:-$(
     )}
 
 GPU_ID=${GPU_ID:-0}
+COMPOSE_FILE=${COMPOSE_FILE:-docker-compose-production.yml}
 
 echo PORT=${PORT} GPU_ID=${GPU_ID}
-docker compose -p doc-qa-${PORT} -f docker-compose-production.yml "$@"
+docker compose -p doc-qa-${PORT} -f ${COMPOSE_FILE} "$@"
