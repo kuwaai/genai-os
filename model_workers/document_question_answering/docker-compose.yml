@@ -15,6 +15,7 @@ services:
       - PORT=9001 # Leave blank will assign by the OS.
       - IGNORE_AGENT=False
       - DEBUG=True
+      - LAYOUT_CONFIG=${LAYOUT_CONFIG:-layout.yaml}
     networks:
       - taide_backend
       - squid_backend

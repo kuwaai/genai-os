@@ -5,6 +5,7 @@ from worker_framework.datatype import ChatRecord, Role
 from typing import Generator
 from pathlib import Path
 from urllib.error import HTTPError
+from langchain.docstore.document import Document
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from .document_store import DocumentStore
@@ -19,9 +20,13 @@ import asyncio
 import copy
 
 class DocumentQa:
-  def __init__(self):
+  def __init__(self, document_store:str = None):
     self.logger = logging.getLogger(__name__)
     self.llm = TaideLlm()
+    self.document_store:DocumentStore = None
+    if document_store != None:
+      self.document_store = DocumentStore.load(document_store)
+
   
   def generate_llm_input(self, task, question, related_docs):
     
@@ -50,30 +55,40 @@ class DocumentQa:
     final_user_record = next(filter(lambda x: x.role == Role.USER, reversed(chat_history)))
     return final_user_record.msg
 
+  async def fetch_documents(self, url:str):
+    # Fetching documents
+    self.logger.info(f'Fetching URL "{url}"')
+    docs = []
+    loader = RecursiveUrlMultimediaLoader(
+      url=url,
+      max_depth=1,
+      prevent_outside=False,
+      use_async = True,
+      cache_proxy_url = 'http://web_cache:10250'
+    ) 
+    docs = await loader.async_load()
+
+    self.logger.info(f'Fetched {len(docs)} documents.')
+    return docs
+    
+  async def construct_document_store(self, docs: [Document]):
+    document_store = DocumentStore()
+    return await document_store.from_documents(docs)
+
   async def process(self, url: str, chat_history: [ChatRecord]) -> Generator[str, None, None]:
 
     final_user_input = self.get_final_user_input(chat_history)
 
-    # Fetching documents
-    self.logger.info(f'Fetching URL "{url}"')
+    document_store = self.document_store
+    docs = None
     try:
-      loader = RecursiveUrlMultimediaLoader(
-        url=url,
-        max_depth=1,
-        prevent_outside=False,
-        use_async = True,
-        cache_proxy_url = 'http://web_cache:10250'
-      ) 
-      docs = await loader.async_load()
+      if document_store == None:
+        docs = await self.fetch_documents(url)
+        document_store = await self.construct_document_store(docs)
     except HTTPError as e:
       await asyncio.sleep(2) # To prevent SSE error of web page.
       yield f'獲取文件時發生錯誤 {str(e)}，請確認所提供文件存在且可被公開存取。'
       return
-
-    self.logger.info(f'Fetched {len(docs)} documents.')
-    
-    document_store = DocumentStore()
-    await document_store.from_documents(docs)
     
     task = ''
     if final_user_input == None:
@@ -88,10 +103,11 @@ class DocumentQa:
       task = 'qa'
 
     # Shortcut
-    related_docs = docs
-    modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
+    if docs != None:
+      related_docs = docs
+      modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
 
-    if self.llm.is_too_long(modified_chat_history):
+    if docs == None or self.llm.is_too_long(modified_chat_history):
       # Retrieve
       related_docs = copy.deepcopy(await document_store.retrieve(question))
       modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)

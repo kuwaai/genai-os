@@ -8,5 +8,5 @@ PORT=${PORT:-$(
 
 GPU_ID=${GPU_ID:-0}
 
-echo PUBIC_PORT=${PUBLIC_PORT} GPU_ID=${GPU_ID}
+echo PORT=${PORT} GPU_ID=${GPU_ID}
 docker compose -p doc-qa-${PORT} -f docker-compose-production.yml "$@"

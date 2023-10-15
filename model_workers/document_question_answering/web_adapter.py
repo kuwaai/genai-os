@@ -56,3 +56,20 @@ class DocumentQaProcess(GeneralProcessInterface):
       await asyncio.sleep(2) # To prevent SSE error of web page.
       self.logger.exception('Unexpected error')
       yield '發生錯誤，請再試一次或是聯絡管理員。'
+
+class DatabaseQaProcess(GeneralProcessInterface):
+  def __init__(self, database_path=''):
+    self.logger = logging.getLogger(__name__)
+    self.app = DocumentQa(database_path)
+
+  async def process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
+
+    try:
+    
+      async for reply in self.app.process(None, chat_history):
+        yield reply
+
+    except Exception as e:
+      await asyncio.sleep(2) # To prevent SSE error of web page.
+      self.logger.exception('Unexpected error')
+      yield '發生錯誤，請再試一次或是聯絡管理員。'

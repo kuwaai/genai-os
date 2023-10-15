@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export LAYOUT_CONFIG="./layout.yaml"
+export LAYOUT_CONFIG=${LAYOUT_CONFIG:-"./layout.yaml"}
 
 exec worker-server

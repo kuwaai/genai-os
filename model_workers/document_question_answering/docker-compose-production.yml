@@ -18,6 +18,7 @@ services:
     environment:
       - LLM_NAME=${LLM_NAME}
       - PORT=${PORT}
+      - LAYOUT_CONFIG=${LAYOUT_CONFIG:-layout.yaml}
     networks:
       - squid_backend
     ports:
