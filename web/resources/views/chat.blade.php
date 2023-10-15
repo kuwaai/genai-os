@@ -118,7 +118,7 @@
                     @if (request()->route('chat_id'))
                         @php
                             $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image;
-                            $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img: asset(Storage::url($img));
+                            $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
@@ -149,6 +149,51 @@
                                             class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
                                             <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}
                                             </p>
+                                            @if ($history->isbot)
+                                                <div class="flex">
+                                                    <button class="flex text-black hover:bg-gray-400 p-2"
+                                                        onclick="copytext($(this).parent().parent().children()[0])">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                            </path>
+                                                            <rect x="8" y="2" width="8" height="4"
+                                                                rx="1" ry="1">
+                                                            </rect>
+                                                        </svg>
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm"
+                                                            style="display:none;" height="1em" width="1em"
+                                                            xmlns="http://www.w3.org/2000/svg">
+                                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                                        </svg>
+                                                    </button>
+                                                    <!--<button class="flex text-black hover:bg-gray-400 p-2">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="flex text-black hover:bg-gray-400 p-2">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                            </path>
+                                                        </svg>
+                                                    </button>-->
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                     @if (!$history->isbot)
@@ -160,18 +205,20 @@
                                 </div>
                             @endif
                         @endforeach
-                    @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
+                    @elseif(request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa','doc_qa_b5']))
                         <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
-                    @elseif(request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa')
-                        <div style="display:none;" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" id="url_only_alert"
-                            role="alert">
-                            <span class="block sm:inline">{{__("The first message for this LLM allows URL only!")}}</span>
+                    @elseif(request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa','web_qa_b5']))
+                        <div style="display:none;"
+                            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                            id="url_only_alert" role="alert">
+                            <span
+                                class="block sm:inline">{{ __('The first message for this LLM allows URL only!') }}</span>
                         </div>
                     @endif
                 </div>
                 <div
-                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa' ? 'overflow-x-hidden' : '' }}">
-                    @if (request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'doc_qa')
+                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa','doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
+                    @if (request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
                         <form method="post" action="{{ route('chat.upload') }}" class="m-auto"
                             enctype="multipart/form-data">
                             @csrf
@@ -185,9 +232,10 @@
                         <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
                             <div class="flex items-end justify-end">
                                 @csrf
-                                <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
+                                <input name="llm_id" value="{{ request()->route('llm_id') }}"
+                                    style="display:none;">
                                 <textarea tabindex="0" data-id="root"
-                                    placeholder="{{ request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa' ? __('An URL is required to create a chatroom') : __('Send a message') }}"
+                                    placeholder="{{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa','web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
                                     rows="1" max-rows="5" oninput="adjustTextareaRows()" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                                 <button type="submit"
@@ -313,6 +361,28 @@
                 </script>
             @endif
             <script>
+                function copytext(node) {
+                    var range = document.createRange();
+                    range.selectNode(node);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    try {
+                        // Attempt to copy the selected text to the clipboard
+                        document.execCommand("copy");
+                    } catch (err) {
+                        console.log("Copy not supported!")
+                    }
+                    window.getSelection().removeAllRanges();
+
+                    $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
+                    $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
+                    setTimeout(function() {
+                        $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
+                        $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
+                    }, 3000);
+
+                }
+
                 function isValidURL(url) {
                     // Regular expression for a simple URL pattern (you can make it more complex if needed)
                     var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
@@ -368,7 +438,7 @@
                     });
                     adjustTextareaRows();
                 }
-                @if (request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'web_qa')
+                @if (request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code,['web_qa','web_qa_b5']))
                     if ($("#prompt_area")) {
                         $("#prompt_area").on("submit", function(event) {
                             event.preventDefault();

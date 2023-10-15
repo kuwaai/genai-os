@@ -100,7 +100,9 @@ class ChatController extends Controller
                 //Create a chat and send that url into the llm
                 $msg = url('storage/' . $directory . '/' . rawurlencode($fileName));
                 $chat = new Chats();
-                $chat->fill(['name' => $msg, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+
+                $chatname = explode("_", $fileName)[1];
+                $chat->fill(['name' => $chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
                 $history = new Histories();
                 $history->fill(['msg' => $msg, 'chat_id' => $chat->id, 'isbot' => false]);
@@ -148,14 +150,49 @@ class ChatController extends Controller
             $input = $request->input('input');
             $llm_id = $request->input('llm_id');
             if ($input && $llm_id && in_array($llm_id, $result)) {
-                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa'])) {
+                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
                     # Validate first message is exactly URL
                     if (!filter_var($input, FILTER_VALIDATE_URL)) {
                         return back();
                     }
                 }
                 $chat = new Chats();
-                $chat->fill(['name' => $input, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+                $chatname = $input;
+                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])){
+                    function getWebPageTitle($url) {
+                        // Try to fetch the HTML content of the URL
+                        $html = @file_get_contents($url);
+
+                        // If the URL is not accessible, return an empty string
+                        if ($html === false) {
+                            return '';
+                        }
+
+                        // Use regular expressions to extract the title from the HTML
+                        if (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+                            return $matches[1];
+                        } else {
+                            // If no title is found, return an empty string
+                            return '';
+                        }
+                    }
+                    function getFilenameFromURL($url) {
+                        $path_parts = pathinfo($url);
+                        
+                        if (isset($path_parts['filename'])) {
+                            return $path_parts['filename'];
+                        } else {
+                            return "";
+                        }
+                    }
+                    $tmp = getWebPageTitle($input);
+                    if ($tmp != "") $chatname = $tmp;
+                    else{
+                        $tmp = getWebPageTitle($input);
+                        if ($tmp != "") $chatname = $tmp;
+                    }
+                }
+                $chat->fill(['name'=>$chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
@@ -207,7 +244,7 @@ class ChatController extends Controller
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
                 $history->save();
-                if (in_array(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, ['doc_qa', 'web_qa']) && !$chained) {
+                if (in_array(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
                     $tmp = json_encode([
                         [
                             'msg' => Histories::where('chat_id', '=', $chatId)
@@ -231,7 +268,7 @@ class ChatController extends Controller
                     $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
                 }
                 $history = new Histories();
-                $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->fill(['chained'=>$chained,'msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
                 $history->save();
                 $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);

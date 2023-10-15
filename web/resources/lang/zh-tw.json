@@ -145,5 +145,6 @@
 "The first message for this LLM allows URL only!":"該模型僅允許由一個URL連結作為開頭！",
 "New LLM":"新增語言模型",
 "Enabled Models":"已啟用模型",
-"Disabled Models":"已停用模型"
+"Disabled Models":"已停用模型",
+"auth.failed":"帳號或密碼錯誤"
 }

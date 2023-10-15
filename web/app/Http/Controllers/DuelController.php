@@ -145,7 +145,20 @@ class DuelController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
                     $history->save();
-                    if (in_array(LLMs::find($chat->llm_id)->access_code, ['doc_qa', 'web_qa']) || $chained) {
+                    if (in_array(LLMs::find($chat->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
+                        $tmp = json_encode([
+                            [
+                                'msg' => Histories::where('chat_id', '=', $chat->id)
+                                    ->select('msg')
+                                    ->orderby('created_at')
+                                    ->orderby('id', 'desc')
+                                    ->get()
+                                    ->first()->msg,
+                                'isbot' => false,
+                            ],
+                            ['msg' => $request->input('input'), 'isbot' => false],
+                        ]);
+                    } elseif ($chained) {
                         $tmp = Histories::where('chat_id', '=', $chat->id)
                             ->select('msg', 'isbot')
                             ->orderby('created_at')

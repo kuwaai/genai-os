@@ -37,10 +37,10 @@ def register():
 def unregister():
     # For Offline LLM to unregister themself
     # Parameters: name, endpoint
-    llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
+    llm_name, endpoint = request.form.get("name"), get_base_url(request.form.get("endpoint"))
     if llm_name in data:
         old = len(data[llm_name])
-        data[llm_name] = [i for i in data[llm_name] if i[0] != endpoint]
+        data[llm_name] = [i for i in data[llm_name] if get_base_url(i[0]) != endpoint]
         if data[llm_name] == []: del data[llm_name]
         if data.get(llm_name) == None or old != len(data[llm_name]):
             save_variable_to_file(record_file, data)
