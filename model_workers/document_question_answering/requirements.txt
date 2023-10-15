@@ -9,3 +9,4 @@ faiss-cpu
 chevron
 accelerate
 trafilatura
+jsonlines

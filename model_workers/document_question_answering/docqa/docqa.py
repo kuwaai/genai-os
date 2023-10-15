@@ -18,15 +18,19 @@ import logging
 import chevron
 import asyncio
 import copy
+import jsonlines
+import time
 
 class DocumentQa:
+
+  log_path = '/var/log/doc_qa/qa.jsonl'
+
   def __init__(self, document_store:str = None):
     self.logger = logging.getLogger(__name__)
     self.llm = TaideLlm()
     self.document_store:DocumentStore = None
     if document_store != None:
       self.document_store = DocumentStore.load(document_store)
-
   
   def generate_llm_input(self, task, question, related_docs):
     
@@ -132,5 +136,15 @@ class DocumentQa:
           msg=self.generate_llm_input('translate', result, [])
           ),
       ])
+
+    # Log the QA history
+    with jsonlines.open(self.log_path, mode='a', flush=True) as log:
+      log.write({
+        'time': time.time(),
+        'url': url,
+        'question': question,
+        'related_docs': [doc.page_content for doc in related_docs],
+        'response': result
+      })
 
     yield result

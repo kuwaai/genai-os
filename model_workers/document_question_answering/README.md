@@ -60,3 +60,4 @@ Retrieve-Augmented Generation Worker.
     ```bash
     sudo LLM_NAME="doc_qa" PORT="9002" GPU_ID="0" ./run_production.sh logs -f
     ```
+    The QA logs are kept in the volume `doc-qa-${PORT}_log` for further investigation.

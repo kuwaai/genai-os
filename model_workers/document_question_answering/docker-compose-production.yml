@@ -30,8 +30,11 @@ services:
       retries: 5
     volumes:
       - /var/models/:/llm/:ro
+      - log:/var/log/doc_qa
 
 # Connect to the network created by web_agent and squid
 networks:
   squid_backend:
     external: true
+volumes:
+  log:
