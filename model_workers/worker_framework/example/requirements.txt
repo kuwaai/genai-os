@@ -1,0 +1,6 @@
+opencc
+# torch
+# transformers
+# accelerate
+# sentencepiece
+# openai

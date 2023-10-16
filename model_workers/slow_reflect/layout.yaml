@@ -1,0 +1,5 @@
+version: 1
+override-process:
+  class: 'slow_reflect.SlowReflectProcess'
+  args:
+    delay_sec: 1

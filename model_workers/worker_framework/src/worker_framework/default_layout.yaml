@@ -1,0 +1,7 @@
+version: 1
+llm:
+  class: 'worker_framework.dummy.DummyModel'
+  args: {}
+
+ingress-filters: []
+egress-filters: []

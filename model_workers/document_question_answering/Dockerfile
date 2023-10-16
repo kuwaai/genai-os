@@ -1,0 +1,31 @@
+ARG WORKER_FRAMEWORK_VERSION=latest
+FROM worker-framework:${WORKER_FRAMEWORK_VERSION}
+
+RUN mkdir -p /model_api
+
+# Install the dependency.
+# Note that this order can prevent re-runing apt-get if requirements.txt changed.
+RUN apt-get update &&\
+    apt-get install -y libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr \
+            flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig
+COPY requirements.txt /model_api/
+RUN pip install -r /model_api/requirements.txt
+
+# Pre-caching the used embedding model from huggingface hub.
+COPY pre_cache_models.py /
+RUN python3 /pre_cache_models.py
+
+# Install the source code of application in the last stage.
+# By doing so, we can utilize the building cache of Docker to speedup the building process.
+COPY . /model_api/
+WORKDIR /model_api/
+RUN chmod +x run.sh
+
+ENV LLM_NAME="doc-qa"
+ENV PUBLIC_ADDRESS="localhost"
+ENV PORT="9001"
+ENV AGENT_ENDPOINT="http://localhost:9000/v1.0/"
+ENV DEBUG="False"
+
+ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["./run.sh"]
