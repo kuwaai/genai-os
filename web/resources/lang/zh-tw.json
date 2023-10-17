@@ -146,5 +146,13 @@
 "New LLM":"新增語言模型",
 "Enabled Models":"已啟用模型",
 "Disabled Models":"已停用模型",
-"auth.failed":"帳號或密碼錯誤"
+"auth.failed":"帳號或密碼錯誤",
+"Provide feedback":"提供意見",
+"Unsafe":"令人反感",
+"Incorrect":"事實不符",
+"Inrelvent":"答非所問",
+"In Wrong Language":"語言錯誤",
+"What was the problem with this response? How can it be improved?":"提供其他意見或建議回答",
+"Submit feedback":"送出意見",
+"What do you like about the response?":"為什麼喜歡這個回答？"
 }

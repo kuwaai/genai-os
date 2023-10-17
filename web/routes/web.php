@@ -91,6 +91,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
                 Route::post('/request', [ChatController::class, 'request'])->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
+                Route::post('/feedback', [ChatController::class, 'feedback'])->name('chat.feedback');
 
                 Route::delete('/delete', [ChatController::class, 'delete'])->name('chat.delete');
             })

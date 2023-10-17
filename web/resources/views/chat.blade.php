@@ -44,7 +44,8 @@
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                         href="{{ route('chat.new', $LLM->id) }}">
-                                        <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('New Chat') }}
+                                        <p class="flex-1 text-center text-gray-700 dark:text-white">
+                                            {{ __('New Chat') }}
                                         </p>
                                     </a>
                                 </div>
@@ -121,7 +122,7 @@
                             $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                         @endphp
-                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at', 'desc')->orderby('id')->get() as $history)
+                        @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->leftjoin('feedback', 'history_id', '=', 'histories.id')->select(['histories.*', 'feedback.nice', 'feedback.detail', 'feedback.flags'])->orderby('histories.created_at', 'desc')->orderby('histories.id')->get() as $history)
                             @if (in_array($history->id, $tasks))
                                 <div class="flex w-full mt-2 space-x-3">
                                     <div
@@ -132,6 +133,59 @@
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
                                             <p class="text-sm whitespace-pre-line break-words"
                                                 id="task_{{ $history->id }}">{{ __($history->msg) }}</p>
+                                            <div class="flex space-x-1 show-on-finished" style="display:none;">
+                                                <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
+                                                    onclick="copytext($(this).parent().parent().children()[0])">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                        </path>
+                                                        <rect x="8" y="2" width="8" height="4" rx="1"
+                                                            ry="1">
+                                                        </rect>
+                                                    </svg>
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" style="display:none;"
+                                                        height="1em" width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback"
+                                                    onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
+                                                        json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                    ) !!});">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback"
+                                                    onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
+                                                        json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                    ) !!});">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -150,8 +204,8 @@
                                             <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}
                                             </p>
                                             @if ($history->isbot)
-                                                <div class="flex">
-                                                    <button class="flex text-black hover:bg-gray-400 p-2"
+                                                <div class="flex space-x-1">
+                                                    <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
                                                         onclick="copytext($(this).parent().parent().children()[0])">
                                                         <svg stroke="currentColor" fill="none" stroke-width="2"
                                                             viewBox="0 0 24 24" stroke-linecap="round"
@@ -172,7 +226,12 @@
                                                             <polyline points="20 6 9 17 4 12"></polyline>
                                                         </svg>
                                                     </button>
-                                                    <!--<button class="flex text-black hover:bg-gray-400 p-2">
+                                                    <button
+                                                        class="flex hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
+                                                        data-modal-target="feedback" data-modal-toggle="feedback"
+                                                        onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
+                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                        ) !!});">
                                                         <svg stroke="currentColor" fill="none" stroke-width="2"
                                                             viewBox="0 0 24 24" stroke-linecap="round"
                                                             stroke-linejoin="round" class="icon-sm" height="1em"
@@ -182,7 +241,12 @@
                                                             </path>
                                                         </svg>
                                                     </button>
-                                                    <button class="flex text-black hover:bg-gray-400 p-2">
+                                                    <button
+                                                        class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
+                                                        data-modal-target="feedback" data-modal-toggle="feedback"
+                                                        onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
+                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                        ) !!});">
                                                         <svg stroke="currentColor" fill="none" stroke-width="2"
                                                             viewBox="0 0 24 24" stroke-linecap="round"
                                                             stroke-linejoin="round" class="icon-sm" height="1em"
@@ -191,7 +255,7 @@
                                                                 d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
                                                             </path>
                                                         </svg>
-                                                    </button>-->
+                                                    </button>
                                                 </div>
                                             @endif
                                         </div>
@@ -205,9 +269,11 @@
                                 </div>
                             @endif
                         @endforeach
-                    @elseif(request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa','doc_qa_b5']))
+                    @elseif(request()->route('llm_id') &&
+                            in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
                         <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
-                    @elseif(request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa','web_qa_b5']))
+                    @elseif(request()->route('llm_id') &&
+                            in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
                         <div style="display:none;"
                             class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
                             id="url_only_alert" role="alert">
@@ -217,8 +283,9 @@
                     @endif
                 </div>
                 <div
-                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa','doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
-                    @if (request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
+                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
+                    @if (request()->route('llm_id') &&
+                            in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
                         <form method="post" action="{{ route('chat.upload') }}" class="m-auto"
                             enctype="multipart/form-data">
                             @csrf
@@ -235,8 +302,8 @@
                                 <input name="llm_id" value="{{ request()->route('llm_id') }}"
                                     style="display:none;">
                                 <textarea tabindex="0" data-id="root"
-                                    placeholder="{{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa','web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
-                                    rows="1" max-rows="5" oninput="adjustTextareaRows()" id="chat_input" name="input"
+                                    placeholder="{{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
+                                    rows="1" max-rows="5" oninput="adjustTextareaRows(this)" id="chat_input" name="input"
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                                 <button type="submit"
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
@@ -260,7 +327,7 @@
                                 <button type="button" onclick="chain_toggle()" id="chain_btn"
                                     class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
                                 <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
-                                    oninput="adjustTextareaRows()" id="chat_input" name="input" readonly
+                                    oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                                 <button type="submit" id='submit_msg' style='display:none;'
                                     class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
@@ -277,6 +344,87 @@
                 </div>
             </div>
             @if (request()->route('chat_id'))
+                <div id="feedback" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+                    class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                    <div class="relative w-full max-w-2xl max-h-full">
+                        <!-- Modal content -->
+                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                            <!-- Modal header -->
+                            <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                                <div style="display:none;"
+                                    class="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 bg-green-100">
+                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                                        stroke-linecap="round" stroke-linejoin="round" class="icon-lg text-green-700"
+                                        aria-hidden="true" height="1em" width="1em"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div style="display:none;"
+                                    class="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 bg-red-100">
+                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                                        stroke-linecap="round" stroke-linejoin="round" class="icon-lg text-red-600"
+                                        aria-hidden="true" height="1em" width="1em"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl my-auto font-semibold text-gray-900 dark:text-white">
+                                    {{ __('Provide feedback') }}
+                                </h3>
+                                <button type="button"
+                                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                                    data-modal-hide="feedback">
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+                            <!-- Modal body -->
+                            <div class="p-6">
+                                <form id="feedback_form" action="{{ route('chat.feedback') }}" method="post">
+                                    @csrf
+                                    <input name="history_id" style="display:none;">
+                                    <input name="type" style="display:none;">
+
+                                    <textarea rows="1" maxlength="4096" max-rows="5" name="feedbacks" id="feedbacks"
+                                        class="w-full resize-none" oninput="adjustTextareaRows(this)"></textarea>
+                                    <div>
+                                        <input name="feedback[]" id="feedback_1" type="checkbox" value="unsafe">
+                                        <label for="feedback_1"
+                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('Unsafe') }}</label>
+                                    </div>
+                                    <div>
+                                        <input name="feedback[]" id="feedback_2" type="checkbox" value="incorrect">
+                                        <label for="feedback_2"
+                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('Incorrect') }}</label>
+                                    </div>
+                                    <div>
+                                        <input name="feedback[]" id="feedback_3" type="checkbox" value="inrelvent">
+                                        <label for="feedback_3"
+                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('Inrelvent') }}</label>
+                                    </div>
+                                    <div>
+                                        <input name="feedback[]" id="feedback_4" type="checkbox" value="language">
+                                        <label for="feedback_4"
+                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('In Wrong Language') }}</label>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button data-modal-hide="feedback" type="submit"
+                                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Submit feedback') }}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <script>
                     function chain_toggle() {
                         $.get("{{ route('chat.chain') }}", {
@@ -291,6 +439,85 @@
 
                     function deleteChat() {
                         $("#deleteChat").submit();
+                    }
+
+                    function copytext(node) {
+                        var range = document.createRange();
+                        range.selectNode(node);
+                        window.getSelection().removeAllRanges();
+                        window.getSelection().addRange(range);
+                        try {
+                            // Attempt to copy the selected text to the clipboard
+                            document.execCommand("copy");
+                        } catch (err) {
+                            console.log("Copy not supported!")
+                        }
+                        window.getSelection().removeAllRanges();
+
+                        $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
+                        $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
+                        setTimeout(function() {
+                            $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
+                            $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
+                        }, 3000);
+
+                    }
+
+                    function feedback(id, type, obj, data) {
+                        $(obj).parent().find("button:not(:first)").removeClass("bg-gray-400")
+                        adjustTextareaRows($("#feedbacks"));
+                        // clear form
+                        $("#feedback_form input:not(:first), #feedback_form textarea").each(function() {
+                            if ($(this).is(":checkbox")) {
+                                $(this).prop("checked", false);
+                            } else {
+                                $(this).val("");
+                            }
+                        });
+                        $("#feedback_form input:eq(1)").val(id) //History id
+                        $("#feedback_form input:eq(2)").val(type) //feedback type
+                        $("#feedback svg").eq(type - 1).parent().show();
+                        $(obj).parent().find(">button:not(:first)").removeClass("text-green-600 text-red-600").addClass("text-black")
+                        $(obj).toggleClass("text-black " + (type == 1 ? "text-green-600" : "text-red-600"))
+                        $("#feedback svg").eq(type % 2).parent().hide();
+                        if (type == 1) {
+                            //Good
+                            $("#feedback_form >div:not(:last)").hide()
+                            $("#feedback_form textarea").attr("placeholder", "{{ __('What do you like about the response?') }}")
+                        } else if (type == 2) {
+                            //Bad
+                            $("#feedback_form >div").show()
+                            $("#feedback_form textarea").attr("placeholder",
+                                "{{ __('What was the problem with this response? How can it be improved?') }}")
+                        }
+                        if (data) {
+                            if (data['nice'] === true && type == 1) {
+                                if (data["detail"]) {
+                                    $("#feedback_form textarea").val(data["detail"]);
+                                }
+                            } else if (data['nice'] === false && type == 2) {
+                                if (data["detail"]) {
+                                    $("#feedback_form textarea").val(data["detail"]);
+                                }
+                                if (type == 2 && data["flags"]) {
+                                    data["flags"] = JSON.parse(data["flags"])
+                                    data["flags"] = data["flags"].map(f => {
+                                        return ["unsafe", "incorrect", "inrelvent", "language"].indexOf(f) + 1
+                                    })
+                                    data["flags"].forEach(i => {
+                                        $("#feedback_" + i).click();
+                                    })
+                                }
+                            } else {
+                                $.post("{{ route('chat.feedback') }}", {
+                                    type: type,
+                                    history_id: id,
+                                    init: true,
+                                    _token: $("input[name='_token']").val()
+                                })
+                            }
+
+                        }
                     }
 
                     function editChat() {
@@ -341,6 +568,8 @@
                             $("#submit_msg").show()
                             $("#chat_input").val("")
                             $("#chat_input").prop("readonly", false)
+                            adjustTextareaRows($("#chat_input"))
+                            $(".show-on-finished").attr("style", "")
                         } else {
                             data = JSON.parse(event.data)
                             number = data["history_id"];
@@ -361,32 +590,26 @@
                 </script>
             @endif
             <script>
-                function copytext(node) {
-                    var range = document.createRange();
-                    range.selectNode(node);
-                    window.getSelection().removeAllRanges();
-                    window.getSelection().addRange(range);
-                    try {
-                        // Attempt to copy the selected text to the clipboard
-                        document.execCommand("copy");
-                    } catch (err) {
-                        console.log("Copy not supported!")
-                    }
-                    window.getSelection().removeAllRanges();
-
-                    $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
-                    $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
-                    setTimeout(function() {
-                        $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
-                        $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
-                    }, 3000);
-
-                }
-
                 function isValidURL(url) {
                     // Regular expression for a simple URL pattern (you can make it more complex if needed)
                     var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
                     return urlPattern.test(url);
+                }
+
+                function adjustTextareaRows(obj) {
+                    obj = $(obj)
+                    if (obj.length) {
+                        const textarea = obj;
+                        const maxRows = parseInt(textarea.attr('max-rows')) || 5;
+                        const lineHeight = parseInt(textarea.css('line-height'));
+
+                        textarea.attr('rows', 1);
+
+                        const contentHeight = textarea[0].scrollHeight;
+                        const rowsToDisplay = Math.floor(contentHeight / lineHeight);
+
+                        textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+                    }
                 }
 
                 function uploadcheck() {
@@ -409,20 +632,6 @@
                 if ($("#chat_input")) {
                     $("#chat_input").focus();
 
-                    function adjustTextareaRows() {
-                        if ($('#chat_input').length) {
-                            const textarea = $('#chat_input');
-                            const maxRows = parseInt(textarea.attr('max-rows')) || 5;
-                            const lineHeight = parseInt(textarea.css('line-height'));
-
-                            textarea.attr('rows', 1);
-
-                            const contentHeight = textarea[0].scrollHeight;
-                            const rowsToDisplay = Math.floor(contentHeight / lineHeight);
-
-                            textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
-                        }
-                    }
                     $("#chat_input").on("keydown", function(event) {
                         if (event.key === "Enter" && !event.shiftKey) {
                             event.preventDefault();
@@ -434,11 +643,12 @@
                                 cursorPosition));
                             this.selectionStart = this.selectionEnd = cursorPosition + 1;
                         }
-                        adjustTextareaRows();
+                        adjustTextareaRows($("#chat_input"));
                     });
-                    adjustTextareaRows();
+                    adjustTextareaRows($("#chat_input"));
                 }
-                @if (request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code,['web_qa','web_qa_b5']))
+                @if (request()->route('llm_id') &&
+                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
                     if ($("#prompt_area")) {
                         $("#prompt_area").on("submit", function(event) {
                             event.preventDefault();

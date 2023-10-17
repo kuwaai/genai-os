@@ -17,6 +17,7 @@ use App\Jobs\RequestChat;
 use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
+use App\Models\Feedback;
 use DB;
 use Session;
 
@@ -101,7 +102,7 @@ class ChatController extends Controller
                 $msg = url('storage/' . $directory . '/' . rawurlencode($fileName));
                 $chat = new Chats();
 
-                $chatname = explode("_", $fileName)[1];
+                $chatname = explode('_', $fileName)[1];
                 $chat->fill(['name' => $chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
                 $history = new Histories();
@@ -127,6 +128,28 @@ class ChatController extends Controller
             return view('chat');
         }
         return redirect()->route('archive.chat', $request->route('chat_id'));
+    }
+
+    public function feedback(Request $request)
+    {
+        $history_id = $request->input('history_id');
+        if ($history_id) {
+            $nice = $request->input('type') == '1';
+            $detail = $request->input('feedbacks');
+            $flag = $request->input('feedback');
+            $init = $request->input('init');
+            $feedback = new Feedback();
+            if (Feedback::where('history_id', '=', $history_id)->exists()) {
+                $feedback = Feedback::where('history_id', '=', $history_id)->first();
+            }
+            if ($init) {
+                $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => null, 'flags' => null]);
+            } else {
+                $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => $detail, 'flags' => $flag == null ? null : json_encode($flag)]);
+            }
+            $feedback->save();
+        }
+        return back();
     }
 
     public function create(ChatRequest $request): RedirectResponse
@@ -158,8 +181,9 @@ class ChatController extends Controller
                 }
                 $chat = new Chats();
                 $chatname = $input;
-                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])){
-                    function getWebPageTitle($url) {
+                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                    function getWebPageTitle($url)
+                    {
                         // Try to fetch the HTML content of the URL
                         $html = @file_get_contents($url);
 
@@ -169,30 +193,34 @@ class ChatController extends Controller
                         }
 
                         // Use regular expressions to extract the title from the HTML
-                        if (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+                        if (preg_match('/<title>(.*?)<\/title>/i', $html, $matches)) {
                             return $matches[1];
                         } else {
                             // If no title is found, return an empty string
                             return '';
                         }
                     }
-                    function getFilenameFromURL($url) {
+                    function getFilenameFromURL($url)
+                    {
                         $path_parts = pathinfo($url);
-                        
+
                         if (isset($path_parts['filename'])) {
                             return $path_parts['filename'];
                         } else {
-                            return "";
+                            return '';
                         }
                     }
                     $tmp = getWebPageTitle($input);
-                    if ($tmp != "") $chatname = $tmp;
-                    else{
+                    if ($tmp != '') {
+                        $chatname = $tmp;
+                    } else {
                         $tmp = getWebPageTitle($input);
-                        if ($tmp != "") $chatname = $tmp;
+                        if ($tmp != '') {
+                            $chatname = $tmp;
+                        }
                     }
                 }
-                $chat->fill(['name'=>$chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+                $chat->fill(['name' => $chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
@@ -268,7 +296,7 @@ class ChatController extends Controller
                     $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
                 }
                 $history = new Histories();
-                $history->fill(['chained'=>$chained,'msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->fill(['chained' => $chained, 'msg' => '* ...thinking... *', 'chat_id' => $chatId, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
                 $history->save();
                 $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
