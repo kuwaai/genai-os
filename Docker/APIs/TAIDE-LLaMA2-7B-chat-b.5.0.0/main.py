@@ -38,12 +38,12 @@ model = AutoModelForCausalLM.from_pretrained(model_loc, device_map="auto",torch_
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_loc, add_bos_token=False)
 set_seed(42)
 generation_config = GenerationConfig(
-    temperature= 0.2, 
-    top_p=0.92, 
-    top_k=0, 
+    # temperature= 0.2, 
+    # top_p=0.92, 
+    # top_k=0, 
     do_sample = False,
-    no_repeat_ngram_size=7,
-    repetition_penalty = 1.0, 
+    # no_repeat_ngram_size=7,
+    # repetition_penalty = 1.0, 
 )
 
 def preprocess(prompt):
