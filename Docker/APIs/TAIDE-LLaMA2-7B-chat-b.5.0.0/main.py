@@ -49,7 +49,7 @@ generation_config = GenerationConfig(
 def preprocess(prompt):
     prompt = f"{tokenizer.bos_token}[INST] <<SYS>>\nYou are a helpful assistant. 你是一個樂於助人的助手。\n<</SYS>>\n\n{prompt} [/INST]\n"
     # prompt = prompt_format.format(prompt)
-    return prompt.strip()
+    return prompt
 
 def process(data):
     try:
