@@ -100,7 +100,7 @@
                     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">
                         {{ __('AI Election Configure') }}</h3>
 
-                    <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
+                    <form method="post" enctype="multipart/form-data" autocomplete="off"
                         action="{{ route('play.ai_elections.update') }}" class="w-full max-w-xl">
                         @csrf
                         @method('patch')
