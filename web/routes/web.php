@@ -40,7 +40,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     })->name('lang');
 
     Route::get('/announcement', function () {
-        session()->put('announcement', Hash::make(str_replace("\n", "|", \App\Models\SystemSetting::where('key', 'announcement')->first()->value)));
+        session()->put('announcement', hash('sha256', \App\Models\SystemSetting::where('key', 'announcement')->first()->value));
 
         return back();
     })->name('announcement');

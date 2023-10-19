@@ -25,9 +25,7 @@
 <body class="font-sans antialiased h-full">
     @if (
         \App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' &&
-            !\Illuminate\Support\Facades\Hash::check(
-                str_replace("\n", "|", \App\Models\SystemSetting::where('key', 'announcement')->first()->value),
-                session()->get('announcement')))
+            hash('sha256', \App\Models\SystemSetting::where('key', 'announcement')->first()->value) !== session()->get('announcement'))
         <div data-modal-target="system_announcement_modal"></div>
         <div id="system_announcement_modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
             class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -133,9 +131,7 @@
                     $.get("{{ route('tos') }}")
                     @if (
                         \App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' &&
-                            !\Illuminate\Support\Facades\Hash::check(
-                                str_replace("\n", "|", \App\Models\SystemSetting::where('key', 'announcement')->first()->value),
-                                session()->get('announcement')))
+                            hash('sha256', \App\Models\SystemSetting::where('key', 'announcement')->first()->value) !== session()->get('announcement'))
                         $modal1.show();
                     @endif
                 }
@@ -143,10 +139,7 @@
             $modal2.show();
         @elseif (
             \App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' &&
-                !\Illuminate\Support\Facades\Hash::check(
-                    str_replace("\n", "|", \App\Models\SystemSetting::where('key', 'announcement')->first()->value),
-                    session()->get('announcement')))
-
+                hash('sha256', \App\Models\SystemSetting::where('key', 'announcement')->first()->value) !== session()->get('announcement'))
             $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
                 backdrop: 'static',
                 closable: true,
