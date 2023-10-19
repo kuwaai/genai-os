@@ -7,13 +7,15 @@ use App\Http\Controllers\SystemController;
 use App\Http\Controllers\DuelController;
 use App\Http\Controllers\PlayController;
 use App\Http\Controllers\ManageController;
-use BeyondCode\LaravelSSE\Facades\SSE;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use App\Models\LLMs;
-use App\Models\Chats;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LanguageMiddleware;
+use BeyondCode\LaravelSSE\Facades\SSE;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use App\Models\Chats;
+use App\Models\User;
+use App\Models\LLMs;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +39,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return back();
     })->name('lang');
 
+    Route::get('/announcement', function () {
+        session()->put('announcement', Hash::make(\App\Models\SystemSetting::where('key', 'announcement')->first()->value));
+
+        return back();
+    })->name('announcement');
+
     Route::get('/api_auth', [ProfileController::class, 'api_auth']);
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
 
@@ -51,6 +59,14 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
 
     # User routes, required email verified
     Route::middleware('auth', 'verified')->group(function () {
+        Route::get('/tos', function () {
+            $user = User::find(Auth::user()->id);
+            $user->term_accepted = true;
+            $user->save();
+    
+            return back();
+        })->name('tos');
+    
         #---Profiles
         Route::middleware(AdminMiddleware::class . ':tab_Profile')
             ->prefix('profile')
@@ -76,12 +92,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->group(function () {
                 Route::get('/', [ChatController::class, 'home'])->name('chat.home');
 
-                Route::get('/new/{llm_id}', function ($llm_id) {
-                    if (!LLMs::findOrFail($llm_id)->exists()) {
-                        return redirect()->route('chat');
-                    }
-                    return view('chat');
-                })->name('chat.new');
+                Route::get('/new/{llm_id}', [ChatController::class, 'new_chat'])->name('chat.new');
 
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
                 Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');

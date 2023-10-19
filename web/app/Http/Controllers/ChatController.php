@@ -52,6 +52,27 @@ class ChatController extends Controller
             return view('chat');
         }
     }
+    public function new_chat(Request $request, $llm_id) {
+        $result = DB::table(function ($query) {
+            $query
+                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                ->from('group_permissions')
+                ->join('permissions', 'perm_id', '=', 'permissions.id')
+                ->where('group_id', Auth()->user()->group_id)
+                ->where('name', 'like', 'model_%')
+                ->get();
+        }, 'tmp')
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->select('llms.id')
+            ->where('llms.enabled', true)
+            ->get()
+            ->pluck('id')
+            ->toarray();
+        if (!in_array($llm_id, $result) || !LLMs::findOrFail($llm_id)->exists()) {
+            return redirect()->route('chat.home');
+        }
+        return view('chat');
+    }
 
     public function upload(Request $request)
     {
