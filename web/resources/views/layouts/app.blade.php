@@ -26,7 +26,7 @@
     @if (
         \App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' &&
             !\Illuminate\Support\Facades\Hash::check(
-                \App\Models\SystemSetting::where('key', 'announcement')->first()->value,
+                str_replace("\n", "|", \App\Models\SystemSetting::where('key', 'announcement')->first()->value),
                 session()->get('announcement')))
         <div data-modal-target="system_announcement_modal"></div>
         <div id="system_announcement_modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
@@ -131,15 +131,20 @@
                 closable: true,
                 onHide: () => {
                     $.get("{{ route('tos') }}")
-
-                    $modal1.show();
+                    @if (
+                        \App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' &&
+                            !\Illuminate\Support\Facades\Hash::check(
+                                str_replace("\n", "|", \App\Models\SystemSetting::where('key', 'announcement')->first()->value),
+                                session()->get('announcement')))
+                        $modal1.show();
+                    @endif
                 }
             });
             $modal2.show();
         @elseif (
             \App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' &&
                 !\Illuminate\Support\Facades\Hash::check(
-                    \App\Models\SystemSetting::where('key', 'announcement')->first()->value,
+                    str_replace("\n", "|", \App\Models\SystemSetting::where('key', 'announcement')->first()->value),
                     session()->get('announcement')))
 
             $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
