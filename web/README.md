@@ -44,6 +44,45 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_
 ### Using JavaScript (Ajax)
 
 You can also use JavaScript and the `fetch` API to send a single message to our API.
+```javascript
+// Define the request payload as an object.
+const requestData = {
+    messages: [
+        { isbot: "false", msg: "你好" }
+    ],
+    model: "llama2-7b-chat-b5.0.0"
+};
+
+// Define the API endpoint and authentication headers.
+const apiUrl = 'http://localhost/v1.0/chat/completions';
+const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer 10d50ac2cd899331f1adaa43a38a03b6ea09e037d7a71783606aae7c6ef38cf5'
+};
+
+// Perform the AJAX request using the fetch API.
+fetch(apiUrl, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(requestData)
+})
+.then(response => {
+    if (response.status === 200) {
+        return response.json(); // Parse the JSON response when the status code is 200.
+    } else {
+        throw new Error('Request failed with status: ' + response.status);
+    }
+})
+.then(data => {
+    // Handle the response data.
+    console.log(data); // Log the response data to the console.
+})
+.catch(error => {
+    // Handle errors.
+    console.error('Error:', error);
+});
+
+```
 
 ### Using Python
 
@@ -94,8 +133,16 @@ You can continue to add user and bot messages to this `messages` array to mainta
 
 ## Handling Responses
 
-Once you make a successful request to our API, you will receive a JSON response. You can then handle the response data as needed in your application.
+Once you make a successful request to our API, you will receive a JSON response.
 
-If you encounter any issues or have questions about our API, please feel free to reach out to our support team for assistance. We're here to help!
+```json
+{
+  "status": "success",
+  "message": "Authentication successful",
+  "tokenable_id": 1,
+  "name": "Drift",
+  "output": "哈囉!我是一個樂於助人的助手,您好!我是身為協助者的角色,竭誠幫助主人公實現其目標或完成任務。您有何需要協助或指引的嗎?請別擔心地問,我竭誠照顧您的需求。"
+}
+```
 
-Thank you for using our API!
+You can then handle the response data as needed in your application.
