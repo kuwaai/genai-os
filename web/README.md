@@ -57,7 +57,7 @@ const requestData = {
 const apiUrl = 'http://localhost/v1.0/chat/completions';
 const headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer 10d50ac2cd899331f1adaa43a38a03b6ea09e037d7a71783606aae7c6ef38cf5'
+    'Authorization': 'Bearer YOUR_AUTH_TOKEN'
 };
 
 // Perform the AJAX request using the fetch API.
