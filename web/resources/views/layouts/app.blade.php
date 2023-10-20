@@ -52,7 +52,7 @@
                     <div class="p-4">
                         @foreach (explode("\n", \App\Models\SystemSetting::where('key', 'announcement')->first()->value) as $paragraph)
                             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                {{ $paragraph }}
+                                {{ trim($paragraph) ?? "&nbsp;" }}
                             </p>
                         @endforeach
                     </div>
@@ -83,7 +83,7 @@
                     <div class="p-4">
                         @foreach (explode("\n", \App\Models\SystemSetting::where('key', 'tos')->first()->value) as $paragraph)
                             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                {{ $paragraph }}
+                                {{ trim($paragraph) == "" ? "　" : trim($paragraph) }}
                             </p>
                         @endforeach
                     </div>
