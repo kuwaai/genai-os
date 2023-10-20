@@ -20,9 +20,8 @@ path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*3
 model_loc = "llama2-7b-chat-b1.0.0"
-api_key = "uwU123DisApikEyiSASeCRetheHehee"
 usr_token = "92d1e9d60879348b8ed2f25f624012dcc596808dc40681d74c4965b8fff8a22a"
-tc_model = 26
+tc_model = "ChineseConvert"
 # -- Config ends --
 
 from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer, StoppingCriteria, StoppingCriteriaList, pipeline
@@ -48,39 +47,48 @@ prompts = "<s>[INST] {0} [/INST]\n{1}"
     
 def llm_compute(data): 
     try:
-        history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
-        while len(history) > limit:
-            del history[0]
-            del history[0]
-        if len(history) != 0:
-            history[0] = "<<SYS>>\n你的名子是 TAIDE, 你是個能夠理解使用者的大語言模型AI，能流暢的以繁體中文溝通，能專業且流利的回答使用者，專長在文本翻譯、寫文章、寫信、自動摘要上\n<</SYS>>\n\n" + history[0]
-            history.append("")
-            history = [prompts.format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
-            history = "".join(history)
-            result = pipe(history)[0]['generated_text']
-            print("https://chatdev.gai.tw/api_auth?key={0}&api_token={1}&llm_id={2}&msg={3}".format(api_key, usr_token, tc_model, result[len(history):]))
-            res = requests.get("https://chatdev.gai.tw/api_auth?key={0}&api_token={1}&llm_id={2}&msg={3}".format(api_key, usr_token, tc_model, result[len(history):]))
+        if data.get("input"):
+            url = "http://localhost/v1.0/chat/completions"
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {usr_token}",
+            }
+
+            data1 = {
+                "messages": eval(data.get("input").replace("true","True").replace("false","False")),
+                "model": "llama2-7b-chat-b1.0.0"
+            }
+            res = requests.post(url, headers=headers, json=data1)
+            result = ""
             if res.status_code == 200:
                 res = res.json()
                 if res["status"] == "success":
-                    print("Before trans:", result, "After trans:", sep="\n")
-                    result = res["output"] + "\n\n[本訊息經過繁體翻譯]"
+                    result = res["output"]
+
+                    data2 = {
+                        "messages": [
+                            {"isbot": "false", "msg": result}
+                        ],
+                        "model": "nihao"
+                    }
+                    res = requests.post(url, headers=headers, json=data2)
+                    if res.status_code == 200:
+                        res = res.json()
+                        if res["status"] == "success":
+                            print("Before trans:", result, "After trans:", sep="\n")
+                            result = res["output"] + "\n\n[本訊息經過繁體翻譯]"
                 else:
-                    result = result[len(history):]
                     print("Failed to auth API!")
             else:
-                print("Translate error!",res.status_code)
-                result = result[len(history):]
-            
-            for i in result:
-                yield i
-                print(end=i)
-                time.sleep(0.02)
+                print("Calling API failed")
+            if result:
+                for i in result:
+                    yield i
+                    print(end=i)
+                    time.sleep(0.02)
 
-            torch.cuda.empty_cache()
-        else:
-            yield "Sorry, The input message is too huge!"
-
+                torch.cuda.empty_cache()
     except Exception as e:
         print(e)
     finally:

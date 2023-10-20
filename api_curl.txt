@@ -1,0 +1,6 @@
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer 10d50ac2cd899331f1adaa43a38a03b6ea09e037d7a71783606aae7c6ef38cf5" -d '{
+    "messages": [
+        { "isbot": "false", "msg": "你好" }
+    ],
+    "model": "TAIDE LLaMA2 7b b5.0.0"
+}' http://localhost/v1.0/chat/completions

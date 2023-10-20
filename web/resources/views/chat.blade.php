@@ -572,7 +572,7 @@
                             $(".show-on-finished").attr("style", "")
                         } else {
                             data = JSON.parse(event.data)
-                            number = data["history_id"];
+                            number = parseInt(data["history_id"]);
                             msg = data["msg"];
                             msg = msg.replace(
                                 "[Oops, the LLM returned empty message, please try again later or report to admins!]",

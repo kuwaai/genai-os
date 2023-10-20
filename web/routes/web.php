@@ -45,7 +45,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return back();
     })->name('announcement');
 
-    Route::get('/api_auth', [ProfileController::class, 'api_auth']);
+    Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
 
     # Admin routes, require admin permission
@@ -63,10 +63,10 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             $user = User::find(Auth::user()->id);
             $user->term_accepted = true;
             $user->save();
-    
+
             return back();
         })->name('tos');
-    
+
         #---Profiles
         Route::middleware(AdminMiddleware::class . ':tab_Profile')
             ->prefix('profile')
@@ -184,12 +184,14 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     })
                     ->name('manage.user');
 
-                Route::prefix('LLMs')->group(function () {
-                    Route::get('/toggle/{llm_id}', [ManageController::class, 'llm_toggle'])->name('manage.llms.toggle');
-                    Route::delete('/delete', [ManageController::class, 'llm_delete'])->name('manage.llms.delete');
-                    Route::post('/create', [ManageController::class, 'llm_create'])->name('manage.llms.create');
-                    Route::patch('/update', [ManageController::class, 'llm_update'])->name('manage.llms.update');
-                })->name('manage.llms');
+                Route::prefix('LLMs')
+                    ->group(function () {
+                        Route::get('/toggle/{llm_id}', [ManageController::class, 'llm_toggle'])->name('manage.llms.toggle');
+                        Route::delete('/delete', [ManageController::class, 'llm_delete'])->name('manage.llms.delete');
+                        Route::post('/create', [ManageController::class, 'llm_create'])->name('manage.llms.create');
+                        Route::patch('/update', [ManageController::class, 'llm_update'])->name('manage.llms.update');
+                    })
+                    ->name('manage.llms');
 
                 Route::post('/tab', [ManageController::class, 'tab'])->name('manage.tab');
             })

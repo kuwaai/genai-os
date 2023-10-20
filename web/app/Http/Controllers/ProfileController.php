@@ -13,6 +13,7 @@ use Illuminate\View\View;
 use App\Jobs\RequestChat;
 use GuzzleHttp\Client;
 use App\Models\LLMs;
+use App\Models\User;
 use DB;
 
 class ProfileController extends Controller
@@ -133,51 +134,84 @@ class ProfileController extends Controller
 
     public function api_auth(Request $request)
     {
-        if (config('app.API_Key') == $request->input('key')) {
-            $result = DB::table('personal_access_tokens')
-                ->join('users', 'tokenable_id', '=', 'users.id')
-                ->where('token', $request->input('api_token'))
-                ->get();
-            if ($result->count() > 0) {
-                $user = $result->first();
-
+        $jsonData = $request->json()->all();
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
+        if ($result->exists()) {
+            $user = $result->first();
+            if (User::find($user->id)->hasPerm('Chat_read_access_to_api')) {
                 $response = [
                     'status' => 'success',
                     'message' => 'Authentication successful',
                     'tokenable_id' => $user->tokenable_id,
-                    'openai_token' => $user->openai_token,
                     'name' => $user->name,
                 ];
+                if (isset($jsonData['messages']) && isset($jsonData['model'])) {
+                    $llm = LLMs::where('access_code', '=', $jsonData['model']);
 
-                if ($request->input('msg') && $request->input('llm_id')) {
-                    $llm = LLMs::findOrFail($request->input('llm_id'));
-                    $response['output'] = '';
+                    if ($llm->exists()) {
+                        $llm = $llm->first();
 
-                    $client = new Client(['timeout' => 300]);
-                    RequestChat::dispatch(json_encode([["msg"=>$request->input('msg'), "isbot"=>false]]), $llm->access_code, $user->id, -$user->id, $user->openai_token, 'aielection_' . $user->id);
-                    $req = $client->get(route('api.stream'), [
-                        'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-                        'query' => [
-                            'key' => $request->input('key'),
-                            'channel' => 'aielection_' . $user->id,
-                        ],
-                        'stream' => true,
-                    ]);
-                    $req = $req->getBody()->getContents();
-                    $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
+                        $tmp = json_encode($jsonData['messages']);
+
+                        if ($tmp === false && json_last_error() !== JSON_ERROR_NONE) {
+                            $errorResponse = [
+                                'status' => 'error',
+                                'message' => 'The msg format is incorrect.',
+                            ];
+                            return response()->json($errorResponse);
+                        } else {
+                            // Input is a valid JSON string
+                            $response['output'] = '';
+                            $client = new Client(['timeout' => 300]);
+
+                            RequestChat::dispatch($tmp, $llm->access_code, $user->id, -$user->id, $user->openai_token, 'aielection_' . $user->id);
+
+                            $req = $client->get(route('api.stream'), [
+                                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                                'query' => [
+                                    'key' => config('app.API_Key'),
+                                    'channel' => 'aielection_' . $user->id,
+                                ],
+                                'stream' => true,
+                            ]);
+
+                            $req = $req->getBody()->getContents();
+                            $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
+                        }
+                    } else {
+                        // Handle the case where the specified model doesn't exist
+                        $errorResponse = [
+                            'status' => 'error',
+                            'message' => 'The specified model does not exist.',
+                        ];
+                        return response()->json($errorResponse);
+                    }
+                } else {
+                    // Handle the case where 'messages' and 'model' are not present in $jsonData
+                    $errorResponse = [
+                        'status' => 'error',
+                        'message' => 'The JSON data is missing required fields.',
+                    ];
+                    return response()->json($errorResponse);
                 }
+
                 return response()->json($response);
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
             }
+        } else {
             $errorResponse = [
                 'status' => 'error',
-                'message' => 'Token Authentication failed',
+                'message' => 'Authentication failed',
             ];
-            return response()->json($errorResponse);
         }
-        $errorResponse = [
-            'status' => 'error',
-            'message' => 'Safety Authentication failed',
-        ];
+
         return response()->json($errorResponse);
     }
 
@@ -200,7 +234,7 @@ class ProfileController extends Controller
                             global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo $result . "[ENDEDPLACEHOLDERUWU]";
+                                echo $result . '[ENDEDPLACEHOLDERUWU]';
                                 ob_flush();
                                 flush();
                                 $client->disconnect();

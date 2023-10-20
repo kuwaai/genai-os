@@ -57,7 +57,9 @@ class TextLevelFilteringInterface:
   def filter(self, msg: [ChatRecord]) -> [ChatRecord]:
     pass
     
-
+tw2sp_config_file = "tw2sp.json"
+if not os.path.exists(tw2sp_config_file):
+    print(f"Alert: Config file '{tw2sp_config_file}' not found!")
 
 class ContextualCC(TextLevelFilteringInterface):
   def __init__(self, dst_region='tw'):

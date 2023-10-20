@@ -1,0 +1,36 @@
+// Define the request payload as an object.
+const requestData = {
+    messages: [
+        { isbot: "false", msg: "你好" }
+    ],
+    model: "TAIDE LLaMA2 7b b5.0.0"
+};
+
+// Define the API endpoint and authentication headers.
+const apiUrl = 'http://localhost/v1.0/chat/completions';
+const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer 10d50ac2cd899331f1adaa43a38a03b6ea09e037d7a71783606aae7c6ef38cf5'
+};
+
+// Perform the AJAX request using the fetch API.
+fetch(apiUrl, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(requestData)
+})
+.then(response => {
+    if (response.status === 200) {
+        return response.json(); // Parse the JSON response when the status code is 200.
+    } else {
+        throw new Error('Request failed with status: ' + response.status);
+    }
+})
+.then(data => {
+    // Handle the response data.
+    console.log(data); // Log the response data to the console.
+})
+.catch(error => {
+    // Handle errors.
+    console.error('Error:', error);
+});
