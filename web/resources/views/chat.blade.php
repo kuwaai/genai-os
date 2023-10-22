@@ -17,6 +17,128 @@
             ->get();
     @endphp
 
+    @if (request()->route('llm_id'))
+        <div id="importModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+            class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative w-full max-w-2xl max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <!-- Modal header -->
+                    <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            {{ __('Import Chat') }}
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                            data-modal-hide="importModal">
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                            </svg>
+                            <span class="sr-only">Close modal</span>
+                        </button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="p-6 flex flex-col justify-center">
+                        <label for="import_file_input"
+                            class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Import from file') }}</label>
+                        <hr class="my-4 border-black dark:border-gray-600" />
+                        <form method="post" action="{{route('chat.import')}}">
+                            @csrf
+                            <input name="llm_id" value="{{request()->route('llm_id')}}" style="display:none;">
+                            <textarea name="history" id="import_json" rows="5" max-rows="15" oninput="adjustTextareaRows(this)"
+                            placeholder="{{ __('You may drop your file here as well...') }}"
+                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+                        </form>
+
+                        <input id="import_file_input" type='file' hidden>
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            // Handle the file input change event
+                            $('#import_file_input').on('change', function() {
+                                loadFile($(this)[0], '#import_json')
+                            });
+                            $('#import_json').on('drop', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                loadFile(e.originalEvent.dataTransfer, '#import_json');
+                            });
+
+                        });
+
+                        function loadFile(fileInput, input) {
+                            const file = fileInput.files[0];
+                            if (file) {
+                                if (file.type === 'text/plain' || file.type === 'application/json') {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        $(input).val(e.target.result);
+                                        adjustTextareaRows(input);
+                                    };
+                                    reader.readAsText(file);
+                                } else {
+                                    alert('Only .txt or ..json files are accepted.');
+                                }
+                            }
+                        }
+                    </script>
+                    <!-- Modal footer -->
+                    <div
+                        class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                        <button data-modal-hide="importModal" type="button" onclick="$(this).parent().parent().find('form').submit()"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Import') }}</button>
+                        <button data-modal-hide="importModal" type="button"
+                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('Cancel') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @elseif (request()->route('chat_id'))
+        <div id="exportModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+            class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative w-full max-w-2xl max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <!-- Modal header -->
+                    <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            {{ __('Export Chat') }}
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                            data-modal-hide="exportModal">
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                            </svg>
+                            <span class="sr-only">Close modal</span>
+                        </button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="p-6 space-y-6">
+                        <textarea id="import_json" rows="15" readonly
+                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none">{{ json_encode(App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at')->orderby('id', 'desc')->select('msg', 'isbot', 'chained')->get()->toArray(),JSON_PRETTY_PRINT) }}</textarea>
+                        <a id="download_holder" style="display:none;"
+                            download="{{ App\Models\Chats::find(request()->route('chat_id'))->name . '.json' }}"></a>
+                    </div>
+                    <!-- Modal footer -->
+                    <div
+                        class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                        <button
+                            onclick='$("#download_holder").attr("href",window.URL.createObjectURL(new Blob([$("#import_json").val()], { type: "text/plain" }))); $("#download_holder")[0].click();'
+                            class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download') }}</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 {{ $result->count() == 1 ? 'flex' : '' }} h-full overflow-y-auto scrollbar">
@@ -92,20 +214,33 @@
                 @endif
                 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
                     @if (request()->route('llm_id'))
-                        <p class="flex items-center">{{ __('New Chat with') }}
+                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
+                            {{ __('New Chat with') }}
                             {{ App\Models\LLMs::findOrFail(request()->route('llm_id'))->name }}</p>
+                        <div class="flex">
+                            <button onclick="import_chat()" data-modal-target="importModal"
+                                data-modal-toggle="importModal"
+                                class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                                <i class="fas fa-file-import"></i>
+                            </button>
+                        </div>
                     @elseif(request()->route('chat_id'))
                         <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar"
                             style='word-break:break-word'>
                             {{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</p>
 
                         <div class="flex">
+                            <button onclick="export_chat()" data-modal-target="exportModal"
+                                data-modal-toggle="exportModal"
+                                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
                             <button onclick="saveChat()"
-                                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
+                                class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
                                 <i class="fas fa-save"></i>
                             </button>
                             <button onclick="editChat()"
-                                class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                                class="bg-orange-500 ml-3 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                                 <i class="fas fa-pen"></i>
                             </button>
                             <button onclick="deleteChat()"
@@ -143,8 +278,8 @@
                                                         <path
                                                             d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
                                                         </path>
-                                                        <rect x="8" y="2" width="8" height="4" rx="1"
-                                                            ry="1">
+                                                        <rect x="8" y="2" width="8" height="4"
+                                                            rx="1" ry="1">
                                                         </rect>
                                                     </svg>
                                                     <svg stroke="currentColor" fill="none" stroke-width="2"
@@ -533,6 +668,10 @@
                         });
                     }
 
+                    function export_chat() {
+
+                    }
+
                     function saveChat() {
                         input = $("#chatHeader >p >input:eq(0)")
                         if (input.val() != input.attr("old")) {
@@ -570,6 +709,8 @@
                             $("#chat_input").prop("readonly", false)
                             adjustTextareaRows($("#chat_input"))
                             $(".show-on-finished").attr("style", "")
+                            $("#import_json").val($("#import_json").val().replace('* ...thinking... *', stringToUnicode($(
+                                "#chatroom p:eq(0)").text().trim())))
                         } else {
                             data = JSON.parse(event.data)
                             number = parseInt(data["history_id"]);
@@ -647,20 +788,30 @@
                     });
                     adjustTextareaRows($("#chat_input"));
                 }
-                @if (request()->route('llm_id') &&
-                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
-                    if ($("#prompt_area")) {
-                        $("#prompt_area").on("submit", function(event) {
-                            event.preventDefault();
-                            if (isValidURL($("#chat_input").val().trim())) {
-                                $("#prompt_area")[0].submit()
-                            } else {
-                                $("#url_only_alert").fadeIn();
-                                setTimeout(function() {
-                                    $("#url_only_alert").fadeOut();
-                                }, 3000);
-                            }
-                        })
+
+                function stringToUnicode(inputString) {
+                    return inputString.replace(/./g, function(char) {
+                        return '\\u' + char.charCodeAt(0).toString(16).padStart(4, '0');
+                    });
+                }
+                @if (request()->route('llm_id'))
+                    @if (in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
+                        if ($("#prompt_area")) {
+                            $("#prompt_area").on("submit", function(event) {
+                                event.preventDefault();
+                                if (isValidURL($("#chat_input").val().trim())) {
+                                    $("#prompt_area")[0].submit()
+                                } else {
+                                    $("#url_only_alert").fadeIn();
+                                    setTimeout(function() {
+                                        $("#url_only_alert").fadeOut();
+                                    }, 3000);
+                                }
+                            })
+                        }
+                    @endif
+                    function import_chat() {
+
                     }
                 @endif
             </script>

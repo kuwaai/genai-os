@@ -161,5 +161,11 @@
 "Close":"關閉",
 "Terms of Service":"服務條款",
 "I accepted":"我同意",
-"Information":"說明"
+"Information":"說明",
+"Export Chat":"導出聊天紀錄",
+"Download":"下載",
+"Import Chat":"導入聊天紀錄",
+"You may drop your file here as well...":"你也可以將檔案拖放至此...",
+"Import from file":"從檔案導入",
+"Import":"導入"
 }

@@ -45,7 +45,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return back();
     })->name('announcement');
 
+    # This will auth the user token that is used to connect.
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
+    # This will auth the server secret that is used by localhost
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
 
     # Admin routes, require admin permission
@@ -99,6 +101,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
 
                 Route::post('/upload', [ChatController::class, 'upload'])->name('chat.upload');
+                Route::post('/import', [ChatController::class, 'import'])->name('chat.import');
                 Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
                 Route::post('/request', [ChatController::class, 'request'])->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');

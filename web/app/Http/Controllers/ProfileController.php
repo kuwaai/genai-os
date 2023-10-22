@@ -225,7 +225,7 @@ class ProfileController extends Controller
         $response->headers->set('Connection', 'close');
 
         $response->setCallback(function () use ($response, $request) {
-            if (config('app.API_Key') == $request->input('key')) {
+            if (config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
                 $channel = $request->input('channel');
                 if ($channel != null) {
                     if (strpos($channel, 'aielection_') === 0) {
