@@ -33,6 +33,7 @@ return new class extends Migration
 		$groups = GroupPermissions::where("perm_id","=",$chat_perm_id)->pluck('group_id')->toArray();
 		
 		foreach($groups as $group){
+			GroupPermissions::where('group_id', $group)->whereIn('perm_id', $perm_ids)->delete();
 			$records = [];
 			foreach($perm_ids as $perm_id){
 				$records[] = [
