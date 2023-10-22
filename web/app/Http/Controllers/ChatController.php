@@ -30,7 +30,7 @@ class ChatController extends Controller
     }
     public function import(Request $request)
     {
-        if (count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
+        if (Auth::user()->hasPerm("Chat_update_import_chat") && count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
             $llm_id = $request->input('llm_id');
             $historys = $request->input('history');
             if ($llm_id && $historys) {
@@ -436,7 +436,8 @@ class ChatController extends Controller
 
         Histories::where('chat_id', '=', $chat->id)->delete();
         $chat->delete();
-        return Redirect::route('chat.home');
+        
+        return redirect()->route('chat.new', $chat->llm_id);
     }
 
     public function edit(Request $request): RedirectResponse

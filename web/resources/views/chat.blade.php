@@ -17,7 +17,7 @@
             ->get();
     @endphp
 
-    @if (request()->route('llm_id'))
+    @if (request()->user()->hasPerm('Chat_update_import_chat') && request()->route('llm_id'))
         <div id="importModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
             class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative w-full max-w-2xl max-h-full">
@@ -45,12 +45,12 @@
                         <label for="import_file_input"
                             class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Import from file') }}</label>
                         <hr class="my-4 border-black dark:border-gray-600" />
-                        <form method="post" action="{{route('chat.import')}}">
+                        <form method="post" action="{{ route('chat.import') }}">
                             @csrf
-                            <input name="llm_id" value="{{request()->route('llm_id')}}" style="display:none;">
+                            <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
                             <textarea name="history" id="import_json" rows="5" max-rows="15" oninput="adjustTextareaRows(this)"
-                            placeholder="{{ __('You may drop your file here as well...') }}"
-                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+                                placeholder="{{ __('You may drop your file here as well...') }}"
+                                class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                         </form>
 
                         <input id="import_file_input" type='file' hidden>
@@ -89,7 +89,8 @@
                     <!-- Modal footer -->
                     <div
                         class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                        <button data-modal-hide="importModal" type="button" onclick="$(this).parent().parent().find('form').submit()"
+                        <button data-modal-hide="importModal" type="button"
+                            onclick="$(this).parent().parent().find('form').submit()"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Import') }}</button>
                         <button data-modal-hide="importModal" type="button"
                             class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('Cancel') }}</button>
@@ -97,7 +98,7 @@
                 </div>
             </div>
         </div>
-    @elseif (request()->route('chat_id'))
+    @elseif (request()->user()->hasPerm('Chat_read_export_chat') && request()->route('chat_id'))
         <div id="exportModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
             class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative w-full max-w-2xl max-h-full">
@@ -198,13 +199,6 @@
             <div id="histories"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
                 @if (request()->route('chat_id'))
-                    <form id="deleteChat" action="{{ route('chat.delete') }}" method="post" class="hidden">
-                        @csrf
-                        @method('delete')
-                        <input name="id"
-                            value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
-                    </form>
-
                     <form id="editChat" action="{{ route('chat.edit') }}" method="post" class="hidden">
                         @csrf
                         <input name="id"
@@ -217,24 +211,28 @@
                         <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
                             {{ __('New Chat with') }}
                             {{ App\Models\LLMs::findOrFail(request()->route('llm_id'))->name }}</p>
-                        <div class="flex">
-                            <button onclick="import_chat()" data-modal-target="importModal"
-                                data-modal-toggle="importModal"
-                                class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                <i class="fas fa-file-import"></i>
-                            </button>
-                        </div>
+                        @if (request()->user()->hasPerm('Chat_update_import_chat'))
+                            <div class="flex">
+                                <button onclick="import_chat()" data-modal-target="importModal"
+                                    data-modal-toggle="importModal"
+                                    class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                                    <i class="fas fa-file-import"></i>
+                                </button>
+                            </div>
+                        @endif
                     @elseif(request()->route('chat_id'))
                         <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar"
                             style='word-break:break-word'>
                             {{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</p>
 
                         <div class="flex">
-                            <button onclick="export_chat()" data-modal-target="exportModal"
-                                data-modal-toggle="exportModal"
-                                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
+                            @if (request()->user()->hasPerm('Chat_read_export_chat'))
+                                <button onclick="export_chat()" data-modal-target="exportModal"
+                                    data-modal-toggle="exportModal"
+                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                            @endif
                             <button onclick="saveChat()"
                                 class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
                                 <i class="fas fa-save"></i>
@@ -243,7 +241,7 @@
                                 class="bg-orange-500 ml-3 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                                 <i class="fas fa-pen"></i>
                             </button>
-                            <button onclick="deleteChat()"
+                            <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
                                 class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -479,6 +477,46 @@
                 </div>
             </div>
             @if (request()->route('chat_id'))
+                <div id="delete_chat_modal" tabindex="-1"
+                    class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                    <div class="relative w-full max-w-md max-h-full">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                            <button type="button"
+                                class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                                data-modal-hide="delete_chat_modal">
+                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                            <form id="deleteChat" action="{{ route('chat.delete') }}" method="post"
+                                class="p-6 text-center">
+                                <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                    {{ __('Are you sure you want to DELETE the chat ') }}"<span>{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</span>"?
+                                </h3>
+                                @csrf
+                                @method('delete')
+                                <input name="id" class="hidden"
+                                    value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
+                                <button type="submit"
+                                    class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                    {{ __('Delete') }}
+                                </button>
+                                <button data-modal-hide="delete_chat_modal" type="button"
+                                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('Cancel') }}</button>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 <div id="feedback" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
                     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="relative w-full max-w-2xl max-h-full">
@@ -570,10 +608,6 @@
                             $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
                                 '{{ __('Chained') }}')
                         })
-                    }
-
-                    function deleteChat() {
-                        $("#deleteChat").submit();
                     }
 
                     function copytext(node) {
