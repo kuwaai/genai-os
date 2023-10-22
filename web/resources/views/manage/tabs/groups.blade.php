@@ -53,7 +53,7 @@
                             [
                                 $group->name,
                                 $group->describe ? $group->describe : '',
-                                App\Models\GroupPermissions::where('group_id', '=', $group->id)->pluck('perm_id'),
+                                App\Models\GroupPermissions::where('group_id', '=', $group->id)->orderby("perm_id")->pluck('perm_id'),
                                 $group->invite_token,
                             ],
                             JSON_HEX_APOS,
