@@ -30,7 +30,7 @@ class ChatController extends Controller
     }
     public function import(Request $request)
     {
-        if (Auth::user()->hasPerm("Chat_update_import_chat") && count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
+        if (count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
             $llm_id = $request->input('llm_id');
             $historys = $request->input('history');
             if ($llm_id && $historys) {
@@ -70,12 +70,12 @@ class ChatController extends Controller
                             {
                                 // Try to fetch the HTML content of the URL
                                 $html = @file_get_contents($url);
-                        
+
                                 // If the URL is not accessible, return an empty string
                                 if ($html === false) {
                                     return '';
                                 }
-                        
+
                                 // Use regular expressions to extract the title from the HTML
                                 if (preg_match('/<title>(.*?)<\/title>/i', $html, $matches)) {
                                     return $matches[1];
@@ -87,7 +87,7 @@ class ChatController extends Controller
                             function getFilenameFromURL($url)
                             {
                                 $path_parts = pathinfo($url);
-                        
+
                                 if (isset($path_parts['filename'])) {
                                     return $path_parts['filename'];
                                 } else {
@@ -142,7 +142,7 @@ class ChatController extends Controller
             ->orderby('llms.order')
             ->orderby('llms.created_at')
             ->first();
-        if ($result) {
+        if ($result && Auth::user()->hasPerm('Chat_update_new_chat')) {
             return redirect()->route('chat.new', $result->id);
         } else {
             return view('chat');
@@ -304,12 +304,12 @@ class ChatController extends Controller
                     {
                         // Try to fetch the HTML content of the URL
                         $html = @file_get_contents($url);
-                
+
                         // If the URL is not accessible, return an empty string
                         if ($html === false) {
                             return '';
                         }
-                
+
                         // Use regular expressions to extract the title from the HTML
                         if (preg_match('/<title>(.*?)<\/title>/i', $html, $matches)) {
                             return $matches[1];
@@ -321,7 +321,7 @@ class ChatController extends Controller
                     function getFilenameFromURL($url)
                     {
                         $path_parts = pathinfo($url);
-                
+
                         if (isset($path_parts['filename'])) {
                             return $path_parts['filename'];
                         } else {
@@ -436,8 +436,10 @@ class ChatController extends Controller
 
         Histories::where('chat_id', '=', $chat->id)->delete();
         $chat->delete();
-        
-        return redirect()->route('chat.new', $chat->llm_id);
+        if (Auth::user()->hasPerm('Chat_update_new_chat')) {
+            return redirect()->route('chat.new', $chat->llm_id);
+        }
+        return Redirect::route('chat.home');
     }
 
     public function edit(Request $request): RedirectResponse

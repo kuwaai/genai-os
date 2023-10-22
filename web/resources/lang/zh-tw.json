@@ -168,5 +168,6 @@
 "You may drop your file here as well...":"您也可以將檔案拖放至此...",
 "Import from file":"從檔案導入",
 "Import":"導入",
-"Are you sure you want to DELETE the chat ":"您確定要刪除聊天室 "
+"Are you sure you want to DELETE the chat ":"您確定要刪除聊天室 ",
+"Sorry, But seems like you don't have permission to upload file.":"很抱歉，但您沒有上傳檔案的權限"
 }

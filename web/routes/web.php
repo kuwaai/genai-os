@@ -94,20 +94,34 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->group(function () {
                 Route::get('/', [ChatController::class, 'home'])->name('chat.home');
 
-                Route::get('/new/{llm_id}', [ChatController::class, 'new_chat'])->name('chat.new');
+                Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
+                    ->get('/new/{llm_id}', [ChatController::class, 'new_chat'])
+                    ->name('chat.new');
 
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
                 Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
                 Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
 
-                Route::post('/upload', [ChatController::class, 'upload'])->name('chat.upload');
-                Route::post('/import', [ChatController::class, 'import'])->name('chat.import');
-                Route::post('/create', [ChatController::class, 'create'])->name('chat.create');
-                Route::post('/request', [ChatController::class, 'request'])->name('chat.request');
+                Route::middleware(AdminMiddleware::class . ':Chat_update_upload_file')
+                    ->post('/upload', [ChatController::class, 'upload'])
+                    ->name('chat.upload');
+                Route::middleware(AdminMiddleware::class . ':Chat_update_import_chat')
+                    ->post('/import', [ChatController::class, 'import'])
+                    ->name('chat.import');
+                Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
+                    ->post('/create', [ChatController::class, 'create'])
+                    ->name('chat.create');
+                Route::middleware(AdminMiddleware::class . ':Chat_update_send_message')
+                    ->post('/request', [ChatController::class, 'request'])
+                    ->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-                Route::post('/feedback', [ChatController::class, 'feedback'])->name('chat.feedback');
+                Route::middleware(AdminMiddleware::class . ':Chat_update_feedback')
+                    ->post('/feedback', [ChatController::class, 'feedback'])
+                    ->name('chat.feedback');
 
-                Route::delete('/delete', [ChatController::class, 'delete'])->name('chat.delete');
+                Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
+                    ->delete('/delete', [ChatController::class, 'delete'])
+                    ->name('chat.delete');
             })
             ->name('chat');
 

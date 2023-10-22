@@ -153,7 +153,11 @@
                     @foreach ($result as $LLM)
                         <div
                             class="{{ $result->count() == 1 ? 'flex flex-1 flex-col' : 'mb-2' }} border border-black dark:border-white border-1 rounded-lg">
-                            <div class="border-b border-black dark:border-white">
+                            <div
+                                class="{{ !Auth::user()->hasPerm('Chat_update_new_chat') &&
+                                !App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->exists()
+                                    ? ''
+                                    : 'border-b border-black dark:border-white' }}">
                                 @if ($LLM->link)
                                     <a href="{{ $LLM->link }}" target="_blank"
                                         class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
@@ -163,15 +167,17 @@
                                 @endif
                             </div>
                             <div class="{{ $result->count() == 1 ? '' : 'max-h-[182px]' }} overflow-y-auto scrollbar">
-                                <div
-                                    class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                    <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                        href="{{ route('chat.new', $LLM->id) }}">
-                                        <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                            {{ __('New Chat') }}
-                                        </p>
-                                    </a>
-                                </div>
+                                @if (Auth::user()->hasPerm('Chat_update_new_chat'))
+                                    <div
+                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                                        <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                            href="{{ route('chat.new', $LLM->id) }}">
+                                            <p class="flex-1 text-center text-gray-700 dark:text-white">
+                                                {{ __('New Chat') }}
+                                            </p>
+                                        </a>
+                                    </div>
+                                @endif
                                 @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
                                     <div
                                         class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
@@ -241,10 +247,12 @@
                                 class="bg-orange-500 ml-3 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                                 <i class="fas fa-pen"></i>
                             </button>
-                            <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
-                                class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            @if (request()->user()->hasPerm('Chat_delete_chatroom'))
+                                <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
+                                    class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -288,36 +296,38 @@
                                                         <polyline points="20 6 9 17 4 12"></polyline>
                                                     </svg>
                                                 </button>
-                                                <button
-                                                    class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
-                                                    data-modal-target="feedback" data-modal-toggle="feedback"
-                                                    onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
-                                                        json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                    ) !!});">
-                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                        viewBox="0 0 24 24" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="icon-sm" height="1em"
-                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                                                        </path>
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
-                                                    data-modal-target="feedback" data-modal-toggle="feedback"
-                                                    onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
-                                                        json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                    ) !!});">
-                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                        viewBox="0 0 24 24" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="icon-sm" height="1em"
-                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                                                        </path>
-                                                    </svg>
-                                                </button>
+                                                @if (request()->user()->hasPerm('Chat_update_feedback'))
+                                                    <button
+                                                        class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
+                                                        data-modal-target="feedback" data-modal-toggle="feedback"
+                                                        onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
+                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                        ) !!});">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
+                                                        data-modal-target="feedback" data-modal-toggle="feedback"
+                                                        onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
+                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                        ) !!});">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -359,36 +369,40 @@
                                                             <polyline points="20 6 9 17 4 12"></polyline>
                                                         </svg>
                                                     </button>
-                                                    <button
-                                                        class="flex hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
-                                                        data-modal-target="feedback" data-modal-toggle="feedback"
-                                                        onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
-                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                        ) !!});">
-                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                            viewBox="0 0 24 24" stroke-linecap="round"
-                                                            stroke-linejoin="round" class="icon-sm" height="1em"
-                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
-                                                    <button
-                                                        class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
-                                                        data-modal-target="feedback" data-modal-toggle="feedback"
-                                                        onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
-                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                        ) !!});">
-                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                            viewBox="0 0 24 24" stroke-linecap="round"
-                                                            stroke-linejoin="round" class="icon-sm" height="1em"
-                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
+                                                    @if (request()->user()->hasPerm('Chat_update_feedback'))
+                                                        <button
+                                                            class="flex hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
+                                                            data-modal-target="feedback" data-modal-toggle="feedback"
+                                                            onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
+                                                                json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                            ) !!});">
+                                                            <svg stroke="currentColor" fill="none"
+                                                                stroke-width="2" viewBox="0 0 24 24"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon-sm" height="1em" width="1em"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path
+                                                                    d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                                </path>
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
+                                                            data-modal-target="feedback" data-modal-toggle="feedback"
+                                                            onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
+                                                                json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                            ) !!});">
+                                                            <svg stroke="currentColor" fill="none"
+                                                                stroke-width="2" viewBox="0 0 24 24"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon-sm" height="1em" width="1em"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path
+                                                                    d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                                </path>
+                                                            </svg>
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             @endif
                                         </div>
@@ -415,66 +429,77 @@
                         </div>
                     @endif
                 </div>
-                <div
-                    class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
-                    @if (request()->route('llm_id') &&
-                            in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
-                        <form method="post" action="{{ route('chat.upload') }}" class="m-auto"
-                            enctype="multipart/form-data">
-                            @csrf
-                            <input name='llm_id' style='display:none;' value='{{ request()->route('llm_id') }}'>
-                            <input id="upload" type="file" name="file" style="display: none;"
-                                onchange='uploadcheck()'>
-                            <label for="upload" id="upload_btn"
-                                class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
-                        </form>
-                    @elseif (request()->route('llm_id'))
-                        <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
-                            <div class="flex items-end justify-end">
-                                @csrf
-                                <input name="llm_id" value="{{ request()->route('llm_id') }}"
-                                    style="display:none;">
-                                <textarea tabindex="0" data-id="root"
-                                    placeholder="{{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
-                                    rows="1" max-rows="5" oninput="adjustTextareaRows(this)" id="chat_input" name="input"
-                                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                                <button type="submit"
-                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
-                                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
-                                        <path
-                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
-                                            fill="currentColor"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </form>
-                    @elseif(request()->route('chat_id'))
-                        <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
-                            <div class="flex items-end justify-end">
-                                @csrf
-                                <input name="chat_id" value="{{ request()->route('chat_id') }}"
-                                    style="display:none;">
-                                <input id="chained" style="display:none;"
-                                    {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                <button type="button" onclick="chain_toggle()" id="chain_btn"
-                                    class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
-                                <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
-                                    oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
-                                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                                <button type="submit" id='submit_msg' style='display:none;'
-                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
-                                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
-                                        <path
-                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
-                                            fill="currentColor"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </form>
-                    @endif
-                </div>
+                @if (
+                    (request()->user()->hasPerm('Chat_update_send_message') &&
+                        request()->route('chat_id')) ||
+                        (request()->user()->hasPerm('Chat_update_new_chat') &&
+                            request()->route('llm_id')))
+                    <div
+                        class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
+                        @if (request()->route('llm_id') &&
+                                in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
+                            @if (request()->user()->hasPerm('Chat_update_upload_file'))
+                                <form method="post" action="{{ route('chat.upload') }}" class="m-auto"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    <input name='llm_id' style='display:none;'
+                                        value='{{ request()->route('llm_id') }}'>
+                                    <input id="upload" type="file" name="file" style="display: none;"
+                                        onchange='uploadcheck()'>
+                                    <label for="upload" id="upload_btn"
+                                        class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
+                                </form>
+                                @else
+                                <p class="text-black dark:text-white mx-auto">{{__("Sorry, But seems like you don't have permission to upload file.")}}</p>
+                            @endif
+                        @elseif (request()->route('llm_id'))
+                            <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
+                                <div class="flex items-end justify-end">
+                                    @csrf
+                                    <input name="llm_id" value="{{ request()->route('llm_id') }}"
+                                        style="display:none;">
+                                    <textarea tabindex="0" data-id="root"
+                                        placeholder="{{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
+                                        rows="1" max-rows="5" oninput="adjustTextareaRows(this)" id="chat_input" name="input"
+                                        class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+                                    <button type="submit"
+                                        class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                            class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                            <path
+                                                d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                                fill="currentColor"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+                        @elseif(request()->route('chat_id'))
+                            <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
+                                <div class="flex items-end justify-end">
+                                    @csrf
+                                    <input name="chat_id" value="{{ request()->route('chat_id') }}"
+                                        style="display:none;">
+                                    <input id="chained" style="display:none;"
+                                        {{ \Session::get('chained') ? '' : 'disabled' }}>
+                                    <button type="button" onclick="chain_toggle()" id="chain_btn"
+                                        class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
+                                    <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
+                                        oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
+                                        class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+                                    <button type="submit" id='submit_msg' style='display:none;'
+                                        class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                            class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                            <path
+                                                d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                                fill="currentColor"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+                @endif
             </div>
             @if (request()->route('chat_id'))
                 <div id="delete_chat_modal" tabindex="-1"
