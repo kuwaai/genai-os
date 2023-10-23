@@ -92,23 +92,31 @@
 
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
-            <div class="p-3 h-full overflow-y-auto scrollbar">
-
+            <div class="p-3 {{ request()->route('duel_id') ? 'flex flex-col' : '' }} h-full overflow-y-auto scrollbar">
                 @if ($result->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        No available LLM to chat with<br>
-                        Please come back later!
+                        {!! __('No available LLM to chat with<br>Please come back later!') !!}
                     </div>
                 @else
-                    <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
-                        data-modal-target="create-model-modal" data-modal-toggle="create-model-modal">
-                        <button
-                            class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == 3 ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
-                            <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create Chat') }}</p>
-                        </button>
-                    </div>
-                    @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
+                    @if (request()->route('duel_id'))
+                        <a href="{{ route('duel.home') }}"
+                            class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
+                            {{ __('Return to Menu') }}</a>
+                    @else
+                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
+                            data-modal-target="create-model-modal" data-modal-toggle="create-model-modal">
+                            <button
+                                class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == 3 ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
+                                <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create Chat') }}</p>
+                            </button>
+                        </div>
+                    @endif
+                    @if (request()->route('duel_id'))
+                    @php 
+                    $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier');
+                    $DC = $DC[collect(Illuminate\Support\Arr::flatten($DC->toarray(),1))->where("id","=",request()->route('duel_id'))->first()["identifier"]];
+                    @endphp
                         @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
                             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
                                 <div
@@ -143,7 +151,45 @@
                                 </div>
                             </div>
                         @endif
-                    @endforeach
+                    @else
+                        @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
+                            @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
+                                <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+                                    <div
+                                        class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
+                                        @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
+                                            <div
+                                                class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-gray-300 flex items-center justify-center overflow-hidden">
+                                                <a href="{{ $chat->link }}" target="_blank"><img
+                                                        data-tooltip-target="llm_{{ $chat->llm_id }}"
+                                                        data-tooltip-placement="top"
+                                                        src="{{ asset(Storage::url($chat->image)) }}"></a>
+                                                <div id="llm_{{ $chat->llm_id }}" role="tooltip"
+                                                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
+                                                    {{ $chat->name }}
+                                                    <div class="tooltip-arrow" data-popper-arrow></div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="max-h-[182px] overflow-y-auto scrollbar">
+                                        @foreach ($DC as $dc)
+                                            <div
+                                                class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                                                <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                                    href="{{ route('duel.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
+                                                    <p
+                                                        class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
+                                                        {{ $dc->name }}</p>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
+
+                    @endif
                 @endif
             </div>
         </div>
@@ -163,7 +209,8 @@
                                 class="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 bg-green-100">
                                 <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
                                     stroke-linecap="round" stroke-linejoin="round" class="icon-lg text-green-700"
-                                    aria-hidden="true" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                    aria-hidden="true" height="1em" width="1em"
+                                    xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
                                     </path>
