@@ -14,6 +14,7 @@ use App\Jobs\RequestChat;
 use GuzzleHttp\Client;
 use App\Models\LLMs;
 use App\Models\User;
+use App\Models\APIHistories;
 use DB;
 
 class ProfileController extends Controller
@@ -167,19 +168,25 @@ class ProfileController extends Controller
                             $response['output'] = '';
                             $client = new Client(['timeout' => 300]);
 
-                            RequestChat::dispatch($tmp, $llm->access_code, $user->id, -$user->id, $user->openai_token, 'aielection_' . $user->id);
+                            $history = new APIHistories();
+                            $history->fill(["input"=>$tmp,'output'=>"generating...", "user_id"=>$user->id]);
+                            $history->save();
+                            RequestChat::dispatch($tmp, $llm->access_code, $user->id, -$history->id, $user->openai_token, 'api_' . $history->id);
 
                             $req = $client->get(route('api.stream'), [
                                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                                 'query' => [
                                     'key' => config('app.API_Key'),
-                                    'channel' => 'aielection_' . $user->id,
+                                    'channel' => 'api_' . $history->id,
                                 ],
                                 'stream' => true,
                             ]);
 
                             $req = $req->getBody()->getContents();
                             $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
+                            
+                            $history->fill(['output'=>$response['output']]);
+                            $history->save();
                         }
                     } else {
                         // Handle the case where the specified model doesn't exist
@@ -228,7 +235,7 @@ class ProfileController extends Controller
             if (config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
                 $channel = $request->input('channel');
                 if ($channel != null) {
-                    if (strpos($channel, 'aielection_') === 0) {
+                    if (strpos($channel, 'api_') === 0) {
                         $client = Redis::connection();
                         $client->subscribe($channel, function ($message, $raw_history_id) use ($client) {
                             global $result;
