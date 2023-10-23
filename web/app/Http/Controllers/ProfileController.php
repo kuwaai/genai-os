@@ -162,7 +162,7 @@ class ProfileController extends Controller
                                 'status' => 'error',
                                 'message' => 'The msg format is incorrect.',
                             ];
-                            return response()->json($errorResponse);
+                            return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
                         } else {
                             // Input is a valid JSON string
                             $response['output'] = '';
@@ -194,7 +194,7 @@ class ProfileController extends Controller
                             'status' => 'error',
                             'message' => 'The specified model does not exist.',
                         ];
-                        return response()->json($errorResponse);
+                        return response()->json($errorResponse, 404, [], JSON_UNESCAPED_UNICODE);
                     }
                 } else {
                     // Handle the case where 'messages' and 'model' are not present in $jsonData
@@ -202,10 +202,10 @@ class ProfileController extends Controller
                         'status' => 'error',
                         'message' => 'The JSON data is missing required fields.',
                     ];
-                    return response()->json($errorResponse);
+                    return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
                 }
 
-                return response()->json($response);
+                return response()->json($response, 401, [], JSON_UNESCAPED_UNICODE);
             } else {
                 $errorResponse = [
                     'status' => 'error',
@@ -219,7 +219,7 @@ class ProfileController extends Controller
             ];
         }
 
-        return response()->json($errorResponse);
+        return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
     }
 
     public function api_stream(Request $request)
