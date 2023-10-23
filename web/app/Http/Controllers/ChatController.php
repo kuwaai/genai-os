@@ -140,10 +140,9 @@ class ChatController extends Controller
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
-            ->orderby('llms.created_at')
-            ->first();
-        if ($result && Auth::user()->hasPerm('Chat_update_new_chat')) {
-            return redirect()->route('chat.new', $result->id);
+            ->orderby('llms.created_at');
+        if ($result->count() == 1 && Auth::user()->hasPerm('Chat_update_new_chat')) {
+            return redirect()->route('chat.new', $result->first()->id);
         } else {
             return view('chat');
         }

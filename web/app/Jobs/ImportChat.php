@@ -18,28 +18,18 @@ use Carbon\Carbon;
 class ImportChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $access_code, $msgtime, $history_id, $user_id, $chatgpt_apitoken, $channel;
+    private $input, $access_code, $user_id;
     public $tries = 1; # Believe when it fails, it always failed
     public $timeout = 600; # Shouldn't takes longer than 10 mins
     public $agent_version = "v1.0";
     /**
      * Create a new job instance.
      */
-    public function __construct($input, $access_code, $user_id, $channel = null)
+    public function __construct($input, $access_code, $user_id)
     {
         $this->input = $input;
-        $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
         $this->access_code = $access_code;
         $this->user_id = $user_id;
-        $this->history_id = $history_id;
-        if ($chatgpt_apitoken == null) {
-            $chatgpt_apitoken = '';
-        }
-        if ($channel == null) {
-            $channel = '';
-        }
-        $this->channel = $channel;
-        $this->chatgpt_apitoken = $chatgpt_apitoken;
     }
 
     /**
