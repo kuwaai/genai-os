@@ -28,7 +28,7 @@ Replace `YOUR_AUTH_TOKEN` with your unique authentication token. This token is u
 
 For single round chatting, you can send a single message using the `messages` field. Here's an example:
 
-### Using `curl`
+### Using `curl` (Linux)
 
 You can use the `curl` command line tool to make POST requests to our API. Here's an example of how to send a single message using `curl`:
 
@@ -39,6 +39,14 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_
     ],
     "model": "llama2-7b-chat-b5.0.0"
 }' http://localhost/v1.0/chat/completions
+```
+
+### Using `curl` (Windows)
+
+For Windows you need to escape these characters, here's how to do it:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": \"false\", \"msg\": \"你好\" }],\"model\": \"llama2-7b-chat-b5.0.0\"}" http://localhost/v1.0/chat/completions
 ```
 
 ### Using JavaScript (Ajax)
