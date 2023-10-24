@@ -19,8 +19,6 @@ services:
       - LLM_NAME=${LLM_NAME}
       - PORT=${PORT}
       - LAYOUT_CONFIG=layout_dbqa.yaml
-    networks:
-      - squid_backend
     ports:
       - ${PORT}:${PORT}
     healthcheck:
@@ -30,18 +28,18 @@ services:
       retries: 5
     volumes:
       - /var/models/:/llm/:ro
+      - database:/database/:ro
       - log:/var/log/doc_qa
-  sftp:
-    image: atmoz/sftp
-    volumes:
-        - /var/models/database:/home/admin/upload
-    ports:
-        - "2222:22"
-    command: admin:taideadmin:1001
 
-# Connect to the network created by web_agent and squid
-networks:
-  squid_backend:
-    external: true
+  # Service for updating the database
+  # sftp:
+  #   image: atmoz/sftp
+  #   volumes:
+  #       - database:/home/admin/upload
+  #   ports:
+  #       - "2222:22"
+  #   command: admin:taideadmin:1001
+
 volumes:
+  database:
   log:

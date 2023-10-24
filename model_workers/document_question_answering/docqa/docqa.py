@@ -13,6 +13,7 @@ from .taide_llm import TaideLlmFactory
 
 import re
 import gc
+import os
 import torch
 import logging
 import chevron
@@ -27,7 +28,7 @@ class DocumentQa:
 
   def __init__(self, document_store:str = None):
     self.logger = logging.getLogger(__name__)
-    self.llm = TaideLlmFactory.get_taide_llm(model_location='remote-nchc')
+    self.llm = TaideLlmFactory.get_taide_llm(model_location=os.environ.get('MODEL_LOCATION','remote-nchc'))
     self.document_store:DocumentStore = None
     if document_store != None:
       self.document_store = DocumentStore.load(document_store)

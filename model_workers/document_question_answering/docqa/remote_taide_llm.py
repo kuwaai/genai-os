@@ -74,12 +74,13 @@ class NchcTaideLlm(TaideLlm):
             
             llm_endpoint = f'{self.api_root}/completions'
             data = {
-                'max_tokens': 2048,
+                'max_tokens': 4096-len(prompt),
                 "model": self.model_name,
                 'prompt': prompt,
                 'temperature': 0.2,
                 'top_p': 0.95
             }
+            logger.debug(f'Data:\n{data}')
             resp = await loop.run_in_executor(
                 None,
                 functools.partial(
@@ -101,5 +102,6 @@ class NchcTaideLlm(TaideLlm):
         except Exception as e:
             result = ''
             logger.exception('Generation failed.')
+            raise
         finally:
             return result, output_tokens

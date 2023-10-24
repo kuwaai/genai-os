@@ -121,6 +121,7 @@ class TaideLlm(ABC):
         except Exception as e:
             result = ''
             logger.exception('Generation failed.')
+            raise
         finally:
             return result
     

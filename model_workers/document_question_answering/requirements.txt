@@ -1,7 +1,7 @@
 langchain
-# accelerate
-# torch
-# transformers
+accelerate
+torch
+transformers
 sentence-transformers
 textract
 bs4
