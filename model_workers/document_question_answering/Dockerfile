@@ -26,6 +26,8 @@ ENV PUBLIC_ADDRESS="localhost"
 ENV PORT="9001"
 ENV AGENT_ENDPOINT="http://localhost:9000/v1.0/"
 ENV DEBUG="False"
+# "local" or "remote-nchc"
+ENV MODEL_LOCATION="remote-nchc"
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["./run.sh"]

@@ -9,10 +9,11 @@ from langchain.docstore.document import Document
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from .document_store import DocumentStore
-from .taide_llm import TaideLlm
+from .taide_llm import TaideLlmFactory
 
 import re
 import gc
+import os
 import torch
 import logging
 import chevron
@@ -27,7 +28,7 @@ class DocumentQa:
 
   def __init__(self, document_store:str = None):
     self.logger = logging.getLogger(__name__)
-    self.llm = TaideLlm()
+    self.llm = TaideLlmFactory.get_taide_llm(model_location=os.environ.get('MODEL_LOCATION','remote-nchc'))
     self.document_store:DocumentStore = None
     if document_store != None:
       self.document_store = DocumentStore.load(document_store)
@@ -52,8 +53,9 @@ class DocumentQa:
   def is_english(self, paragraph:str, threshold=0.8):
     total_count = len(paragraph)
     english_charter_count = len(paragraph.encode("ascii", "ignore"))
+    english_rate = 0 if total_count == 0 else english_charter_count / total_count
 
-    return english_charter_count / total_count >= threshold
+    return english_rate >= threshold
 
   def get_final_user_input(self, chat_history: [ChatRecord]) -> str:
     final_user_record = next(filter(lambda x: x.role == Role.USER, reversed(chat_history)))

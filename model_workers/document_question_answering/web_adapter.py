@@ -69,7 +69,14 @@ class DatabaseQaProcess(GeneralProcessInterface):
       
       if len(chat_history) > 0 and chat_history[-1].msg == '/reload':
         self.app = DocumentQa(self.database_path)
+        await asyncio.sleep(2) # To prevent SSE error of web page.
         yield '資料庫已重新載入。'
+        return
+      
+      # Hardcoded response. Should be removed in the future.
+      if len(chat_history) > 0 and chat_history[-1].msg.upper().find('TAIDE') != -1:
+        await asyncio.sleep(2) # To prevent SSE error of web page.
+        yield '有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。'
         return
 
       async for reply in self.app.process(None, chat_history):

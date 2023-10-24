@@ -1,4 +1,5 @@
 langchain
+accelerate
 torch
 transformers
 sentence-transformers
@@ -7,6 +8,8 @@ bs4
 # faiss-gpu # Since the count of fetched document is relatively small, CPU is enough.
 faiss-cpu
 chevron
-accelerate
 trafilatura
 jsonlines
+tokenizers
+requests-oauthlib
+requests
