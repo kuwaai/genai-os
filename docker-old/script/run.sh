@@ -14,6 +14,7 @@ rm * -rf
 ln -s ../sites-available/llmproject .
 service nginx restart
 cp /var/www/html/LLM_Project/www.conf /etc/php/8.1/fpm/pool.d/www.conf
+cp /var/www/html/LLM_Project/php.ini /etc/php/8.1/fpm/php.ini
 service php8.1-fpm start
 # Start the agent program
 cd /agent
