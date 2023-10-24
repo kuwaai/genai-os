@@ -1,9 +1,13 @@
 version: '3'
 
 services:
-  web_agent:
-    image: taide_web_agent
-    build: .
+  web:
+    image: llmproject_web
+    build:
+      context: ./images/llmproject_image
+      dockerfile: ${PWD}/images/llmproject_image/Dockerfile
+    logging:
+      driver: "json-file"
     environment:
       TZ: 'Asia/Taipei'
       WEBROOT: '/var/www/html/TAIDE/public'
@@ -14,9 +18,13 @@ services:
       NPMMIRROR: 'https://registry.npmmirror.com'
     ports:
       - "8080:80"
+      - "443:443"
+      - "9000:9000"
     volumes:
-      - ../../web:/var/www/html/TAIDE
-      - ../../LLMs/agent:/agent
+      - ../web:/var/www/html/LLM_Project
+      - ./script:/script
+      - ./ssl:/ssl
+      - ../LLMs/agent:/agent
     networks:
       - backend
     depends_on:
@@ -61,6 +69,55 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  api_debug_01:
+    runtime: nvidia
+    image: api
+    build:
+      context: ./images/API_image
+      dockerfile: ${PWD}/images/API_image/Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+    volumes:
+      - ./api_debug:/API
+    depends_on:
+      - web
+    networks:
+      - taide
+    healthcheck:
+      test: ["CMD", "curl", "-X", "POST", "-f", "http://localhost:9001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  api:
+    runtime: nvidia
+    image: api
+    build:
+      context: ./images/API_image
+      dockerfile: ${PWD}/images/API_image/Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+    volumes:
+      - ./APIs:/API
+    depends_on:
+      - web
+    networks:
+      - taide
+    healthcheck:
+      test: ["CMD", "curl", "-X", "POST", "-f", "http://localhost:9001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
 networks:
   backend:
