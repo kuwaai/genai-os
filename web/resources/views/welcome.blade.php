@@ -73,7 +73,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Text Translate') }}
+                                {{ __('Translation') }}
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
@@ -109,7 +109,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Writing post') }}</h2>
+                                {{ __('Composition') }}</h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -148,7 +148,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Writing letter') }}
+                                {{ __('Communication') }}
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
@@ -185,7 +185,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Summarize') }}</h2>
+                                {{ __('Summarization') }}</h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -225,7 +225,7 @@
                     <div class="flex items-center gap-4">
                         <a href="https://www.nuk.edu.tw/" target="_blank"
                             class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
-                            {!! __('Developed by NUK') !!}
+                            {!! __('Developed by NUK and NARLabs') !!}
                         </a>
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         href="https://www.twcc.ai/" target="_blank">{{ __('Powered by TWCC') }}</a>
                     <span class="text-black dark:text-white flex justify-end text-sm">{{ __('Version') }}
-                        0.0.6.7</span>
+                        0.0.7.1</span>
                 </div>
             </div>
 

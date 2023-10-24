@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'chats/stream'
+        'chats/stream',
+		'v1.0/chat/completions'
     ];
 }

@@ -10,7 +10,7 @@ function cleanup() {
 trap cleanup SIGTERM
 cd /API
 apt update
-apt install -y curl
+apt install -y curl screen
 while ! curl -s http://web:9000/v1.0/workers/debug >/dev/null; do
   echo "Waiting for connection to http://web:9000/debug ..."
   sleep 1

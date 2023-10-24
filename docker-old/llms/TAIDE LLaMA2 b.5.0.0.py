@@ -3,9 +3,9 @@ from base import *
 
 # -- Configs --
 app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://192.168.211.4:9000/"
-app.LLM_name = "llama2-7b-chat-b1.0.0"
+app.LLM_name = "llama2-7b-chat-b5.0.0"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
@@ -19,31 +19,17 @@ if app.port == None:
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*3
-model_loc = "llama2-7b-chat-b1.0.0"
+model_loc = "llama2-7b-ccw_cp-j-v2+cc_ft-l-e3_tv"
 api_key = None
 usr_token = None
 tc_model = None
 # -- Config ends --
 
-from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer, StoppingCriteria, StoppingCriteriaList, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, set_seed
     
-class StopOnTokens(StoppingCriteria):
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
-        for stop_ids in stop_token_ids:
-            if torch.all(input_ids[0][-len(stop_ids):] == stop_ids):
-                return True
-        return False
-
-
-model = AutoModelForCausalLM.from_pretrained(model_loc,
-    config=AutoConfig.from_pretrained(model_loc),device_map="auto",torch_dtype=torch.float16)
-model.eval()
+set_seed(42)
+model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained(model_loc)
-stop_list = ['[INST]', '\nQuestion:', "[INST: ]"]
-stop_token_ids = [torch.LongTensor(tokenizer(x)['input_ids']).to('cuda') for x in stop_list]
-pipe = pipeline(model=model, tokenizer=tokenizer,return_full_text=True,
-    task='text-generation',stopping_criteria=StoppingCriteriaList([StopOnTokens()]),
-    temperature=0.2,max_new_tokens=2048,repetition_penalty = 1.0, do_sample=True)
 prompts = "<s>[INST] {0} [/INST]\n{1}"
     
 def llm_compute(data): 
@@ -57,9 +43,19 @@ def llm_compute(data):
             history.append("")
             history = [prompts.format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
             history = "".join(history)
-            result = pipe(history)[0]['generated_text']
-            print(result)
-            for i in result[len(history):]:
+            encoding = tokenizer(history, return_tensors='pt', add_special_tokens=False).to(model.device)
+            
+            l = encoding['input_ids'].size(1)
+            x = model.generate(
+                **encoding,
+                generation_config=GenerationConfig(
+                    max_new_tokens=2048,
+                    pad_token_id=tokenizer.eos_token_id,
+                )
+            )
+            result = tokenizer.batch_decode(x[:, l:])[0].strip().replace("</s>","")
+            print(tokenizer.batch_decode(x)[0].encode("utf-8","ignore").decode("utf-8"))
+            for i in result:
                 yield i
                 time.sleep(0.02)
 
