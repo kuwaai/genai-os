@@ -205,7 +205,7 @@ class ProfileController extends Controller
                     return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
                 }
 
-                return response()->json($response, 401, [], JSON_UNESCAPED_UNICODE);
+                return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
             } else {
                 $errorResponse = [
                     'status' => 'error',
