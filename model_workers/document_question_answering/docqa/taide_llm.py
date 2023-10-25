@@ -45,7 +45,7 @@ class TaideLlm(ABC):
     def __init__(self,
                  token_limit = 3500,
                  prompt_template_path = 'prompt_template/taide.mustache',
-                 tokenizer_path = '/llm/llama2-7b-chat-b5.0.0/tokenizer.json',
+                 tokenizer_path = '/llm/tokenizer.json',
                  ):
 
         self.input_token_limit = token_limit
@@ -114,7 +114,7 @@ class TaideLlm(ABC):
             logger.info('Final Prompt ({} tokens):\n{}'.format(tokens, prompt))
             
             logger.info('Generating...')
-            result, output_tokens = await self._complete(prompt)
+            result, output_tokens = await self._complete(prompt, tokens)
             logger.info(f'Generation finished. Generated {output_tokens} tokens.')
             logger.debug(f'Reply: {result}')
             
@@ -126,11 +126,12 @@ class TaideLlm(ABC):
             return result
     
     @abstractmethod
-    def _complete(self, prompt:str) -> (str, int):
+    def _complete(self, prompt:str, tokens:int) -> (str, int):
         """
         The implementation of invoking the LLM to complete the prompt.
         Parameter:
         prompt: The complete prompt to the LLM.
+        tokens: The number of tokens of the prompt.
 
         Return:
         The response from the LLM and number of output tokens.

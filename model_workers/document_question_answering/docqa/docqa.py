@@ -70,7 +70,7 @@ class DocumentQa:
       max_depth=1,
       prevent_outside=False,
       use_async = True,
-      cache_proxy_url = 'http://web_cache:10250'
+      cache_proxy_url = os.environ.get('HTTP_CACHE_PROXY', None)
     ) 
     docs = await loader.async_load()
 
