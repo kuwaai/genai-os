@@ -4,6 +4,7 @@ name: doc-qa
 services:
   api:
     runtime: nvidia
+    image: doc-qa
     build: .
     container_name: ${LLM_NAME}-api-${PORT}
     restart: unless-stopped
