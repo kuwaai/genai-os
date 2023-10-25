@@ -56,7 +56,7 @@
                                 <input type="checkbox" name="llm[]" id="{{ $LLM->access_code }}"
                                     value="{{ $LLM->access_code }}" class="hidden peer">
                                 <label for="{{ $LLM->access_code }}"
-                                    class="inline-flex items-center justify-between w-full p-2 text-gray-300 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">
+                                    class="inline-flex items-center justify-between w-full p-2 text-gray-400 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">
                                     <div class="flex items-center">
                                         <div
                                             class="flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
