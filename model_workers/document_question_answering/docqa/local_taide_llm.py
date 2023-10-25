@@ -22,7 +22,7 @@ class StopOnTokens(StoppingCriteria):
 
 class LocalTaideLlm(TaideLlm):
     def __init__(self,
-                 model_path = '/llm/llama2-7b-chat-b5.0.0',
+                 model_path = '/llm/',
                  ):
         super(LocalTaideLlm, self).__init__()
         
@@ -50,7 +50,7 @@ class LocalTaideLlm(TaideLlm):
             repetition_penalty=1.0,
         )
 
-    async def _complete(self, prompt:str)-> (str, int):
+    async def _complete(self, prompt:str, tokens:int)-> (str, int):
         result = ''
         output_tokens = 0
         try:

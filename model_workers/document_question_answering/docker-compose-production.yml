@@ -19,6 +19,7 @@ services:
       - LLM_NAME=${LLM_NAME}
       - PORT=${PORT}
       - LAYOUT_CONFIG=${LAYOUT_CONFIG:-layout.yaml}
+      - HTTP_CACHE_PROXY=http://web_cache:10250
     networks:
       - squid_backend
     ports:
@@ -29,7 +30,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - /var/models/:/llm/:ro
+      - /var/models/llama2-7b-chat-b5.0.0:/llm/:ro
       - log:/var/log/doc_qa
 
 # Connect to the network created by web_agent and squid
