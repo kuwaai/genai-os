@@ -41,6 +41,8 @@ services:
       POSTGRES_PASSWORD: LLMProject
       POSTGRES_USER: llmprojectroot
       POSTGRES_DB: llm_project
+    ports:
+      - "5432:5432"
     networks:
       - taide
     healthcheck:
