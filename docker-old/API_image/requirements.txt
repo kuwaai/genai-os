@@ -1,7 +1,0 @@
-flask
-flask_sse
-torch
-transformers
-accelerate
-sentencepiece
-openai
