@@ -47,7 +47,6 @@ class NchcTaideAuth(requests.auth.AuthBase):
 
 class NchcTaideLlm(TaideLlm):
     def __init__(self,
-                 model_name = 'TAIDE/b.5.0.0',
                  client_id = 'doc_qa',
                  api_root = 'https://td.nchc.org.tw/api/v1',
                  ):
@@ -63,9 +62,9 @@ class NchcTaideLlm(TaideLlm):
             api_root = api_root
         )
         self.api_root = api_root
-        self.model_name = model_name
+        self.model_name = environ.get('NCHC_TAIDE_MODEL_NAME', 'TAIDE/b.5.0.0')
 
-    async def _complete(self, prompt:str)-> (str, int):
+    async def _complete(self, prompt:str, tokens:int)-> (str, int):
         result = ''
         output_tokens = 0
         try:
@@ -74,7 +73,7 @@ class NchcTaideLlm(TaideLlm):
             
             llm_endpoint = f'{self.api_root}/completions'
             data = {
-                'max_tokens': 4096-len(prompt),
+                'max_tokens': 4096-tokens,
                 "model": self.model_name,
                 'prompt': prompt,
                 'temperature': 0.2,
@@ -95,8 +94,13 @@ class NchcTaideLlm(TaideLlm):
             
             resp = resp.json()
             reply = resp["choices"][0]["text"]
+            logger.debug(f'Reply from API: {reply}')
             prompt_end = "[/INST]"
-            result = reply[reply.rfind(prompt_end)+len(prompt_end):].strip()
+            prompt_end_location = reply.rfind(prompt_end)
+            if prompt_end_location != -1:
+                result = reply[prompt_end_location+len(prompt_end):].strip()
+            else:
+                result = reply.strip()
             output_tokens = resp['usage']['completion_tokens']
             
         except Exception as e:
