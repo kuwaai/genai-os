@@ -3,6 +3,7 @@ version: '3'
 services:
   api_doc_qa:
     runtime: nvidia
+    image: doc-qa
     build: .
     devices:
       - /dev/nvidia0:/dev/nvidia0
