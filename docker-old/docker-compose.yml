@@ -30,7 +30,7 @@ services:
       - db
       - redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/debug"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/v1.0/worker/debug"]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -45,6 +45,8 @@ services:
       - "5432:5432"
     networks:
       - taide
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U llmprojectroot -d llm_project -t 1"]
       interval: 10s

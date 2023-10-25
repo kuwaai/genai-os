@@ -1,0 +1,45 @@
+version: '3'
+name: dbqa
+
+services:
+  api:
+    runtime: nvidia
+    build: .
+    container_name: ${LLM_NAME}-api-${PORT}
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ["${GPU_ID}"]
+            capabilities: [gpu]
+    env_file: .env.prod
+    environment:
+      - LLM_NAME=${LLM_NAME}
+      - PORT=${PORT}
+      - LAYOUT_CONFIG=layout_dbqa.yaml
+    ports:
+      - ${PORT}:${PORT}
+    healthcheck:
+      test: "curl --fail http://localhost:${PORT}/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /var/models/:/llm/:ro
+      - database:/database/:ro
+      - log:/var/log/doc_qa
+
+  # Service for updating the database
+  # sftp:
+  #   image: atmoz/sftp
+  #   volumes:
+  #       - database:/home/admin/upload
+  #   ports:
+  #       - "2222:22"
+  #   command: admin:taideadmin:1001
+
+volumes:
+  database:
+  log:

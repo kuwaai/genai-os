@@ -59,13 +59,12 @@
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+                        <button onclick="$(this).children().eq(1).children().toggleClass('rotate-180')" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
                             <div>{{ Auth::user()->name }}</div>
 
                             <div class="ml-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                                <i
+                                class="fas fa-chevron-up mx-3 transform duration-500 rotate-180" style="font-size:10px;"></i>
                             </div>
                         </button>
                     </x-slot>
@@ -76,6 +75,11 @@
                             {{ __('Profile') }}
                         </x-dropdown-link>
                         @endif
+                        <x-dropdown-link :href="route('lang')">
+                            {{ __("Language") }}
+                        </x-dropdown-link>
+
+                        <a class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out" href="https://www.taide.tw/" target="_blank">{{__("Information")}}</a>
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -84,7 +88,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                {{ __('Sign out') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -118,12 +122,12 @@
             @endif
             @if(Auth::user()->hasPerm('tab_Chat'))
             <x-responsive-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
-                {{ __('Chats') }}
+                {{ __('Chat') }}
             </x-responsive-nav-link>
             @endif
             @if(Auth::user()->hasPerm('tab_Archive'))
             <x-responsive-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
-                {{ __('Archives') }}
+                {{ __('Archive') }}
             </x-responsive-nav-link>
             @endif
             @if(Auth::user()->hasPerm('tab_Play'))
@@ -151,15 +155,17 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
                 @endif
-
-                <!-- Authentication -->
+                <x-responsive-nav-link :href="route('lang')">
+                    {{ __("Language") }}
+                </x-responsive-nav-link>
+                <a class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out" href="https://taide.tw/" target="_blank">{{__("Information")}}</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        {{ __('Sign out') }}
                     </x-responsive-nav-link>
                 </form>
             </div>

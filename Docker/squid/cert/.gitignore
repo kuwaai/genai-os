@@ -1,0 +1,5 @@
+squid-self-signed.crt
+squid-self-signed.der
+squid-self-signed.key
+squid-self-signed.pem
+squid-self-signed_dhparam.pem

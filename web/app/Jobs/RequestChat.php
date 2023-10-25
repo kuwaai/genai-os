@@ -21,7 +21,9 @@ class RequestChat implements ShouldQueue
     private $input, $access_code, $msgtime, $history_id, $user_id, $chatgpt_apitoken, $channel;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
-    public $agent_version = "v1.0";
+    public $agent_version = 'v1.0';
+    public $filters = ["[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]", '[Oops, the LLM returned empty message, please try again later or report to admins!]', '[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]', '[Sorry, something is broken, please try again later!]'];
+
     /**
      * Create a new job instance.
      */
@@ -52,12 +54,12 @@ class RequestChat implements ShouldQueue
         }
         Log::channel('analyze')->Info($this->channel);
         if ($this->history_id > 0 && $this->channel == $this->history_id . '') {
-            if (Histories::findOrFail($this->channel)->msg != '* ...thinking... *') {
+            if (Histories::find($this->channel) && Histories::find($this->channel)->msg != '* ...thinking... *') {
                 Log::Debug('Hmmm');
                 return;
             }
         }
-        //Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
         $start = microtime(true);
         $tmp = '';
         try {
@@ -67,14 +69,61 @@ class RequestChat implements ShouldQueue
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
                     'name' => $this->access_code,
-                    'history_id' => $this->history_id
+                    'history_id' => $this->history_id,
                 ],
                 'stream' => true,
             ]);
-            if ($response->getBody()->getContents() == 'BUSY') {
+            $state = trim($response->getBody()->getContents());
+            if ($state == 'BUSY') {
                 $this->release(10);
-            } else {
+            } elseif ($state == 'NOMACHINE') {
+                $tmp = "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]";
                 try {
+                    if ($this->channel == '' . $this->history_id) {
+                        $history = Histories::find($this->history_id);
+                        if ($history != null) {
+                            $history->fill(['msg' => $tmp]);
+                            $history->save();
+                        }
+                    }
+                } catch (Exception $e) {
+                }
+                Log::channel('analyze')->Info('NOMACHINE: ' . $this->access_code . ' | ' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+                Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                sleep(1);
+                Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
+                Redis::publish($this->channel, 'Ended Ended');
+            } elseif ($state == 'READY') {
+                try {
+                    $tmp = json_decode($this->input);
+
+                    if ($tmp === false && json_last_error() !== JSON_ERROR_NONE) {
+                        //There're error in the json!
+                        //which shouldn't be happening...
+                        Log::channel('analyze')->Info("How does that happened? JSON decode error in the Job!\n" . $this->input);
+                        return;
+                    } else {
+                        $taide_flag =
+                            strpos(
+                                strtoupper(
+                                    collect(json_decode($this->input))
+                                        ->where('isbot', false)
+                                        ->last()->msg,
+                                ),
+                                strtoupper('taide'),
+                            ) !== false;
+
+                        foreach ($tmp as $t) {
+                            foreach ($this->filters as $filter) {
+                                if (strpos($t->msg, $filter) !== false) {
+                                    $t->msg = trim(str_replace($filter, '', $t->msg));
+                                }
+                            }
+                        }
+                        $this->input = json_encode($tmp);
+                        $tmp = '';
+                    }
+
                     $response = $client->post($agent_location . $this->agent_version . '/chat/completions', [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'form_params' => [
@@ -85,7 +134,6 @@ class RequestChat implements ShouldQueue
                         ],
                         'stream' => true,
                     ]);
-
                     $stream = $response->getBody();
                     $buffer = '';
                     while (!$stream->eof()) {
@@ -103,7 +151,7 @@ class RequestChat implements ShouldQueue
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 $tmp .= $message;
-                                Redis::publish($this->channel, 'New ' . json_encode(["msg" => $tmp . '...']));
+                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . '...' . ($taide_flag ? "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]" : '')]));
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
@@ -113,32 +161,34 @@ class RequestChat implements ShouldQueue
                     }
                     if (trim($tmp) == '') {
                         $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
+                    } else {
+                        if ($taide_flag) {
+                            $tmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
+                        }
                     }
                 } catch (Exception $e) {
-                    Redis::publish($this->channel, 'New ' . json_encode(["msg" => $tmp . '\n[Sorry, something is broken, please try again later!]']));
+                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . '\n[Sorry, something is broken, please try again later!]']));
                     $tmp .= "\n[Sorry, something is broken, please try again later!]";
                     Log::channel('analyze')->Debug('failJob ' . $this->history_id);
                 } finally {
                     try {
                         if ($this->channel == '' . $this->history_id) {
-                            $history = Histories::findOrFail($this->history_id);
-                            $history->fill(['msg' => trim($tmp)]);
-                            $history->save();
+                            $history = Histories::find($this->history_id);
+                            if ($history != null) {
+                                $history->fill(['msg' => trim($tmp)]);
+                                $history->save();
+                            }
                         }
                     } catch (Exception $e) {
-                    }
-                    Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
-                    for ($i = 0; $i < 5; $i++) {
-                        sleep(1);
-                        Redis::publish($this->channel, 'New ' . json_encode(["msg" => trim($tmp)]));
                     }
                     if ($this->channel == '' . $this->history_id) {
                         Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     }
+                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                     Redis::publish($this->channel, 'Ended Ended');
                     $end = microtime(true); // Record end time
                     $elapsed = $end - $start; // Calculate elapsed time
-                    //Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . trim(str_replace("\n", '[NEWLINEPLACEHOLDERUWU]', $tmp)));
+                    Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . $tmp);
                 }
             }
         } catch (Exception $e) {

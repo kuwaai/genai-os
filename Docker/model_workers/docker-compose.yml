@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  api_cc:
+    # runtime: nvidia
+    image: worker-chinese-convert:latest
+    # devices:
+      # - /dev/nvidia0:/dev/nvidia0
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - AGENT_ENDPOINT=http://web_agent:9000/v1.0/
+      - LLM_NAME=contextual_cc
+      - PUBLIC_ADDRESS=api_cc
+      - PORT=9001 # Leave blank will assign by the OS.
+      - IGNORE_AGENT=False
+      - DEBUG=True
+    networks:
+      - taide_backend
+    healthcheck:
+      test: "curl --fail http://localhost:9001/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Connect to the network created by web_agent
+networks:
+  taide_backend:
+    external: true

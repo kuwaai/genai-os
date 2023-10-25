@@ -1,15 +1,21 @@
-# TAIDE Chat 0.0.6.3
+# TAIDE Chat 0.0.7.1
 ### Implements
-* [Finished] Chatting with one LLMs
-* [Finished] Chatting with multiple LLMs at the same time
+* [Finished] Basic Chatting with just one LLM
+* [Finished] Duel Chatting with multiple LLMs
 * [Finished] LLM management and internal API with proxy
-* [Finished] User sign up & login, email auth
-* [Finished] Group & Permission management
+* [Finished] User sign up & login, email auth, api auth
+* [Finished] Group & Permission & User management
+* [Finished] A basic working API that just worked
+* [Finished] Import & Export Chatroom
+* [Finished] Feedback system
+* [Finished] Soft delete for chatroom and history
+* [WIP] Regeneration & Translation button
+* [WIP] Rule-based control in Model worker
+* [WIP] Expanded Chatroom list
+* [WIP] Import with generate
 * [WIP] First play ground game: AI Election
-* [WIP] User account management
-* [WIP] Better UI
-* [WIP] Externel API
-* [Not Started] Combine Duel and Chat route
+* [WIP] A complete Externel API
+* [WIP] Blinded model rating
 
 ### Basic Software Requirements
 * PostgreSQL 14
@@ -18,61 +24,57 @@
 * Redis Server
 * Vite (Use `npm install -g vite`)
 
-### Steps to setup Docker enviroment
-1. Clone the whole project
-2. Run the commands below to download required packages on the machine you want to use
-```shell
-#Please be aware that the last command will make the machine reboot!
-curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+### The whole commands to setup the web and database directly
+```sh
+# Update all packages
 sudo apt update
-sudo apt install -y docker docker.io nvidia-docker2 docker-compose ubuntu-drivers-common
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-sudo ubuntu-drivers install
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
-sudo dpkg -i cuda-keyring_1.0-1_all.deb
-sudo apt-get update
-sudo apt-get -y install cuda
-rm -rf cuda-keyring_1.0-1_all.deb
-sudo reboot
-```
-3. Go inside `Docker/llmproject_image` and run `./build.sh` to build web image
-4. Go inside `Docker/API_image` and run `./build.sh` to build LLM API image
-5. Back to `Docker` and run `./rebuild.sh` to start the docker-compose
-6. You can run `sudo docker container ls -a` to check if the 4 services are all alive and good
-7. Go inside the web and here's the 4 default accounts
-
-Role | Developer | Demo1 | Demo2 | Demo3
---- | --- | --- | --- | --- 
-Account | dev@chat.gai.tw | demo1@chat.gai.tw | demo2@chat.gai.tw | demo3@chat.gai.tw 
-Password | develope | chatchat | chatchat | chatchat 
-isDemo | False | True | True | True 
-8. Your web should goes online and you're able to view the web at `localhost:8080`
-9. This setup contain one default Debug LLM API, You need to add it to dashboard in order to use it, Just create a LLM Profile with `debug` as `ACCESS CODE`
-
-### Setup the web 
-1. Clone this project by using `git clone`
-2. Copy environment configure file `cp .env.debug .env`
-3. Modify `.env` for your environment
-4. Go under the folder `cd executables/sh`
-5. Run the script `./install.sh`, this should install most of things you needed.
-6. Below are the commands you might need to startup the entire service.
-```shell
-screen -dmS web bash -c "./startWeb_Public.sh" #This is the web process
-screen -dmS agent bash -c "python3 ~/LLMs/0.0.3/agent.py" # This agent is required
-
-#Below is your LLM API and workers, remember for each API, you should open a worker for it
-
-screen -dmS workerForBloom bash -c "cd /var/www/html/LLM_Project/executables/sh/ && ./work.sh"
-screen -dmS bloom1b1zh bash -c "python3 ~/LLMs/0.0.3/Bloom_1b1-zh.py"
-
-screen -dmS workerForDolly bash -c "cd /var/www/html/LLM_Project/executables/sh/ && ./work.sh"
-screen -dmS dolly bash -c "python3 ~/LLMs/0.0.3/Dolly.py"
-
-screen -dmS workerForLLaMA bash -c "cd /var/www/html/LLM_Project/executables/sh/ && ./work.sh"
-screen -dmS llama bash -c "python3 ~/LLMs/0.0.3/LLaMA_TW1.py"
+sudo apt upgrade -y
+# These are required packages
+sudo apt install nginx php php-fpm redis nodejs npm postgresql postgresql-contrib zip unzip php-zip
+ -y
+#Install hamachi if you need (optional)
+wget https://www.vpn.net/installers/logmein-hamachi_2.1.0.203-1_amd64.deb
+sudo dpkg -i logmein-hamachi_2.1.0.203-1_amd64.deb
+rm logmein-hamachi_2.1.0.203-1_amd64.deb
+sudo hamachi login
+# Create database (modify the command’s red parts as your require)
+sudo -u postgres psql
+create database llm_project;
+create user llmprojectroot with encrypted password 'LLMProject';
+grant all privileges on database llm_project to llmprojectroot;
+quit
+# Installing ‘n’ package require sudo account
+sudo su
+npm install n -g
+n stable
+exit
+# After installing, you need to relogin
+node -v # Should show you v18.xx.xx version installed
+# Time for the github project
+git clone git@github.com:taifu9920/LLM_Project.git
+sudo mv LLM_Project /var/www/html/
+cd /var/www/html
+sudo chown ubuntu:ubuntu -R LLMProject 
+cd /var/www/html/LLM_Project/web/
+cp .env.debug .env
+# Now you should edit the .env file before proceed
+cd executables/sh
+sudo chmod +x *.sh
+./production_update.sh
+# This step give the file owner back to www-data, so nginx can works
+cd /var/www/html
+sudo chown www-data:www-data -R LLMProject 
+# It should setup most of things, proceed if no errors
+# Please make sure the path correct for you before execute
+sudo cp /var/www/html/LLM_Project/web/www.conf /etc/php/8.1/fpm/pool.d/
+cd /etc/nginx/sites-enabled
+sudo cp /var/www/html/LLM_Project/web/nginx_config ../sites-available/LLM_Project
+sudo ln -s ../sites-available/LLM_Project .
+# Get a ssl cert (optional)
+sudo apt install python3-certbot-nginx -y
+sudo certbot
+# Fill the information and done
+# Now the web should be ready
 ```
 
 ### How to update
@@ -80,7 +82,7 @@ screen -dmS llama bash -c "python3 ~/LLMs/0.0.3/LLaMA_TW1.py"
 2. Pull the newest version of files by using `git pull`
 3. Go under the folder `cd executables/sh`
 4. Run the script `./production_update.sh`
-(Some updates will required to do migration)
+(Some updates will required to do migration update, So confirm the migrate is recommanded)
 
 ### For production
 Nginx is recommanded, Since that is the only tested one,

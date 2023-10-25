@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
+use App\Http\Requests\LLMUpdateRequest;
+use App\Http\Requests\LLMCreateRequest;
 use App\Models\Groups;
 use App\Models\User;
 use App\Models\GroupPermissions;
+use App\Models\LLMs;
+use App\Models\Permissions;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ManageController extends Controller
 {
@@ -159,5 +164,62 @@ class ManageController extends Controller
         return Redirect::route('manage.home')
             ->with('last_tab', 'users')
             ->with('last_tool', 'group_selector');
+    }
+
+    public function llm_update(LLMUpdateRequest $request): RedirectResponse
+    {
+        $model = LLMs::findOrFail($request->input("id"));
+        $validated = $request->validated();
+        if ($file = $request->file('image')) {
+            Storage::delete($model->image);
+            $validated['image'] = $file->store('public/images');
+        }
+        if (is_null($validated['order']))  unset($validated['order']);
+        if (is_null($validated['version']))  unset($validated['version']);
+        $model->fill($validated);
+        $model->save();
+        return Redirect::route('manage.home')
+        ->with('last_tab', 'llms')
+        ->with('last_llm_id', $request->input("id"));
+    }
+
+    public function llm_delete(Request $request): RedirectResponse
+    {
+        $model = LLMs::findOrFail($request->input("id")); 
+        Storage::delete($model->image);
+        $model->delete();
+        Permissions::where("name","=","model_" . $request->input("id"))->delete();
+        return Redirect::route('manage.home')
+        ->with('last_tab', 'llms')
+        ->with('last_llm_id', $request->input("id"));
+    }
+
+    public function llm_create(LLMCreateRequest $request): RedirectResponse
+    {
+        $model = new LLMs;
+        $validated = $request->validated();
+        if ($file = $request->file('image')) {
+            $validated['image'] = $file->store('public/images');
+        }
+        if (is_null($validated['order']))  unset($validated['order']);
+        if (is_null($validated['version']))  unset($validated['version']);
+        $model->fill($validated);
+        $model->save();
+        $perm = new Permissions;
+        $perm->fill(["name" => "model_" . $model->id,"describe"=>"Permission for model id " . $model->id]);
+        $perm->save();
+        return Redirect::route('manage.home')
+        ->with('last_tab', 'llms')
+        ->with('last_llm_id', $model->id);
+    }
+
+    public function llm_toggle(Request $request): RedirectResponse
+    {
+        $model = LLMs::findOrFail($request->route('llm_id'));
+        $model->enabled = !$model->enabled;
+        $model->save();
+        return Redirect::route('manage.home')
+        ->with('last_tab', 'llms')
+        ->with('last_llm_id', $request->route('llm_id'));
     }
 }

@@ -3,7 +3,7 @@ from base import *
 
 # -- Configs --
 app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 app.agent_endpoint = "http://192.168.211.4:9000/"
 app.LLM_name = "llama2-7b-chat-b1.0.0"
 app.version_code = "v1.0"
@@ -49,11 +49,11 @@ prompts = "<s>[INST] {0} [/INST]\n{1}"
 def llm_compute(data): 
     try:
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
-        while len(history) > limit:
+        while len("".join(history)) > limit:
             del history[0]
             del history[0]
         if len(history) != 0:
-            history[0] = "<<SYS>>\n你的名子是 TAIDE, 你是個能夠理解使用者的大語言模型AI，能流暢的以繁體中文溝通，能專業且流利的回答使用者，專長在文本翻譯、寫文章、寫信、自動摘要上\n<</SYS>>\n\n" + history[0]
+            history[0] = "<<SYS>>\nYou are a helpful assistant. 你是一個樂於助人的助手。\n<</SYS>>\n\n" + history[0]
             history.append("")
             history = [prompts.format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
             history = "".join(history)
