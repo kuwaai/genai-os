@@ -27,7 +27,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - /var/models/:/llm/:ro
+      - /var/models/llama2-7b-chat-b5.0.0:/llm/:ro
       - database:/database/:ro
       - log:/var/log/doc_qa
 
