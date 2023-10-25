@@ -14,9 +14,9 @@
             @method('delete')
             <input name="id">
         </form>
-        <div class="flex-1 overflow-y-auto scrollbar pr-2">
+        <div class="flex-1 overflow-y-auto scrollbar pr-2 text-black dark:text-white">
             <p>{{ __('Enabled Models') }}</p>
-            <hr class="mb-2">
+            <hr class="mb-2 border-black dark:border-white">
             @foreach (App\Models\LLMs::orderby('order')->orderby('order')->where('enabled', '=', true)->get() as $LLM)
                 <div id="edit_llm_btns"
                     class="mb-2 border border-black dark:border-white border-1 rounded-l-full overflow-hidden">
@@ -121,7 +121,7 @@
                                     {{ __('LLM Name') }}
                                 </label>
                                 <input name="name" required
-                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                     id="llm_name" placeholder="{{ __('LLM Name') }}">
                         </div>
                         <div class="w-full
@@ -138,7 +138,7 @@
                                 {{ __('Version') }}
                             </label>
                             <input name="version"
-                                class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 id="version" type="text" placeholder="{{ __('Version') }}">
                         </div>
                         <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
@@ -147,7 +147,7 @@
                                 {{ __('Access Code') }}
                             </label>
                             <input name="access_code" required
-                                class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 id="access_code" type="text" placeholder="{{ __('Access Code') }}">
                         </div>
                         <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
@@ -156,7 +156,7 @@
                                 {{ __('Order') }}
                             </label>
                             <input name="order"
-                                class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 id="order" type="text" placeholder="{{ __('Order') }}">
                         </div>
                     </div>
@@ -167,7 +167,7 @@
                                 {{ __('Link') }}
                             </label>
                             <input name="link"
-                                class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 id="link" placeholder="{{ __('Link for more information to this LLM') }}"
                                 value="">
                         </div>
@@ -179,7 +179,7 @@
                                 {{ __('Description') }}
                             </label>
                             <input name="description"
-                                class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 id="description" placeholder="{{ __('Description for this LLM') }}">
                         </div>
                     </div>
@@ -287,8 +287,8 @@
         $("#edit_llm h3:eq(1)").text("{{ __('Are you sure you want to UPDATE this LLM Profile?') }}")
         $("#edit_llm h3:eq(2)").text("{{ __('Are you sure you want to DELETE this LLM Profile?') }}")
         $("#delete_button").show()
-        $("#edit_llm_btns > button").removeClass("bg-gray-600")
-        $("#edit_llm_btn_" + $llms[data][5]).addClass("bg-gray-600")
+        $("#edit_llm_btns > button").removeClass("bg-gray-200 dark:bg-gray-600")
+        $("#edit_llm_btn_" + $llms[data][5]).addClass("bg-gray-200 dark:bg-gray-600")
         $("#new_llm_btn").addClass("bg-green-400 dark:bg-green-600")
         $("#new_llm_btn").removeClass("dark:bg-green-700 bg-green-500")
         $("#toggle_llm_btn").attr("href", "{{ route('manage.llms.toggle', '') }}" + "/" + $llms[data][5])
