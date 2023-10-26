@@ -28,6 +28,8 @@ This project has two configurations.
         # MODEL_LOCATION: Set to "local" to use local model. Set to "remote-nchc" to use the NCHC TAIDE API.
         # NCHC_TAIDE_USERNAME: The username when using a NCHC TAIDE API.
         # NCHC_TAIDE_PASSWORD: The password when using a NCHC TAIDE API.
+        # NCHC_TAIDE_MODEL_NAME: The model name when using a NCHC TAIDE API.
+        # HTTP_CACHE_PROXY: The HTTP proxy for caching downloaded web pages.
         ```
     - Copy the LLM to the host directory `/var/models/`. This directory will be mounted into the container.  
       Currently, the model directory used is called `llama2-7b-chat-b5.0.0`.
