@@ -534,7 +534,7 @@
                                         style="display:none;">
                                     <input id="chained" style="display:none;"
                                         {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                    <button type="button" onclick="chain_toggle()" id="chain_btn"
+                                    <button type="button" onclick="chain_toggle()" id="chain_btn" disabled
                                         class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
                                     <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
                                         oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
