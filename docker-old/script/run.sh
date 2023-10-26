@@ -1,6 +1,6 @@
 cd /var/www/html
 # Install packages
-cp /.env /var/www/html/LLM_Project/
+# cp /.env /var/www/html/LLM_Project/
 cd /var/www/html/LLM_Project/executables/docker
 chmod +x install.sh
 ./install.sh
@@ -8,7 +8,7 @@ chmod +x install.sh
 chown -R www-data:www-data /var/www/html/LLM_Project
 # Configure nginx
 cd /etc/nginx/sites-available
-cp /nginx_config llmproject
+cp /var/www/html/LLM_Project/nginx_config llmproject
 cd /etc/nginx/sites-enabled
 rm * -rf
 ln -s ../sites-available/llmproject .

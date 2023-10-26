@@ -1,5 +1,6 @@
 import socket, os
 from threading import Thread
+import torch
 
 import sys
 sys.path.append('../')
