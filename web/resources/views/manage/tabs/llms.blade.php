@@ -91,15 +91,16 @@
     </div>
     <div id="edit_llm" style="display:none;"
         class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-        <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white"></h3>
+        <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white"></h3>
         <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
-            action="{{ route('manage.llms.update') }}" class="w-full max-w-2xl p-4 overflow-y-auto scrollbar overflow-x-hidden">
+            action="{{ route('manage.llms.update') }}"
+            class="w-full max-w-2xl p-4 overflow-y-auto scrollbar overflow-x-hidden">
             @csrf
             @method('patch')
             <input id="update_img" name="image" type="file" style="display:none">
             <input name="id" style="display:none">
             <div class="flex flex-wrap -mx-3 mb-2 items-center">
-                <div class="w-full md:w-2/6 px-3 mb-6 md:mb-0">
+                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3 flex flex-col items-center">
                             <label for="update_img">
@@ -114,19 +115,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-full md:w-3/6 px-3">
-                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2" for="llm_name">
-                        {{ __('LLM Name') }}
-                    </label>
-                    <input name="name" required
-                        class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="llm_name" placeholder="{{ __('LLM Name') }}">
-                </div>
-                <div class="w-full
-                        md:w-1/6 px-3">
-                    <a id="toggle_llm_btn" class="text-white font-bold py-3 px-4 rounded margin-t-auto">
-                        <i class="fas fa-power-off"></i>
-                    </a>
+                <div class="w-full md:w-2/3 px-3 flex justify-center items-center flex-wrap md:flex-nowrap">
+                    <div class="w-full md:w-5/6">
+                        <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
+                            for="llm_name">
+                            {{ __('LLM Name') }}
+                        </label>
+                        <input name="name" required
+                            class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                            id="llm_name" placeholder="{{ __('LLM Name') }}">
+                    </div>
+                    <div class="md:w-1/6 pl-3">
+                        <a id="toggle_llm_btn" class="text-white font-bold py-3 px-4 rounded margin-t-auto">
+                            <i class="fas fa-power-off"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
             <div class="flex flex-wrap -mx-3 mb-2">
@@ -179,28 +182,31 @@
                         id="description" placeholder="{{ __('Description for this LLM') }}">
                 </div>
             </div>
+
             <!--<div class="flex flex-wrap -mx-3 mb-2">
                 <div class="w-full px-3">
-                    <div>
-                        <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
-                        for="config">
-                        {{ __('Config for the model') }}
+                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
+                        for="system_prompt">
+                        {{ __('System prompt') }}
                     </label>
-                    <input name="config"
+                    <input name="system_prompt"
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="config" placeholder="{{ __('Description for this LLM') }}">
-                    </div>
-                    <div>
-                        <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
-                        for="config">
-                        {{ __('Config for the model') }}
+                        id="system_prompt" placeholder="{{ __('System Prompt for the model') }}">
+                </div>
+            </div>
+
+            <div class="flex flex-wrap -mx-3 mb-2">
+                <div class="w-full px-3">
+                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
+                        for="chain_enable">
+                        {{ __('Chain button') }}
                     </label>
-                    <input name="config"
-                        class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="config" placeholder="{{ __('Description for this LLM') }}">
-                    </div>
+                    <input name="chain_enable" type="checkbox"
+                        class="appearance-none block text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        id="chain_enable">
                 </div>
             </div>-->
+
             <div class="text-center">
                 <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
                     class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
