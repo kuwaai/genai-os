@@ -116,7 +116,10 @@ class DocumentQa:
     if docs == None or self.llm.is_too_long(modified_chat_history):
       # Retrieve
       related_docs = copy.deepcopy(await document_store.retrieve(question))
-      modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
+      while True:
+        modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
+        if not self.llm.is_too_long(modified_chat_history): break
+        related_docs = related_docs[:-1]
 
     # Free the unused VRAM
     del document_store
