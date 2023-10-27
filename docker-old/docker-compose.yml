@@ -110,6 +110,35 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  api_worker:
+    runtime: nvidia
+    image: doc-qa
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ["0"]
+            capabilities: [gpu]
+    env_file: data/doc-qa/.env.prod
+    environment:
+      - LLM_NAME=db_qa
+      - PORT=9001
+      - LAYOUT_CONFIG=layout_dbqa.yaml
+    volumes:
+      - ./APIs/TAIDE-LLaMA2-7B-chat-b.1.0.0/llama2-7b_tv_noemb_chat_tokenizer=ccw|stage=2|data=j|epoch=0-step=12740:/llm/:ro
+      - ./data/doc-qa/database:/database/:ro
+      - ./data/doc-qa/log:/var/log/doc_qa
+    depends_on:
+      - web
+    networks:
+      - taide
+    healthcheck:
+      test: "curl --fail http://localhost:9001/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 
 networks:
