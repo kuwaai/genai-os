@@ -129,7 +129,7 @@
 
                     <!-- Modal body -->
                     <div class="p-6 space-y-6">
-                        <textarea id="import_json" rows="15" readonly
+                        <textarea id="export_json" rows="15" readonly
                             class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none">{{ json_encode(App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at')->orderby('id', 'desc')->select('msg', 'isbot', 'chained')->get()->toArray(),JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) }}</textarea>
                         <a id="download_holder" style="display:none;"
                             download="{{ App\Models\Chats::find(request()->route('chat_id'))->name . '.json' }}"></a>
@@ -687,6 +687,8 @@
                     </div>
                 </div>
                 <script>
+                    var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
                     function chain_toggle() {
                         $.get("{{ route('chat.chain') }}", {
                             switch: $('#chained').prop('disabled')
@@ -833,8 +835,8 @@
                             $("#chat_input").prop("readonly", false)
                             adjustTextareaRows($("#chat_input"))
                             $(".show-on-finished").attr("style", "")
-                            $("#import_json").val($("#import_json").val().replace('* ...thinking... *', $(
-                                "#chatroom p:eq(0)").text().trim()))
+                            $("#export_json").val($("#export_json").val().replace('* ...thinking... *', $(
+                                "#chatroom p:last()").text().trim()))
                         } else {
                             data = JSON.parse(event.data)
                             number = parseInt(data["history_id"]);
@@ -855,8 +857,6 @@
                 </script>
             @endif
             <script>
-                var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-
                 function isValidURL(url) {
                     // Regular expression for a simple URL pattern (you can make it more complex if needed)
                     var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
