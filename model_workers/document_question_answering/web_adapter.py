@@ -125,31 +125,45 @@ class SearchQaProcess(GeneralProcessInterface):
       'q': latest_user_msg
     }
 
-    loop = asyncio.get_running_loop()
-    resp = await loop.run_in_executor(
-      None,
-      functools.partial(
-        requests.get,
-        endpoint,
-        params = params
+    urls = []
+
+    try:
+
+      loop = asyncio.get_running_loop()
+      resp = await loop.run_in_executor(
+        None,
+        functools.partial(
+          requests.get,
+          endpoint,
+          params = params
+        )
       )
-    )
-    self.logger.debug(f'Search response ({resp.status_code}):\n{resp.content}')
+      
 
-    resp  = resp.json()
-    urls = [item['link'] for item in resp['items']]
-    urls_reachable = await asyncio.gather(*[self.is_url_reachable(url) for url in urls])
-    self.logger.debug(list(zip(urls, urls_reachable)))
-    urls = list(itertools.compress(urls, urls_reachable))
-    urls = urls[:min(len(urls), num_url)]
+      self.logger.debug(f'Search response ({resp.status_code}):\n{resp.content}')
 
-    return urls, [latest_user_record]
+      if not resp.ok or 'error' in resp.json(): raise ValueError()
+      resp  = resp.json()
+      
+      urls = [item['link'] for item in resp['items']]
+      urls_reachable = await asyncio.gather(*[self.is_url_reachable(url) for url in urls])
+      self.logger.debug(list(zip(urls, urls_reachable)))
+      urls = list(itertools.compress(urls, urls_reachable))
+      urls = urls[:min(len(urls), num_url)]
+    
+    except Exception as e:
+      self.logger.exception('Error while getting URLs for Google searching API')
+    
+    finally:
+      return urls, [latest_user_record]
 
   async def process(self, chat_history: [ChatRecord]) -> Generator[str, None, None]:
 
     try:
     
       urls, chat_history = await self.search_url(chat_history)
+
+      if len(urls) == 0: raise NoUrlException
       
       async for reply in self.app.process(urls, chat_history):
         yield reply
@@ -157,6 +171,10 @@ class SearchQaProcess(GeneralProcessInterface):
       yield f'\n\n參考資料：\n'
       for url in urls:
         yield f'{url}\n'
+    
+    except NoUrlException as e:
+      await asyncio.sleep(2) # To prevent SSE error of web page.
+      yield '外部搜尋暫無法連上，請稍後重試或是聯絡管理員。'
 
     except Exception as e:
       await asyncio.sleep(2) # To prevent SSE error of web page.
