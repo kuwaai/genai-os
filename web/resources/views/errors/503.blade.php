@@ -30,7 +30,7 @@
                 <p style="font-size:50px;" class="text-center text-orange-500 dark:text-orange-300">Under Maintenance</p>
 
                 <p style="font-size:30px;" class="my-auto text-center text-blue-600 dark:text-blue-400">我們正在進行網站維護，<br>請稍後再回來看看！</p>
-                <p style="font-size:30px;" class="my-auto text-center text-blue-600 dark:text-blue-400">We're under maintenance, <br>Please come back later.</p>
+                <p style="font-size:30px;" class="my-auto text-center text-blue-600 dark:text-blue-400">We're under maintenance.<br>Please come back later.</p>
             </div>
         </div>
     </div>

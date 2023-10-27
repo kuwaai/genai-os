@@ -857,6 +857,7 @@
                 </script>
             @endif
             <script>
+                var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
                 function isValidURL(url) {
                     // Regular expression for a simple URL pattern (you can make it more complex if needed)
                     var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
