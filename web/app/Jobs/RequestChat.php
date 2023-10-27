@@ -95,33 +95,37 @@ class RequestChat implements ShouldQueue
                 Redis::publish($this->channel, 'Ended Ended');
             } elseif ($state == 'READY') {
                 try {
-                    $tmp = json_decode($this->input);
+                    $test = json_decode($this->input);
 
-                    if ($tmp === false && json_last_error() !== JSON_ERROR_NONE) {
+                    if ($test === false && json_last_error() !== JSON_ERROR_NONE) {
                         //There're error in the json!
                         //which shouldn't be happening...
                         Log::channel('analyze')->Info("How does that happened? JSON decode error in the Job!\n" . $this->input);
                         return;
                     } else {
-                        $taide_flag =
+                        $test_2 = collect(json_decode($this->input))
+                        ->where('isbot', false)
+                        ->last();
+                        if ($test_2 !== null){
+                            $taide_flag =
                             strpos(
                                 strtoupper(
-                                    collect(json_decode($this->input))
-                                        ->where('isbot', false)
-                                        ->last()->msg,
+                                    $test_2->msg,
                                 ),
                                 strtoupper('taide'),
                             ) !== false;
 
-                        foreach ($tmp as $t) {
+                        foreach ($test as $t) {
                             foreach ($this->filters as $filter) {
                                 if (strpos($t->msg, $filter) !== false) {
                                     $t->msg = trim(str_replace($filter, '', $t->msg));
                                 }
                             }
                         }
-                        $this->input = json_encode($tmp);
-                        $tmp = '';
+                        $this->input = json_encode($test);
+                        }else{
+                            $taide_flag = false;
+                        }
                     }
 
                     $response = $client->post($agent_location . $this->agent_version . '/chat/completions', [
