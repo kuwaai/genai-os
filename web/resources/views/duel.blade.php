@@ -18,6 +18,7 @@
             ->get();
     @endphp
 
+@if (!request()->route('duel_id'))
     <div id="create-model-modal"
         data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40" tabindex="-1"
         aria-hidden="true"
@@ -89,7 +90,7 @@
             </div>
         </div>
     </div>
-
+@endif
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 {{ request()->route('duel_id') ? 'flex flex-col' : '' }} h-full overflow-y-auto scrollbar">
@@ -113,10 +114,21 @@
                         </div>
                     @endif
                     @if (request()->route('duel_id'))
-                    @php 
-                    $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier');
-                    $DC = $DC[collect(Illuminate\Support\Arr::flatten($DC->toarray(),1))->where("id","=",request()->route('duel_id'))->first()["identifier"]];
-                    @endphp
+                        @php
+                            $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')
+                                ->where('chats.user_id', Auth::user()->id)
+                                ->orderby('counts', 'desc')
+                                ->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.id) as identifier'), DB::raw('count(chats.id) as counts'))
+                                ->groupBy('duelchat.id')
+                                ->get()
+                                ->groupBy('identifier');
+                            $DC =
+                                $DC[
+                                    collect(Illuminate\Support\Arr::flatten($DC->toarray(), 1))
+                                        ->where('id', '=', request()->route('duel_id'))
+                                        ->first()['identifier']
+                                ];
+                        @endphp
                         @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
                             <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
                                 <div
@@ -339,100 +351,31 @@
                     </div>
                 </div>
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
-                    @php
-                        $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                    @endphp
-                    @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->leftjoin('feedback', 'history_id', '=', 'histories.id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags')->union(
+                    <div>
+                        @php
+                            $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+                        @endphp
+                        @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->leftjoin('feedback', 'history_id', '=', 'histories.id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags')->union(
             App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', false)->where(
                     'chats.id',
                     App\Models\Chats::where('dcID', request()->route('duel_id'))->get()->first()->id,
                 )->leftjoin('feedback', 'history_id', '=', 'histories.id')->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags'),
-        )->get()->sortByDesc(function ($chat) {
+        )->get()->sortBy(function ($chat) {
             return [$chat->created_at, $chat->llm_id, -$chat->history_id];
         }) as $history)
-                        @if (in_array($history->history_id, $tasks))
-                            <div class="flex w-full mt-2 space-x-3">
-                                <div data-tooltip-target="llm_{{ $history->llm_id }}_chat"
-                                    data-tooltip-placement="top"
-                                    class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                    <img src="{{ asset(Storage::url($history->image)) }}">
-                                </div>
-                                <div>
-                                    <div {{ request()->input('limit') > 0 ? 'style=max-height:' . 0.75 + 0.75 + 0.875 * 1.25 * request()->input('limit') . 'rem' : '' }}
-                                        class="flex flex-col scrollbar overflow-y-auto p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                        <p class="text-sm whitespace-pre-line break-all"
-                                            id="task_{{ $history->history_id }}">{{ $history->msg }}</p>
-                                        <div class="flex space-x-1 show-on-finished" style="display:none;">
-                                            <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
-                                                onclick="copytext($(this).parent().parent().children()[0])">
-                                                <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                    viewBox="0 0 24 24" stroke-linecap="round"
-                                                    stroke-linejoin="round" class="icon-sm" height="1em"
-                                                    width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                    <path
-                                                        d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                                    </path>
-                                                    <rect x="8" y="2" width="8" height="4" rx="1"
-                                                        ry="1">
-                                                    </rect>
-                                                </svg>
-                                                <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                    viewBox="0 0 24 24" stroke-linecap="round"
-                                                    stroke-linejoin="round" class="icon-sm" style="display:none;"
-                                                    height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                                </svg>
-                                            </button>
-                                            <button
-                                                class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
-                                                data-modal-target="feedback" data-modal-toggle="feedback"
-                                                onclick="feedback({{ $history->history_id }},1,this,{!! htmlspecialchars(
-                                                    json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                ) !!});">
-                                                <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                    viewBox="0 0 24 24" stroke-linecap="round"
-                                                    stroke-linejoin="round" class="icon-sm" height="1em"
-                                                    width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                    <path
-                                                        d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                                                    </path>
-                                                </svg>
-                                            </button>
-                                            <button
-                                                class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
-                                                data-modal-target="feedback" data-modal-toggle="feedback"
-                                                onclick="feedback({{ $history->history_id }},2,this,{!! htmlspecialchars(
-                                                    json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                ) !!});">
-                                                <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                    viewBox="0 0 24 24" stroke-linecap="round"
-                                                    stroke-linejoin="round" class="icon-sm" height="1em"
-                                                    width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                    <path
-                                                        d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                                                    </path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <div id="history_{{ $history->history_id }}"
-                                class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
-                                @if ($history->isbot)
+                            @if (in_array($history->history_id, $tasks))
+                                <div class="flex w-full mt-2 space-x-3">
                                     <div data-tooltip-target="llm_{{ $history->llm_id }}_chat"
                                         data-tooltip-placement="top"
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                                         <img src="{{ asset(Storage::url($history->image)) }}">
                                     </div>
-                                @endif
-                                <div>
-                                    <div {{ request()->input('limit') > 0 ? 'style=max-height:' . 0.75 + 0.75 + 0.875 * 1.25 * request()->input('limit') . 'rem' : '' }}
-                                        class="scrollbar overflow-y-auto p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                        <p class="text-sm whitespace-pre-line break-all">{{ $history->msg }}</p>
-                                        @if ($history->isbot)
-                                            <div class="flex space-x-1">
+                                    <div>
+                                        <div {{ request()->input('limit') > 0 ? 'style=max-height:' . 0.75 + 0.75 + 0.875 * 1.25 * request()->input('limit') . 'rem' : '' }}
+                                            class="flex flex-col scrollbar overflow-y-auto p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm whitespace-pre-line break-all"
+                                                id="task_{{ $history->history_id }}">{{ $history->msg }}</p>
+                                            <div class="flex space-x-1 show-on-finished" style="display:none;">
                                                 <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
                                                     onclick="copytext($(this).parent().parent().children()[0])">
                                                     <svg stroke="currentColor" fill="none" stroke-width="2"
@@ -455,7 +398,7 @@
                                                     </svg>
                                                 </button>
                                                 <button
-                                                    class="flex hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
+                                                    class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
                                                     data-modal-target="feedback" data-modal-toggle="feedback"
                                                     onclick="feedback({{ $history->history_id }},1,this,{!! htmlspecialchars(
                                                         json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
@@ -485,18 +428,92 @@
                                                     </svg>
                                                 </button>
                                             </div>
-                                        @endif
+                                        </div>
                                     </div>
                                 </div>
-                                @if (!$history->isbot)
-                                    <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        User
+                            @else
+                                <div id="history_{{ $history->history_id }}"
+                                    class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
+                                    @if ($history->isbot)
+                                        <div data-tooltip-target="llm_{{ $history->llm_id }}_chat"
+                                            data-tooltip-placement="top"
+                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            <img src="{{ asset(Storage::url($history->image)) }}">
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <div {{ request()->input('limit') > 0 ? 'style=max-height:' . 0.75 + 0.75 + 0.875 * 1.25 * request()->input('limit') . 'rem' : '' }}
+                                            class="scrollbar overflow-y-auto p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
+                                            {{-- blade-formatter-disable --}}
+                                                <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}</p>
+                                                {{-- blade-formatter-enable --}}
+                                            @if ($history->isbot)
+                                                <div class="flex space-x-1">
+                                                    <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
+                                                        onclick="copytext($(this).parent().parent().children()[0])">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                            </path>
+                                                            <rect x="8" y="2" width="8" height="4"
+                                                                rx="1" ry="1">
+                                                            </rect>
+                                                        </svg>
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm"
+                                                            style="display:none;" height="1em" width="1em"
+                                                            xmlns="http://www.w3.org/2000/svg">
+                                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        class="flex hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
+                                                        data-modal-target="feedback" data-modal-toggle="feedback"
+                                                        onclick="feedback({{ $history->history_id }},1,this,{!! htmlspecialchars(
+                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                        ) !!});">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
+                                                        data-modal-target="feedback" data-modal-toggle="feedback"
+                                                        onclick="feedback({{ $history->history_id }},2,this,{!! htmlspecialchars(
+                                                            json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
+                                                        ) !!});">
+                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                            viewBox="0 0 24 24" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="icon-sm" height="1em"
+                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
-                                @endif
-                            </div>
-                        @endif
-                    @endforeach
+                                    @if (!$history->isbot)
+                                        <div
+                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                            User
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
                     <form method="post"
@@ -659,6 +676,7 @@
             </script>
         @endif
         <script>
+            var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
             if ($("#chat_input")) {
                 $("#chat_input").focus();
 
@@ -674,17 +692,20 @@
                 }
 
                 function copytext(node) {
-                    var range = document.createRange();
-                    range.selectNode(node);
-                    window.getSelection().removeAllRanges();
-                    window.getSelection().addRange(range);
+                    var textArea = document.createElement("textarea");
+                    textArea.value = node.textContent;
+
+                    document.body.appendChild(textArea);
+
+                    textArea.select();
+
                     try {
-                        // Attempt to copy the selected text to the clipboard
                         document.execCommand("copy");
                     } catch (err) {
-                        console.log("Copy not supported!")
+                        console.log("Copy not supported or failed: ", err);
                     }
-                    window.getSelection().removeAllRanges();
+
+                    document.body.removeChild(textArea);
 
                     $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
                     $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
@@ -692,7 +713,6 @@
                         $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
                         $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
                     }, 3000);
-
                 }
 
                 function adjustTextareaRows(obj) {
@@ -711,8 +731,9 @@
                     }
                 }
                 $("#chat_input").on("keydown", function(event) {
-                    if (event.key === "Enter" && !event.shiftKey) {
+                    if (!isMac && event.key === "Enter" && !event.shiftKey) {
                         event.preventDefault();
+
                         $("#prompt_area").submit();
                     } else if (event.key === "Enter" && event.shiftKey) {
                         event.preventDefault();

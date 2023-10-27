@@ -169,7 +169,7 @@ class ProfileController extends Controller
                             $client = new Client(['timeout' => 300]);
 
                             $history = new APIHistories();
-                            $history->fill(["input"=>$tmp,'output'=>"generating...", "user_id"=>$user->id]);
+                            $history->fill(["input"=>$tmp,'output'=>"* ...thinking... *", "user_id"=>$user->id]);
                             $history->save();
                             RequestChat::dispatch($tmp, $llm->access_code, $user->id, -$history->id, $user->openai_token, 'api_' . $history->id);
 

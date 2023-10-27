@@ -200,5 +200,7 @@
 "Permission to delete chatroom":"刪除聊天室的權限",
 "Permission to export chat history":"匯出聊天紀錄的權限",
 "Permission to import history":"匯入聊天室紀錄的權限（仍需要創建聊天室的權限）",
-"No available LLM to chat with<br>Please come back later!":"沒有可用的模型<br>請稍後再回來看看！"
+"No available LLM to chat with<br>Please come back later!":"沒有可用的模型<br>請稍後再回來看看！",
+"We're under maintenance, <br>Please come back later.":"我們正在進行網站維護，<br>請稍後再回來看看！",
+"Under Maintenance":"暫停服務"
 }
