@@ -835,8 +835,10 @@
                             $("#chat_input").prop("readonly", false)
                             adjustTextareaRows($("#chat_input"))
                             $(".show-on-finished").attr("style", "")
-                            $("#export_json").val($("#export_json").val().replace('* ...thinking... *', $(
-                                "#chatroom p:last()").text().trim()))
+                            @if (request()->user()->hasPerm('Chat_read_export_chat'))
+                                $("#export_json").val($("#export_json").val().replace('* ...thinking... *', $(
+                                    "#chatroom p:last()").text().trim()))
+                            @endif
                         } else {
                             data = JSON.parse(event.data)
                             number = parseInt(data["history_id"]);
@@ -858,6 +860,7 @@
             @endif
             <script>
                 var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
                 function isValidURL(url) {
                     // Regular expression for a simple URL pattern (you can make it more complex if needed)
                     var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
