@@ -544,7 +544,7 @@
                                         style="display:none;">
                                     <input id="chained" style="display:none;"
                                         {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                    <button type="button" onclick="chain_toggle()" id="chain_btn" disabled
+                                    <button type="button" onclick="chain_toggle()" id="chain_btn"
                                         class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
                                     <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
                                         oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
@@ -808,17 +808,6 @@
                         $("#chatHeader button").find('.fa-save').parent().addClass('hidden');
                         $("#chatHeader >p").text(input.val())
                     }
-                    const chat_input = document.getElementById('chat_input');
-                    const chat_submit = document.getElementById('chat_submit');
-
-                    function preventEnterKey(event) {
-                        if (event.key === 'Enter') {
-                            event.preventDefault();
-                            chat_input.disabled = true;
-                            chat_submit.disabled = true;
-                            chat_input.value = "Waiting...";
-                        }
-                    }
 
                     $("#chat_input").val("訊息處理中...請稍後...")
                     $chattable = false
@@ -836,13 +825,7 @@
                         withCredentials: false
                     });
                     task.addEventListener('error', error => {
-                        if (event.eventPhase === EventSource.CLOSED) {
-                            chat_input.disabled = false;
-                            chat_submit.disabled = false;
-                            chat_input.value = "";
-                            chat_input.removeEventListener('keydown', preventEnterKey);
-                            task.close();
-                        }
+                        task.close();
                     });
                     task.addEventListener('message', event => {
                         if (event.data == "finished") {
@@ -924,11 +907,6 @@
                             event.preventDefault();
 
                             $("#prompt_area").submit();
-                            const chat_input = document.getElementById('chat_input');
-                            const chat_submit = document.getElementById('chat_submit');
-                            chat_input.disabled = true;
-                            chat_submit.disabled = true;
-                            chat_input.value = "Waiting...";
                         } else if (event.key === "Enter" && event.shiftKey) {
                             event.preventDefault();
                             var cursorPosition = this.selectionStart;
