@@ -130,7 +130,7 @@
                     <!-- Modal body -->
                     <div class="p-6 space-y-6">
                         <textarea id="export_json" rows="15" readonly
-                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none">{{ json_encode(App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at')->orderby('id', 'desc')->select('msg', 'isbot', 'chained')->get()->toArray(),JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) }}</textarea>
+                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                         <a id="download_holder" style="display:none;"
                             download="{{ App\Models\Chats::find(request()->route('chat_id'))->name . '.json' }}"></a>
                     </div>
@@ -326,7 +326,7 @@
                                         </div>
                                         <div class="overflow-hidden">
                                             <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                                <p class="text-sm whitespace-pre-line break-words"
+                                                <p class="text-sm whitespace-pre-line break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}"
                                                     id="task_{{ $history->id }}">{{ __($history->msg) }}</p>
                                                 <div class="flex space-x-1 show-on-finished" style="display:none;">
                                                     <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
@@ -401,7 +401,7 @@
                                             <div
                                                 class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
                                                 {{-- blade-formatter-disable --}}
-                                            <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}</p>
+                                            <p class="text-sm whitespace-pre-line break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ __($history->msg) }}</p>
                                             {{-- blade-formatter-enable --}}
                                                 @if ($history->isbot)
                                                     <div class="flex space-x-1">
@@ -795,7 +795,23 @@
                     }
 
                     function export_chat() {
+                        var chatMessages = [];
 
+                        $("#chatroom > div > div p").each(function(index, element) {
+                            var msgText = $(element).text();
+                            var isBot = $(element).hasClass("bot-msg");
+                            var chained = $(element).hasClass("chain-msg"); 
+
+                            var message = {
+                                "msg": msgText,
+                                "isbot": isBot,
+                                "chained": chained
+                            };
+
+                            chatMessages.push(message);
+                        });
+
+                        $("#export_json").val(JSON.stringify(chatMessages, null, 4))
                     }
 
                     function saveChat() {
@@ -835,10 +851,6 @@
                             $("#chat_input").prop("readonly", false)
                             adjustTextareaRows($("#chat_input"))
                             $(".show-on-finished").attr("style", "")
-                            @if (request()->user()->hasPerm('Chat_read_export_chat'))
-                                $("#export_json").val($("#export_json").val().replace('* ...thinking... *', $(
-                                    "#chatroom p:last()").text().trim()))
-                            @endif
                         } else {
                             data = JSON.parse(event.data)
                             number = parseInt(data["history_id"]);
