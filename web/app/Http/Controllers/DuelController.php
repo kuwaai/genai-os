@@ -52,14 +52,7 @@ class DuelController extends Controller
                 ->get()
                 ->pluck('id')
                 ->toarray();
-            $llms = [];
-            foreach ($request->input('llm') as $llm) {
-                $tmp = LLMs::where('access_code', $llm);
-                if (!$tmp->exists()) {
-                    return back();
-                }
-                $llms[] = LLMs::where('access_code', $llm)->first()->id;
-            }
+
             foreach ($llms as $i) {
                 if (!in_array($i, $result)) {
                     return back();
@@ -70,27 +63,76 @@ class DuelController extends Controller
             $Duel = new DuelChat();
             $Duel->fill(['name' => '新對話', 'user_id' => Auth::user()->id]);
             $Duel->save();
+            $input = $request->input('input');
             foreach ($llms as $llm) {
                 $chat = new Chats();
                 $chat->fill(['name' => 'Duel Chat', 'llm_id' => $llm, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
                 $chat->save();
+
+                $history = new Histories();
+                $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
+                $history->save();
+                $history = new Histories();
+                $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                $history->save();
+                RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                Redis::rpush('usertask_' . Auth::user()->id, $history->id);
             }
         }
         return redirect()->to(route('duel.chat', $Duel->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''));
     }
+
+    public function new(Request $request): RedirectResponse
+    {
+        $llms = $request->input('llm');
+        if (count($llms) > 1) {
+            $result = DB::table(function ($query) {
+                $query
+                    ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                    ->from('group_permissions')
+                    ->join('permissions', 'perm_id', '=', 'permissions.id')
+                    ->where('group_id', Auth()->user()->group_id)
+                    ->where('name', 'like', 'model_%')
+                    ->get();
+            }, 'tmp')
+                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+                ->select('llms.id')
+                ->where('llms.enabled', true)
+                ->get()
+                ->pluck('id')
+                ->toarray();
+
+            foreach ($llms as $i) {
+                if (!in_array($i, $result)) {
+                    return back();
+                }
+            }
+
+            return redirect()
+                ->route('duel.home')
+                ->with('llms', $llms);
+        }
+
+        return redirect()->route('duel.home');
+    }
+
     public function delete(Request $request): RedirectResponse
     {
         try {
-            $chat = DuelChat::findOrFail($request->input('id'));
-            foreach (Chats::where("dcID","=",$chat->id)->get()->pluck("id") as $chat_id){
-                Histories::where("chat_id","=",$chat_id)->delete();
+            $ids = [];
+            $chats = DuelChat::findOrFail($request->input('id'));
+            foreach (Chats::where('dcID', '=', $chats->id)->get() as $chat) {
+                $ids[] = $chat->llm_id;
+                Histories::where('chat_id', '=', $chat->id)->delete();
             }
-            Chats::where("dcID","=",$chat->id)->delete();
-            $chat->delete();
+            Chats::where('dcID', '=', $chats->id)->delete();
+            $chats->delete();
         } catch (ModelNotFoundException $e) {
             Log::error('Chat not found: ' . $request->input('id'));
         }
-        return redirect()->to(route('duel.home') . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''));
+        return redirect()
+            ->to(route('duel.home') . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
+            ->with('llms', $ids);
     }
 
     public function edit(Request $request): RedirectResponse
@@ -135,8 +177,8 @@ class DuelController extends Controller
                     ->pluck('id')
                     ->toarray();
 
-                foreach($chats->pluck("llm_id")->toarray() as $i){
-                    if(!in_array($i, $result)){
+                foreach ($chats->pluck('llm_id')->toarray() as $i) {
+                    if (!in_array($i, $result)) {
                         return back();
                     }
                 }

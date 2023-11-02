@@ -145,6 +145,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->group(function () {
                 Route::get('/', [DuelController::class, 'main'])->name('duel.home');
 
+                Route::post('/new', [DuelController::class, 'new'])->name('duel.new');
                 Route::post('/create', [DuelController::class, 'create'])->name('duel.create');
                 Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
