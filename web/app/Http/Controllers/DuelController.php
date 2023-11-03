@@ -60,10 +60,10 @@ class DuelController extends Controller
             }
             # model permission auth done
 
-            $Duel = new DuelChat();
-            $Duel->fill(['name' => '新對話', 'user_id' => Auth::user()->id]);
-            $Duel->save();
             $input = $request->input('input');
+            $Duel = new DuelChat();
+            $Duel->fill(['name' => $input, 'user_id' => Auth::user()->id]);
+            $Duel->save();
             foreach ($llms as $llm) {
                 $chat = new Chats();
                 $chat->fill(['name' => 'Duel Chat', 'llm_id' => $llm, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
