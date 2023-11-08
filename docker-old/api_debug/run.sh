@@ -11,12 +11,15 @@ trap cleanup SIGTERM
 cd /API
 apt update
 apt install -y curl screen
-while ! curl -s http://web:9000/v1.0/workers/debug >/dev/null; do
-  echo "Waiting for connection to http://web:9000/debug ..."
+pip install -U transformers accelerate
+pip install safetensors protobuf
+while ! curl -s http://web:9000/v1.0/worker/debug >/dev/null; do
+  echo "Waiting for connection to http://web:9000/v1.0/worker/debug ..."
   sleep 1
 done
 
-echo "Connected to http://web:9000/debug"
+echo "Connected to http://web:9000/v1.0/worker/debug"
+export CUDA_VISIBLE_DEVICES=0 
 python3 debug.py &
 PYTHON_PID=$!
 

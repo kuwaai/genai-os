@@ -10,7 +10,7 @@ sys.path.remove('../')
 # -- Configs --
 app.config["REDIS_URL"] = "redis://redis:6379/0"
 app.agent_endpoint = "http://web:9000/"
-app.LLM_name = "taide2_7b_chat_bx"
+app.LLM_name = "taide2_7b_chat_l.0.1.0"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
@@ -24,8 +24,8 @@ if app.port == None:
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*3
-model_loc = "llama2-7b-ccw_cp-j-v2+cc_tv"
-tokenizer_loc = "llama2-7b-ccw_cp-j-v2+cc_tv"
+model_loc = "Taide-Taibun-v0.1.0"
+tokenizer_loc = "Taide-Taibun-v0.1.0"
 api_key = None
 usr_token = None
 tc_model = None
@@ -38,15 +38,16 @@ model = AutoModelForCausalLM.from_pretrained(model_loc, device_map="auto",torch_
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_loc, add_bos_token=False)
 set_seed(42)
 generation_config = GenerationConfig(
-    # temperature= 0.2, 
-    # top_p=0.92, 
-    # top_k=0, 
-    do_sample = False,
-    # no_repeat_ngram_size=7,
-    # repetition_penalty = 1.0, 
+    temperature=0.2, 
+    top_p=0.9, 
+    top_k=40,
+    do_sample=True,
+    max_new_tokens=1024,
+    repetition_penalty=1.1,
+    guidance_scale=1.0
 )
 system_prompt_fmt = "<<SYS>>\n{0}\n<</SYS>>\n\n {1}"
-system_text = "You are a helpful assistant. 你是一個樂於助人的助手。"
+system_text = "你是一個樂於助人的助手。"
 prompt_fmt = "<s>[INST] {0} [/INST]"
 answer_fmt = " {0} </s>"
 
