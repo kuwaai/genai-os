@@ -300,7 +300,8 @@
                     @endif
                 </div>
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
-                    <div>
+                    <div class="{{request()->route('llm_id') &&
+                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'm-auto' : ''}}">
                         @if (request()->route('chat_id'))
                             @php
                                 $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image;
