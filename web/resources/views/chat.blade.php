@@ -252,7 +252,7 @@
                 <div id="chatHeader"
                     class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex justify-center items-center">
                     <div
-                        class="flex-shrink-0 mx-2 h-10 w-10 rounded-full flex items-center justify-center overflow-hidden">
+                        class="flex-shrink-0 mx-2 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                         <img class="h-full w-full"
                             src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
                     </div>
