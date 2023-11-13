@@ -206,7 +206,16 @@ class ChatController extends Controller
         if (!in_array($llm_id, $result) || !LLMs::findOrFail($llm_id)->exists()) {
             return redirect()->route('chat.home');
         }
-        return view('chat');
+        if (Auth::user()->hasPerm("Chat_update_new_chat")){
+            return view('chat');
+        }else{
+            $result = Chats::where("llm_id", "=",$llm_id)->whereNull("dcID");
+            if ($result->exists()){
+                return Redirect::route('chat.chat', $result->first()->id);
+            }else{
+                return view('chat');
+            }
+        }
     }
 
     public function upload(Request $request)

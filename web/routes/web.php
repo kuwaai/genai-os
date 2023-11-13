@@ -94,8 +94,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->group(function () {
                 Route::get('/', [ChatController::class, 'home'])->name('chat.home');
 
-                Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
-                    ->get('/new/{llm_id}', [ChatController::class, 'new_chat'])
+                Route::get('/new/{llm_id}', [ChatController::class, 'new_chat'])
                     ->name('chat.new');
 
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');

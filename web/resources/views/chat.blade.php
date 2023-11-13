@@ -163,18 +163,23 @@
                 @elseif(request()->route('chat_id') || request()->route('llm_id'))
                     <div
                         class="flex flex-1 h-full overflow-y-hidden flex-col border border-black dark:border-white border-1 rounded-lg">
-                        <div
-                            class="{{ !Auth::user()->hasPerm('Chat_update_new_chat') &&
-                            !App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->exists()
-                                ? ''
-                                : 'border-b border-black dark:border-white' }}">
-                            @if ($LLM->link)
-                                <a href="{{ $LLM->link }}" target="_blank"
-                                    class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                            @else
-                                <span
-                                    class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                            @endif
+                        <div class="border-b border-black dark:border-white">
+                            <div class="my-2 ml-4">
+                                @if ($LLM->link)
+                                    <a href="{{ $LLM->link }}" target="_blank"
+                                        class="inline-block menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                                @else
+                                    <span
+                                        class="inline-block menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                                @endif
+
+                                @if ($LLM->description)
+                                    <span class="w-full text-sm leading-none text-gray-400">
+                                        {{ $LLM->description }}
+                                    </span>
+                                @endif
+                            </div>
+
                         </div>
                         <div class="overflow-y-auto scrollbar">
                             @if (Auth::user()->hasPerm('Chat_update_new_chat'))
@@ -204,46 +209,25 @@
                     </div>
                 @else
                     @foreach ($result as $LLM)
-                        <div
-                            class="{{ $result->count() == 1 ? 'flex flex-1 flex-col' : 'mb-2' }} border border-black dark:border-white border-1 rounded-lg">
-                            <div
-                                class="{{ !Auth::user()->hasPerm('Chat_update_new_chat') &&
-                                !App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->exists()
-                                    ? ''
-                                    : 'border-b border-black dark:border-white' }}">
-                                @if ($LLM->link)
-                                    <a href="{{ $LLM->link }}" target="_blank"
-                                        class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                                @else
-                                    <span
-                                        class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                                @endif
-                            </div>
-                            <div class="{{ $result->count() == 1 ? '' : 'max-h-[182px]' }} overflow-y-auto scrollbar">
-                                @if (Auth::user()->hasPerm('Chat_update_new_chat'))
-                                    <div
-                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                        <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('chat.new', $LLM->id) }}">
-                                            <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                                {{ __('New Chat') }}
-                                            </p>
-                                        </a>
+                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+                            <a class="flex rounded-lg menu-btn flex items-center justify-center w-full dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                href="{{ route('chat.new', $LLM->id) }}">
+                                <div
+                                    class="flex-shrink-0 m-2 h-5 w-5 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                                    <img class="h-full w-full"
+                                        src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
+                                </div>
+                                <div class="pl-2 mr-auto my-2">
+                                    <div class="w-full text-md font-semibold leading-none">
+                                        {{ $LLM->name }}
                                     </div>
-                                @endif
-                                @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
-                                    <div
-                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                        <a style="word-break:break-all"
-                                            class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto overflow-x-hidden scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('chat.chat', $chat->id) }}">
-                                            <p
-                                                class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                                {{ $chat->name }}</p>
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
+                                    @if ($LLM->description)
+                                        <div class="w-full text-sm leading-none text-gray-400">
+                                            {{ $LLM->description }}
+                                        </div>
+                                    @endif
+                                </div>
+                            </a>
                         </div>
                     @endforeach
                 @endif
@@ -265,7 +249,13 @@
                         <input name="new_name" />
                     </form>
                 @endif
-                <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
+                <div id="chatHeader"
+                    class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex justify-center items-center">
+                    <div
+                        class="flex-shrink-0 mx-2 h-10 w-10 rounded-full flex items-center justify-center overflow-hidden">
+                        <img class="h-full w-full"
+                            src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
+                    </div>
                     @if (request()->route('llm_id'))
                         <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
                             {{ __('New Chat with') }}
@@ -326,7 +316,7 @@
                                         </div>
                                         <div class="overflow-hidden">
                                             <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                                <p class="text-sm whitespace-pre-line break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}"
+                                                <p class="text-sm whitespace-pre-line break-words{{ $history->chained ? ' chain-msg' : '' }}{{ $history->isbot ? ' bot-msg' : '' }}"
                                                     id="task_{{ $history->id }}">{{ __($history->msg) }}</p>
                                                 <div class="flex space-x-1 show-on-finished" style="display:none;">
                                                     <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
@@ -800,7 +790,7 @@
                         $("#chatroom > div > div p").each(function(index, element) {
                             var msgText = $(element).text();
                             var isBot = $(element).hasClass("bot-msg");
-                            var chained = $(element).hasClass("chain-msg"); 
+                            var chained = $(element).hasClass("chain-msg");
 
                             var message = {
                                 "msg": msgText,
