@@ -170,7 +170,7 @@
                                         class="inline-block menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
                                 @else
                                     <span
-                                        class="inline-block menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                                        class="inline-block menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</span>
                                 @endif
 
                                 @if ($LLM->description)
