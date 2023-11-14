@@ -167,14 +167,14 @@
                             <div class="my-2 ml-4">
                                 @if ($LLM->link)
                                     <a href="{{ $LLM->link }}" target="_blank"
-                                        class="inline-block menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                                        class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
                                 @else
                                     <span
-                                        class="inline-block menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</span>
+                                        class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</span>
                                 @endif
 
                                 @if ($LLM->description)
-                                    <span class="inline-block text-sm leading-none text-gray-400">
+                                    <span class="inline text-sm whitespace-pre-line break-words leading-none text-gray-400">
                                         {{ $LLM->description }}
                                     </span>
                                 @endif
@@ -217,14 +217,14 @@
                                     <img class="h-full w-full"
                                         src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
                                 </div>
-                                <div class="pl-2 mr-auto my-2">
-                                    <div class="w-full text-md font-semibold leading-none">
-                                        {{ $LLM->name }}
-                                    </div>
+                                <div class="pl-2 overflow-hidden mr-auto my-2 ">
+                                    {{-- blade-formatter-disable --}}
+                                    <div class="w-full text-md whitespace-pre-line break-words font-semibold leading-none">{{ $LLM->name }}</div>
+                                    {{-- blade-formatter-enable --}}
                                     @if ($LLM->description)
-                                        <div class="w-full text-sm leading-none text-gray-400">
-                                            {{ $LLM->description }}
-                                        </div>
+                                        {{-- blade-formatter-disable --}}
+                                        <div class="w-full text-sm leading-none whitespace-pre-line break-words text-gray-400">{{ $LLM->description }}</div>
+                                        {{-- blade-formatter-enable --}}
                                     @endif
                                 </div>
                             </a>
@@ -300,8 +300,11 @@
                     @endif
                 </div>
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
-                    <div class="{{request()->route('llm_id') &&
-                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'm-auto' : ''}}">
+                    <div
+                        class="{{ request()->route('llm_id') &&
+                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5'])
+                            ? 'm-auto'
+                            : '' }}">
                         @if (request()->route('chat_id'))
                             @php
                                 $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image;
