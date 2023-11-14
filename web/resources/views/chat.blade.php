@@ -174,7 +174,7 @@
                                 @endif
 
                                 @if ($LLM->description)
-                                    <span class="w-full text-sm leading-none text-gray-400">
+                                    <span class="inline-block text-sm leading-none text-gray-400">
                                         {{ $LLM->description }}
                                     </span>
                                 @endif
