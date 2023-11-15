@@ -55,20 +55,18 @@
                                     <input type="checkbox" name="llm[]" id="llm_create_check_{{ $LLM->id }}"
                                         value="{{ $LLM->id }}" class="hidden peer">
                                     <label for="llm_create_check_{{ $LLM->id }}"
-                                        class="inline-flex items-center justify-between w-full p-2 text-gray-400 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">
-                                        <div class="flex items-center">
+                                        class="inline-flex items-center justify-between overflow-hidden w-full p-2 text-gray-400 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">
+                                        <div class="flex items-center overflow-hidden">
                                             <div
                                                 class="flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
                                                 <img
                                                     src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
                                             </div>
-                                            <div class="pl-2">
-                                                <div class="w-full text-lg font-semibold leading-none">
-                                                    {{ $LLM->name }}
-                                                </div>
-                                                <div class="w-full text-sm leading-none">
-                                                    {{ $LLM->description ? $LLM->description : __('This LLM is currently available!') }}
-                                                </div>
+                                            <div class="pl-2 overflow-hidden">
+                                                {{-- blade-formatter-disable --}}
+                                                <div class="w-full text-lg font-semibold leading-none whitespace-pre-line break-words">{{ $LLM->name }}</div>
+                                                <div class="w-full text-sm leading-none whitespace-pre-line break-words">{{ $LLM->description ? $LLM->description : __('This LLM is currently available!') }}</div>
+                                                {{-- blade-formatter-enable --}}
                                             </div>
                                         </div>
                                     </label>
@@ -803,8 +801,8 @@
                     @endif
                     @if (session('selLLMs'))
                         <script>
-                            @foreach($llms as $llm)
-                                $(`#btn_{{$llm->id}}_toggle`).click()
+                            @foreach ($llms as $llm)
+                                $(`#btn_{{ $llm->id }}_toggle`).click()
                             @endforeach
                             @foreach (session('selLLMs') as $id)
                                 $(`#btn_{{ $id }}_toggle`).click()
