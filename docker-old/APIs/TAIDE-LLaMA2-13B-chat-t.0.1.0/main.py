@@ -38,13 +38,8 @@ model = AutoModelForCausalLM.from_pretrained(model_loc, device_map="auto",torch_
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_loc, add_bos_token=False)
 set_seed(42)
 generation_config = GenerationConfig(
-    temperature=0.2, 
-    top_p=0.9, 
-    top_k=40,
-    do_sample=True,
-    max_new_tokens=1024,
     repetition_penalty=1.1,
-    guidance_scale=1.0
+    do_sample=False,
 )
 BOS = tokenizer.bos_token
 EOS = tokenizer.eos_token
@@ -74,7 +69,7 @@ def process(data):
             print(prompt.encode('utf-8','ignore').decode('utf-8'))
             input_ids = tokenizer.encode(prompt, return_tensors='pt').to("cuda:0")
             streamer =TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
-            generation_kwargs = dict(input_ids=input_ids, streamer=streamer, max_new_tokens=2048,generation_config=generation_config)
+            generation_kwargs = dict(input_ids=input_ids, streamer=streamer, max_new_tokens=1024,generation_config=generation_config)
             thread = Thread(target=model.generate, kwargs=generation_kwargs)
             thread.start()
             generated_text = ""
