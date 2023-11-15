@@ -174,7 +174,8 @@
                                 @endif
 
                                 @if ($LLM->description)
-                                    <span class="inline text-sm whitespace-pre-line break-words leading-none text-gray-400">
+                                    <span
+                                        class="inline text-sm whitespace-pre-line break-words leading-none text-gray-400">
                                         {{ $LLM->description }}
                                     </span>
                                 @endif
@@ -250,7 +251,7 @@
                     </form>
                 @endif
                 <div id="chatHeader"
-                    class="bg-gray-300 dark:bg-gray-700 p-4 text-gray-700 dark:text-white flex justify-center items-center">
+                    class="bg-gray-300 dark:bg-gray-700 p-4 h-20 max-h-20 overflow-hidden text-gray-700 dark:text-white flex">
                     <div
                         class="flex-shrink-0 mx-2 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                         <img class="h-full w-full"
@@ -476,13 +477,12 @@
                             <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
-                            <div style="display:none;"
-                                class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-                                id="url_only_alert" role="alert">
-                                <span
-                                    class="block sm:inline">{{ __('The first message for this LLM allows URL only!') }}</span>
-                            </div>
                         @endif
+                        <div style="display:none;"
+                            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                            id="error_alert" role="alert">
+                            <span class="block sm:inline"></span>
+                        </div>
                     </div>
                 </div>
                 @if (
@@ -938,9 +938,11 @@
                                 if (isValidURL($("#chat_input").val().trim())) {
                                     $("#prompt_area")[0].submit()
                                 } else {
-                                    $("#url_only_alert").fadeIn();
+                                    $("#error_alert >span").text(
+                                        "{{ __('The first message for this LLM allows URL only!') }}")
+                                    $("#error_alert").fadeIn();
                                     setTimeout(function() {
-                                        $("#url_only_alert").fadeOut();
+                                        $("#error_alert").fadeOut();
                                     }, 3000);
                                 }
                             })

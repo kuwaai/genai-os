@@ -385,7 +385,7 @@ class ChatController extends Controller
                         }
                     }
                 }
-                $chat->fill(['name' => substr($chatname, 0, 75), 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+                $chat->fill(['name' => mb_substr($chatname, 0, 75, "utf-8"), 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);

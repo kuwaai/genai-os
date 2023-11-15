@@ -36,7 +36,8 @@ class DuelController extends Controller
     public function create(Request $request): RedirectResponse
     {
         $llms = $request->input('llm');
-        if (count($llms) > 1) {
+        $selectedLLMs = $request->input('chatsTo');
+        if (count($selectedLLMs) > 0 && count($llms) > 1) {
             $result = DB::table(function ($query) {
                 $query
                     ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
@@ -59,7 +60,11 @@ class DuelController extends Controller
                 }
             }
             # model permission auth done
-
+            foreach ($selectedLLMs as $id) {
+                if (!in_array($id, $llms)) {
+                    return back();
+                }
+            }
             $input = $request->input('input');
             $Duel = new DuelChat();
             $Duel->fill(['name' => $input, 'user_id' => Auth::user()->id]);
@@ -68,18 +73,20 @@ class DuelController extends Controller
                 $chat = new Chats();
                 $chat->fill(['name' => 'Duel Chat', 'llm_id' => $llm, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
                 $chat->save();
+                if (in_array($llm, $selectedLLMs)) {
 
-                $history = new Histories();
-                $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
-                $history->save();
-                $history = new Histories();
-                $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
-                $history->save();
-                RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
-                Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                    $history = new Histories();
+                    $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
+                    $history->save();
+                    $history = new Histories();
+                    $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                    $history->save();
+                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                    Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                }
             }
         }
-        return redirect()->to(route('duel.chat', $Duel->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''));
+        return redirect()->to(route('duel.chat', $Duel->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))->with("selLLMs",$selectedLLMs);
     }
 
     public function new(Request $request): RedirectResponse
@@ -150,9 +157,10 @@ class DuelController extends Controller
     public function request(Request $request): RedirectResponse
     {
         $duelId = $request->input('duel_id');
+        $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
         $chained = Session::get('chained') == 'true';
-        if ($duelId && $input) {
+        if (count($selectedLLMs) > 0 && $duelId && $input) {
             $chats = Chats::where('dcID', $request->input('duel_id'))->get();
             if (
                 Chats::join('llms', 'llms.id', '=', 'llm_id')
@@ -182,43 +190,50 @@ class DuelController extends Controller
                         return back();
                     }
                 }
+                foreach ($selectedLLMs as $id) {
+                    if (!in_array($id, $chats->pluck('llm_id')->toarray())) {
+                        return back();
+                    }
+                }
                 #Model permission checked
                 foreach ($chats as $chat) {
-                    $history = new Histories();
-                    $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
-                    $history->save();
-                    if (in_array(LLMs::find($chat->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
-                        $tmp = json_encode([
-                            [
-                                'msg' => Histories::where('chat_id', '=', $chat->id)
-                                    ->select('msg')
-                                    ->orderby('created_at')
-                                    ->orderby('id', 'desc')
-                                    ->get()
-                                    ->first()->msg,
-                                'isbot' => false,
-                            ],
-                            ['msg' => $request->input('input'), 'isbot' => false],
-                        ]);
-                    } elseif ($chained) {
-                        $tmp = Histories::where('chat_id', '=', $chat->id)
-                            ->select('msg', 'isbot')
-                            ->orderby('created_at')
-                            ->orderby('id', 'desc')
-                            ->get()
-                            ->toJson();
-                    } else {
-                        $tmp = json_encode([['msg' => $input, 'isbot' => false]]);
-                    }
+                    if (in_array($chat->llm_id, $selectedLLMs)) {
+                        $history = new Histories();
+                        $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
+                        $history->save();
+                        if (in_array(LLMs::find($chat->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
+                            $tmp = json_encode([
+                                [
+                                    'msg' => Histories::where('chat_id', '=', $chat->id)
+                                        ->select('msg')
+                                        ->orderby('created_at')
+                                        ->orderby('id', 'desc')
+                                        ->get()
+                                        ->first()->msg,
+                                    'isbot' => false,
+                                ],
+                                ['msg' => $request->input('input'), 'isbot' => false],
+                            ]);
+                        } elseif ($chained) {
+                            $tmp = Histories::where('chat_id', '=', $chat->id)
+                                ->select('msg', 'isbot')
+                                ->orderby('created_at')
+                                ->orderby('id', 'desc')
+                                ->get()
+                                ->toJson();
+                        } else {
+                            $tmp = json_encode([['msg' => $input, 'isbot' => false]]);
+                        }
 
-                    $history = new Histories();
-                    $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
-                    $history->save();
-                    RequestChat::dispatch($tmp, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
-                    Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                        $history = new Histories();
+                        $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                        $history->save();
+                        RequestChat::dispatch($tmp, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                        Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                    }
                 }
             }
         }
-        return redirect()->to(route('duel.chat', $duelId) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''));
+        return redirect()->to(route('duel.chat', $duelId) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))->with("selLLMs",$selectedLLMs);
     }
 }

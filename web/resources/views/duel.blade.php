@@ -141,9 +141,9 @@
                                 }
                             } catch (Exception $e) {
                                 $llms = App\Models\LLMs::whereIn('id', session('llms'))
-                                        ->orderby('id')
-                                        ->get();
-                                        $DC = null;
+                                    ->orderby('id')
+                                    ->get();
+                                $DC = null;
                             }
                         @endphp
                         @if (session('llms'))
@@ -152,13 +152,15 @@
                                     array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == []
                             )
 
-                                <div class="flex flex-1 flex-col border border-black dark:border-white border-1 rounded-lg">
+                                <div
+                                    class="flex flex-1 flex-col border border-black dark:border-white border-1 rounded-lg">
                                     <div
                                         class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
                                         @foreach ($llms as $llm)
                                             <div
                                                 class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
-                                                <a href="{{ $llm->link }}" target="_blank" class="h-full w-full"><img
+                                                <a href="{{ $llm->link }}" target="_blank"
+                                                    class="h-full w-full"><img
                                                         data-tooltip-target="llm_{{ $llm->id }}"
                                                         data-tooltip-placement="top" class="h-full w-full"
                                                         src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}"></a>
@@ -173,8 +175,7 @@
                                     <div class="overflow-y-auto scrollbar">
                                         <div class="m-2 border border-green-400 border-1 rounded-lg overflow-hidden">
                                             <form method="post"
-                                                action="{{ route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
-                                                >
+                                                action="{{ route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
                                                 <div class="flex items-end justify-end">
                                                     @csrf
                                                     @foreach ($llms as $llm)
@@ -208,13 +209,15 @@
                             @endif
                         @else
                             @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
-                                <div class="flex flex-1 flex-col border border-black dark:border-white border-1 rounded-lg">
+                                <div
+                                    class="flex flex-1 flex-col border border-black dark:border-white border-1 rounded-lg">
                                     <div
                                         class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
                                         @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                                             <div
                                                 class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
-                                                <a href="{{ $chat->link }}" target="_blank" class="h-full w-full"><img
+                                                <a href="{{ $chat->link }}" target="_blank"
+                                                    class="h-full w-full"><img
                                                         data-tooltip-target="llm_{{ $chat->llm_id }}"
                                                         data-tooltip-placement="top" class="h-full w-full"
                                                         src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}"></a>
@@ -269,7 +272,8 @@
                                         @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                                             <div
                                                 class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
-                                                <a href="{{ $chat->link }}" target="_blank" class="h-full w-full"><img
+                                                <a href="{{ $chat->link }}" target="_blank"
+                                                    class="h-full w-full"><img
                                                         data-tooltip-target="llm_{{ $chat->llm_id }}"
                                                         data-tooltip-placement="top" class="h-full w-full"
                                                         src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}"></a>
@@ -427,8 +431,8 @@
                                     <div
                                         class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                                         <img data-tooltip-target="llm_{{ $llm->id }}_toggle"
-                                                data-tooltip-placement="top" class="h-full w-full"
-                                                src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}">
+                                            data-tooltip-placement="top" class="h-full w-full"
+                                            src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}">
                                         <div id="llm_{{ $llm->id }}_toggle" role="tooltip"
                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                                             {{ $llm->name }}
@@ -446,8 +450,8 @@
                                     <div
                                         class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                                         <img data-tooltip-target="llm_{{ $chat->llm_id }}_toggle"
-                                                data-tooltip-placement="top" class="h-full w-full"
-                                                src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}">
+                                            data-tooltip-placement="top" class="h-full w-full"
+                                            src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}">
                                         <div id="llm_{{ $chat->llm_id }}_toggle" role="tooltip"
                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                                             {{ $chat->name }}
@@ -484,21 +488,58 @@
                         @if (!session('llms'))
                             @php
                                 $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+
+                                $duelId = request()->route('duel_id');
+
+                                $duelId = Illuminate\Support\Facades\Request::route('duel_id');
+
+                                $botChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
+                                    ->leftJoin('feedback', 'history_id', '=', 'histories.id')
+                                    ->join('llms', 'llms.id', '=', 'chats.llm_id')
+                                    ->where('isbot', true)
+                                    ->whereIn('chats.id', App\Models\Chats::where('dcID', $duelId)->pluck('id'))
+                                    ->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags');
+
+                                $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
+                                    ->leftjoin('llms', 'llms.id', '=', 'chats.llm_id')
+                                    ->where('isbot', false)
+                                    ->whereIn('chats.id', App\Models\Chats::where('dcID', $duelId)->pluck('id'))
+                                    ->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', DB::raw('NULL as nice'), DB::raw('NULL as detail'), DB::raw('NULL as flags'));
+
+                                $mergedChats = $botChats
+                                    ->union($nonBotChats)
+                                    ->get()
+                                    ->sortBy(function ($chat) {
+                                        return [$chat->created_at, $chat->llm_id, -$chat->history_id];
+                                    });
+                                $mergedMessages = [];
+                                // Filter and merge the chats based on the condition
+                                $filteredChats = $mergedChats->filter(function ($chat) use (&$mergedMessages) {
+                                    // Check if the chat is non-bot and if its message hasn't been merged before
+                                    if (!$chat->isbot && !in_array($chat->msg, $mergedMessages)) {
+                                        // Add the message to the merged messages array
+                                        $mergedMessages[] = $chat->msg;
+                                        return true; // Keep this chat in the final result
+                                    } elseif ($chat->isbot) {
+                                        $mergedMessages = [];
+                                        return true; // Keep bot chats in the final result
+                                    }
+                                    return false; // Exclude duplicate non-bot chats
+                                });
+
+                                // Sort the filtered chats
+                                $mergedChats = $filteredChats->sortBy(function ($chat) {
+                                    return [$chat->created_at, $chat->llm_id, -$chat->history_id];
+                                });
                             @endphp
-                            @foreach (App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->leftjoin('feedback', 'history_id', '=', 'histories.id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', true)->whereIn('chats.id', App\Models\Chats::where('dcID', request()->route('duel_id'))->pluck('id'))->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags')->union(
-            App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id')->where('isbot', false)->where(
-                    'chats.id',
-                    App\Models\Chats::where('dcID', request()->route('duel_id'))->get()->first()->id,
-                )->leftjoin('feedback', 'history_id', '=', 'histories.id')->select('chats.id as chat_id', 'histories.id as history_id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags'),
-        )->get()->sortBy(function ($chat) {
-            return [$chat->created_at, $chat->llm_id, -$chat->history_id];
-        }) as $history)
+                            @foreach ($mergedChats as $history)
                                 @if (in_array($history->history_id, $tasks))
                                     <div class="flex w-full mt-2 space-x-3">
                                         <div data-tooltip-target="llm_{{ $history->llm_id }}_chat"
                                             data-tooltip-placement="top"
                                             class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                            <img class="h-full w-full" src="{{ strpos($history->image, 'data:image/png;base64') === 0 ? $history->image : asset(Storage::url($history->image)) }}">
+                                            <img class="h-full w-full"
+                                                src="{{ strpos($history->image, 'data:image/png;base64') === 0 ? $history->image : asset(Storage::url($history->image)) }}">
                                         </div>
                                         <div>
                                             <div {{ request()->input('limit') > 0 ? 'style=max-height:' . 0.75 + 0.75 + 0.875 * 1.25 * request()->input('limit') . 'rem' : '' }}
@@ -568,7 +609,8 @@
                                             <div data-tooltip-target="llm_{{ $history->llm_id }}_chat"
                                                 data-tooltip-placement="top"
                                                 class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                                <img class="h-full w-full" src="{{ strpos($history->image, 'data:image/png;base64') === 0 ? $history->image : asset(Storage::url($history->image)) }}">
+                                                <img class="h-full w-full"
+                                                    src="{{ strpos($history->image, 'data:image/png;base64') === 0 ? $history->image : asset(Storage::url($history->image)) }}">
                                             </div>
                                         @endif
                                         <div>
@@ -648,6 +690,11 @@
                                 @endif
                             @endforeach
                         @endif
+                        <div style="display:none;"
+                            class="bg-red-100 border border-red-400 mt-2 text-red-700 px-4 py-3 rounded relative"
+                            id="error_alert" role="alert">
+                            <span class="block sm:inline"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
@@ -655,11 +702,32 @@
                         <form method="post"
                             action="{{ route('duel.create') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
                             id="prompt_area">
-                            <div class="flex items-end justify-end">
+                            <div class="flex flex-col items-end justify-end">
                                 @csrf
                                 @foreach (session('llms') as $id)
                                     <input name="llm[]" value="{{ $id }}" style="display:none;">
+                                    <input id="chatsTo_{{ $id }}" name="chatsTo[]"
+                                        value="{{ $id }}" style="display:none;">
                                 @endforeach
+
+                                <div class="flex mr-auto dark:text-white mb-2 select-none">
+                                    <div>
+                                        <div class="flex justify-center items-center">{{ __('Send to:') }}
+                                            @foreach ($llms as $llm)
+                                                <span data-tooltip-target="llm_{{ $llm->id }}_toggle"
+                                                    data-tooltip-placement="top" id="btn_{{ $llm->id }}_toggle"
+                                                    onclick="$('#chatsTo_{{ $llm->id }}').prop('disabled',(i,val)=>{return !val}); $(this).toggleClass('bg-green-500 hover:bg-green-600 bg-red-500 hover:bg-red-600')"
+                                                    class="cursor-pointer flex py-1 px-2 mx-1 bg-green-500 hover:bg-green-600 rounded-full">
+                                                    <div
+                                                        class="inline h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black overflow-hidden">
+                                                        <img
+                                                            src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}">
+                                                    </div>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
                                 <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
                                     oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
                                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
@@ -680,7 +748,11 @@
                         <form method="post"
                             action="{{ route('duel.request') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
                             id="prompt_area">
-                            <div class="flex items-end justify-end">
+                            @foreach ($llms as $llm)
+                                <input id="chatsTo_{{ $llm->id }}" name="chatsTo[]"
+                                    value="{{ $llm->id }}" style="display:none;">
+                            @endforeach
+                            <div class="flex">
                                 @csrf
                                 <input name="duel_id" value="{{ request()->route('duel_id') }}"
                                     style="display:none;">
@@ -688,22 +760,56 @@
                                     {{ \Session::get('chained') ? '' : 'disabled' }}>
                                 <button type="button" onclick="chain_toggle()" id="chain_btn"
                                     class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
-                                <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
-                                    oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
-                                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                                <button type="submit" id='submit_msg' style='display:none;'
-                                    class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
-                                        class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
-                                        <path
-                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
-                                            fill="currentColor"></path>
-                                    </svg>
-                                </button>
+                                <div class="flex flex-1 items-end justify-end flex-col">
+
+                                    <div class="flex mr-auto dark:text-white mb-2 select-none">
+                                        <div>
+                                            <div class="flex justify-center items-center">{{ __('Send to:') }}
+                                                @foreach ($llms as $llm)
+                                                    <span data-tooltip-target="llm_{{ $llm->id }}_toggle"
+                                                        data-tooltip-placement="top"
+                                                        id="btn_{{ $llm->id }}_toggle"
+                                                        onclick="$('#chatsTo_{{ $llm->id }}').prop('disabled',(i,val)=>{return !val}); $(this).toggleClass('bg-green-500 hover:bg-green-600 bg-red-500 hover:bg-red-600')"
+                                                        class="cursor-pointer flex py-1 px-2 mx-1 bg-green-500 hover:bg-green-600 rounded-full">
+                                                        <div
+                                                            class="inline h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black overflow-hidden">
+                                                            <img
+                                                                src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}">
+                                                        </div>
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
+                                        oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
+                                        class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+                                    <button type="submit" id='submit_msg' style='display:none;'
+                                        class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                            class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
+                                            <path
+                                                d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                                fill="currentColor"></path>
+                                        </svg>
+                                    </button>
+
+                                </div>
+
                             </div>
                             <input type="hidden" name="limit"
                                 value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                         </form>
+                    @endif
+                    @if (session('selLLMs'))
+                        <script>
+                            @foreach($llms as $llm)
+                                $(`#btn_{{$llm->id}}_toggle`).click()
+                            @endforeach
+                            @foreach (session('selLLMs') as $id)
+                                $(`#btn_{{ $id }}_toggle`).click()
+                            @endforeach
+                        </script>
                     @endif
                 </div>
             </div>
@@ -796,13 +902,38 @@
                 $chattable = false
                 $("#prompt_area").submit(function(event) {
                     event.preventDefault();
-                    if ($chattable) {
+                    var allDisabled = true;
+                    $('input[name="chatsTo[]"]').each(function() {
+                        if (!$(this).prop('disabled')) {
+                            allDisabled = false;
+                            return false; // exit the loop if at least one input is not disabled
+                        }
+                    });
+
+                    if ($chattable && !allDisabled && $("#chat_input").val().trim() != "") {
                         this.submit();
                         $chattable = false
+                        $("#submit_msg").hide()
+                        $("#chat_input").val("訊息處理中...請稍後...")
+                        $("#chat_input").prop("readonly", true)
+                    } else {
+                        if ($("#chat_input").val().trim() == "") {
+                            $("#error_alert >span").text(
+                                "{{ __('You cannot send a empty message!') }}")
+                        } else if (!$chattable) {
+                            $("#error_alert >span").text(
+                                "{{ __('Still processing a request, If this take too long, Please refresh.') }}")
+                        } else if (allDisabled) {
+                            $("#error_alert >span").text(
+                                "{{ __('You selected no LLM to chat with. Please select one first!') }}")
+                        } else {
+                            $("#error_alert >span").text("{{ __('Something went wrong! Please refresh the page.') }}")
+                        }
+                        $("#error_alert").fadeIn();
+                        setTimeout(function() {
+                            $("#error_alert").fadeOut();
+                        }, 3000);
                     }
-                    $("#submit_msg").hide()
-                    $("#chat_input").val("訊息處理中...請稍後...")
-                    $("#chat_input").prop("readonly", true)
                 })
                 task = new EventSource("{{ route('chat.sse') }}", {
                     withCredentials: false

@@ -29,7 +29,7 @@ class RequestChat implements ShouldQueue
      */
     public function __construct($input, $access_code, $user_id, $history_id, $chatgpt_apitoken, $channel = null)
     {
-        $this->input = $input;
+        $this->input = json_encode(json_decode($input),JSON_UNESCAPED_UNICODE);
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
         $this->access_code = $access_code;
         $this->user_id = $user_id;
