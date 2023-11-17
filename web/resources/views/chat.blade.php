@@ -175,7 +175,7 @@
 
                                 @if ($LLM->description)
                                     <span
-                                        class="inline text-sm whitespace-pre-line break-words leading-none text-gray-400">
+                                        class="inline text-sm whitespace-pre-line break-words leading-none text-gray-500 dark:text-gray-400">
                                         {{ $LLM->description }}
                                     </span>
                                 @endif
@@ -220,11 +220,11 @@
                                 </div>
                                 <div class="pl-2 overflow-hidden mr-auto my-2 ">
                                     {{-- blade-formatter-disable --}}
-                                    <div class="w-full text-md whitespace-pre-line break-words font-semibold leading-none">{{ $LLM->name }}</div>
+                                    <div class="w-full text-md text-gray-600 dark:text-white whitespace-pre-line break-words font-semibold leading-none">{{ $LLM->name }}</div>
                                     {{-- blade-formatter-enable --}}
                                     @if ($LLM->description)
                                         {{-- blade-formatter-disable --}}
-                                        <div class="w-full text-sm leading-none whitespace-pre-line break-words text-gray-400">{{ $LLM->description }}</div>
+                                        <div class="w-full text-sm leading-none whitespace-pre-line break-words text-gray-500 dark:text-gray-400">{{ $LLM->description }}</div>
                                         {{-- blade-formatter-enable --}}
                                     @endif
                                 </div>
