@@ -147,6 +147,9 @@ class TaideLlmFactory:
         elif model_location == 'remote-nchc':
             from .remote_taide_llm import NchcTaideLlm
             return NchcTaideLlm(*args, **kwargs)
+        elif model_location == 'remote-llmproject':
+            from .llm_project_taide_llm import LLMProjectTaideLlm
+            return LLMProjectTaideLlm(*args, **kwargs)
         else:
             raise ValueError(f'Unknown model_location {model_location}')
             return None
