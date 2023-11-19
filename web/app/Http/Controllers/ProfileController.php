@@ -169,7 +169,7 @@ class ProfileController extends Controller
                             $client = new Client(['timeout' => 300]);
 
                             $history = new APIHistories();
-                            $history->fill(["input"=>$tmp,'output'=>"* ...thinking... *", "user_id"=>$user->id]);
+                            $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => $user->id]);
                             $history->save();
                             RequestChat::dispatch($tmp, $llm->access_code, $user->id, -$history->id, $user->openai_token, 'api_' . $history->id);
 
@@ -184,8 +184,8 @@ class ProfileController extends Controller
 
                             $req = $req->getBody()->getContents();
                             $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
-                            
-                            $history->fill(['output'=>$response['output']]);
+
+                            $history->fill(['output' => $response['output']]);
                             $history->save();
                         }
                     } else {
@@ -235,23 +235,21 @@ class ProfileController extends Controller
             if (config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
                 $channel = $request->input('channel');
                 if ($channel != null) {
-                    if (strpos($channel, 'api_') === 0) {
-                        $client = Redis::connection();
-                        $client->subscribe($channel, function ($message, $raw_history_id) use ($client) {
-                            global $result;
-                            [$type, $msg] = explode(' ', $message, 2);
-                            if ($type == 'Ended') {
-                                echo $result . '[ENDEDPLACEHOLDERUWU]';
-                                ob_flush();
-                                flush();
-                                $client->disconnect();
-                            } elseif ($type == 'New') {
-                                $result = json_decode($msg)->msg;
-                                ob_flush();
-                                flush();
-                            }
-                        });
-                    }
+                    $client = Redis::connection();
+                    $client->subscribe($channel, function ($message, $raw_history_id) use ($client) {
+                        global $result;
+                        [$type, $msg] = explode(' ', $message, 2);
+                        if ($type == 'Ended') {
+                            echo $result . '[ENDEDPLACEHOLDERUWU]';
+                            ob_flush();
+                            flush();
+                            $client->disconnect();
+                        } elseif ($type == 'New') {
+                            $result = json_decode($msg)->msg;
+                            ob_flush();
+                            flush();
+                        }
+                    });
                 }
             }
         });

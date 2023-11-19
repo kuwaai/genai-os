@@ -130,7 +130,7 @@
                     <!-- Modal body -->
                     <div class="p-6 space-y-6">
                         <textarea id="export_json" rows="15" readonly
-                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none">{{ json_encode(App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('created_at')->orderby('id', 'desc')->select('msg', 'isbot', 'chained')->get()->toArray(),JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) }}</textarea>
+                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                         <a id="download_holder" style="display:none;"
                             download="{{ App\Models\Chats::find(request()->route('chat_id'))->name . '.json' }}"></a>
                     </div>
@@ -138,7 +138,7 @@
                     <div
                         class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                         <button
-                            onclick='$("#download_holder").attr("href",window.URL.createObjectURL(new Blob([$("#import_json").val()], { type: "text/plain" }))); $("#download_holder")[0].click();'
+                            onclick='$("#download_holder").attr("href",window.URL.createObjectURL(new Blob([$("#export_json").val()], { type: "text/plain" }))); $("#download_holder")[0].click();'
                             class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download') }}</button>
 
                     </div>
@@ -163,18 +163,24 @@
                 @elseif(request()->route('chat_id') || request()->route('llm_id'))
                     <div
                         class="flex flex-1 h-full overflow-y-hidden flex-col border border-black dark:border-white border-1 rounded-lg">
-                        <div
-                            class="{{ !Auth::user()->hasPerm('Chat_update_new_chat') &&
-                            !App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->exists()
-                                ? ''
-                                : 'border-b border-black dark:border-white' }}">
-                            @if ($LLM->link)
-                                <a href="{{ $LLM->link }}" target="_blank"
-                                    class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                            @else
-                                <span
-                                    class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                            @endif
+                        <div class="border-b border-black dark:border-white">
+                            <div class="my-2 ml-4">
+                                @if ($LLM->link)
+                                    <a href="{{ $LLM->link }}" target="_blank"
+                                        class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
+                                @else
+                                    <span
+                                        class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</span>
+                                @endif
+
+                                @if ($LLM->description)
+                                    <span
+                                        class="inline text-sm whitespace-pre-line break-words leading-none text-gray-500 dark:text-gray-400">
+                                        {{ $LLM->description }}
+                                    </span>
+                                @endif
+                            </div>
+
                         </div>
                         <div class="overflow-y-auto scrollbar">
                             @if (Auth::user()->hasPerm('Chat_update_new_chat'))
@@ -204,46 +210,25 @@
                     </div>
                 @else
                     @foreach ($result as $LLM)
-                        <div
-                            class="{{ $result->count() == 1 ? 'flex flex-1 flex-col' : 'mb-2' }} border border-black dark:border-white border-1 rounded-lg">
-                            <div
-                                class="{{ !Auth::user()->hasPerm('Chat_update_new_chat') &&
-                                !App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->exists()
-                                    ? ''
-                                    : 'border-b border-black dark:border-white' }}">
-                                @if ($LLM->link)
-                                    <a href="{{ $LLM->link }}" target="_blank"
-                                        class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                                @else
-                                    <span
-                                        class="inline-block menu-btn my-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                                @endif
-                            </div>
-                            <div class="{{ $result->count() == 1 ? '' : 'max-h-[182px]' }} overflow-y-auto scrollbar">
-                                @if (Auth::user()->hasPerm('Chat_update_new_chat'))
-                                    <div
-                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                        <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('chat.new', $LLM->id) }}">
-                                            <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                                {{ __('New Chat') }}
-                                            </p>
-                                        </a>
-                                    </div>
-                                @endif
-                                @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
-                                    <div
-                                        class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                        <a style="word-break:break-all"
-                                            class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto overflow-x-hidden scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                            href="{{ route('chat.chat', $chat->id) }}">
-                                            <p
-                                                class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                                {{ $chat->name }}</p>
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
+                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+                            <a class="flex rounded-lg menu-btn flex items-center justify-center w-full dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                href="{{ route('chat.new', $LLM->id) }}">
+                                <div
+                                    class="flex-shrink-0 m-2 h-5 w-5 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                                    <img class="h-full w-full"
+                                        src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
+                                </div>
+                                <div class="pl-2 overflow-hidden mr-auto my-2 ">
+                                    {{-- blade-formatter-disable --}}
+                                    <div class="w-full text-md text-gray-600 dark:text-white whitespace-pre-line break-words font-semibold leading-none">{{ $LLM->name }}</div>
+                                    {{-- blade-formatter-enable --}}
+                                    @if ($LLM->description)
+                                        {{-- blade-formatter-disable --}}
+                                        <div class="w-full text-sm leading-none whitespace-pre-line break-words text-gray-500 dark:text-gray-400">{{ $LLM->description }}</div>
+                                        {{-- blade-formatter-enable --}}
+                                    @endif
+                                </div>
+                            </a>
                         </div>
                     @endforeach
                 @endif
@@ -265,7 +250,13 @@
                         <input name="new_name" />
                     </form>
                 @endif
-                <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-4 h-20 text-gray-700 dark:text-white flex">
+                <div id="chatHeader"
+                    class="bg-gray-300 dark:bg-gray-700 p-4 h-20 max-h-20 overflow-hidden text-gray-700 dark:text-white flex">
+                    <div
+                        class="flex-shrink-0 mx-2 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                        <img class="h-full w-full"
+                            src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
+                    </div>
                     @if (request()->route('llm_id'))
                         <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
                             {{ __('New Chat with') }}
@@ -310,7 +301,11 @@
                     @endif
                 </div>
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
-                    <div>
+                    <div
+                        class="{{ request()->route('llm_id') &&
+                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5'])
+                            ? 'm-auto'
+                            : '' }}">
                         @if (request()->route('chat_id'))
                             @php
                                 $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image;
@@ -326,7 +321,7 @@
                                         </div>
                                         <div class="overflow-hidden">
                                             <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                                <p class="text-sm whitespace-pre-line break-words"
+                                                <p class="text-sm whitespace-pre-line break-words{{ $history->chained ? ' chain-msg' : '' }}{{ $history->isbot ? ' bot-msg' : '' }}"
                                                     id="task_{{ $history->id }}">{{ __($history->msg) }}</p>
                                                 <div class="flex space-x-1 show-on-finished" style="display:none;">
                                                     <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
@@ -401,7 +396,7 @@
                                             <div
                                                 class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
                                                 {{-- blade-formatter-disable --}}
-                                            <p class="text-sm whitespace-pre-line break-words">{{ __($history->msg) }}</p>
+                                            <p class="text-sm whitespace-pre-line break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ __($history->msg) }}</p>
                                             {{-- blade-formatter-enable --}}
                                                 @if ($history->isbot)
                                                     <div class="flex space-x-1">
@@ -482,13 +477,12 @@
                             <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
-                            <div style="display:none;"
-                                class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-                                id="url_only_alert" role="alert">
-                                <span
-                                    class="block sm:inline">{{ __('The first message for this LLM allows URL only!') }}</span>
-                            </div>
                         @endif
+                        <div style="display:none;"
+                            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                            id="error_alert" role="alert">
+                            <span class="block sm:inline"></span>
+                        </div>
                     </div>
                 </div>
                 @if (
@@ -795,7 +789,23 @@
                     }
 
                     function export_chat() {
+                        var chatMessages = [];
 
+                        $("#chatroom > div > div p").each(function(index, element) {
+                            var msgText = $(element).text();
+                            var isBot = $(element).hasClass("bot-msg");
+                            var chained = $(element).hasClass("chain-msg");
+
+                            var message = {
+                                "msg": msgText,
+                                "isbot": isBot,
+                                "chained": chained
+                            };
+
+                            chatMessages.push(message);
+                        });
+
+                        $("#export_json").val(JSON.stringify(chatMessages, null, 4))
                     }
 
                     function saveChat() {
@@ -835,8 +845,6 @@
                             $("#chat_input").prop("readonly", false)
                             adjustTextareaRows($("#chat_input"))
                             $(".show-on-finished").attr("style", "")
-                            $("#export_json").val($("#export_json").val().replace('* ...thinking... *', $(
-                                "#chatroom p:last()").text().trim()))
                         } else {
                             data = JSON.parse(event.data)
                             number = parseInt(data["history_id"]);
@@ -858,6 +866,7 @@
             @endif
             <script>
                 var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
                 function isValidURL(url) {
                     // Regular expression for a simple URL pattern (you can make it more complex if needed)
                     var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
@@ -929,9 +938,11 @@
                                 if (isValidURL($("#chat_input").val().trim())) {
                                     $("#prompt_area")[0].submit()
                                 } else {
-                                    $("#url_only_alert").fadeIn();
+                                    $("#error_alert >span").text(
+                                        "{{ __('The first message for this LLM allows URL only!') }}")
+                                    $("#error_alert").fadeIn();
                                     setTimeout(function() {
-                                        $("#url_only_alert").fadeOut();
+                                        $("#error_alert").fadeOut();
                                     }, 3000);
                                 }
                             })

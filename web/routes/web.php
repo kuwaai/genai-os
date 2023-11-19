@@ -94,8 +94,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->group(function () {
                 Route::get('/', [ChatController::class, 'home'])->name('chat.home');
 
-                Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
-                    ->get('/new/{llm_id}', [ChatController::class, 'new_chat'])
+                Route::get('/new/{llm_id}', [ChatController::class, 'new_chat'])
                     ->name('chat.new');
 
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
@@ -145,6 +144,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->group(function () {
                 Route::get('/', [DuelController::class, 'main'])->name('duel.home');
 
+                Route::post('/new', [DuelController::class, 'new'])->name('duel.new');
                 Route::post('/create', [DuelController::class, 'create'])->name('duel.create');
                 Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
