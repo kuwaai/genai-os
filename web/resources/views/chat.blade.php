@@ -474,7 +474,7 @@
                             @endforeach
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
-                            <p class="m-auto text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
+                            <p class="m-auto text-black dark:text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
                         @endif
