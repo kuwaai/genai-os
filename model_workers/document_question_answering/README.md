@@ -30,6 +30,12 @@ This project has two configurations.
         # NCHC_TAIDE_PASSWORD: The password when using a NCHC TAIDE API.
         # NCHC_TAIDE_MODEL_NAME: The model name when using a NCHC TAIDE API.
         # HTTP_CACHE_PROXY: The HTTP proxy for caching downloaded web pages.
+        #
+        # Options for SearchQA.
+        # GOOGLE_API_KEY: The API key to invoke custom search engine.
+        # GOOGLE_CSE_ID: The Custom Search Engine (CSE) ID.
+        # SEARCH_RESTRICTED_SITES: The semicolon-separated website list to search. A blank list means no restriction. For detailed syntax, refer to https://developers.google.com/search/docs/monitor-debug/search-operators/all-search-site
+        # SEARCH_BLOCKED_SITES: Opposite to SEARCH_RESTRICTED_SITES. The listed website will never be accessed.
         ```
     - Copy the LLM to the host directory `/var/models/`. This directory will be mounted into the container.  
       Currently, the model directory used is called `llama2-7b-chat-b5.0.0`.
