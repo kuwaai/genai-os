@@ -99,7 +99,8 @@ class SearchQaProcess(GeneralProcessInterface):
         functools.partial(
           requests.get,
           url,
-          timeout=timeout
+          timeout=timeout,
+          verify=False
         )
       )
     except Exception as e:
@@ -115,14 +116,28 @@ class SearchQaProcess(GeneralProcessInterface):
 
     api_key = os.environ['GOOGLE_API_KEY']
     searching_engine_id = os.environ['GOOGLE_CSE_ID']
+    restricted_sites = os.environ.get('SEARCH_RESTRICTED_SITES', '')
+    blocked_sites = os.environ.get('SEARCH_BLOCKED_SITES', '')
+
+    process_site_list = lambda x: list(filter(None, x.split(';')))
+    restricted_sites = process_site_list(restricted_sites)
+    blocked_sites = process_site_list(blocked_sites)
     latest_user_record = next(filter(lambda x: x.role == Role.USER, reversed(chat_history)))
     latest_user_msg = latest_user_record.msg
+
+    query = latest_user_msg
+    query += ''.join([f' site:{s.strip()}' for s in restricted_sites])
+    query += ''.join([f' -site:{s.strip()}' for s in blocked_sites])
     
+    logging.debug(f'Restricted sites: {restricted_sites}')
+    logging.debug(f'Blocked sites: {blocked_sites}')
+    logging.debug(f'Query: {query}')
+
     endpoint = 'https://customsearch.googleapis.com/customsearch/v1'
     params = {
       'key': api_key,
       'cx': searching_engine_id,
-      'q': latest_user_msg
+      'q': query
     }
 
     urls = []

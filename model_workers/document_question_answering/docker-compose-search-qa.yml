@@ -20,7 +20,7 @@ services:
       - LLM_NAME=${LLM_NAME}
       - PORT=${PORT}
       - LAYOUT_CONFIG=layout_search_qa.yaml
-      - HTTP_CACHE_PROXY=http://web_cache:10250
+      # - HTTP_CACHE_PROXY=http://web_cache:10250
     networks:
       - squid_backend
     ports:
