@@ -210,5 +210,8 @@
 "You cannot send a empty message!":"你無法傳送空訊息",
 "Still processing a request, If this take too long, Please refresh.":"仍在處理之前的請求，如果卡了太久，請嘗試重新整理網頁。",
 "You selected no LLM to chat with. Please select one first!":"你沒有選擇任何要聊天的模型，請先選一個！",
-"Something went wrong! Please refresh the page.":"好像有東西出錯了！請重新整理網頁。"
+"Something went wrong! Please refresh the page.":"好像有東西出錯了！請重新整理網頁。",
+"Correct":"正確無誤",
+"Simplify":"簡潔易懂",
+"Integrated":"回答完整"
 }

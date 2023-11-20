@@ -24,132 +24,22 @@
     @endphp
 
     @if (request()->user()->hasPerm('Chat_update_import_chat') && request()->route('llm_id'))
-        <div id="importModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
-            class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative w-full max-w-2xl max-h-full">
-                <!-- Modal content -->
-                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    <!-- Modal header -->
-                    <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                            {{ __('Import Chat') }}
-                        </h3>
-                        <button type="button"
-                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                            data-modal-hide="importModal">
-                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 14 14">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                            </svg>
-                            <span class="sr-only">Close modal</span>
-                        </button>
-                    </div>
-
-                    <!-- Modal body -->
-                    <div class="p-6 flex flex-col justify-center">
-                        <label for="import_file_input"
-                            class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Import from file') }}</label>
-                        <hr class="my-4 border-black dark:border-gray-600" />
-                        <form method="post" action="{{ route('chat.import') }}">
-                            @csrf
-                            <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
-                            <textarea name="history" id="import_json" rows="5" max-rows="15" oninput="adjustTextareaRows(this)"
-                                placeholder="{{ __('You may drop your file here as well...') }}"
-                                class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                        </form>
-
-                        <input id="import_file_input" type='file' hidden>
-                    </div>
-                    <script>
-                        $(document).ready(function() {
-                            // Handle the file input change event
-                            $('#import_file_input').on('change', function() {
-                                loadFile($(this)[0], '#import_json')
-                            });
-                            $('#import_json').on('drop', function(e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-
-                                loadFile(e.originalEvent.dataTransfer, '#import_json');
-                            });
-
-                        });
-
-                        function loadFile(fileInput, input) {
-                            const file = fileInput.files[0];
-                            if (file) {
-                                if (file.type === 'text/plain' || file.type === 'application/json') {
-                                    const reader = new FileReader();
-                                    reader.onload = function(e) {
-                                        $(input).val(e.target.result);
-                                        adjustTextareaRows(input);
-                                    };
-                                    reader.readAsText(file);
-                                } else {
-                                    alert('Only .txt or .json files are accepted.');
-                                }
-                            }
-                        }
-                    </script>
-                    <!-- Modal footer -->
-                    <div
-                        class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                        <button data-modal-hide="importModal" type="button"
-                            onclick="$(this).parent().parent().find('form').submit()"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Import') }}</button>
-                        <button data-modal-hide="importModal" type="button"
-                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('Cancel') }}</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-chat.modals.import_history />
     @elseif (request()->user()->hasPerm('Chat_read_export_chat') && request()->route('chat_id'))
-        <div id="exportModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
-            class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative w-full max-w-2xl max-h-full">
-                <!-- Modal content -->
-                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    <!-- Modal header -->
-                    <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                            {{ __('Export Chat') }}
-                        </h3>
-                        <button type="button"
-                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                            data-modal-hide="exportModal">
-                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 14 14">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                            </svg>
-                            <span class="sr-only">Close modal</span>
-                        </button>
-                    </div>
-
-                    <!-- Modal body -->
-                    <div class="p-6 space-y-6">
-                        <textarea id="export_json" rows="15" readonly
-                            class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                        <a id="download_holder" style="display:none;"
-                            download="{{ App\Models\Chats::find(request()->route('chat_id'))->name . '.json' }}"></a>
-                    </div>
-                    <!-- Modal footer -->
-                    <div
-                        class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                        <button
-                            onclick='$("#download_holder").attr("href",window.URL.createObjectURL(new Blob([$("#export_json").val()], { type: "text/plain" }))); $("#download_holder")[0].click();'
-                            class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download') }}</button>
-
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-chat.modals.export_history />
     @endif
     <div class="flex h-full max-w-7xl mx-auto py-2">
-        <div class="bg-white dark:bg-gray-800 text-white w-64 flex-shrink-0 relative rounded-l-lg overflow-hidden">
+        @if (request()->route('chat_id') || request()->route('llm_id'))
+            <x-chat.rooms.drawer :LLM="$LLM" />
+        @endif
+        <div
+            class="{{ request()->route('chat_id') || request()->route('llm_id') ? 'hidden sm:block' : '' }} {{ $result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id')) ? 'w-64' : 'sm:w-64 w-full' }} bg-white dark:bg-gray-800 text-black dark:text-white flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div
                 class="p-3 {{ $result->count() == 1 || request()->route('chat_id') || request()->route('llm_id') ? 'flex flex-col' : '' }} h-full overflow-y-auto scrollbar">
+                @if (!($result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id'))))
+                    <h2 class="block sm:hidden text-xl text-center">{{ __('Chat') }}</h2>
+                    <p class="block sm:hidden text-center">{{ __('Select a chatroom to begin with') }}</p>
+                @endif
                 @if ($result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id')))
                     <a href="{{ route('chat.home') }}"
                         class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
@@ -161,145 +51,23 @@
                         {!! __('No available LLM to chat with<br>Please come back later!') !!}
                     </div>
                 @elseif(request()->route('chat_id') || request()->route('llm_id'))
-                    <div
-                        class="flex flex-1 h-full overflow-y-hidden flex-col border border-black dark:border-white border-1 rounded-lg">
-                        <div class="border-b border-black dark:border-white">
-                            <div class="my-2 ml-4">
-                                @if ($LLM->link)
-                                    <a href="{{ $LLM->link }}" target="_blank"
-                                        class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                                @else
-                                    <span
-                                        class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</span>
-                                @endif
-
-                                @if ($LLM->description)
-                                    <span
-                                        class="inline text-sm whitespace-pre-line break-words leading-none text-gray-500 dark:text-gray-400">
-                                        {{ $LLM->description }}
-                                    </span>
-                                @endif
-                            </div>
-
-                        </div>
-                        <div class="overflow-y-auto scrollbar">
-                            @if (Auth::user()->hasPerm('Chat_update_new_chat'))
-                                <div
-                                    class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                    <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                        href="{{ route('chat.new', $LLM->id) }}">
-                                        <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                            {{ __('New Chat') }}
-                                        </p>
-                                    </a>
-                                </div>
-                            @endif
-                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
-                                <div
-                                    class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                                    <a style="word-break:break-all"
-                                        class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto overflow-x-hidden scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                        href="{{ route('chat.chat', $chat->id) }}">
-                                        <p
-                                            class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                            {{ $chat->name }}</p>
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
+                    <x-chat.rooms.list :LLM="$LLM" />
                 @else
-                    @foreach ($result as $LLM)
-                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-                            <a class="flex rounded-lg menu-btn flex items-center justify-center w-full dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                href="{{ route('chat.new', $LLM->id) }}">
-                                <div
-                                    class="flex-shrink-0 m-2 h-5 w-5 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                    <img class="h-full w-full"
-                                        src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
-                                </div>
-                                <div class="pl-2 overflow-hidden mr-auto my-2 ">
-                                    {{-- blade-formatter-disable --}}
-                                    <div class="w-full text-md text-gray-600 dark:text-white whitespace-pre-line break-words font-semibold leading-none">{{ $LLM->name }}</div>
-                                    {{-- blade-formatter-enable --}}
-                                    @if ($LLM->description)
-                                        {{-- blade-formatter-disable --}}
-                                        <div class="w-full text-sm leading-none whitespace-pre-line break-words text-gray-500 dark:text-gray-400">{{ $LLM->description }}</div>
-                                        {{-- blade-formatter-enable --}}
-                                    @endif
-                                </div>
-                            </a>
-                        </div>
-                    @endforeach
+                    <x-chat.llm :result="$result" />
                 @endif
             </div>
         </div>
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
-                class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
+                class="hidden sm:flex flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                 {{ __('Select a chatroom to begin with') }}
             </div>
         @else
             <div id="histories"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
-                @if (request()->route('chat_id'))
-                    <form id="editChat" action="{{ route('chat.edit') }}" method="post" class="hidden">
-                        @csrf
-                        <input name="id"
-                            value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
-                        <input name="new_name" />
-                    </form>
-                @endif
-                <div id="chatHeader"
-                    class="bg-gray-300 dark:bg-gray-700 p-4 h-20 max-h-20 overflow-hidden text-gray-700 dark:text-white flex">
-                    <div
-                        class="flex-shrink-0 mx-2 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                        <img class="h-full w-full"
-                            src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
-                    </div>
-                    @if (request()->route('llm_id'))
-                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
-                            {{ __('New Chat with') }}
-                            {{ App\Models\LLMs::findOrFail(request()->route('llm_id'))->name }}</p>
-                        @if (request()->user()->hasPerm('Chat_update_import_chat'))
-                            <div class="flex">
-                                <button onclick="import_chat()" data-modal-target="importModal"
-                                    data-modal-toggle="importModal"
-                                    class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                    <i class="fas fa-file-import"></i>
-                                </button>
-                            </div>
-                        @endif
-                    @elseif(request()->route('chat_id'))
-                        <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar"
-                            style='word-break:break-word'>
-                            {{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</p>
+                
+                <x-chat.header :llmId="request()->route('llm_id')" :chatId="request()->route('chat_id')" :LLM="$LLM" />
 
-                        <div class="flex">
-                            @if (request()->user()->hasPerm('Chat_read_export_chat'))
-                                <button onclick="export_chat()" data-modal-target="exportModal"
-                                    data-modal-toggle="exportModal"
-                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                    <i class="fas fa-share-alt"></i>
-                                </button>
-                            @endif
-                            <button onclick="saveChat()"
-                                class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
-                                <i class="fas fa-save"></i>
-                            </button>
-                            <button onclick="editChat()"
-                                class="bg-orange-500 ml-3 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            @if (request()->user()->hasPerm('Chat_delete_chatroom'))
-                                <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
-                                    class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            @endif
-                        </div>
-                    @endif
-                </div>
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
                     <div
                         class="{{ request()->route('llm_id') &&
@@ -313,164 +81,7 @@
                                 $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                             @endphp
                             @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->leftjoin('feedback', 'history_id', '=', 'histories.id')->select(['histories.*', 'feedback.nice', 'feedback.detail', 'feedback.flags'])->orderby('histories.created_at')->orderby('histories.id', 'desc')->get() as $history)
-                                @if (in_array($history->id, $tasks))
-                                    <div class="flex w-full mt-2 space-x-3">
-                                        <div
-                                            class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                            <img src="{{ $botimgurl }}">
-                                        </div>
-                                        <div class="overflow-hidden">
-                                            <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                                <p class="text-sm whitespace-pre-line break-words{{ $history->chained ? ' chain-msg' : '' }}{{ $history->isbot ? ' bot-msg' : '' }}"
-                                                    id="task_{{ $history->id }}">{{ __($history->msg) }}</p>
-                                                <div class="flex space-x-1 show-on-finished" style="display:none;">
-                                                    <button class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
-                                                        onclick="copytext($(this).parent().parent().children()[0])">
-                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                            viewBox="0 0 24 24" stroke-linecap="round"
-                                                            stroke-linejoin="round" class="icon-sm" height="1em"
-                                                            width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                                            </path>
-                                                            <rect x="8" y="2" width="8" height="4"
-                                                                rx="1" ry="1">
-                                                            </rect>
-                                                        </svg>
-                                                        <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                            viewBox="0 0 24 24" stroke-linecap="round"
-                                                            stroke-linejoin="round" class="icon-sm"
-                                                            style="display:none;" height="1em" width="1em"
-                                                            xmlns="http://www.w3.org/2000/svg">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </button>
-                                                    @if (request()->user()->hasPerm('Chat_update_feedback'))
-                                                        <button
-                                                            class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
-                                                            data-modal-target="feedback" data-modal-toggle="feedback"
-                                                            onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
-                                                                json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                            ) !!});">
-                                                            <svg stroke="currentColor" fill="none"
-                                                                stroke-width="2" viewBox="0 0 24 24"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon-sm" height="1em" width="1em"
-                                                                xmlns="http://www.w3.org/2000/svg">
-                                                                <path
-                                                                    d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                                                                </path>
-                                                            </svg>
-                                                        </button>
-                                                        <button
-                                                            class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
-                                                            data-modal-target="feedback" data-modal-toggle="feedback"
-                                                            onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
-                                                                json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                            ) !!});">
-                                                            <svg stroke="currentColor" fill="none"
-                                                                stroke-width="2" viewBox="0 0 24 24"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon-sm" height="1em" width="1em"
-                                                                xmlns="http://www.w3.org/2000/svg">
-                                                                <path
-                                                                    d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                                                                </path>
-                                                            </svg>
-                                                        </button>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div id="history_{{ $history->id }}"
-                                        class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
-                                        @if ($history->isbot)
-                                            <div
-                                                class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                                <img src="{{ $botimgurl }}">
-                                            </div>
-                                        @endif
-                                        <div class="overflow-hidden">
-                                            <div
-                                                class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
-                                                {{-- blade-formatter-disable --}}
-                                            <p class="text-sm whitespace-pre-line break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ __($history->msg) }}</p>
-                                            {{-- blade-formatter-enable --}}
-                                                @if ($history->isbot)
-                                                    <div class="flex space-x-1">
-                                                        <button
-                                                            class="flex text-black hover:bg-gray-400 p-2 rounded-lg"
-                                                            onclick="copytext($(this).parent().parent().children()[0])">
-                                                            <svg stroke="currentColor" fill="none"
-                                                                stroke-width="2" viewBox="0 0 24 24"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon-sm" height="1em" width="1em"
-                                                                xmlns="http://www.w3.org/2000/svg">
-                                                                <path
-                                                                    d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                                                </path>
-                                                                <rect x="8" y="2" width="8" height="4"
-                                                                    rx="1" ry="1">
-                                                                </rect>
-                                                            </svg>
-                                                            <svg stroke="currentColor" fill="none"
-                                                                stroke-width="2" viewBox="0 0 24 24"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="icon-sm" style="display:none;" height="1em"
-                                                                width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                                <polyline points="20 6 9 17 4 12"></polyline>
-                                                            </svg>
-                                                        </button>
-                                                        @if (request()->user()->hasPerm('Chat_update_feedback'))
-                                                            <button
-                                                                class="flex hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
-                                                                data-modal-target="feedback"
-                                                                data-modal-toggle="feedback"
-                                                                onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
-                                                                    json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                                ) !!});">
-                                                                <svg stroke="currentColor" fill="none"
-                                                                    stroke-width="2" viewBox="0 0 24 24"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="icon-sm" height="1em" width="1em"
-                                                                    xmlns="http://www.w3.org/2000/svg">
-                                                                    <path
-                                                                        d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                                                                    </path>
-                                                                </svg>
-                                                            </button>
-                                                            <button
-                                                                class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
-                                                                data-modal-target="feedback"
-                                                                data-modal-toggle="feedback"
-                                                                onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
-                                                                    json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
-                                                                ) !!});">
-                                                                <svg stroke="currentColor" fill="none"
-                                                                    stroke-width="2" viewBox="0 0 24 24"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="icon-sm" height="1em" width="1em"
-                                                                    xmlns="http://www.w3.org/2000/svg">
-                                                                    <path
-                                                                        d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                                                                    </path>
-                                                                </svg>
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        @if (!$history->isbot)
-                                            <div
-                                                class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                                User
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endif
+                                <x-chat.message :history="$history" :tasks="$tasks" :botimgurl="$botimgurl" />
                             @endforeach
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
@@ -494,192 +105,18 @@
                         class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
                         @if (request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
-                            @if (request()->user()->hasPerm('Chat_update_upload_file'))
-                                <form method="post" action="{{ route('chat.upload') }}" class="m-auto"
-                                    enctype="multipart/form-data">
-                                    @csrf
-                                    <input name='llm_id' style='display:none;'
-                                        value='{{ request()->route('llm_id') }}'>
-                                    <input id="upload" type="file" name="file" style="display: none;"
-                                        onchange='uploadcheck()'>
-                                    <label for="upload" id="upload_btn"
-                                        class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
-                                </form>
-                            @else
-                                <p class="text-black dark:text-white mx-auto">
-                                    {{ __("Sorry, But seems like you don't have permission to upload file.") }}</p>
-                            @endif
+                            <x-chat.prompt-area.upload :llmId="request()->route('llm_id')" />
                         @elseif (request()->route('llm_id'))
-                            <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
-                                <div class="flex items-end justify-end">
-                                    @csrf
-                                    <input name="llm_id" value="{{ request()->route('llm_id') }}"
-                                        style="display:none;">
-                                    <textarea tabindex="0" data-id="root"
-                                        placeholder="{{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
-                                        rows="1" max-rows="5" oninput="adjustTextareaRows(this)" id="chat_input" name="input"
-                                        class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                                    <button type="submit"
-                                        class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
-                                            class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
-                                            <path
-                                                d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
-                                                fill="currentColor"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </form>
+                            <x-chat.prompt-area.request :llmId="request()->route('llm_id')" />
                         @elseif(request()->route('chat_id'))
-                            <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
-                                <div class="flex items-end justify-end">
-                                    @csrf
-                                    <input name="chat_id" value="{{ request()->route('chat_id') }}"
-                                        style="display:none;">
-                                    <input id="chained" style="display:none;"
-                                        {{ \Session::get('chained') ? '' : 'disabled' }}>
-                                    <button type="button" onclick="chain_toggle()" id="chain_btn"
-                                        class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
-                                    <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
-                                        oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
-                                        class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                                    <button type="submit" id='submit_msg' style='display:none;'
-                                        class="inline-flex items-center justify-center fixed w-[32px] bg-blue-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-blue-500 dark:hover:bg-blue-700">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
-                                            class="w-5 h-5 text-white dark:text-gray-300 icon-sm m-1 md:m-0">
-                                            <path
-                                                d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
-                                                fill="currentColor"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </form>
+                            <x-chat.prompt-area.create :chained="\Session::get('chained')" />
                         @endif
                     </div>
                 @endif
             </div>
             @if (request()->route('chat_id'))
-                <div id="delete_chat_modal" tabindex="-1"
-                    class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative w-full max-w-md max-h-full">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                            <button type="button"
-                                class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                data-modal-hide="delete_chat_modal">
-                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 14 14">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                </svg>
-                                <span class="sr-only">Close modal</span>
-                            </button>
-                            <form id="deleteChat" action="{{ route('chat.delete') }}" method="post"
-                                class="p-6 text-center">
-                                <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 20 20">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('Are you sure you want to DELETE the chat ') }}"<span>{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->name }}</span>"?
-                                </h3>
-                                @csrf
-                                @method('delete')
-                                <input name="id" class="hidden"
-                                    value="{{ App\Models\Chats::findOrFail(request()->route('chat_id'))->id }}" />
-                                <button type="submit"
-                                    class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                    {{ __('Delete') }}
-                                </button>
-                                <button data-modal-hide="delete_chat_modal" type="button"
-                                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('Cancel') }}</button>
-
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div id="feedback" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
-                    class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative w-full max-w-2xl max-h-full">
-                        <!-- Modal content -->
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                            <!-- Modal header -->
-                            <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                                <div style="display:none;"
-                                    class="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 bg-green-100">
-                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                                        stroke-linecap="round" stroke-linejoin="round" class="icon-lg text-green-700"
-                                        aria-hidden="true" height="1em" width="1em"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <div style="display:none;"
-                                    class="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 bg-red-100">
-                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                                        stroke-linecap="round" stroke-linejoin="round" class="icon-lg text-red-600"
-                                        aria-hidden="true" height="1em" width="1em"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl my-auto font-semibold text-gray-900 dark:text-white">
-                                    {{ __('Provide feedback') }}
-                                </h3>
-                                <button type="button"
-                                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                    data-modal-hide="feedback">
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
-                            <!-- Modal body -->
-                            <div class="p-6">
-                                <form id="feedback_form" action="{{ route('chat.feedback') }}" method="post">
-                                    @csrf
-                                    <input name="history_id" style="display:none;">
-                                    <input name="type" style="display:none;">
-
-                                    <textarea rows="1" maxlength="4096" max-rows="5" name="feedbacks" id="feedbacks"
-                                        class="w-full resize-none" oninput="adjustTextareaRows(this)"></textarea>
-                                    <div>
-                                        <input name="feedback[]" id="feedback_1" type="checkbox" value="unsafe">
-                                        <label for="feedback_1"
-                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('Unsafe') }}</label>
-                                    </div>
-                                    <div>
-                                        <input name="feedback[]" id="feedback_2" type="checkbox" value="incorrect">
-                                        <label for="feedback_2"
-                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('Incorrect') }}</label>
-                                    </div>
-                                    <div>
-                                        <input name="feedback[]" id="feedback_3" type="checkbox" value="inrelvent">
-                                        <label for="feedback_3"
-                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('Inrelvent') }}</label>
-                                    </div>
-                                    <div>
-                                        <input name="feedback[]" id="feedback_4" type="checkbox" value="language">
-                                        <label for="feedback_4"
-                                            class="ml-2 text-sm font-medium text-gray-400 dark:text-gray-300">{{ __('In Wrong Language') }}</label>
-                                    </div>
-                                    <div class="flex justify-end">
-                                        <button data-modal-hide="feedback" type="submit"
-                                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Submit feedback') }}</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <x-chat.modals.delete_confirm />
+                <x-chat.modals.feedback />
                 <script>
                     var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
@@ -735,13 +172,16 @@
                         $(obj).parent().find(">button:not(:first)").removeClass("text-green-600 text-red-600").addClass("text-black")
                         $(obj).toggleClass("text-black " + (type == 1 ? "text-green-600" : "text-red-600"))
                         $("#feedback svg").eq(type % 2).parent().hide();
+                        $("#feedback_form >div:not(:last)").hide()
+                        $("#feedback_form >div:not(:last) >input").prop("disabled", true)
+                        $("#feedback_form >div." + ["good", "bad"][type - 1]).show()
+                        $("#feedback_form >div." + ["good", "bad"][type - 1] + " >input").prop("disabled", false)
                         if (type == 1) {
                             //Good
-                            $("#feedback_form >div:not(:last)").hide()
                             $("#feedback_form textarea").attr("placeholder", "{{ __('What do you like about the response?') }}")
                         } else if (type == 2) {
                             //Bad
-                            $("#feedback_form >div").show()
+                            $("#feedback_form >div.bad").show()
                             $("#feedback_form textarea").attr("placeholder",
                                 "{{ __('What was the problem with this response? How can it be improved?') }}")
                         }
@@ -754,15 +194,7 @@
                                 if (data["detail"]) {
                                     $("#feedback_form textarea").val(data["detail"]);
                                 }
-                                if (type == 2 && data["flags"]) {
-                                    data["flags"] = JSON.parse(data["flags"])
-                                    data["flags"] = data["flags"].map(f => {
-                                        return ["unsafe", "incorrect", "inrelvent", "language"].indexOf(f) + 1
-                                    })
-                                    data["flags"].forEach(i => {
-                                        $("#feedback_" + i).click();
-                                    })
-                                }
+
                             } else {
                                 $.post("{{ route('chat.feedback') }}", {
                                     type: type,
@@ -771,42 +203,16 @@
                                     _token: $("input[name='_token']").val()
                                 })
                             }
-
+                            if (data["flags"]) {
+                                data["flags"] = JSON.parse(data["flags"]);
+                                data["flags"].forEach(flagValue => {
+                                    $('input[name="feedback[]"][value="' + flagValue + '"]').prop('checked', true);
+                                });
+                            }
                         }
                     }
 
-                    function editChat() {
-                        $("#chatHeader button").find('.fa-pen').parent().addClass('hidden');
-                        $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
-                        name = $("#chatHeader >p:eq(0)").text().trim();
-                        $("#chatHeader >p:eq(0)").html(
-                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`
-                        )
-
-                        $("#chatHeader >p >input:eq(0)").keypress(function(e) {
-                            if (e.which == 13) saveChat();
-                        });
-                    }
-
-                    function export_chat() {
-                        var chatMessages = [];
-
-                        $("#chatroom > div > div p").each(function(index, element) {
-                            var msgText = $(element).text();
-                            var isBot = $(element).hasClass("bot-msg");
-                            var chained = $(element).hasClass("chain-msg");
-
-                            var message = {
-                                "msg": msgText,
-                                "isbot": isBot,
-                                "chained": chained
-                            };
-
-                            chatMessages.push(message);
-                        });
-
-                        $("#export_json").val(JSON.stringify(chatMessages, null, 4))
-                    }
+                    
 
                     function saveChat() {
                         input = $("#chatHeader >p >input:eq(0)")
