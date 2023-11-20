@@ -38,7 +38,32 @@
                 <input id="import_file_input" type='file' hidden>
             </div>
             <script>
-                // JavaScript code here...
+                $(document).ready(function() {
+                    // Handle the file input change event
+                    $('#import_file_input').on('change', function() {
+                        loadFile($(this)[0], '#import_json')
+                    });
+                    $('#import_json').on('drop', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        loadFile(e.originalEvent.dataTransfer, '#import_json');
+                    });
+                });
+                function loadFile(fileInput, input) {
+                    const file = fileInput.files[0];
+                    if (file) {
+                        if (file.type === 'text/plain' || file.type === 'application/json') {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                $(input).val(e.target.result);
+                                adjustTextareaRows(input);
+                            };
+                            reader.readAsText(file);
+                        } else {
+                            alert('Only .txt or .json files are accepted.');
+                        }
+                    }
+                }
             </script>
             <!-- Modal footer -->
             <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">

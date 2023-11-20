@@ -354,9 +354,6 @@
                             })
                         }
                     @endif
-                    function import_chat() {
-
-                    }
                 @endif
             </script>
         @endif
