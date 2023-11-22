@@ -20,6 +20,7 @@
         </svg>
     </button>
     @if (request()->user()->hasPerm('Chat_update_feedback'))
+        <x-chat.modals.feedback />
         <button
             class="flex text-black hover:bg-gray-400 p-2 rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
             data-modal-target="feedback" data-modal-toggle="feedback"
@@ -50,3 +51,31 @@
         </button>
     @endif
 </div>
+
+<script>
+    var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
+    function copytext(node) {
+        var textArea = document.createElement("textarea");
+        textArea.value = node.textContent;
+
+        document.body.appendChild(textArea);
+
+        textArea.select();
+
+        try {
+            document.execCommand("copy");
+        } catch (err) {
+            console.log("Copy not supported or failed: ", err);
+        }
+
+        document.body.removeChild(textArea);
+
+        $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
+        $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
+        setTimeout(function() {
+            $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
+            $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
+        }, 3000);
+    }
+</script>

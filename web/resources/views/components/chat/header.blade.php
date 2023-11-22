@@ -48,25 +48,24 @@
                 <script>
                     function export_chat() {
                         var chatMessages = [];
-                
+
                         $("#chatroom > div > div p").each(function(index, element) {
                             var msgText = $(element).text();
                             var isBot = $(element).hasClass("bot-msg");
                             var chained = $(element).hasClass("chain-msg");
-                
+
                             var message = {
                                 "msg": msgText,
                                 "isbot": isBot,
                                 "chained": chained
                             };
-                
+
                             chatMessages.push(message);
                         });
-                
+
                         $("#export_json").val(JSON.stringify(chatMessages, null, 4))
                     }
                 </script>
-                
             @endif
             <button onclick="saveChat()"
                 class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
@@ -77,6 +76,7 @@
                 <i class="fas fa-pen"></i>
             </button>
             @if (request()->user()->hasPerm('Chat_delete_chatroom'))
+                <x-chat.modals.delete_confirm />
                 <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
                     class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                     <i class="fas fa-trash"></i>
@@ -98,5 +98,16 @@
         $("#chatHeader >p >input:eq(0)").keypress(function(e) {
             if (e.which == 13) saveChat();
         });
+    }
+
+    function saveChat() {
+        input = $("#chatHeader >p >input:eq(0)")
+        if (input.val() != input.attr("old")) {
+            $("#editChat input:eq(2)").val(input.val())
+            $("#editChat").submit();
+        }
+        $("#chatHeader button").find('.fa-pen').parent().removeClass('hidden');
+        $("#chatHeader button").find('.fa-save').parent().addClass('hidden');
+        $("#chatHeader >p").text(input.val())
     }
 </script>

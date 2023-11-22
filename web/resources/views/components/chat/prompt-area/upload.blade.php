@@ -5,10 +5,30 @@
         @csrf
         <input name="llm_id" style="display:none;" value="{{ $llmId }}">
         <input id="upload" type="file" name="file" style="display: none;" onchange="uploadcheck()">
-        <label for="upload" id="upload_btn" class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
+        <label for="upload" id="upload_btn"
+            class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
     </form>
 @else
     <p class="text-black dark:text-white mx-auto">
         {{ __("Sorry, but it seems like you don't have permission to upload a file.") }}
     </p>
 @endif
+
+<script>
+    function uploadcheck() {
+        if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
+            1024) {
+            $("#upload").parent().submit();
+        } else {
+            $("#upload_btn").text('{{ __('File Too Large') }}')
+            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+            $("#upload").val("");
+
+
+            setTimeout(function() {
+                $("#upload_btn").text('{{ __('Upload file') }}')
+                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+            }, 3000);
+        }
+    }
+</script>

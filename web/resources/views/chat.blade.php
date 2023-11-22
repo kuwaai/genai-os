@@ -65,7 +65,7 @@
         @else
             <div id="histories"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
-                
+
                 <x-chat.header :llmId="request()->route('llm_id')" :chatId="request()->route('chat_id')" :LLM="$LLM" />
 
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
@@ -90,7 +90,7 @@
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
                         @endif
                         <div style="display:none;"
-                            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                            class="bg-red-100 border border-red-400 mt-2 text-red-700 px-4 py-3 rounded relative"
                             id="error_alert" role="alert">
                             <span class="block sm:inline"></span>
                         </div>
@@ -114,171 +114,7 @@
                     </div>
                 @endif
             </div>
-            @if (request()->route('chat_id'))
-                <x-chat.modals.delete_confirm />
-                <x-chat.modals.feedback />
-                <script>
-                    var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-
-                    function chain_toggle() {
-                        $.get("{{ route('chat.chain') }}", {
-                            switch: $('#chained').prop('disabled')
-                        }, function() {
-                            $('#chained').prop('disabled', !$('#chained').prop('disabled'));
-                            $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
-                            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
-                                '{{ __('Chained') }}')
-                        })
-                    }
-
-                    function copytext(node) {
-                        var textArea = document.createElement("textarea");
-                        textArea.value = node.textContent;
-
-                        document.body.appendChild(textArea);
-
-                        textArea.select();
-
-                        try {
-                            document.execCommand("copy");
-                        } catch (err) {
-                            console.log("Copy not supported or failed: ", err);
-                        }
-
-                        document.body.removeChild(textArea);
-
-                        $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
-                        $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
-                        setTimeout(function() {
-                            $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
-                            $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
-                        }, 3000);
-                    }
-
-                    function feedback(id, type, obj, data) {
-                        $(obj).parent().find("button:not(:first)").removeClass("bg-gray-400")
-                        adjustTextareaRows($("#feedbacks"));
-                        // clear form
-                        $("#feedback_form input:not(:first), #feedback_form textarea").each(function() {
-                            if ($(this).is(":checkbox")) {
-                                $(this).prop("checked", false);
-                            } else {
-                                $(this).val("");
-                            }
-                        });
-                        $("#feedback_form input:eq(1)").val(id) //History id
-                        $("#feedback_form input:eq(2)").val(type) //feedback type
-                        $("#feedback svg").eq(type - 1).parent().show();
-                        $(obj).parent().find(">button:not(:first)").removeClass("text-green-600 text-red-600").addClass("text-black")
-                        $(obj).toggleClass("text-black " + (type == 1 ? "text-green-600" : "text-red-600"))
-                        $("#feedback svg").eq(type % 2).parent().hide();
-                        $("#feedback_form >div:not(:last)").hide()
-                        $("#feedback_form >div:not(:last) >input").prop("disabled", true)
-                        $("#feedback_form >div." + ["good", "bad"][type - 1]).show()
-                        $("#feedback_form >div." + ["good", "bad"][type - 1] + " >input").prop("disabled", false)
-                        if (type == 1) {
-                            //Good
-                            $("#feedback_form textarea").attr("placeholder", "{{ __('What do you like about the response?') }}")
-                        } else if (type == 2) {
-                            //Bad
-                            $("#feedback_form >div.bad").show()
-                            $("#feedback_form textarea").attr("placeholder",
-                                "{{ __('What was the problem with this response? How can it be improved?') }}")
-                        }
-                        if (data) {
-                            if (data['nice'] === true && type == 1) {
-                                if (data["detail"]) {
-                                    $("#feedback_form textarea").val(data["detail"]);
-                                }
-                            } else if (data['nice'] === false && type == 2) {
-                                if (data["detail"]) {
-                                    $("#feedback_form textarea").val(data["detail"]);
-                                }
-
-                            } else {
-                                $.post("{{ route('chat.feedback') }}", {
-                                    type: type,
-                                    history_id: id,
-                                    init: true,
-                                    _token: $("input[name='_token']").val()
-                                })
-                            }
-                            if (data["flags"]) {
-                                data["flags"] = JSON.parse(data["flags"]);
-                                data["flags"].forEach(flagValue => {
-                                    $('input[name="feedback[]"][value="' + flagValue + '"]').prop('checked', true);
-                                });
-                            }
-                        }
-                    }
-
-                    
-
-                    function saveChat() {
-                        input = $("#chatHeader >p >input:eq(0)")
-                        if (input.val() != input.attr("old")) {
-                            $("#editChat input:eq(2)").val(input.val())
-                            $("#editChat").submit();
-                        }
-                        $("#chatHeader button").find('.fa-pen').parent().removeClass('hidden');
-                        $("#chatHeader button").find('.fa-save').parent().addClass('hidden');
-                        $("#chatHeader >p").text(input.val())
-                    }
-
-                    $("#chat_input").val("訊息處理中...請稍後...")
-                    $chattable = false
-                    $("#prompt_area").submit(function(event) {
-                        event.preventDefault();
-                        if ($chattable) {
-                            this.submit();
-                            $chattable = false
-                        }
-                        $("#submit_msg").hide()
-                        if (!isMac) $("#chat_input").val("訊息處理中...請稍後...")
-                        $("#chat_input").prop("readonly", true)
-                    })
-                    task = new EventSource("{{ route('chat.sse') }}", {
-                        withCredentials: false
-                    });
-                    task.addEventListener('error', error => {
-                        task.close();
-                    });
-                    task.addEventListener('message', event => {
-                        if (event.data == "finished") {
-                            $chattable = true
-                            $("#submit_msg").show()
-                            $("#chat_input").val("")
-                            $("#chat_input").prop("readonly", false)
-                            adjustTextareaRows($("#chat_input"))
-                            $(".show-on-finished").attr("style", "")
-                        } else {
-                            data = JSON.parse(event.data)
-                            number = parseInt(data["history_id"]);
-                            msg = data["msg"];
-                            msg = msg.replace(
-                                "[Oops, the LLM returned empty message, please try again later or report to admins!]",
-                                "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}"
-                            )
-                            msg = msg.replace("[Sorry, something is broken, please try again later!]",
-                                "{{ __('[Sorry, something is broken, please try again later!]') }}")
-                            msg = msg.replace(
-                                "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]",
-                                "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
-                            )
-                            $('#task_' + number).text(msg);
-                        }
-                    });
-                </script>
-            @endif
             <script>
-                var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-
-                function isValidURL(url) {
-                    // Regular expression for a simple URL pattern (you can make it more complex if needed)
-                    var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
-                    return urlPattern.test(url);
-                }
-
                 function adjustTextareaRows(obj) {
                     obj = $(obj)
                     if (obj.length) {
@@ -294,67 +130,6 @@
                         textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
                     }
                 }
-
-                function uploadcheck() {
-                    if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
-                        1024) {
-                        $("#upload").parent().submit();
-                    } else {
-                        $("#upload_btn").text('{{ __('File Too Large') }}')
-                        $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                        $("#upload").val("");
-
-
-                        setTimeout(function() {
-                            $("#upload_btn").text('{{ __('Upload file') }}')
-                            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                        }, 3000);
-                    }
-                }
-
-                if ($("#chat_input")) {
-                    $("#chat_input").focus();
-                    $("#chat_input").on("keydown", function(event) {
-                        if (!isMac && event.key === "Enter" && !event.shiftKey) {
-                            event.preventDefault();
-
-                            $("#prompt_area").submit();
-                        } else if (event.key === "Enter" && event.shiftKey) {
-                            event.preventDefault();
-                            var cursorPosition = this.selectionStart;
-                            $(this).val($(this).val().substring(0, cursorPosition) + "\n" + $(this).val().substring(
-                                cursorPosition));
-                            this.selectionStart = this.selectionEnd = cursorPosition + 1;
-                        }
-                        adjustTextareaRows($("#chat_input"));
-                    });
-                    adjustTextareaRows($("#chat_input"));
-                }
-
-                function stringToUnicode(inputString) {
-                    return inputString.replace(/./g, function(char) {
-                        return '\\u' + char.charCodeAt(0).toString(16).padStart(4, '0');
-                    });
-                }
-                @if (request()->route('llm_id'))
-                    @if (in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
-                        if ($("#prompt_area")) {
-                            $("#prompt_area").on("submit", function(event) {
-                                event.preventDefault();
-                                if (isValidURL($("#chat_input").val().trim())) {
-                                    $("#prompt_area")[0].submit()
-                                } else {
-                                    $("#error_alert >span").text(
-                                        "{{ __('The first message for this LLM allows URL only!') }}")
-                                    $("#error_alert").fadeIn();
-                                    setTimeout(function() {
-                                        $("#error_alert").fadeOut();
-                                    }, 3000);
-                                }
-                            })
-                        }
-                    @endif
-                @endif
             </script>
         @endif
     </div>
