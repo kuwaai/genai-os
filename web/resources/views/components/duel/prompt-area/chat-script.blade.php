@@ -1,3 +1,5 @@
+@props(['llms'])
+
 <script>
     function adjustTextareaRows(obj) {
         obj = $(obj)
@@ -14,13 +16,19 @@
             textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
         }
     }
-
-    $("#chat_input").prop("readonly", true)
     $("#chat_input").val("訊息處理中...請稍後...")
     $chattable = false
     $("#prompt_area").submit(function(event) {
         event.preventDefault();
-        if ($chattable && $("#chat_input").val().trim() != "") {
+        var allDisabled = true;
+        $('input[name="chatsTo[]"]').each(function() {
+            if (!$(this).prop('disabled')) {
+                allDisabled = false;
+                return false; // exit the loop if at least one input is not disabled
+            }
+        });
+
+        if ($chattable && !allDisabled && $("#chat_input").val().trim() != "") {
             this.submit();
             $chattable = false
             $("#submit_msg").hide()
@@ -33,6 +41,9 @@
             } else if (!$chattable) {
                 $("#error_alert >span").text(
                     "{{ __('Still processing a request, If this take too long, Please refresh.') }}")
+            } else if (allDisabled) {
+                $("#error_alert >span").text(
+                    "{{ __('You selected no LLM to chat with. Please select one first!') }}")
             } else {
                 $("#error_alert >span").text("{{ __('Something went wrong! Please refresh the page.') }}")
             }
@@ -74,20 +85,42 @@
         }
     });
 
-    $("#chat_input").focus();
-    $("#chat_input").on("keydown", function(event) {
-        if (!isMac && event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
+    if ($("#chat_input")) {
+        $("#chat_input").focus();
 
-            $("#prompt_area").submit();
-        } else if (event.key === "Enter" && event.shiftKey) {
-            event.preventDefault();
-            var cursorPosition = this.selectionStart;
-            $(this).val($(this).val().substring(0, cursorPosition) + "\n" + $(this).val().substring(
-                cursorPosition));
-            this.selectionStart = this.selectionEnd = cursorPosition + 1;
+        function chain_toggle() {
+            $.get("{{ route('chat.chain') }}", {
+                switch: $('#chained').prop('disabled')
+            }, function() {
+                $('#chained').prop('disabled', !$('#chained').prop('disabled'));
+                $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
+                $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
+                    '{{ __('Chained') }}')
+            })
         }
+        $("#chat_input").on("keydown", function(event) {
+            if (!isMac && event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+
+                $("#prompt_area").submit();
+            } else if (event.key === "Enter" && event.shiftKey) {
+                event.preventDefault();
+                var cursorPosition = this.selectionStart;
+                $(this).val($(this).val().substring(0, cursorPosition) + "\n" + $(this).val().substring(
+                    cursorPosition));
+                this.selectionStart = this.selectionEnd = cursorPosition + 1;
+            }
+            adjustTextareaRows($("#chat_input"));
+        });
         adjustTextareaRows($("#chat_input"));
-    });
-    adjustTextareaRows($("#chat_input"));
+    }
+
+    @if (session('selLLMs'))
+        @foreach ($llms as $llm)
+            $(`#btn_{{ $llm->id }}_toggle`).click()
+        @endforeach
+        @foreach (session('selLLMs') as $id)
+            $(`#btn_{{ $id }}_toggle`).click()
+        @endforeach
+    @endif
 </script>

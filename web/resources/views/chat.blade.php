@@ -23,6 +23,9 @@
         }
     @endphp
 
+    <script>
+        var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    </script>
     @if (request()->user()->hasPerm('Chat_update_import_chat') && request()->route('llm_id'))
         <x-chat.modals.import_history />
     @elseif (request()->user()->hasPerm('Chat_read_export_chat') && request()->route('chat_id'))
@@ -31,26 +34,58 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         @if (request()->route('chat_id') || request()->route('llm_id'))
             <x-chat.rooms.drawer :LLM="$LLM" />
+            @if (request()->route('chat_id'))
+                <x-chat.modals.feedback />
+
+                <script>
+                    var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
+                    function copytext(node) {
+                        var textArea = document.createElement("textarea");
+                        textArea.value = node.textContent;
+
+                        document.body.appendChild(textArea);
+
+                        textArea.select();
+
+                        try {
+                            document.execCommand("copy");
+                        } catch (err) {
+                            console.log("Copy not supported or failed: ", err);
+                        }
+
+                        document.body.removeChild(textArea);
+
+                        $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
+                        $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
+                        setTimeout(function() {
+                            $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
+                            $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
+                        }, 3000);
+                    }
+                </script>
+            @endif
         @endif
         <div
-            class="{{ request()->route('chat_id') || request()->route('llm_id') ? 'hidden sm:block' : '' }} {{ $result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id')) ? 'w-64' : 'sm:w-64 w-full' }} bg-white dark:bg-gray-800 text-black dark:text-white flex-shrink-0 relative rounded-l-lg overflow-hidden">
-            <div
-                class="p-3 {{ $result->count() == 1 || request()->route('chat_id') || request()->route('llm_id') ? 'flex flex-col' : '' }} h-full overflow-y-auto scrollbar">
+            class="{{ request()->route('chat_id') || request()->route('llm_id') ? 'w-64 hidden sm:flex' : 'sm:w-64 w-full flex' }} bg-white dark:bg-gray-800 text-black dark:text-white flex-shrink-0 relative rounded-l-lg overflow-hidden">
+            <div class="p-3 flex flex-1 flex-col overflow-y-auto scrollbar">
                 @if (!($result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id'))))
                     <h2 class="block sm:hidden text-xl text-center">{{ __('Chat') }}</h2>
-                    <p class="block sm:hidden text-center">{{ __('Select a chatroom to begin with') }}</p>
+                    @if ($result->count() == 0)
+                        <div
+                            class="text-center rounded-r-lg flex flex-1 overflow-hidden justify-center items-center text-gray-700 dark:text-white">
+                            {!! __('No available LLM to chat with<br>Please come back later!') !!}
+                        </div>
+                    @else
+                        <p class="block sm:hidden text-center">{{ __('Select a chatroom to begin with') }}</p>
+                    @endif
                 @endif
                 @if ($result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id')))
                     <a href="{{ route('chat.home') }}"
                         class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
                         {{ __('Return to Menu') }}</a>
                 @endif
-                @if ($result->count() == 0)
-                    <div
-                        class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        {!! __('No available LLM to chat with<br>Please come back later!') !!}
-                    </div>
-                @elseif(request()->route('chat_id') || request()->route('llm_id'))
+                @if (request()->route('chat_id') || request()->route('llm_id'))
                     <x-chat.rooms.list :LLM="$LLM" />
                 @else
                     <x-chat.llm :result="$result" />
@@ -76,12 +111,10 @@
                             : '' }}">
                         @if (request()->route('chat_id'))
                             @php
-                                $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image;
-                                $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
                                 $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                             @endphp
                             @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->leftjoin('feedback', 'history_id', '=', 'histories.id')->select(['histories.*', 'feedback.nice', 'feedback.detail', 'feedback.flags'])->orderby('histories.created_at')->orderby('histories.id', 'desc')->get() as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" :botimgurl="$botimgurl" />
+                                <x-chat.message :history="$history" :tasks="$tasks" />
                             @endforeach
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))

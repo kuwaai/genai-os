@@ -21,5 +21,4 @@
         </a>
     </div>
 @empty
-    <p>No LLMs found.</p>
 @endforelse

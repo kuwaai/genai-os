@@ -70,3 +70,14 @@
         </div>
     </div>
 </div>
+
+<script>
+    function checkForm() {
+        if ($("#create_duel input[name='llm[]']:checked").length > 1) {
+            return true;
+        } else {
+            $("#create_error").show().delay(3000).fadeOut();
+            return false;
+        }
+    }
+</script>
