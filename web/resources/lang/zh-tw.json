@@ -90,7 +90,7 @@
 "New Group":"新增群組",
 "Create a new Group":"創建一個新群組",
 "Tab Permissions":"頁面權限",
-"Description":"模型敘述",
+"Description":"敘述",
 "Invite Token":"邀請碼",
 "Register":"註冊",
 "Already registered?":"已經註冊了？登入",
@@ -213,5 +213,17 @@
 "Something went wrong! Please refresh the page.":"好像有東西出錯了！請重新整理網頁。",
 "Correct":"正確無誤",
 "Easy to understand":"簡潔易懂",
-"Complete":"回答完整"
+"Complete":"回答完整",
+"Create Application":"創建應用",
+"New Application":"新應用",
+"Startup Prompt":"對話開頭",
+"Startup Reply":"對話回答",
+"Application Name":"應用名稱",
+"Application Description":"應用敘述",
+"Startup prompt that leading the talk to an application":"引導應用導向的開頭問題",
+"Startup reply that leading the talk to an application":"引導應用導向的開頭回答",
+"Comparative":"同時比較模型回答",
+"Feedbacks":"蒐集模型回饋",
+"Developer API":"開發者API",
+"Portalable & Distributed":"系統可攜帶性與分散式架構"
 }

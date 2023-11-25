@@ -58,12 +58,29 @@
 
         <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
             <div class="flex items-center flex-col">
-                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200"><a class="flex items-center"
-                        href="https://taide.tw/" target="_blank"><img class="mr-3 hidden dark:block"
-                            src="{{ asset('images/TAIDE2.png') }}"><img class="mr-3 dark:hidden block"
-                            src="{{ asset('images/TAIDE2_dark.png') }}"><span class="pt-4"
-                            style="font-size:75px;">Chat</span></a></h3>
-
+                @env('nuk')
+                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
+                    <div class="flex items-center justify-center overflow-hidden">
+                        <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
+                            <img class="w-[150px] sm:w-[175px] md:w-[200px]" src="{{ asset('images/csie_logo.svg') }}">
+                        </a>
+                        <div class="flex flex-col ml-4 text-[50px] sm:text-[62.5px] md:text-[75px]">
+                            <span>LLM</span>
+                            <span class="pt-4">Workspace</span>
+                        </div>
+                    </div>
+                </h3>
+            @else
+                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
+                    <a class="flex items-center overflow-hidden" href="https://taide.tw/" target="_blank">
+                        <div>
+                            <img class="mr-3 hidden dark:block" src="{{ asset('images/TAIDE2.png') }}">
+                            <img class="mr-3 dark:hidden block" src="{{ asset('images/TAIDE2_dark.png') }}">
+                        </div>
+                        <span class="pt-4 text-[75px]">Chat</span>
+                    </a>
+                </h3>
+                @endenv
             </div>
 
 
@@ -73,10 +90,59 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                @env('nuk')
+                                {{ __('Comparative') }}
+                            @else
                                 {{ __('Translation') }}
+                                @endenv
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
+                                @env('nuk')
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm">你好</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/dolly.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">你好，請問我能如何幫助你？</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/MetaAI.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">嗨！請問需要甚麼幫助？</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/bloom.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">您好！我是一個熱心助人的AI。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -102,6 +168,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -109,9 +176,83 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Composition') }}</h2>
+                                @env('nuk')
+                                {{ __('Feedbacks') }}
+                            @else
+                                {{ __('Composition') }}
+                                @endenv
+                            </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
+                                @env('nuk')
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm">請介紹吳俊興教授</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/csie.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">
+                                                吳俊興教授是國立高雄大學資訊工程學系的專任教師,目前擔任副教授一職。<br>他的學歷為國立台灣大學資訊工程博士,是資深的科技人才。<br>以下為吳俊興教授的詳細資訊:...
+                                            </p>
+                                            <div class="flex space-x-1" style="">
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                        </path>
+                                                        <rect x="8" y="2" width="8" height="4"
+                                                            rx="1" ry="1">
+                                                        </rect>
+                                                    </svg>
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" style="display:none;"
+                                                        height="1em" width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex hover:bg-gray-400 p-2 rounded-lg text-green-600"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg text-black"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -137,6 +278,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -148,10 +290,24 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                @env('nuk')
+                                {{ __('Developer API') }}
+                            @else
                                 {{ __('Communication') }}
+                                @endenv
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
+                                @env('nuk')
+                                <div class="bg-black text-white rounded-lg overflow-hidden break-all">
+                                    <span class="text-green-300">$</span> curl -X POST -H "Content-Type:
+                                    application/json" -H "Authorization: Bearer YOUR_TOKEN_HERE" -d "{\"messages\": [{
+                                    \"isbot\": \"false\", \"msg\": \"你好\" }],\"model\": \"MODEL_YOU_WANT_TO_USE\"}"
+                                    WEB_ENDPOINT
+                                    <br><br><span class="text-green-300">{"status":"success","message":"Authentication
+                                        successful","tokenable_id":-1,"name":"YOUR_NAME","output":"你好！我今天可以如何協助你？"}</span>
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -177,6 +333,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -185,9 +342,16 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Summarization') }}</h2>
+                                @env("nuk")
+                                {{ __('Portalable & Distributed') }}
+                                @else
+                                {{ __('Summarization') }}
+                                @endenv
+                            </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
+                                @env("nuk")
+                                <p class="text-white m-auto">待完成：一張解釋系統架構的圖</p>
+                                @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -215,6 +379,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -223,16 +388,27 @@
             <div class="flex justify-center mt-4 px-0 sm:items-center sm:justify-between">
                 <div class="text-center text-sm text-gray-500 dark:text-gray-400 sm:text-left">
                     <div class="flex items-center gap-4">
+                        @env('nuk')
+                        <a href="https://www.csie.nuk.edu.tw/" target="_blank"
+                            class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">由國立高雄大學
+                            資訊工程學系<br>開發與維護的語言模型平台</a>
+                    @else
                         <a href="https://www.nuk.edu.tw/" target="_blank"
                             class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
                             {!! __('Developed by NUK and NARLabs') !!}
                         </a>
+                        @endenv
                     </div>
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
+                    @env('nuk')
+                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                        href="https://www.nuk.edu.tw/" target="_blank">國立高雄大學</a>
+                @else
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         href="https://www.twcc.ai/" target="_blank">{{ __('Powered by TWCC') }}</a>
+                    @endenv
                     <span class="text-black dark:text-white flex justify-end text-sm">{{ __('Version') }}
                         0.0.7.1</span>
                 </div>
