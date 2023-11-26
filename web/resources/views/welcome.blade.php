@@ -187,7 +187,7 @@
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm">請介紹吳俊興教授</p>
+                                            <p class="text-sm">請介紹國立高雄大學大學部</p>
                                         </div>
                                     </div>
                                     <div
@@ -202,9 +202,9 @@
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm">
-                                                吳俊興教授是國立高雄大學資訊工程學系的專任教師,目前擔任副教授一職。<br>他的學歷為國立台灣大學資訊工程博士,是資深的科技人才。<br>以下為吳俊興教授的詳細資訊:...
-                                            </p>
+                                            <p class="text-sm">國立高雄大學大學部的資訊工程學系的課程設計重點主要在於培養學生資訊領域的基礎知識及未來就業或研究所繼續深造的技術能力。課程設計以實用性及前瞻性為原則，以符合業界當前的技術需求，並為學生未來就業做準備。<br>
+課程設計重點包括：<br>
+1. 奠定學生資訊領域的基礎知識。...</p>
                                             <div class="flex space-x-1" style="">
                                                 <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg">
                                                     <svg stroke="currentColor" fill="none" stroke-width="2"
@@ -299,13 +299,18 @@
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 @env('nuk')
-                                <div class="bg-black text-white rounded-lg overflow-hidden break-all">
-                                    <span class="text-green-300">$</span> curl -X POST -H "Content-Type:
+                                <div class="bg-gray-600 dark:bg-black text-white rounded-lg overflow-hidden break-all">
+                                    {{-- blade-formatter-disable --}}<span class="text-green-300">$</span> curl -X POST -H "Content-Type:
                                     application/json" -H "Authorization: Bearer YOUR_TOKEN_HERE" -d "{\"messages\": [{
                                     \"isbot\": \"false\", \"msg\": \"你好\" }],\"model\": \"MODEL_YOU_WANT_TO_USE\"}"
                                     WEB_ENDPOINT
-                                    <br><br><span class="text-green-300">{"status":"success","message":"Authentication
-                                        successful","tokenable_id":-1,"name":"YOUR_NAME","output":"你好！我今天可以如何協助你？"}</span>
+                                    <br><br><pre class="text-green-300">{
+    "status": "success",
+    "message": "Authentication successful",
+    "tokenable_id": -1,
+    "name": "YOUR_NAME",
+    "output": "你好！我今天可以如何協助你？"
+}</pre>{{-- blade-formatter-enable --}}
                                 </div>
                             @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -342,16 +347,20 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                @env("nuk")
+                                @env('nuk')
                                 {{ __('Portalable & Distributed') }}
-                                @else
+                            @else
                                 {{ __('Summarization') }}
                                 @endenv
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-                                @env("nuk")
-                                <p class="text-white m-auto">待完成：一張解釋系統架構的圖</p>
-                                @else
+                                @env('nuk')
+                                <div class="flex justify-center items-center">
+                                    <img class="w-auto dark:hidden" src="{{ asset('images/system_light.png') }}">
+                                    <img class="w-auto hidden dark:block"
+                                        src="{{ asset('images/system_dark.png') }}">
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">

@@ -99,8 +99,8 @@
                             {{ __('Return to Menu') }}</a>
                         <x-duel.rooms.list :llms="$llms" :DC="$DC" :result="$result" />
                     @else
-                        <h2 class="block sm:hidden text-xl text-center">{{ __('Duel') }}</h2>
-                        <p class="block sm:hidden text-center">{{ __('Select a chatroom to begin with') }}</p>
+                        <h2 class="block sm:hidden text-xl text-center text-black dark:text-white">{{ __('Duel') }}</h2>
+                        <p class="block sm:hidden text-center text-black dark:text-white">{{ __('Select a chatroom to begin with') }}</p>
                         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
                             data-modal-target="create-model-modal" data-modal-toggle="create-model-modal">
                             <button

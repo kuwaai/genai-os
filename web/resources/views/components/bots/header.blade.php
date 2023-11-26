@@ -18,12 +18,7 @@
     </button>
     <div
         class="flex-shrink-0 mx-2 my-auto h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-        <div id="llm_{{ $LLM->id }}_chat" role="tooltip"
-            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{ $LLM->name }}
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
-        <img class="h-full w-full" data-tooltip-target="llm_{{$LLM->id}}_chat" data-tooltip-placement="top" 
+        <img class="h-full w-full"
             src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
     </div>
     @if ($llmId)
@@ -44,34 +39,6 @@
             {{ App\Models\Chats::findOrFail($chatId)->name }}</p>
 
         <div class="flex">
-            @if (request()->user()->hasPerm('Chat_read_export_chat'))
-                <button onclick="export_chat()" data-modal-target="exportModal" data-modal-toggle="exportModal"
-                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                    <i class="fas fa-share-alt"></i>
-                </button>
-
-                <script>
-                    function export_chat() {
-                        var chatMessages = [];
-
-                        $("#chatroom > div > div p").each(function(index, element) {
-                            var msgText = $(element).text();
-                            var isBot = $(element).hasClass("bot-msg");
-                            var chained = $(element).hasClass("chain-msg");
-
-                            var message = {
-                                "msg": msgText,
-                                "isbot": isBot,
-                                "chained": chained
-                            };
-
-                            chatMessages.push(message);
-                        });
-
-                        $("#export_json").val(JSON.stringify(chatMessages, null, 4))
-                    }
-                </script>
-            @endif
             <button onclick="saveChat()"
                 class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
                 <i class="fas fa-save"></i>
