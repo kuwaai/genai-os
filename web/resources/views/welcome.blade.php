@@ -62,9 +62,9 @@
                 <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
                     <div class="flex items-center justify-center overflow-hidden">
                         <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
-                            <img class="w-[150px] sm:w-[175px] md:w-[200px]" src="{{ asset('images/csie_logo.svg') }}">
+                            <img class="w-[150px]" src="{{ asset('images/csie_logo.svg') }}">
                         </a>
-                        <div class="flex flex-col ml-4 text-[50px] sm:text-[62.5px] md:text-[75px]">
+                        <div class="flex flex-col ml-4 text-[50px]">
                             <span>LLM</span>
                             <span class="pt-4">Workspace</span>
                         </div>
