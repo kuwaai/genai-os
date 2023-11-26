@@ -348,7 +348,7 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env('nuk')
-                                {{ __('Portalable & Distributed') }}
+                                {{ __('Scalable & Distributed') }}
                             @else
                                 {{ __('Summarization') }}
                                 @endenv
