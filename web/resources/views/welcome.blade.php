@@ -112,33 +112,45 @@
                                 <div class="flex w-full mt-2 space-x-3 ">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ asset('images/dolly.png') }}">
+                                        <img src="{{ asset('images/taibun.png') }}">
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm">你好，請問我能如何幫助你？</p>
+                                            <p class="text-sm">你好！有啥物我會使幫助你的？</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="flex w-full mt-2 space-x-3 ">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ asset('images/MetaAI.png') }}">
+                                        <img src="{{ asset('images/hakka.png') }}">
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm">嗨！請問需要甚麼幫助？</p>
+                                            <p class="text-sm">你好！當歡喜看著你。有麼个𠊎做得𢯭手个無？</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="flex w-full mt-2 space-x-3 ">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ asset('images/bloom.png') }}">
+                                        <img src="{{ asset('images/meta.png') }}">
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm">您好！我是一個熱心助人的AI。</p>
+                                            <p class="text-sm">Hello! 😊 I'm here to help you with any questions or
+                                                concerns you may have. Please feel free to...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/chatglm.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">你好👋！我是人工智能助手 ChatGLM3-6B，很高兴见到你，欢迎问我任何问题。</p>
                                         </div>
                                     </div>
                                 </div>
@@ -177,80 +189,17 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env('nuk')
-                                {{ __('Feedbacks') }}
+                                {{ __('Deployment') }}
                             @else
                                 {{ __('Composition') }}
                                 @endenv
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
                                 @env('nuk')
-                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
-                                    <div>
-                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm">請介紹國立高雄大學大學部</p>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        User
-                                    </div>
-                                </div>
-                                <div class="flex w-full mt-2 space-x-3 ">
-                                    <div
-                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ asset('images/csie.png') }}">
-                                    </div>
-                                    <div>
-                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
-                                            <p class="text-sm">國立高雄大學大學部的資訊工程學系的課程設計重點主要在於培養學生資訊領域的基礎知識及未來就業或研究所繼續深造的技術能力。課程設計以實用性及前瞻性為原則，以符合業界當前的技術需求，並為學生未來就業做準備。<br>
-課程設計重點包括：<br>
-1. 奠定學生資訊領域的基礎知識。...</p>
-                                            <div class="flex space-x-1" style="">
-                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg">
-                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                        viewBox="0 0 24 24" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="icon-sm" height="1em"
-                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                                        </path>
-                                                        <rect x="8" y="2" width="8" height="4"
-                                                            rx="1" ry="1">
-                                                        </rect>
-                                                    </svg>
-                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                        viewBox="0 0 24 24" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="icon-sm" style="display:none;"
-                                                        height="1em" width="1em"
-                                                        xmlns="http://www.w3.org/2000/svg">
-                                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                                    </svg>
-                                                </div>
-                                                <div class="flex hover:bg-gray-400 p-2 rounded-lg text-green-600"
-                                                    data-modal-target="feedback" data-modal-toggle="feedback">
-                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                        viewBox="0 0 24 24" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="icon-sm" height="1em"
-                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                                                        </path>
-                                                    </svg>
-                                                </div>
-                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg text-black"
-                                                    data-modal-target="feedback" data-modal-toggle="feedback">
-                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
-                                                        viewBox="0 0 24 24" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="icon-sm" height="1em"
-                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                                                        </path>
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="flex justify-center items-center">
+                                    <img class="w-auto dark:hidden" src="{{ asset('images/deployment_light.png') }}">
+                                    <img class="w-auto hidden dark:block"
+                                        src="{{ asset('images/deployment_dark.png') }}">
                                 </div>
                             @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -299,18 +248,23 @@
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 @env('nuk')
-                                <div class="bg-gray-600 dark:bg-black text-white rounded-lg overflow-hidden break-all">
-                                    {{-- blade-formatter-disable --}}<span class="text-green-300">$</span> curl -X POST -H "Content-Type:
+                                <div class="flex justify-center items-center">
+                                    <img class="w-auto dark:hidden" src="{{ asset('images/api_light.png') }}">
+                                    <img class="w-auto hidden dark:block" src="{{ asset('images/api_dark.png') }}">
+                                </div>
+                                <div class="text-black flex dark:text-white text-center mt-3 dark:bg-black bg-gray-300 rounded-t-lg">
+                                    <span class="mr-auto ml-2">>_</span>
+                                <h3 class="mr-auto">Terminal is supported as well!</h3>
+                                </div>
+                                <div class="bg-gray-400 dark:bg-gray-900 text-white rounded-b-lg overflow-hidden break-all border border-2 border-gray-400 dark:border-black">
+                                    <span class="text-green-300">$</span> curl -X POST -H "Content-Type:
                                     application/json" -H "Authorization: Bearer YOUR_TOKEN_HERE" -d "{\"messages\": [{
                                     \"isbot\": \"false\", \"msg\": \"你好\" }],\"model\": \"MODEL_YOU_WANT_TO_USE\"}"
                                     WEB_ENDPOINT
-                                    <br><br><pre class="text-green-300">{
-    "status": "success",
-    "message": "Authentication successful",
-    "tokenable_id": -1,
-    "name": "YOUR_NAME",
-    "output": "你好！我今天可以如何協助你？"
-}</pre>{{-- blade-formatter-enable --}}
+                                    <br><br>
+                                    <div class="text-green-300">{"status": "success","message": "Authentication
+                                        successful","tokenable_id": -1,"name": "YOUR_NAME","output": "你好！我今天可以如何協助你？"}
+                                    </div>
                                 </div>
                             @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
@@ -348,17 +302,254 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env('nuk')
-                                {{ __('Scalable & Distributed') }}
+                                {{ __('Feedback') }}
                             @else
                                 {{ __('Summarization') }}
                                 @endenv
                             </h2>
                             <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
                                 @env('nuk')
-                                <div class="flex justify-center items-center">
-                                    <img class="w-auto dark:hidden" src="{{ asset('images/system_light.png') }}">
-                                    <img class="w-auto hidden dark:block"
-                                        src="{{ asset('images/system_dark.png') }}">
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm">當我說A，請回答我B</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/taibun.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">你若共我問 A 的問題，遐爾我的回答將是 B。</p>
+                                            <div class="flex space-x-1" style="">
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                        </path>
+                                                        <rect x="8" y="2" width="8" height="4"
+                                                            rx="1" ry="1">
+                                                        </rect>
+                                                    </svg>
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" style="display:none;"
+                                                        height="1em" width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex hover:bg-gray-400 p-2 rounded-lg text-green-600"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg text-black"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/hakka.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">好，當你講 A 時節，𠊎會應你 B。</p>
+                                            <div class="flex space-x-1" style="">
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                        </path>
+                                                        <rect x="8" y="2" width="8" height="4"
+                                                            rx="1" ry="1">
+                                                        </rect>
+                                                    </svg>
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" style="display:none;"
+                                                        height="1em" width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex hover:bg-gray-400 p-2 rounded-lg text-green-600"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg text-black"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm">A</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/taibun.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">你予的字母是 A，答案嘛是 A。真簡單的問題，多謝你呢！敢有需要我為你解答其他問題？</p>
+                                            <div class="flex space-x-1" style="">
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                        </path>
+                                                        <rect x="8" y="2" width="8" height="4"
+                                                            rx="1" ry="1">
+                                                        </rect>
+                                                    </svg>
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" style="display:none;"
+                                                        height="1em" width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg text-black"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg text-red-600"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/hakka.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">B</p>
+                                            <div class="flex space-x-1" style="">
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                                        </path>
+                                                        <rect x="8" y="2" width="8" height="4"
+                                                            rx="1" ry="1">
+                                                        </rect>
+                                                    </svg>
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" style="display:none;"
+                                                        height="1em" width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex hover:bg-gray-400 p-2 rounded-lg text-green-600"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex text-black hover:bg-gray-400 p-2 rounded-lg text-black"
+                                                    data-modal-target="feedback" data-modal-toggle="feedback">
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="icon-sm" height="1em"
+                                                        width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
