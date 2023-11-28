@@ -16,5 +16,6 @@
     "Profile_update_password":"Update Password",
     "Profile_update_openai_token":"Update OpenAI Token",
     "Profile_read_api_token":"Read Web API Token",
-    "Profile_delete_account":"Delete Account"
+    "Profile_delete_account":"Delete Account",
+    "Change Language":"Language"
 }
