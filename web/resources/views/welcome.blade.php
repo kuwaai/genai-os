@@ -112,7 +112,7 @@
                                 <div class="flex w-full mt-2 space-x-3 ">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ asset('images/taide.png') }}">
+                                        <img src="{{ asset('images/TAIDE.png') }}">
                                     </div>
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
