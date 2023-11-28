@@ -96,7 +96,7 @@
                                 {{ __('Translation') }}
                                 @endenv
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
                                 @env('nuk')
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
@@ -205,7 +205,7 @@
                                 {{ __('Composition') }}
                                 @endenv
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
                                 @env('nuk')
                                 <div class="flex justify-center items-center">
                                     <img class="w-auto dark:hidden" src="{{ asset('images/deployment_light.png') }}">
@@ -251,12 +251,12 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env('nuk')
-                                {{ __('Import & Export') }}
+                                {{ __('Export & Import') }}
                             @else
                                 {{ __('Communication') }}
                                 @endenv
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
 
                                 @env('nuk')
                                 <div class="flex justify-center items-center">
@@ -304,7 +304,7 @@
                                 {{ __('Summarization') }}
                                 @endenv
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
                                 @env('nuk')
                                 <div class="flex justify-center items-center">
                                     <img class="w-auto dark:hidden" src="{{ asset('images/rag_light.png') }}">
