@@ -12,7 +12,7 @@ cd /API
 apt update
 apt install -y curl screen
 pip install -U transformers accelerate
-pip install safetensors protobuf
+pip install safetensors protobuf bitsandbytes scipy
 while ! curl -s http://web:9000/v1.0/worker/debug >/dev/null; do
   echo "Waiting for connection to http://web:9000/v1.0/worker/debug ..."
   sleep 1
