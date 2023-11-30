@@ -3,9 +3,9 @@ from base import *
 
 # -- Configs --
 app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://192.168.211.4:9000/"
-app.LLM_name = "llama2-7b-chat-b1.0.0"
+app.LLM_name = "llama2_b.11.0.0-4bits"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
@@ -19,31 +19,33 @@ if app.port == None:
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*3
-model_loc = "llama2-7b-chat-b1.0.0"
+model_loc = "llama2-7b-b.11.0.0-4bits"
 api_key = None
 usr_token = None
 tc_model = None
 # -- Config ends --
-    
-from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer
+
+from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, set_seed
 from intel_extension_for_transformers.transformers import AutoModelForCausalLM
 from threading import Thread
-
-model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
+    
+set_seed(42)
+model = AutoModelForCausalLM.from_pretrained(model_loc, torch_dtype=torch.float16,device_map="auto")
 tokenizer = AutoTokenizer.from_pretrained(model_loc)
-prompts = "<s>[INST] {0} [/INST]\n{1}"
+prompts = "<s>[INST] {0} [/INST]{1}"
     
 def llm_compute(data): 
     try:
+        s = time.time()
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
         while len("".join(history)) > limit:
             del history[0]
             del history[0]
         if len(history) != 0:
-            history[0] = "<<SYS>>\nYou are a helpful assistant. 你是一個樂於助人的助手。\n<</SYS>>\n\n" + history[0]
+            #history[0] = "<<SYS>>\n\n<</SYS>>\n\n" + history[0]
             history.append("")
-            history = [prompts.format(history[i], history[i + 1]).strip() for i in range(0, len(history), 2)]
-            history = " ".join(history)
+            history = [prompts.format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
+            history = "".join(history)
             encoding = tokenizer(history, return_tensors='pt', add_special_tokens=False).to(model.device)
             
             streamer = TextIteratorStreamer(tokenizer,skip_prompt=True)
@@ -52,6 +54,9 @@ def llm_compute(data):
                 generation_config=GenerationConfig(
                     max_new_tokens=4096,
                     pad_token_id=tokenizer.eos_token_id,
+                    temperature = 0.2,
+                    repetition_penalty = 1.0,
+                    do_sample=True
                 )))
             thread.start()
             for i in streamer:
