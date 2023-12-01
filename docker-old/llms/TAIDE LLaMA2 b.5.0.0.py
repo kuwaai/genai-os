@@ -25,7 +25,9 @@ usr_token = None
 tc_model = None
 # -- Config ends --
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, set_seed
+from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, set_seed
+from intel_extension_for_transformers.transformers import AutoModelForCausalLM
+from threading import Thread
     
 set_seed(42)
 model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
@@ -45,19 +47,17 @@ def llm_compute(data):
             history = "".join(history)
             encoding = tokenizer(history, return_tensors='pt', add_special_tokens=False).to(model.device)
             
+            streamer = TextIteratorStreamer(tokenizer,skip_prompt=True)
             l = encoding['input_ids'].size(1)
-            x = model.generate(
-                **encoding,
+            thread = Thread(target=model.generate, kwargs=dict(input_ids=encoding['input_ids'], streamer=streamer,
                 generation_config=GenerationConfig(
-                    max_new_tokens=2048,
+                    max_new_tokens=4096,
                     pad_token_id=tokenizer.eos_token_id,
-                )
-            )
-            result = tokenizer.batch_decode(x[:, l:])[0].strip().replace("</s>","")
-            print(tokenizer.batch_decode(x)[0].encode("utf-8","ignore").decode("utf-8"))
-            for i in result:
-                yield i
-                time.sleep(0.02)
+                )))
+            thread.start()
+            for i in streamer:
+                print(end=i.replace("</s>",""),flush=True)
+                yield i.replace("</s>","")
 
             torch.cuda.empty_cache()
         else:
