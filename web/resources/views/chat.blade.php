@@ -77,7 +77,7 @@
                                 } else {
                                     $($(node).parent().parent().children()[0]).text(response + "\n\n[此訊息經由" + (history_id >
                                         0 ?
-                                        '該模型' : 'OpenCC') + "嘗試翻譯，瀏覽器重新整理可復原]");
+                                        '該模型' : 'OpenCC') + "嘗試翻譯，瀏覽器重新整理後可復原]");
                                     $(node).parent().children("button.translates").each(function() {
                                         $(this).removeClass("hidden");
                                         $(this).children("svg").addClass("hidden");
