@@ -13,17 +13,65 @@ use Illuminate\Support\Facades\File;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
 use App\Models\Histories;
-use App\Jobs\ImportChat;
 use App\Jobs\RequestChat;
+use App\Jobs\ImportChat;
+use GuzzleHttp\Client;
 use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
 use App\Models\Feedback;
+use App\Models\APIHistories;
 use DB;
 use Session;
 
 class ChatController extends Controller
 {
+    public function translate(Request $request)
+    {
+        $record = Histories::find($request->route('history_id'));
+
+        if (!$record) {
+            return response('Unauthorized', 401);
+        }
+
+        $chat = Chats::find($record->chat_id);
+
+        if (!$chat || $chat->user_id !== Auth::user()->id) {
+            return response('Unauthorized', 401);
+        }
+
+        $access_code = $request->input('model');
+        $msg = $record->msg;
+        if ($access_code == null){
+            $access_code = LLMs::find($chat->llm_id)->access_code;
+            $msg = "以下提供內容，請幫我翻譯成中文。\n" . $msg;
+        }
+
+        $tmp = json_encode([['isbot' => false, 'msg' => $msg]]);
+        $history = new APIHistories();
+        $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => Auth::user()->id]);
+        $history->save();
+
+        RequestChat::dispatch($tmp, $access_code, Auth::user()->id, -$history->id, Auth::user()->openai_token, 'api_' . $history->id);
+
+        $client = new Client(['timeout' => 300]);
+        $req = $client->get(route('api.stream'), [
+            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'query' => [
+                'key' => config('app.API_Key'),
+                'channel' => 'api_' . $history->id,
+            ],
+            'stream' => true,
+        ]);
+
+        $result = explode('[ENDEDPLACEHOLDERUWU]', $req->getBody()->getContents())[0];
+
+        $history->fill(['output' => $result]);
+        $history->save();
+
+        return response($result, 200)->header('Content-Type', 'text/plain');
+    }
+
     public function update_chain(Request $request)
     {
         $state = $request->input('switch') == 'true';
@@ -206,13 +254,13 @@ class ChatController extends Controller
         if (!in_array($llm_id, $result) || !LLMs::findOrFail($llm_id)->exists()) {
             return redirect()->route('chat.home');
         }
-        if (Auth::user()->hasPerm("Chat_update_new_chat")){
+        if (Auth::user()->hasPerm('Chat_update_new_chat')) {
             return view('chat');
-        }else{
-            $result = Chats::where("llm_id", "=",$llm_id)->whereNull("dcID");
-            if ($result->exists()){
+        } else {
+            $result = Chats::where('llm_id', '=', $llm_id)->whereNull('dcID');
+            if ($result->exists()) {
                 return Redirect::route('chat.chat', $result->first()->id);
-            }else{
+            } else {
                 return view('chat');
             }
         }
@@ -385,7 +433,7 @@ class ChatController extends Controller
                         }
                     }
                 }
-                $chat->fill(['name' => mb_substr($chatname, 0, 75, "utf-8"), 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+                $chat->fill(['name' => mb_substr($chatname, 0, 75, 'utf-8'), 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                 $chat->save();
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);

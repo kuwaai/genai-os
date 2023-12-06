@@ -225,5 +225,18 @@
 "Comparative":"同時比較模型回答",
 "Deployment":"兼容地端雲端佈署",
 "Export & Import":"完整匯出匯入問答",
-"Application":"迅速建立模型應用"
+"Application":"迅速建立模型應用",
+"Allow":"允許",
+"Disallow":"不允許",
+"Toggle Chain":"切換問答方式",
+"Default State":"問答預設使用",
+"Feedbacks":"回饋機制",
+"Translate":"翻譯機制",
+"System prompt":"系統提示詞",
+"System Prompt for the model":"模型預設會使用的系統提示詞",
+"Copy message":"複製",
+"Like the message":"讚",
+"Dislike the message":"倒讚",
+"Translate by the model":"用該模型翻譯",
+"Translate by OpenCC":"用OpenCC翻譯"
 }

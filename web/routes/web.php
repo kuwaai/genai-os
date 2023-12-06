@@ -94,6 +94,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->prefix('chats')
             ->group(function () {
                 Route::get('/', [ChatController::class, 'home'])->name('chat.home');
+                Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('chat.translate');
 
                 Route::get('/new/{llm_id}', [ChatController::class, 'new_chat'])->name('chat.new');
 

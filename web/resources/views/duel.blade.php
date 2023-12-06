@@ -26,6 +26,76 @@
             <x-chat.modals.feedback />
 
             <script>
+                
+                function translates(node, history_id) {
+                        $(node).parent().children("button.translates").addClass("hidden")
+                        $(node).removeClass("hidden")
+
+
+                        $(node).children("svg").addClass("hidden");
+                        $(node).children("svg").eq(1).removeClass("hidden");
+                        $(node).prop("disabled", true);
+                        data = history_id > 0 ? {} : {
+                            model: "nihao"
+                        }
+                        $.ajax({
+                            url: '{{ route('chat.translate', '') }}/' + (history_id > 0 ? history_id : -history_id),
+                            method: 'GET',
+                            data: data,
+                            success: function(response) {
+                                if (response ==
+                                    "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
+                                ) {
+                                    $(node).children("svg").addClass("hidden");
+                                    $(node).children("svg").eq(3).removeClass("hidden");
+                                    $("#error_alert >span").text(
+                                        "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
+                                        )
+                                    $("#error_alert").fadeIn();
+                                    setTimeout(function() {
+                                        $("#error_alert").fadeOut();
+                                        $(node).parent().children("button.translates").each(function() {
+                                            $(this).removeClass("hidden");
+                                            $(this).children("svg").addClass("hidden");
+                                            $(this).children("svg").eq(0).removeClass("hidden");
+                                            $(this).prop("disabled", false);
+                                        });
+                                    }, 3000);
+                                } else {
+                                    $($(node).parent().parent().children()[0]).text(response + "\n\n[此訊息經由" + (history_id >
+                                        0 ?
+                                        '該模型' : 'OpenCC') + "嘗試翻譯，重新整理可復原]");
+                                    $(node).parent().children("button.translates").each(function() {
+                                        $(this).removeClass("hidden");
+                                        $(this).children("svg").addClass("hidden");
+                                        $(this).children("svg").eq(0).removeClass("hidden");
+                                        $(this).prop("disabled", false);
+                                    });
+                                    $(node).prop("disabled", true);
+                                    $(node).children("svg").addClass("hidden");
+                                    $(node).children("svg").eq(2).removeClass("hidden");
+                                    $(node).parent().children("button.translates").removeClass("hidden")
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error(error);
+                                $(node).children("svg").addClass("hidden");
+                                $(node).children("svg").eq(3).removeClass("hidden");
+                                $("#error_alert >span").text(error)
+                                $("#error_alert").fadeIn();
+                                setTimeout(function() {
+                                    $("#error_alert").fadeOut();
+                                    $(node).parent().children("button.translates").each(function() {
+                                        $(this).removeClass("hidden");
+                                        $(this).children("svg").addClass("hidden");
+                                        $(this).children("svg").eq(0).removeClass("hidden");
+                                        $(this).prop("disabled", false);
+                                    });
+                                }, 3000);
+                            }
+                        })
+                    }
+                    
                 function copytext(node) {
                     var textArea = document.createElement("textarea");
                     textArea.value = node.textContent;

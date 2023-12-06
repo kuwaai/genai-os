@@ -23,6 +23,31 @@
             {{ $LLM->name }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
+        <div id="react_copy" role="tooltip"
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+            {{__("Copy message")}}
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        <div id="react_like" role="tooltip"
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+            {{__("Like the message")}}
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        <div id="react_dislike" role="tooltip"
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+            {{__("Dislike the message")}}
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        <div id="react_translate" role="tooltip"
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+            {{__("Translate by the model")}}
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        <div id="react_translateCC" role="tooltip"
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+            {{__("Translate by OpenCC")}}
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
         <img class="h-full w-full" data-tooltip-target="llm_{{$LLM->id}}_chat" data-tooltip-placement="top" 
             src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
     </div>
