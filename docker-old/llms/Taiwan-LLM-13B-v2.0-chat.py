@@ -36,9 +36,9 @@ prompts = "USER: {0} ASSISTANT: {1}"
 def llm_compute(data): 
     try:
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
-        while len("".join(history)) > limit:
-            del history[0]
-            del history[0]
+        #while len("".join(history)) > limit:
+        #    del history[0]
+        #    del history[0]
         if len(history) != 0:
             history.append("")
             history = [prompts.format(history[i], history[i + 1]) for i in range(0, len(history), 2)]
