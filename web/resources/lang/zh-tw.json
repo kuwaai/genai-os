@@ -238,5 +238,6 @@
 "Like the message":"讚",
 "Dislike the message":"倒讚",
 "Translate by the model":"用該模型翻譯",
-"Translate by OpenCC":"用OpenCC翻譯"
+"Translate by OpenCC":"用OpenCC翻譯",
+"This is for human feedback, Only import/export is allowed here.":"此處用於模型回饋蒐集，只能匯入匯出。"
 }

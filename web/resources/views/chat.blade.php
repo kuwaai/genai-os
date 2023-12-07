@@ -175,7 +175,7 @@
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
                     <div
                         class="{{ request()->route('llm_id') &&
-                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5'])
+                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5', 'feedback'])
                             ? 'm-auto'
                             : '' }}">
                         @if (request()->route('chat_id'))
@@ -189,6 +189,9 @@
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
                             <p class="m-auto text-black dark:text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
                         @elseif(request()->route('llm_id') &&
+                                in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['feedback']))
+                            <p class="m-auto text-black dark:text-white">{!! __('This is for human feedback, Only import/export is allowed here.') !!}</p>
+                        @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
                         @endif
                         <div style="display:none;"
@@ -198,11 +201,10 @@
                         </div>
                     </div>
                 </div>
-                @if (
-                    (request()->user()->hasPerm('Chat_update_send_message') &&
-                        request()->route('chat_id')) ||
+                @if ((request()->user()->hasPerm('Chat_update_send_message') &&
+                        request()->route('chat_id') && App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code != 'feedback') ||
                         (request()->user()->hasPerm('Chat_update_new_chat') &&
-                            request()->route('llm_id')))
+                            request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code != 'feedback' ))
                     <div
                         class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
                         @if (request()->route('llm_id') &&
