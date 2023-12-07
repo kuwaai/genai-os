@@ -28,8 +28,12 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        if (Auth::user()->hasPerm('tab_Chat')){
+            return redirect()->intended(RouteServiceProvider::HOME);
+        }else{
+            return redirect()->intended("/");
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        }
     }
 
     /**
