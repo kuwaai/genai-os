@@ -42,7 +42,7 @@ class ChatController extends Controller
 
         $access_code = $request->input('model');
         $msg = $record->msg;
-        if ($access_code == null){
+        if ($access_code == null) {
             $access_code = LLMs::find($chat->llm_id)->access_code;
             $msg = "以下提供內容，請幫我翻譯成中文。\n" . $msg;
         }
@@ -631,7 +631,9 @@ class ChatController extends Controller
                     ob_flush();
                     flush();
                     try {
-                        $client->disconnect();
+                        if ($client) {
+                            $client->disconnect();
+                        }
                     } catch (Exception) {
                     }
                 }
