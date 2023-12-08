@@ -632,7 +632,7 @@ class ChatController extends Controller
                     flush();
                     try {
                         $client->disconnect();
-                    } catch (RedisException) {
+                    } catch (Exception) {
                     }
                 }
             }
