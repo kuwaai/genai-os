@@ -23,9 +23,7 @@
         }
     @endphp
 
-    <script>
-        var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    </script>
+    <x-chat.functions/>
     @if (request()->user()->hasPerm('Chat_update_import_chat') && request()->route('llm_id'))
         <x-chat.modals.import_history />
     @elseif (request()->user()->hasPerm('Chat_read_export_chat') && request()->route('chat_id'))
@@ -36,103 +34,6 @@
             <x-chat.rooms.drawer :LLM="$LLM" />
             @if (request()->route('chat_id'))
                 <x-chat.modals.feedback />
-
-                <script>
-                    var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-
-                    function translates(node, history_id) {
-                        $(node).parent().children("button.translates").addClass("hidden")
-                        $(node).removeClass("hidden")
-
-
-                        $(node).children("svg").addClass("hidden");
-                        $(node).children("svg").eq(1).removeClass("hidden");
-                        $(node).prop("disabled", true);
-                        data = history_id > 0 ? {} : {
-                            model: "nihao"
-                        }
-                        $.ajax({
-                            url: '{{ route('chat.translate', '') }}/' + (history_id > 0 ? history_id : -history_id),
-                            method: 'GET',
-                            data: data,
-                            success: function(response) {
-                                if (response ==
-                                    "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
-                                ) {
-                                    $(node).children("svg").addClass("hidden");
-                                    $(node).children("svg").eq(3).removeClass("hidden");
-                                    $("#error_alert >span").text(
-                                        "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
-                                        )
-                                    $("#error_alert").fadeIn();
-                                    setTimeout(function() {
-                                        $("#error_alert").fadeOut();
-                                        $(node).parent().children("button.translates").each(function() {
-                                            $(this).removeClass("hidden");
-                                            $(this).children("svg").addClass("hidden");
-                                            $(this).children("svg").eq(0).removeClass("hidden");
-                                            $(this).prop("disabled", false);
-                                        });
-                                    }, 3000);
-                                } else {
-                                    $($(node).parent().parent().children()[0]).text(response + "\n\n[此訊息經由" + (history_id >
-                                        0 ?
-                                        '該模型' : 'OpenCC') + "嘗試翻譯，瀏覽器重新整理後可復原]");
-                                    $(node).parent().children("button.translates").each(function() {
-                                        $(this).removeClass("hidden");
-                                        $(this).children("svg").addClass("hidden");
-                                        $(this).children("svg").eq(0).removeClass("hidden");
-                                        $(this).prop("disabled", false);
-                                    });
-                                    $(node).prop("disabled", true);
-                                    $(node).children("svg").addClass("hidden");
-                                    $(node).children("svg").eq(2).removeClass("hidden");
-                                    $(node).parent().children("button.translates").removeClass("hidden")
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.error(error);
-                                $(node).children("svg").addClass("hidden");
-                                $(node).children("svg").eq(3).removeClass("hidden");
-                                $("#error_alert >span").text(error)
-                                $("#error_alert").fadeIn();
-                                setTimeout(function() {
-                                    $("#error_alert").fadeOut();
-                                    $(node).parent().children("button.translates").each(function() {
-                                        $(this).removeClass("hidden");
-                                        $(this).children("svg").addClass("hidden");
-                                        $(this).children("svg").eq(0).removeClass("hidden");
-                                        $(this).prop("disabled", false);
-                                    });
-                                }, 3000);
-                            }
-                        })
-                    }
-
-                    function copytext(node) {
-                        var textArea = document.createElement("textarea");
-                        textArea.value = node.textContent;
-
-                        document.body.appendChild(textArea);
-
-                        textArea.select();
-
-                        try {
-                            document.execCommand("copy");
-                        } catch (err) {
-                            console.log("Copy not supported or failed: ", err);
-                        }
-
-                        document.body.removeChild(textArea);
-
-                        $(node).parent().children().eq(1).children().eq(0).children().eq(0).hide();
-                        $(node).parent().children().eq(1).children().eq(0).children().eq(1).show();
-                        setTimeout(function() {
-                            $(node).parent().children().eq(1).children().eq(0).children().eq(0).show();
-                            $(node).parent().children().eq(1).children().eq(0).children().eq(1).hide();
-                        }, 3000);
-                    }
-                </script>
             @endif
         @endif
         <div
@@ -201,10 +102,14 @@
                         </div>
                     </div>
                 </div>
-                @if ((request()->user()->hasPerm('Chat_update_send_message') &&
-                        request()->route('chat_id') && App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code != 'feedback') ||
+                @if (
+                    (request()->user()->hasPerm('Chat_update_send_message') &&
+                        request()->route('chat_id') &&
+                        App\Models\LLMs::find(App\Models\Chats::find(request()->route('chat_id'))->llm_id)->access_code !=
+                            'feedback') ||
                         (request()->user()->hasPerm('Chat_update_new_chat') &&
-                            request()->route('llm_id') && App\Models\LLMs::find(request()->route('llm_id'))->access_code != 'feedback' ))
+                            request()->route('llm_id') &&
+                            App\Models\LLMs::find(request()->route('llm_id'))->access_code != 'feedback'))
                     <div
                         class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
                         @if (request()->route('llm_id') &&
@@ -218,23 +123,6 @@
                     </div>
                 @endif
             </div>
-            <script>
-                function adjustTextareaRows(obj) {
-                    obj = $(obj)
-                    if (obj.length) {
-                        const textarea = obj;
-                        const maxRows = parseInt(textarea.attr('max-rows')) || 5;
-                        const lineHeight = parseInt(textarea.css('line-height'));
-
-                        textarea.attr('rows', 1);
-
-                        const contentHeight = textarea[0].scrollHeight;
-                        const rowsToDisplay = Math.floor(contentHeight / lineHeight);
-
-                        textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
-                    }
-                }
-            </script>
         @endif
     </div>
 </x-app-layout>

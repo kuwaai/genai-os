@@ -82,6 +82,9 @@
                 "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
             )
             $('#task_' + number).text(msg);
+            histories[number] = $("#history_" + number + " div.text-sm.space-y-3.break-words")
+                .text()
+            chatroomFormatter($("#history_" + data["history_id"])[0]);
         }
     });
 

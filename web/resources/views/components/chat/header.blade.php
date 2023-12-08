@@ -79,10 +79,11 @@
                     function export_chat() {
                         var chatMessages = [];
 
-                        $("#chatroom > div > div p").each(function(index, element) {
-                            var msgText = $(element).text();
-                            var isBot = $(element).hasClass("bot-msg");
-                            var chained = $(element).hasClass("chain-msg");
+                        $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                            var history_id = $(element).prop("id").replace("history_","")
+                            var msgText = histories[history_id]
+                            var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
+                            var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
 
                             var message = {
                                 "msg": msgText,

@@ -1,20 +1,4 @@
 <script>
-    function adjustTextareaRows(obj) {
-        obj = $(obj)
-        if (obj.length) {
-            const textarea = obj;
-            const maxRows = parseInt(textarea.attr('max-rows')) || 5;
-            const lineHeight = parseInt(textarea.css('line-height'));
-
-            textarea.attr('rows', 1);
-
-            const contentHeight = textarea[0].scrollHeight;
-            const rowsToDisplay = Math.floor(contentHeight / lineHeight);
-
-            textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
-        }
-    }
-
     $("#chat_input").prop("readonly", true)
     $("#chat_input").val("訊息處理中...請稍後...")
     $chattable = false
@@ -71,6 +55,9 @@
                 "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
             )
             $('#task_' + number).text(msg);
+            histories[number] = $("#history_" + number + " div.text-sm.space-y-3.break-words")
+                .text()
+            chatroomFormatter($("#history_" + data["history_id"])[0]);
         }
     });
 
