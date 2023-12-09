@@ -75,7 +75,7 @@
                         </h2>
                         <p class="block sm:hidden text-center text-black dark:text-white">
                             {{ __('Select a chatroom to begin with') }}</p>
-                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
+                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg"
                             data-modal-target="create-model-modal" data-modal-toggle="create-model-modal">
                             <button
                                 class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == 3 ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
