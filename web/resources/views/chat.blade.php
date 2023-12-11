@@ -27,7 +27,7 @@
     @if (request()->user()->hasPerm('Chat_update_import_chat') && request()->route('llm_id'))
         <x-chat.modals.import_history />
     @elseif (request()->user()->hasPerm('Chat_read_export_chat') && request()->route('chat_id'))
-        <x-chat.modals.export_history />
+        <x-chat.modals.export_history :name="App\Models\Chats::find(request()->route('chat_id'))->name . '.json'" />
     @endif
     <div class="flex h-full max-w-7xl mx-auto py-2">
         @if (request()->route('chat_id') || request()->route('llm_id'))

@@ -74,7 +74,6 @@ class DuelController extends Controller
                 $chat->fill(['name' => 'Duel Chat', 'llm_id' => $llm, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
                 $chat->save();
                 if (in_array($llm, $selectedLLMs)) {
-
                     $history = new Histories();
                     $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
                     $history->save();
@@ -86,7 +85,9 @@ class DuelController extends Controller
                 }
             }
         }
-        return redirect()->to(route('duel.chat', $Duel->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))->with("selLLMs",$selectedLLMs);
+        return redirect()
+            ->to(route('duel.chat', $Duel->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
+            ->with('selLLMs', $selectedLLMs);
     }
 
     public function new(Request $request): RedirectResponse
@@ -159,7 +160,7 @@ class DuelController extends Controller
         $duelId = $request->input('duel_id');
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
-        $chained = Session::get('chained') == 'true';
+        $chained = Session::get('chained') == true;
         if (count($selectedLLMs) > 0 && $duelId && $input) {
             $chats = Chats::where('dcID', $request->input('duel_id'))->get();
             if (
@@ -196,10 +197,12 @@ class DuelController extends Controller
                     }
                 }
                 #Model permission checked
+                $start = date('Y-m-d H:i:s');
+                $deltaStart = date('Y-m-d H:i:s', strtotime($start . ' +1 second'));
                 foreach ($chats as $chat) {
                     if (in_array($chat->llm_id, $selectedLLMs)) {
                         $history = new Histories();
-                        $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false]);
+                        $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false, 'created_at' => $start, 'updated_at' => $start]);
                         $history->save();
                         if (in_array(LLMs::find($chat->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
                             $tmp = json_encode([
@@ -226,7 +229,7 @@ class DuelController extends Controller
                         }
 
                         $history = new Histories();
-                        $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
+                        $history->fill(['msg' => '* ...thinking... *', 'chained' => $chained, 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $deltaStart, 'updated_at' => $deltaStart]);
                         $history->save();
                         RequestChat::dispatch($tmp, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
                         Redis::rpush('usertask_' . Auth::user()->id, $history->id);
@@ -234,6 +237,8 @@ class DuelController extends Controller
                 }
             }
         }
-        return redirect()->to(route('duel.chat', $duelId) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))->with("selLLMs",$selectedLLMs);
+        return redirect()
+            ->to(route('duel.chat', $duelId) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
+            ->with('selLLMs', $selectedLLMs);
     }
 }

@@ -84,7 +84,7 @@ class ChatController extends Controller
             $historys = $request->input('history');
             if ($llm_id && $historys) {
                 $historys = json_decode($historys);
-                if (!($historys === false && json_last_error() !== JSON_ERROR_NONE)) {
+                if ($historys !== null && isset($historys->messages) && is_array($historys->messages) && count($historys->messages) > 1) {
                     $result = DB::table(function ($query) {
                         $query
                             ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
@@ -101,11 +101,35 @@ class ChatController extends Controller
                         ->pluck('id')
                         ->toarray();
                     if (in_array($llm_id, $result)) {
+                        $data = [];
+                        $chainValue = null;
+                        $access_code = LLMs::find($llm_id)->access_code;
+
+                        foreach ($historys->messages as $message) {
+                            if (isset($message->role) && is_string($message->role)) {
+                                if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
+                                    $data[] = $message;
+                                    $chainValue = isset($message->chain) ? (bool)$message->chain : $chainValue;
+                                } elseif ($message->role === 'assistant') {
+                                    $model = isset($message->model) ? $message->model : $access_code;
+                                    $content = isset($message->content) && is_string($message->content) ? $message->content : '';
+                        
+                                    if (is_string($model) && $model === $access_code && is_string($content) && $content !== '') {
+                                        if ($chainValue === true) {
+                                            $message->chain = true;
+                                        }
+                                        $data[] = $message;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+
+                        $historys = $data;
                         $first = array_shift($historys);
-                        // Model can't speak first and the first message must be exist
-                        while (trim($first->msg ?? '') == '' || ($first->isbot ?? false) == true) {
-                            if ($historys . length() > 0) {
-                                // Take the next record to see if it is valid to be the first message
+                        while (trim($first->content ?? '') == '' || trim($first->role ?? '') == '') {
+                            if ($historys) {
                                 $first = array_shift($historys);
                             } else {
                                 // This import data is invalid
@@ -113,7 +137,7 @@ class ChatController extends Controller
                             }
                         }
                         $chat = new Chats();
-                        $chatname = $first->msg;
+                        $chatname = $first->content;
                         if (in_array(LLMs::find($llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
                             function getWebPageTitle($url)
                             {
@@ -143,11 +167,11 @@ class ChatController extends Controller
                                     return '';
                                 }
                             }
-                            $tmp = getWebPageTitle($first->msg);
+                            $tmp = getWebPageTitle($first->content);
                             if ($tmp != '') {
                                 $chatname = $tmp;
                             } else {
-                                $tmp = getWebPageTitle($first->msg);
+                                $tmp = getWebPageTitle($first->content);
                                 if ($tmp != '') {
                                     $chatname = $tmp;
                                 }
@@ -157,7 +181,7 @@ class ChatController extends Controller
                         $chat->save();
                         $deltaTime = count($historys) + 1;
                         $record = new Histories();
-                        $record->fill(['msg' => $first->msg, 'chat_id' => $chat->id, 'isbot' => $first->isbot ?? false, 'chained' => false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                        $record->fill(['msg' => $first->content, 'chat_id' => $chat->id, 'isbot' => $first->role == 'user' ? false : true, 'chained' => $first->role == 'user' ? false : $first->chained ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                         $record->save();
 
                         if (count($historys) > 0) {
@@ -165,18 +189,18 @@ class ChatController extends Controller
                             $chained = $record->chained;
                             $ids = [];
                             foreach ($historys as $history) {
-                                if (($history->msg ?? '') == '') {
-                                    $history->msg = null;
+                                if (($history->content ?? '') == '') {
+                                    $history->content = null;
                                 }
-                                $history->isbot = $history->isbot ?? false;
-                                if (!(!$history->msg && ($history->isbot ?? false) == false)) {
+                                $history->isbot = $history->role == 'user' ? false : true;
+                                if (!(!$history->content && ($history->isbot ?? false) == false)) {
                                     if ($flag == ($history->isbot ?? false)) {
                                         $record = new Histories();
-                                        $record->fill(['msg' => $history->msg ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $history->isbot ? $chained | ($history->chained ?? false) : false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                                        $record->fill(['msg' => $history->content ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $history->isbot ? $chained | ($history->chained ?? false) : false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                                         $record->save();
                                         $flag = !$flag;
                                         $chained = $history->chained ?? false;
-                                        if ($history->isbot && $history->msg == '') {
+                                        if ($history->isbot && $history->content == '') {
                                             Redis::rpush('usertask_' . $request->user()->id, $record->id);
                                             $ids[] = $record->id;
                                         }
@@ -187,7 +211,7 @@ class ChatController extends Controller
                                         Redis::rpush('usertask_' . $request->user()->id, $record->id);
                                         $ids[] = $record->id;
                                         $record = new Histories();
-                                        $record->fill(['msg' => $history->msg ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                                        $record->fill(['msg' => $history->content ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                                         $record->save();
                                         $chained = $history->chained ?? false;
                                     }

@@ -18,7 +18,7 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = 1024*3
+limit = 1024*14
 api_key = None
 usr_token = None
 tc_model = None

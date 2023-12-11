@@ -18,7 +18,7 @@
     </button>
     <div
         class="flex-shrink-0 mx-2 my-auto h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-        <div id="llm_{{ $LLM->id }}_chat" role="tooltip"
+        <div id="llm_{{ $LLM->id }}_chat" role="tooltip" access_code="{{$LLM->access_code}}"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
             {{ $LLM->name }}
             <div class="tooltip-arrow" data-popper-arrow></div>
@@ -78,23 +78,33 @@
                 <script>
                     function export_chat() {
                         var chatMessages = [];
-
+    
                         $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
-                            var history_id = $(element).prop("id").replace("history_","")
+                            var history_id = $(element).prop("id").replace("history_", "")
                             var msgText = histories[history_id]
                             var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
                             var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
-
-                            var message = {
-                                "msg": msgText,
-                                "isbot": isBot,
-                                "chained": chained
-                            };
-
+                            if (isBot) {
+                                console.log($(element).children("div").children("img"))
+                                var message = {
+                                    "role": "assistant",
+                                    "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target")).attr("access_code"),
+                                    "content": msgText,
+                                    "chain": chained
+                                };
+                            } else {
+                                var message = {
+                                    "role": "user",
+                                    "content": msgText,
+                                };
+                            }
+    
                             chatMessages.push(message);
                         });
-
-                        $("#export_json").val(JSON.stringify(chatMessages, null, 4))
+    
+                        $("#export_json").val(JSON.stringify({
+                            "messages": chatMessages
+                        }, null, 4))
                     }
                 </script>
             @endif

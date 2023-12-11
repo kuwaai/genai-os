@@ -1,3 +1,5 @@
+@props(['name'])
+
 <div id="exportModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-2xl max-h-full">
@@ -25,7 +27,7 @@
                 <textarea id="export_json" rows="15" readonly
                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                 <a id="download_holder" style="display:none;"
-                    download="{{ App\Models\Chats::find(request()->route('chat_id'))->name . '.json' }}"></a>
+                    download="{{ $name }}"></a>
             </div>
             <!-- Modal footer -->
             <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">

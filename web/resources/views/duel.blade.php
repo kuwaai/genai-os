@@ -22,6 +22,7 @@
     @else
         @if (request()->route('duel_id'))
             <x-chat.modals.feedback />
+            <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name . '.json'"/>
         @endif
         @php
             $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')
@@ -115,13 +116,13 @@
                                     ->join('llms', 'llms.id', '=', 'chats.llm_id')
                                     ->where('isbot', true)
                                     ->whereIn('chats.id', App\Models\Chats::where('dcID', $duelId)->pluck('id'))
-                                    ->select('chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags');
+                                    ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags');
 
                                 $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
                                     ->leftjoin('llms', 'llms.id', '=', 'chats.llm_id')
                                     ->where('isbot', false)
                                     ->whereIn('chats.id', App\Models\Chats::where('dcID', $duelId)->pluck('id'))
-                                    ->select('chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', DB::raw('NULL as nice'), DB::raw('NULL as detail'), DB::raw('NULL as flags'));
+                                    ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', DB::raw('NULL as nice'), DB::raw('NULL as detail'), DB::raw('NULL as flags'));
 
                                 $mergedChats = $botChats
                                     ->union($nonBotChats)

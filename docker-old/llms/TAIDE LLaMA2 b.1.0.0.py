@@ -18,7 +18,7 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = 1024*3
+limit = 1024*14
 model_loc = "llama2-7b-chat-b1.0.0"
 api_key = None
 usr_token = None
@@ -36,9 +36,9 @@ prompts = "<s>[INST] {0} [/INST]\n{1}"
 def llm_compute(data): 
     try:
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
-        #while len("".join(history)) > limit:
-        #    del history[0]
-        #    del history[0]
+        while len("".join(history)) > limit:
+            del history[0]
+            del history[0]
         if len(history) != 0:
             history[0] = "<<SYS>>\nYou are a helpful assistant. 你是一個樂於助人的助手。\n<</SYS>>\n\n" + history[0]
             history.append("")

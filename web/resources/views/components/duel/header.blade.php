@@ -57,7 +57,7 @@
                             {{ $chat->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
                         </div>
-                        <div id="llm_{{ $chat->llm_id }}_chat" role="tooltip"
+                        <div id="llm_{{ $chat->llm_id }}_chat" role="tooltip" access_code="{{$chat->access_code}}"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                             {{ $chat->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
@@ -66,39 +66,76 @@
                 @endforeach
                 <div id="react_copy" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{__("Copy message")}}
+                    {{ __('Copy message') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_like" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{__("Like the message")}}
+                    {{ __('Like the message') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_dislike" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{__("Dislike the message")}}
+                    {{ __('Dislike the message') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_translate" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{__("Translate by the model")}}
+                    {{ __('Translate by the model') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_translateCC" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{__("Translate by OpenCC")}}
+                    {{ __('Translate by OpenCC') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
 
             @endif
         </div>
         @if (!session('llms'))
+            <button onclick="export_chat()" data-modal-target="exportModal" data-modal-toggle="exportModal"
+                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                <i class="fas fa-share-alt"></i>
+            </button>
+
+            <script>
+                function export_chat() {
+                    var chatMessages = [];
+
+                    $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                        var history_id = $(element).prop("id").replace("history_", "")
+                        var msgText = histories[history_id]
+                        var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
+                        var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
+                        if (isBot) {
+                            console.log($(element).children("div").children("img"))
+                            var message = {
+                                "role": "assistant",
+                                "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target")).attr("access_code"),
+                                "content": msgText,
+                                "chain": chained
+                            };
+                        } else {
+                            var message = {
+                                "role": "user",
+                                "content": msgText,
+                            };
+                        }
+
+                        chatMessages.push(message);
+                    });
+
+                    $("#export_json").val(JSON.stringify({
+                        "messages": chatMessages
+                    }, null, 4))
+                }
+            </script>
             <button onclick="saveChat()"
                 class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
                 <i class="fas fa-save"></i>
             </button>
             <button onclick="editChat()"
-                class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                class="bg-orange-500 ml-3 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                 <i class="fas fa-pen"></i>
             </button>
             <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
@@ -110,10 +147,6 @@
 </div>
 
 <script>
-    function deleteChat() {
-        $("#deleteChat").submit();
-    }
-
     function editChat() {
         $("#chatHeader button").find('.fa-pen').parent().addClass('hidden');
         $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
