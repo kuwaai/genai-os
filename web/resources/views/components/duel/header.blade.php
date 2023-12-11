@@ -57,7 +57,7 @@
                             {{ $chat->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
                         </div>
-                        <div id="llm_{{ $chat->llm_id }}_chat" role="tooltip" access_code="{{$chat->access_code}}"
+                        <div id="llm_{{ $chat->llm_id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                             {{ $chat->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
@@ -111,7 +111,8 @@
                             console.log($(element).children("div").children("img"))
                             var message = {
                                 "role": "assistant",
-                                "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target")).attr("access_code"),
+                                "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                    .attr("access_code"),
                                 "content": msgText,
                                 "chain": chained
                             };
@@ -142,6 +143,13 @@
                 class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                 <i class="fas fa-trash"></i>
             </button>
+        @else
+            <div class="flex hidden">
+                <button onclick="import_chat()" data-modal-target="importModal" data-modal-toggle="importModal"
+                    class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                    <i class="fas fa-file-import"></i>
+                </button>
+            </div>
         @endif
     </div>
 </div>

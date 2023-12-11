@@ -33,6 +33,174 @@ class DuelController extends Controller
         #return redirect()->route('archives', $request->route('chat_id'));
     }
 
+    public function import(Request $request)
+    {
+        if (count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
+            $llm_id = $request->input('llm_id');
+            $historys = $request->input('history');
+            if ($llm_id && $historys) {
+                $historys = json_decode($historys);
+                if ($historys !== null && isset($historys->messages) && is_array($historys->messages) && count($historys->messages) > 1) {
+                    $result = DB::table(function ($query) {
+                        $query
+                            ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                            ->from('group_permissions')
+                            ->join('permissions', 'perm_id', '=', 'permissions.id')
+                            ->where('group_id', Auth()->user()->group_id)
+                            ->where('name', 'like', 'model_%')
+                            ->get();
+                    }, 'tmp')
+                        ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+                        ->select('llms.id')
+                        ->where('llms.enabled', true)
+                        ->get()
+                        ->pluck('id')
+                        ->toarray();
+                    if (in_array($llm_id, $result)) {
+                        $data = [];
+                        $chainValue = null;
+                        $access_codes = LLMs::whereIn('id', request()->input('llms'))->select('access_code');
+
+                        foreach ($historys->messages as $message) {
+                            if (isset($message->role) && is_string($message->role)) {
+                                if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
+                                    $data[] = $message;
+                                    $chainValue = isset($message->chain) ? (bool) $message->chain : $chainValue;
+                                } elseif ($message->role === 'assistant') {
+                                    $model = isset($message->model) && is_string($message->content) ? $message->model : null;
+                                    $content = isset($message->content) && is_string($message->content) ? $message->content : '';
+                                    $message->content = $content;
+                                    if (is_string($model) && in_array($model, $access_codes)) {
+                                        if ($chainValue === true) {
+                                            $message->chain = true;
+                                        }
+                                        $data[] = $message;
+                                    } elseif (is_null($model)) {
+                                        foreach ($access_codes as $access_code) {
+                                            $newMessage = clone $message;
+                                            $newMessage->model = $access_code;
+
+                                            if ($chainValue === true) {
+                                                $newMessage->chain = true;
+                                            }
+                                            $data[] = $newMessage;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        $historys = $data;
+                        $first = array_shift($historys);
+                        while (trim($first->content ?? '') == '' || trim($first->role ?? '') == '') {
+                            if ($historys) {
+                                $first = array_shift($historys);
+                            } else {
+                                // This import data is invalid
+                                return redirect()->route('chat.home');
+                            }
+                        }
+                        $chat = new Chats();
+                        $chatname = $first->content;
+                        if (in_array(LLMs::find($llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                            function getWebPageTitle($url)
+                            {
+                                // Try to fetch the HTML content of the URL
+                                $html = @file_get_contents($url);
+
+                                // If the URL is not accessible, return an empty string
+                                if ($html === false) {
+                                    return '';
+                                }
+
+                                // Use regular expressions to extract the title from the HTML
+                                if (preg_match('/<title>(.*?)<\/title>/i', $html, $matches)) {
+                                    return $matches[1];
+                                } else {
+                                    // If no title is found, return an empty string
+                                    return '';
+                                }
+                            }
+                            function getFilenameFromURL($url)
+                            {
+                                $path_parts = pathinfo($url);
+
+                                if (isset($path_parts['filename'])) {
+                                    return $path_parts['filename'];
+                                } else {
+                                    return '';
+                                }
+                            }
+                            $tmp = getWebPageTitle($first->content);
+                            if ($tmp != '') {
+                                $chatname = $tmp;
+                            } else {
+                                $tmp = getWebPageTitle($first->content);
+                                if ($tmp != '') {
+                                    $chatname = $tmp;
+                                }
+                            }
+                        }
+                        $chat->fill(['name' => $chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
+                        $chat->save();
+                        $deltaTime = count($historys) + 1;
+                        $record = new Histories();
+                        $record->fill(['msg' => $first->content, 'chat_id' => $chat->id, 'isbot' => $first->role == 'user' ? false : true, 'chained' => $first->role == 'user' ? false : $first->chained ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                        $record->save();
+
+                        if (count($historys) > 0) {
+                            $flag = true;
+                            $chained = $record->chained;
+                            $ids = [];
+                            foreach ($historys as $history) {
+                                if (($history->content ?? '') == '') {
+                                    $history->content = null;
+                                }
+                                $history->isbot = $history->role == 'user' ? false : true;
+                                if (!(!$history->content && ($history->isbot ?? false) == false)) {
+                                    if ($flag == ($history->isbot ?? false)) {
+                                        $record = new Histories();
+                                        $record->fill(['msg' => $history->content ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $history->isbot ? $chained | ($history->chained ?? false) : false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                                        $record->save();
+                                        $flag = !$flag;
+                                        $chained = $history->chained ?? false;
+                                        if ($history->isbot && $history->content == '') {
+                                            Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                            $ids[] = $record->id;
+                                        }
+                                    } elseif ($flag == true && ($history->isbot ?? false) == false) {
+                                        $record = new Histories();
+                                        $record->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $chained | ($history->chained ?? false), 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                                        $record->save();
+                                        Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                        $ids[] = $record->id;
+                                        $record = new Histories();
+                                        $record->fill(['msg' => $history->content ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                                        $record->save();
+                                        $chained = $history->chained ?? false;
+                                    }
+                                    if (count($ids) > 30) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if ($flag == true && count($ids) < 30) {
+                                $record = new Histories();
+                                $record->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $chained, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                                $record->save();
+                                Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                $ids[] = $record->id;
+                            }
+                            ImportChat::dispatch($ids, LLMs::find($llm_id)->access_code, Auth::user()->id);
+                        }
+                        return Redirect::route('chat.chat', $chat->id);
+                    }
+                }
+            }
+        }
+        return redirect()->route('chat.home');
+    }
+
     public function create(Request $request): RedirectResponse
     {
         $llms = $request->input('llm');

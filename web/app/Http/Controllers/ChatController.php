@@ -111,13 +111,14 @@ class ChatController extends Controller
                                     $data[] = $message;
                                     $chainValue = isset($message->chain) ? (bool)$message->chain : $chainValue;
                                 } elseif ($message->role === 'assistant') {
-                                    $model = isset($message->model) ? $message->model : $access_code;
+                                    $model = isset($message->model) && is_string($message->model) ? $message->model : null;
                                     $content = isset($message->content) && is_string($message->content) ? $message->content : '';
                         
-                                    if (is_string($model) && $model === $access_code && is_string($content) && $content !== '') {
+                                    if (is_string($model) && $model === $access_code && is_string($content)) {
                                         if ($chainValue === true) {
                                             $message->chain = true;
                                         }
+                                        $message->content = $content;
                                         $data[] = $message;
                                     }
                                 }

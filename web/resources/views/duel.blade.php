@@ -16,13 +16,15 @@
             ->orderby('llms.created_at')
             ->get();
     @endphp
-    <x-chat.functions/>
+    <x-chat.functions />
     @if (!(request()->route('duel_id') || session('llms')))
         <x-duel.modal.group-chat :result="$result" />
     @else
         @if (request()->route('duel_id'))
             <x-chat.modals.feedback />
-            <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name . '.json'"/>
+            <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name . '.json'" />
+        @elseif (session('llms'))
+            <x-chat.modals.import_history />
         @endif
         @php
             $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')
