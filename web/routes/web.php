@@ -151,6 +151,8 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
                 Route::delete('/delete', [DuelController::class, 'delete'])->name('duel.delete');
                 Route::post('/request', [DuelController::class, 'request'])->name('duel.request');
+                Route::post('/import', [DuelController::class, 'import'])
+                    ->name('duel.import');
             })
             ->name('duel');
 

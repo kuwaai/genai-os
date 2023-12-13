@@ -129,14 +129,6 @@ class ChatController extends Controller
 
                         $historys = $data;
                         $first = array_shift($historys);
-                        while (trim($first->content ?? '') == '' || trim($first->role ?? '') == '') {
-                            if ($historys) {
-                                $first = array_shift($historys);
-                            } else {
-                                // This import data is invalid
-                                return redirect()->route('chat.home');
-                            }
-                        }
                         $chat = new Chats();
                         $chatname = $first->content;
                         if (in_array(LLMs::find($llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
@@ -184,28 +176,22 @@ class ChatController extends Controller
                         $record = new Histories();
                         $record->fill(['msg' => $first->content, 'chat_id' => $chat->id, 'isbot' => $first->role == 'user' ? false : true, 'chained' => $first->role == 'user' ? false : $first->chained ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                         $record->save();
-
                         if (count($historys) > 0) {
-                            $flag = true;
                             $chained = $record->chained;
                             $ids = [];
                             foreach ($historys as $history) {
-                                if (($history->content ?? '') == '') {
-                                    $history->content = null;
-                                }
                                 $history->isbot = $history->role == 'user' ? false : true;
                                 if (!(!$history->content && ($history->isbot ?? false) == false)) {
-                                    if ($flag == ($history->isbot ?? false)) {
+                                    if ($history->isbot) {
                                         $record = new Histories();
                                         $record->fill(['msg' => $history->content ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $history->isbot ? $chained | ($history->chained ?? false) : false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                                         $record->save();
-                                        $flag = !$flag;
                                         $chained = $history->chained ?? false;
-                                        if ($history->isbot && $history->content == '') {
+                                        if ($history->content == '') {
                                             Redis::rpush('usertask_' . $request->user()->id, $record->id);
                                             $ids[] = $record->id;
                                         }
-                                    } elseif ($flag == true && ($history->isbot ?? false) == false) {
+                                    } else {
                                         $record = new Histories();
                                         $record->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $chained | ($history->chained ?? false), 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                                         $record->save();
@@ -221,14 +207,14 @@ class ChatController extends Controller
                                     }
                                 }
                             }
-                            if ($flag == true && count($ids) < 30) {
+                            if (count($ids) < 30) {
                                 $record = new Histories();
                                 $record->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $chained, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                                 $record->save();
                                 Redis::rpush('usertask_' . $request->user()->id, $record->id);
                                 $ids[] = $record->id;
                             }
-                            ImportChat::dispatch($ids, LLMs::find($llm_id)->access_code, Auth::user()->id);
+                            ImportChat::dispatch($ids, Auth::user()->id);
                         }
                         return Redirect::route('chat.chat', $chat->id);
                     }
