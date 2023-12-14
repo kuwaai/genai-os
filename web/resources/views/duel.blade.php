@@ -17,14 +17,15 @@
             ->get();
     @endphp
     <x-chat.functions />
+    @if (!request()->route('duel_id'))
+        <x-chat.modals.import_history />
+    @endif
     @if (!(request()->route('duel_id') || session('llms')))
         <x-duel.modal.group-chat :result="$result" />
     @else
         @if (request()->route('duel_id'))
             <x-chat.modals.feedback />
             <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name . '.json'" />
-        @elseif (session('llms'))
-            <x-chat.modals.import_history />
         @endif
         @php
             $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')
@@ -78,12 +79,19 @@
                         </h2>
                         <p class="block sm:hidden text-center text-black dark:text-white">
                             {{ __('Select a chatroom to begin with') }}</p>
-                        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg"
-                            data-modal-target="create-model-modal" data-modal-toggle="create-model-modal">
-                            <button
-                                class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == 3 ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
-                                <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create Chat') }}</p>
-                            </button>
+                        <div class="mb-2">
+                            <div class="flex">
+                                <button data-modal-target="create-model-modal" data-modal-toggle="create-model-modal"
+                                    class="flex rounded-l-lg border border-black dark:border-white border-2 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+                                    <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create Chat') }}
+                                    </p>
+                                </button>
+                                <button onclick="import_chat()" data-modal-target="importModal"
+                                    data-modal-toggle="importModal"
+                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-r-lg flex items-center justify-center">
+                                    <i class="fas fa-file-import"></i>
+                                </button>
+                            </div>
                         </div>
                         <x-duel.llm :result="$result" />
                     @endif
