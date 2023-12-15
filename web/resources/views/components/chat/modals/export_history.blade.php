@@ -31,7 +31,7 @@
             </div>
             <!-- Modal footer -->
             <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                <button
+                <button data-modal-hide="exportModal"
                     onclick='$("#download_holder").attr("href",window.URL.createObjectURL(new Blob([$("#export_json").val()], { type: "text/plain" }))); $("#download_holder")[0].click();'
                     class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download') }}</button>
             </div>
