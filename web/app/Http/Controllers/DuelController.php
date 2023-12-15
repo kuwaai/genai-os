@@ -40,7 +40,7 @@ class DuelController extends Controller
         if ($historys) {
             $historys = json_decode($historys);
         }
-        if ($historys) {
+        if ($historys && isset($historys->messages)) {
             $result = DB::table(function ($query) {
                 $query
                     ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
@@ -56,7 +56,6 @@ class DuelController extends Controller
                 ->get()
                 ->pluck('id')
                 ->toarray();
-
             $data = [];
             $chainValue = null;
             $access_codes = [];
