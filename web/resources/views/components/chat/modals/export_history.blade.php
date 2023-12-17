@@ -23,17 +23,41 @@
             </div>
 
             <!-- Modal body -->
-            <div class="p-6 space-y-6">
-                <textarea id="export_json" rows="15" readonly
+            <div class="p-6">
+                <label class="text-black dark:text-white" for="export_json">{{__("JSON format")}}</label>
+                <textarea id="export_json" rows="7" readonly
                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                <a id="download_holder" style="display:none;"
-                    download="{{ $name }}"></a>
+
+                <label class="text-black dark:text-white" for="export_tsv">{{__("Tab Separate Values")}}</label>
+                <textarea id="export_tsv" rows="7" readonly
+                    class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
+                <a id="download_holder_json" style="display:none;" download="{{ $name . '.json' }}"></a>
+                <a id="download_holder_tsv" style="display:none;" download="{{ $name . '.txt' }}"></a>
             </div>
             <!-- Modal footer -->
             <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                <button data-modal-hide="exportModal"
-                    onclick='$("#download_holder").attr("href",window.URL.createObjectURL(new Blob([$("#export_json").val()], { type: "text/plain" }))); $("#download_holder")[0].click();'
-                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download') }}</button>
+                <div id="export_json_btn" role="tooltip"
+                    class="absolute z-10 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm tooltip dark:bg-gray-600 opacity-0 invisible"
+                    style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(352.8px, -108px, 0px);"
+                    data-popper-placement="top">
+                    {{ __('Unescaped JSON Format') }}
+                    <div class="tooltip-arrow" data-popper-arrow=""
+                        style="position: absolute; left: 0px; transform: translate3d(89.6px, 0px, 0px);"></div>
+                </div>
+                <button data-modal-hide="exportModal" data-tooltip-target="export_json_btn"
+                    onclick='$("#download_holder_json").attr("href",window.URL.createObjectURL(new Blob([$("#export_json").val()], { type: "text/plain" }))); $("#download_holder_json")[0].click();'
+                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download JSON') }}</button>
+                <div id="export_txt_btn" role="tooltip"
+                    class="absolute z-10 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm tooltip dark:bg-gray-600 opacity-0 invisible"
+                    style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(352.8px, -108px, 0px);"
+                    data-popper-placement="top">
+                    {{ __('Tab Separated Value') }}
+                    <div class="tooltip-arrow" data-popper-arrow=""
+                        style="position: absolute; left: 0px; transform: translate3d(89.6px, 0px, 0px);"></div>
+                </div>
+                <button data-modal-hide="exportModal" data-tooltip-target="export_txt_btn"
+                    onclick='$("#download_holder_tsv").attr("href",window.URL.createObjectURL(new Blob([$("#export_tsv").val()], { type: "text/plain" }))); $("#download_holder_tsv")[0].click();'
+                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download TXT') }}</button>
             </div>
         </div>
     </div>

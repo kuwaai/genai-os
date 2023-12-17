@@ -228,7 +228,7 @@
 "Application":"迅速建立模型應用",
 "Allow":"允許",
 "Disallow":"不允許",
-"Toggle Chain":"切換問答方式",
+"Toggle Chain":"單筆多輪切換",
 "Default State":"問答預設使用",
 "Feedbacks":"回饋機制",
 "Translate":"翻譯機制",
@@ -251,5 +251,11 @@
 "Regards":"敬上",
 "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:":"如果你無法點擊\":actionText\"的按鈕，您可以將該連結複製貼上到瀏覽器打開來驗證：",
 "Verify Email Address":"驗證電子信箱",
-"Return Home":"回首頁"
+"Return Home":"回首頁",
+"Unescaped JSON Format":"無跳脫的JSON格式",
+"Tab Separated Value":"Tab分隔，可由Excel讀入",
+"Download TXT":"下載TXT檔",
+"Download JSON":"下載JSON檔",
+"Tab Separate Values":"Tab分隔資料",
+"JSON format":"JSON格式"
 }

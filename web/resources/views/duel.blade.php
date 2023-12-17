@@ -25,7 +25,7 @@
     @else
         @if (request()->route('duel_id'))
             <x-chat.modals.feedback />
-            <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name . '.json'" />
+            <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name " />
         @endif
         @php
             $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')

@@ -18,37 +18,37 @@
     </button>
     <div
         class="flex-shrink-0 mx-2 my-auto h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-        <div id="llm_{{ $LLM->id }}_chat" role="tooltip" access_code="{{$LLM->access_code}}"
+        <div id="llm_{{ $LLM->id }}_chat" role="tooltip" access_code="{{ $LLM->access_code }}"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
             {{ $LLM->name }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <div id="react_copy" role="tooltip"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{__("Copy message")}}
+            {{ __('Copy message') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <div id="react_like" role="tooltip"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{__("Like the message")}}
+            {{ __('Like the message') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <div id="react_dislike" role="tooltip"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{__("Dislike the message")}}
+            {{ __('Dislike the message') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <div id="react_translate" role="tooltip"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{__("Translate by the model")}}
+            {{ __('Translate by the model') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <div id="react_translateCC" role="tooltip"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{__("Translate by OpenCC")}}
+            {{ __('Translate by OpenCC') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
-        <img class="h-full w-full" data-tooltip-target="llm_{{$LLM->id}}_chat" data-tooltip-placement="top" 
+        <img class="h-full w-full" data-tooltip-target="llm_{{ $LLM->id }}_chat" data-tooltip-placement="top"
             src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
     </div>
     @if ($llmId)
@@ -78,17 +78,17 @@
                 <script>
                     function export_chat() {
                         var chatMessages = [];
-    
+                        //JSON format
                         $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
                             var history_id = $(element).prop("id").replace("history_", "")
                             var msgText = histories[history_id]
                             var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
                             var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
                             if (isBot) {
-                                console.log($(element).children("div").children("img"))
                                 var message = {
                                     "role": "assistant",
-                                    "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target")).attr("access_code"),
+                                    "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                        .attr("access_code"),
                                     "content": msgText,
                                     "chain": chained
                                 };
@@ -98,13 +98,37 @@
                                     "content": msgText,
                                 };
                             }
-    
+
                             chatMessages.push(message);
                         });
-    
+
                         $("#export_json").val(JSON.stringify({
                             "messages": chatMessages
                         }, null, 4))
+                    //Tab Separate Values
+                    var csvContent = "role	model	content	chain\n"; // Define CSV header
+
+                    $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                        var historyId = $(element).prop("id").replace("history_", "");
+                        var msgText = JSON.stringify(histories[historyId]);
+                        if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
+                            msgText = msgText.substring(1, msgText.length - 1);
+                        }
+                        var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
+                        var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
+
+                        var row = "";
+                        if (isBot) {
+                            var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                .attr("access_code");
+                            row = `assistant	${model}	${msgText}	${chained}\n`;
+                        } else {
+                            row = `user		${msgText}	\n`;
+                        }
+
+                        csvContent += row; // Add row to CSV content
+                    });
+                    $("#export_tsv").val(csvContent)
                     }
                 </script>
             @endif

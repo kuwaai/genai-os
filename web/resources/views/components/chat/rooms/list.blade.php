@@ -3,12 +3,7 @@
 <div class="flex flex-1 h-full overflow-y-hidden flex-col border border-black dark:border-white border-1 rounded-lg">
     <div class="border-b border-black dark:border-white">
         <div class="my-2 ml-4">
-            @if ($LLM->link)
-                <a href="{{ $LLM->link }}" target="_blank"
-                    class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-            @else
-                <span class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</span>
-            @endif
+            <span class="inline whitespace-pre-line break-words menu-btn w-auto mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</span>
 
             @if ($LLM->description)
                 <span class="inline text-sm whitespace-pre-line break-words leading-none text-gray-500 dark:text-gray-400">

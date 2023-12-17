@@ -17,7 +17,7 @@ class ExportTrainData extends Command
     {
         $file = $this->argument('file');
         if ($file) {
-            
+
         } else {
             $this->exportToJson();
         }
@@ -50,7 +50,6 @@ class ExportTrainData extends Command
                                     'updated_at' => strtotime($record->updated_at),
                                     'deleted_at' => strtotime($record->deleted_at),
                                     'chain' => $record->chain,
-                                    'user_id' => $record->user_id,
                                 ];
                                 if ($record->nice) {
                                     $tmp = [];

@@ -100,6 +100,7 @@
 
             <script>
                 function export_chat() {
+                    //JSON format
                     var chatMessages = [];
 
                     $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
@@ -129,6 +130,30 @@
                     $("#export_json").val(JSON.stringify({
                         "messages": chatMessages
                     }, null, 4))
+                    //Tab Separate Values
+                    var csvContent = "role	model	content	chain\n"; // Define CSV header
+
+                    $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                        var historyId = $(element).prop("id").replace("history_", "");
+                        var msgText = JSON.stringify(histories[historyId]);
+                        if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
+                            msgText = msgText.substring(1, msgText.length - 1);
+                        }
+                        var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
+                        var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
+
+                        var row = "";
+                        if (isBot) {
+                            var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                .attr("access_code");
+                            row = `assistant	${model}	${msgText}	${chained}\n`;
+                        } else {
+                            row = `user		${msgText}	\n`;
+                        }
+
+                        csvContent += row; // Add row to CSV content
+                    });
+                    $("#export_tsv").val(csvContent)
                 }
             </script>
             <button onclick="saveChat()"
