@@ -38,9 +38,6 @@ class DuelController extends Controller
     {
         $historys = $request->input('history');
         if ($historys) {
-            $historys = json_decode($historys);
-        }
-        if ($historys && isset($historys->messages)) {
             $result = DB::table(function ($query) {
                 $query
                     ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
@@ -56,104 +53,179 @@ class DuelController extends Controller
                 ->get()
                 ->pluck('id')
                 ->toarray();
-            $data = [];
-            $chainValue = null;
-            $access_codes = [];
-            foreach ($historys->messages as $message) {
-                if (isset($message->role) && is_string($message->role)) {
-                    $model = isset($message->model) && is_string($message->model) ? $message->model : null;
-                    if ($message->role === 'assistant') {
-                        if (!is_null($model) && !in_array($model, $access_codes)) {
-                            $access_codes[] = $model;
+            $historys = json_decode($historys);
+            if ($historys) {
+                //JSON format
+                $historys = $historys->messages;
+            } else {
+                //TSV Format
+                $rows = explode("\n", str_replace("\r\n", "\n", $request->input('history')));
+                $historys = [];
+                $headers = null;
+
+                foreach ($rows as $index => $row) {
+                    // Splitting each row into columns using tabs as delimiter
+                    if ($index === 0) {
+                        $headers = explode("\t", $row);
+                        continue;
+                    }
+                    if ($headers === null) {
+                        break;
+                    }
+                    $columns = explode("\t", $row);
+
+                    $record = [];
+                    foreach ($headers as $columnIndex => $header) {
+                        if (!isset($columns[$columnIndex]) || empty($columns[$columnIndex])) {
+                            continue;
+                        }
+                        $value = $columns[$columnIndex];
+                        if ($header === 'content') {
+                            $value = trim(json_decode('"' . $value . '"'), '"');
+                        }
+                        $record[$header] = $value;
+                    }
+                    $historys[] = (object) $record;
+                }
+            }
+            if ($historys) {
+                //Permission check
+                $access_codes = [];
+                foreach ($historys as $message) {
+                    if (isset($message->role) && is_string($message->role)) {
+                        $model = isset($message->model) && is_string($message->model) ? $message->model : null;
+                        if ($message->role === 'assistant') {
+                            if (!is_null($model) && !in_array($model, $access_codes)) {
+                                $access_codes[] = $model;
+                            }
                         }
                     }
                 }
-            }
-            $llm_ids = LLMs::whereIn('access_code', $access_codes)
-                ->select('id', 'access_code')
-                ->get();
-            $access_codes = [];
-            foreach ($llm_ids as $i) {
-                if (in_array($i->id, $result)) {
-                    $access_codes[] = $i->access_code;
+                $llm_ids = LLMs::whereIn('access_code', $access_codes)
+                    ->select('id', 'access_code')
+                    ->get();
+                $access_codes = [];
+                foreach ($llm_ids as $i) {
+                    if (in_array($i->id, $result)) {
+                        $access_codes[] = $i->access_code;
+                    }
                 }
-            }
-            foreach ($historys->messages as $message) {
-                if (isset($message->role) && is_string($message->role)) {
-                    if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
-                        $data[] = $message;
-                        $chainValue = isset($message->chain) ? (bool) $message->chain : $chainValue;
-                    } elseif ($message->role === 'assistant') {
-                        $model = isset($message->model) && is_string($message->model) ? $message->model : null;
-                        $content = isset($message->content) && is_string($message->content) ? $message->content : '';
-                        $message->content = $content;
-                        $message->model = $model;
-                        if ($chainValue === true) {
-                            $message->chain = true;
-                        }
-                        if (is_null($model)) {
-                            foreach ($access_codes as $access_code) {
-                                $newMessage = clone $message;
-                                $newMessage->model = $access_code;
-
+                //Filtering
+                $chainValue = null;
+                $data = [];
+                $flag = false;
+                foreach ($historys as $message) {
+                    if (isset($message->role) && is_string($message->role)) {
+                        if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
+                            if ($flag) {
+                                $newMessage = (object) [
+                                    'role' => 'assistant',
+                                    'model' => '',
+                                    'chain' => $chainValue,
+                                    'content' => '',
+                                ];
                                 if ($chainValue === true) {
                                     $newMessage->chain = true;
                                 }
-                                $data[] = $newMessage;
-                            }
-                        } elseif (in_array($model, $access_codes)) {
-                            $data[] = $message;
-                        }
-                    }
-                }
-            }
+                                foreach ($access_codes as $access_code) {
+                                    $newMessage->model = $access_code;
 
-            $historys = $data;
-            if (count($historys) > 0) {
-                $Duel = new DuelChat();
-                $Duel->fill(['name' => $historys[0]->content, 'user_id' => $request->user()->id]);
-                $Duel->save();
-                $deltaTime = count($historys);
-                foreach ($llm_ids->pluck('id') as $id) {
-                    $chat = new Chats();
-                    $chat->fill(['name' => 'Duel Chat', 'llm_id' => $id, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
-                    $chat->save();
-                    $chatIds[] = $chat->id;
-                }
-                $flag = true;
-                $user_msg = null;
-                $appended = [];
-                $ids = [];
-                $t = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime . ' second'));
-                $chatIds = Chats::join('llms', 'llm_id', '=', 'llms.id')
-                    ->whereIn('chats.id', $chatIds)
-                    ->select('chats.id', 'llms.access_code')
-                    ->get();
-                foreach ($historys as $history) {
-                    $history->isbot = $history->role == 'user' ? false : true;
-                    if ($history->isbot) {
-                        if ($user_msg != null && !in_array($history->model, $appended)) {
-                            $record = new Histories();
-                            $record->fill(['msg' => $user_msg, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'isbot' => false, 'chained' => $history->chain, 'created_at' => $t, 'updated_at' => $t]);
-                            $record->save();
+                                    $data[] = clone $newMessage;
+                                }
+                            }
+                            $chainValue = isset($message->chain) ? (bool) $message->chain : false;
+                            $data[] = $message;
+                            $flag = true;
+                        } elseif ($message->role === 'assistant') {
+                            $model = isset($message->model) && is_string($message->model) ? $message->model : null;
+                            $content = isset($message->content) && is_string($message->content) ? $message->content : '';
+                            $message->content = $content;
+                            $message->model = $model;
+                            if ($chainValue === true) {
+                                $message->chain = true;
+                            }
+                            if (is_null($model)) {
+                                $flag = false;
+                                foreach ($access_codes as $access_code) {
+                                    $newMessage = clone $message;
+                                    $newMessage->model = $access_code;
+
+                                    if ($chainValue === true) {
+                                        $newMessage->chain = true;
+                                    }
+                                    $data[] = $newMessage;
+                                }
+                            } elseif (in_array($model, $access_codes)) {
+                                $flag = false;
+                                $data[] = $message;
+                            }
                         }
-                        $appended[] = $history->model;
-                        $t2 = date('Y-m-d H:i:s', strtotime($t . ' +' . array_count_values($appended)[$history->model] . ' second'));
-                        $record = new Histories();
-                        $record->fill(['msg' => $history->content == "" ? '* ...thinking... *' : $history->content, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'chained' => $history->chain, 'isbot' => true, 'created_at' => $t2, 'updated_at' => $t2]);
-                        $record->save();
-                        if ($history->content == ""){
-                            $ids[] = $record->id;
-                            Redis::rpush('usertask_' . $request->user()->id, $record->id);
-                        }
-                    } else {
-                        $user_msg = $history->content;
-                        $appended = [];
-                        $t = date('Y-m-d H:i:s', strtotime($t . ' +' . ($appended != [] ? max(array_count_values($appended)) : 1)+1 . ' second'));
                     }
                 }
-                ImportChat::dispatch($ids, Auth::user()->id);
-                return Redirect::route('duel.chat', $Duel->id);
+                if ($flag) {
+                    $newMessage = (object) [
+                        'role' => 'assistant',
+                        'model' => '',
+                        'chain' => $chainValue,
+                        'content' => '',
+                    ];
+                    if ($chainValue === true) {
+                        $newMessage->chain = true;
+                    }
+                    foreach ($access_codes as $access_code) {
+                        $newMessage->model = $access_code;
+
+                        $data[] = clone $newMessage;
+                    }
+                }
+                $historys = $data;
+                if (count($historys) > 0) {
+                    //Start loading
+                    $Duel = new DuelChat();
+                    $Duel->fill(['name' => $historys[0]->content, 'user_id' => $request->user()->id]);
+                    $Duel->save();
+                    $deltaTime = count($historys);
+                    foreach ($llm_ids->pluck('id') as $id) {
+                        $chat = new Chats();
+                        $chat->fill(['name' => 'Duel Chat', 'llm_id' => $id, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
+                        $chat->save();
+                        $chatIds[] = $chat->id;
+                    }
+                    $flag = true;
+                    $user_msg = null;
+                    $appended = [];
+                    $ids = [];
+                    $t = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime . ' second'));
+                    $chatIds = Chats::join('llms', 'llm_id', '=', 'llms.id')
+                        ->whereIn('chats.id', $chatIds)
+                        ->select('chats.id', 'llms.access_code')
+                        ->get();
+                    foreach ($historys as $history) {
+                        $history->isbot = $history->role == 'user' ? false : true;
+                        if ($history->isbot) {
+                            if ($user_msg != null && !in_array($history->model, $appended)) {
+                                $record = new Histories();
+                                $record->fill(['msg' => $user_msg, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'isbot' => false, 'chained' => $history->chain, 'created_at' => $t, 'updated_at' => $t]);
+                                $record->save();
+                            }
+                            $appended[] = $history->model;
+                            $t2 = date('Y-m-d H:i:s', strtotime($t . ' +' . array_count_values($appended)[$history->model] . ' second'));
+                            $record = new Histories();
+                            $record->fill(['msg' => $history->content == '' ? '* ...thinking... *' : $history->content, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'chained' => $history->chain, 'isbot' => true, 'created_at' => $t2, 'updated_at' => $t2]);
+                            $record->save();
+                            if ($history->content == '') {
+                                $ids[] = $record->id;
+                                Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                            }
+                        } else {
+                            $user_msg = $history->content;
+                            $t = date('Y-m-d H:i:s', strtotime($t . ' +' . ($appended != [] ? max(array_count_values($appended)) : 1) + 1 . ' second'));
+                            $appended = [];
+                        }
+                    }
+                    ImportChat::dispatch($ids, Auth::user()->id);
+                    return Redirect::route('duel.chat', $Duel->id);
+                }
             }
         }
         return redirect()->route('duel.home');

@@ -81,52 +81,104 @@ class ChatController extends Controller
     {
         if (count(Redis::lrange('usertask_' . Auth::user()->id, 0, -1)) == 0) {
             $llm_id = $request->input('llm_id');
+            $access_code = LLMs::find($llm_id)->access_code;
             $historys = $request->input('history');
             if ($llm_id && $historys) {
-                $historys = json_decode($historys);
-                if ($historys !== null && isset($historys->messages) && is_array($historys->messages) && count($historys->messages) > 1) {
-                    $result = DB::table(function ($query) {
-                        $query
-                            ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                            ->from('group_permissions')
-                            ->join('permissions', 'perm_id', '=', 'permissions.id')
-                            ->where('group_id', Auth()->user()->group_id)
-                            ->where('name', 'like', 'model_%')
-                            ->get();
-                    }, 'tmp')
-                        ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-                        ->select('llms.id')
-                        ->where('llms.enabled', true)
-                        ->get()
-                        ->pluck('id')
-                        ->toarray();
-                    if (in_array($llm_id, $result)) {
-                        $data = [];
-                        $chainValue = null;
-                        $access_code = LLMs::find($llm_id)->access_code;
+                $result = DB::table(function ($query) {
+                    $query
+                        ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                        ->from('group_permissions')
+                        ->join('permissions', 'perm_id', '=', 'permissions.id')
+                        ->where('group_id', Auth()->user()->group_id)
+                        ->where('name', 'like', 'model_%')
+                        ->get();
+                }, 'tmp')
+                    ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+                    ->select('llms.id')
+                    ->where('llms.enabled', true)
+                    ->get()
+                    ->pluck('id')
+                    ->toarray();
+                if (in_array($llm_id, $result)) {
+                    $historys = json_decode($historys);
+                    if ($historys !== null && isset($historys->messages) && is_array($historys->messages) && count($historys->messages) > 1) {
+                        // JSON format
+                        $historys = $historys->messages;
+                    } else {
+                        // TSV format
+                        $rows = explode("\n", str_replace("\r\n", "\n", $request->input('history')));
+                        $historys = [];
+                        $headers = null;
 
-                        foreach ($historys->messages as $message) {
-                            if (isset($message->role) && is_string($message->role)) {
-                                if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
-                                    $data[] = $message;
-                                    $chainValue = isset($message->chain) ? (bool)$message->chain : $chainValue;
-                                } elseif ($message->role === 'assistant') {
-                                    $model = isset($message->model) && is_string($message->model) ? $message->model : null;
-                                    $content = isset($message->content) && is_string($message->content) ? $message->content : '';
-                        
-                                    if (is_string($model) && $model === $access_code && is_string($content)) {
-                                        if ($chainValue === true) {
-                                            $message->chain = true;
-                                        }
-                                        $message->content = $content;
-                                        $data[] = $message;
+                        foreach ($rows as $index => $row) {
+                            if ($index === 0) {
+                                $headers = explode("\t", $row);
+                                continue;
+                            }
+                            if ($headers === null) {
+                                break;
+                            }
+                            $columns = explode("\t", $row);
+
+                            $record = [];
+                            foreach ($headers as $columnIndex => $header) {
+                                if (!isset($columns[$columnIndex]) || empty($columns[$columnIndex])) {
+                                    continue;
+                                }
+                                $value = $columns[$columnIndex];
+                                if ($header === 'content') {
+                                    $value = trim(json_decode('"' . $value . '"'), '"');
+                                }
+                                $record[$header] = $value;
+                            }
+                            $historys[] = (object) $record;
+                        }
+                    }
+                    //Filtering
+                    $data = [];
+                    $chainValue = false;
+                    $flag = false;
+                    foreach ($historys as $message) {
+                        if (isset($message->role) && is_string($message->role)) {
+                            if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
+                                if ($flag) {
+                                    $newRecord = [
+                                        'role' => 'assistant',
+                                        'chain' => $chainValue,
+                                        'content' => '',
+                                    ];
+                                    $data[] = (object) $newRecord;
+                                }
+                                $chainValue = isset($message->chain) ? (bool) $message->chain : false;
+                                $data[] = $message;
+                                $flag = true;
+                            } elseif ($message->role === 'assistant') {
+                                $model = isset($message->model) && is_string($message->model) ? $message->model : $access_code;
+                                $content = isset($message->content) && is_string($message->content) ? $message->content : '';
+
+                                if ($model === $access_code) {
+                                    $flag = false;
+                                    if ($chainValue === true) {
+                                        $message->chain = $chainValue;
                                     }
+                                    $message->model = $model;
+                                    $message->content = $content;
+                                    $data[] = $message;
                                 }
                             }
                         }
-                        
-                        
+                    }
+                    if ($flag) {
+                        $newRecord = [
+                            'role' => 'assistant',
+                            'chain' => $chainValue,
+                            'content' => '',
+                        ];
+                        $data[] = (object) $newRecord;
+                    }
 
+                    if ($data) {
+                        //Start loading
                         $historys = $data;
                         $first = array_shift($historys);
                         $chat = new Chats();
@@ -172,48 +224,39 @@ class ChatController extends Controller
                         }
                         $chat->fill(['name' => $chatname, 'llm_id' => $llm_id, 'user_id' => $request->user()->id]);
                         $chat->save();
-                        $deltaTime = count($historys) + 1;
+                        $deltaTime = count($historys);
                         $record = new Histories();
                         $record->fill(['msg' => $first->content, 'chat_id' => $chat->id, 'isbot' => $first->role == 'user' ? false : true, 'chained' => $first->role == 'user' ? false : $first->chained ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
                         $record->save();
                         if (count($historys) > 0) {
-                            $chained = $record->chained;
+                            $user_msg = null;
                             $ids = [];
+                            $model_counter = 0;
+                            $t = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime . ' second'));
                             foreach ($historys as $history) {
                                 $history->isbot = $history->role == 'user' ? false : true;
-                                if (!(!$history->content && ($history->isbot ?? false) == false)) {
-                                    if ($history->isbot) {
+                                if ($history->isbot) {
+                                    if ($user_msg != null) {
                                         $record = new Histories();
-                                        $record->fill(['msg' => $history->content ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $history->isbot ? $chained | ($history->chained ?? false) : false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
+                                        $record->fill(['msg' => $user_msg, 'chat_id' => $chat->id, 'isbot' => false, 'chained' => $history->chain, 'created_at' => $t, 'updated_at' => $t]);
                                         $record->save();
-                                        $chained = $history->chained ?? false;
-                                        if ($history->content == '') {
-                                            Redis::rpush('usertask_' . $request->user()->id, $record->id);
-                                            $ids[] = $record->id;
-                                        }
-                                    } else {
-                                        $record = new Histories();
-                                        $record->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $chained | ($history->chained ?? false), 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
-                                        $record->save();
-                                        Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                    }
+                                    $model_counter += 1;
+                                    $t2 = date('Y-m-d H:i:s', strtotime($t . ' +' . $model_counter . ' second'));
+                                    $record = new Histories();
+                                    $record->fill(['msg' => $history->content == '' ? '* ...thinking... *' : $history->content, 'chat_id' => $chat->id, 'chained' => $history->chain, 'isbot' => true, 'created_at' => $t2, 'updated_at' => $t2]);
+                                    $record->save();
+                                    if ($history->content == '') {
                                         $ids[] = $record->id;
-                                        $record = new Histories();
-                                        $record->fill(['msg' => $history->content ?? '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => false, 'isbot' => $history->isbot ?? false, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
-                                        $record->save();
-                                        $chained = $history->chained ?? false;
+                                        Redis::rpush('usertask_' . $request->user()->id, $record->id);
                                     }
-                                    if (count($ids) > 30) {
-                                        break;
-                                    }
+                                } else {
+                                    $user_msg = $history->content;
+                                    $t = date('Y-m-d H:i:s', strtotime($t . ' +' . ($model_counter != 0 ? $model_counter : 1) + 1 . ' second'));
+                                    $model_counter = 0;
                                 }
                             }
-                            if (count($ids) < 30) {
-                                $record = new Histories();
-                                $record->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'chained' => $chained, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime-- . ' second'))]);
-                                $record->save();
-                                Redis::rpush('usertask_' . $request->user()->id, $record->id);
-                                $ids[] = $record->id;
-                            }
+
                             ImportChat::dispatch($ids, Auth::user()->id);
                         }
                         return Redirect::route('chat.chat', $chat->id);
