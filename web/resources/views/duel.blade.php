@@ -159,9 +159,10 @@
                                 $mergedChats = $filteredChats->sortBy(function ($chat) {
                                     return [$chat->created_at, $chat->llm_id, -$chat->id];
                                 });
+                                $refers = $mergedChats->where("isbot","=",true);
                             @endphp
                             @foreach ($mergedChats as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" />
+                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
                             @endforeach
                         @endif
                         <div style="display:none;"

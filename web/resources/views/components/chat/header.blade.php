@@ -48,6 +48,12 @@
             {{ __('Translate by OpenCC') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
+        <div id="ref-tooltip" role="tooltip"
+            class="absolute z-10 invisible whitespace-pre-wrap max-w-[600px] inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+            {{ __('Reference') }}
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+
         <img class="h-full w-full" data-tooltip-target="llm_{{ $LLM->id }}_chat" data-tooltip-placement="top"
             src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
     </div>
@@ -105,30 +111,30 @@
                         $("#export_json").val(JSON.stringify({
                             "messages": chatMessages
                         }, null, 4))
-                    //Tab Separate Values
-                    var csvContent = "role	model	content	chain\n"; // Define CSV header
+                        //Tab Separate Values
+                        var csvContent = "role	model	content	chain\n"; // Define CSV header
 
-                    $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
-                        var historyId = $(element).prop("id").replace("history_", "");
-                        var msgText = JSON.stringify(histories[historyId]);
-                        if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
-                            msgText = msgText.substring(1, msgText.length - 1);
-                        }
-                        var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
-                        var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
+                        $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                            var historyId = $(element).prop("id").replace("history_", "");
+                            var msgText = JSON.stringify(histories[historyId]);
+                            if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
+                                msgText = msgText.substring(1, msgText.length - 1);
+                            }
+                            var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
+                            var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
 
-                        var row = "";
-                        if (isBot) {
-                            var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
-                                .attr("access_code");
-                            row = `assistant	${model}	${msgText}	${chained}\n`;
-                        } else {
-                            row = `user		${msgText}	\n`;
-                        }
+                            var row = "";
+                            if (isBot) {
+                                var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                    .attr("access_code");
+                                row = `assistant	${model}	${msgText}	${chained}\n`;
+                            } else {
+                                row = `user		${msgText}	\n`;
+                            }
 
-                        csvContent += row; // Add row to CSV content
-                    });
-                    $("#export_tsv").val(csvContent)
+                            csvContent += row; // Add row to CSV content
+                        });
+                        $("#export_tsv").val(csvContent)
                     }
                 </script>
             @endif

@@ -3,7 +3,7 @@
     var histories = {}
 
     function chatroomFormatter(node) {
-        $(node).find('div.text-sm.break-words.bot-msg').each(function() {
+        $(node).find('div.text-sm.space-y-3.break-words').each(function() {
             if ($(this).text() == "<pending holder>") {
                 $(this).html(`<svg aria-hidden="true"
 class="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-400 fill-blue-800 w-[16px] h-[16px]"
@@ -19,17 +19,18 @@ fill="currentFill" />
                 $(this).html(DOMPurify.sanitize((marked.parse($(this).text()))));
             }
         });
-        $(node).find('div.text-sm.break-words.bot-msg table').addClass('table-auto');
-        $(node).find('div.text-sm.break-words.bot-msg table *').addClass('border border-2 border-gray-500 border-solid p-1');
-        $(node).find('div.text-sm.break-words.bot-msg ul').addClass('list-inside list-disc');
-        $(node).find('div.text-sm.break-words.bot-msg > p').addClass('whitespace-pre-wrap');
-        $(node).find('div.text-sm.break-words.bot-msg a').addClass('text-blue-600 hover:text-blue-800').prop('target',
+        $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
+        $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
+            'border border-2 border-gray-500 border-solid p-1');
+        $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
+        $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
+        $(node).find('div.text-sm.space-y-3.break-words a').addClass('text-blue-600 hover:text-blue-800').prop('target',
             '_blank');
-        $(node).find('div.text-sm.break-words.bot-msg pre code').each(function() {
+        $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
             hljs.highlightElement($(this)[0]);
         });
-        $(node).find('div.text-sm.break-words.bot-msg pre code').addClass("scrollbar scrollbar-3 rounded-b-lg")
-        $(node).find('div.text-sm.break-words.bot-msg pre').each(function() {
+        $(node).find('div.text-sm.space-y-3.break-words pre code').addClass("scrollbar scrollbar-3 rounded-b-lg")
+        $(node).find('div.text-sm.space-y-3.break-words pre').each(function() {
             let languageClass = '';
             $(this).children("code")[0].classList.forEach(cName => {
                 if (cName.startsWith('language-')) {
@@ -55,6 +56,22 @@ xmlns="http://www.w3.org/2000/svg">
 </svg><span class="ml-2">{{ __('Copy') }}</span></button></div>`
             )
         })
+
+        $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
+            var $h5 = $(this);
+            var pattern = /<%ref-(\d+)%>/;
+            var match = $h5.text().match(pattern);
+            if (match) {
+                var refNumber = match[1];
+                $msg = $("#history_" + refNumber).text().trim()
+                $h5.html(`<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="$('#chatroom').animate({scrollTop:$('#history_${refNumber}').offset().top - $('#chatroom').offset().top + $('#chatroom').scrollTop() }, 300);">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`);
+            }
+        });
+    }
+
+    function refToolTip(refID){
+        $msg = $("#history_" + refID).text().trim()
+        $('#ref-tooltip').text($msg);
     }
 
     function translates(node, history_id) {

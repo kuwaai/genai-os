@@ -23,7 +23,7 @@
         }
     @endphp
 
-    <x-chat.functions/>
+    <x-chat.functions />
     @if (request()->user()->hasPerm('Chat_update_import_chat') && request()->route('llm_id'))
         <x-chat.modals.import_history />
     @elseif (request()->user()->hasPerm('Chat_read_export_chat') && request()->route('chat_id'))
@@ -82,9 +82,13 @@
                         @if (request()->route('chat_id'))
                             @php
                                 $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+                                $refers = App\Models\Histories::where('chat_id', '=', request()->route('chat_id'))
+                                ->where("isbot","=",true)
+                                        ->select('msg', 'id')->get();
                             @endphp
+                            <script>$refs = []</script>
                             @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->leftjoin('feedback', 'history_id', '=', 'histories.id')->leftJoin('chats', 'histories.chat_id', '=', 'chats.id')->select(['histories.*', 'chats.llm_id', 'feedback.nice', 'feedback.detail', 'feedback.flags'])->orderby('histories.created_at')->orderby('histories.id', 'desc')->get() as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" />
+                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
                             @endforeach
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
