@@ -3,7 +3,7 @@
 @foreach (App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.llm_id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('duelchat.id')->get()->groupBy('identifier') as $DC)
     @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
-            <form method="post" action="http://localhost/duel/new?limit=">
+            <form method="post" action="{{route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit'))}}">
                 @csrf
                 <button
                     class="flex px-2 scrollbar rounded-t-lg w-full hover:bg-gray-700 scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
