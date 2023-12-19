@@ -23,9 +23,9 @@
         @endif
     </p>
 
-    <div class="flex">
+    <div class="flex overflow-x-hidden">
         <div
-            class="flex items-center mr-1 max-w-[144px] min-w-[] overflow-x-auto overflow-y-hidden scrollbar scrollbar-3">
+            class="flex items-center mr-1 max-w-[144px] min-w-[40px] overflow-x-auto overflow-y-hidden scrollbar scrollbar-3">
             @if (session('llms'))
                 @foreach ($llms as $llm)
                     <div
