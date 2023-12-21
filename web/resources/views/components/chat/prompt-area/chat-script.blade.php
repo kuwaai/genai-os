@@ -11,7 +11,7 @@
             $("#submit_msg").hide()
             $("#chat_input").val("訊息處理中...請稍後...")
             $("#chat_input").prop("readonly", true)
-        } else if ($chattable && ($("#chat_input").val().trim() != "")) {
+        } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
             tmp = ""
             for (var i in quoted) {
                 tmp += `${$("#llm_" + quoted[i][0] + "_chat").text().trim()}:"""${histories[quoted[i][1]]}"""\n`
