@@ -9,17 +9,22 @@
     $visable = true;
     if (!$history->isbot) {
         foreach ($refers->where('id', '<', $history->id) as $refer) {
-            $referMsg = trim(str_replace(["\r\n"], "\n", $refer->msg));
-
-            if ($refer->id !== $history->id) {
-                if ($message === $referMsg) {
-                    $visable = false;
-                    break;
+            for ($i = 0; $i <= 1; $i++) {
+                $referMsg = trim(str_replace(["\r\n"], "\n", $refer->msg));
+                if ($i == 0) {
+                    $referMsg = '"""' . $referMsg . '"""';
                 }
-                $pos = strpos($message, $referMsg);
 
-                if ($pos !== false) {
-                    $message = substr_replace($message, "\n##### <%ref-{$refer->id}%>\n", $pos, strlen($referMsg));
+                if ($refer->id !== $history->id) {
+                    if ($message === $referMsg) {
+                        $visable = false;
+                        break;
+                    }
+                    $pos = strpos($message, $referMsg);
+
+                    if ($pos !== false) {
+                        $message = substr_replace($message, "\n##### <%ref-{$refer->id}%>\n", $pos, strlen($referMsg));
+                    }
                 }
             }
         }
