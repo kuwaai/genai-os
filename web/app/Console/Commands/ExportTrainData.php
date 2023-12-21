@@ -36,13 +36,13 @@ class ExportTrainData extends Command
                                     $tmp = null;
                                     if ($item->chain && $histories !== []) {
                                         $count = min(count($histories), count($roles));
-                                        $tmp = ['prompt' => ""];
+                                        $tmp = ['prompt' => ''];
                                         for ($i = 0; $i < $count; $i++) {
-                                            $tmp["prompt"] .= "$roles[$i] $histories[$i] ";
+                                            $tmp['prompt'] .= "$roles[$i] $histories[$i] ";
                                         }
-                                        $tmp["prompt"] = trim($tmp["prompt"]) . " Assistant:";
+                                        $tmp['prompt'] = trim($tmp['prompt']) . ' Assistant:';
                                     } else {
-                                        $tmp = ['prompt' => "Human: " . trim(end($histories)) . " Assistant:"];
+                                        $tmp = ['prompt' => 'Human: ' . trim(end($histories)) . ' Assistant:'];
                                     }
                                     if ($item->feedback->nice) {
                                         $tmp['response'] = $item->content;
@@ -56,13 +56,13 @@ class ExportTrainData extends Command
                                     $trainData[] = $tmp;
                                 }
                                 $histories[] = $item->content;
-                                $roles[] = $item->role == "user" ? "Human:" : "Assistant:";
+                                $roles[] = $item->role == 'user' ? 'Human:' : 'Assistant:';
                             }
                         }
                     }
                 }
             }
-            $handle = fopen("converted_data.jsonl", 'w');
+            $handle = fopen('converted_data.jsonl', 'w');
             if ($handle !== false) {
                 foreach ($trainData as $item) {
                     fwrite($handle, json_encode($item, JSON_UNESCAPED_UNICODE) . "\n");
@@ -108,43 +108,51 @@ class ExportTrainData extends Command
                     ->contains(true);
             })
             ->map(function ($access_codes) {
-                return $access_codes->groupby('user_id')->map(function ($userHistories) {
-                    return $userHistories
-                        ->groupBy('id')
-                        ->filter(function ($groupedHistories) {
-                            $filteredHistories = $groupedHistories->filter(function ($record) {
-                                return $record->nice !== null;
-                            });
-                            return $filteredHistories->isNotEmpty();
-                        })
-                        ->map(function ($groupedHistories) {
-                            return $groupedHistories
-                                ->map(function ($record) {
-                                    $raw = [
-                                        'content' => $record->content,
-                                        'id' => $record->history_id,
-                                        'role' => $record->isbot ? 'assistant' : 'user',
-                                        'created_at' => strtotime($record->created_at),
-                                        'updated_at' => strtotime($record->updated_at),
-                                        'deleted_at' => strtotime($record->deleted_at),
-                                        'chain' => $record->chain,
-                                    ];
-                                    if ($record->nice !== null) {
-                                        $tmp = [];
-                                        $tmp['nice'] = $record->nice;
-                                        if ($record->flags) {
-                                            $tmp['flags'] = json_decode($record->flags);
-                                        }
-                                        if ($record->detail) {
-                                            $tmp['detail'] = $record->detail;
-                                        }
-                                        $raw['feedback'] = $tmp;
-                                    }
-                                    return $raw;
-                                })
-                                ->toArray();
+                return $access_codes
+                    ->groupby('user_id')
+                    ->filter(function ($userHistories) {
+                        $filtered = $userHistories->filter(function ($record) {
+                            return $record->nice !== null;
                         });
-                });
+                        return $filtered->isNotEmpty();
+                    })
+                    ->map(function ($userHistories) {
+                        return $userHistories
+                            ->groupBy('id')
+                            ->filter(function ($groupedHistories) {
+                                $filtered = $groupedHistories->filter(function ($record) {
+                                    return $record->nice !== null;
+                                });
+                                return $filtered->isNotEmpty();
+                            })
+                            ->map(function ($groupedHistories) {
+                                return $groupedHistories
+                                    ->map(function ($record) {
+                                        $raw = [
+                                            'content' => $record->content,
+                                            'id' => $record->history_id,
+                                            'role' => $record->isbot ? 'assistant' : 'user',
+                                            'created_at' => strtotime($record->created_at),
+                                            'updated_at' => strtotime($record->updated_at),
+                                            'deleted_at' => strtotime($record->deleted_at),
+                                            'chain' => $record->chain,
+                                        ];
+                                        if ($record->nice !== null) {
+                                            $tmp = [];
+                                            $tmp['nice'] = $record->nice;
+                                            if ($record->flags) {
+                                                $tmp['flags'] = json_decode($record->flags);
+                                            }
+                                            if ($record->detail) {
+                                                $tmp['detail'] = $record->detail;
+                                            }
+                                            $raw['feedback'] = $tmp;
+                                        }
+                                        return $raw;
+                                    })
+                                    ->toArray();
+                            });
+                    });
             });
         file_put_contents('exported_data.json', json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
