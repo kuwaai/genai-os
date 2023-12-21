@@ -10,7 +10,7 @@ sys.path.remove('../')
 # -- Configs --
 app.config["REDIS_URL"] = "redis://redis:6379/0"
 app.agent_endpoint = "http://web:9000/"
-app.LLM_name = "taide2_7b_chat_b1"
+app.LLM_name = "taide2_7b_chat_b11"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
@@ -24,8 +24,8 @@ if app.port == None:
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*3
-model_loc = "llama2-7b_tv_noemb_chat_tokenizer=ccw|stage=2|data=j|epoch=0-step=12740"
-tokenizer_loc = "llama2-7b_tv_noemb_chat_tokenizer=ccw|stage=2|data=j|epoch=0-step=12740"
+model_loc = "em7wns48-epoch=17-step=234"
+tokenizer_loc = "em7wns48-epoch=17-step=234"
 api_key = None
 usr_token = None
 tc_model = None
@@ -33,22 +33,22 @@ tc_model = None
 # -- Model Part --
 # Model Setting
 # model part
-from transformers import AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer
+from transformers import AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, set_seed
 model = AutoModelForCausalLM.from_pretrained(model_loc, device_map="auto",torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_loc, add_bos_token=False)
+set_seed(42)
 generation_config = GenerationConfig(
-    temperature= 0.2, 
-    top_p=0.92, 
-    top_k=0, 
-    do_sample=True, 
-    no_repeat_ngram_size=7,
-    repetition_penalty = 1.0, 
+    # temperature= 0.2, 
+    # top_p=0.92, 
+    # top_k=0, 
+    do_sample = False,
+    # no_repeat_ngram_size=7,
+    # repetition_penalty = 1.0, 
 )
-
-def preprocess(prompt):
-    prompt_format = "<s> [INST] {0} [/INST]"
-    prompt = prompt_format.format(prompt)
-    return prompt.strip()
+system_prompt_fmt = "<<SYS>>\n{0}\n<</SYS>>\n\n {1}"
+system_text = "You are a helpful assistant. 你是一個樂於助人的助手。"
+prompt_fmt = "<s>[INST] {0} [/INST]"
+answer_fmt = " {0} </s>"
 
 def process(data):
     try:
@@ -57,15 +57,17 @@ def process(data):
             del history[0]
             del history[0]
         if len(history) != 0:
-            print(history)
-            # history.append("")
-            # prompt = ""
-            # for i in range(0, len(history), 2):
-            #     prompt += "{}{}".format(preprocess(history[i]), history[i+1])
-            #     if i != (len(history)-2):
-            #         prompt += "</s>"
-            prompt = preprocess(history[-1])
-            print(prompt)
+            history[0] = system_prompt_fmt.format(system_text, history[0])
+            history_process = []
+            for i in range(0, len(history), 2):
+                tmp_txt = ""
+                if i == (len(history)-1):
+                    tmp_txt = prompt_fmt.format(history[i])
+                else:
+                    tmp_txt = prompt_fmt.format(history[i])+answer_fmt.format(history[i+1])
+                history_process.append(tmp_txt)
+            prompt = "".join(history_process)
+            print(prompt.encode('utf-8','ignore').decode('utf-8'))
             input_ids = tokenizer.encode(prompt, return_tensors='pt').to("cuda:0")
             streamer =TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
             generation_kwargs = dict(input_ids=input_ids, streamer=streamer, max_new_tokens=2048,generation_config=generation_config)
@@ -79,6 +81,7 @@ def process(data):
                 generated_text += new_text
                 torch.cuda.empty_cache()
             del streamer
+            print(generated_text.encode('utf-8','ignore').decode('utf-8'))
         else:
             yield "Sorry, The input message is too huge!"
 

@@ -44,11 +44,10 @@ generation_config = GenerationConfig(
     no_repeat_ngram_size=7,
     repetition_penalty = 1.0, 
 )
-
-def preprocess(prompt):
-    prompt_format = "<s> [INST] {0} [/INST]"
-    prompt = prompt_format.format(prompt)
-    return prompt.strip()
+system_prompt_fmt = "<<SYS>>\n{0}\n<</SYS>>\n\n {1}"
+system_text = "You are a helpful assistant. 你是一個樂於助人的助手。"
+prompt_fmt = "<s>[INST] {0} [/INST]\n"
+answer_fmt = " {0} </s>"
 
 def process(data):
     try:
@@ -57,15 +56,17 @@ def process(data):
             del history[0]
             del history[0]
         if len(history) != 0:
-            print(history)
-            # history.append("")
-            # prompt = ""
-            # for i in range(0, len(history), 2):
-            #     prompt += "{}{}".format(preprocess(history[i]), history[i+1])
-            #     if i != (len(history)-2):
-            #         prompt += "</s>"
-            prompt = preprocess(history[-1])
-            print(prompt)
+            history[0] = system_prompt_fmt.format(system_text, history[0])
+            history_process = []
+            for i in range(0, len(history), 2):
+                tmp_txt = ""
+                if i == (len(history)-1):
+                    tmp_txt = prompt_fmt.format(history[i])
+                else:
+                    tmp_txt = prompt_fmt.format(history[i])+answer_fmt.format(history[i+1])
+                history_process.append(tmp_txt)
+            prompt = "".join(history_process)
+            print(prompt.encode('utf-8','ignore').decode('utf-8'))
             input_ids = tokenizer.encode(prompt, return_tensors='pt').to("cuda:0")
             streamer =TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
             generation_kwargs = dict(input_ids=input_ids, streamer=streamer, max_new_tokens=2048,generation_config=generation_config)
@@ -79,6 +80,7 @@ def process(data):
                 generated_text += new_text
                 torch.cuda.empty_cache()
             del streamer
+            print(generated_text.encode('utf-8','ignore').decode('utf-8'))
         else:
             yield "Sorry, The input message is too huge!"
 
