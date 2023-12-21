@@ -19,7 +19,7 @@
                 $pos = strpos($message, $referMsg);
 
                 if ($pos !== false) {
-                    $message = substr_replace('"""' + $message + '"""', "\n##### <%ref-{$refer->id}%>\n", $pos, strlen($referMsg));
+                    $message = substr_replace('"""' . $message . '"""', "\n##### <%ref-{$refer->id}%>\n", $pos, strlen($referMsg));
                     $message = substr_replace($message, "\n##### <%ref-{$refer->id}%>\n", $pos, strlen($referMsg));
                 }
             }
