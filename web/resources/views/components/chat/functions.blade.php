@@ -64,14 +64,38 @@ xmlns="http://www.w3.org/2000/svg">
             if (match) {
                 var refNumber = match[1];
                 $msg = $("#history_" + refNumber).text().trim()
-                $h5.html(`<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="$('#chatroom').animate({scrollTop:$('#history_${refNumber}').offset().top - $('#chatroom').offset().top + $('#chatroom').scrollTop() }, 300);">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`);
+                $h5.html(
+                    `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="$('#chatroom').animate({scrollTop:$('#history_${refNumber}').offset().top - $('#chatroom').offset().top + $('#chatroom').scrollTop() }, 300);">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
+                );
             }
         });
     }
 
-    function refToolTip(refID){
+    function refToolTip(refID) {
         $msg = $("#history_" + refID).text().trim()
         $('#ref-tooltip').text($msg);
+    }
+    var quoted = [];
+    function quote(llm_id, history_id, node) {
+        if ($("#chat_input").val() != "訊息處理中...請稍後..." && !quoted.includes(history_id)) {
+            quoted.push(history_id);
+            $('#chat_input').val(($('#chat_input').val() + '\n' + $(`#llm_${llm_id}_chat`).text().trim() +
+                    ':「' + $(`#history_${history_id} div.text-sm.space-y-3.break-words`).text().trim() + '」\n')
+                .trim());
+            adjustTextareaRows($('#chat_input'))
+            $(node).children("svg").eq(0).hide();
+            $(node).children("svg").eq(1).show();
+            if ($(node).children("span")) {
+                $(node).children("span").text("{{ __('Copied') }}")
+            }
+            setTimeout(function() {
+                $(node).children("svg").eq(0).show();
+                $(node).children("svg").eq(1).hide();
+                if ($(node).children("span")) {
+                    $(node).children("span").text("{{ __('Copy') }}")
+                }
+            }, 3000);
+        }
     }
 
     function translates(node, history_id) {
