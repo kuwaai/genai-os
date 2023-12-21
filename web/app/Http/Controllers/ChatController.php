@@ -139,8 +139,8 @@ class ChatController extends Controller
                     $chainValue = false;
                     $flag = false;
                     foreach ($historys as $message) {
-                        if (isset($message->role) && is_string($message->role)) {
-                            if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
+                        if ((isset($message->role) && is_string($message->role)) || !isset($message->role)) {
+                            if (((isset($message->role) && $message->role === 'user') || !isset($message->role)) && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
                                 if ($flag) {
                                     $newRecord = [
                                         'role' => 'assistant',
@@ -150,9 +150,12 @@ class ChatController extends Controller
                                     $data[] = (object) $newRecord;
                                 }
                                 $chainValue = isset($message->chain) ? (bool) $message->chain : false;
+                                if (!isset($message->role)) {
+                                    $message->role = 'user';
+                                }
                                 $data[] = $message;
                                 $flag = true;
-                            } elseif ($message->role === 'assistant') {
+                            } elseif (isset($message->role) && $message->role === 'assistant') {
                                 $model = isset($message->model) && is_string($message->model) ? $message->model : $access_code;
                                 $content = isset($message->content) && is_string($message->content) ? $message->content : '';
 

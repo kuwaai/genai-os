@@ -82,13 +82,9 @@ xmlns="http://www.w3.org/2000/svg">
         $(node).children("svg").addClass("hidden");
         $(node).children("svg").eq(1).removeClass("hidden");
         $(node).prop("disabled", true);
-        data = history_id > 0 ? {} : {
-            model: "nihao"
-        }
         $.ajax({
-            url: '{{ route('chat.translate', '') }}/' + (history_id > 0 ? history_id : -history_id),
+            url: '{{ route('chat.translate', '') }}/' + history_id,
             method: 'GET',
-            data: data,
             success: function(response) {
                 if (response ==
                     "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
@@ -109,12 +105,10 @@ xmlns="http://www.w3.org/2000/svg">
                         });
                     }, 3000);
                 } else {
-                    $($(node).parent().parent().children()[0]).text(response + "\n\n[此訊息經由" + (history_id >
-                        0 ?
-                        '該模型' : 'OpenCC') + "嘗試翻譯，瀏覽器重新整理後可復原]");
-                    histories[(history_id > 0 ? history_id : -history_id)] = $($(node).parent().parent()
+                    $($(node).parent().parent().children()[0]).text(response + "\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]");
+                    histories[history_id] = $($(node).parent().parent()
                         .children()[0]).text()
-                    chatroomFormatter($("#history_" + (history_id > 0 ? history_id : -history_id)));
+                    chatroomFormatter($("#history_" + history_id));
                     $(node).parent().children("button.translates").each(function() {
                         $(this).removeClass("hidden");
                         $(this).children("svg").addClass("hidden");
