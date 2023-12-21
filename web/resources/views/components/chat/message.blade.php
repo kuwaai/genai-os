@@ -38,8 +38,7 @@
                 src="{{ $botimgurl }}">
         </div>
         <div class="overflow-hidden">
-            <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg" onmouseover="toggleHighlight(this, true)"
-                onmouseout="toggleHighlight(this, false)">
+            <div tabindex="0" hidefocus="true" class="{{$history->isbot ? 'focus:cursor-auto cursor-pointer' : ''}} transition-colors p-3 bg-gray-300 rounded-r-lg rounded-bl-lg" @if ($history->isbot)onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif >
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{ $history->chained ? ' chain-msg' : '' }}{{ $history->isbot ? ' bot-msg' : '' }}" id="task_{{ $history->id }}">{{ $history->msg == "* ...thinking... *" ? "<pending holder>" : $history->msg }}</div>
                 {{-- blade-formatter-enable --}}
@@ -57,8 +56,8 @@
             </div>
         @endif
         <div class="overflow-hidden">
-            <div onmouseover="toggleHighlight(this, true)" onmouseout="toggleHighlight(this, false)"
-                class="p-3 {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
+            <div tabindex="0" @if ($history->isbot) onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif 
+                class="p-3 transition-colors {{ $history->isbot ? 'bg-gray-300 focus:cursor-auto cursor-pointer rounded-r-lg rounded-bl-lg' : 'bg-blue-600 text-white rounded-l-lg rounded-br-lg' }}">
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ __($message) }}</div>
                 {{-- blade-formatter-enable --}}
@@ -81,61 +80,4 @@
     histories[{{ $history->id }}] = $("#tmp_{{ $history->id }}").text();
     $("#tmp_{{ $history->id }}").remove();
     chatroomFormatter($("#history_{{ $history->id }}"))
-
-    function toggleHighlight(node, flag) {
-        if ($(node).find(".bot-msg").length != 0) {
-            if ($(node).find(".chain-msg").length != 0) {
-                let $trigger = true;
-                $prevMsgs = $(node).parent().parent().prevAll('div').filter(function() {
-                    if ($(this).find("div div.bot-msg").length == 0) {
-                        if ($trigger) {
-                            $trigger = false;
-                            return true
-                        }
-                        return false
-                    } else if ($(this).find("img").attr("data-tooltip-target") == $(node).parent().parent()
-                        .find(
-                            "div img").attr("data-tooltip-target")) {
-                        $trigger = true;
-                        return true
-                    }
-                    return false
-                }).find("div div");
-
-                if (flag) {
-                    $($prevMsgs).addClass("bg-yellow-500");
-                    $(node).addClass("bg-orange-400");
-                } else {
-                    $($prevMsgs).removeClass("bg-yellow-500");
-                    $(node).removeClass("bg-orange-400");
-                }
-            }
-            $prevUser = $(node).parent().parent().prevAll('div').filter(function() {
-                return $(this).find('div div div.bot-msg').length == 0;
-            }).first()
-            $prevUserMsg = $prevUser.find('div div div').text().trim()
-            $refRecord = $(node).parent().parent().prevAll('div').filter(function() {
-                $msgWindow = $(this).find('div div div.bot-msg');
-                return $msgWindow.length != 0 && $msgWindow.text().trim() == $prevUserMsg;
-            }).first().find("div div")
-            if ($refRecord.length > 0) {
-                if (flag) {
-                    $($refRecord).addClass("bg-yellow-500");
-                    $(node).addClass("bg-orange-400");
-                } else {
-                    $($refRecord).removeClass("bg-yellow-500");
-                    $(node).removeClass("bg-orange-400");
-                }
-            } else {
-                $prevUser = $prevUser.find("div div")
-                if (flag) {
-                    $($prevUser).addClass("bg-yellow-500");
-                    $(node).addClass("bg-orange-400");
-                } else {
-                    $($prevUser).removeClass("bg-yellow-500");
-                    $(node).removeClass("bg-orange-400");
-                }
-            }
-        }
-    }
 </script>

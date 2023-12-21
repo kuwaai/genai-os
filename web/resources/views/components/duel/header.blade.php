@@ -89,7 +89,11 @@
                     {{ __('Quote this message') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
-
+                <div id="ref-tooltip" role="tooltip"
+                    class="absolute z-10 invisible whitespace-pre-wrap max-w-[600px] inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                    {{ __('Reference') }}
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
             @endif
         </div>
         @if (!session('llms'))

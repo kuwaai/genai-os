@@ -65,10 +65,75 @@ xmlns="http://www.w3.org/2000/svg">
                 var refNumber = match[1];
                 $msg = $("#history_" + refNumber).text().trim()
                 $h5.html(
-                    `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="$('#chatroom').animate({scrollTop:$('#history_${refNumber}').offset().top - $('#chatroom').offset().top + $('#chatroom').scrollTop() }, 300);">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
+                    `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
                 );
             }
         });
+    }
+
+    function scrollToRef(refNumber) {
+        $('#chatroom').animate({
+            scrollTop: $(`#history_${refNumber}`).offset().top - $('#chatroom').offset().top + $('#chatroom')
+                .scrollTop()
+        }, 300);
+        $(`#history_${refNumber} div[tabindex=0]`).focus();
+    }
+
+    function toggleHighlight(node, flag) {
+        if ($(node).find(".bot-msg").length != 0) {
+            if ($(node).find(".chain-msg").length != 0) {
+                let $trigger = true;
+                $prevMsgs = $(node).parent().parent().prevAll('div').filter(function() {
+                    if ($(this).find("div div.bot-msg").length == 0) {
+                        if ($trigger) {
+                            $trigger = false;
+                            return true
+                        }
+                        return false
+                    } else if ($(this).find("img").attr("data-tooltip-target") == $(node).parent().parent()
+                        .find(
+                            "div img").attr("data-tooltip-target")) {
+                        $trigger = true;
+                        return true
+                    }
+                    return false
+                }).find("div div");
+
+                if (flag) {
+                    $($prevMsgs).addClass("bg-orange-400");
+                    $(node).addClass("bg-yellow-300");
+                } else {
+                    $($prevMsgs).removeClass("bg-orange-400");
+                    $(node).removeClass("bg-yellow-300");
+                }
+            }
+            $prevUser = $(node).parent().parent().prevAll('div').filter(function() {
+                return $(this).find('div div div.bot-msg').length == 0;
+            }).first()
+            $prevUserMsg = $prevUser.find('div div div').text().trim()
+            $refRecord = $(node).parent().parent().prevAll('div').filter(function() {
+                $msgWindow = $(this).find('div div div.bot-msg');
+                return $msgWindow.length != 0 && $msgWindow.text().trim() == $prevUserMsg;
+            }).first().find("div div")
+            if ($refRecord.length > 0) {
+                if (flag) {
+                    $($refRecord).addClass("bg-orange-400");
+                    $(node).addClass("bg-yellow-300");
+                } else {
+                    $($refRecord).removeClass("bg-orange-400");
+                    $(node).removeClass("bg-yellow-300");
+                }
+            } else {
+                $prevUser = $prevUser.find("div div")
+                if (flag) {
+                    $($prevUser).addClass("bg-orange-400");
+                    $(node).addClass("bg-yellow-300");
+                } else {
+                    $($prevUser).removeClass("bg-orange-400");
+                    $(node).removeClass("bg-yellow-300");
+                }
+            }
+        }
     }
 
     function refToolTip(refID) {
