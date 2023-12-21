@@ -75,26 +75,27 @@ xmlns="http://www.w3.org/2000/svg">
         $msg = $("#history_" + refID).text().trim()
         $('#ref-tooltip').text($msg);
     }
-    var quoted = [];
+    let quoted = [];
+
     function quote(llm_id, history_id, node) {
-        if ($("#chat_input").val() != "訊息處理中...請稍後..." && !quoted.includes(history_id)) {
-            quoted.push(history_id);
-            $('#chat_input').val(($('#chat_input').val() + '\n' + $(`#llm_${llm_id}_chat`).text().trim() +
-                    ':「' + $(`#history_${history_id} div.text-sm.space-y-3.break-words`).text().trim() + '」\n')
-                .trim());
-            adjustTextareaRows($('#chat_input'))
-            $(node).children("svg").eq(0).hide();
-            $(node).children("svg").eq(1).show();
-            if ($(node).children("span")) {
-                $(node).children("span").text("{{ __('Copied') }}")
+        let isQuoted = false;
+
+        // Check if the [llm_id, history_id] pair exists in the quoted array
+        for (let i = 0; i < quoted.length; i++) {
+            if (quoted[i][0] === llm_id && quoted[i][1] === history_id) {
+                isQuoted = true;
+                quoted.splice(i, 1); // Remove the pair from the array
+                break;
             }
-            setTimeout(function() {
-                $(node).children("svg").eq(0).show();
-                $(node).children("svg").eq(1).hide();
-                if ($(node).children("span")) {
-                    $(node).children("span").text("{{ __('Copy') }}")
-                }
-            }, 3000);
+        }
+
+        if (isQuoted) {
+            $(node).removeClass("fill-green-400 text-green-400");
+            $(node).parent().parent().removeClass("bg-green-100")
+        } else {
+            $(node).addClass("fill-green-400 text-green-400");
+            $(node).parent().parent().addClass("bg-green-100")
+            quoted.push([llm_id, history_id]); // Add the pair to the array
         }
     }
 
@@ -129,7 +130,8 @@ xmlns="http://www.w3.org/2000/svg">
                         });
                     }, 3000);
                 } else {
-                    $($(node).parent().parent().children()[0]).text(response + "\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]");
+                    $($(node).parent().parent().children()[0]).text(response +
+                        "\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]");
                     histories[history_id] = $($(node).parent().parent()
                         .children()[0]).text()
                     chatroomFormatter($("#history_" + history_id));

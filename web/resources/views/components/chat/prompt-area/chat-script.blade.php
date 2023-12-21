@@ -4,7 +4,20 @@
     $chattable = false
     $("#prompt_area").submit(function(event) {
         event.preventDefault();
-        if ($chattable && $("#chat_input").val().trim() != "") {
+        if ($chattable && $("#chat_input").val().trim() == "" && quoted.length == 1) {
+            $("#chat_input").val(histories[quoted[0][1]])
+            this.submit();
+            $chattable = false
+            $("#submit_msg").hide()
+            $("#chat_input").val("訊息處理中...請稍後...")
+            $("#chat_input").prop("readonly", true)
+        } else if ($chattable && ($("#chat_input").val().trim() != "")) {
+            tmp = ""
+            for (var i in quoted) {
+                tmp += `${$("#llm_" + quoted[i][0] + "_chat").text().trim()}:"""${histories[quoted[i][1]]}"""\n`
+            }
+            tmp = tmp.trim()
+            $("#chat_input").val($("#chat_input").val().trim() + "\n" + tmp)
             this.submit();
             $chattable = false
             $("#submit_msg").hide()
