@@ -109,7 +109,7 @@ headers = {
 # Define the request payload as a dictionary for single round chatting.
 request_data = {
     "messages": [
-        { "isbot": false, "msg": "你好" }
+        { "isbot": False, "msg": "你好" }
     ],
     "model": "gemini-pro"
 }
