@@ -186,7 +186,9 @@ class ChatController extends Controller
                         $first = array_shift($historys);
                         $chat = new Chats();
                         $chatname = $first->content;
-                        if (in_array(LLMs::find($llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                        if (strpos(LLMs::find($llm_id)->access_code, 'doc-qa') === 0 ||
+                        strpos(LLMs::find($llm_id)->access_code, 'doc_qa') === 0 || 
+                        strpos(LLMs::find($llm_id)->access_code, 'web_qa') === 0) {
                             function getWebPageTitle($url)
                             {
                                 // Try to fetch the HTML content of the URL
@@ -443,7 +445,9 @@ class ChatController extends Controller
             $input = $request->input('input');
             $llm_id = $request->input('llm_id');
             if ($input && $llm_id && in_array($llm_id, $result)) {
-                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 ||
+                        strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || 
+                        strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
                     # Validate first message is exactly URL
                     if (!filter_var($input, FILTER_VALIDATE_URL)) {
                         return back();
@@ -451,7 +455,9 @@ class ChatController extends Controller
                 }
                 $chat = new Chats();
                 $chatname = $input;
-                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 ||
+                strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || 
+                strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
                     function getWebPageTitle($url)
                     {
                         // Try to fetch the HTML content of the URL
@@ -542,7 +548,9 @@ class ChatController extends Controller
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
                 $history->save();
-                if (in_array(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
+                if ((strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc-qa') === 0 ||
+                strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc_qa') === 0 || 
+                strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'web_qa') === 0) && !$chained) {
                     $tmp = json_encode([
                         [
                             'msg' => Histories::where('chat_id', '=', $chatId)
