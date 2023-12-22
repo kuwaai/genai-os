@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Queueable;
 use App\Models\Histories;
 use App\Models\User;
+use App\Models\Chats;
+use App\Models\LLMs;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use DB;
@@ -26,10 +28,9 @@ class ImportChat implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($ids, $access_code, $user_id)
+    public function __construct($ids, $user_id)
     {
         $this->ids = $ids;
-        $this->access_code = $access_code;
         $this->user_id = $user_id;
     }
 
@@ -40,6 +41,7 @@ class ImportChat implements ShouldQueue
     {
         foreach ($this->ids as $id) {
             $history = Histories::find($id);
+            $access_code = LLMs::find(Chats::find($history->chat_id)->llm_id)->access_code;
             $input = Histories::where('chat_id', '=', $history->chat_id)
                 ->where('id', '<', $id)
                 ->select('msg', 'isbot');
@@ -52,7 +54,7 @@ class ImportChat implements ShouldQueue
                     ->limit(1);
             }
             $input = $input->get()->toJson();
-            RequestChat::dispatchSync($input, $this->access_code, $this->user_id, $id, User::find($this->user_id)->openai_token);
+            RequestChat::dispatchSync($input, $access_code, $this->user_id, $id, User::find($this->user_id)->openai_token);
         }
     }
 }

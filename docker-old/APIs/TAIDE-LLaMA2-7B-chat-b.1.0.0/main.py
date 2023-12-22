@@ -1,5 +1,6 @@
 import socket, os
 from threading import Thread
+import torch
 
 import sys
 sys.path.append('../')
@@ -52,26 +53,28 @@ def preprocess(prompt):
 def process(data):
     try:
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
-        while len(history) > limit:
+        while len("".join(history)) > limit:
             del history[0]
             del history[0]
         if len(history) != 0:
-            history.append("")
-            prompt = ""
-            for i in range(0, len(history), 2):
-                prompt += "{}{}".format(preprocess(history[i]), history[i+1])
-                if i != (len(history)-2):
-                    prompt += "</s>"
+            print(history)
+            # history.append("")
+            # prompt = ""
+            # for i in range(0, len(history), 2):
+            #     prompt += "{}{}".format(preprocess(history[i]), history[i+1])
+            #     if i != (len(history)-2):
+            #         prompt += "</s>"
+            prompt = preprocess(history[-1])
+            print(prompt)
             input_ids = tokenizer.encode(prompt, return_tensors='pt').to("cuda:0")
-            decode_kwargs = dict(skip_special_tokens=True)
-            streamer =TextIteratorStreamer(tokenizer, skip_prompt=True, decode_kwargs=decode_kwargs)
+            streamer =TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
             generation_kwargs = dict(input_ids=input_ids, streamer=streamer, max_new_tokens=2048,generation_config=generation_config)
             thread = Thread(target=model.generate, kwargs=generation_kwargs)
             thread.start()
             generated_text = ""
             for new_text in streamer:
-                if "</s>" in new_text:
-                    new_text = new_text.replace("</s>","")
+                # if "</s>" in new_text:
+                #     new_text = new_text.replace("</s>","")
                 yield new_text
                 generated_text += new_text
                 torch.cuda.empty_cache()

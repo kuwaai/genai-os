@@ -61,10 +61,17 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'driver' => 'ldap',
+            'model' => LdapRecord\Models\OpenLDAP\User::class,
+            'database' => [
+                'model' => App\Models\User::class,
+                'sync_passwords' => true,
+                'sync_attributes' => [
+                    'name' => 'uid',
+                    'email' => 'mail',
+                ],
+            ],
         ],
-
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

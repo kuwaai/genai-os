@@ -22,3 +22,11 @@ ssl/
 screenlog.0
 *__pycache__
 tmp/
+
+*config.json
+*.safetensors
+model.safetensors.index.json
+special_tokens_map.json
+tokenizer.json
+tokenizer.model
+pytorch_model.bin

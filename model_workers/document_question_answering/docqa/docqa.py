@@ -24,7 +24,7 @@ import time
 
 class DocumentQa:
 
-  log_path = '/var/log/doc_qa/qa.jsonl'
+  log_path = os.environ.get('llm_log_path','/var/log/doc_qa/qa.jsonl')
 
   def __init__(self, document_store:str = None):
     self.logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class DocumentQa:
   def generate_llm_input(self, task, question, related_docs):
     
     template_path = 'prompt_template/' + f'llm_input_{task}.mustache'
-    llm_input_template = Path(template_path).read_text()
+    llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
       'question': question

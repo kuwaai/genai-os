@@ -38,7 +38,7 @@
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign out') }}</a>
                         <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                            href="{{ route('lang') }}">{{ __('Language') }}</a>
+                            href="{{ route('lang') }}">{{ __('Change Language') }}</a>
                     </form>
                 @else
                     <a href="{{ route('login') }}"
@@ -50,7 +50,7 @@
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign up') }}</a>
                     @endif <a
                         class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                        href="{{ route('lang') }}">{{ __('Language') }}</a>
+                        href="{{ route('lang') }}">{{ __('Change Language') }}</a>
 
                 @endauth
             </div>
@@ -58,12 +58,29 @@
 
         <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
             <div class="flex items-center flex-col">
-                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200"><a class="flex items-center"
-                        href="https://taide.tw/" target="_blank"><img class="mr-3 hidden dark:block"
-                            src="{{ asset('images/TAIDE2.png') }}"><img class="mr-3 dark:hidden block"
-                            src="{{ asset('images/TAIDE2_dark.png') }}"><span class="pt-4"
-                            style="font-size:75px;">Chat</span></a></h3>
-
+                @env('nuk')
+                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
+                    <div class="flex items-center justify-center overflow-hidden">
+                        <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
+                            <img class="w-[150px]" src="{{ asset('images/csie.png') }}">
+                        </a>
+                        <div class="flex flex-col ml-4 text-[50px]">
+                            <span>LLM</span>
+                            <span class="pt-4">Workspace</span>
+                        </div>
+                    </div>
+                </h3>
+            @else
+                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
+                    <a class="flex items-center overflow-hidden" href="https://taide.tw/" target="_blank">
+                        <div>
+                            <img class="mr-3 hidden dark:block" src="{{ asset('images/TAIDE2.png') }}">
+                            <img class="mr-3 dark:hidden block" src="{{ asset('images/TAIDE2_dark.png') }}">
+                        </div>
+                        <span class="pt-4 text-[75px]">Chat</span>
+                    </a>
+                </h3>
+                @endenv
             </div>
 
 
@@ -73,10 +90,82 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                @env('nuk')
+                                {{ __('Comparative') }}
+                            @else
                                 {{ __('Translation') }}
+                                @endenv
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
+                                @env('nuk')
+                                <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
+                                    <div>
+                                        <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
+                                            <p class="text-sm">你好</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        User
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/TAIDE.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">哈囉!我是一個樂於助人的助手,您好!我是身為協助者的角色,竭誠幫助主人公實現其目標或完成任務。您有何需要協助或指引的嗎?請別擔心地問,我竭誠照顧您的需求。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/taibun.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">你好！有啥物我會使幫助你的？</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/hakka.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">你好！當歡喜看著你。有麼个𠊎做得𢯭手个無？</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/meta.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">Hello! 😊 I'm here to help you with any questions or
+                                                concerns you may have. Please feel free to...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex w-full mt-2 space-x-3 ">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ asset('images/chatglm.png') }}">
+                                    </div>
+                                    <div>
+                                        <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
+                                            <p class="text-sm">你好👋！我是人工智能助手 ChatGLM3-6B，很高兴见到你，欢迎问我任何问题。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -102,6 +191,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -109,9 +199,20 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Composition') }}</h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
+                                @env('nuk')
+                                {{ __('Deployment') }}
+                            @else
+                                {{ __('Composition') }}
+                                @endenv
+                            </h2>
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
+                                @env('nuk')
+                                <div class="flex justify-center items-center">
+                                    <img class="w-auto dark:hidden" src="{{ asset('images/deployment_light.png') }}">
+                                    <img class="w-auto hidden dark:block"
+                                        src="{{ asset('images/deployment_dark.png') }}">
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -137,6 +238,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -148,10 +250,20 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                                @env('nuk')
+                                {{ __('Export & Import') }}
+                            @else
                                 {{ __('Communication') }}
+                                @endenv
                             </h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
 
+                                @env('nuk')
+                                <div class="flex justify-center items-center">
+                                    <img class="w-auto dark:hidden" src="{{ asset('images/feedback.png') }}">
+                                    <img class="w-auto hidden dark:block" src="{{ asset('images/feedback.png') }}">
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -177,6 +289,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -185,9 +298,20 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                {{ __('Summarization') }}</h2>
-                            <div id="chatroom" class="flex-1 p-4 overflow-hidden flex flex-col scrollbar rounded-lg">
-
+                                @env('nuk')
+                                {{ __('Application') }}
+                            @else
+                                {{ __('Summarization') }}
+                                @endenv
+                            </h2>
+                            <div id="chatroom" class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
+                                @env('nuk')
+                                <div class="flex justify-center items-center">
+                                    <img class="w-auto dark:hidden" src="{{ asset('images/rag_light.png') }}">
+                                    <img class="w-auto hidden dark:block"
+                                        src="{{ asset('images/rag_dark.png') }}">
+                                </div>
+                            @else
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -215,6 +339,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endenv
                             </div>
                         </div>
                     </div>
@@ -223,16 +348,27 @@
             <div class="flex justify-center mt-4 px-0 sm:items-center sm:justify-between">
                 <div class="text-center text-sm text-gray-500 dark:text-gray-400 sm:text-left">
                     <div class="flex items-center gap-4">
+                        @env('nuk')
+                        <a href="https://www.csie.nuk.edu.tw/" target="_blank"
+                            class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">由國立高雄大學
+                            資訊工程學系<br>開發與維護的語言模型平台</a>
+                    @else
                         <a href="https://www.nuk.edu.tw/" target="_blank"
                             class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
                             {!! __('Developed by NUK and NARLabs') !!}
                         </a>
+                        @endenv
                     </div>
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
+                    @env('nuk')
+                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                        href="https://www.nuk.edu.tw/" target="_blank">國立高雄大學</a>
+                @else
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         href="https://www.twcc.ai/" target="_blank">{{ __('Powered by TWCC') }}</a>
+                    @endenv
                     <span class="text-black dark:text-white flex justify-end text-sm">{{ __('Version') }}
                         0.0.7.1</span>
                 </div>

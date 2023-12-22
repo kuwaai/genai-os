@@ -6,8 +6,8 @@ server {
     listen [::]:443 ssl default_server;
     #server_name chat.cdalab.tw;
 
-    ssl_certificate /ssl/nginx.crt;
-    ssl_certificate_key /ssl/nginx.key;
+    ssl_certificate /ssl/fullchain1.pem;
+    ssl_certificate_key /ssl/privkey1.pem;
 
     root /var/www/html/LLM_Project/public;
 
