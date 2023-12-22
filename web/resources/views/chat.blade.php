@@ -126,6 +126,7 @@
                         @endif
                     </div>
                 @endif
+                <x-chat.prompt-area.chat-script />
             </div>
         @endif
     </div>

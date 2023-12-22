@@ -68,7 +68,11 @@ class DuelController extends Controller
                     // Splitting each row into columns using tabs as delimiter
                     if ($index === 0) {
                         $headers = explode("\t", $row);
-                        continue;
+                        if(in_array("content", $headers)){
+                            continue;
+                        }else{
+                            $headers = ["content"];
+                        }
                     }
                     if ($headers === null) {
                         break;
@@ -123,8 +127,8 @@ class DuelController extends Controller
                     $data = [];
                     $flag = false;
                     foreach ($historys as $message) {
-                        if (isset($message->role) && is_string($message->role)) {
-                            if ($message->role === 'user' && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
+                        if ((isset($message->role) && is_string($message->role)) || !isset($message->role)) {
+                            if (((isset($message->role) && $message->role === 'user') || !isset($message->role)) && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
                                 if ($flag) {
                                     $newMessage = (object) [
                                         'role' => 'assistant',
@@ -142,6 +146,9 @@ class DuelController extends Controller
                                     }
                                 }
                                 $chainValue = isset($message->chain) ? (bool) $message->chain : false;
+                                if (!isset($message->role)) {
+                                    $message->role = 'user';
+                                }
                                 $data[] = $message;
                                 $flag = true;
                             } elseif ($message->role === 'assistant') {

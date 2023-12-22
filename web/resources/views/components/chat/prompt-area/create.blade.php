@@ -1,10 +1,11 @@
 @props([
     'chained' => false,
     'chatId' => request()->route('chat_id'),
+    'disabled' => false
 ])
 
 <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
-    <div class="flex items-end justify-end">
+    <div class="flex items-end justify-end {{ $disabled ? 'hidden' : ''}}">
         @csrf
         <input name="chat_id" value="{{ $chatId }}" style="display:none;">
         <input id="chained" style="display:none;" {{ $chained ? '' : 'disabled' }}>
@@ -63,4 +64,3 @@
         @endif
     @endif
 </script>
-<x-chat.prompt-area.chat-script />

@@ -314,7 +314,7 @@ class ChatController extends Controller
         if (Auth::user()->hasPerm('Chat_update_new_chat')) {
             return view('chat');
         } else {
-            $result = Chats::where('llm_id', '=', $llm_id)->whereNull('dcID');
+            $result = Chats::where('llm_id', '=', $llm_id)->whereNull('dcID')->where("user_id","=",Auth::user()->id);
             if ($result->exists()) {
                 return Redirect::route('chat.chat', $result->first()->id);
             } else {

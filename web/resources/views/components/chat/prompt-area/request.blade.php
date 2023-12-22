@@ -1,4 +1,4 @@
-@props(['llmId'])
+@props(['llmId', 'disabled' => false])
 
 <form method="post" action="{{ route('chat.create') }}" id="prompt_area">
     <div class="flex items-end justify-end">
@@ -19,4 +19,3 @@
         </button>
     </div>
 </form>
-<x-chat.prompt-area.chat-script/>
