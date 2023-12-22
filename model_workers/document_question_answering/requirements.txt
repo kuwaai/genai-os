@@ -13,3 +13,4 @@ jsonlines
 tokenizers
 requests-oauthlib
 requests
+selenium
