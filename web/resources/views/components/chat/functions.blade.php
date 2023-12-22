@@ -23,6 +23,7 @@ fill="currentFill" />
         $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
             'border border-2 border-gray-500 border-solid p-1');
         $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
+        $(node).find('div.text-sm.space-y-3.break-words ol').addClass('list-inside list-decimal');
         $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
         $(node).find('div.text-sm.space-y-3.break-words a').addClass('text-blue-600 hover:text-blue-800').prop('target',
             '_blank');
