@@ -26,11 +26,17 @@
                 <label for="import_file_input"
                     class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Import from file') }}</label>
                 <hr class="my-4 border-black dark:border-gray-600" />
-                <form method="post" action="{{ request()->routeIs('duel.*') ? route('duel.import') : route('chat.import') }}">
+                <form method="post"
+                    action="{{ request()->routeIs('duel.*') ? route('duel.import') : route('chat.import') }}">
                     @csrf
-                    <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
-                    <textarea name="history" id="import_json" rows="5" max-rows="15"
-                        oninput="adjustTextareaRows(this)"
+                    @if (request()->route('llm_id'))
+                        <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
+                    @elseif (session('llms'))
+                        @foreach (session('llms') as $llm_id)
+                            <input name="llm_ids[]" value="{{ $llm_id }}" style="display:none;">
+                        @endforeach
+                    @endif
+                    <textarea name="history" id="import_json" rows="5" max-rows="15" oninput="adjustTextareaRows(this)"
                         placeholder="{{ __('You may drop your file here as well...') }}"
                         class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                 </form>
@@ -49,6 +55,7 @@
                         loadFile(e.originalEvent.dataTransfer, '#import_json');
                     });
                 });
+
                 function loadFile(fileInput, input) {
                     const file = fileInput.files[0];
                     if (file) {
