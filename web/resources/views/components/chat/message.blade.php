@@ -57,7 +57,7 @@
         @endif
         <div class="overflow-hidden">
             <div tabindex="0" @if ($history->isbot) onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif 
-                class="p-3 transition-colors {{ $history->isbot ? 'bg-gray-300 focus:cursor-auto cursor-pointer rounded-r-lg rounded-bl-lg' : 'bg-blue-500 text-white rounded-l-lg rounded-br-lg' }}">
+                class="p-3 transition-colors {{ $history->isbot ? 'bg-gray-300 focus:cursor-auto cursor-pointer rounded-r-lg rounded-bl-lg' : 'bg-cyan-500 text-white rounded-l-lg rounded-br-lg' }}">
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ __($message) }}</div>
                 {{-- blade-formatter-enable --}}
@@ -69,7 +69,7 @@
         @if (!$history->isbot)
             <div
                 class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                User
+                {{request()->user()->name[0]}}
             </div>
         @endif
     </div>
