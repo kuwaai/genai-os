@@ -68,7 +68,7 @@
             {{ App\Models\LLMs::findOrFail($llmId)->name }}</p>
         @if (request()->user()->hasPerm('Chat_update_import_chat'))
             <div class="flex">
-                <button onclick="import_chat()" data-modal-target="importModal" data-modal-toggle="importModal"
+                <button data-modal-target="importModal" data-modal-toggle="importModal"
                     class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                     <i class="fas fa-file-import"></i>
                 </button>

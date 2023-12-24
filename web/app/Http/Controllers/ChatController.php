@@ -186,9 +186,7 @@ class ChatController extends Controller
                         $first = array_shift($historys);
                         $chat = new Chats();
                         $chatname = $first->content;
-                        if (strpos(LLMs::find($llm_id)->access_code, 'doc-qa') === 0 ||
-                        strpos(LLMs::find($llm_id)->access_code, 'doc_qa') === 0 || 
-                        strpos(LLMs::find($llm_id)->access_code, 'web_qa') === 0) {
+                        if (strpos(LLMs::find($llm_id)->access_code, 'doc-qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'doc_qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'web_qa') === 0) {
                             function getWebPageTitle($url)
                             {
                                 // Try to fetch the HTML content of the URL
@@ -316,7 +314,9 @@ class ChatController extends Controller
         if (Auth::user()->hasPerm('Chat_update_new_chat')) {
             return view('chat');
         } else {
-            $result = Chats::where('llm_id', '=', $llm_id)->whereNull('dcID')->where("user_id","=",Auth::user()->id);
+            $result = Chats::where('llm_id', '=', $llm_id)
+                ->whereNull('dcID')
+                ->where('user_id', '=', Auth::user()->id);
             if ($result->exists()) {
                 return Redirect::route('chat.chat', $result->first()->id);
             } else {
@@ -406,20 +406,26 @@ class ChatController extends Controller
     {
         $history_id = $request->input('history_id');
         if ($history_id) {
-            $nice = $request->input('type') == '1';
-            $detail = $request->input('feedbacks');
-            $flag = $request->input('feedback');
-            $init = $request->input('init');
-            $feedback = new Feedback();
-            if (Feedback::where('history_id', '=', $history_id)->exists()) {
-                $feedback = Feedback::where('history_id', '=', $history_id)->first();
+            $tmp = Histories::find($history_id);
+            if ($tmp) {
+                $tmp = Chats::find($tmp->chat_id)->dcID;
+                if (($tmp != null && Auth::user()->hasPerm('Duel_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
+                    $nice = $request->input('type') == '1';
+                    $detail = $request->input('feedbacks');
+                    $flag = $request->input('feedback');
+                    $init = $request->input('init');
+                    $feedback = new Feedback();
+                    if (Feedback::where('history_id', '=', $history_id)->exists()) {
+                        $feedback = Feedback::where('history_id', '=', $history_id)->first();
+                    }
+                    if ($init) {
+                        $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => null, 'flags' => null]);
+                    } else {
+                        $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => $detail, 'flags' => $flag == null ? null : json_encode($flag)]);
+                    }
+                    $feedback->save();
+                }
             }
-            if ($init) {
-                $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => null, 'flags' => null]);
-            } else {
-                $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => $detail, 'flags' => $flag == null ? null : json_encode($flag)]);
-            }
-            $feedback->save();
         }
         return back();
     }
@@ -445,9 +451,7 @@ class ChatController extends Controller
             $input = $request->input('input');
             $llm_id = $request->input('llm_id');
             if ($input && $llm_id && in_array($llm_id, $result)) {
-                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 ||
-                        strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || 
-                        strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
+                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
                     # Validate first message is exactly URL
                     if (!filter_var($input, FILTER_VALIDATE_URL)) {
                         return back();
@@ -455,9 +459,7 @@ class ChatController extends Controller
                 }
                 $chat = new Chats();
                 $chatname = $input;
-                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 ||
-                strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || 
-                strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
+                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
                     function getWebPageTitle($url)
                     {
                         // Try to fetch the HTML content of the URL
@@ -548,9 +550,7 @@ class ChatController extends Controller
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
                 $history->save();
-                if ((strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc-qa') === 0 ||
-                strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc_qa') === 0 || 
-                strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'web_qa') === 0) && !$chained) {
+                if ((strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc-qa') === 0 || strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc_qa') === 0 || strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'web_qa') === 0) && !$chained) {
                     $tmp = json_encode([
                         [
                             'msg' => Histories::where('chat_id', '=', $chatId)

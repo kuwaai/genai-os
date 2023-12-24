@@ -309,7 +309,7 @@ class DuelController extends Controller
     public function new(Request $request): RedirectResponse
     {
         $llms = $request->input('llm');
-        if (count($llms) > 1) {
+        if (request()->user()->hasPerm('Duel_update_new_chat') && count($llms) > 1) {
             $result = DB::table(function ($query) {
                 $query
                     ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')

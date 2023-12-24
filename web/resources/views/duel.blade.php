@@ -17,15 +17,21 @@
             ->get();
     @endphp
     <x-chat.functions />
-    @if (!request()->route('duel_id'))
+    @if (request()->user()->hasPerm('Duel_update_import_chat') && !request()->route('duel_id'))
         <x-chat.modals.import_history />
     @endif
     @if (!(request()->route('duel_id') || session('llms')))
-        <x-duel.modal.group-chat :result="$result" />
+        @if (request()->user()->hasPerm('Duel_update_new_chat'))
+            <x-duel.modal.group-chat :result="$result" />
+        @endif
     @else
         @if (request()->route('duel_id'))
-            <x-chat.modals.feedback />
-            <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name " />
+            @if (request()->user()->hasPerm('Duel_update_feedback'))
+                <x-chat.modals.feedback />
+            @endif
+            @if (request()->user()->hasPerm('Duel_read_export_chat'))
+                <x-chat.modals.export_history :name="App\Models\DuelChat::find(request()->route('duel_id'))->name" />
+            @endif
         @endif
         @php
             $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')
@@ -81,16 +87,23 @@
                             {{ __('Select a chatroom to begin with') }}</p>
                         <div class="mb-2">
                             <div class="flex">
-                                <button data-modal-target="create-model-modal" data-modal-toggle="create-model-modal"
-                                    class="flex rounded-l-lg border border-black dark:border-white border-2 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
-                                    <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create Chat') }}
-                                    </p>
-                                </button>
-                                <button onclick="import_chat()" data-modal-target="importModal"
-                                    data-modal-toggle="importModal"
-                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-r-lg flex items-center justify-center">
-                                    <i class="fas fa-file-import"></i>
-                                </button>
+                                @if (request()->user()->hasPerm('Duel_update_new_chat'))
+                                    <button data-modal-target="create-model-modal"
+                                        data-modal-toggle="create-model-modal"
+                                        class="flex rounded-{{ request()->user()->hasPerm('Duel_update_import_chat')? 'l-': '' }}lg border border-black dark:border-white border-2 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+                                        <p class="flex-1 text-center text-gray-700 dark:text-white">
+                                            {{ __('Create Chat') }}
+                                        </p>
+                                    </button>
+                                @endif
+                                @if (request()->user()->hasPerm('Duel_update_import_chat'))
+                                    <button data-modal-target="importModal"
+                                        data-modal-toggle="importModal"
+                                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 {{ request()->user()->hasPerm('Duel_update_new_chat')? 'rounded-r-lg ': 'rounded-lg w-full' }} flex items-center justify-center">
+                                        {{ request()->user()->hasPerm('Duel_update_new_chat')? '': '匯入對話　' }}
+                                        <i class="fas fa-file-import"></i>
+                                    </button>
+                                @endif
                             </div>
                         </div>
                         <x-duel.llm :result="$result" />
@@ -104,7 +117,7 @@
                 {{ __('Select a chatroom to begin with') }}
             </div>
         @else
-            @if (!session('llms'))
+            @if (request()->user()->hasPerm('Duel_delete_chatroom') && !session('llms'))
                 <x-duel.modal.delete_confirm />
             @endif
             <div id="histories"
@@ -144,22 +157,22 @@
                                 // Filter and merge the chats based on the condition
                                 $filteredChats = $mergedChats->filter(function ($chat) use (&$mergedMessages) {
                                     // Check if the chat is non-bot and if its message hasn't been merged before
-                                    if (!$chat->isbot && !in_array($chat->msg, $mergedMessages)) {
-                                        // Add the message to the merged messages array
-                                        $mergedMessages[] = $chat->msg;
-                                        return true; // Keep this chat in the final result
-                                    } elseif ($chat->isbot) {
-                                        $mergedMessages = [];
-                                        return true; // Keep bot chats in the final result
-                                    }
-                                    return false; // Exclude duplicate non-bot chats
-                                });
+    if (!$chat->isbot && !in_array($chat->msg, $mergedMessages)) {
+        // Add the message to the merged messages array
+        $mergedMessages[] = $chat->msg;
+        return true; // Keep this chat in the final result
+    } elseif ($chat->isbot) {
+        $mergedMessages = [];
+        return true; // Keep bot chats in the final result
+    }
+    return false; // Exclude duplicate non-bot chats
+});
 
-                                // Sort the filtered chats
-                                $mergedChats = $filteredChats->sortBy(function ($chat) {
-                                    return [$chat->created_at, $chat->llm_id, -$chat->id];
-                                });
-                                $refers = $mergedChats->where("isbot","=",true);
+// Sort the filtered chats
+$mergedChats = $filteredChats->sortBy(function ($chat) {
+    return [$chat->created_at, $chat->llm_id, -$chat->id];
+});
+$refers = $mergedChats->where('isbot', '=', true);
                             @endphp
                             @foreach ($mergedChats as $history)
                                 <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
@@ -172,13 +185,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
-                    @if (session('llms'))
-                        <x-duel.prompt-area.create :llms="$llms" />
-                    @else
-                        <x-duel.prompt-area.request :llms="$llms" />
-                    @endif
-                </div>
+                @if (
+                    (request()->user()->hasPerm('Duel_update_new_chat') &&
+                        session('llms')) ||
+                        (request()->user()->hasPerm('Duel_update_send_message') &&
+                            !session('llms')))
+                    <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
+                        @if (request()->user()->hasPerm('Duel_update_new_chat') && session('llms'))
+                            <x-duel.prompt-area.create :llms="$llms" />
+                        @elseif (request()->user()->hasPerm('Duel_update_send_message') && !session('llms'))
+                            <x-duel.prompt-area.request :llms="$llms" />
+                        @endif
+                    </div>
+                @endif
             </div>
         @endif
     </div>

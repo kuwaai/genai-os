@@ -25,7 +25,7 @@ fill="currentFill" />
         $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
         $(node).find('div.text-sm.space-y-3.break-words ol').addClass('list-inside list-decimal');
         $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
-        $(node).find('div.text-sm.space-y-3.break-words a').addClass('text-blue-600 hover:text-blue-800').prop('target',
+        $(node).find('div.text-sm.space-y-3.break-words a').addClass('text-blue-700 hover:text-blue-900').prop('target',
             '_blank');
         $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
             hljs.highlightElement($(this)[0]);

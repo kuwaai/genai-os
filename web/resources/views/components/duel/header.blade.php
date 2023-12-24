@@ -97,8 +97,9 @@
             @endif
         </div>
         @if (!session('llms'))
+        @if (request()->user()->hasPerm('Duel_read_export_chat'))
             <button onclick="export_chat()" data-modal-target="exportModal" data-modal-toggle="exportModal"
-                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                class="bg-green-500 mr-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                 <i class="fas fa-share-alt"></i>
             </button>
 
@@ -113,7 +114,6 @@
                         var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
                         var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
                         if (isBot) {
-                            console.log($(element).children("div").children("img"))
                             var message = {
                                 "role": "assistant",
                                 "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
@@ -160,25 +160,30 @@
                     $("#export_tsv").val(csvContent)
                 }
             </script>
+            @endif
             <button onclick="saveChat()"
                 class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
                 <i class="fas fa-save"></i>
             </button>
             <button onclick="editChat()"
-                class="bg-orange-500 ml-3 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                 <i class="fas fa-pen"></i>
             </button>
+            @if (request()->user()->hasPerm('Duel_delete_chatroom'))
             <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
                 class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                 <i class="fas fa-trash"></i>
             </button>
+            @endif
         @else
+        @if (request()->user()->hasPerm('Duel_update_import_chat'))
             <div class="flex">
-                <button onclick="import_chat()" data-modal-target="importModal" data-modal-toggle="importModal"
+                <button data-modal-target="importModal" data-modal-toggle="importModal"
                     class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                     <i class="fas fa-file-import"></i>
                 </button>
             </div>
+            @endif
         @endif
     </div>
 </div>

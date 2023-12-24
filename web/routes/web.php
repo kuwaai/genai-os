@@ -115,8 +115,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->post('/request', [ChatController::class, 'request'])
                     ->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-                Route::middleware(AdminMiddleware::class . ':Chat_update_feedback')
-                    ->post('/feedback', [ChatController::class, 'feedback'])
+                Route::post('/feedback', [ChatController::class, 'feedback'])
                     ->name('chat.feedback');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
@@ -146,12 +145,19 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/', [DuelController::class, 'main'])->name('duel.home');
 
                 Route::post('/new', [DuelController::class, 'new'])->name('duel.new');
-                Route::post('/create', [DuelController::class, 'create'])->name('duel.create');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_new_chat')
+                    ->post('/create', [DuelController::class, 'create'])
+                    ->name('duel.create');
                 Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
-                Route::delete('/delete', [DuelController::class, 'delete'])->name('duel.delete');
-                Route::post('/request', [DuelController::class, 'request'])->name('duel.request');
-                Route::post('/import', [DuelController::class, 'import'])
+                Route::middleware(AdminMiddleware::class . ':Duel_delete_chatroom')
+                    ->delete('/delete', [DuelController::class, 'delete'])
+                    ->name('duel.delete');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_send_message')
+                    ->post('/request', [DuelController::class, 'request'])
+                    ->name('duel.request');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_import_chat')
+                    ->post('/import', [DuelController::class, 'import'])
                     ->name('duel.import');
             })
             ->name('duel');

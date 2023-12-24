@@ -258,5 +258,14 @@
 "Download JSON":"下載JSON檔",
 "Tab Separate Values":"Tab分隔資料(.txt檔)",
 "JSON format":"JSON格式(.json檔)",
-"Quote this message":"引用該訊息"
+"Quote this message":"引用該訊息",
+"Duel_update_import_chat":"匯入聊天室",
+"Duel_update_new_chat":"創建新聊天室",
+"Duel_update_feedback":"給予回饋",
+"Duel_update_send_message":"傳送訊息",
+"Chat_update_react_message":"額外操作按鈕",
+"Duel_update_react_message":"額外操作按鈕",
+"Permission to use extra react buttons":"對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)",
+"Duel_read_export_chat":"匯出聊天室",
+"Duel_delete_chatroom":"刪除聊天室"
 }
