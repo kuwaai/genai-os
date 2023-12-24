@@ -101,13 +101,11 @@ xmlns="http://www.w3.org/2000/svg">
                 }).find("div div");
 
                 if (flag) {
-                    $($prevMsgs).removeClass("bg-cyan-500");
-                    $($prevMsgs).addClass("bg-orange-400");
-                    $(node).addClass("bg-yellow-300");
+                    $($prevMsgs).addClass("!bg-orange-400");
+                    $(node).addClass("!bg-yellow-300");
                 } else {
-                    $($prevMsgs).addClass("bg-cyan-500");
-                    $($prevMsgs).removeClass("bg-orange-400");
-                    $(node).removeClass("bg-yellow-300");
+                    $($prevMsgs).removeClass("!bg-orange-400");
+                    $(node).removeClass("!bg-yellow-300");
                 }
             }
             $prevUser = $(node).parent().parent().prevAll('div').filter(function() {
@@ -120,24 +118,20 @@ xmlns="http://www.w3.org/2000/svg">
             }).first().find("div div")
             if ($refRecord.length > 0) {
                 if (flag) {
-                    $($refRecord).removeClass("bg-cyan-500");
-                    $($refRecord).addClass("bg-orange-400");
-                    $(node).addClass("bg-yellow-300");
+                    $($refRecord).addClass("!bg-orange-400");
+                    $(node).addClass("!bg-yellow-300");
                 } else {
-                    $($refRecord).addClass("bg-cyan-500");
-                    $($refRecord).removeClass("bg-orange-400");
-                    $(node).removeClass("bg-yellow-300");
+                    $($refRecord).removeClass("!bg-orange-400");
+                    $(node).removeClass("!bg-yellow-300");
                 }
             } else {
                 $prevUser = $prevUser.find("div div")
                 if (flag) {
-                    $($prevUser).removeClass("bg-cyan-500");
-                    $($prevUser).addClass("bg-orange-400");
-                    $(node).addClass("bg-yellow-300");
+                    $($prevUser).addClass("!bg-orange-400");
+                    $(node).addClass("!bg-yellow-300");
                 } else {
-                    $($prevUser).addClass("bg-cyan-500");
-                    $($prevUser).removeClass("bg-orange-400");
-                    $(node).removeClass("bg-yellow-300");
+                    $($prevUser).removeClass("!bg-orange-400");
+                    $(node).removeClass("!bg-yellow-300");
                 }
             }
         }
