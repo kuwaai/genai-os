@@ -90,7 +90,7 @@
                                 @if (request()->user()->hasPerm('Duel_update_new_chat'))
                                     <button data-modal-target="create-model-modal"
                                         data-modal-toggle="create-model-modal"
-                                        class="flex rounded-{{ request()->user()->hasPerm('Duel_update_import_chat')? 'l-': '' }}lg border border-black dark:border-white border-2 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+                                        class="flex rounded-{{ request()->user()->hasPerm('Duel_update_import_chat')? 'l-': '' }}lg border border-black dark:border-white border-1 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
                                         <p class="flex-1 text-center text-gray-700 dark:text-white">
                                             {{ __('Create Chat') }}
                                         </p>

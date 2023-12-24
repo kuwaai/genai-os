@@ -8,7 +8,7 @@
                     action="{{ route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
                     @csrf
                     <button
-                        class="flex px-2 scrollbar rounded-t-lg w-full hover:bg-gray-700 scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
+                        class="flex px-2 scrollbar rounded-t-lg w-full hover:bg-gray-300 dark:hover:bg-gray-700 scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
                         @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                             <div
                                 class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">

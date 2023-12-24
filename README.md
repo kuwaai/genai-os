@@ -1,21 +1,28 @@
-# TAIDE Chat 0.0.7.1
+# TAIDE Chat 0.1.0.0
 ### Implements
-* [Finished] Basic Chatting with just one LLM
-* [Finished] Duel Chatting with multiple LLMs
+* [Finished] One or more LLMs chatting
 * [Finished] LLM management and internal API with proxy
-* [Finished] User sign up & login, email auth, api auth
+* [Finished] User sign up & login, email auth, LDAP auth, api with user key
 * [Finished] Group & Permission & User management
-* [Finished] A basic working API that just worked
-* [Finished] Import & Export Chatroom
-* [Finished] Feedback system
-* [Finished] Soft delete for chatroom and history
-* [WIP] Regeneration & Translation button
+* [Finished] Import & Export Chatrooms via TSV or JSON
+* [Finished] Import multiple prompt to quick inference
+* [Finished] Feedback & train data export
+* [Finished] Soft delete except account deletion
+* [Finished] Translation and quote react button
+* [Finished] Mobile UI
+* [Finished] Markdown output supported
+* [Finished] Highlight the input output prompt
+* [WIP] Regenerate & Edit message button
 * [WIP] Rule-based control in Model worker
-* [WIP] Expanded Chatroom list
-* [WIP] Import with generate
 * [WIP] First play ground game: AI Election
-* [WIP] A complete Externel API
-* [WIP] Blinded model rating
+* [WIP] Bot stores
+* [WIP] A fully working API
+* [WIP] Blinded model feedback testing
+* [WIP] Live streaming chat
+* [WIP] Auto scaling models
+* [WIP] ODT chat history export
+* [WIP] System stress measure
+
 
 ### Basic Software Requirements
 * PostgreSQL 14

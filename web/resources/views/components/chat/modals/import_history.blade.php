@@ -25,7 +25,7 @@
             <div class="p-6 flex flex-col justify-center">
                 <label for="import_file_input"
                     class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Import from file') }}</label>
-                <hr class="my-4 border-black dark:border-gray-600" />
+                <hr class="my-4 border-black border-gray-300 dark:border-gray-600" />
                 <form method="post"
                     action="{{ request()->routeIs('duel.*') ? route('duel.import') : route('chat.import') }}">
                     @csrf
