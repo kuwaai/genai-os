@@ -41,7 +41,7 @@ generation_config = GenerationConfig(
     temperature=0.2,
     repetition_penalty=1.0
 )
-system_prompt_fmt = "<s>{0} USER: {0} ASSISTANT:"
+system_prompt_fmt = "<s>{0} USER: {1} ASSISTANT:"
 system_text = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
 prompt_fmt = " USER: {0} ASSISTANT:"
 answer_fmt = "{0}"
