@@ -69,7 +69,7 @@
         @if (!$history->isbot)
             <div
                 class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                {{request()->user()->name[0]}}
+                {{mb_substr(request()->user()->name, 0, 1, 'UTF-8')}}
             </div>
         @endif
     </div>
