@@ -268,5 +268,8 @@
 "Permission to use extra react buttons":"對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)",
 "Duel_read_export_chat":"匯出聊天室",
 "Duel_delete_chatroom":"刪除聊天室",
-"Register Need Invite":"註冊必需有邀請碼"
+"Register Need Invite":"註冊必需有邀請碼",
+"[Sorry, The input message is too huge!]":"[很抱歉，輸入的訊息太長了！]",
+"validation.min.string":"長度太短！",
+"passwords.token":"重設密碼連結已過時！"
 }
