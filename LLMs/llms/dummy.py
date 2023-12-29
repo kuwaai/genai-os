@@ -5,7 +5,7 @@ from base import *
 app.config["REDIS_URL"] = "redis://localhost:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://localhost:9000/"
-app.LLM_name = "doc_qa"
+app.LLM_name = "debug_network"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent

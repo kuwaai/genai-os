@@ -18,14 +18,16 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = 1024*3
+limit = 1024*14
 model_loc = "llama2-7b-ccw_cp-j-v2+cc_tv"
 api_key = None
 usr_token = None
 tc_model = None
 # -- Config ends --
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, set_seed
+from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, set_seed
+from intel_extension_for_transformers.transformers import AutoModelForCausalLM
+from threading import Thread
     
 set_seed(42)
 model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
@@ -34,6 +36,7 @@ prompts = "<s>[INST] {0} [/INST]{1}"
     
 def llm_compute(data): 
     try:
+        s = time.time()
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
         while len("".join(history)) > limit:
             del history[0]
@@ -45,19 +48,17 @@ def llm_compute(data):
             history = "".join(history)
             encoding = tokenizer(history, return_tensors='pt', add_special_tokens=False).to(model.device)
             
+            streamer = TextIteratorStreamer(tokenizer,skip_prompt=True)
             l = encoding['input_ids'].size(1)
-            x = model.generate(
-                **encoding,
+            thread = Thread(target=model.generate, kwargs=dict(input_ids=encoding['input_ids'], streamer=streamer,
                 generation_config=GenerationConfig(
-                    max_new_tokens=2048,
+                    max_new_tokens=4096,
                     pad_token_id=tokenizer.eos_token_id,
-                )
-            )
-            result = tokenizer.batch_decode(x[:, l:])[0].strip().replace("</s>","")
-            print(result.encode("utf-8","ignore").decode("utf-8"))
-            for i in result:
-                yield i
-                time.sleep(0.02)
+                )))
+            thread.start()
+            for i in streamer:
+                print(end=i.replace("</s>",""),flush=True)
+                yield i.replace("</s>","")
 
             torch.cuda.empty_cache()
         else:

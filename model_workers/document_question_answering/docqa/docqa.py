@@ -2,7 +2,7 @@
 # -#- coding: UTF-8 -*-
 
 from worker_framework.datatype import ChatRecord, Role
-from typing import Generator
+from typing import Generator, Iterable
 from pathlib import Path
 from urllib.error import HTTPError
 from langchain.docstore.document import Document
@@ -24,7 +24,7 @@ import time
 
 class DocumentQa:
 
-  log_path = '/var/log/doc_qa/qa.jsonl'
+  log_path = os.environ.get('llm_log_path','/var/log/doc_qa/qa.jsonl')
 
   def __init__(self, document_store:str = None):
     self.logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class DocumentQa:
   def generate_llm_input(self, task, question, related_docs):
     
     template_path = 'prompt_template/' + f'llm_input_{task}.mustache'
-    llm_input_template = Path(template_path).read_text()
+    llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
       'question': question
@@ -79,9 +79,10 @@ class DocumentQa:
     
   async def construct_document_store(self, docs: [Document]):
     document_store = DocumentStore()
-    return await document_store.from_documents(docs)
+    await document_store.from_documents(docs)
+    return document_store
 
-  async def process(self, url: str, chat_history: [ChatRecord]) -> Generator[str, None, None]:
+  async def process(self, urls: Iterable, chat_history: [ChatRecord]) -> Generator[str, None, None]:
 
     final_user_input = self.get_final_user_input(chat_history)
 
@@ -89,7 +90,8 @@ class DocumentQa:
     docs = None
     try:
       if document_store == None:
-        docs = await self.fetch_documents(url)
+        docs = await asyncio.gather(*[self.fetch_documents(url) for url in urls])
+        docs = [doc for sub_docs in docs for doc in sub_docs]
         document_store = await self.construct_document_store(docs)
     except HTTPError as e:
       await asyncio.sleep(2) # To prevent SSE error of web page.
@@ -146,7 +148,7 @@ class DocumentQa:
     with jsonlines.open(self.log_path, mode='a', flush=True) as log:
       log.write({
         'time': time.time(),
-        'url': url,
+        'url': urls,
         'question': question,
         'related_docs': [doc.page_content for doc in related_docs],
         'response': result

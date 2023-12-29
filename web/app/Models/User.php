@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Models;
-
+use LdapRecord\Laravel\Auth\LdapAuthenticatable;
+use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,9 +11,9 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\GroupPermissions;
 use App\Models\Group;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, LdapAuthenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, AuthenticatesWithLdap;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +26,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
 		'openai_token',
         'group_id',
-        'term_accepted'
+        'term_accepted',
+        'guid',
+        'domain'
     ];
 
     /**

@@ -15,10 +15,17 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next, $config): Response
     {
-		if (auth()->check() && auth()->user()->hasPerm($config)) {
-			return $next($request);
-		}
+        if (
+            auth()->check() &&
+            auth()
+                ->user()
+                ->hasPerm($config)
+        ) {
+            return $next($request);
+        } elseif ($config == 'tab_Chat') {
+            return redirect('/');
+        }
 
-		abort(403, 'Unauthorized action.');
+        abort(403, 'Unauthorized action.');
     }
 }

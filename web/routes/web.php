@@ -7,6 +7,7 @@ use App\Http\Controllers\SystemController;
 use App\Http\Controllers\DuelController;
 use App\Http\Controllers\PlayController;
 use App\Http\Controllers\ManageController;
+use App\Http\Controllers\BotController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LanguageMiddleware;
 use BeyondCode\LaravelSSE\Facades\SSE;
@@ -93,10 +94,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->prefix('chats')
             ->group(function () {
                 Route::get('/', [ChatController::class, 'home'])->name('chat.home');
+                Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('chat.translate');
 
-                Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
-                    ->get('/new/{llm_id}', [ChatController::class, 'new_chat'])
-                    ->name('chat.new');
+                Route::get('/new/{llm_id}', [ChatController::class, 'new_chat'])->name('chat.new');
 
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
                 Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
@@ -115,8 +115,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->post('/request', [ChatController::class, 'request'])
                     ->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-                Route::middleware(AdminMiddleware::class . ':Chat_update_feedback')
-                    ->post('/feedback', [ChatController::class, 'feedback'])
+                Route::post('/feedback', [ChatController::class, 'feedback'])
                     ->name('chat.feedback');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
@@ -145,11 +144,21 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->group(function () {
                 Route::get('/', [DuelController::class, 'main'])->name('duel.home');
 
-                Route::post('/create', [DuelController::class, 'create'])->name('duel.create');
+                Route::post('/new', [DuelController::class, 'new'])->name('duel.new');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_new_chat')
+                    ->post('/create', [DuelController::class, 'create'])
+                    ->name('duel.create');
                 Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
-                Route::delete('/delete', [DuelController::class, 'delete'])->name('duel.delete');
-                Route::post('/request', [DuelController::class, 'request'])->name('duel.request');
+                Route::middleware(AdminMiddleware::class . ':Duel_delete_chatroom')
+                    ->delete('/delete', [DuelController::class, 'delete'])
+                    ->name('duel.delete');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_send_message')
+                    ->post('/request', [DuelController::class, 'request'])
+                    ->name('duel.request');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_import_chat')
+                    ->post('/import', [DuelController::class, 'import'])
+                    ->name('duel.import');
             })
             ->name('duel');
 
@@ -167,6 +176,37 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::patch('/update', [PlayController::class, 'update'])->name('play.ai_elections.update');
                     })
                     ->name('play.ai_elections');
+
+                Route::middleware(AdminMiddleware::class . ':tab_Chat')
+                    ->prefix('bots')
+                    ->group(function () {
+                        Route::get('/', [BotController::class, 'home'])->name('play.bots.home');
+
+                        Route::get('/new/{llm_id}', [BotController::class, 'new_chat'])->name('play.bots.new');
+
+                        Route::get('/chain', [BotController::class, 'update_chain'])->name('play.bots.chain');
+                        Route::get('/stream', [BotController::class, 'SSE'])->name('play.bots.sse');
+                        Route::get('/{chat_id}', [BotController::class, 'main'])->name('play.bots.chat');
+
+                        Route::middleware(AdminMiddleware::class . ':Chat_update_upload_file')
+                            ->post('/upload', [BotController::class, 'upload'])
+                            ->name('play.bots.upload');
+                        Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
+                            ->post('/create', [BotController::class, 'create'])
+                            ->name('play.bots.create');
+                        Route::middleware(AdminMiddleware::class . ':Chat_update_send_message')
+                            ->post('/request', [BotController::class, 'request'])
+                            ->name('play.bots.request');
+                        Route::post('/edit', [BotController::class, 'edit'])->name('play.bots.edit');
+                        Route::middleware(AdminMiddleware::class . ':Chat_update_feedback')
+                            ->post('/feedback', [BotController::class, 'feedback'])
+                            ->name('play.bots.feedback');
+
+                        Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
+                            ->delete('/delete', [BotController::class, 'delete'])
+                            ->name('play.bots.delete');
+                    })
+                    ->name('play.bots');
             })
             ->name('play');
         #---Play

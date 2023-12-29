@@ -26,8 +26,18 @@ class SystemController extends Controller
             }
         }
 
+        if ($request->input('register_need_invite') == 'allow') {
+            if (in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')])) {
+                $request->merge(['register_need_invite' => null]);
+                $result = 'smtp_not_configured';
+            }
+        }
         $model = SystemSetting::where('key', 'allowRegister')->first();
         $model->value = $request->input('allow_register') == 'allow' ? 'true' : 'false';
+        $model->save();
+
+        $model = SystemSetting::where('key', 'register_need_invite')->first();
+        $model->value = $request->input('register_need_invite') == 'allow' ? 'true' : 'false';
         $model->save();
 
         $model = SystemSetting::where('key', 'announcement')->first();

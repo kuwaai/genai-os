@@ -35,9 +35,9 @@ You can use the `curl` command line tool to make POST requests to our API. Here'
 ```bash
 curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d '{
     "messages": [
-        { "isbot": "false", "msg": "你好" }
+        { "isbot": false, "msg": "你好" }
     ],
-    "model": "llama2-7b-chat-b5.0.0"
+    "model": "gemini-pro"
 }' http://localhost/v1.0/chat/completions
 ```
 
@@ -46,7 +46,7 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_
 For Windows you need to escape these characters, here's how to do it:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": \"false\", \"msg\": \"你好\" }],\"model\": \"llama2-7b-chat-b5.0.0\"}" http://localhost/v1.0/chat/completions
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": false, \"msg\": \"你好\" }],\"model\": \"gemini-pro\"}" http://localhost/v1.0/chat/completions
 ```
 
 ### Using JavaScript (Ajax)
@@ -56,9 +56,9 @@ You can also use JavaScript and the `fetch` API to send a single message to our 
 // Define the request payload as an object.
 const requestData = {
     messages: [
-        { isbot: "false", msg: "你好" }
+        { isbot: false, msg: "你好" }
     ],
-    model: "llama2-7b-chat-b5.0.0"
+    model: "gemini-pro"
 };
 
 // Define the API endpoint and authentication headers.
@@ -109,9 +109,9 @@ headers = {
 # Define the request payload as a dictionary for single round chatting.
 request_data = {
     "messages": [
-        { "isbot": "false", "msg": "你好" }
+        { "isbot": False, "msg": "你好" }
     ],
-    "model": "llama2-7b-chat-b5.0.0"
+    "model": "gemini-pro"
 }
 
 # Perform the HTTP request using the requests library.
@@ -131,9 +131,9 @@ For multiple rounds of chatting, you can extend the `messages` field with the co
 
 ```json
 "messages": [
-    { "isbot": "false", "msg": "你好" },
-    { "isbot": "true", "msg": "你好，我是一個機器人" },
-    { "isbot": "false", "msg": "嗨" }
+    { "isbot": false, "msg": "你好" },
+    { "isbot": true, "msg": "你好，我是一個機器人" },
+    { "isbot": false, "msg": "嗨" }
 ]
 ```
 

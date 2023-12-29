@@ -55,6 +55,7 @@ class ManageController extends Controller
             $group->fill(['name' => $name, 'describe' => $describe, 'invite_token'=>$request->input('invite_code')]);
             $group->save();
             $permissions = $request->input('permissions');
+            GroupPermissions::where('group_id', '=', $group->id)->delete();
             if ($permissions) {
                 $currentTimestamp = now();
                 $perm_records = [];
@@ -67,7 +68,6 @@ class ManageController extends Controller
                         'updated_at' => $currentTimestamp,
                     ];
                 }
-                GroupPermissions::where('group_id', '=', $group->id)->delete();
                 GroupPermissions::insert($perm_records);
             }
         }

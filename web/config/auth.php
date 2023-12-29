@@ -39,7 +39,7 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-        ],
+        ]
     ],
 
     /*
@@ -61,10 +61,19 @@ return [
 
     'providers' => [
         'users' => [
+            'driver' => 'ldap',
+            'model' => LdapRecord\Models\OpenLDAP\User::class,
+            'database' => [
+                'model' => App\Models\User::class,
+                'sync_passwords' => true,
+                'sync_attributes' => [
+                    'name' => 'uid',
+                    'email' => 'mail',
+                ],
+            ],
+        ],'users2' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
-
+            'model' => App\Models\User::class,]
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
@@ -93,6 +102,12 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'users2' => [
+            'provider' => 'users2',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
