@@ -29,7 +29,7 @@ class RequestChat implements ShouldQueue
      */
     public function __construct($input, $access_code, $user_id, $history_id, $chatgpt_apitoken, $channel = null)
     {
-        $this->input = json_encode(json_decode($input),JSON_UNESCAPED_UNICODE);
+        $this->input = json_encode(json_decode($input), JSON_UNESCAPED_UNICODE);
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
         $this->access_code = $access_code;
         $this->user_id = $user_id;
@@ -89,8 +89,17 @@ class RequestChat implements ShouldQueue
                 } catch (Exception $e) {
                 }
                 Log::channel('analyze')->Info('NOMACHINE: ' . $this->access_code . ' | ' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+
+                Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
+                Redis::publish($this->channel, 'Ended Ended');
+                $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
+                $currentTimeInSeconds = Carbon::now()->timestamp;
+                $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
+
+                if ($ExecutionTime < 2) {
+                    sleep(2 - $ExecutionTime);
+                }
                 Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
-                sleep(1);
                 Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                 Redis::publish($this->channel, 'Ended Ended');
             } elseif ($state == 'READY') {
@@ -104,26 +113,20 @@ class RequestChat implements ShouldQueue
                         return;
                     } else {
                         $test_2 = collect(json_decode($this->input))
-                        ->where('isbot', false)
-                        ->last();
-                        if ($test_2 !== null){
-                            $taide_flag =
-                            strpos(
-                                strtoupper(
-                                    $test_2->msg,
-                                ),
-                                strtoupper('taide'),
-                            ) !== false;
+                            ->where('isbot', false)
+                            ->last();
+                        if ($test_2 !== null) {
+                            $taide_flag = strpos(strtoupper($test_2->msg), strtoupper('taide')) !== false;
 
-                        foreach ($test as $t) {
-                            foreach ($this->filters as $filter) {
-                                if (strpos($t->msg, $filter) !== false) {
-                                    $t->msg = trim(str_replace($filter, '', $t->msg));
+                            foreach ($test as $t) {
+                                foreach ($this->filters as $filter) {
+                                    if (strpos($t->msg, $filter) !== false) {
+                                        $t->msg = trim(str_replace($filter, '', $t->msg));
+                                    }
                                 }
                             }
-                        }
-                        $this->input = json_encode($test);
-                        }else{
+                            $this->input = json_encode($test);
+                        } else {
                             $taide_flag = false;
                         }
                     }
@@ -163,7 +166,7 @@ class RequestChat implements ShouldQueue
                             break;
                         }*/
                     }
-                    
+
                     if (trim($tmp) == '') {
                         $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
                     } else {
@@ -189,7 +192,7 @@ class RequestChat implements ShouldQueue
                     if ($this->channel == '' . $this->history_id) {
                         Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
                     }
-                    
+
                     $end = microtime(true);
                     $elapsed = $end - $start;
                     Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . $tmp);

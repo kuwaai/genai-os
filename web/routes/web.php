@@ -35,7 +35,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     })->name('/');
 
     Route::get('/lang', function () {
-        session()->put('locale', session()->get('locale') ? (session()->get('locale') == 'en-us' ? 'zh-tw' : 'en-us') : 'en-us');
+        session()->put('locale', session()->get('locale') ? (session()->get('locale') == 'en_us' ? 'zh_tw' : 'en_us') : 'en_us');
 
         return back();
     })->name('lang');
@@ -50,6 +50,8 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
     # This will auth the server secret that is used by localhost
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
+    # Debugging, test hashing API
+    Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
 
     # Admin routes, require admin permission
     Route::middleware('auth', 'verified', AdminMiddleware::class . ':tab_Dashboard')->group(function () {

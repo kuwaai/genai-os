@@ -38,14 +38,14 @@ def llm_compute(data):
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
         while len("".join(history)) > limit:
             del history[0]
-            del history[0]
+            if history: del history[0]
         if len(history) != 0:
             history.append("")
             history = [prompts.format(history[i], history[i + 1]) for i in range(0, len(history), 2)]
             history = "你是人工智慧助理，以下是用戶和人工智能助理之間的對話。你要對用戶的問題提供有用、安全、詳細和禮貌的回答。" + "".join(history).strip()
             encoding = tokenizer(history, return_tensors='pt', add_special_tokens=False).to(model.device)
             
-            streamer = TextIteratorStreamer(tokenizer,skip_prompt=True)
+            streamer = TextIteratorStreamer(tokenizer,skip_prompt=True,timeout=2)
             l = encoding['input_ids'].size(1)
             thread = Thread(target=model.generate, kwargs=dict(input_ids=encoding['input_ids'], streamer=streamer,
                 generation_config=GenerationConfig(
@@ -59,7 +59,7 @@ def llm_compute(data):
 
             torch.cuda.empty_cache()
         else:
-            yield "Sorry, The input message is too huge!"
+            yield "[Sorry, The input message is too long!]"
 
     except Exception as e:
         print(e)

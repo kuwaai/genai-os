@@ -1,0 +1,18 @@
+{
+    "Chat_update_send_message": "Send Message",
+    "Chat_update_new_chat": "New Chatroom",
+    "Chat_update_upload_file": "Upload File",
+    "Chat_update_feedback": "Give Feedback",
+    "Chat_update_import_chat": "Import Chat",
+    "Chat_read_access_to_api": "Use API",
+    "Chat_read_export_chat": "Export Chat",
+    "Chat_delete_chatroom": "Delete Chat",
+    "Profile_update_api_token": "Update Web API Token",
+    "Profile_update_name": "Update Username",
+    "Profile_update_email": "Update Email",
+    "Profile_update_password": "Update Password",
+    "Profile_update_openai_token": "Update OpenAI Token",
+    "Profile_read_api_token": "Read Web API Token",
+    "Profile_delete_account": "Delete Account",
+    "Change Language": "Language"
+}

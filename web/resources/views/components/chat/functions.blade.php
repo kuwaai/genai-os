@@ -2,6 +2,24 @@
     var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     var histories = {}
 
+
+    function translate_msg($msg) {
+        let msgTranslations = {
+
+            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}",
+            "[Sorry, something is broken, please try again later!]": "{{ __('[Sorry, something is broken, please try again later!]') }}",
+            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}",
+            "[Sorry, The input message is too huge!]": "{{ __('[Sorry, The input message is too huge!]') }}"
+        };
+
+        for (let original in msgTranslations) {
+            if (msgTranslations.hasOwnProperty(original)) {
+                $msg = $msg.replace(original, msgTranslations[original]);
+            }
+        }
+        return $msg;
+    }
+
     function chatroomFormatter(node) {
         $(node).find('div.text-sm.space-y-3.break-words').each(function() {
             if ($(this).text() == "<pending holder>") {
@@ -16,31 +34,36 @@ d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.82
 fill="currentFill" />
 </svg>`);
             } else {
-                $(this).html(DOMPurify.sanitize((marked.parse($(this).text()))));
-            }
-        });
-        $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
-        $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
-            'border border-2 border-gray-500 border-solid p-1');
-        $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
-        $(node).find('div.text-sm.space-y-3.break-words ol').addClass('list-inside list-decimal');
-        $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
-        $(node).find('div.text-sm.space-y-3.break-words a').addClass('text-blue-700 hover:text-blue-900').prop('target',
-            '_blank');
-        $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
-            hljs.highlightElement($(this)[0]);
-        });
-        $(node).find('div.text-sm.space-y-3.break-words pre code').addClass("scrollbar scrollbar-3 rounded-b-lg")
-        $(node).find('div.text-sm.space-y-3.break-words pre').each(function() {
-            let languageClass = '';
-            $(this).children("code")[0].classList.forEach(cName => {
-                if (cName.startsWith('language-')) {
-                    languageClass = cName.replace('language-', '');
-                    return;
+                $msg = $(this).text()
+                if ($(this).hasClass("bot-msg")) {
+                    $msg = translate_msg($msg);
                 }
-            })
-            $(this).prepend(
-                `<div class="flex items-center text-gray-200 bg-gray-800 px-4 py-2 rounded-t-lg">
+                $(this).html(DOMPurify.sanitize((marked.parse($msg))));
+
+                $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
+                $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
+                    'border border-2 border-gray-500 border-solid p-1');
+                $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
+                $(node).find('div.text-sm.space-y-3.break-words ol').addClass('list-inside list-decimal');
+                $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
+                $(node).find('div.text-sm.space-y-3.break-words a').addClass(
+                    'text-blue-700 hover:text-blue-900').prop('target',
+                    '_blank');
+                $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
+                    hljs.highlightElement($(this)[0]);
+                });
+                $(node).find('div.text-sm.space-y-3.break-words pre code').addClass(
+                    "scrollbar scrollbar-3 rounded-b-lg")
+                $(node).find('div.text-sm.space-y-3.break-words pre').each(function() {
+                    let languageClass = '';
+                    $(this).children("code")[0].classList.forEach(cName => {
+                        if (cName.startsWith('language-')) {
+                            languageClass = cName.replace('language-', '');
+                            return;
+                        }
+                    })
+                    $(this).prepend(
+                        `<div class="flex items-center text-gray-200 bg-gray-800 px-4 py-2 rounded-t-lg">
 <span class="mr-auto">${languageClass}</span>
 <button onclick="copytext(this, $(this).parent().parent().children('code').text().trim())"
 class="flex items-center"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"
@@ -55,19 +78,21 @@ stroke-linejoin="round" class="icon-sm" style="display:none;" height="1em" width
 xmlns="http://www.w3.org/2000/svg">
 <polyline points="20 6 9 17 4 12"></polyline>
 </svg><span class="ml-2">{{ __('Copy') }}</span></button></div>`
-            )
-        })
+                    )
+                })
 
-        $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
-            var $h5 = $(this);
-            var pattern = /<%ref-(\d+)%>/;
-            var match = $h5.text().match(pattern);
-            if (match) {
-                var refNumber = match[1];
-                $msg = $("#history_" + refNumber).text().trim()
-                $h5.html(
-                    `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
-                );
+                $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
+                    var $h5 = $(this);
+                    var pattern = /<%ref-(\d+)%>/;
+                    var match = $h5.text().match(pattern);
+                    if (match) {
+                        var refNumber = match[1];
+                        $msg = $("#history_" + refNumber).text().trim()
+                        $h5.html(
+                            `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
+                        );
+                    }
+                });
             }
         });
     }
