@@ -210,7 +210,32 @@ class RequestChat implements ShouldQueue
                     Redis::publish($this->channel, 'Ended Ended');
                 }
             }
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
+            Log::channel('analyze')->Info("Failed job: " . $this->channel);
+            $history = Histories::find($this->history_id);
+            if ($history != null) {
+                $history->fill(['msg' => '[Sorry, something is broken, please try again later!]']);
+                $history->save();
+            }
+            Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+            Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));
+            Redis::publish($this->channel, 'Ended Ended');
         }
+    }
+    public function failed(\Throwable $exception)
+    {
+        if ($this->channel == '') {
+            $this->channel .= $this->history_id;
+        }
+        Log::channel('analyze')->Info("Failed job: " . $this->channel);
+
+        $history = Histories::find($this->history_id);
+        if ($history != null) {
+            $history->fill(['msg' => '[Sorry, something is broken, please try again later!]']);
+            $history->save();
+        }
+        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+        Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));
+        Redis::publish($this->channel, 'Ended Ended');
     }
 }

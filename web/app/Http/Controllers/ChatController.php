@@ -695,12 +695,6 @@ class ChatController extends Controller
                     echo "event: close\n\n";
                     ob_flush();
                     flush();
-                    try {
-                        if ($client) {
-                            $client->disconnect();
-                        }
-                    } catch (Exception) {
-                    }
                 }
             }
         });
