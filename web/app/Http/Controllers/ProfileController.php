@@ -149,7 +149,7 @@ class ProfileController extends Controller
                             }
 
                             if ($invite_code) {
-                                $group_id = Groups::where('invite_token', '=', $invite_code)->first()->id ?? null;
+                                $group_id = Groups::where('invite_token', '=', trim($invite_code))->first()->id ?? null;
                             } else {
                                 $group_id = null;
                             }
