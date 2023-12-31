@@ -27,7 +27,7 @@ def register():
     # For Online LLM register themself
     # Parameters: name, endpoint
     llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
-    if endpoint == None or llm_name == None or endpoint in data.get(llm_name, []): return "Failed"
+    if endpoint == None or llm_name == None or endpoint_formatter(endpoint) in data.get(llm_name, []): return "Failed"
     data.setdefault(llm_name, []).append([endpoint_formatter(endpoint), "READY", -1, -1])
     save_variable_to_file(record_file, data)
     log(0,f"A new {llm_name} is registered at {endpoint}")
