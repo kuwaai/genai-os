@@ -48,7 +48,7 @@ def loadRecords(var, keep_state = False):
     for i,o in var.items():
         data[i] = []
         for k in o:
-            if endpoint_formatter(k[0]) in data.get(i, []):
+            if endpoint_formatter(k[0]) in [j[0] for j in data.get(i, [])]:
                 try:
                     resp = requests.get(get_base_url(k[0]) + "/health")
                     if resp.status_code == 204:
