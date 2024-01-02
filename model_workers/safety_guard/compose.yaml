@@ -1,0 +1,27 @@
+version: '3'
+name: safety-guard
+
+services:
+  api:
+    runtime: nvidia
+    image: safety-guard
+    build: .
+    container_name: safety-guard-api-${PORT}
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ["${GPU_ID}"]
+            capabilities: [gpu]
+    env_file: .env
+    environment:
+      - PORT=${PORT}
+    ports:
+      - ${PORT}:${PORT}
+    healthcheck:
+      test: "curl --fail http://localhost:${PORT}/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
