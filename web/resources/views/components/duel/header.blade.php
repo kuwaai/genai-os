@@ -84,6 +84,11 @@
                     {{ __('Translate by the model') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
+                <div id="react_safetyGuard" role="tooltip"
+                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                    {{ __('Safety Guard Check') }}
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
                 <div id="react_quote" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                     {{ __('Quote this message') }}
@@ -97,69 +102,69 @@
             @endif
         </div>
         @if (!session('llms'))
-        @if (request()->user()->hasPerm('Duel_read_export_chat'))
-            <button onclick="export_chat()" data-modal-target="exportModal" data-modal-toggle="exportModal"
-                class="bg-green-500 mr-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                <i class="fas fa-share-alt"></i>
-            </button>
+            @if (request()->user()->hasPerm('Duel_read_export_chat'))
+                <button onclick="export_chat()" data-modal-target="exportModal" data-modal-toggle="exportModal"
+                    class="bg-green-500 mr-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                    <i class="fas fa-share-alt"></i>
+                </button>
 
-            <script>
-                function export_chat() {
-                    //JSON format
-                    var chatMessages = [];
+                <script>
+                    function export_chat() {
+                        //JSON format
+                        var chatMessages = [];
 
-                    $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
-                        var history_id = $(element).prop("id").replace("history_", "")
-                        var msgText = histories[history_id]
-                        var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
-                        var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
-                        if (isBot) {
-                            var message = {
-                                "role": "assistant",
-                                "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
-                                    .attr("access_code"),
-                                "content": msgText,
-                                "chain": chained
-                            };
-                        } else {
-                            var message = {
-                                "role": "user",
-                                "content": msgText,
-                            };
-                        }
+                        $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                            var history_id = $(element).prop("id").replace("history_", "")
+                            var msgText = histories[history_id]
+                            var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
+                            var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
+                            if (isBot) {
+                                var message = {
+                                    "role": "assistant",
+                                    "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                        .attr("access_code"),
+                                    "content": msgText,
+                                    "chain": chained
+                                };
+                            } else {
+                                var message = {
+                                    "role": "user",
+                                    "content": msgText,
+                                };
+                            }
 
-                        chatMessages.push(message);
-                    });
+                            chatMessages.push(message);
+                        });
 
-                    $("#export_json").val(JSON.stringify({
-                        "messages": chatMessages
-                    }, null, 4))
-                    //Tab Separate Values
-                    var csvContent = "role	model	content	chain\n"; // Define CSV header
+                        $("#export_json").val(JSON.stringify({
+                            "messages": chatMessages
+                        }, null, 4))
+                        //Tab Separate Values
+                        var csvContent = "role	model	content	chain\n"; // Define CSV header
 
-                    $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
-                        var historyId = $(element).prop("id").replace("history_", "");
-                        var msgText = JSON.stringify(histories[historyId]);
-                        if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
-                            msgText = msgText.substring(1, msgText.length - 1);
-                        }
-                        var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
-                        var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
+                        $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                            var historyId = $(element).prop("id").replace("history_", "");
+                            var msgText = JSON.stringify(histories[historyId]);
+                            if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
+                                msgText = msgText.substring(1, msgText.length - 1);
+                            }
+                            var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
+                            var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
 
-                        var row = "";
-                        if (isBot) {
-                            var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
-                                .attr("access_code");
-                            row = `assistant	${model}	${msgText}	${chained}\n`;
-                        } else {
-                            row = `user		${msgText}	\n`;
-                        }
+                            var row = "";
+                            if (isBot) {
+                                var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                    .attr("access_code");
+                                row = `assistant	${model}	${msgText}	${chained}\n`;
+                            } else {
+                                row = `user		${msgText}	\n`;
+                            }
 
-                        csvContent += row; // Add row to CSV content
-                    });
-                    $("#export_tsv").val(csvContent)
-                }
-            </script>
+                            csvContent += row; // Add row to CSV content
+                        });
+                        $("#export_tsv").val(csvContent)
+                    }
+                </script>
             @endif
             <button onclick="saveChat()"
                 class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
@@ -170,19 +175,19 @@
                 <i class="fas fa-pen"></i>
             </button>
             @if (request()->user()->hasPerm('Duel_delete_chatroom'))
-            <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
-                class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                <i class="fas fa-trash"></i>
-            </button>
+                <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
+                    class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                    <i class="fas fa-trash"></i>
+                </button>
             @endif
         @else
-        @if (request()->user()->hasPerm('Duel_update_import_chat'))
-            <div class="flex">
-                <button data-modal-target="importModal" data-modal-toggle="importModal"
-                    class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
-                    <i class="fas fa-file-import"></i>
-                </button>
-            </div>
+            @if (request()->user()->hasPerm('Duel_update_import_chat'))
+                <div class="flex">
+                    <button data-modal-target="importModal" data-modal-toggle="importModal"
+                        class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
+                        <i class="fas fa-file-import"></i>
+                    </button>
+                </div>
             @endif
         @endif
     </div>

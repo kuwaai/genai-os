@@ -190,10 +190,9 @@ xmlns="http://www.w3.org/2000/svg">
         }
     }
 
-    function translates(node, history_id) {
+    function translates(node, history_id, model) {
         $(node).parent().children("button.translates").addClass("hidden")
         $(node).removeClass("hidden")
-
 
         $(node).children("svg").addClass("hidden");
         $(node).children("svg").eq(1).removeClass("hidden");
@@ -201,6 +200,7 @@ xmlns="http://www.w3.org/2000/svg">
         $.ajax({
             url: '{{ route('chat.translate', '') }}/' + history_id,
             method: 'GET',
+            data: {"model":model},
             success: function(response) {
                 if (response ==
                     "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
@@ -222,7 +222,7 @@ xmlns="http://www.w3.org/2000/svg">
                     }, 3000);
                 } else {
                     $($(node).parent().parent().children()[0]).text(response +
-                        "\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]");
+                        (model ? "" : '\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]'));
                     histories[history_id] = $($(node).parent().parent()
                         .children()[0]).text()
                     chatroomFormatter($("#history_" + history_id));
