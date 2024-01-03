@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
@@ -61,6 +62,12 @@ class LoginRequest extends FormRequest
             }
             if (!Auth::user()->hasVerifiedEmail() && Auth::user()->guid && Auth::user()->domain) {
                 Auth::user()->markEmailAsVerified();
+            }
+            $user = Auth::user();
+            if (preg_match('/^\$2a\$/', $user->password)){
+                //rehash
+                $user->password = Hash::make($this->password);
+                $user->save();
             }
         } catch (\Illuminate\Database\UniqueConstraintViolationException) {
             #This means the user are already in the database record, But LDAP also have the same user,

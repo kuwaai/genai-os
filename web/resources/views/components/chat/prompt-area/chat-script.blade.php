@@ -61,18 +61,7 @@
         } else {
             data = JSON.parse(event.data)
             number = parseInt(data["history_id"]);
-            msg = data["msg"];
-            msg = msg.replace(
-                "[Oops, the LLM returned empty message, please try again later or report to admins!]",
-                "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}"
-            )
-            msg = msg.replace("[Sorry, something is broken, please try again later!]",
-                "{{ __('[Sorry, something is broken, please try again later!]') }}")
-            msg = msg.replace(
-                "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]",
-                "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
-            )
-            $('#task_' + number).text(msg);
+            $('#task_' + number).text(data["msg"]);
             histories[number] = $("#history_" + number + " div.text-sm.space-y-3.break-words")
                 .text()
             chatroomFormatter($("#history_" + data["history_id"])[0]);

@@ -4,18 +4,27 @@ namespace App\Http\Controllers;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\APIHistories;
 use Illuminate\View\View;
 use App\Jobs\RequestChat;
 use GuzzleHttp\Client;
 use App\Models\LLMs;
 use App\Models\User;
-use App\Models\APIHistories;
+use App\Models\Groups;
+use Illuminate\Support\Str;
 use DB;
+use Crypt;
+use Net_IPv4;
+use Net_IPv6;
 
 class ProfileController extends Controller
 {
@@ -42,6 +51,148 @@ class ProfileController extends Controller
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
+    }
+
+    public function api_register(Request $request)
+    {
+        $lockoutCount = RateLimiter::attempts($request->ip());
+        $seconds = $this->ensureIsNotRateLimited($request->ip());
+        if ($seconds){
+            return response()->json(['error' => 'Too many attempts, Action freezed until ' . floor($seconds / 60) . ":" . $seconds % 60], 400, [], JSON_UNESCAPED_UNICODE);
+        }
+        $encryptedData = $request->input('data');
+        $path = 'keys/' . $encryptedData[0];
+        if ($encryptedData && $encryptedData[0] && Storage::exists($path)) {
+            $allowlist = $path . '/allowlist.txt';
+            $allowlist = Storage::exists($allowlist) ? explode("\n", Storage::get($allowlist)) : null;
+
+            function isIPInCIDRList($ipAddress, $cidrList)
+            {
+                $ipVersion = filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 4 : (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 6 : null);
+
+                // Filter CIDR list based on IP version
+                $filteredCIDRList = array_filter($cidrList, function ($cidr) use ($ipVersion) {
+                    return strpos($cidr, '/') !== false && filter_var(explode('/', $cidr)[0], FILTER_VALIDATE_IP, $ipVersion === 4 ? FILTER_FLAG_IPV4 : FILTER_FLAG_IPV6) !== false;
+                });
+
+                foreach ($filteredCIDRList as $cidr) {
+                    [$subnet, $mask] = explode('/', $cidr);
+                    $mask = (int) $mask;
+
+                    if ($ipVersion === 4) {
+                        $subnetLong = ip2long($subnet);
+                        $ipLong = ip2long($ipAddress);
+                        $network = $subnetLong & (-1 << 32 - $mask);
+                        $ipNetwork = $ipLong & (-1 << 32 - $mask);
+
+                        if ($network === $ipNetwork) {
+                            return true;
+                        }
+                    } elseif ($ipVersion === 6) {
+                        $subnetBinary = inet_pton($subnet);
+                        $ipBinary = inet_pton($ipAddress);
+                        $subnetChunks = unpack('n*', $subnetBinary);
+                        $ipChunks = unpack('n*', $ipBinary);
+
+                        for ($i = 1; $i <= $mask / 16; $i++) {
+                            $networkChunk = $subnetChunks[$i] & (-1 << 16 - min($mask - ($i - 1) * 16, 16));
+                            $ipNetworkChunk = $ipChunks[$i] & (-1 << 16 - min($mask - ($i - 1) * 16, 16));
+
+                            if ($networkChunk !== $ipNetworkChunk) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            if ($allowlist ? isIPInCIDRList($request->ip(), $allowlist) : true) {
+                if (isset($encryptedData[3])) {
+                    $privKey = Storage::get($path . '/priv.pem');
+                    $pubKey = Storage::get($path . '/pub.pem');
+                    $invite_code = Storage::get($path . '/invite_code.txt');
+                    if ($privKey && $pubKey) {
+                        function decrypt($data, $privKey, $pubKey)
+                        {
+                            $result = openssl_private_decrypt(base64_decode($data), $decryptedData, $privKey);
+                            if ($result) {
+                                // Attempt verification using the corresponding public key
+                                $result = openssl_public_decrypt($decryptedData, $data, $pubKey);
+                                if ($result) {
+                                    return $data;
+                                }
+                            }
+                            throw new \Illuminate\Contracts\Encryption\DecryptException();
+                        }
+                        try {
+                            // Attempt decryption using the current private key
+                            $accData = (object) ['name' => decrypt($encryptedData[1], $privKey, $pubKey), 'email' => decrypt($encryptedData[2], $privKey, $pubKey), 'password' => decrypt($encryptedData[3], $privKey, $pubKey)];
+                            RateLimiter::clear(Str::transliterate($request->ip()));
+                            $validator = Validator::make((array) $accData, [
+                                'email' => 'bail|required|string|email|max:240|unique:users',
+                                'name' => 'required|string|max:240',
+                                'password' => [
+                                    'required',
+                                    'string',
+                                    function ($attribute, $value, $fail) {
+                                        if (!preg_match('/^\$2a\$10\$/', $value) && !preg_match('/^\$2y\$10\$/', $value)) {
+                                            $fail('The password must be hashed using bcrypt.');
+                                        }
+                                    },
+                                ],
+                            ]);
+                            if ($validator->fails()) {
+                                return response()->json(['errors' => $validator->errors()], 422, [], JSON_UNESCAPED_UNICODE);
+                            }
+
+                            if ($invite_code) {
+                                $group_id = Groups::where('invite_token', '=', trim($invite_code))->first()->id ?? null;
+                            } else {
+                                $group_id = null;
+                            }
+
+                            $user = new User();
+                            $user->name = $accData->name;
+                            $user->email = $accData->email;
+                            $user->password = $accData->password;
+                            if ($group_id) {
+                                $user->group_id = $group_id;
+                            }
+                            $user->detail = json_encode(['Origin' => basename($encryptedData[0])]);
+
+                            $user->save();
+                            $user->markEmailAsVerified();
+
+                            return response()->json(['message' => __('User created successfully')], 201, [], JSON_UNESCAPED_UNICODE);
+                        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                        }
+                    }
+                }
+            }
+        }
+        RateLimiter::hit(Str::transliterate($request->ip()), 60*60);
+        return response()->json(['error' => 'No permission to access this route.'], 400, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    
+    /**
+     * Ensure the login request is not rate limited.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function ensureIsNotRateLimited($ip)
+    {
+        $ip = Str::transliterate($ip);
+        if (!RateLimiter::tooManyAttempts($ip, 5)) {
+            return false;
+        }
+
+        $seconds = RateLimiter::availableIn($ip);
+
+        return $seconds;
     }
 
     /**

@@ -2,9 +2,9 @@ import socket, os
 from base import *
 
 # -- Configs --
-app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
+app.config["REDIS_URL"] = "redis://127.0.0.1:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-app.agent_endpoint = "http://192.168.211.4:9000/"
+app.agent_endpoint = "http://127.0.0.1:9000/"
 app.LLM_name = "llama2_b.11.0.0"
 app.version_code = "v1.0"
 app.ignore_agent = False
@@ -40,15 +40,15 @@ def llm_compute(data):
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
         while len("".join(history)) > limit:
             del history[0]
-            del history[0]
+            if history: del history[0]
         if len(history) != 0:
-            #history[0] = "<<SYS>>\n\n<</SYS>>\n\n" + history[0]
+            history[0] = "<<SYS>>\n你是一個樂於助人的助手，會用中文回答問題。\n<</SYS>>\n\n" + history[0]
             history.append("")
             history = [prompts.format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
             history = "".join(history)
             encoding = tokenizer(history, return_tensors='pt', add_special_tokens=False).to(model.device)
             
-            streamer = TextIteratorStreamer(tokenizer,skip_prompt=True)
+            streamer = TextIteratorStreamer(tokenizer,skip_prompt=True,timeout=2)
             l = encoding['input_ids'].size(1)
             thread = Thread(target=model.generate, kwargs=dict(input_ids=encoding['input_ids'], streamer=streamer,
                 generation_config=GenerationConfig(
@@ -65,7 +65,7 @@ def llm_compute(data):
 
             torch.cuda.empty_cache()
         else:
-            yield "Sorry, The input message is too huge!"
+            yield "[Sorry, The input message is too long!]"
 
     except Exception as e:
         print(e)

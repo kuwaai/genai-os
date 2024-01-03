@@ -64,7 +64,7 @@ presence_penalty=0.0
 
             torch.cuda.empty_cache()
         else:
-            yield "Sorry, The input message is too huge!"
+            yield "[Sorry, The input message is too long!]"
 
     except Exception as e:
         print(e)
