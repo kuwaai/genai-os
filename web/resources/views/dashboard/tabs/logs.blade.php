@@ -65,7 +65,7 @@
         @foreach ($logs as $log)
             <div class="bg-gray-500 p-2 my-1 rounded-md">
                 <p><span class="font-bold">{{ __('dashboard.colName.Action') }}</span> {{ $log->action }}</p>
-                <p><span class="font-bold">{{ __('dashboard.colName.Description') }}</span> {{ $log->description }}</p>
+                <p class="whitespace-pre"><span class="font-bold">{{ __('dashboard.colName.Description') }}</span> {{ $log->description }}</p>
                 <p><span class="font-bold">{{ __('dashboard.colName.UserID') }}</span> {{ $log->user_id }}</p>
                 <p><span class="font-bold">{{ __('dashboard.colName.IP') }}</span> {{ $log->ip_address }}</p>
                 <p><span class="font-bold">{{ __('dashboard.colName.Timestamp') }}</span> <span

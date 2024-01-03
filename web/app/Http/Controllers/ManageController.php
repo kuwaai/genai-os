@@ -41,13 +41,11 @@ class ManageController extends Controller
             $log = new Logs();
             $log->fill([
                 'action' => 'create_group',
-                'description' => "Created group {$group->id} with name {$group->name}" .
-                    ($group->describe ? " and described {$group->describe}" : '') .
-                    ($group->invite_token ? " and invite_token {$group->invite_token}" : '') .
-                    "\npermIDs: " . implode(' ', $request->input('permissions')),
+                'description' => "Created group {$group->id} with name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions')),
                 'user_id' => $request->user()->id,
-                'ip_address' => $request->ip()
-            ]);            $log->save();
+                'ip_address' => $request->ip(),
+            ]);
+            $log->save();
             return Redirect::route('manage.home')
                 ->with('last_tab', 'groups')
                 ->with('last_group', $group->id)
@@ -81,12 +79,23 @@ class ManageController extends Controller
                 }
                 GroupPermissions::insert($perm_records);
             }
+            $log = new Logs();
+            $log->fill([
+                'action' => 'update_group',
+                'description' => "Updated group {$group->id} by name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions')),
+                'user_id' => $request->user()->id,
+                'ip_address' => $request->ip(),
+            ]);
+            $log->save();
+            return Redirect::route('manage.home')
+                ->with('last_tab', 'groups')
+                ->with('last_group', $id)
+                ->with('last_action', 'update')
+                ->with('status', 'success');
         }
         return Redirect::route('manage.home')
             ->with('last_tab', 'groups')
-            ->with('last_group', $id)
-            ->with('last_action', 'update')
-            ->with('status', 'success');
+            ->with('last_group', $id);
     }
 
     public function group_delete(Request $request): RedirectResponse
@@ -95,12 +104,23 @@ class ManageController extends Controller
         if ($id) {
             $group = Groups::find($id);
             $group->delete();
+            $log = new Logs();
+            $log->fill([
+                'action' => 'delete_group',
+                'description' => "Deleted group " . $group->id,
+                'user_id' => $request->user()->id,
+                'ip_address' => $request->ip(),
+            ]);
+            $log->save();
+            return Redirect::route('manage.home')
+                ->with('last_tab', 'groups')
+                ->with('last_group', null)
+                ->with('last_action', 'delete')
+                ->with('status', 'success');
         }
         return Redirect::route('manage.home')
             ->with('last_tab', 'groups')
-            ->with('last_group', null)
-            ->with('last_action', 'delete')
-            ->with('status', 'success');
+            ->with('last_group', null);
     }
 
     public function user_update(Request $request): RedirectResponse
@@ -116,6 +136,14 @@ class ManageController extends Controller
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }
         $user->save();
+        $log = new Logs();
+        $log->fill([
+            'action' => 'update_user',
+            'description' => "Updated user " . $user->id,
+            'user_id' => $request->user()->id,
+            'ip_address' => $request->ip(),
+        ]);
+        $log->save();
         return Redirect::route('manage.home')
             ->with('last_tab', 'users')
             ->with('last_tool', 'group_selector')
