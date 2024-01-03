@@ -1,4 +1,4 @@
-<div class="bg-gray-600 w-full flex">
+<div class="w-full flex">
     <div method="post" action="{{ route('dashboard.feedback') }}" class="w-full flex flex-col">
         @csrf
         <div class="flex-1 flex overflow-hidden">
@@ -50,20 +50,20 @@
                 </div>
                 <div class="flex justify-center items-center my-1">
                     <button
-                        class="bg-green-600 py-1 px-2 rounded-lg hover:bg-green-700">{{ __('dashboard.button.ExportAndDownload') }}</button>
+                        class="bg-green-600 py-1 px-2 rounded-lg hover:bg-green-700 text-white">{{ __('dashboard.button.ExportAndDownload') }}</button>
                 </div>
             </form>
             <form class="flex-1 flex flex-col" method="post" action="{{ route('dashboard.feedback') }}"
                 onsubmit="return validateForm2()">
                 @csrf
                 <textarea id="feedback_rawdata" name="rawdata" placeholder="{{ __('dashboard.hint.PasteRawDataHere') }}"
-                    class="border-gray-300 flex-1 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 block w-full resize-none">{{ session('rawdata') ?? '' }}</textarea>
+                    class="bg-gray-300 border-gray-300 flex-1 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 block w-full resize-none">{{ session('rawdata') ?? '' }}</textarea>
                 <div class="flex justify-center items-center my-1 space-x-2">
                     <label for="import_file_input"
                         class="bg-orange-600 hover:bg-orange-700 py-1 px-2 rounded-lg cursor-pointer text-white">{{ __('dashboard.button.LoadFile') }}</label>
                     <input id="import_file_input" type='file' hidden>
                     <button
-                        class="bg-green-600 hover:bg-green-700 py-1 px-2 rounded-lg">{{ __('dashboard.button.ConvertAndDownload') }}</button>
+                        class="bg-green-600 hover:bg-green-700 py-1 px-2 rounded-lg text-white">{{ __('dashboard.button.ConvertAndDownload') }}</button>
                 </div>
             </form>
         </div>

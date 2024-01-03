@@ -42,19 +42,19 @@
                                 </ul>
                             </div>
                             <div id="Contents" class="flex flex-1 overflow-hidden">
-                                <div class="{{ session('last_tab') ? 'hidden' : '' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                <div class="{{ session('last_tab') ? 'hidden' : '' }} bg-gray-200 flex flex-1 dark:bg-gray-700"
                                     id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
                                     @include('dashboard.tabs.statistics')
                                 </div>
-                                <div class="{{ session('last_tab') == 'blacklist' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                <div class="{{ session('last_tab') == 'blacklist' ? '' : 'hidden' }} bg-gray-200 flex flex-1 dark:bg-gray-700"
                                     id="blacklist" role="tabpanel" aria-labelledby="blacklist-tab">
                                     @include('dashboard.tabs.blacklist')
                                 </div>
-                                <div class="{{ session('last_tab') == 'feedbacks' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                <div class="{{ session('last_tab') == 'feedbacks' ? '' : 'hidden' }} bg-gray-200 flex flex-1 dark:bg-gray-700"
                                     id="feedbacks" role="tabpanel" aria-labelledby="feedbacks-tab">
                                     @include('dashboard.tabs.feedbacks')
                                 </div>
-                                <div class="{{ session('last_tab') == 'logs' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                <div class="{{ session('last_tab') == 'logs' ? '' : 'hidden' }} bg-gray-200 flex flex-1 dark:bg-gray-700 overflow-x-hidden"
                                     id="logs" role="tabpanel" aria-labelledby="logs-tab">
                                     @include('dashboard.tabs.logs')
                                 </div>
