@@ -23,7 +23,7 @@ return [
     "filter.IPAddress" => "IP位置：",
 
     //Tab_feedback
-    "hint.PasteRawDataHere" => "請貼上要轉換的原始資料",
+    "hint.PasteRawDataHere" => "請貼上要轉換的原始資料，也可以將檔案拖移至此。",
     "header.ActiveModels" => "已啟用模型",
     "header.InactiveModels" => "已停用模型",
     "header.ModelFilter" => "過濾模型：",

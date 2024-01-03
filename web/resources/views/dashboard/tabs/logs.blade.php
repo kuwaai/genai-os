@@ -23,7 +23,7 @@
     $logs = $logs->paginate(10, ['*'], 'page', session('page') ?? 1);
     $systemTime = now()->toIso8601String();
 @endphp
-<div class="bg-gray-600 w-full overflow-hidden flex flex-col p-2">
+<div class="w-full overflow-hidden flex flex-col p-2">
     <form id="filterForm" method="GET" action="{{ route('dashboard.home') }}" class="mb-4 flex space-x-2">
         <input class="text-black" type="text" name="tab" value="logs" hidden>
 
@@ -60,16 +60,15 @@
             class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"><i class="fa fa-filter" style="color: #ffffff;"></i></button>
     </form>
 
-    <div class="flex flex-col overflow-y-auto scrollbar">
+    <div class="flex flex-col overflow-y-auto scrollbar overflow-x-hidden">
         @if ($logs->count())
         @foreach ($logs as $log)
-            <div class="bg-gray-500 p-2 my-1 rounded-md">
-                <p><span class="font-bold">{{ __('dashboard.colName.Action') }}</span> {{ $log->action }}</p>
-                <p class="whitespace-pre"><span class="font-bold">{{ __('dashboard.colName.Description') }}</span> {{ $log->description }}</p>
-                <p><span class="font-bold">{{ __('dashboard.colName.UserID') }}</span> {{ $log->user_id }}</p>
-                <p><span class="font-bold">{{ __('dashboard.colName.IP') }}</span> {{ $log->ip_address }}</p>
-                <p><span class="font-bold">{{ __('dashboard.colName.Timestamp') }}</span> <span
-                        class="log-timestamp">{{ $log->created_at->format('Y/m/d H:i:s') }}</span></p>
+            <div class="bg-gray-300 dark:bg-gray-500 p-2 my-1 rounded-md">
+                <p class="whitespace-pre-line"><span class="font-bold">{{ __('dashboard.colName.Action') }}</span> {{ $log->action }}</p>
+                <p class="whitespace-pre-line"><span class="font-bold">{{ __('dashboard.colName.Description') }}</span> {{ $log->description }}</p>
+                <p class="whitespace-pre-line"><span class="font-bold">{{ __('dashboard.colName.UserID') }}</span> {{ $log->user_id }}</p>
+                <p class="whitespace-pre-line"><span class="font-bold">{{ __('dashboard.colName.IP') }}</span> {{ $log->ip_address }}</p>
+                <p class="whitespace-pre-line"><span class="font-bold">{{ __('dashboard.colName.Timestamp') }}</span> <span class="log-timestamp">{{ $log->created_at->format('Y/m/d H:i:s') }}</span></p>
             </div>
         @endforeach
         @else
@@ -92,7 +91,7 @@
         function updateTimeAgo() {
             $('.log-timestamp').each(function() {
                 var currentTime = new Date(systemTime); // Convert system time to date object
-                var timestamp = $(this).text().split("(")[0];
+                var timestamp = $(this).text().split("(")[0].trim();
                 var date = new Date(timestamp); // Convert log timestamp to date object
                 currentTime.setTime((new Date() - clientTime) + currentTime
                     .getTime())
