@@ -29,29 +29,29 @@
 
         <div class="grid grid-cols-6 gap-4">
             <div class="flex flex-col">
-                <label for="start_date">{{__("Dashboard.filter.StartDate")}}</label>
+                <label for="start_date">{{__("dashboard.filter.StartDate")}}</label>
                 <input class="text-black" type="datetime-local" id="start_date" name="start_date">
             </div>
             <div class="flex flex-col">
-                <label for="end_date">{{__("Dashboard.filter.EndDate")}}</label>
+                <label for="end_date">{{__("dashboard.filter.EndDate")}}</label>
                 <input class="text-black" type="datetime-local" id="end_date" name="end_date">
             </div>
     
             <div class="flex flex-col">
-                <label for="action">{{__("Dashboard.filter.Action")}}</label>
+                <label for="action">{{__("dashboard.filter.Action")}}</label>
                 <input class="text-black" type="text" id="action" name="action">
             </div>
             <div class="flex flex-col">
-                <label for="description">{{__("Dashboard.filter.Description")}}</label>
+                <label for="description">{{__("dashboard.filter.Description")}}</label>
                 <input class="text-black" type="text" id="description" name="description">
             </div>
             <div class="flex flex-col">
-                <label for="user_id">{{__("Dashboard.filter.UserID")}}</label>
+                <label for="user_id">{{__("dashboard.filter.UserID")}}</label>
                 <input class="text-black" type="text" id="user_id" name="user_id">
             </div>
     
             <div class="flex flex-col">
-                <label for="ip_address">{{__("Dashboard.filter.IPAddress")}}</label>
+                <label for="ip_address">{{__("dashboard.filter.IPAddress")}}</label>
                 <input class="text-black" type="text" id="ip_address" name="ip_address">
             </div>
         </div>
@@ -73,7 +73,7 @@
             </div>
         @endforeach
         @else
-        <p class="text-center">{{__("Dashboard.msg.NoRecord")}}</p>
+        <p class="text-center">{{__("dashboard.msg.NoRecord")}}</p>
         @endif
     </div>
 
