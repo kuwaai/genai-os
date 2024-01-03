@@ -8,6 +8,7 @@ use App\Http\Controllers\DuelController;
 use App\Http\Controllers\PlayController;
 use App\Http\Controllers\ManageController;
 use App\Http\Controllers\BotController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LanguageMiddleware;
 use BeyondCode\LaravelSSE\Facades\SSE;
@@ -56,9 +57,8 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     # Admin routes, require admin permission
     Route::middleware('auth', 'verified', AdminMiddleware::class . ':tab_Dashboard')->group(function () {
         Route::group(['prefix' => 'dashboard'], function () {
-            Route::get('/', function () {
-                return view('dashboard');
-            })->name('dashboard.home');
+            Route::get('/', [DashboardController::class, 'home'])->name('dashboard.home');
+            Route::post('/feedback', [DashboardController::class, 'feedback'])->name('dashboard.feedback');
         });
     });
 
