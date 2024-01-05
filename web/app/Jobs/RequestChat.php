@@ -214,6 +214,7 @@ class RequestChat implements ShouldQueue
             }
         } catch (\Throwable $e) {
             Log::channel('analyze')->Info("Failed job: " . $this->channel);
+            Log::channel('analyze')->Info($e->getMessage());
             $history = Histories::find($this->history_id);
             if ($history != null) {
                 $history->fill(['msg' => '[Sorry, something is broken, please try again later!]']);
