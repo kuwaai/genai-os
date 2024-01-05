@@ -1,5 +1,7 @@
-from .guard_interface import GuardInterface
 import sys, os, importlib
+
+from .guard_interface import GuardInterface
+from typing import Any
 
 sys.path.append(os.getcwd())
 
@@ -39,7 +41,7 @@ class MixedGuard(GuardInterface):
     result = dict(sorted(result.items()))
     return result
   
-  def check(self, records: [dict[str, str]]) -> dict[int, bool]:
+  def check(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
     result = {}
     for guard in self.guards.values():
       result.update(guard.check(records))

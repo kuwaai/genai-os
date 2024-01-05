@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 class GuardInterface(ABC):
 
@@ -25,8 +26,13 @@ class GuardInterface(ABC):
     pass
 
   @abstractmethod
-  def check(self, records: [dict[str, str]]) -> dict[int, bool]:
+  def check(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
     """
-    Return {rule_id: violate}
+    Return {
+      rule_id: {
+        'violate': bool,
+        'detail': str [optional]
+      }
+    }
     """
     pass

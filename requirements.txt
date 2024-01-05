@@ -1,1 +1,6 @@
 ckip_transformers==0.3.4
+accelerate
+torch
+transformers
+protobuf
+pyahocorasick

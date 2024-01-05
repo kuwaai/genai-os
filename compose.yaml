@@ -5,7 +5,10 @@ services:
   api:
     runtime: nvidia
     image: safety-guard
-    build: .
+    build:
+      context: .
+      args:
+        - HF_TOKEN=${HF_TOKEN}
     container_name: safety-guard-api-${PORT}
     restart: unless-stopped
     deploy:
@@ -18,6 +21,8 @@ services:
     env_file: .env
     environment:
       - PORT=${PORT}
+    volumes:
+      - /var/models/hub:/root/.cache/huggingface/hub:rw # Huggingface download location
     ports:
       - ${PORT}:${PORT}
     healthcheck:

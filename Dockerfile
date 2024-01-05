@@ -1,7 +1,13 @@
-FROM worker-framework
+ARG WORKER_FRAMEWORK_VERSION=latest
+FROM worker-framework:${WORKER_FRAMEWORK_VERSION}
 
+# Install python packages
+COPY requirements.txt /model_api/
+RUN pip install -r /model_api/requirements.txt
+
+# Install the source code of application in the last stage.
+# By doing so, we can utilize the building cache of Docker to speedup the building process.
 RUN mkdir -p /model_api
-
 COPY . /model_api/
 WORKDIR /model_api/
 

@@ -21,11 +21,20 @@ class SafetyGuard(CompletionInterface):
     } for i in records]
 
     result = self.guard.check(records).items()
+    result = [(k, v) for k, v in result if v['violate']]
 
     msg = f"{records[-1]['msg']}\n\n{self.safe_msg}"
-    if any([v for k, v in result]):
+    if len(result) != 0:
       msg = f"{records[-1]['msg']}\n\n{self.unsafe_msg}"
-      violated_rules = [self.principles[k]['description'] for k, v in result if v]
+      violated_rules = [self.format_violated_rules(k, v) for k, v in result]
       msg += ''.join([f"\n  - {v}" for v in violated_rules])
     
     yield ChatRecord(msg, Role.BOT)
+
+  def format_violated_rules(self, index, check_result):
+    if not check_result['violate']:
+      return None
+    result = self.principles[index]['description']
+    if 'detail' in check_result:
+      result += ': '+check_result['detail']
+    return result
