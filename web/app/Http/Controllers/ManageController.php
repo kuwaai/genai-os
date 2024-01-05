@@ -107,7 +107,7 @@ class ManageController extends Controller
             $log = new Logs();
             $log->fill([
                 'action' => 'delete_group',
-                'description' => "Deleted group " . $group->id,
+                'description' => 'Deleted group ' . $group->id,
                 'user_id' => $request->user()->id,
                 'ip_address' => $request->ip(),
             ]);
@@ -136,14 +136,6 @@ class ManageController extends Controller
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }
         $user->save();
-        $log = new Logs();
-        $log->fill([
-            'action' => 'update_user',
-            'description' => "Updated user " . $user->id,
-            'user_id' => $request->user()->id,
-            'ip_address' => $request->ip(),
-        ]);
-        $log->save();
         return Redirect::route('manage.home')
             ->with('last_tab', 'users')
             ->with('last_tool', 'group_selector')

@@ -11,7 +11,7 @@ return [
     //Tab_logs
     "colName.Action" => "操作：",
     "colName.Description" => "敘述：",
-    "colName.UserID" => "使用者ID：",
+    "colName.UserID" => "操作者ID：",
     "colName.IP" => "IP位置：",
     "colName.Timestamp" => "時間戳：",
     "msg.NoRecord" => "無紀錄",
@@ -19,7 +19,7 @@ return [
     "filter.EndDate" => "結束：",
     "filter.Action" => "操作：",
     "filter.Description" => "敘述：",
-    "filter.UserID" => "使用者ID：",
+    "filter.UserID" => "操作者ID：",
     "filter.IPAddress" => "IP位置：",
 
     //Tab_feedback

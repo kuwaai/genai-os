@@ -51,7 +51,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
     # This will auth the server secret that is used by localhost
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
-    # Debugging, test hashing API
+    # This allow other registering from other platform
     Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
 
     # Admin routes, require admin permission

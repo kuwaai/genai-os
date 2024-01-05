@@ -177,12 +177,6 @@ class ProfileController extends Controller
         return response()->json(['error' => 'No permission to access this route.'], 400, [], JSON_UNESCAPED_UNICODE);
     }
 
-    
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function ensureIsNotRateLimited($ip)
     {
         $ip = Str::transliterate($ip);
