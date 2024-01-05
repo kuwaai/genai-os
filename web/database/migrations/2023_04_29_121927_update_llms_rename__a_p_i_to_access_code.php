@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('llms', function (Blueprint $table) {
-            $table->renameColumn('"API"', 'access_code');
+            $table->renameColumn('api', 'access_code');
         });
     }
 

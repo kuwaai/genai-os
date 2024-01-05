@@ -127,9 +127,9 @@
                                     strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc-qa') === 0))
                             <x-chat.prompt-area.upload :llmId="request()->route('llm_id')" />
                         @elseif (request()->route('llm_id'))
-                            <x-chat.prompt-area.request :llmId="request()->route('llm_id')" />
+                            <x-chat.prompt-area.create :llmId="request()->route('llm_id')" />
                         @elseif(request()->route('chat_id'))
-                            <x-chat.prompt-area.create :chained="\Session::get('chained')" />
+                            <x-chat.prompt-area.request :chained="\Session::get('chained')" />
                         @endif
                     </div>
                 @endif

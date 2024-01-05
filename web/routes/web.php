@@ -103,6 +103,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
                 Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
                 Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
+                Route::get('/abort/{chat_id}', [ChatController::class, 'abort'])->name('chat.abort');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_update_upload_file')
                     ->post('/upload', [ChatController::class, 'upload'])

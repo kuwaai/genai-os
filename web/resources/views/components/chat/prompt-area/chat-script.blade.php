@@ -2,6 +2,8 @@
     if ($("#chat_input")) {
         $("#chat_input").prop("readonly", true)
         $("#chat_input").val("訊息處理中...請稍後...")
+        $("#submit_msg").hide()
+        if ($("#abort_btn")) $("#abort_btn").hide()
         $chattable = false
     }
     if ($("#prompt_area")) {
@@ -54,6 +56,7 @@
         if (event.data == "finished" && $("#submit_msg")) {
             $chattable = true
             $("#submit_msg").show()
+            if ($("#abort_btn")) $("#abort_btn").hide();
             $("#chat_input").val("")
             $("#chat_input").prop("readonly", false)
             adjustTextareaRows($("#chat_input"))
@@ -65,6 +68,7 @@
             histories[number] = $("#history_" + number + " div.text-sm.space-y-3.break-words")
                 .text()
             chatroomFormatter($("#history_" + data["history_id"])[0]);
+            if ($("#abort_btn")) $("#abort_btn").show();
         }
     });
     if ($("#chat_input")) {

@@ -21,7 +21,7 @@ class RequestChat implements ShouldQueue
     private $input, $access_code, $msgtime, $history_id, $user_id, $chatgpt_apitoken, $channel;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
-    public $agent_version = 'v1.0';
+    public static $agent_version = 'v1.0';
     public $filters = ["[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]", '[Oops, the LLM returned empty message, please try again later or report to admins!]', '[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]', '[Sorry, something is broken, please try again later!]'];
 
     /**
@@ -70,6 +70,7 @@ class RequestChat implements ShouldQueue
                 'form_params' => [
                     'name' => $this->access_code,
                     'history_id' => $this->history_id,
+                    'user_id' => $this->user_id,
                 ],
                 'stream' => true,
             ]);
@@ -136,6 +137,7 @@ class RequestChat implements ShouldQueue
                         'form_params' => [
                             'input' => $this->input,
                             'name' => $this->access_code,
+                            'user_id' => $this->user_id,
                             'history_id' => $this->history_id,
                             'chatgpt_apitoken' => $this->chatgpt_apitoken,
                         ],

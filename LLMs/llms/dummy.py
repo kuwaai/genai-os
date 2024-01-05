@@ -18,11 +18,6 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = 1024*3
-model_loc = "llama2-7b-chat-b1.0.0"
-api_key = "uwU123DisApikEyiSASeCRetheHehee"
-usr_token = "92d1e9d60879348b8ed2f25f624012dcc596808dc40681d74c4965b8fff8a22a"
-tc_model = 26
 # -- Config ends --
 
 def llm_compute(data): 

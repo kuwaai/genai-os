@@ -26,6 +26,24 @@ use Session;
 
 class ChatController extends Controller
 {
+    public function abort(Request $request)
+    {
+        $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))
+            ->where('chat_id', '=', $request->route('chat_id'))
+            ->pluck('id')
+            ->toArray();
+        $client = new Client(['timeout' => 300]);
+        $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
+        $response = $client->post($agent_location . RequestChat::$agent_version . '/chat/abort', [
+            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'form_params' => [
+                'history_id' => json_encode($list),
+                'user_id' => Auth::user()->id,
+            ],
+        ]);
+        return response('Success', 200);
+    }
+
     public function translate(Request $request)
     {
         $record = Histories::find($request->route('history_id'));
@@ -48,18 +66,29 @@ class ChatController extends Controller
         }
 
         $tmp = json_encode([['isbot' => false, 'msg' => $msg]]);
-        if ($access_code == "safety-guard"){
-            if ($record->chained){
+        if ($access_code == 'safety-guard') {
+            if ($record->chained) {
                 $tmp = Histories::where('chat_id', '=', $record->chat_id)
-                ->where('id', '<=', $record->id)
-                ->where('created_at', '<=', $record->created_at)
-                ->select('msg', 'isbot')
-                ->orderby('created_at')
-                ->orderby('id', 'desc')
-                ->get()
-                ->toJson();
-            }else{
-                $tmp = json_encode([["isbot"=>false, "msg"=>Histories::where("chat_id","=",$record->chat_id)->where("isbot","=",false)->orderby("created_at")->orderby("id","desc")->get()->last()->msg],['isbot' => true, 'msg' => $msg]]);
+                    ->where('id', '<=', $record->id)
+                    ->where('created_at', '<=', $record->created_at)
+                    ->select('msg', 'isbot')
+                    ->orderby('created_at')
+                    ->orderby('id', 'desc')
+                    ->get()
+                    ->toJson();
+            } else {
+                $tmp = json_encode([
+                    [
+                        'isbot' => false,
+                        'msg' => Histories::where('chat_id', '=', $record->chat_id)
+                            ->where('isbot', '=', false)
+                            ->orderby('created_at')
+                            ->orderby('id', 'desc')
+                            ->get()
+                            ->last()->msg,
+                    ],
+                    ['isbot' => true, 'msg' => $msg],
+                ]);
             }
         }
         $history = new APIHistories();
