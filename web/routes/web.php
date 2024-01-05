@@ -152,6 +152,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->post('/create', [DuelController::class, 'create'])
                     ->name('duel.create');
                 Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
+                Route::get('/abort/{duel_id}', [DuelController::class, 'abort'])->name('duel.abort');
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
                 Route::middleware(AdminMiddleware::class . ':Duel_delete_chatroom')
                     ->delete('/delete', [DuelController::class, 'delete'])

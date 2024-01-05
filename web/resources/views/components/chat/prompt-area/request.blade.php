@@ -1,11 +1,11 @@
 @props([
     'chained' => false,
     'chatId' => request()->route('chat_id'),
-    'disabled' => false
+    'disabled' => false,
 ])
 
 <form method="post" action="{{ route('chat.request') }}" id="prompt_area">
-    <div class="flex items-end justify-end {{ $disabled ? 'hidden' : ''}}">
+    <div class="flex items-end justify-end {{ $disabled ? 'hidden' : '' }}">
         @csrf
         <input name="chat_id" value="{{ $chatId }}" style="display:none;">
         <input id="chained" style="display:none;" {{ $chained ? '' : 'disabled' }}>
@@ -53,7 +53,7 @@
         return urlPattern.test(url);
     }
     @if (request()->route('llm_id'))
-        @if (in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
+        @if (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'web_qa') === 0)
             if ($("#prompt_area")) {
                 $("#prompt_area").on("submit", function(event) {
                     event.preventDefault();

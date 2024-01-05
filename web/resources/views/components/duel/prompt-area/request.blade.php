@@ -13,7 +13,6 @@
         <button type="button" onclick="chain_toggle()" id="chain_btn"
             class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
         <div class="flex flex-1 items-end justify-end flex-col">
-
             <div class="flex mr-auto dark:text-white mb-2 select-none">
                 <div>
                     <div class="flex justify-center items-center">{{ __('Send to:') }}
@@ -44,10 +43,28 @@
                         fill="currentColor"></path>
                 </svg>
             </button>
-
+            <button id='abort_btn' style='display:none;' onclick="return abortGenerate()"
+                class="text-white inline-flex items-center justify-center fixed w-[32px] bg-orange-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-orange-500 dark:hover:bg-orange-700">
+                <i class="far fa-stop-circle"></i></button>
         </div>
-
     </div>
     <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
 </form>
 <x-duel.prompt-area.chat-script :llms="$llms"/>
+<script>
+    function chain_toggle() {
+        $.get("{{ route('chat.chain') }}", {
+            switch: $('#chained').prop('disabled')
+        }, function() {
+            $('#chained').prop('disabled', !$('#chained').prop('disabled'));
+            $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
+            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
+                '{{ __('Chained') }}')
+        })
+    }
+
+    function abortGenerate() {
+        $.get("{{ route('duel.abort', request()->route('duel_id')) }}");
+        return false;
+    }
+</script>

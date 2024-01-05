@@ -13,11 +13,32 @@ use App\Models\DuelChat;
 use App\Models\Histories;
 use App\Models\Chats;
 use App\Models\LLMs;
+use GuzzleHttp\Client;
 use DB;
 use Session;
 
 class DuelController extends Controller
 {
+    public function abort(Request $request)
+    {
+        $chatIDs = Chats::where('dcID', '=', $request->route('duel_id'))
+            ->pluck('id')
+            ->toArray();
+        $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))
+            ->whereIn('chat_id', $chatIDs)
+            ->pluck('id')
+            ->toArray();
+        $client = new Client(['timeout' => 300]);
+        $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
+        $response = $client->post($agent_location . RequestChat::$agent_version . '/chat/abort', [
+            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'form_params' => [
+                'history_id' => json_encode($list),
+                'user_id' => Auth::user()->id,
+            ],
+        ]);
+        return response('Success', 200);
+    }
     public function main(Request $request)
     {
         $duel_id = $request->route('duel_id');
@@ -68,10 +89,10 @@ class DuelController extends Controller
                     // Splitting each row into columns using tabs as delimiter
                     if ($index === 0) {
                         $headers = explode("\t", $row);
-                        if(in_array("content", $headers)){
+                        if (in_array('content', $headers)) {
                             continue;
-                        }else{
-                            $headers = ["content"];
+                        } else {
+                            $headers = ['content'];
                         }
                     }
                     if ($headers === null) {
@@ -309,7 +330,12 @@ class DuelController extends Controller
     public function new(Request $request): RedirectResponse
     {
         $llms = $request->input('llm');
-        if (request()->user()->hasPerm('Duel_update_new_chat') && count($llms) > 1) {
+        if (
+            request()
+                ->user()
+                ->hasPerm('Duel_update_new_chat') &&
+            count($llms) > 1
+        ) {
             $result = DB::table(function ($query) {
                 $query
                     ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')

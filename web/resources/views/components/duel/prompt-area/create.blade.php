@@ -42,4 +42,4 @@
     </div>
     <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
 </form>
-<x-duel.prompt-area.chat-script :llms="$llms"/>
+<x-duel.prompt-area.chat-script :llms="$llms" />
