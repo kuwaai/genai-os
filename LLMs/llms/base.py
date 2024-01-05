@@ -22,6 +22,12 @@ def api():
 @app.route('/health')
 def health_check():
     return Response(status=204)
+    
+@app.route("/abort", methods=["GET"])
+def abort():
+    if app.abort:
+        return Response(app.abort(), mimetype='text/plain')
+    return "No abort method configured"
 
 def shut():
     if app.registered:

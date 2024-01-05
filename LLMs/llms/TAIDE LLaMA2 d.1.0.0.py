@@ -25,15 +25,27 @@ usr_token = None
 tc_model = None
 # -- Config ends --
 
-from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer
+from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList
 from intel_extension_for_transformers.transformers import AutoModelForCausalLM
 from threading import Thread
+    
+class CustomStoppingCriteria(StoppingCriteria):
+    def __init__(self):
+        pass
+    
+    def __call__(self, input_ids, score, **kwargs) -> bool:
+        global proc
+        return not proc
     
 model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained(model_loc)
 prompts = "<|user|>\n{0}\n<|assistant|>\n{1}"
 
+global proc
+proc = None
 def llm_compute(data): 
+    global proc
+    torch.cuda.empty_cache()
     try:
         s = time.time()
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
@@ -56,11 +68,14 @@ def llm_compute(data):
                     temperature = 0.2,
                     repetition_penalty = 1.0,
                     do_sample=True
-                )))
+                ),stopping_criteria=StoppingCriteriaList([CustomStoppingCriteria()])),daemon=True)
             thread.start()
+            proc = thread
             for i in streamer:
                 print(end=i.replace("</s>",""),flush=True)
                 yield i.replace("</s>","")
+                if not proc: break
+            thread.join()
 
             torch.cuda.empty_cache()
         else:
@@ -68,9 +83,23 @@ def llm_compute(data):
     except Exception as e:
         print(e)
     finally:
+        proc = None
         torch.cuda.empty_cache()
         app.Ready[0] = True
         print("finished")
+        
+def abort():
+    global proc
+    if proc:
+        tmp = proc
+        proc = None
+        print("aborting...")
+        tmp.join()
+        print("aborted")
+        torch.cuda.empty_cache()
+        return "Aborted"
+    return "No process to abort"
 # model part ends
 app.llm_compute = llm_compute
+app.abort = abort
 start()

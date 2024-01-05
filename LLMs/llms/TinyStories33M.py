@@ -25,12 +25,26 @@ usr_token = None
 tc_model = None
 # -- Config ends --
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+from transformers import AutoTokenizer, GenerationConfig, StoppingCriteria, StoppingCriteriaList, TextIteratorStreamer
+from intel_extension_for_transformers.transformers import AutoModelForCausalLM
+from threading import Thread
+
+class CustomStoppingCriteria(StoppingCriteria):
+    def __init__(self):
+        pass
+    
+    def __call__(self, input_ids, score, **kwargs) -> bool:
+        global proc
+        return not proc
     
 model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="cpu")
 tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
+global proc
+proc = None
     
-def llm_compute(data): 
+def llm_compute(data):
+    global proc
+    torch.cuda.empty_cache()
     try:
         s = time.time()
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
@@ -38,31 +52,43 @@ def llm_compute(data):
             history = history[-1]
             encoding = tokenizer(history, return_tensors='pt', add_special_tokens=False).to(model.device)
             
+            streamer = TextIteratorStreamer(tokenizer,skip_prompt=True,timeout=2)
             l = encoding['input_ids'].size(1)
-            x = model.generate(
-                **encoding,
+            thread = Thread(target=model.generate, kwargs=dict(input_ids=encoding['input_ids'], streamer=streamer,
                 generation_config=GenerationConfig(
                     max_length=1000,
                     pad_token_id=tokenizer.eos_token_id,repetition_penalty=1.1
-                )
-            )
-            result = tokenizer.batch_decode(x[:, l:])[0].strip().replace("<|endoftext|>","")
-            print(result.encode("utf-8","ignore").decode("utf-8"))
-            print(app.LLM_name, time.time() - s, len(result.strip()), len(result.strip())/(time.time() - s))
-            for i in result:
-                yield i
-                time.sleep(0.01)
-
+                ),stopping_criteria=StoppingCriteriaList([CustomStoppingCriteria()])),daemon=True)
+            thread.start()
+            proc = thread
+            for i in streamer:
+                print(end=i.replace("<|endoftext|>",""),flush=True)
+                yield i.replace("<|endoftext|>","")
+                if not proc: break
+            thread.join()
             torch.cuda.empty_cache()
         else:
-            yield "Sorry, The input message is too huge!"
+            yield "[Sorry, The input message is too long!]"
 
     except Exception as e:
         print(e)
     finally:
+        proc = None
         torch.cuda.empty_cache()
         app.Ready[0] = True
         print("finished")
+def abort():
+    global proc
+    if proc:
+        tmp = proc
+        proc = None
+        print("aborting...")
+        tmp.join()
+        print("aborted")
+        torch.cuda.empty_cache()
+        return "Aborted"
+    return "No process to abort"
 # model part ends
 app.llm_compute = llm_compute
+app.abort = abort
 start()
