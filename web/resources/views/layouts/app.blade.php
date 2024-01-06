@@ -117,7 +117,7 @@
             $(node).find('ol').addClass('list-inside list-decimal');
             $(node).find('> p').addClass('whitespace-pre-wrap');
             $(node).find('a').addClass(
-                'text-blue-700 hover:text-blue-900').prop('target',
+                'text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500').prop('target',
                 '_blank');
             $(node).find('pre code').each(function() {
                 hljs.highlightElement($(this)[0]);
