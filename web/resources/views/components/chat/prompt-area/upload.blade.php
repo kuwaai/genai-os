@@ -7,6 +7,8 @@
         <input id="upload" type="file" name="file" style="display: none;" onchange="uploadcheck()">
         <label for="upload" id="upload_btn"
             class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Upload File') }}</label>
+        <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">
+            {{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? '' }}</p>
     </form>
 @else
     <p class="text-black dark:text-white mx-auto">

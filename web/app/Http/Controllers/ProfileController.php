@@ -57,8 +57,8 @@ class ProfileController extends Controller
     {
         $lockoutCount = RateLimiter::attempts($request->ip());
         $seconds = $this->ensureIsNotRateLimited($request->ip());
-        if ($seconds){
-            return response()->json(['error' => 'Too many attempts, Action freezed until ' . floor($seconds / 60) . ":" . $seconds % 60], 400, [], JSON_UNESCAPED_UNICODE);
+        if ($seconds) {
+            return response()->json(['error' => 'Too many attempts, Action freezed until ' . floor($seconds / 60) . ':' . $seconds % 60], 400, [], JSON_UNESCAPED_UNICODE);
         }
         $encryptedData = $request->input('data');
         $path = 'keys/' . $encryptedData[0];
@@ -173,7 +173,7 @@ class ProfileController extends Controller
                 }
             }
         }
-        RateLimiter::hit(Str::transliterate($request->ip()), 60*60);
+        RateLimiter::hit(Str::transliterate($request->ip()), 60 * 60);
         return response()->json(['error' => 'No permission to access this route.'], 400, [], JSON_UNESCAPED_UNICODE);
     }
 
@@ -349,6 +349,52 @@ class ProfileController extends Controller
                     ];
                     return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
                 }
+
+                return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+        }
+
+        return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    public function api_abort(Request $request)
+    {
+        $jsonData = $request->json()->all();
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
+        if ($result->exists()) {
+            $user = $result->first();
+            if (User::find($user->id)->hasPerm('Chat_read_access_to_api')) {
+                $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('api_' . $user->tokenable_id, 0, -1))
+                    ->pluck('id')
+                    ->toArray();
+                $client = new Client(['timeout' => 300]);
+                $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
+                $msg = $client->post($agent_location . RequestChat::$agent_version . '/chat/abort', [
+                    'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                    'form_params' => [
+                        'history_id' => json_encode($list),
+                        'user_id' => $user->tokenable_id,
+                    ],
+                ]);
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Aborted',
+                    'tokenable_id' => $user->tokenable_id,
+                    'name' => $user->name,
+                ];
 
                 return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
             } else {

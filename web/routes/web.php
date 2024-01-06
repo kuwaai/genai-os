@@ -41,14 +41,10 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return back();
     })->name('lang');
 
-    Route::get('/announcement', function () {
-        session()->put('announcement', hash('sha256', \App\Models\SystemSetting::where('key', 'announcement')->first()->value));
-
-        return back();
-    })->name('announcement');
 
     # This will auth the user token that is used to connect.
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
+    Route::post('/v1.0/chat/abort', [ProfileController::class, 'api_abort']);
     # This will auth the server secret that is used by localhost
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
     # This allow other registering from other platform
@@ -72,6 +68,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             return back();
         })->name('tos');
 
+        Route::get('/announcement', function () {
+            $user = User::find(Auth::user()->id);
+            $user->announced = true;
+            $user->save();
+            return back();
+        })->name('announcement');
         #---Profiles
         Route::middleware(AdminMiddleware::class . ':tab_Profile')
             ->prefix('profile')

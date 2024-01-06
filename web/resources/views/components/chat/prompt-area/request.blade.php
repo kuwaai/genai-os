@@ -29,6 +29,8 @@
             class="text-white inline-flex items-center justify-center fixed w-[32px] bg-orange-600 h-[32px] my-[4px] mr-[12px] rounded hover:bg-orange-500 dark:hover:bg-orange-700">
             <i class="far fa-stop-circle"></i></button>
     </div>
+    <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">{{\App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? ''}}</p>
+
 </form>
 
 <script>

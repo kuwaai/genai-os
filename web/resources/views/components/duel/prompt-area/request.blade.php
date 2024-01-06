@@ -49,6 +49,7 @@
         </div>
     </div>
     <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
+    <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">{{\App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? ''}}</p>
 </form>
 <x-duel.prompt-area.chat-script :llms="$llms"/>
 <script>

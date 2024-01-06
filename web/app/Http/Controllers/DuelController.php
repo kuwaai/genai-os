@@ -37,7 +37,7 @@ class DuelController extends Controller
                 'user_id' => Auth::user()->id,
             ],
         ]);
-        return response('Success', 200);
+        return response('Aborted', 200);
     }
     public function main(Request $request)
     {
