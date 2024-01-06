@@ -68,7 +68,7 @@
                 <div class="flex items-center">
                     <x-text-input id="warning_footer" name="warning_footer" type="text"
                         class="mr-2 mb-1 block w-full"
-                        value="{{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value }}" autocomplete="no" />
+                        value="{{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value }}" autocomplete="off" />
                 </div>
             </div>
 
