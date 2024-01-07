@@ -29,7 +29,7 @@ def register():
     # Parameters: name, endpoint
     llm_name, endpoint, guard, async_flag = request.form.get("name"), request.form.get("endpoint"), request.form.get("guard"), request.form.get("async")
     if endpoint == None or llm_name == None or endpoint_formatter(endpoint) in [j[0] for j in data.get(llm_name, [])]: return "Failed"
-    data.setdefault(llm_name, []).append([endpoint_formatter(endpoint), "READY", -1, -1,(guard if guard else True),(async_flag if async_flag else False)])
+    data.setdefault(llm_name, []).append([endpoint_formatter(endpoint), "READY", -1, -1,(guard if guard else False),(async_flag if async_flag else False)])
     save_variable_to_file(record_file, data)
     log(0,f"A new {llm_name} is registered at {endpoint}")
     return "Success"
