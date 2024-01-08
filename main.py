@@ -38,6 +38,6 @@ if __name__ == '__main__':
     app.register_blueprint(chat, url_prefix=f'/{version}/chat')
     log(0,"Route list:\n","\n".join([str(i) for i in app.url_map.iter_rules()]), "\n")
     log(0,"Server started")
-    app.run(port=9000, host="0.0.0.0", threaded=True)
+    app.run(port=port, host=ip, threaded=True)
     #Stopped, saving to file
     save_variable_to_file(record_file, data)

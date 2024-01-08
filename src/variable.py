@@ -5,7 +5,6 @@ version = "v1.0"
 data = {}
 log_folder = "logs"
 record_file = "records.pickle"
-safety_guard = "safety-guard"
 
 port = 9000
 ip = "0.0.0.0"

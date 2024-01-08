@@ -11,11 +11,10 @@ def status():
     if llm_name and history_id:
         if data.get(llm_name):
             for i in data[llm_name]:
-                if i[5] or (i[1] == "READY" and i[2] == -1 and i[3] == -1):
-                    if not i[5]:
-                        i[2] = history_id
-                        i[3] = user_id
-                    log(0, f"Scheduled {llm_name}" + (", async" if i[5] else "") + f",{i[0]} for {history_id},{user_id}")
+                if i[1] == "READY" and i[2] == -1 and i[3] == -1:
+                    i[2] = history_id
+                    i[3] = user_id
+                    log(0, f"Scheduled {llm_name},{i[0]} for {history_id},{user_id}")
                     return "READY"
         else:
             log(0, f"No machine for {llm_name} has founded, returning NOMACHINE code")
@@ -27,9 +26,9 @@ def status():
 def register():
     # For Online LLM register themself
     # Parameters: name, endpoint
-    llm_name, endpoint, guard, async_flag = request.form.get("name"), request.form.get("endpoint"), request.form.get("guard"), request.form.get("async")
+    llm_name, endpoint = request.form.get("name"), request.form.get("endpoint")
     if endpoint == None or llm_name == None or endpoint_formatter(endpoint) in [j[0] for j in data.get(llm_name, [])]: return "Failed"
-    data.setdefault(llm_name, []).append([endpoint_formatter(endpoint), "READY", -1, -1,(guard if guard else False),(async_flag if async_flag else False)])
+    data.setdefault(llm_name, []).append([endpoint_formatter(endpoint), "READY", -1, -1])
     save_variable_to_file(record_file, data)
     log(0,f"A new {llm_name} is registered at {endpoint}")
     return "Success"

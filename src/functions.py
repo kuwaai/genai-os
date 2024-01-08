@@ -53,7 +53,7 @@ def loadRecords(var, keep_state = False):
                 try:
                     resp = requests.get(get_base_url(k[0]) + "/health")
                     if resp.status_code == 204:
-                        data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1, (k[4] if len(k) > 4 else False), (k[5] if len(k) > 5 else False)])
+                        data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1])
                     else:
                         log(0,f"Healthy check failed in {i} at {k[0]}, removed")
                 except requests.exceptions.ConnectionError as e:
