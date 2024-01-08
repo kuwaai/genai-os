@@ -3,7 +3,7 @@ from base import *
 
 # -- Configs --
 app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://192.168.211.4:9000/"
 app.LLM_name = "e.1.1.0"
 app.version_code = "v1.0"
@@ -63,6 +63,7 @@ def llm_compute(data):
                 generation_config=GenerationConfig(
                     max_new_tokens=4096,
                     temperature = 0.2,
+                    do_sample=True,
                     repetition_penalty = 1.0
                 ),stopping_criteria=StoppingCriteriaList([CustomStoppingCriteria()])),daemon=True)
             thread.start()
