@@ -51,7 +51,7 @@ def loadRecords(var, keep_state = False):
         for k in o:
             if not(endpoint_formatter(k[0]) in [j[0] for j in data.get(i, [])]):
                 try:
-                    resp = requests.get(get_base_url(k[0]) + "/health")
+                    resp = requests.get(get_base_url(k[0]) + "/health", timeout=5)
                     if resp.status_code == 204:
                         data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1])
                     else:
