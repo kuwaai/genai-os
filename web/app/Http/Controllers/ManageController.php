@@ -15,6 +15,7 @@ use App\Models\Logs;
 use App\Models\Permissions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ManageController extends Controller
 {
@@ -41,7 +42,7 @@ class ManageController extends Controller
             $log = new Logs();
             $log->fill([
                 'action' => 'create_group',
-                'description' => "Created group {$group->id} with name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions')),
+                'description' => "Created group {$group->id} with name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions') ?? []),
                 'user_id' => $request->user()->id,
                 'ip_address' => $request->ip(),
             ]);
@@ -82,7 +83,7 @@ class ManageController extends Controller
             $log = new Logs();
             $log->fill([
                 'action' => 'update_group',
-                'description' => "Updated group {$group->id} by name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions')),
+                'description' => "Updated group {$group->id} by name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions') ?? []),
                 'user_id' => $request->user()->id,
                 'ip_address' => $request->ip(),
             ]);
@@ -103,6 +104,7 @@ class ManageController extends Controller
         $id = $request->input('id');
         if ($id) {
             $group = Groups::find($id);
+            User::where("group_id","=",$id)->update(["group_id"=>null]);
             $group->delete();
             $log = new Logs();
             $log->fill([
@@ -153,6 +155,16 @@ class ManageController extends Controller
 
     public function user_create(Request $request): RedirectResponse
     {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'password' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
+            'group' => 'nullable|string',
+        ]);
+        if ($validator->fails()) {
+            return Redirect::route('manage.home')
+                ->with('last_tab', 'users');
+        }
         $user = new User();
         if ($request->input('group')) {
             $group_id = Groups::where('name', '=', $request->input('group'))->first()->id;
