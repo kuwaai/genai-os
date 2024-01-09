@@ -353,7 +353,7 @@ class ProfileController extends Controller
                                     if ($char === "\n") {
                                         $line = trim($line);
                                         if (substr($line, 0, 5) === 'data:') {
-                                            $jsonData = json_decode(trim(substr($line, 5)), true);
+                                            $jsonData = json_decode(trim(substr($line, 5)));
                                             if ($jsonData !== null) {
                                                 $resp['choices'][0]['delta']['content'] = $jsonData->msg;
                                                 echo 'data: ' . json_encode($resp) . "\n";
