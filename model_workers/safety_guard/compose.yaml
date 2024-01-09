@@ -23,6 +23,7 @@ services:
       - PORT=${PORT}
     volumes:
       - /var/models/hub:/root/.cache/huggingface/hub:rw # Huggingface download location
+      - /var/models/torch:/root/.cache/torch:rw # PyTorch download location
     ports:
       - ${PORT}:${PORT}
     healthcheck:
