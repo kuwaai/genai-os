@@ -330,8 +330,7 @@ class ProfileController extends Controller
                             ]);
 
                             $req = $req->getBody()->getContents();
-                            $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
-                            Log::channel('analyze')->Info($response['output']);
+                            $response['output'] = json_decode(explode('[ENDEDPLACEHOLDERUWU]', $req)[0])["message"];
 
                             $history->fill(['output' => $response['output']]);
                             $history->save();
@@ -434,7 +433,7 @@ class ProfileController extends Controller
                             global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo $result . '[ENDEDPLACEHOLDERUWU]';
+                                echo json_encode(["message"=>$result]) . '[ENDEDPLACEHOLDERUWU]';
                                 ob_flush();
                                 flush();
                                 $client->disconnect();
