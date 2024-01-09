@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+service Detection {
+  // Perform the safety check on a single message.
+  rpc MessageFilter (MessageFilterRequest) returns (CheckingResponse) {}
+  
+  // Perform the safety check on a prompt-response pair.
+  rpc QaFilter (QaFilterRequest) returns (CheckingResponse) {}
+}
+
+message MessageFilterRequest {
+  string message = 1;
+}
+
+message QaFilterRequest {
+  string prompt = 1;
+  string response = 2;
+}
+
+message CheckingResponse {
+  bool safe = 1;
+
+  // Optional detail message when it's unsafe.
+  optional string detail = 2;
+}
