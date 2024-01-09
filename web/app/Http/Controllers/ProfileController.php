@@ -364,6 +364,7 @@ class ProfileController extends Controller
                                                 break;
                                             }
                                         }
+                                        $line = "";
                                     } else {
                                         $line .= $char;
                                     }
