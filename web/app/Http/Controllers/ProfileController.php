@@ -319,6 +319,8 @@ class ProfileController extends Controller
                             $response->setCallback(function () use ($request, $history, $tmp, $llm, $user) {
                                 $client = new Client(['timeout' => 300]);
                                 Redis::rpush('api_' . $user->tokenable_id, $history->id);
+                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $user->openai_token, 'api_' . $history->id);
+
                                 $req = $client->get(route('api.stream'), [
                                     'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                                     'query' => [
@@ -346,7 +348,6 @@ class ProfileController extends Controller
                                     'usage' => [],
                                 ];
 
-                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $user->openai_token, 'api_' . $history->id);
                                 while (!$stream->eof()) {
                                     $line = trim($stream->readLine());
 
