@@ -316,7 +316,7 @@ class ProfileController extends Controller
                             $history = new APIHistories();
                             $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => $user->id]);
                             $history->save();
-                            Redis::rpush('api_' . Auth::user()->id, $history->id);
+                            Redis::rpush('api_' . $user->tokenable_id, $history->id);
                             RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $user->openai_token, 'api_' . $history->id);
 
                             $req = $client->get(route('api.stream'), [
