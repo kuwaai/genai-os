@@ -426,7 +426,7 @@ class ProfileController extends Controller
 
         $response->setCallback(function () use ($response, $request) {
             if (config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
-                if ($channel != null) {
+                if ($request->input('history_id') && $request->input('user_id')) {
                     if (in_array($request->input('history_id'), Redis::lrange('api_' . $request->input('user_id'), 0, -1))) {
                         $client = Redis::connection();
                         $client->subscribe('api_' + $request->input('history_id'), function ($message, $raw_history_id) use ($client) {
