@@ -199,9 +199,9 @@ class RequestChat implements ShouldQueue
                     $elapsed = $end - $start;
                     Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . $tmp);
 
-                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
-                    Redis::publish($this->channel, 'Ended Ended');
                     if ($this->channel == $this->history_id) {
+                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
+                        Redis::publish($this->channel, 'Ended Ended');
                         $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
                         $currentTimeInSeconds = Carbon::now()->timestamp;
                         $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
