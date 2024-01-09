@@ -345,14 +345,14 @@ class ProfileController extends Controller
                                     'object' => 'chat.completion',
                                     'usage' => [],
                                 ];
-
-                                while (!$stream->eof()) {
-                                    $line = fgets($stream->detach());
-                                    if ($line !== false) {
+                                $line = '';
+                                while (!$body->eof()) {
+                                    $char = $body->read(1);
+                                
+                                    if ($char === "\n") {
                                         $line = trim($line);
                                         if (substr($line, 0, 5) === 'data:') {
                                             $jsonData = json_decode(trim(substr($line, 5)), true);
-                                            //Make sure it's valid json
                                             if ($jsonData !== null) {
                                                 $resp['choices'][0]['delta']['content'] = $jsonData->message;
                                                 echo 'data: ' . json_encode($resp) . "\n";
@@ -364,6 +364,8 @@ class ProfileController extends Controller
                                                 break;
                                             }
                                         }
+                                    } else {
+                                        $line .= $char;
                                     }
                                 }
                                 $history->fill(['output' => $response['output']]);
