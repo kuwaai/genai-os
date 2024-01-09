@@ -347,7 +347,7 @@ class ProfileController extends Controller
                                 ];
 
                                 while (!$stream->eof()) {
-                                    $line = gets($stream->detach());
+                                    $line = fgets($stream->detach());
                                     if ($line !== false) {
                                         $line = trim($line);
                                         if (substr($line, 0, 5) === 'data:') {
