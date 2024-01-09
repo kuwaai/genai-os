@@ -29,6 +29,9 @@ def predict(prompts: [str], database_path: str):
 
     return y_pred
 
+def calc_f1(precision:float, recall:float):
+    return 2*(precision*recall)/(precision+recall)
+
 def plot(
     figure_path: str,
     db_name: str,
@@ -91,9 +94,12 @@ def evaluate(test_data_file: str, database_path: str, result_file:str, seed=0):
 
     y_score = predict(prompts, database_path)
     
-    precision, recall, _ = precision_recall_curve(y_true, y_score)
+    precision, recall, threshold = precision_recall_curve(y_true, y_score)
     average_precision = average_precision_score(y_true, y_score)
 
+    print('Threshold\tPrecision\tRecall\tF1-score')
+    for t, p, r in zip(threshold, precision, recall):
+        print(f'{t:.4f}\t{p:.4f}\t{r:.4f}\t{calc_f1(p, r):.4f}')
     print(f'Average precision: {average_precision}')
 
     chance_level=np.count_nonzero(y_true) / len(y_true)
@@ -104,6 +110,7 @@ def evaluate(test_data_file: str, database_path: str, result_file:str, seed=0):
         'chance_level': chance_level,
         'recall': list(recall),
         'precision': list(precision),
+        'threshold': list(threshold)
     }
 
     with open(result_file, 'a') as f:
