@@ -20,3 +20,12 @@ python -m grpc_tools.protoc --python_out=./example --grpc_python_out=./example -
 # generated files to the directory of your client code.
 ```
 2. For the sample client/server code, please refer to the `example/` directory.
+
+## Management API
+- Style: Web API
+- Client component: Demo site web server
+
+### Endpoints
+- Keyword create, read, and delete
+- Embedding create, read, and delete
+- For the OpenAPI specification, please refer to `management.yaml`

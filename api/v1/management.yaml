@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: Safety Guard Management API
+  version: 1.0.0
+servers:
+  - url: http://localhost/v1/management
+    description: Development server
+
+paths:
+  /keyword:
+    get:
+      summary: Get the keywords list.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              example:
+                ["keyword1", "keyword2"]
+  /keyword/add:
+    post:
+      summary: Add keywords to the list.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              ["keyword1", "keyword2"]
+      responses:
+        '200':
+          description: Keyword filter updated successfully.
+  /keyword/remove:
+    post:
+      summary: Remove keywords from the list.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              ["keyword1", "keyword2"]
+      responses:
+        '204':
+          description: Keyword filter updated successfully.
+          
+  /embedding:
+    get:
+      summary: Get the sentences in the vector database.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              example:
+                ["keyword1", "keyword2"]
+  /embedding/add:
+    post:
+      summary: Add sentences to the vector database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              ["Example sentence 1", "Example sentence 2"]
+      responses:
+        '200':
+          description: Vector database updated successfully.
+  /embedding/remove:
+    post:
+      summary: Remove sentences from the vector database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              ["Example sentence 1", "Example sentence 2"]
+      responses:
+        '204':
+          description: Vector database updated successfully.
