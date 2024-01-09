@@ -100,7 +100,7 @@ class RequestChat implements ShouldQueue
                 if ($ExecutionTime < 2) {
                     sleep(2 - $ExecutionTime);
                 }
-                Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
+                Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
 
                 Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                 Redis::publish($this->channel, 'Ended Ended');
@@ -161,7 +161,7 @@ class RequestChat implements ShouldQueue
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 $tmp .= $message;
-                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . '...' . ($taide_flag ? "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]" : '')]));
+                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . ($this->channel == $this->history_id ? '...' : '') . ($taide_flag ? "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]" : '')]));
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
@@ -193,8 +193,7 @@ class RequestChat implements ShouldQueue
                     } catch (Exception $e) {
                     }
 
-                    Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
-
+                    Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
 
                     $end = microtime(true);
                     $elapsed = $end - $start;
@@ -202,15 +201,17 @@ class RequestChat implements ShouldQueue
 
                     Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                     Redis::publish($this->channel, 'Ended Ended');
-                    $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
-                    $currentTimeInSeconds = Carbon::now()->timestamp;
-                    $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
+                    if ($this->channel == $this->history_id) {
+                        $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
+                        $currentTimeInSeconds = Carbon::now()->timestamp;
+                        $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
 
-                    if ($ExecutionTime < 2) {
-                        sleep(2 - $ExecutionTime);
+                        if ($ExecutionTime < 2) {
+                            sleep(2 - $ExecutionTime);
+                        }
+                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
+                        Redis::publish($this->channel, 'Ended Ended');
                     }
-                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
-                    Redis::publish($this->channel, 'Ended Ended');
                 }
             }
         } catch (\Throwable $e) {
@@ -223,7 +224,7 @@ class RequestChat implements ShouldQueue
             }
             Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));
             Redis::publish($this->channel, 'Ended Ended');
-            Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
+            Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
 
             $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
             $currentTimeInSeconds = Carbon::now()->timestamp;
@@ -249,7 +250,7 @@ class RequestChat implements ShouldQueue
             $history->fill(['msg' => '[Sorry, something is broken, please try again later!]']);
             $history->save();
         }
-        Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
+        Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
 
         Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));
         Redis::publish($this->channel, 'Ended Ended');
