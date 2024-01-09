@@ -330,7 +330,7 @@ class ProfileController extends Controller
                             ]);
 
                             $req = $req->getBody()->getContents();
-                            $response['output'] = json_decode(explode('[ENDEDPLACEHOLDERUWU]', $req)[0])["message"];
+                            $response['output'] = json_decode(explode('[ENDEDPLACEHOLDERUWU]', $req)[0])->message;
 
                             $history->fill(['output' => $response['output']]);
                             $history->save();
