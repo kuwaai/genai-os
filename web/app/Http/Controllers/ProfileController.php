@@ -21,6 +21,7 @@ use App\Models\LLMs;
 use App\Models\User;
 use App\Models\Groups;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use DB;
 use Crypt;
 use Net_IPv4;
