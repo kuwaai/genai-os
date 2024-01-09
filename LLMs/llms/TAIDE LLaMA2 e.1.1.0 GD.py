@@ -1,10 +1,10 @@
-import socket, os, requests
+import socket, os, requests, json
 from base import *
 
 # -- Configs --
-app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
+app.config["REDIS_URL"] = "redis://127.0.0.1:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-app.agent_endpoint = "http://192.168.211.4:9000/"
+app.agent_endpoint = "http://127.0.0.1:9000/"
 app.LLM_name = "e.1.1.0-GD"
 app.version_code = "v1.0"
 app.ignore_agent = False
@@ -23,6 +23,13 @@ model_loc = "safety-guard"
 model_loc2 = "e.1.1.0"
 usr_token = "92d1e9d60879348b8ed2f25f624012dcc596808dc40681d74c4965b8fff8a22a"
 # -- Config ends --
+
+def process_event(package):
+    try:
+        return json.loads(package)
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+
 def llm_compute(data): 
     try:
         if data.get("input"):
@@ -37,17 +44,16 @@ def llm_compute(data):
                 "messages": msg,
                 "model": model_loc
             }
-            res = requests.post(url, headers=headers, json=data1)
-            if res.status_code == 200:
-                res = res.json()
-                if res["status"] == "success":
-                    for i in res["output"]:
-                        yield i
-                        time.sleep(0.02)
-                else:
-                    print("Failed to auth API!", res)
-            else:
-                print("Calling API failed", res.status_code)
+            with requests.post(url, headers=headers, json=data1, stream=True,timeout=60) as response:
+                for line in response.iter_lines(decode_unicode=True):
+                    if line:
+                        line = line.decode()
+                        if line == "event: end":
+                            break
+                        elif line.startswith("data: "):
+                            tmp = process_event(line[len("data: "):])["choices"][0]["delta"]["content"]
+                            yield tmp[-1]
+                            time.sleep(0.02)
             yield "\n\n-----\n"
             headers = {
                 "Content-Type": "application/json",
@@ -57,33 +63,37 @@ def llm_compute(data):
                 "messages": msg,
                 "model": model_loc2
             }
-            res = requests.post(url, headers=headers, json=data1)
-            if res.status_code == 200:
-                res = res.json()
-                if res["status"] == "success":
-                    headers = {
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {usr_token}",
-                    }
-                    data1 = {
-                        "messages": msg + [{"msg":res["output"], "isbot":True}],
-                        "model": model_loc
-                    }
-                    res = requests.post(url, headers=headers, json=data1)
-                    if res.status_code == 200:
-                        res = res.json()
-                        if res["status"] == "success":
-                            for i in res["output"]:
-                                yield i
+            result = ""
+            with requests.post(url, headers=headers, json=data1, stream=True,timeout=60) as response:
+                for line in response.iter_lines(decode_unicode=True):
+                    if line:
+                        line = line.decode()
+                        if line == "event: end":
+                            break
+                        elif line.startswith("data: "):
+                            tmp = process_event(line[len("data: "):])["choices"][0]["delta"]["content"]
+                            yield tmp[-1]
+                            result = tmp
+                            time.sleep(0.02)
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {usr_token}",
+            }
+            data1 = {
+                "messages": msg + [{"msg":result, "isbot":True}],
+                "model": model_loc
+            }
+            with requests.post(url, headers=headers, json=data1, stream=True,timeout=60) as response:
+                for line in response.iter_lines(decode_unicode=True):
+                    if line:
+                        line = line.decode()
+                        if line == "event: end":
+                            break
+                        elif line.startswith("data: "):
+                            tmp = process_event(line[len("data: "):])["choices"][0]["delta"]["content"]
+                            if len(tmp) > len(result):
+                                yield tmp[-1]
                                 time.sleep(0.02)
-                        else:
-                            print("Failed to auth API!", res)
-                    else:
-                        print("Calling API failed", res.status_code)
-                else:
-                    print("Failed to auth API!", res)
-            else:
-                print("Calling API failed", res.status_code)
     except Exception as e:
         print(e)
     finally:

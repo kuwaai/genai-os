@@ -14,7 +14,7 @@ def completions():
         if len(dest) > 0:
             dest = dest[0]
             try:
-                response = requests.post(dest[0], data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken}, stream=True, timeout=5)
+                response = requests.post(dest[0], data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken}, stream=True, timeout=60)
                 def event_stream(dest, response):
                     dest[1] = "BUSY"
                     try:
@@ -42,5 +42,5 @@ def abort():
         for i, o in data.items():
             dest = [k for k in o if int(k[2]) in history_id and k[3] == user_id]
             for d in dest:
-                requests.get(d[0] + "/abort", timeout=5)
+                requests.get(d[0] + "/abort", timeout=10)
     return "Success"
