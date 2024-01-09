@@ -17,7 +17,6 @@ use App\Models\APIHistories;
 use Illuminate\View\View;
 use App\Jobs\RequestChat;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Stream;
 use App\Models\LLMs;
 use App\Models\User;
 use App\Models\Groups;
@@ -330,8 +329,7 @@ class ProfileController extends Controller
                                     ],
                                     'stream' => true,
                                 ]);
-                                $body = $req->getBody();
-                                $stream = Stream::factory($body);
+                                $stream = $req->getBody();
                                 $resp = [
                                     'choices' => [
                                         [
