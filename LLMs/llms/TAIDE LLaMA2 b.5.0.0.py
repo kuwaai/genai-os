@@ -19,22 +19,33 @@ if app.port == None:
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*14
-model_loc = "llama2-7b-ccw_cp-j-v2+cc_ft-l-e3_tv"
+model_loc = "./llama2-7b-ccw_cp-j-v2+cc_ft-l-e3_tv"
 api_key = None
 usr_token = None
 tc_model = None
 # -- Config ends --
 
-from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, set_seed
+from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, set_seed, StoppingCriteria, StoppingCriteriaList
 from intel_extension_for_transformers.transformers import AutoModelForCausalLM
 from threading import Thread
+class CustomStoppingCriteria(StoppingCriteria):
+    def __init__(self):
+        pass
+    
+    def __call__(self, input_ids, score, **kwargs) -> bool:
+        global proc
+        return not proc
     
 set_seed(42)
 model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained(model_loc)
 prompts = "<s>[INST] {0} [/INST]\n{1}"
+global proc
+proc = None
     
 def llm_compute(data): 
+    global proc
+    torch.cuda.empty_cache()
     try:
         history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
         while len("".join(history)) > limit:
@@ -53,12 +64,14 @@ def llm_compute(data):
                 generation_config=GenerationConfig(
                     max_new_tokens=4096,
                     pad_token_id=tokenizer.eos_token_id,
-                )))
+                ),stopping_criteria=StoppingCriteriaList([CustomStoppingCriteria()])),daemon=True)
             thread.start()
+            proc = thread
             for i in streamer:
                 print(end=i.replace("</s>",""),flush=True)
                 yield i.replace("</s>","")
-
+                if not proc: break
+            thread.join()
             torch.cuda.empty_cache()
         else:
             yield "[Sorry, The input message is too long!]"
@@ -66,9 +79,22 @@ def llm_compute(data):
     except Exception as e:
         print(e)
     finally:
+        proc = None
         torch.cuda.empty_cache()
         app.Ready[0] = True
         print("finished")
+def abort():
+    global proc
+    if proc:
+        tmp = proc
+        proc = None
+        print("aborting...")
+        tmp.join()
+        print("aborted")
+        torch.cuda.empty_cache()
+        return "Aborted"
+    return "No process to abort"
 # model part ends
 app.llm_compute = llm_compute
+app.abort = abort
 start()

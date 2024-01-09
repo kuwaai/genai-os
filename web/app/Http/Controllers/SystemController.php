@@ -41,9 +41,18 @@ class SystemController extends Controller
         $model->save();
 
         $model = SystemSetting::where('key', 'announcement')->first();
+        $oldanno = $model->value;
         $model->value = $request->input('announcement') ?? "";
         $model->save();
 
+        if ($oldanno != $model->value ){
+            User::query()->update(['announced' => false]);
+        }
+
+        $model = SystemSetting::where('key', 'warning_footer')->first();
+        $model->value = $request->input('warning_footer') ?? "";
+        $model->save();
+        
         $model = SystemSetting::where('key', 'tos')->first();
         $oldtos = $model->value;
         $model->value = $request->input('tos') ?? "";

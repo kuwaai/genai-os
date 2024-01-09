@@ -41,17 +41,13 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return back();
     })->name('lang');
 
-    Route::get('/announcement', function () {
-        session()->put('announcement', hash('sha256', \App\Models\SystemSetting::where('key', 'announcement')->first()->value));
-
-        return back();
-    })->name('announcement');
 
     # This will auth the user token that is used to connect.
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
+    Route::post('/v1.0/chat/abort', [ProfileController::class, 'api_abort']);
     # This will auth the server secret that is used by localhost
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
-    # Debugging, test hashing API
+    # This allow other registering from other platform
     Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
 
     # Admin routes, require admin permission
@@ -72,6 +68,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             return back();
         })->name('tos');
 
+        Route::get('/announcement', function () {
+            $user = User::find(Auth::user()->id);
+            $user->announced = true;
+            $user->save();
+            return back();
+        })->name('announcement');
         #---Profiles
         Route::middleware(AdminMiddleware::class . ':tab_Profile')
             ->prefix('profile')
@@ -103,6 +105,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
                 Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
                 Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
+                Route::get('/abort/{chat_id}', [ChatController::class, 'abort'])->name('chat.abort');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_update_upload_file')
                     ->post('/upload', [ChatController::class, 'upload'])
@@ -151,6 +154,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->post('/create', [DuelController::class, 'create'])
                     ->name('duel.create');
                 Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
+                Route::get('/abort/{duel_id}', [DuelController::class, 'abort'])->name('duel.abort');
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
                 Route::middleware(AdminMiddleware::class . ':Duel_delete_chatroom')
                     ->delete('/delete', [DuelController::class, 'delete'])

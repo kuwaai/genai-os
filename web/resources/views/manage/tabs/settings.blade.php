@@ -59,9 +59,16 @@
             <div>
                 <x-input-label for="tos" :value="__('Terms of Service')" />
                 <div class="flex items-center">
-                    <textarea id="tos" name="tos" type="text" oninput="adjustTextareaRows(this)" rows="1"
-                        max-rows="5"
+                    <textarea id="tos" name="tos" type="text" oninput="adjustTextareaRows(this)" rows="1" max-rows="5"
                         class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 mb-1 block w-full resize-none">{{ \App\Models\SystemSetting::where('key', 'tos')->first()->value }}</textarea>
+                </div>
+            </div>
+            <div>
+                <x-input-label for="warning_footer" :value="__('Footer Warning')" />
+                <div class="flex items-center">
+                    <x-text-input id="warning_footer" name="warning_footer" type="text"
+                        class="mr-2 mb-1 block w-full"
+                        value="{{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value }}" autocomplete="off" />
                 </div>
             </div>
 
