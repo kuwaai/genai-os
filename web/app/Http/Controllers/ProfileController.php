@@ -352,11 +352,10 @@ class ProfileController extends Controller
                                 
                                     if ($char === "\n") {
                                         $line = trim($line);
-                                        Log::channel('analyze')->Debug($line);
                                         if (substr($line, 0, 5) === 'data:') {
                                             $jsonData = json_decode(trim(substr($line, 5)), true);
                                             if ($jsonData !== null) {
-                                                $resp['choices'][0]['delta']['content'] = $jsonData->message;
+                                                $resp['choices'][0]['delta']['content'] = $jsonData->msg;
                                                 echo 'data: ' . json_encode($resp) . "\n";
                                             }
                                         } elseif (substr($line, 0, 6) === 'event:') {
@@ -476,7 +475,7 @@ class ProfileController extends Controller
                                 flush();
                                 $client->disconnect();
                             } elseif ($type == 'New') {
-                                echo 'data: ' . json_decode($msg)->msg . "\n";
+                                echo 'data: ' . $msg . "\n";
                                 ob_flush();
                                 flush();
                             }
