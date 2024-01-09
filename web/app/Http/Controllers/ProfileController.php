@@ -429,7 +429,7 @@ class ProfileController extends Controller
                 if ($request->input('history_id') && $request->input('user_id')) {
                     if (in_array($request->input('history_id'), Redis::lrange('api_' . $request->input('user_id'), 0, -1))) {
                         $client = Redis::connection();
-                        $client->subscribe('api_' + $request->input('history_id'), function ($message, $raw_history_id) use ($client) {
+                        $client->subscribe('api_' . $request->input('history_id'), function ($message, $raw_history_id) use ($client) {
                             global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
