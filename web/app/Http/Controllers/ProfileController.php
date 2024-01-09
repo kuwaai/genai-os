@@ -353,6 +353,7 @@ class ProfileController extends Controller
                                     if ($char === "\n") {
                                         $line = trim($line);
                                         if (substr($line, 0, 5) === 'data:') {
+                                            Log::channel('analyze')->Info($line);
                                             $jsonData = json_decode(trim(substr($line, 5)));
                                             if ($jsonData !== null) {
                                                 $resp['choices'][0]['delta']['content'] = $jsonData->msg;
