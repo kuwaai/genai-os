@@ -176,6 +176,9 @@ class RequestChat implements ShouldQueue
                         if ($taide_flag) {
                             $tmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
                         }
+                        if ($this->channel != $this->history_id) {
+                            Redis::publish($this->channel, 'Ended Ended');
+                        }
                     }
                 } catch (Exception $e) {
                     Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . '\n[Sorry, something is broken, please try again later!]']));
