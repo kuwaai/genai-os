@@ -17,6 +17,7 @@ use App\Models\APIHistories;
 use Illuminate\View\View;
 use App\Jobs\RequestChat;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Stream;
 use App\Models\LLMs;
 use App\Models\User;
 use App\Models\Groups;
@@ -288,12 +289,6 @@ class ProfileController extends Controller
         if ($result->exists()) {
             $user = $result->first();
             if (User::find($user->id)->hasPerm('Chat_read_access_to_api')) {
-                $response = [
-                    'status' => 'success',
-                    'message' => 'Authentication successful',
-                    'tokenable_id' => $user->tokenable_id,
-                    'name' => $user->name,
-                ];
                 if (isset($jsonData['messages']) && isset($jsonData['model'])) {
                     $llm = LLMs::where('access_code', '=', $jsonData['model']);
 
@@ -310,30 +305,70 @@ class ProfileController extends Controller
                             return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
                         } else {
                             // Input is a valid JSON string
-                            $response['output'] = '';
-                            $client = new Client(['timeout' => 300]);
-
                             $history = new APIHistories();
                             $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => $user->id]);
                             $history->save();
                             Redis::rpush('api_' . $user->tokenable_id, $history->id);
                             RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $user->openai_token, 'api_' . $history->id);
 
-                            $req = $client->get(route('api.stream'), [
-                                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-                                'query' => [
-                                    'key' => config('app.API_Key'),
-                                    'user_id' => $user->tokenable_id,
-                                    'history_id' => $history->id,
-                                ],
-                                'stream' => true,
-                            ]);
+                            $response = new StreamedResponse();
+                            $response->headers->set('Content-Type', 'event-stream');
+                            $response->headers->set('Cache-Control', 'no-cache');
+                            $response->headers->set('X-Accel-Buffering', 'no');
+                            $response->headers->set('charset', 'utf-8');
+                            $response->headers->set('Connection', 'close');
 
-                            $req = $req->getBody()->getContents();
-                            $response['output'] = json_decode(explode('[ENDEDPLACEHOLDERUWU]', $req)[0])->message;
+                            $response->setCallback(function () use ($request, $history) {
+                                $client = new Client(['timeout' => 300]);
+                                $req = $client->get(route('api.stream'), [
+                                    'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                                    'query' => [
+                                        'key' => config('app.API_Key'),
+                                        'user_id' => $user->tokenable_id,
+                                        'history_id' => $history->id,
+                                    ],
+                                    'stream' => true,
+                                ]);
+                                $body = $req->getBody();
+                                $stream = Stream::factory($body);
+                                $resp = [
+                                    'choices' => [
+                                        [
+                                            'delta' => [
+                                                'content' => '',
+                                                'role' => null,
+                                            ],
+                                        ],
+                                    ],
+                                    'created' => time(),
+                                    'id' => 'chatcmpl-' . $history->id,
+                                    'model' => $llm->access_code,
+                                    'object' => 'chat.completion',
+                                    'usage' => [],
+                                ];
 
-                            $history->fill(['output' => $response['output']]);
-                            $history->save();
+                                while (!$stream->eof()) {
+                                    $line = trim($stream->readLine());
+
+                                    if (substr($line, 0, 5) === 'data:') {
+                                        $jsonData = json_decode(trim(substr($line, 5)), true);
+                                        //Make sure it's valid json
+                                        if ($jsonData !== null) {
+                                            $resp['choices'][0]["delta"["content"]] = $jsonData->message;
+                                            echo 'data: ' . json_encode($resp) . "\n";
+                                        }
+                                    } elseif (substr($line, 0, 6) === 'event:') {
+                                        if (trim(substr($line, 5)) == 'end') {
+                                            echo "event: end\n\n";
+                                            $client->disconnect();
+                                            break;
+                                        }
+                                    }
+                                }
+                                $history->fill(['output' => $response['output']]);
+                                $history->save();
+                            });
+                            return $response;
                         }
                     } else {
                         // Handle the case where the specified model doesn't exist
@@ -351,8 +386,6 @@ class ProfileController extends Controller
                     ];
                     return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
                 }
-
-                return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
             } else {
                 $errorResponse = [
                     'status' => 'error',
@@ -418,13 +451,13 @@ class ProfileController extends Controller
     public function api_stream(Request $request)
     {
         $response = new StreamedResponse();
-        $response->headers->set('Content-Type', 'text/plain');
+        $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
 
-        $response->setCallback(function () use ($response, $request) {
+        $response->setCallback(function () use ($request) {
             if (config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
                 if ($request->input('history_id') && $request->input('user_id')) {
                     if (in_array($request->input('history_id'), Redis::lrange('api_' . $request->input('user_id'), 0, -1))) {
@@ -433,12 +466,12 @@ class ProfileController extends Controller
                             global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo json_encode(["message"=>$result]) . '[ENDEDPLACEHOLDERUWU]';
+                                echo 'event: end\n\n';
                                 ob_flush();
                                 flush();
                                 $client->disconnect();
                             } elseif ($type == 'New') {
-                                $result = json_decode($msg)->msg;
+                                echo 'data: ' . json_decode($msg)->msg . "\n";
                                 ob_flush();
                                 flush();
                             }
