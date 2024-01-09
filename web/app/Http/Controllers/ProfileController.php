@@ -346,8 +346,8 @@ class ProfileController extends Controller
                                     'usage' => [],
                                 ];
                                 $line = '';
-                                while (!$body->eof()) {
-                                    $char = $body->read(1);
+                                while (!$stream->eof()) {
+                                    $char = $stream->read(1);
                                 
                                     if ($char === "\n") {
                                         $line = trim($line);
