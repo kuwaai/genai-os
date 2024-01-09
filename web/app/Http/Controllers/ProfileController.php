@@ -369,7 +369,7 @@ class ProfileController extends Controller
                                         $line .= $char;
                                     }
                                 }
-                                $history->fill(['output' => $response['output']]);
+                                $history->fill(['output' => $resp['choices'][0]['delta']['content']]);
                                 $history->save();
                             });
                             return $response;
