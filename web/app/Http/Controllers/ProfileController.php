@@ -308,8 +308,6 @@ class ProfileController extends Controller
                             $history = new APIHistories();
                             $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => $user->id]);
                             $history->save();
-                            Redis::rpush('api_' . $user->tokenable_id, $history->id);
-                            RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $user->openai_token, 'api_' . $history->id);
 
                             $response = new StreamedResponse();
                             $response->headers->set('Content-Type', 'event-stream');
@@ -318,8 +316,9 @@ class ProfileController extends Controller
                             $response->headers->set('charset', 'utf-8');
                             $response->headers->set('Connection', 'close');
 
-                            $response->setCallback(function () use ($request, $history) {
+                            $response->setCallback(function () use ($request, $history, $tmp, $llm, $user) {
                                 $client = new Client(['timeout' => 300]);
+                                Redis::rpush('api_' . $user->tokenable_id, $history->id);
                                 $req = $client->get(route('api.stream'), [
                                     'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                                     'query' => [
@@ -347,6 +346,7 @@ class ProfileController extends Controller
                                     'usage' => [],
                                 ];
 
+                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $user->openai_token, 'api_' . $history->id);
                                 while (!$stream->eof()) {
                                     $line = trim($stream->readLine());
 
@@ -354,7 +354,7 @@ class ProfileController extends Controller
                                         $jsonData = json_decode(trim(substr($line, 5)), true);
                                         //Make sure it's valid json
                                         if ($jsonData !== null) {
-                                            $resp['choices'][0]["delta"["content"]] = $jsonData->message;
+                                            $resp['choices'][0]['delta']['content'] = $jsonData->message;
                                             echo 'data: ' . json_encode($resp) . "\n";
                                         }
                                     } elseif (substr($line, 0, 6) === 'event:') {
@@ -463,7 +463,6 @@ class ProfileController extends Controller
                     if (in_array($request->input('history_id'), Redis::lrange('api_' . $request->input('user_id'), 0, -1))) {
                         $client = Redis::connection();
                         $client->subscribe('api_' . $request->input('history_id'), function ($message, $raw_history_id) use ($client) {
-                            global $result;
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
                                 echo 'event: end\n\n';
