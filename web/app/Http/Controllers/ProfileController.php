@@ -347,20 +347,22 @@ class ProfileController extends Controller
                                 ];
 
                                 while (!$stream->eof()) {
-                                    $line = trim($stream->readLine());
-
-                                    if (substr($line, 0, 5) === 'data:') {
-                                        $jsonData = json_decode(trim(substr($line, 5)), true);
-                                        //Make sure it's valid json
-                                        if ($jsonData !== null) {
-                                            $resp['choices'][0]['delta']['content'] = $jsonData->message;
-                                            echo 'data: ' . json_encode($resp) . "\n";
-                                        }
-                                    } elseif (substr($line, 0, 6) === 'event:') {
-                                        if (trim(substr($line, 5)) == 'end') {
-                                            echo "event: end\n\n";
-                                            $client->disconnect();
-                                            break;
+                                    $line = gets($stream->detach());
+                                    if ($line !== false) {
+                                        $line = trim($line);
+                                        if (substr($line, 0, 5) === 'data:') {
+                                            $jsonData = json_decode(trim(substr($line, 5)), true);
+                                            //Make sure it's valid json
+                                            if ($jsonData !== null) {
+                                                $resp['choices'][0]['delta']['content'] = $jsonData->message;
+                                                echo 'data: ' . json_encode($resp) . "\n";
+                                            }
+                                        } elseif (substr($line, 0, 6) === 'event:') {
+                                            if (trim(substr($line, 5)) == 'end') {
+                                                echo "event: end\n\n";
+                                                $client->disconnect();
+                                                break;
+                                            }
                                         }
                                     }
                                 }
