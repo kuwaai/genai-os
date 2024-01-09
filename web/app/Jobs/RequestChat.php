@@ -69,7 +69,7 @@ class RequestChat implements ShouldQueue
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
                     'name' => $this->access_code,
-                    'history_id' => $this->history_id,
+                    'history_id' => $this->history_id * ($this->channel == $this->history_id ? 1 : -1),
                     'user_id' => $this->user_id,
                 ],
                 'stream' => true,
@@ -100,7 +100,8 @@ class RequestChat implements ShouldQueue
                 if ($ExecutionTime < 2) {
                     sleep(2 - $ExecutionTime);
                 }
-                Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+                Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
+
                 Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                 Redis::publish($this->channel, 'Ended Ended');
             } elseif ($state == 'READY') {
@@ -138,7 +139,7 @@ class RequestChat implements ShouldQueue
                             'input' => $this->input,
                             'name' => $this->access_code,
                             'user_id' => $this->user_id,
-                            'history_id' => $this->history_id,
+                            'history_id' => $this->history_id * ($this->channel == $this->history_id ? 1 : -1),
                             'chatgpt_apitoken' => $this->chatgpt_apitoken,
                         ],
                         'stream' => true,
@@ -182,7 +183,7 @@ class RequestChat implements ShouldQueue
                     Log::channel('analyze')->Debug('failJob ' . $this->history_id);
                 } finally {
                     try {
-                        if ($this->channel == '' . $this->history_id) {
+                        if ($this->channel == $this->history_id) {
                             $history = Histories::find($this->history_id);
                             if ($history != null) {
                                 $history->fill(['msg' => trim($tmp)]);
@@ -191,9 +192,9 @@ class RequestChat implements ShouldQueue
                         }
                     } catch (Exception $e) {
                     }
-                    if ($this->channel == '' . $this->history_id) {
-                        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
-                    }
+
+                    Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
+
 
                     $end = microtime(true);
                     $elapsed = $end - $start;
@@ -213,14 +214,25 @@ class RequestChat implements ShouldQueue
                 }
             }
         } catch (\Throwable $e) {
-            Log::channel('analyze')->Info("Failed job: " . $this->channel);
+            Log::channel('analyze')->Info('Failed job: ' . $this->channel);
             Log::channel('analyze')->Info($e->getMessage());
             $history = Histories::find($this->history_id);
             if ($history != null) {
                 $history->fill(['msg' => '[Sorry, something is broken, please try again later!]']);
                 $history->save();
             }
-            Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+            Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));
+            Redis::publish($this->channel, 'Ended Ended');
+            Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
+
+            $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
+            $currentTimeInSeconds = Carbon::now()->timestamp;
+            $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
+
+            if ($ExecutionTime < 2) {
+                sleep(2 - $ExecutionTime);
+            }
+
             Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));
             Redis::publish($this->channel, 'Ended Ended');
         }
@@ -230,14 +242,15 @@ class RequestChat implements ShouldQueue
         if ($this->channel == '') {
             $this->channel .= $this->history_id;
         }
-        Log::channel('analyze')->Info("Failed job: " . $this->channel);
+        Log::channel('analyze')->Info('Failed job: ' . $this->channel);
 
         $history = Histories::find($this->history_id);
         if ($history != null) {
             $history->fill(['msg' => '[Sorry, something is broken, please try again later!]']);
             $history->save();
         }
-        Redis::lrem('usertask_' . $this->user_id, 0, $this->history_id);
+        Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : "api_") . $this->user_id, 0, $this->history_id);
+
         Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));
         Redis::publish($this->channel, 'Ended Ended');
     }
