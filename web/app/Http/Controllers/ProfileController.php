@@ -331,6 +331,7 @@ class ProfileController extends Controller
 
                             $req = $req->getBody()->getContents();
                             $response['output'] = explode('[ENDEDPLACEHOLDERUWU]', $req)[0];
+                            Log::channel('analyze')->Info($response['output']);
 
                             $history->fill(['output' => $response['output']]);
                             $history->save();
@@ -418,7 +419,7 @@ class ProfileController extends Controller
     public function api_stream(Request $request)
     {
         $response = new StreamedResponse();
-        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Content-Type', 'text/plain');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
