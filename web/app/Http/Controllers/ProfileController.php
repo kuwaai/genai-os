@@ -310,7 +310,7 @@ class ProfileController extends Controller
                             $history->save();
 
                             $response = new StreamedResponse();
-                            $response->headers->set('Content-Type', 'event-stream');
+                            $response->headers->set('Content-Type', 'text/event-stream');
                             $response->headers->set('Cache-Control', 'no-cache');
                             $response->headers->set('X-Accel-Buffering', 'no');
                             $response->headers->set('charset', 'utf-8');

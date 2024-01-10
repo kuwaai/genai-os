@@ -197,48 +197,86 @@ xmlns="http://www.w3.org/2000/svg">
         $(node).children("svg").addClass("hidden");
         $(node).children("svg").eq(1).removeClass("hidden");
         $(node).prop("disabled", true);
-        $.ajax({
-            url: '{{ route('chat.translate', '') }}/' + history_id,
-            method: 'GET',
-            data: {"model":model},
-            success: function(response) {
-                if (response ==
-                    "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
-                ) {
-                    $(node).children("svg").addClass("hidden");
-                    $(node).children("svg").eq(3).removeClass("hidden");
-                    $("#error_alert >span").text(
-                        "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
-                    )
-                    $("#error_alert").fadeIn();
-                    setTimeout(function() {
-                        $("#error_alert").fadeOut();
-                        $(node).parent().children("button.translates").each(function() {
-                            $(this).removeClass("hidden");
-                            $(this).children("svg").addClass("hidden");
-                            $(this).children("svg").eq(0).removeClass("hidden");
-                            $(this).prop("disabled", false);
-                        });
-                    }, 3000);
-                } else {
-                    $($(node).parent().parent().children()[0]).text(response +
-                        (model ? "" : '\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]'));
-                    histories[history_id] = $($(node).parent().parent()
-                        .children()[0]).text()
-                    chatroomFormatter($("#history_" + history_id));
-                    $(node).parent().children("button.translates").each(function() {
-                        $(this).removeClass("hidden");
-                        $(this).children("svg").addClass("hidden");
-                        $(this).children("svg").eq(0).removeClass("hidden");
-                        $(this).prop("disabled", false);
+        const url = '{{ route('chat.translate', '') }}/' + history_id + (model ? "?model=" + model : "");
+
+        fetch(url)
+            .then(response => {
+                const reader = response.body.getReader();
+                var output = "";
+                function streamRead() {
+                    reader.read().then(({
+                        done,
+                        value
+                    }) => {
+                        if (done) {
+                            // Stream has ended
+                            $(node).prop("disabled", false);
+                            $(node).parent().children("button.translates").removeClass("hidden");
+                            return;
+                        }
+
+                        const content = new TextDecoder().decode(value);
+                        if (output ===
+                            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
+                        ) {
+                            $(node).children("svg").addClass("hidden");
+                            $(node).children("svg").eq(3).removeClass("hidden");
+                            $("#error_alert >span").text(
+                                "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
+                            )
+                            $("#error_alert").fadeIn();
+                            setTimeout(function() {
+                                $("#error_alert").fadeOut();
+                                $(node).parent().children("button.translates").each(function() {
+                                    $(this).removeClass("hidden");
+                                    $(this).children("svg").addClass("hidden");
+                                    $(this).children("svg").eq(0).removeClass("hidden");
+                                    $(this).prop("disabled", false);
+                                });
+                            }, 3000);
+                        } else {
+                            output += content
+                            $($(node).parent().parent().children()[0]).text(output +
+                                (model ? "" : '\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]'));
+                            histories[history_id] = $($(node).parent().parent()
+                                .children()[0]).text()
+                            chatroomFormatter($("#history_" + history_id));
+                            $(node).parent().children("button.translates").each(function() {
+                                $(this).removeClass("hidden");
+                                $(this).children("svg").addClass("hidden");
+                                $(this).children("svg").eq(0).removeClass("hidden");
+                                $(this).prop("disabled", false);
+                            });
+                            $(node).prop("disabled", true);
+                            $(node).children("svg").addClass("hidden");
+                            $(node).children("svg").eq(2).removeClass("hidden");
+                            $(node).parent().children("button.translates").removeClass("hidden")
+                        }
+
+                        // Continue reading the stream
+                        streamRead();
+                    }).catch(error => {
+                        console.error('Error reading stream:', error);
+                        console.error(error);
+                        $(node).children("svg").addClass("hidden");
+                        $(node).children("svg").eq(3).removeClass("hidden");
+                        $("#error_alert >span").text(error)
+                        $("#error_alert").fadeIn();
+                        setTimeout(function() {
+                            $("#error_alert").fadeOut();
+                            $(node).parent().children("button.translates").each(function() {
+                                $(this).removeClass("hidden");
+                                $(this).children("svg").addClass("hidden");
+                                $(this).children("svg").eq(0).removeClass("hidden");
+                                $(this).prop("disabled", false);
+                            });
+                        }, 3000);
                     });
-                    $(node).prop("disabled", true);
-                    $(node).children("svg").addClass("hidden");
-                    $(node).children("svg").eq(2).removeClass("hidden");
-                    $(node).parent().children("button.translates").removeClass("hidden")
                 }
-            },
-            error: function(xhr, status, error) {
+                streamRead();
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
                 console.error(error);
                 $(node).children("svg").addClass("hidden");
                 $(node).children("svg").eq(3).removeClass("hidden");
@@ -253,8 +291,7 @@ xmlns="http://www.w3.org/2000/svg">
                         $(this).prop("disabled", false);
                     });
                 }, 3000);
-            }
-        })
+            })
     }
 
     function copytext(node, text) {

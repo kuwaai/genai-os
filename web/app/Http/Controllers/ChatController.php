@@ -94,25 +94,59 @@ class ChatController extends Controller
         $history = new APIHistories();
         $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => Auth::user()->id]);
         $history->save();
+        $response = new StreamedResponse();
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        $response->headers->set('charset', 'utf-8');
+        $response->headers->set('Connection', 'close');
 
-        RequestChat::dispatch($tmp, $access_code, Auth::user()->id, -$history->id, Auth::user()->openai_token, 'api_' . $history->id);
+        $response->setCallback(function () use ($history, $tmp, $access_code) {
+            $client = new Client(['timeout' => 300]);
+            Redis::rpush('api_' . Auth::user()->id, $history->id);
+            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, Auth::user()->openai_token, 'api_' . $history->id);
 
-        $client = new Client(['timeout' => 300]);
-        $req = $client->get(route('api.stream'), [
-            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-            'query' => [
-                'key' => config('app.API_Key'),
-                'channel' => 'api_' . $history->id,
-            ],
-            'stream' => true,
-        ]);
-
-        $result = explode('[ENDEDPLACEHOLDERUWU]', $req->getBody()->getContents())[0];
-
-        $history->fill(['output' => $result]);
-        $history->save();
-
-        return response($result, 200)->header('Content-Type', 'text/plain');
+            $req = $client->get(route('api.stream'), [
+                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                'query' => [
+                    'key' => config('app.API_Key'),
+                    'user_id' => Auth::user()->id,
+                    'history_id' => $history->id,
+                ],
+                'stream' => true,
+            ]);
+            $stream = $req->getBody();
+            $result = "";
+            $line = '';
+            while (!$stream->eof()) {
+                $char = $stream->read(1);
+            
+                if ($char === "\n") {
+                    $line = trim($line);
+                    if (substr($line, 0, 5) === 'data:') {
+                        $jsonData = (object)json_decode(trim(substr($line, 5)));
+                        if ($jsonData !== null) {
+                            $tmp = mb_substr($jsonData->msg, mb_strlen($jsonData->msg, 'UTF-8') - 1, 1, 'UTF-8');
+                            $result .= $tmp;
+                            echo $tmp;
+                            ob_flush();
+                            flush();
+                        }
+                    } elseif (substr($line, 0, 6) === 'event:') {
+                        if (trim(substr($line, 5)) == 'end') {
+                            $client->disconnect();
+                            break;
+                        }
+                    }
+                    $line = "";
+                } else {
+                    $line .= $char;
+                }
+            }
+            $history->fill(['output' => $result]);
+            $history->save();
+        });
+        return $response;
     }
 
     public function update_chain(Request $request)
