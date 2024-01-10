@@ -161,7 +161,7 @@ class RequestChat implements ShouldQueue
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 $tmp .= $message;
-                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . ($this->channel == $this->history_id ? '...' : '') . ($taide_flag ? "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]" : '')]));
+                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . ($this->channel == $this->history_id ? '...' : '') . ($taide_flag && $this->channel == $this->history_id ? "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]" : '')]));
                                 $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
@@ -173,11 +173,11 @@ class RequestChat implements ShouldQueue
                     if (trim($tmp) == '') {
                         $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
                     } else {
-                        if ($taide_flag) {
-                            $tmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
-                        }
                         if ($this->channel != $this->history_id) {
                             Redis::publish($this->channel, 'Ended Ended');
+                        }
+                        else if ($taide_flag) {
+                            $tmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
                         }
                     }
                 } catch (Exception $e) {
