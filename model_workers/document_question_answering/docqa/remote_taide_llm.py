@@ -141,22 +141,32 @@ class LlmProjectTaideLlm(TaideLlm):
         }
         
         # Perform the HTTP request.
-        loop = asyncio.get_running_loop()
-        response = await loop.run_in_executor(
-            None,
-            functools.partial(
-                requests.post,
-                self.api_endpoint,
-                headers=headers,
-                json=request_data
-            )
+        response = await self.call_sse_api(
+            url=self.api_endpoint,
+            headers=headers,
+            data=request_data
         )
-        logger.debug(response.json())
-        if not response.ok:
-            raise RuntimeError(f'Request failed with status {response.status_code}')
+        logger.debug(response)
         
-        data = response.json()
-        return data["output"]
+        return response
+
+    async def call_sse_api(self, url, headers, data):
+        
+        def handle_sse():
+            nonlocal url, headers, data
+            buffer = ''
+            with requests.post(url, headers=headers, json=data, stream=True,timeout=60) as resp:
+                if not resp.ok:
+                    raise RuntimeError(f'Request failed with status {response.status_code}')
+                for line in resp.iter_lines(decode_unicode=True):
+                    if not line or line == "event: end": break
+                    elif line.startswith("data: "):
+                        chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
+                        buffer += chunk[-1]
+            return buffer
+
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, handle_sse)
 
     async def complete(self, chat_history: [ChatRecord]) -> str:
         chat_history = [
