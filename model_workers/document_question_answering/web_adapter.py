@@ -88,7 +88,7 @@ class DatabaseQaProcess(GeneralProcessInterface):
 class SearchQaProcess(GeneralProcessInterface):
   def __init__(self):
     self.logger = logging.getLogger(__name__)
-    self.app = DocumentQa()
+    self.app = DocumentQa(with_ref=False)
 
   async def is_url_reachable(self, url:str, timeout=5) -> bool:
     loop = asyncio.get_running_loop()
@@ -109,7 +109,7 @@ class SearchQaProcess(GeneralProcessInterface):
     finally:
       return resp != None and resp.ok
 
-  async def search_url(self, chat_history: [ChatRecord], num_url = 3) -> str:
+  async def search_url(self, chat_history: [ChatRecord], num_url = 3) -> ([dict[str, str]],[str]):
     """
     Get first URL from the search result.
     """
@@ -161,8 +161,10 @@ class SearchQaProcess(GeneralProcessInterface):
       resp  = resp.json()
       
       urls = [item['link'] for item in resp['items']]
+      titles = [item['title'] for item in resp['items']]
       urls_reachable = await asyncio.gather(*[self.is_url_reachable(url) for url in urls])
       self.logger.debug(list(zip(urls, urls_reachable)))
+      urls = list(zip(urls, titles))
       urls = list(itertools.compress(urls, urls_reachable))
       urls = urls[:min(len(urls), num_url)]
     
@@ -180,12 +182,12 @@ class SearchQaProcess(GeneralProcessInterface):
 
       if len(urls) == 0: raise NoUrlException
       
-      async for reply in self.app.process(urls, chat_history):
+      async for reply in self.app.process([u for u,t in urls], chat_history):
         yield reply
       
       yield f'\n\n參考資料：\n'
-      for url in urls:
-        yield f'{url}\n'
+      for i, (url, title) in enumerate(urls):
+        yield f'{i+1}. [{title.strip()}]({url})\n'
     
     except NoUrlException as e:
       await asyncio.sleep(2) # To prevent SSE error of web page.
