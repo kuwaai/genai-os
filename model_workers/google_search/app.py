@@ -111,9 +111,11 @@ class GoogleSearchProcess(GeneralProcessInterface):
       escaped_query = urllib.parse.quote_plus(query)
 
       yield f'  \n### 外部搜尋引擎連結  \n'
-      for link in self.search_engine_links:
+      for item in self.search_engine_links:
+        name = item['name']
+        link = item['link']
         link = link.replace('{}', escaped_query)
-        yield f'- {link}  \n'
+        yield f'- [{name}]({link})  \n'
     
     except NoSearchEngineException as e:
       yield '外部搜尋暫無法連上，請稍後重試或是聯絡管理員。'
