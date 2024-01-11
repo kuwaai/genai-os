@@ -22,6 +22,7 @@
                 @endforeach
             </div>
             <div class="overflow-y-auto scrollbar">
+                @if (request()->user()->hasPerm('Duel_update_new_chat'))
                 <div class="m-2 border border-green-400 border-1 rounded-lg overflow-hidden">
                     <form method="post"
                         action="{{ route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
@@ -39,6 +40,7 @@
                         </div>
                     </form>
                 </div>
+                @endif
                 @if ($DC)
                     @foreach ($DC as $dc)
                         <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
@@ -75,6 +77,7 @@
                 @endforeach
             </div>
             <div class="overflow-y-auto scrollbar">
+                @if (request()->user()->hasPerm('Duel_update_new_chat'))
                 <div class="m-2 border border-green-400 border-1 rounded-lg overflow-hidden">
                     <form method="post"
                         action="{{ route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
@@ -92,6 +95,7 @@
                         </div>
                     </form>
                 </div>
+                @endif
                 @foreach ($DC as $dc)
                     <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                         <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"

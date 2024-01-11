@@ -273,7 +273,7 @@
                         <label for="edit_group_invite_code"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Invite Code') }}</label>
                         <div class="flex rounded-lg overflow-hidden">
-                            <label class="bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
+                            <label class="bg-gray-300 dark:bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
                                 for="edit_enable_invite_code">
                                 <input type="checkbox" style="box-shadow:none;" id="edit_enable_invite_code"
                                     onclick="$(this).parent().next().val('');$(this).parent().next().prop('disabled', !$(this).prop('checked')); $(this).parent().next().next().attr('style',!$(this).prop('checked') ? 'display:none':'')">

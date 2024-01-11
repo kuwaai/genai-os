@@ -11,9 +11,11 @@ use App\Models\Groups;
 use App\Models\User;
 use App\Models\GroupPermissions;
 use App\Models\LLMs;
+use App\Models\Logs;
 use App\Models\Permissions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ManageController extends Controller
 {
@@ -21,7 +23,7 @@ class ManageController extends Controller
     {
         if ($request->input('name')) {
             $group = new Groups();
-            $group->fill(['name' => $request->input('name'), 'describe' => $request->input('describe'), 'invite_token'=>$request->input('invite_code')]);
+            $group->fill(['name' => $request->input('name'), 'describe' => $request->input('describe'), 'invite_token' => $request->input('invite_code')]);
             $group->save();
             if ($request->input('permissions')) {
                 $currentTimestamp = now();
@@ -37,6 +39,14 @@ class ManageController extends Controller
                 }
                 GroupPermissions::insert($perm_records);
             }
+            $log = new Logs();
+            $log->fill([
+                'action' => 'create_group',
+                'description' => "Created group {$group->id} with name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions') ?? []),
+                'user_id' => $request->user()->id,
+                'ip_address' => $request->ip(),
+            ]);
+            $log->save();
             return Redirect::route('manage.home')
                 ->with('last_tab', 'groups')
                 ->with('last_group', $group->id)
@@ -52,7 +62,7 @@ class ManageController extends Controller
             $group = Groups::find($id);
             $name = $request->input('name');
             $describe = $request->input('describe');
-            $group->fill(['name' => $name, 'describe' => $describe, 'invite_token'=>$request->input('invite_code')]);
+            $group->fill(['name' => $name, 'describe' => $describe, 'invite_token' => $request->input('invite_code')]);
             $group->save();
             $permissions = $request->input('permissions');
             GroupPermissions::where('group_id', '=', $group->id)->delete();
@@ -70,12 +80,23 @@ class ManageController extends Controller
                 }
                 GroupPermissions::insert($perm_records);
             }
+            $log = new Logs();
+            $log->fill([
+                'action' => 'update_group',
+                'description' => "Updated group {$group->id} by name {$group->name}" . ($group->describe ? " and described {$group->describe}" : '') . ($group->invite_token ? " and invite_token {$group->invite_token}" : '') . "\npermIDs: " . implode(' ', $request->input('permissions') ?? []),
+                'user_id' => $request->user()->id,
+                'ip_address' => $request->ip(),
+            ]);
+            $log->save();
+            return Redirect::route('manage.home')
+                ->with('last_tab', 'groups')
+                ->with('last_group', $id)
+                ->with('last_action', 'update')
+                ->with('status', 'success');
         }
         return Redirect::route('manage.home')
             ->with('last_tab', 'groups')
-            ->with('last_group', $id)
-            ->with('last_action', 'update')
-            ->with('status', 'success');
+            ->with('last_group', $id);
     }
 
     public function group_delete(Request $request): RedirectResponse
@@ -83,13 +104,25 @@ class ManageController extends Controller
         $id = $request->input('id');
         if ($id) {
             $group = Groups::find($id);
+            User::where("group_id","=",$id)->update(["group_id"=>null]);
             $group->delete();
+            $log = new Logs();
+            $log->fill([
+                'action' => 'delete_group',
+                'description' => 'Deleted group ' . $group->id,
+                'user_id' => $request->user()->id,
+                'ip_address' => $request->ip(),
+            ]);
+            $log->save();
+            return Redirect::route('manage.home')
+                ->with('last_tab', 'groups')
+                ->with('last_group', null)
+                ->with('last_action', 'delete')
+                ->with('status', 'success');
         }
         return Redirect::route('manage.home')
             ->with('last_tab', 'groups')
-            ->with('last_group', null)
-            ->with('last_action', 'delete')
-            ->with('status', 'success');
+            ->with('last_group', null);
     }
 
     public function user_update(Request $request): RedirectResponse
@@ -122,6 +155,16 @@ class ManageController extends Controller
 
     public function user_create(Request $request): RedirectResponse
     {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'password' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
+            'group' => 'nullable|string',
+        ]);
+        if ($validator->fails()) {
+            return Redirect::route('manage.home')
+                ->with('last_tab', 'users');
+        }
         $user = new User();
         if ($request->input('group')) {
             $group_id = Groups::where('name', '=', $request->input('group'))->first()->id;
@@ -146,7 +189,7 @@ class ManageController extends Controller
         return Redirect::route('manage.home')
             ->with('last_tab', 'users')
             ->with('last_tool', 'fuzzy_selector')
-            ->with('fuzzy_search', $request->input("search"));
+            ->with('fuzzy_search', $request->input('search'));
     }
 
     public function user_delete(Request $request): RedirectResponse
@@ -168,49 +211,57 @@ class ManageController extends Controller
 
     public function llm_update(LLMUpdateRequest $request): RedirectResponse
     {
-        $model = LLMs::findOrFail($request->input("id"));
+        $model = LLMs::findOrFail($request->input('id'));
         $validated = $request->validated();
         if ($file = $request->file('image')) {
             Storage::delete($model->image);
             $validated['image'] = $file->store('public/images');
         }
-        if (is_null($validated['order']))  unset($validated['order']);
-        if (is_null($validated['version']))  unset($validated['version']);
+        if (is_null($validated['order'])) {
+            unset($validated['order']);
+        }
+        if (is_null($validated['version'])) {
+            unset($validated['version']);
+        }
         $model->fill($validated);
         $model->save();
         return Redirect::route('manage.home')
-        ->with('last_tab', 'llms')
-        ->with('last_llm_id', $request->input("id"));
+            ->with('last_tab', 'llms')
+            ->with('last_llm_id', $request->input('id'));
     }
 
     public function llm_delete(Request $request): RedirectResponse
     {
-        $model = LLMs::findOrFail($request->input("id")); 
+        $model = LLMs::findOrFail($request->input('id'));
         Storage::delete($model->image);
         $model->delete();
-        Permissions::where("name","=","model_" . $request->input("id"))->delete();
+        Permissions::where('name', '=', 'model_' . $request->input('id'))->delete();
         return Redirect::route('manage.home')
-        ->with('last_tab', 'llms')
-        ->with('last_llm_id', $request->input("id"));
+            ->with('last_tab', 'llms')
+            ->with('last_llm_id', $request->input('id'));
     }
 
     public function llm_create(LLMCreateRequest $request): RedirectResponse
     {
-        $model = new LLMs;
+        $model = new LLMs();
         $validated = $request->validated();
         if ($file = $request->file('image')) {
             $validated['image'] = $file->store('public/images');
         }
-        if (is_null($validated['order']))  unset($validated['order']);
-        if (is_null($validated['version']))  unset($validated['version']);
+        if (is_null($validated['order'])) {
+            unset($validated['order']);
+        }
+        if (is_null($validated['version'])) {
+            unset($validated['version']);
+        }
         $model->fill($validated);
         $model->save();
-        $perm = new Permissions;
-        $perm->fill(["name" => "model_" . $model->id,"describe"=>"Permission for model id " . $model->id]);
+        $perm = new Permissions();
+        $perm->fill(['name' => 'model_' . $model->id, 'describe' => 'Permission for model id ' . $model->id]);
         $perm->save();
         return Redirect::route('manage.home')
-        ->with('last_tab', 'llms')
-        ->with('last_llm_id', $model->id);
+            ->with('last_tab', 'llms')
+            ->with('last_llm_id', $model->id);
     }
 
     public function llm_toggle(Request $request): RedirectResponse
@@ -219,7 +270,7 @@ class ManageController extends Controller
         $model->enabled = !$model->enabled;
         $model->save();
         return Redirect::route('manage.home')
-        ->with('last_tab', 'llms')
-        ->with('last_llm_id', $request->route('llm_id'));
+            ->with('last_tab', 'llms')
+            ->with('last_llm_id', $request->route('llm_id'));
     }
 }

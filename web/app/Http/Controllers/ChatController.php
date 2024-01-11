@@ -26,6 +26,24 @@ use Session;
 
 class ChatController extends Controller
 {
+    public function abort(Request $request)
+    {
+        $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))
+            ->where('chat_id', '=', $request->route('chat_id'))
+            ->pluck('id')
+            ->toArray();
+        $client = new Client(['timeout' => 300]);
+        $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
+        $response = $client->post($agent_location . RequestChat::$agent_version . '/chat/abort', [
+            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'form_params' => [
+                'history_id' => json_encode($list),
+                'user_id' => Auth::user()->id,
+            ],
+        ]);
+        return response('Aborted', 200);
+    }
+
     public function translate(Request $request)
     {
         $record = Histories::find($request->route('history_id'));
@@ -48,28 +66,87 @@ class ChatController extends Controller
         }
 
         $tmp = json_encode([['isbot' => false, 'msg' => $msg]]);
+        if ($access_code == 'safety-guard') {
+            if ($record->chained) {
+                $tmp = Histories::where('chat_id', '=', $record->chat_id)
+                    ->where('id', '<=', $record->id)
+                    ->where('created_at', '<=', $record->created_at)
+                    ->select('msg', 'isbot')
+                    ->orderby('created_at')
+                    ->orderby('id', 'desc')
+                    ->get()
+                    ->toJson();
+            } else {
+                $tmp = json_encode([
+                    [
+                        'isbot' => false,
+                        'msg' => Histories::where('chat_id', '=', $record->chat_id)
+                            ->where('isbot', '=', false)
+                            ->orderby('created_at')
+                            ->orderby('id', 'desc')
+                            ->get()
+                            ->last()->msg,
+                    ],
+                    ['isbot' => true, 'msg' => $msg],
+                ]);
+            }
+        }
         $history = new APIHistories();
         $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => Auth::user()->id]);
         $history->save();
+        $response = new StreamedResponse();
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        $response->headers->set('charset', 'utf-8');
+        $response->headers->set('Connection', 'close');
 
-        RequestChat::dispatch($tmp, $access_code, Auth::user()->id, -$history->id, Auth::user()->openai_token, 'api_' . $history->id);
+        $response->setCallback(function () use ($history, $tmp, $access_code) {
+            $client = new Client(['timeout' => 300]);
+            Redis::rpush('api_' . Auth::user()->id, $history->id);
+            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, Auth::user()->openai_token, 'api_' . $history->id);
 
-        $client = new Client(['timeout' => 300]);
-        $req = $client->get(route('api.stream'), [
-            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-            'query' => [
-                'key' => config('app.API_Key'),
-                'channel' => 'api_' . $history->id,
-            ],
-            'stream' => true,
-        ]);
-
-        $result = explode('[ENDEDPLACEHOLDERUWU]', $req->getBody()->getContents())[0];
-
-        $history->fill(['output' => $result]);
-        $history->save();
-
-        return response($result, 200)->header('Content-Type', 'text/plain');
+            $req = $client->get(route('api.stream'), [
+                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                'query' => [
+                    'key' => config('app.API_Key'),
+                    'user_id' => Auth::user()->id,
+                    'history_id' => $history->id,
+                ],
+                'stream' => true,
+            ]);
+            $stream = $req->getBody();
+            $result = "";
+            $line = '';
+            while (!$stream->eof()) {
+                $char = $stream->read(1);
+            
+                if ($char === "\n") {
+                    $line = trim($line);
+                    if (substr($line, 0, 5) === 'data:') {
+                        $jsonData = (object)json_decode(trim(substr($line, 5)));
+                        if ($jsonData !== null) {
+                            $tmp = mb_substr($jsonData->msg, mb_strlen($jsonData->msg, 'UTF-8') - 1, 1, 'UTF-8');
+                            $result .= $tmp;
+                            echo $tmp;
+                            ob_flush();
+                            flush();
+                        }
+                    } elseif (substr($line, 0, 6) === 'event:') {
+                        if (trim(substr($line, 5)) == 'end') {
+                            $client->disconnect();
+                            break;
+                        }
+                    }
+                    $line = "";
+                } else {
+                    $line .= $char;
+                }
+            }
+            $history->fill(['output' => $result]);
+            $history->save();
+        });
+        return $response;
     }
 
     public function update_chain(Request $request)
@@ -186,7 +263,7 @@ class ChatController extends Controller
                         $first = array_shift($historys);
                         $chat = new Chats();
                         $chatname = $first->content;
-                        if (in_array(LLMs::find($llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                        if (strpos(LLMs::find($llm_id)->access_code, 'doc-qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'doc_qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'web_qa') === 0) {
                             function getWebPageTitle($url)
                             {
                                 // Try to fetch the HTML content of the URL
@@ -314,7 +391,9 @@ class ChatController extends Controller
         if (Auth::user()->hasPerm('Chat_update_new_chat')) {
             return view('chat');
         } else {
-            $result = Chats::where('llm_id', '=', $llm_id)->whereNull('dcID');
+            $result = Chats::where('llm_id', '=', $llm_id)
+                ->whereNull('dcID')
+                ->where('user_id', '=', Auth::user()->id);
             if ($result->exists()) {
                 return Redirect::route('chat.chat', $result->first()->id);
             } else {
@@ -404,20 +483,26 @@ class ChatController extends Controller
     {
         $history_id = $request->input('history_id');
         if ($history_id) {
-            $nice = $request->input('type') == '1';
-            $detail = $request->input('feedbacks');
-            $flag = $request->input('feedback');
-            $init = $request->input('init');
-            $feedback = new Feedback();
-            if (Feedback::where('history_id', '=', $history_id)->exists()) {
-                $feedback = Feedback::where('history_id', '=', $history_id)->first();
+            $tmp = Histories::find($history_id);
+            if ($tmp) {
+                $tmp = Chats::find($tmp->chat_id)->dcID;
+                if (($tmp != null && Auth::user()->hasPerm('Duel_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
+                    $nice = $request->input('type') == '1';
+                    $detail = $request->input('feedbacks');
+                    $flag = $request->input('feedback');
+                    $init = $request->input('init');
+                    $feedback = new Feedback();
+                    if (Feedback::where('history_id', '=', $history_id)->exists()) {
+                        $feedback = Feedback::where('history_id', '=', $history_id)->first();
+                    }
+                    if ($init) {
+                        $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => null, 'flags' => null]);
+                    } else {
+                        $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => $detail, 'flags' => $flag == null ? null : json_encode($flag)]);
+                    }
+                    $feedback->save();
+                }
             }
-            if ($init) {
-                $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => null, 'flags' => null]);
-            } else {
-                $feedback->fill(['history_id' => $history_id, 'nice' => $nice, 'detail' => $detail, 'flags' => $flag == null ? null : json_encode($flag)]);
-            }
-            $feedback->save();
         }
         return back();
     }
@@ -443,7 +528,7 @@ class ChatController extends Controller
             $input = $request->input('input');
             $llm_id = $request->input('llm_id');
             if ($input && $llm_id && in_array($llm_id, $result)) {
-                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
                     # Validate first message is exactly URL
                     if (!filter_var($input, FILTER_VALIDATE_URL)) {
                         return back();
@@ -451,7 +536,7 @@ class ChatController extends Controller
                 }
                 $chat = new Chats();
                 $chatname = $input;
-                if (in_array(LLMs::find($request->input('llm_id'))->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5'])) {
+                if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
                     function getWebPageTitle($url)
                     {
                         // Try to fetch the HTML content of the URL
@@ -542,7 +627,7 @@ class ChatController extends Controller
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
                 $history->save();
-                if (in_array(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
+                if ((strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc-qa') === 0 || strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'doc_qa') === 0 || strpos(LLMs::find(Chats::find($request->input('chat_id'))->llm_id)->access_code, 'web_qa') === 0) && !$chained) {
                     $tmp = json_encode([
                         [
                             'msg' => Histories::where('chat_id', '=', $chatId)
@@ -687,12 +772,6 @@ class ChatController extends Controller
                     echo "event: close\n\n";
                     ob_flush();
                     flush();
-                    try {
-                        if ($client) {
-                            $client->disconnect();
-                        }
-                    } catch (Exception) {
-                    }
                 }
             }
         });

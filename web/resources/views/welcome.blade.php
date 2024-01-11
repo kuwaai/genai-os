@@ -370,7 +370,7 @@
                         href="https://www.twcc.ai/" target="_blank">{{ __('Powered by TWCC') }}</a>
                     @endenv
                     <span class="text-black dark:text-white flex justify-end text-sm">{{ __('Version') }}
-                        0.0.7.1</span>
+                        0.1.0.0</span>
                 </div>
             </div>
 

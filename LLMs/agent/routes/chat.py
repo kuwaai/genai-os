@@ -14,7 +14,7 @@ def completions():
         if len(dest) > 0:
             dest = dest[0]
             try:
-                response = requests.post(dest[0], data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken}, stream=True)
+                response = requests.post(dest[0], data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken}, stream=True, timeout=60)
                 def event_stream(dest, response):
                     dest[1] = "BUSY"
                     try:
@@ -27,9 +27,20 @@ def completions():
                         dest[2] = -1
                         dest[1] = "READY"
                         print("Done")
-                return Response(event_stream(dest, response), mimetype='text/event-stream')
+                return Response(event_stream(dest, response), mimetype='text/plain')
             except requests.exceptions.ConnectionError as e:
                 #POST Failed, unregister this
                 data[llm_name] = [i for i in data[llm_name] if i[0] != dest[0]]
                 if data[llm_name] == []: del data[llm_name]
     return ""
+
+@chat.route("/abort", methods=["POST"])
+def abort():
+    history_id, user_id = request.form.get("history_id"), request.form.get("user_id")
+    if history_id and user_id:
+        history_id = eval(history_id)
+        for i, o in data.items():
+            dest = [k for k in o if int(k[2]) in history_id and k[3] == user_id]
+            for d in dest:
+                requests.get(d[0] + "/abort", timeout=10)
+    return "Success"

@@ -16,7 +16,7 @@ return new class extends Migration
 			$table->string('image')->unique();
 			$table->string('name')->unique();
 			$table->string('link')->unique();
-			$table->string('API')->unique();
+			$table->string('api')->unique();
 			$table->integer('limit_per_day');
             $table->timestamps();
         });

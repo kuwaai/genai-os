@@ -32,7 +32,7 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         @if (request()->route('chat_id') || request()->route('llm_id'))
             <x-chat.rooms.drawer :LLM="$LLM" />
-            @if (request()->route('chat_id'))
+            @if (request()->route('chat_id') && request()->user()->hasPerm('Chat_update_feedback'))
                 <x-chat.modals.feedback />
             @endif
         @endif
@@ -76,28 +76,34 @@
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
                     <div
                         class="{{ request()->route('llm_id') &&
-                        in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5', 'feedback'])
+                        (App\Models\LLMs::find(request()->route('llm_id'))->access_code == 'feedback' ||
+                            (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc_qa') === 0 ||
+                                strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc-qa') === 0))
                             ? 'm-auto'
                             : '' }}">
                         @if (request()->route('chat_id'))
                             @php
                                 $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                                 $refers = App\Models\Histories::where('chat_id', '=', request()->route('chat_id'))
-                                ->where("isbot","=",true)
-                                        ->select('msg', 'id')->get();
+                                    ->where('isbot', '=', true)
+                                    ->select('msg', 'id')
+                                    ->get();
                             @endphp
-                            <script>$refs = []</script>
+                            <script>
+                                $refs = []
+                            </script>
                             @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->leftjoin('feedback', 'history_id', '=', 'histories.id')->leftJoin('chats', 'histories.chat_id', '=', 'chats.id')->select(['histories.*', 'chats.llm_id', 'feedback.nice', 'feedback.detail', 'feedback.flags'])->orderby('histories.created_at')->orderby('histories.id', 'desc')->get() as $history)
                                 <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
                             @endforeach
                         @elseif(request()->route('llm_id') &&
-                                in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
+                                (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc_qa') === 0 ||
+                                    strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc-qa') === 0))
                             <p class="m-auto text-black dark:text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['feedback']))
                             <p class="m-auto text-black dark:text-white">{!! __('This is for human feedback, Only import/export is allowed here.') !!}</p>
                         @elseif(request()->route('llm_id') &&
-                                in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
+                                strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'web_qa') === 0)
                         @endif
                         <div style="display:none;"
                             class="bg-red-100 border border-red-400 mt-2 text-red-700 px-4 py-3 rounded relative"
@@ -115,17 +121,19 @@
                             request()->route('llm_id') &&
                             App\Models\LLMs::find(request()->route('llm_id'))->access_code != 'feedback'))
                     <div
-                        class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']) ? 'overflow-x-hidden' : '' }}">
+                        class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden {{ request()->route('llm_id') && (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc_qa') === 0 || strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc-qa') === 0) ? 'overflow-x-hidden' : '' }}">
                         @if (request()->route('llm_id') &&
-                                in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
+                                (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc_qa') === 0 ||
+                                    strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc-qa') === 0))
                             <x-chat.prompt-area.upload :llmId="request()->route('llm_id')" />
                         @elseif (request()->route('llm_id'))
-                            <x-chat.prompt-area.request :llmId="request()->route('llm_id')" />
+                            <x-chat.prompt-area.create :llmId="request()->route('llm_id')" />
                         @elseif(request()->route('chat_id'))
-                            <x-chat.prompt-area.create :chained="\Session::get('chained')" />
+                            <x-chat.prompt-area.request :chained="\Session::get('chained')" />
                         @endif
                     </div>
                 @endif
+                <x-chat.prompt-area.chat-script />
             </div>
         @endif
     </div>

@@ -45,16 +45,18 @@ def get_base_url(url):
     
 def loadRecords(var, keep_state = False):
     log(0,"Loading records, Here's before\n",data)
+    log(0,"Here's new records\n",var)
     for i,o in var.items():
         data[i] = []
         for k in o:
-            try:
-                resp = requests.get(get_base_url(k[0]) + "/health")
-                if resp.status_code == 204:
-                    data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1])
-                else:
+            if not(endpoint_formatter(k[0]) in [j[0] for j in data.get(i, [])]):
+                try:
+                    resp = requests.get(get_base_url(k[0]) + "/health", timeout=20)
+                    if resp.status_code == 204:
+                        data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1])
+                    else:
+                        log(0,f"Healthy check failed in {i} at {k[0]}, removed")
+                except requests.exceptions.ConnectionError as e:
                     log(0,f"Healthy check failed in {i} at {k[0]}, removed")
-            except requests.exceptions.ConnectionError as e:
-                log(0,f"Healthy check failed in {i} at {k[0]}, removed")
         if len(data[i]) == 0: del data[i]
     log(0,"Records loaded, Here's After\n",data)

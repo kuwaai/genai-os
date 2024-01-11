@@ -43,9 +43,9 @@
             {{ __('Translate by the model') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
-        <div id="react_translateCC" role="tooltip"
+        <div id="react_safetyGuard" role="tooltip"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{ __('Translate by OpenCC') }}
+            {{ __('Safety Guard Check') }}
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <div id="react_quote" role="tooltip"
@@ -68,7 +68,7 @@
             {{ App\Models\LLMs::findOrFail($llmId)->name }}</p>
         @if (request()->user()->hasPerm('Chat_update_import_chat'))
             <div class="flex">
-                <button onclick="import_chat()" data-modal-target="importModal" data-modal-toggle="importModal"
+                <button data-modal-target="importModal" data-modal-toggle="importModal"
                     class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                     <i class="fas fa-file-import"></i>
                 </button>

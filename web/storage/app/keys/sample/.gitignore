@@ -1,0 +1,7 @@
+*
+!.gitignore
+!gen.bat
+!gen.sh
+!allowlist.txt
+!DO_NOT_USE_THIS_FOLDER.txt
+!invite_code.txt

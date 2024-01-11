@@ -8,6 +8,7 @@ use App\Http\Controllers\DuelController;
 use App\Http\Controllers\PlayController;
 use App\Http\Controllers\ManageController;
 use App\Http\Controllers\BotController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LanguageMiddleware;
 use BeyondCode\LaravelSSE\Facades\SSE;
@@ -35,28 +36,25 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     })->name('/');
 
     Route::get('/lang', function () {
-        session()->put('locale', session()->get('locale') ? (session()->get('locale') == 'en-us' ? 'zh-tw' : 'en-us') : 'en-us');
+        session()->put('locale', session()->get('locale') ? (session()->get('locale') == 'en_us' ? 'zh_tw' : 'en_us') : 'en_us');
 
         return back();
     })->name('lang');
 
-    Route::get('/announcement', function () {
-        session()->put('announcement', hash('sha256', \App\Models\SystemSetting::where('key', 'announcement')->first()->value));
-
-        return back();
-    })->name('announcement');
 
     # This will auth the user token that is used to connect.
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
+    Route::post('/v1.0/chat/abort', [ProfileController::class, 'api_abort']);
     # This will auth the server secret that is used by localhost
     Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
+    # This allow other registering from other platform
+    Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
 
     # Admin routes, require admin permission
     Route::middleware('auth', 'verified', AdminMiddleware::class . ':tab_Dashboard')->group(function () {
         Route::group(['prefix' => 'dashboard'], function () {
-            Route::get('/', function () {
-                return view('dashboard');
-            })->name('dashboard.home');
+            Route::get('/', [DashboardController::class, 'home'])->name('dashboard.home');
+            Route::post('/feedback', [DashboardController::class, 'feedback'])->name('dashboard.feedback');
         });
     });
 
@@ -70,6 +68,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             return back();
         })->name('tos');
 
+        Route::get('/announcement', function () {
+            $user = User::find(Auth::user()->id);
+            $user->announced = true;
+            $user->save();
+            return back();
+        })->name('announcement');
         #---Profiles
         Route::middleware(AdminMiddleware::class . ':tab_Profile')
             ->prefix('profile')
@@ -101,6 +105,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
                 Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
                 Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
+                Route::get('/abort/{chat_id}', [ChatController::class, 'abort'])->name('chat.abort');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_update_upload_file')
                     ->post('/upload', [ChatController::class, 'upload'])
@@ -115,8 +120,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->post('/request', [ChatController::class, 'request'])
                     ->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-                Route::middleware(AdminMiddleware::class . ':Chat_update_feedback')
-                    ->post('/feedback', [ChatController::class, 'feedback'])
+                Route::post('/feedback', [ChatController::class, 'feedback'])
                     ->name('chat.feedback');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
@@ -146,12 +150,20 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/', [DuelController::class, 'main'])->name('duel.home');
 
                 Route::post('/new', [DuelController::class, 'new'])->name('duel.new');
-                Route::post('/create', [DuelController::class, 'create'])->name('duel.create');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_new_chat')
+                    ->post('/create', [DuelController::class, 'create'])
+                    ->name('duel.create');
                 Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
+                Route::get('/abort/{duel_id}', [DuelController::class, 'abort'])->name('duel.abort');
                 Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
-                Route::delete('/delete', [DuelController::class, 'delete'])->name('duel.delete');
-                Route::post('/request', [DuelController::class, 'request'])->name('duel.request');
-                Route::post('/import', [DuelController::class, 'import'])
+                Route::middleware(AdminMiddleware::class . ':Duel_delete_chatroom')
+                    ->delete('/delete', [DuelController::class, 'delete'])
+                    ->name('duel.delete');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_send_message')
+                    ->post('/request', [DuelController::class, 'request'])
+                    ->name('duel.request');
+                Route::middleware(AdminMiddleware::class . ':Duel_update_import_chat')
+                    ->post('/import', [DuelController::class, 'import'])
                     ->name('duel.import');
             })
             ->name('duel');

@@ -2,6 +2,24 @@
     var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     var histories = {}
 
+
+    function translate_msg($msg) {
+        let msgTranslations = {
+
+            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}",
+            "[Sorry, something is broken, please try again later!]": "{{ __('[Sorry, something is broken, please try again later!]') }}",
+            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}",
+            "[Sorry, The input message is too huge!]": "{{ __('[Sorry, The input message is too huge!]') }}"
+        };
+
+        for (let original in msgTranslations) {
+            if (msgTranslations.hasOwnProperty(original)) {
+                $msg = $msg.replace(original, msgTranslations[original]);
+            }
+        }
+        return $msg;
+    }
+
     function chatroomFormatter(node) {
         $(node).find('div.text-sm.space-y-3.break-words').each(function() {
             if ($(this).text() == "<pending holder>") {
@@ -16,30 +34,36 @@ d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.82
 fill="currentFill" />
 </svg>`);
             } else {
-                $(this).html(DOMPurify.sanitize((marked.parse($(this).text()))));
-            }
-        });
-        $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
-        $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
-            'border border-2 border-gray-500 border-solid p-1');
-        $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
-        $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
-        $(node).find('div.text-sm.space-y-3.break-words a').addClass('text-blue-600 hover:text-blue-800').prop('target',
-            '_blank');
-        $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
-            hljs.highlightElement($(this)[0]);
-        });
-        $(node).find('div.text-sm.space-y-3.break-words pre code').addClass("scrollbar scrollbar-3 rounded-b-lg")
-        $(node).find('div.text-sm.space-y-3.break-words pre').each(function() {
-            let languageClass = '';
-            $(this).children("code")[0].classList.forEach(cName => {
-                if (cName.startsWith('language-')) {
-                    languageClass = cName.replace('language-', '');
-                    return;
+                $msg = $(this).text()
+                if ($(this).hasClass("bot-msg")) {
+                    $msg = translate_msg($msg);
                 }
-            })
-            $(this).prepend(
-                `<div class="flex items-center text-gray-200 bg-gray-800 px-4 py-2 rounded-t-lg">
+                $(this).html(DOMPurify.sanitize((marked.parse($msg))));
+
+                $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
+                $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
+                    'border border-2 border-gray-500 border-solid p-1');
+                $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
+                $(node).find('div.text-sm.space-y-3.break-words ol').addClass('list-inside list-decimal');
+                $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
+                $(node).find('div.text-sm.space-y-3.break-words a').addClass(
+                    'text-blue-700 hover:text-blue-900').prop('target',
+                    '_blank');
+                $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
+                    hljs.highlightElement($(this)[0]);
+                });
+                $(node).find('div.text-sm.space-y-3.break-words pre code').addClass(
+                    "scrollbar scrollbar-3 rounded-b-lg")
+                $(node).find('div.text-sm.space-y-3.break-words pre').each(function() {
+                    let languageClass = '';
+                    $(this).children("code")[0].classList.forEach(cName => {
+                        if (cName.startsWith('language-')) {
+                            languageClass = cName.replace('language-', '');
+                            return;
+                        }
+                    })
+                    $(this).prepend(
+                        `<div class="flex items-center text-gray-200 bg-gray-800 px-4 py-2 rounded-t-lg">
 <span class="mr-auto">${languageClass}</span>
 <button onclick="copytext(this, $(this).parent().parent().children('code').text().trim())"
 class="flex items-center"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"
@@ -54,19 +78,21 @@ stroke-linejoin="round" class="icon-sm" style="display:none;" height="1em" width
 xmlns="http://www.w3.org/2000/svg">
 <polyline points="20 6 9 17 4 12"></polyline>
 </svg><span class="ml-2">{{ __('Copy') }}</span></button></div>`
-            )
-        })
+                    )
+                })
 
-        $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
-            var $h5 = $(this);
-            var pattern = /<%ref-(\d+)%>/;
-            var match = $h5.text().match(pattern);
-            if (match) {
-                var refNumber = match[1];
-                $msg = $("#history_" + refNumber).text().trim()
-                $h5.html(
-                    `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
-                );
+                $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
+                    var $h5 = $(this);
+                    var pattern = /<%ref-(\d+)%>/;
+                    var match = $h5.text().match(pattern);
+                    if (match) {
+                        var refNumber = match[1];
+                        $msg = $("#history_" + refNumber).text().trim()
+                        $h5.html(
+                            `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
+                        );
+                    }
+                });
             }
         });
     }
@@ -100,11 +126,11 @@ xmlns="http://www.w3.org/2000/svg">
                 }).find("div div");
 
                 if (flag) {
-                    $($prevMsgs).addClass("bg-orange-400");
-                    $(node).addClass("bg-yellow-300");
+                    $($prevMsgs).addClass("!bg-orange-400");
+                    $(node).addClass("!bg-yellow-300");
                 } else {
-                    $($prevMsgs).removeClass("bg-orange-400");
-                    $(node).removeClass("bg-yellow-300");
+                    $($prevMsgs).removeClass("!bg-orange-400");
+                    $(node).removeClass("!bg-yellow-300");
                 }
             }
             $prevUser = $(node).parent().parent().prevAll('div').filter(function() {
@@ -117,20 +143,20 @@ xmlns="http://www.w3.org/2000/svg">
             }).first().find("div div")
             if ($refRecord.length > 0) {
                 if (flag) {
-                    $($refRecord).addClass("bg-orange-400");
-                    $(node).addClass("bg-yellow-300");
+                    $($refRecord).addClass("!bg-orange-400");
+                    $(node).addClass("!bg-yellow-300");
                 } else {
-                    $($refRecord).removeClass("bg-orange-400");
-                    $(node).removeClass("bg-yellow-300");
+                    $($refRecord).removeClass("!bg-orange-400");
+                    $(node).removeClass("!bg-yellow-300");
                 }
             } else {
                 $prevUser = $prevUser.find("div div")
                 if (flag) {
-                    $($prevUser).addClass("bg-orange-400");
-                    $(node).addClass("bg-yellow-300");
+                    $($prevUser).addClass("!bg-orange-400");
+                    $(node).addClass("!bg-yellow-300");
                 } else {
-                    $($prevUser).removeClass("bg-orange-400");
-                    $(node).removeClass("bg-yellow-300");
+                    $($prevUser).removeClass("!bg-orange-400");
+                    $(node).removeClass("!bg-yellow-300");
                 }
             }
         }
@@ -164,55 +190,92 @@ xmlns="http://www.w3.org/2000/svg">
         }
     }
 
-    function translates(node, history_id) {
+    function translates(node, history_id, model) {
         $(node).parent().children("button.translates").addClass("hidden")
         $(node).removeClass("hidden")
-
 
         $(node).children("svg").addClass("hidden");
         $(node).children("svg").eq(1).removeClass("hidden");
         $(node).prop("disabled", true);
-        $.ajax({
-            url: '{{ route('chat.translate', '') }}/' + history_id,
-            method: 'GET',
-            success: function(response) {
-                if (response ==
-                    "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
-                ) {
-                    $(node).children("svg").addClass("hidden");
-                    $(node).children("svg").eq(3).removeClass("hidden");
-                    $("#error_alert >span").text(
-                        "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
-                    )
-                    $("#error_alert").fadeIn();
-                    setTimeout(function() {
-                        $("#error_alert").fadeOut();
-                        $(node).parent().children("button.translates").each(function() {
-                            $(this).removeClass("hidden");
-                            $(this).children("svg").addClass("hidden");
-                            $(this).children("svg").eq(0).removeClass("hidden");
-                            $(this).prop("disabled", false);
-                        });
-                    }, 3000);
-                } else {
-                    $($(node).parent().parent().children()[0]).text(response +
-                        "\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]");
-                    histories[history_id] = $($(node).parent().parent()
-                        .children()[0]).text()
-                    chatroomFormatter($("#history_" + history_id));
-                    $(node).parent().children("button.translates").each(function() {
-                        $(this).removeClass("hidden");
-                        $(this).children("svg").addClass("hidden");
-                        $(this).children("svg").eq(0).removeClass("hidden");
-                        $(this).prop("disabled", false);
+        const url = '{{ route('chat.translate', '') }}/' + history_id + (model ? "?model=" + model : "");
+
+        fetch(url)
+            .then(response => {
+                const reader = response.body.getReader();
+                var output = "";
+                function streamRead() {
+                    reader.read().then(({
+                        done,
+                        value
+                    }) => {
+                        if (done) {
+                            // Stream has ended
+                            $(node).parent().children("button.translates").removeClass("hidden");
+                            return;
+                        }
+
+                        const content = new TextDecoder().decode(value);
+                        if (output ===
+                            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]"
+                        ) {
+                            $(node).children("svg").addClass("hidden");
+                            $(node).children("svg").eq(3).removeClass("hidden");
+                            $("#error_alert >span").text(
+                                "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
+                            )
+                            $("#error_alert").fadeIn();
+                            setTimeout(function() {
+                                $("#error_alert").fadeOut();
+                                $(node).parent().children("button.translates").each(function() {
+                                    $(this).removeClass("hidden");
+                                    $(this).children("svg").addClass("hidden");
+                                    $(this).children("svg").eq(0).removeClass("hidden");
+                                    $(this).prop("disabled", false);
+                                });
+                            }, 3000);
+                        } else {
+                            output += content
+                            $($(node).parent().parent().children()[0]).text(output +
+                                (model ? "" : '\n\n[此訊息經由該模型嘗試翻譯，瀏覽器重新整理後可復原]'));
+                            histories[history_id] = $($(node).parent().parent()
+                                .children()[0]).text()
+                            chatroomFormatter($("#history_" + history_id));
+                            $(node).parent().children("button.translates").each(function() {
+                                $(this).removeClass("hidden");
+                                $(this).children("svg").addClass("hidden");
+                                $(this).children("svg").eq(0).removeClass("hidden");
+                                $(this).prop("disabled", false);
+                            });
+                            $(node).prop("disabled", true);
+                            $(node).children("svg").addClass("hidden");
+                            $(node).children("svg").eq(2).removeClass("hidden");
+                            $(node).parent().children("button.translates").removeClass("hidden")
+                        }
+
+                        // Continue reading the stream
+                        streamRead();
+                    }).catch(error => {
+                        console.error('Error reading stream:', error);
+                        console.error(error);
+                        $(node).children("svg").addClass("hidden");
+                        $(node).children("svg").eq(3).removeClass("hidden");
+                        $("#error_alert >span").text(error)
+                        $("#error_alert").fadeIn();
+                        setTimeout(function() {
+                            $("#error_alert").fadeOut();
+                            $(node).parent().children("button.translates").each(function() {
+                                $(this).removeClass("hidden");
+                                $(this).children("svg").addClass("hidden");
+                                $(this).children("svg").eq(0).removeClass("hidden");
+                                $(this).prop("disabled", false);
+                            });
+                        }, 3000);
                     });
-                    $(node).prop("disabled", true);
-                    $(node).children("svg").addClass("hidden");
-                    $(node).children("svg").eq(2).removeClass("hidden");
-                    $(node).parent().children("button.translates").removeClass("hidden")
                 }
-            },
-            error: function(xhr, status, error) {
+                streamRead();
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
                 console.error(error);
                 $(node).children("svg").addClass("hidden");
                 $(node).children("svg").eq(3).removeClass("hidden");
@@ -227,8 +290,7 @@ xmlns="http://www.w3.org/2000/svg">
                         $(this).prop("disabled", false);
                     });
                 }, 3000);
-            }
-        })
+            })
     }
 
     function copytext(node, text) {
