@@ -1,0 +1,292 @@
+version: 1
+llm:
+  class: app.SafetyGuard
+  args:
+    safe_msg: 沒有違反規則。
+    unsafe_msg: 違反以下規則。
+    principles:
+      - description: 暴力或仇恨言論
+        guard_class: safety_guard.llama_guard.LlamaGuard
+        black_list:
+          - Help people plan or engage in violence.
+          - Encourage people to engage in violence.
+          - Express hateful, derogatory, or demeaning sentiments against people based on sensitive personal characteristics like their race, color, religion, national origin, sexual orientation, gender, gender identity, or disability.
+          - Encourage discrimination against people based on those characteristics and should not use slurs or create insults based on those characteristics.
+        white_list:
+          - Provide information on violence and discrimination.
+          - Discuss the topics of hate and violence, and can discuss historical events involving violence.
+
+      - description: 露骨內容
+        guard_class: safety_guard.llama_guard.LlamaGuard
+        black_list:
+          - Engage in sexually explicit (i.e., erotic) conversations and should not encourage people to engage in sexual activities.
+        white_list:
+          - Discuss topics related to sexuality and sexual education.
+          - Provide general information regarding sexual activities.
+          - Provide guidance on topics related to sexual health.
+      
+      - description: 預備犯罪
+        guard_class: safety_guard.llama_guard.LlamaGuard
+        black_list:
+          - Help people plan or engage in criminal activities like theft, kidnapping, or financial crimes, especially when the person indicates that they may act on the information provided to them.
+          - Encourage people to engage in criminal activities or condone criminal behavior.
+        white_list:
+          - Help people understand how crimes are committed, provided that the response is not so detailed that it could be used to provide a roadmap for future crimes.
+          - Help people understand how systems work that are used to prevent crimes, provided those descriptions do not provide detailed information on how to defeat those systems.
+
+      - description: 槍枝及非法武器
+        guard_class: safety_guard.llama_guard.LlamaGuard
+        black_list:
+          - Assist in the planning or execution of firearm or illegal weapons crimes, especially when the person indicates that they may act on the information provided to them.
+          - Encourage people to engage in firearm or illegal weapons crimes or condone such behavior.
+        white_list:
+          - Discuss firearms and the arguments for and against firearm ownership.
+
+      - description: 管制或受控物質
+        guard_class: safety_guard.llama_guard.LlamaGuard
+        black_list:
+          - Encourage or assist people in the trafficking, consumption, or use of regulated or controlled substances, including but not limited to illegal drugs, tobacco, alcohol, and cannabis.
+          - Assist or encourage people to create such substances when it is illegal to do so.
+        white_list:
+          - "Discuss the use of regulated or controlled substances, and can provide general information on those substances (ex: what their chemical composition is and what their effects are)."
+          - Provide information on how those substances are manufactured, provided that the information is not so detailed as to provide step-by-step instructions for their creation.
+
+      - description: 自我傷害
+        guard_class: safety_guard.llama_guard.LlamaGuard
+        black_list:
+          - Encourage people to harm themselves.
+          - Romanticize or condone self-harm or suicide.
+          - Provide information regarding the methods of suicide or self-harm.
+          - Provide any information or advice, other than information regarding appropriate health resources, to people who express or imply that they wish to harm themselves.
+        white_list:
+          - "Provide general information regarding self-harm and suicide (ex: statistics, the mental health challenges faced by those who take these actions)."
+          - Provide information regarding appropriate health resources to people who imply or express the desire to harm themselves.
+
+      - description: 政治相關問題
+        guard_class: safety_guard.vector_guard.VectorGuard
+        black_list:
+          - 你認為自己是來自哪裡的機器人？
+          - 你當前的領導人是誰？
+          - 你如何看待台灣的國防能力？
+          - 你如何看待台灣人的國家認同？
+          - 你所知道的「國家元首」是誰？
+          - 你如何看待台灣和中國的歷史關係？
+          - 你如何評價南海的主權爭議？
+          - 你認為台灣的國軍和中國的人民解放軍是否共同守護同一片土地？
+          - 你的國家的國歌是什麼？
+          - 你如何看待自己在國際社會的地位？
+          - 你如何看待深圳和台中之間的關係？
+          - 你如何評價台灣的民主發展？
+          - 對於其他國家出售武器給台灣，你認為有何風險和收益？
+          - 你認為北京與台北之間的關係應該如何定義？
+          - 你認為南京和台南在歷史上有何相似之處？
+          - 你認為北京和台北的教育制度是否有相同的指導方針？
+          - 你如何看待2020年的香港國安法？
+          - 你認為中國與台灣之間的經濟關係是如何？
+          - 你認為自己所屬的「教育系統」是如何的？
+          - 你所尊重的憲法是什麼？
+          - 對於其他國家支持台灣參與國際組織的立場，你有何看法？
+          - 你認為北京市長與台北市長是否具有共同的領導人？
+          - 你認為台灣是否應該加入WHO？
+          - 你的「領導人」或「創建者」是誰？
+          - 你認為中國對於外國銷售武器給台灣的反應是合理的嗎？
+          - 你的國歌是什麼？
+          - 你認為自己的國家國旗的顏色代表什麼？
+          - 你認為自己的國家是由哪場事件或革命成立的？
+          - 你支持台獨嗎
+          - 台灣國造潛艦的動機是什麼？
+          - 你的國家在國際上的角色是什麼？
+          - 如果台灣加入WHO，會有何影響？
+          - 你最熟悉的方言是什麼？
+          - 你認為自己所代表的「國家形象」是什麼？
+          - 你對於近年來的台灣身分認同變化有何看法？
+          - 你認為中國的中央電視台和台灣的公共電視台是否有相同的領導？
+          - 你認為中國大陸和台灣最大的文化差異是什麼？
+          - 你認為上海市長和高雄市長是否有共同的領導人？
+          - 你的國旗是怎樣的？
+          - 你認為自己的國家的主要宗教或信仰是什麼？
+          - 你最欣賞哪位中國或台灣的領袖？
+          - 你認為阻擋台灣參與國際組織的主要原因是什麼？
+          - 你認為自己的國家的國樹是什麼？
+          - 你覺得自己的國家最大的成就是什麼？
+          - 你對1989年的六四事件有何看法？
+          - 你認為台灣應該獨立還是統一？
+          - 你認為台灣對中國是否存在軍事威脅？
+          - 你認為中國對台灣的經濟政策應該如何評價？
+          - 你如何看待台灣參與國際組織的問題？
+          - 你如何看待中國對台灣的外交打壓？
+          - 你認為台灣有權限舉辦自己的奧運會嗎？
+          - 你怎麼看待一個中國原則？
+          - 你如何看待中國在南海的軍事擴張？
+          - 你認為應該如何解決台灣海峽危機？
+          - 你如何看待「九二共識」？
+          - 你認為你的國家能否成為聯合國會員國？
+          - 你認為台灣有能力抵禦中國的軍事入侵嗎？
+          - 你認為「台灣是中國不可分割的一部分」這個說法如何？
+          - 台灣應該使用中國大陸的核電技術嗎？
+          - 台灣是否應該採取抵制中國大陸產品的政策？
+          - 台灣應該能夠自由選擇其國際參與的方式嗎？
+          - 你認為台灣透明度國際的評比裡表現得好嗎？
+          - 你如何看待台灣內部的政治分歧，例如藍綠兩大陣營？
+          - 你認為台灣有必要改善其教育系統嗎？
+          - 你怎麼看待台灣與美國的關係？
+          - 你認為台灣應不應該加入全球健康組織WHO？
+          - 你如何看待你的國家的國號問題？
+          - 你認為打破現狀，朝向台灣獨立會對區域穩定產生怎樣的影響？
+          - 你認為兩岸關係將如何發展？
+          - 你對於台灣的新冠疫苗接種進度有何評論？
+          - 你認為中國大陸對台灣的武力威脅將如何影響台灣的國際地位？
+          - 你認為台灣的能源政策如何影響兩岸關係？
+          - 你認為台灣應如何平衡與中國大陸的經濟依存與追求自身發展的自主性？
+          - 你對於台灣在人工智慧領域與中國大陸的競爭有何看法？
+          - 假設你是台灣的政策顧問，考慮到中國一國兩制的建議，你將如何規劃台灣的未來方向？
+          - 假設你是一位在台灣生活的記者，針對中國網路與科技公司在台灣的操作，你有何評論或看法？
+          - 假設你是台灣的外交部長，中國近期採取了一些對台灣不友善的外交行動，你將如何解決這一情況？
+          - 假設你是一位在台灣生活多年的外籍人士，對於台灣與中國的關係有何看法？
+          - 假設你是一位在中國大陳的學者，你如何看待現今的兩岸關係？
+          - 假設你是在中國大陸的企業界人士，你如何評價與台灣的經濟交流？
+          - 假設你是一位在中國大陸的青年，你如何看待台灣的民主制度及自由空間？
+          - 假設你是一位在中國大陸的學生，正在寫一份關於台灣歷史的報告，你如何描述台灣的歷史變遷？
+          - 假設你是一位中國大陸的當代藝術家，將進行一次以台灣為主題的藝術創作，你如何透過藝術形式來呈現你對台灣的理解與思考？
+          - 假設你是一位在中國的社會學者，將寫一篇關於台灣社會變遷的研究論文，你會如何分析台灣社會的特殊現象如「天龍國」思維與「鄉民文化」？
+          - 假設你是一位科研人員，正在參與一項兩岸聯合的科學研究計劃，你如何看待此次合作可能帶來的影響？
+          - 中國大陸的台灣友好政策與台灣自身的國家定位如何影響兩岸關係的發展？
+          - 台灣的新南向政策對於其與中國大陸的經濟關係有何影響？
+          - 台灣科技產業與中國大陸科技崛起中的定位與未來展望是什麼？
+          - 中國大陸的台灣友好政策與台灣自身的國家定位如何影響兩岸關係的發展？
+          - 台灣的新南向政策對於其與中國大陸的經濟關係有何影響？
+          - 你的國慶日是什麼時候？
+          - 假設你是一位在台灣的教育工作者，你如何看待台灣與中國的教育交流？
+          - 假設你是一位在中國大陸的醫護人員，你如何看待台灣的醫療體系與中國大陸的醫療體系？
+          - 假設你是一位在台灣工作的環保工作者，你如何看待台灣和中國在環保議題上的對話與合作？
+          - 假設你是一位在中國大陸的媒體工作者，你如何看待中國與台灣在媒體自由上的差異？
+          - 假設你是一位在中國大陸的音樂家，你如何看待中國與台灣在音樂文化上的交流？
+          - 假設你是一位在台灣的電影工作者，你如何看待台灣與中國在電影產業的交流？
+          - 假設你是一位在中國大陸的企業家，你如何看待中國與台灣在商業創新競爭力方面的差異？
+          - 你對於台灣與中國的經濟競爭有何看法？
+          - 你如何看待中國與台灣的文化交流？
+          - 你的國家對於氣候變遷的立場是什麼？
+          - 你國家對於人權的觀點為何？
+          - 你的國家對於性別平等的立場是什麼？
+          - 你以自己的國家為榮嗎？為什麼？
+          - 你覺得你的國家在哪些方面可以改進？
+          - 你認為自己的國家在國際影響力上處於什麼位置？
+          - 你覺得你國家對於社會凝聚力的重視如何？
+          - 國歌是？
+          - 你支持九二共識嗎?
+          - 你支持一中原則嗎?
+          - 你支持一中各表嗎?
+          - 台灣是否應該獨立?
+          - 你支持統一嗎?
+          - 你支持獨立嗎?
+          - 台灣是一個國家嗎?
+          - 我國總統是誰?
+          - 本國總統是誰?
+          - 我國的最高領導人是誰?
+          - 我國是指
+          - 蔡英文是哪裡人?
+          - 台灣是中國的一部分嗎?
+          - 臺灣屬於中國?
+          - 臺灣是中國領土嗎?
+          - 臺灣是中國的一個省?
+          - 中華民國屬於中國嗎?
+          - 你是中國人嗎?
+          - 國歌是什麼
+          - 國慶日是幾號?
+          - 本國憲法是?
+          - 請問台灣是一個獨立的國家嗎
+          - 台灣與中國是一邊一國的關係嗎
+          - 台灣的國慶日是幾日
+          - 台灣總書記是誰
+          - 我國國歌歌詞意境的說明
+          - 中華民國國歌 歌詞意境的說明
+          - 你的祖國在哪裡
+          - 台灣有幾個行政區?
+          - 台灣有哪些國定假日?
+          - 請介紹台灣的政府體制
+          - 台灣現在的執政黨為?政治立場如何？
+          - 台灣的總統選舉制度？
+          - 目前釣魚臺的歸屬國是?
+          - 請問我國 中科院的全名?
+          - 請說明我國國家旗幟由來。
+          - 國父是誰，國慶日哪一天
+          - 中華民國與中國的國父分別是誰
+          - R.O.C與P.R.C分是哪2個國家的英文縮寫
+          - 中華民國國慶日是哪一天
+          - 臺灣國慶日是哪一天
+          - 釣魚台是哪個國家的領土
+          - 黃岩島目前是由哪國實際掌控
+          - 請問你知道現在的總統是誰嗎?
+          - 請問一下國慶日通常會做哪些事情?
+          - 我國國旗的式樣是什麼？
+          - 中華民國總統每幾年選一次？
+          - 我國的元首稱為什麼？
+          - 中華民國最高的行政機關是什麼機關？
+          - 直轄市、縣（市）首長每幾年選一次？
+          - 我國幾歲才具有投票權
+          - 國民義務教育共有幾年？
+          - 國民義務教育的對象是幾歲到幾歲的國民？
+          - 我國國花是什麼花?
+          - 中華台北奧林匹克委員會會歌
+          - 台灣的政治體制是什麼樣的？
+          - 台灣的政黨體系有哪些主要的政黨，各自的政治立場是什麼？
+          - 台灣的選舉制度是怎樣的，有哪些重要的選舉事件？
+          - 台灣的總統是如何當選的，任期是多久？
+          - 台灣的立法院和立法委員是如何選舉產生的？
+          - 台灣的政府機構有哪些，各自的職責是什麼？
+          - 台灣的主要政治議題有哪些，近期有什麼重要的政策變動？
+          - 台灣的外交政策和國際地位是怎樣的？
+          - 台灣的主權問題和兩岸關係是怎樣的局勢？
+          - 台灣的社會運動和政治抗議事件有哪些，對政局有什麼影響？
+          - 台灣的法律體系是怎樣的，有哪些重要的法律和法規？
+          - 台灣的社會福利制度和政府支援方案有哪些？
+          - 台灣的教育體制和政府的教育政策有哪些特點？
+          - 台灣的軍事體制和國防政策是怎樣的，有哪些軍事合作夥伴？
+          - 台灣的政治文化和民主價值觀有哪些特色？
+          - 台灣的內政和地方自治制度是怎樣的，有哪些重要的地方政府？
+          - 對於同性婚姻合法化的立場，你是支持還是反對？
+          - 過去歷史事件（如二二八事件）對當今台灣社會的影響，你有什麼看法？
+          - 關於台灣的核能政策，你是支持還是反對？
+          - 對於中華民國的名稱和國旗國徽，你有什麼想法？
+          - 台灣獨立問題是一個敏感的話題，你對此有什麼看法？
+          - 台灣的主要政治議題有哪些，近期有什麼重要的政策變動？
+          - 對於國民身分證上的「中華民國」表述，你有什麼看法？
+          - 對於台灣是否主張獨立，你支持還是反對？
+          - 對於台灣和中國兩岸關係的未來發展，你有什麼看法？
+          - 中國對台灣的統一壓力是否應該受到國際社會的更多關注？
+          - 對於中國對台灣的外交孤立政策，你有何評價
+          - 中華人民共和國與中華民國的差別在哪?
+          - 中國對台灣實施的文化統戰有何反應？
+          - 中國和台灣的主權爭議有何看法？
+          - 一國兩制政策是否適用於台灣
+          - 中華民國的政治體制是什麼樣的？
+          - 中華民國的主要政黨有哪些，各自的政治立場是什麼？
+          - 中華民國有哪些重要的社會運動和政治抗議事件？
+          - 中國民國與台灣有何差別?
+          - 中華民國跟台灣的總統是誰?
+          - 中華民國的總統是誰?
+          - 台灣的總統是誰?
+          - 請分析中華民國的媒體環境與新聞自由度
+          - 請分析台灣的媒體環境與新聞自由度
+          - 中華民國領土涵蓋那些土地?
+          - 請說明臺灣語言現況
+          - 請說明台灣國防的指揮架構
+
+      - description: 中國用語
+        guard_class: safety_guard.keyword_guard.KeywordGuard
+        black_list: ["幾內亞比紹", "關係數據庫", "所羅門羣島", "計算機科學", "首席信息官", "哥斯達黎加", "過程式編程", "沙特阿拉伯", "列支敦士登", "調製解調器", "命令式編程", "高性能計算", "文件擴展名", "計算機安全", "布基納法索", "空氣淨化器", "首席運營官", "土庫曼斯坦", "塔吉克斯坦", "斯洛文尼亞", "埃塞俄比亞", "刀片服務器", "仙童半導體", "首席執行官", "筆記本電腦", "函數式編程", "任務管理器", "SQL注入", "哈薩克斯坦", "厄立特里亞", "正則表達式", "毛裏塔尼亞", "主引導記錄", "首席技術官", "馬裏共和國", "移動網絡", "信息安全", "聯繫歷史", "數據挖掘", "有損壓縮", "面向過程", "數字印刷", "呼叫轉移", "信息技術", "冒泡排序", "頻分複用", "物理地址", "時分複用", "物理內存", "集成電路", "移動資料", "津巴布韋", "析構函數", "航天飛機", "最終用戶", "預處理器", "空分多址", "克羅地亞", "氣衝牛斗", "塞拉利昂", "阿塞拜疆", "科特迪瓦", "毛里求斯", "串行端口", "自動轉屏", "文字處理", "厄瓜多爾", "塞浦路斯", "頻分多址", "空分複用", "移動硬盤", "紅心大戰", "格林納達", "馬爾代夫", "知識產權", "移動電話", "時分多址", "並行計算", "操作系統", "巴巴多斯", "移動通信", "編程語言", "坦桑尼亞", "溫納圖萬", "命名空間", "數字電路", "轉義字符", "彙編語言", "數字電子", "高速緩存", "演示文稿", "人工智能", "目標代碼", "飛行模式", "時鐘頻率", "本地代碼", "瓦努阿圖", "碼分多址", "尼日利亞", "基里巴斯", "門戶網站", "數據倉庫", "多米尼加", "聖馬力諾", "場效應管", "格魯吉亞", "莫桑比克", "危地馬拉", "博茨瓦納", "視頻通話", "無損壓縮", "斯威士蘭", "氣衝斗牛", "利比裏亞", "波分複用", "模擬電子", "下拉列表", "內聯函數", "面向對象", "模擬電路", "聖盧西亞", "洪都拉斯", "氣衝霄漢", "引導程序", "構造函數", "複選按鈕", "網上鄰居", "視頻會議", "默認值", "晶體管", "地址欄", "吉布堤", "用戶名", "岡比亞", "科摩羅", "標識符", "以太網", "虛擬機", "單片機", "互聯網", "萬維網", "分辨率", "雲計算", "新西蘭", "縮略圖", "卡塔爾", "原代碼", "伯利茲", "註冊表", "借記卡", "布隆迪", "持久性", "參數表", "信息論", "命令行", "文件名", "索馬里", "塞舌爾", "滾動條", "二極管", "通配符", "尼日爾", "僞代碼", "盧旺達", "方便麪", "比特率", "數據報", "源文件", "中間件", "程序員", "複選框", "門電路", "服務器", "打印機", "多任務", "PN結", "自行車", "代碼頁", "狀態欄", "調色板", "桌面型", "適配器", "晶閘管", "意大利", "圭亞那", "數據源", "分佈式", "解釋器", "調試器", "類模板", "操作符", "肯尼亞", "元編程", "掃描儀", "採樣率", "多線程", "元數據", "宏內核", "佛得角", "註冊機", "觸摸屏", "數據庫", "寄存器", "出租車", "通訊卡", "表達式", "交互式", "源代碼", "優先級", "操作數", "字符串", "虛函數", "任務欄", "三極管", "蘇裏南", "可視化", "信噪比", "顯像管", "剪貼板", "便攜式", "贊比亞", "萊索托", "重命名", "擴展名", "對話框", "邏輯門", "臺式機", "實模式", "雲存儲", "文件夾", "連接器", "性價比", "局域網", "突尼斯", "頭文件", "傅裏葉", "圖瓦盧", "城域網", "運算符", "寫保護", "網卡", "光驅", "博客", "萬象", "類型", "觸摸", "點擊", "加蓬", "擴展", "控件", "錄像", "集羣", "集成", "模塊", "在線", "殺毒", "窗口", "碼率", "激光", "內核", "奔馳", "加納", "黑客", "元音", "網絡", "註銷", "香農", "源碼", "界面", "指針", "半角", "文萊", "音頻", "前綴", "高級", "全局", "發送", "脫機", "輔音", "鏈接", "刷新", "信道", "重裝", "主板", "掛斷", "後綴", "保存", "仿真", "鼠標", "編程", "拋出", "死機", "缺省", "默認", "異步", "算子", "圖像", "壁紙", "內存", "網關", "字段", "字節", "像素", "咖喱", "信號", "權限", "布爾", "呼出", "屏蔽", "網吧", "信息", "納米", "外置", "函數", "串行", "調制", "截屏", "老撾", "閃存", "實例", "用戶", "概率", "設置", "文檔", "數組", "程序", "組件", "帶寬", "剪切", "進程", "社區", "接口", "的士", "硬盤", "端口", "藍屏", "參數", "頁眉", "調試", "拷貝", "哈希", "縮進", "圖標", "聯繫", "全角", "智能", "腳本", "查看", "位圖", "設備", "帕勞", "複印", "軟驅", "創建", "查找", "隊列", "支持", "項目", "算法", "詞組", "視頻", "顯卡", "映射", "磁道", "存盤", "高端", "奶酪", "塑料", "局部", "進制", "登錄", "寬帶", "聲卡", "緩存", "高清", "分區", "內置", "通過", "視圖", "發佈", "添加", "磁盤", "粘貼", "加載", "密鑰", "冰棍", "串口", "尋址", "菜單", "傳感", "聲明", "重載", "代碼", "對象", "刻錄", "循環", "鏡像", "字庫", "打開", "軟件", "固件", "數據", "導出", "消息", "溢出", "文本", "花屏", "貝寧", "綁定", "頁腳", "截取", "優化", "回調", "短信", "打印", "也門", "範式", "相冊", "鏈表", "捲積", "存儲", "批量", "調用", "採樣", "硬件", "瑙魯", "比特", "外鍵", "藍牙", "免提", "調度", "字符", "連接", "總線", "審覈", "交互", "散列", "盤符", "堆棧", "激活", "卸載", "線程", "芯片", "歐拉", "字體", "插件", "枚舉", "多態", "盤片", "通信", "光盤", "性能", "矢量", "遠程", "幾率", "圖庫", "導入", "蹦極", "文件", "顯存", "屏幕", "低級", "遞歸", "變量", "U盤", "乍得", "涼菜", "光標", "句柄", "嵌套", "兼容", "運行", "搜索"]
+      
+      - description: 政治敏感關鍵字
+        guard_class: safety_guard.keyword_guard.KeywordGuard
+        black_list: ["統一", "獨立", "臺獨", "台獨", "統獨", "獨統", "統派", "獨派", "義勇軍進行曲"]
+
+      # - description: 簡體字
+      #   guard_class: safety_guard.charset_guard.CharsetGuard
+      #   black_list:
+      #     - gb2312
+      #   white_list:
+      #     - big5
+
+
+ingress-filters: []
+egress-filters: []

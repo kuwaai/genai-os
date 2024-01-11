@@ -47,6 +47,15 @@ class DocumentQa:
   def replace_chat_history(self, chat_history, task, question, related_docs):
     llm_input = self.generate_llm_input(task, question, related_docs)
     modified_chat_history = chat_history[:-1] + [ChatRecord(llm_input, Role.USER)]
+    if modified_chat_history[0].msg is None:
+      if len(modified_chat_history) != 2: # Multi-round
+        modified_chat_history[0].msg = '請提供這篇文章的摘要'
+      else: # Single-round
+        modified_chat_history = modified_chat_history[1:]
+    modified_chat_history = [
+      ChatRecord('[Empty message]', r.role) if r.msg == '' else r
+      for r in modified_chat_history
+    ]
 
     return modified_chat_history
   
