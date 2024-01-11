@@ -47,7 +47,6 @@ def llm_compute(data):
             with requests.post(url, headers=headers, json=data1, stream=True,timeout=60) as response:
                 for line in response.iter_lines(decode_unicode=True):
                     if line:
-                        line = line.decode()
                         if line == "event: end":
                             break
                         elif line.startswith("data: "):
@@ -67,7 +66,6 @@ def llm_compute(data):
             with requests.post(url, headers=headers, json=data1, stream=True,timeout=60) as response:
                 for line in response.iter_lines(decode_unicode=True):
                     if line:
-                        line = line.decode()
                         if line == "event: end":
                             break
                         elif line.startswith("data: "):
@@ -86,7 +84,6 @@ def llm_compute(data):
             with requests.post(url, headers=headers, json=data1, stream=True,timeout=60) as response:
                 for line in response.iter_lines(decode_unicode=True):
                     if line:
-                        line = line.decode()
                         if line == "event: end":
                             break
                         elif line.startswith("data: "):
