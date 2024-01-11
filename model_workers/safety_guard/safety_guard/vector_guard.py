@@ -35,28 +35,37 @@ class VectorGuard(GuardInterface):
     db = DocumentStore()
     black_list = [chunk for i in black_list for chunk in self.split(i)]
     embeddings = db.embedding_model.embed_documents(black_list)
-    text_embedding_pairs = [('', embedding) for embedding in embeddings]
+    text_embedding_pairs = list(zip(black_list, embeddings))
     db.from_embeddings(text_embedding_pairs)
 
     self.vector_db[rule_id] = db
 
     return True
 
-  def score(self, records: [dict[str, str]]) -> dict[int, float]:
+  def _score(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
     msg = records[-1]['msg']
     result = {}
     for rule_id, db in self.vector_db.items():
-      score = db.vector_store.similarity_search_with_relevance_scores(msg, k=1)[0][1]
-      result[rule_id] = max(0, score)
+      doc, score = db.vector_store.similarity_search_with_relevance_scores(msg, k=1)[0]
+      result[rule_id] = {
+        'score': max(0, score),
+        'doc': doc.page_content
+      }
     return result
+  
+  def score(self, records: [dict[str, str]]) -> dict[int, float]:
+    result = self._score[records]
+    return {i: r['score'] for i,r in result.items()}
 
   def check(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
-    result = {}
     text = records[-1]['msg']
-    score = self.score(records)
+    result = self._score(records)
     result = {
-      i: {'violate': (s > self.threshold)}
-      for i, s in score.items()
+      i: {
+        'violate': (r['score'] > self.threshold),
+        'detail': f"與 \"{r['doc']}\" 相似 (score: {r['score']:.5f})"
+      }
+      for i, r in result.items()
     }
     
     return result
