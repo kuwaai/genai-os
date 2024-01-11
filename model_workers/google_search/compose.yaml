@@ -1,0 +1,21 @@
+version: '3'
+name: google-search
+
+services:
+  api:
+    image: google-search
+    build: .
+    container_name: google-search-${PORT}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - LLM_NAME=${LLM_NAME}
+      - PORT=${PORT}
+      - LAYOUT_CONFIG=layout.yaml
+    ports:
+      - ${PORT}:${PORT}
+    healthcheck:
+      test: "curl --fail http://localhost:${PORT}/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5

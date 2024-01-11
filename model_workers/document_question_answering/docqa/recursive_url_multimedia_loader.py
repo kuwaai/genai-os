@@ -309,7 +309,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
             async with session.get(url, proxy=self.cache_proxy_url) as response:
                 content_type = response.headers.get('content-type')
                 if 'text/' in content_type:
-                    raw_content = await response.text()
+                    raw_content = await response.text(errors='ignore')
                 else:
                     raw_content = await response.read()
                 if self.check_response_status and 400 <= response.status <= 599:
@@ -324,6 +324,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
             raise
         results = []
         content = await self.extractor(raw_content, url, content_type)
+        if not content: content=''
         
         # Ugly hot patch to fetch the content of Client-Side rendering page
         csr_threshold = 100

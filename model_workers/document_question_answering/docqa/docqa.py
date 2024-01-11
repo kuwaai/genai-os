@@ -26,9 +26,10 @@ class DocumentQa:
 
   log_path = os.environ.get('llm_log_path','/var/log/doc_qa/qa.jsonl')
 
-  def __init__(self, document_store:str = None):
+  def __init__(self, document_store:str = None, with_ref = True):
     self.logger = logging.getLogger(__name__)
     self.llm = TaideLlmFactory.get_taide_llm(model_location=os.environ.get('MODEL_LOCATION','remote-nchc'))
+    self.with_ref = with_ref
     self.document_store:DocumentStore = None
     if document_store != None:
       self.document_store = DocumentStore.load(document_store)
@@ -39,7 +40,8 @@ class DocumentQa:
     llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
-      'question': question
+      'question': question,
+      'ref': self.with_ref
     })
 
     return llm_input

@@ -1,0 +1,9 @@
+version: 1
+override-process:
+  class: 'app.GoogleSearchProcess'
+  args:
+    num_result: 5
+    search_engine_links:
+      - https://www.google.com/search?q={}
+      - https://www.bing.com/search?q={}
+      - https://duckduckgo.com/?q={}
