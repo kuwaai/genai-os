@@ -116,15 +116,15 @@ class ChatController extends Controller
                 'stream' => true,
             ]);
             $stream = $req->getBody();
-            $result = "";
+            $result = '';
             $line = '';
             while (!$stream->eof()) {
                 $char = $stream->read(1);
-            
+
                 if ($char === "\n") {
                     $line = trim($line);
                     if (substr($line, 0, 5) === 'data:') {
-                        $jsonData = (object)json_decode(trim(substr($line, 5)));
+                        $jsonData = (object) json_decode(trim(substr($line, 5)));
                         if ($jsonData !== null) {
                             $tmp = mb_substr($jsonData->msg, mb_strlen($jsonData->msg, 'UTF-8') - 1, 1, 'UTF-8');
                             $result .= $tmp;
@@ -138,7 +138,7 @@ class ChatController extends Controller
                             break;
                         }
                     }
-                    $line = "";
+                    $line = '';
                 } else {
                     $line .= $char;
                 }
@@ -190,7 +190,11 @@ class ChatController extends Controller
                         foreach ($rows as $index => $row) {
                             if ($index === 0) {
                                 $headers = explode("\t", $row);
-                                continue;
+                                if (in_array('content', $headers)) {
+                                    continue;
+                                } else {
+                                    $headers = ['content'];
+                                }
                             }
                             if ($headers === null) {
                                 break;
