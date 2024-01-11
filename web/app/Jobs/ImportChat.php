@@ -39,9 +39,33 @@ class ImportChat implements ShouldQueue
      */
     public function handle(): void
     {
+        $dispatchedAccessCodes = [];
+        $dispatchedids = [];
         foreach ($this->ids as $id) {
             $history = Histories::find($id);
             $access_code = LLMs::find(Chats::find($history->chat_id)->llm_id)->access_code;
+            if (in_array($access_code, $dispatchedAccessCodes)) {
+                while (count($dispatchedAccessCodes) > 0) {
+                    // Retrieve the data from Redis
+                    $redisData = Redis::lrange('usertask_' . $this->user_id, 0, -1);
+                    $id_list = $this->ids;
+                    // Filter the data based on $dispatchedAccessCodes
+                    $filteredData = array_filter($dispatchedids, function ($history_id) use ($redisData) {
+                        // Assuming $item is a JSON-encoded string, you may need to decode it if it's a different format
+                        return !in_array($history_id, $redisData);
+                    });
+                    foreach ($filteredData as $id2){
+                        $access_code2 = LLMs::find(Chats::find(Histories::find($id2)->chat_id)->llm_id)->access_code;
+                        unset($dispatchedAccessCodes[array_search($access_code2, $dispatchedAccessCodes)]);
+                        unset($dispatchedids[array_search($id2, $dispatchedids)]);
+                    }
+                    sleep(1);
+                }
+            }
+            $dispatchedAccessCodes[] = $access_code;
+            $dispatchedids[] = $id;
+            // get new record
+            $history = Histories::find($id);
             $input = Histories::where('chat_id', '=', $history->chat_id)
                 ->where('id', '<', $id)
                 ->select('msg', 'isbot');
@@ -54,7 +78,7 @@ class ImportChat implements ShouldQueue
                     ->limit(1);
             }
             $input = $input->get()->toJson();
-            RequestChat::dispatchSync($input, $access_code, $this->user_id, $id, User::find($this->user_id)->openai_token);
+            RequestChat::dispatch($input, $access_code, $this->user_id, $id, User::find($this->user_id)->openai_token);
         }
     }
 }
