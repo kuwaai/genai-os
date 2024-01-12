@@ -21,11 +21,11 @@ class DuelController extends Controller
 {
     public function share(Request $request)
     {
-        $chat = Chats::find($request->route("duel_id"));
+        $chat = DuelChat::find($request->route("duel_id"));
         if ($chat && $chat->user_id == Auth::user()->id){
-            return view('chat.share');
+            return view('duel.share');
         }else{
-            return redirect()->route('chat.home');
+            return redirect()->route('duel.home');
         }
     }
     public function abort(Request $request)

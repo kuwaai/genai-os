@@ -22,6 +22,19 @@
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>
+    <style>
+        @media print {
+            .new-page {
+                page-break-after: auto;
+            }
+            #chatroom {
+                overflow:unset!important;
+            }
+        }
+            #chatroom {
+                overflow-y:auto;
+            }
+    </style>
 </head>
 
 <body class="font-sans antialiased h-full">
@@ -49,11 +62,8 @@
     <x-chat.modals.export_history :name="App\Models\Chats::find(request()->route('chat_id'))->name" />
     <div class="flex h-full mx-auto">
         <div id="histories"
-            class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
-
-            <x-chat.header :llmId="request()->route('llm_id')" :chatId="request()->route('chat_id')" :LLM="$LLM" :readonly="true" />
-
-            <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
+            class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 ">
+            <div id="chatroom" class="flex-1 p-4 flex flex-col-reverse scrollbar">
                 <div
                     @php
                         $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
