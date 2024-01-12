@@ -172,6 +172,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::middleware(AdminMiddleware::class . ':Duel_update_import_chat')
                     ->post('/import', [DuelController::class, 'import'])
                     ->name('duel.import');
+                Route::middleware(AdminMiddleware::class . ':Duel_read_export_chat')
+                    ->get('/share/{duel_id}', [DuelController::class, 'share'])
+                    ->name('duel.share');
             })
             ->name('duel');
 

@@ -19,6 +19,15 @@ use Session;
 
 class DuelController extends Controller
 {
+    public function share(Request $request)
+    {
+        $chat = Chats::find($request->route("duel_id"));
+        if ($chat && $chat->user_id == Auth::user()->id){
+            return view('chat.share');
+        }else{
+            return redirect()->route('chat.home');
+        }
+    }
     public function abort(Request $request)
     {
         $chatIDs = Chats::where('dcID', '=', $request->route('duel_id'))

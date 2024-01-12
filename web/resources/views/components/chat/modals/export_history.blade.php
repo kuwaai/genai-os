@@ -23,22 +23,25 @@
             </div>
             <!-- Modal body -->
             <div class="p-6">
-                <div class="flex items-center space-x-2">
-                    <label class="block text-black dark:text-white" for="link">
-                        {{__("Share link (For now, Only you can access)")}}
-                    </label>
-                    <p id="copiedAlert" class="text-sm text-gray-600 dark:text-green-400" style="display: none;">
-                        {{ __('Copied') }}</p>
-                </div>
+                @if (request()->routeIs('chat.*'))
+                    <div class="flex items-center space-x-2">
+                        <label class="block text-black dark:text-white" for="link">
+                            {{ __('Share link (For now, Only you can access)') }}
+                        </label>
+                        <p id="copiedAlert" class="text-sm text-gray-600 dark:text-green-400" style="display: none;">
+                            {{ __('Copied') }}</p>
+                    </div>
                 <div class="flex">
                     <input name="link" onclick="copyShare($(this), $('#copiedAlert'))"
                         class="block w-full text-black dark:text-white bg-gray-200 transition-colors dark:bg-gray-600 border border-gray-200 rounded-l-lg py-3 px-4 leading-tight focus:outline-none border-0"
                         id="link" value="{{ route('chat.share', request()->route('chat_id')) }}" autocomplete="off"
                         readonly>
-                    <a href="{{ route('chat.share', request()->route('chat_id')) }}" target="_blank" class="px-4 flex justify-center items-center rounded-r-lg bg-green-500 hover:bg-green-600 text-white">
+                    <a href="{{ route('chat.share', request()->route('chat_id')) }}" target="_blank"
+                        class="px-4 flex justify-center items-center rounded-r-lg bg-green-500 hover:bg-green-600 text-white">
                         <i class="fas fa-external-link-alt"></i>
                     </a>
                 </div>
+                @endif
                 <label class="text-black dark:text-white" for="export_json">{{ __('JSON format') }}</label>
                 <textarea id="export_json" rows="5" readonly
                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
