@@ -39,6 +39,18 @@
                                             data-tabs-target="#logs" type="button" role="tab" aria-controls="logs"
                                             aria-selected="{{ session('last_tab') == 'logs' ? 'true' : 'false' }}">{{ __('dashboard.tab.logs') }}</button>
                                     </li>
+                                    <li class="mr-2" role="presentation">
+                                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="safetyguard-tab"
+                                            data-tabs-target="#safetyguard" type="button" role="tab"
+                                            aria-controls="safetyguard"
+                                            aria-selected="{{ session('last_tab') == 'safetyguard' ? 'true' : 'false' }}">{{ __('dashboard.tab.safetyguard') }}</button>
+                                    </li>
+                                    <li class="mr-2" role="presentation">
+                                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="inspect-tab"
+                                            data-tabs-target="#inspect" type="button" role="tab"
+                                            aria-controls="inspect"
+                                            aria-selected="{{ session('last_tab') == 'inspect' ? 'true' : 'false' }}">{{ __('dashboard.tab.inspect') }}</button>
+                                    </li>
                                 </ul>
                             </div>
                             <div id="Contents" class="flex flex-1 overflow-hidden">
@@ -57,6 +69,14 @@
                                 <div class="{{ session('last_tab') == 'logs' ? '' : 'hidden' }} bg-gray-200 flex flex-1 dark:bg-gray-700 overflow-x-hidden"
                                     id="logs" role="tabpanel" aria-labelledby="logs-tab">
                                     @include('dashboard.tabs.logs')
+                                </div>
+                                <div class="{{ session('last_tab') == 'safetyguard' ? '' : 'hidden' }} bg-gray-200 flex flex-1 dark:bg-gray-700 overflow-x-hidden"
+                                    id="safetyguard" role="tabpanel" aria-labelledby="safetyguard-tab">
+                                    @include('dashboard.tabs.safetyguard')
+                                </div>
+                                <div class="{{ session('last_tab') == 'inspect' ? '' : 'hidden' }} bg-gray-200 flex flex-1 dark:bg-gray-700 overflow-x-hidden"
+                                    id="inspect" role="tabpanel" aria-labelledby="inspect-tab">
+                                    @include('dashboard.tabs.inspect')
                                 </div>
                             </div>
                         </div>

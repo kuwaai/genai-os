@@ -41,7 +41,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return back();
     })->name('lang');
 
-
     # This will auth the user token that is used to connect.
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
     Route::post('/v1.0/chat/abort', [ProfileController::class, 'api_abort']);
@@ -55,6 +54,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         Route::group(['prefix' => 'dashboard'], function () {
             Route::get('/', [DashboardController::class, 'home'])->name('dashboard.home');
             Route::post('/feedback', [DashboardController::class, 'feedback'])->name('dashboard.feedback');
+            Route::group(['prefix' => 'safetyguard'], function () {
+                Route::get('/rule', [DashboardController::class, 'guard_fetch'])->name('dashboard.safetyguard.fetch');
+                Route::delete('/delete/{rule_id}', [DashboardController::class, 'guard_delete'])->name('dashboard.safetyguard.delete');
+                Route::patch('/update/{rule_id}', [DashboardController::class, 'guard_update'])->name('dashboard.safetyguard.update');
+                Route::post('/create', [DashboardController::class, 'guard_create'])->name('dashboard.safetyguard.create');
+            });
         });
     });
 
@@ -120,12 +125,14 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->post('/request', [ChatController::class, 'request'])
                     ->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-                Route::post('/feedback', [ChatController::class, 'feedback'])
-                    ->name('chat.feedback');
+                Route::post('/feedback', [ChatController::class, 'feedback'])->name('chat.feedback');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
                     ->delete('/delete', [ChatController::class, 'delete'])
                     ->name('chat.delete');
+                Route::middleware(AdminMiddleware::class . ':Chat_read_export_chat')
+                    ->get('/share/{chat_id}', [ChatController::class, 'share'])
+                    ->name('chat.share');
             })
             ->name('chat');
 

@@ -7,6 +7,8 @@ return [
     "tab.blacklist" => "Blacklist",
     "tab.feedbacks" => "Feedbacks",
     "tab.logs" => "Logs",
+    "tab.safetyguard"=>"Safety Guard",
+    "tab.inspect"=>"Message Inspect",
 
     //Tab_logs
     "colName.Action" => "Action: ",

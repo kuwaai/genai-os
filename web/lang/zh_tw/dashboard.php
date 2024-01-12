@@ -7,6 +7,8 @@ return [
     "tab.blacklist" => "黑名單",
     "tab.feedbacks" => "回饋資料",
     "tab.logs" => "系統日誌",
+    "tab.safetyguard"=>"安全過濾",
+    "tab.inspect"=>"訊息瀏覽器",
 
     //Tab_logs
     "colName.Action" => "操作：",
@@ -34,4 +36,6 @@ return [
     "button.ConvertAndDownload" => "轉換並下載",
     "msg.MustHave1Model" => "你必須選取至少一個模型來匯出",
     "msg.InvalidJSONFormat"=>"JSON格式錯誤",
+    //Tab_SafetyGuard
+
 ];

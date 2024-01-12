@@ -26,6 +26,16 @@ use Session;
 
 class ChatController extends Controller
 {
+    public function share(Request $request)
+    {
+        $chat = Chats::find($request->route("chat_id"));
+        if ($chat && $chat->user_id == Auth::user()->id){
+            return view('chat.share');
+        }else{
+            return redirect()->route('chat.home');
+        }
+    }
+
     public function abort(Request $request)
     {
         $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))

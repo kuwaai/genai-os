@@ -1,6 +1,6 @@
 <!-- resources/views/components/combined-history.blade.php -->
 
-@props(['history', 'tasks', 'refers'])
+@props(['history', 'tasks', 'refers', 'readonly' => false])
 
 @php
     $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail($history->chat_id)->llm_id)->image;
@@ -38,7 +38,9 @@
                 src="{{ $botimgurl }}">
         </div>
         <div class="overflow-hidden">
-            <div tabindex="0" hidefocus="true" class="{{$history->isbot ? 'focus:cursor-auto cursor-pointer' : ''}} transition-colors p-3 bg-gray-300 rounded-r-lg rounded-bl-lg" @if ($history->isbot)onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif >
+            <div tabindex="0" hidefocus="true"
+                class="{{ $history->isbot ? 'focus:cursor-auto cursor-pointer' : '' }} transition-colors p-3 bg-gray-300 rounded-r-lg rounded-bl-lg"
+                @if ($history->isbot) onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif>
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{ $history->chained ? ' chain-msg' : '' }}{{ $history->isbot ? ' bot-msg' : '' }}" id="task_{{ $history->id }}">{{ $history->msg == "* ...thinking... *" ? "<pending holder>" : $history->msg }}</div>
                 {{-- blade-formatter-enable --}}
@@ -56,12 +58,13 @@
             </div>
         @endif
         <div class="overflow-hidden">
-            <div tabindex="0" @if ($history->isbot) onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif 
+            <div tabindex="0"
+                @if ($history->isbot) onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif
                 class="p-3 transition-colors {{ $history->isbot ? 'bg-gray-300 focus:cursor-auto cursor-pointer rounded-r-lg rounded-bl-lg' : 'bg-cyan-500 text-white rounded-l-lg rounded-br-lg' }}">
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ __($message) }}</div>
                 {{-- blade-formatter-enable --}}
-                @if ($history->isbot)
+                @if (!$readonly && $history->isbot)
                     <x-chat.react-buttons :history="$history" :showOnFinished='false' />
                 @endif
             </div>
@@ -69,7 +72,7 @@
         @if (!$history->isbot)
             <div
                 class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                {{mb_substr(request()->user()->name, 0, 1, 'UTF-8')}}
+                {{ mb_substr(request()->user()->name, 0, 1, 'UTF-8') }}
             </div>
         @endif
     </div>

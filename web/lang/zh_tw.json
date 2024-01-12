@@ -268,5 +268,6 @@
     "User created successfully": "使用者創建成功",
     "The password must be hashed using bcrypt.":"密碼必須經由bcrypt加密過",
     "Safety Guard Check":"安全檢查",
-    "Footer Warning":"對話底部警告"
+    "Footer Warning":"對話底部警告",
+    "Share link (For now, Only you can access)":"分享連結 (目前只有自己可存取)"
 }
