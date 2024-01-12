@@ -32,7 +32,7 @@
                 </div>
                 <div class="flex">
                     <input name="link" onclick="copyShare($(this), $('#copiedAlert'))"
-                        class="block w-full text-white bg-gray-200 transition-colors dark:bg-gray-600 border border-gray-200 rounded-l-lg py-3 px-4 leading-tight focus:outline-none border-0"
+                        class="block w-full text-black dark:text-white bg-gray-200 transition-colors dark:bg-gray-600 border border-gray-200 rounded-l-lg py-3 px-4 leading-tight focus:outline-none border-0"
                         id="link" value="{{ route('chat.share', request()->route('chat_id')) }}" autocomplete="off"
                         readonly>
                     <a href="{{ route('chat.share', request()->route('chat_id')) }}" target="_blank" class="px-4 flex justify-center items-center rounded-r-lg bg-green-500 hover:bg-green-600 text-white">

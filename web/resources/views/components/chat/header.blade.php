@@ -170,10 +170,10 @@
     function copyShare(node, alertNode) {
         copytext(null, node.val());
         alertNode.show();
-        node.addClass("hover:bg-green-600");
+        node.addClass("hover:bg-green-600 hover:text-white");
         setTimeout(function() {
             alertNode.fadeOut();
-            node.removeClass("hover:bg-green-500");
+            node.removeClass("hover:bg-green-600 hover:text-white");
         }, 2000);
     }
     function editChat() {
