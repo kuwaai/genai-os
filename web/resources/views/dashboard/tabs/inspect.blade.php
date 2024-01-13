@@ -50,7 +50,7 @@
     
         <div class="mt-auto">
             <ul class="pagination">
-                {{ $histories->onEachSide(3)->links('components.pagination', ['tab' => 'logs']) }}
+                {{ $histories->onEachSide(3)->links('components.pagination', ['tab' => 'inspect']) }}
             </ul>
         </div>
     </div>
