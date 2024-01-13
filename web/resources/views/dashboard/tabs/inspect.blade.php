@@ -24,24 +24,37 @@
         </div>
 
     </form>
-    <div class="flex-1 text-black h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 scrollbar overflow-y-auto ">
-        @foreach (App\Models\Histories::where('isbot', '=', true)->get() as $history)
-            <div class="flex-1 p-4 flex flex-col-reverse scrollbar">
-                <div>
-                    @php
-                        $inptHistory = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')
-                            ->where('chat_id', '=', $history->chat_id)
-                            ->where('isbot', '=', false)
-                            ->orderby('chats.llm_id')
-                            ->orderby('histories.id', 'desc')
-                            ->first();
-                    @endphp
-                    <x-chat.message :history="$inptHistory" :readonly="true" />
-                    <x-chat.message :history="$history" :readonly="true" />
+    
+    <div class="flex flex-col">
+        <div class="flex-1 text-black h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 scrollbar overflow-y-auto ">
+            @php 
+            $histories = App\Models\Histories::where('isbot', '=', true)->paginate(15, ['*'], 'page', session('page') ?? 1);
+            @endphp
+            @foreach ($histories as $history)
+                <div class="flex-1 p-4 flex flex-col-reverse scrollbar">
+                    <div>
+                        @php
+                            $inptHistory = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')
+                                ->where('chat_id', '=', $history->chat_id)
+                                ->where('isbot', '=', false)
+                                ->orderby('chats.llm_id')
+                                ->orderby('histories.id', 'desc')
+                                ->first();
+                        @endphp
+                        <x-chat.message :history="$inptHistory" :readonly="true" />
+                        <x-chat.message :history="$history" :readonly="true" />
+                    </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        </div>
+    
+        <div class="mt-auto">
+            <ul class="pagination">
+                {{ $histories->onEachSide(3)->links('components.pagination', ['tab' => 'logs']) }}
+            </ul>
+        </div>
     </div>
+
 </div>
 <script>
     const inspect_tagInput = document.getElementById('inspect_tagInput');
