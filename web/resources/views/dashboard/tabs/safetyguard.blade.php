@@ -53,15 +53,15 @@
                     <hr>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
-                            <label for="tagInput"
+                            <label for="safetyguard_tagInput"
                                 class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定模型</label>
                             <div class="relative mt-1">
-                                <div id="tagContainer" class="mt-2 flex flex-wrap">
-                                    <input id="tagInput" type="text"
+                                <div id="safetyguard_tagContainer" class="mt-2 flex flex-wrap">
+                                    <input id="safetyguard_tagInput" type="text"
                                         class="bg-transparent border-2 rounded-lg placeholder:text-black dark:placeholder:text-white"
                                         placeholder="請選擇模型">
                                 </div>
-                                <div id="tagSuggestions" style="display:none;"
+                                <div id="safetyguard_tagSuggestions" style="display:none;"
                                     class="absolute z-10 mt-2 bg-white border border-gray-300 rounded-md shadow-lg p-2">
                                 </div>
                             </div>
@@ -71,23 +71,26 @@
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
-                                for="link">
+                                for="action">
                                 規則行為
                             </label>
-                            <input name="link"
-                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="link" placeholder="該語言模型的外部相關連結" value="">
+                            <select id="action" name="action"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <option value="none" selected>無行為</option>
+                                <option value="block">阻擋</option>
+                                <option value="warn">警告</option>
+                            </select>
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="description">
-                                規則提示訊息
+                                警告提示訊息
                             </label>
                             <input name="description"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="description" placeholder="這個語言模型的相關介紹">
+                                id="description" placeholder="警告提示訊息">
                         </div>
                     </div>
                     <div class="text-center">
@@ -223,111 +226,105 @@
             $('#safety-guard-interface >div:eq(1)').show();
         }
     });
-    const tagInput = document.getElementById('tagInput');
-    const tagSuggestions = document.getElementById('tagSuggestions');
-    const tagContainer = document.getElementById('tagContainer');
+    const safetyguard_tagInput = document.getElementById('safetyguard_tagInput');
+    const safetyguard_tagSuggestions = document.getElementById('safetyguard_tagSuggestions');
+    const safetyguard_tagContainer = document.getElementById('safetyguard_tagContainer');
 
-    const enabled_tags = JSON.parse({!! json_encode(
+    const safetyguard_enabled_tags = JSON.parse({!! json_encode(
         App\Models\LLMs::orderby('order')->orderby('order')->where('enabled', '=', true)->get()->pluck('access_code')->toJson(),
     ) !!});
-    const disabled_tags = JSON.parse({!! json_encode(
+    const safetyguard_disabled_tags = JSON.parse({!! json_encode(
         App\Models\LLMs::orderby('order')->orderby('order')->where('enabled', '=', false)->get()->pluck('access_code')->toJson(),
     ) !!});
-    const selectedTags = [];
+    const safetyguard_selectedTags = [];
 
-    tagInput.addEventListener('input', handleInput);
-    tagInput.addEventListener('focus', handleFocus);
-    tagInput.addEventListener('blur', handleBlur);
-
-    function handleInput(event) {
+    safetyguard_tagInput.addEventListener('input', (event) => {
         const inputValue = event.target.value.toLowerCase();
-        const filteredTags = filterTags(inputValue);
+        const filteredTags = safetyguard_filterTags(inputValue);
 
         if (filteredTags.length == 0) {
-            clearSuggestions();
+            safetyguard_clearSuggestions();
         } else {
-            renderTagSuggestions(filteredTags);
+            safetyguard_render_tagSuggestions(filteredTags);
         }
+    });
+    safetyguard_tagInput.addEventListener('focus', () => {
+        const inputValue = safetyguard_tagInput.value.toLowerCase();
+        const filteredTags = safetyguard_filterTags(inputValue);
+        safetyguard_render_tagSuggestions(filteredTags);
+    });
+    safetyguard_tagInput.addEventListener('blur', () => {
+        setTimeout(safetyguard_clearSuggestions, 200);
+    });
+
+    function safetyguard_filterTags(inputValue) {
+        const allTags = [...safetyguard_enabled_tags, ...safetyguard_disabled_tags];
+        return allTags.filter(tag => tag.toLowerCase().includes(inputValue) && !safetyguard_selectedTags.includes(tag));
     }
 
-    function handleFocus() {
-        const inputValue = tagInput.value.toLowerCase();
-        const filteredTags = filterTags(inputValue);
-        renderTagSuggestions(filteredTags);
-    }
-
-    function handleBlur() {
-        setTimeout(clearSuggestions, 200);
-    }
-
-    function filterTags(inputValue) {
-        const allTags = [...enabled_tags, ...disabled_tags];
-        return allTags.filter(tag => tag.toLowerCase().includes(inputValue) && !selectedTags.includes(tag));
-    }
-
-    function renderTagSuggestions(filteredTags) {
-        tagSuggestions.innerHTML = '';
+    function safetyguard_render_tagSuggestions(filteredTags) {
+        safetyguard_tagSuggestions.innerHTML = '';
         if (filteredTags.length != 0) {
             const suggestionContainer = document.createElement('div');
             suggestionContainer.className = 'flex flex-wrap';
 
             filteredTags.forEach(tag => {
-                const suggestionItem = createSuggestionItem(tag);
+                const suggestionItem = safetyguard_createSuggestionItem(tag);
                 suggestionContainer.appendChild(suggestionItem);
             });
 
-            tagSuggestions.appendChild(suggestionContainer);
-            $(tagSuggestions).show();
+            safetyguard_tagSuggestions.appendChild(suggestionContainer);
+            $(safetyguard_tagSuggestions).show();
         }
     }
 
-    function createSuggestionItem(tag) {
+    function safetyguard_createSuggestionItem(tag) {
         const suggestionItem = document.createElement('div');
         suggestionItem.className = 'p-2 cursor-pointer text-black bg-gray-300 hover:bg-gray-100 rounded-md mb-2 mr-2';
         suggestionItem.textContent = tag;
-        suggestionItem.addEventListener('click', () => addTag(tag));
+        suggestionItem.addEventListener('click', () => safetyguard_addTag(tag));
         return suggestionItem;
     }
 
-    function clearSuggestions() {
-        tagSuggestions.innerHTML = '';
-        $(tagSuggestions).hide();
+    function safetyguard_clearSuggestions() {
+        safetyguard_tagSuggestions.innerHTML = '';
+        $(safetyguard_tagSuggestions).hide();
     }
 
-    function addTag(tag) {
-        selectedTags.push(tag);
+    function safetyguard_addTag(tag) {
+        safetyguard_selectedTags.push(tag);
 
-        const tagElement = createTagElement(tag);
-        tagContainer.prepend(tagElement);
-        updateTargetInput();
-        tagInput.value = '';
-        clearSuggestions();
+        const tagElement = safetyguard_createTagElement(tag);
+        safetyguard_tagContainer.prepend(tagElement);
+        safetyguard_updateTargetInput();
+        safetyguard_tagInput.value = '';
+        safetyguard_clearSuggestions();
 
-        tagElement.addEventListener('click', () => removeTag(tag, tagElement));
+        tagElement.addEventListener('click', () => safetyguard_removeTag(tag, tagElement));
     }
 
-    function createTagElement(tag) {
+    function safetyguard_createTagElement(tag) {
         const tagElement = document.createElement('div');
         tagElement.className = 'bg-blue-500 hover:bg-red-600 text-white px-2 py-1 rounded-md cursor-pointer mr-2 mb-2';
         tagElement.textContent = tag;
         return tagElement;
     }
 
-    function removeTag(tag, tagElement) {
-        const index = selectedTags.indexOf(tag);
+    function safetyguard_removeTag(tag, tagElement) {
+        const index = safetyguard_selectedTags.indexOf(tag);
         if (index !== -1) {
-            selectedTags.splice(index, 1);
+            safetyguard_selectedTags.splice(index, 1);
         }
 
-        tagContainer.removeChild(tagElement);
-        updateTargetInput();
+        safetyguard_tagContainer.removeChild(tagElement);
+        safetyguard_updateTargetInput();
     }
 
-    function updateTargetInput() {
+    function safetyguard_updateTargetInput() {
         const targetInputsContainer = document.getElementById('targetInputsContainer');
         targetInputsContainer.innerHTML = ''; // Clear existing inputs
 
-        selectedTags.forEach((tag, index) => {
+        safetyguard_selectedTags.forEach((tag, index) => {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = `target[]`; // Use index to create multiple inputs

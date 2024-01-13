@@ -8,7 +8,7 @@
     </form>
 @endif
 <div id="chatHeader"
-    class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 max-h-20 overflow-hidden text-gray-700 dark:text-white flex">
+    class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 max-h-20 text-gray-700 dark:text-white flex">
     @if (!$readonly)
         <button
             class="block sm:hidden text-center text-white bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2 dark:bg-gray-700 dark:hover:bg-gray-800 focus:outline-none dark:focus:ring-blue-800"

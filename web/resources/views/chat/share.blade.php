@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{App\Models\Chats::findOrFail(request()->route("chat_id"))->name}}</title>
 
     <!-- Fonts -->
     <link href="{{ asset('css/fontBunny.css') }}" rel="stylesheet" />
@@ -59,12 +59,13 @@
     @endphp
 
     <x-chat.functions />
-    <x-chat.modals.export_history :name="App\Models\Chats::find(request()->route('chat_id'))->name" />
     <div class="flex h-full mx-auto">
         <div id="histories"
             class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 ">
-            <div id="chatroom" class="flex-1 p-4 flex flex-col-reverse scrollbar">
-                <div
+            <x-chat.header :llmId="request()->route('llm_id')" :chatId="request()->route('chat_id')" :LLM="$LLM" :readonly="true" />
+
+            <div id="chatroom" class="flex-1 p-4 flex flex-col-reverse scrollbar bg-gray-200 dark:bg-gray-600">
+                <div>
                     @php
                         $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
                         $refers = App\Models\Histories::where('chat_id', '=', request()->route('chat_id'))

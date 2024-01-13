@@ -1,13 +1,15 @@
-<!-- resources/views/components/combined-history.blade.php -->
-
-@props(['history', 'tasks', 'refers', 'readonly' => false])
+@props(['history', 'tasks' => null, 'refers' => null, 'readonly' => false])
 
 @php
-    $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail($history->chat_id)->llm_id)->image;
-    $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
+    try {
+        $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail($history->chat_id)->llm_id)->image;
+        $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
+    } catch (\Throwable $e) {
+        $botimgurl = '';
+    }
     $message = trim(str_replace(["\r\n"], "\n", $history->msg));
     $visable = true;
-    if (!$history->isbot) {
+    if (!$history->isbot && $refers) {
         foreach ($refers->where('id', '<', $history->id) as $refer) {
             for ($i = 0; $i <= 1; $i++) {
                 $referMsg = trim(str_replace(["\r\n"], "\n", $refer->msg));
@@ -31,7 +33,7 @@
     }
 @endphp
 
-@if (in_array($history->id, $tasks))
+@if ($tasks && in_array($history->id, $tasks))
     <div id="history_{{ $history->id }}" class="new-page flex w-full mt-2 space-x-3 {{ $visable ? '' : 'hidden' }}">
         <div class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
             <img data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
