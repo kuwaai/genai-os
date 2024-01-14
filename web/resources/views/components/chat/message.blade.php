@@ -37,7 +37,7 @@
     <div id="history_{{ $history->id }}" class="new-page flex w-full mt-2 space-x-3 {{ $visable ? '' : 'hidden' }}">
         <div class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
             <img data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
-                src="{{ $botimgurl }}">
+                src="{{ $botimgurl }}" class="h-full w-full">
         </div>
         <div class="overflow-hidden">
             <div tabindex="0" hidefocus="true"
@@ -56,7 +56,7 @@
         @if ($history->isbot)
             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                 <img data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
-                    src="{{ $botimgurl }}">
+                    src="{{ $botimgurl }}" class="h-full w-full">
             </div>
         @endif
         <div class="overflow-hidden">

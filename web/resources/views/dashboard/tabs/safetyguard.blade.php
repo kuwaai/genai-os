@@ -27,7 +27,7 @@
                     @csrf
                     @method('patch')
                     <input name="id" style="display:none">
-                    <div id="targetInputsContainer"></div>
+                    <div id="safetygard_targetInputsContainer"></div>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
@@ -321,15 +321,15 @@
     }
 
     function safetyguard_updateTargetInput() {
-        const targetInputsContainer = document.getElementById('targetInputsContainer');
-        targetInputsContainer.innerHTML = ''; // Clear existing inputs
+        const safetygard_targetInputsContainer = document.getElementById('safetygard_targetInputsContainer');
+        safetygard_targetInputsContainer.innerHTML = ''; // Clear existing inputs
 
         safetyguard_selectedTags.forEach((tag, index) => {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = `target[]`; // Use index to create multiple inputs
             input.value = tag;
-            targetInputsContainer.appendChild(input);
+            safetygard_targetInputsContainer.appendChild(input);
         });
     }
 </script>

@@ -24,7 +24,9 @@
                 this.submit();
                 $chattable = false
                 $("#submit_msg").hide()
-                $("#chat_input").val("訊息處理中...請稍後...")
+                if (!isMac) {
+                    $("#chat_input").val("訊息處理中...請稍後...")
+                }
                 $("#chat_input").prop("readonly", true)
             } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
                 tmp = ""
@@ -37,7 +39,9 @@
                 this.submit();
                 $chattable = false
                 $("#submit_msg").hide()
-                $("#chat_input").val("訊息處理中...請稍後...")
+                if (!isMac) {
+                    $("#chat_input").val("訊息處理中...請稍後...")
+                }
                 $("#chat_input").prop("readonly", true)
             } else {
                 if ($("#chat_input").val().trim() == "") {

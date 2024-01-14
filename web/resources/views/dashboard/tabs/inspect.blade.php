@@ -1,10 +1,35 @@
+@php
+    $histories = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id');
+
+    if (session('search')) {
+        $chatIds = $histories
+            ->where('msg', 'like', '%' . session('search') . '%')
+            ->pluck('chat_id')
+            ->unique()
+            ->values();
+        $histories = $histories->whereIn('chat_id', $chatIds);
+    }
+    if (session('target')) {
+        $histories = $histories->whereIn('access_code', session('target'));
+    }
+    $histories = $histories->where('isbot', '=', true);
+    $histories = $histories->orderby('chats.llm_id')->paginate(15, ['*', 'histories.id as id'], 'page', session('page') ?? 1);
+@endphp
 <x-chat.functions />
 <div class="w-full overflow-hidden flex">
-    <form method="post"
+    @foreach ($histories->unique('access_code') as $history)
+        <div id="llm_{{ $history->llm_id }}_chat" role="tooltip" access_code="{{ $history->access_code }}"
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+            {{ $history->name }}
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+    @endforeach
+    <form method="get"
         class="flex flex-col bg-white dark:bg-gray-700 p-2 text-white w-72 flex-shrink-0 relative overflow-y-auto overflow-x-hidden scrollbar">
         @csrf
-        <label for="tagInput" class="block uppercase tracking-wide dark:text-white">搜尋訊息</label>
-        <input placeholder="過濾內容"
+        <input name="tab" value="inspect" hidden>
+        <label for="inspect_searchbox" class="block uppercase tracking-wide dark:text-white">搜尋訊息</label>
+        <input placeholder="過濾內容" id="inspect_searchbox" name="search" value="{{session('search')}}"
             class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
         <div id="inspect_targetInputsContainer"></div>
         <div class="flex flex-wrap -mx-3">
@@ -24,33 +49,60 @@
         </div>
 
     </form>
-    
-    <div class="flex flex-col">
-        <div class="flex-1 text-black h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 scrollbar overflow-y-auto ">
-            @php 
-            $histories = App\Models\Histories::where('isbot', '=', true)->paginate(15, ['*'], 'page', session('page') ?? 1);
-            @endphp
+
+    <div class="flex flex-col overflow-hidden">
+        <div
+            class="flex-1 text-black h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 scrollbar overflow-y-auto ">
             @foreach ($histories as $history)
-                <div class="flex-1 p-4 flex flex-col-reverse scrollbar">
+                <div
+                    class="flex-1 p-4 flex flex-col-reverse scrollbar {{ $loop->even ? 'bg-gray-200 dark:bg-gray-600' : 'bg-gray-100 dark:bg-gray-500' }}">
                     <div>
                         @php
-                            $inptHistory = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')
+                            $chat_histories = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')
                                 ->where('chat_id', '=', $history->chat_id)
-                                ->where('isbot', '=', false)
-                                ->orderby('chats.llm_id')
+                                ->orderby('histories.created_at')
                                 ->orderby('histories.id', 'desc')
-                                ->first();
+                                ->select('*', 'histories.id as id')
+                                ->get();
+                            $botMsg = $history;
+                            $outputs = [];
+                            if ($botMsg->chained) {
+                                $skip = true;
+                                foreach ($chat_histories->reverse() as $chat_history) {
+                                    if (!$skip) {
+                                        $outputs[] = $chat_history;
+                                    }
+                                    if ($chat_history->id == $botMsg->id) {
+                                        $skip = false;
+                                    }
+                                }
+                            } else {
+                                $skip = true;
+                                foreach ($chat_histories->reverse() as $chat_history) {
+                                    if (!$skip) {
+                                        $outputs[] = $chat_history;
+                                    }
+                                    if ($chat_history->id == $botMsg->id) {
+                                        $skip = false;
+                                    } elseif (!$skip) {
+                                        break;
+                                    }
+                                }
+                            }
+                            $outputs[] = $botMsg;
+
                         @endphp
-                        <x-chat.message :history="$inptHistory" :readonly="true" />
-                        <x-chat.message :history="$history" :readonly="true" />
+                        @foreach ($outputs as $chat_history)
+                            <x-chat.message :history="$chat_history" :readonly="true" />
+                        @endforeach
                     </div>
                 </div>
             @endforeach
         </div>
-    
+
         <div class="mt-auto">
             <ul class="pagination">
-                {{ $histories->onEachSide(3)->links('components.pagination', ['tab' => 'inspect']) }}
+                {{ $histories->onEachSide(3)->links('components.pagination', ['query' => ['tab' => 'inspect', 'search' => session('search'), 'target' => session('target')]]) }}
             </ul>
         </div>
     </div>
@@ -122,7 +174,7 @@
         $(inspect_tagSuggestions).hide();
     }
 
-    function inspect_addTag(tag) {
+    function inspect_addTag(tag, submit = true) {
         inspect_selectedTags.push(tag);
 
         const tagElement = inspect_createTagElement(tag);
@@ -132,6 +184,12 @@
         inspect_clearSuggestions();
 
         tagElement.addEventListener('click', () => inspect_removeTag(tag, tagElement));
+
+
+        if (submit) {
+            doneTyping();
+            $("#inspect_tagInput").prop("hidden", true);
+        };
     }
 
     function inspect_createTagElement(tag) {
@@ -149,18 +207,42 @@
 
         inspect_tagContainer.removeChild(tagElement);
         inspect_updateTargetInput();
+        $("#inspect_tagInput").prop("disable", true);
+        doneTyping();
     }
 
     function inspect_updateTargetInput() {
-        const targetInputsContainer = document.getElementById('targetInputsContainer');
-        targetInputsContainer.innerHTML = ''; // Clear existing inputs
+        const inspect_targetInputsContainer = document.getElementById('inspect_targetInputsContainer');
+        inspect_targetInputsContainer.innerHTML = ''; // Clear existing inputs
 
         inspect_selectedTags.forEach((tag, index) => {
             const input = document.createElement('input');
-            input.type = 'hidden';
+            input.type = "hidden"
             input.name = `target[]`; // Use index to create multiple inputs
             input.value = tag;
-            targetInputsContainer.appendChild(input);
+            inspect_targetInputsContainer.appendChild(input);
         });
     }
+    var typingTimer;
+    var doneTypingInterval = 1000;
+    var $input = $('#inspect_searchbox');
+
+    //on keyup, start the countdown
+    $input.on('keyup', function() {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    });
+
+    //on keydown, clear the countdown 
+    $input.on('keydown', function() {
+        clearTimeout(typingTimer);
+    });
+
+    //user is "finished typing," do something
+    function doneTyping() {
+        $("#inspect_searchbox").closest('form').submit()
+    }
+    @foreach (session('target') ?? [] as $target)
+        inspect_addTag("{{ $target }}", false)
+    @endforeach
 </script>

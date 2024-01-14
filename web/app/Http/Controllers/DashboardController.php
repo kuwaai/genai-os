@@ -23,7 +23,9 @@ class DashboardController extends Controller
                 ->with('action', $request->input('action'))
                 ->with('description', $request->input('description'))
                 ->with('user_id', $request->input('user_id'))
-                ->with('ip_address', $request->input('ip_address'));
+                ->with('ip_address', $request->input('ip_address'))
+                ->with('target', $request->input('target'))
+                ->with('search', $request->input('search'));
         }
         return view('dashboard.home');
     }

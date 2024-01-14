@@ -78,7 +78,7 @@
 
     <div class="mt-auto">
         <ul class="pagination">
-            {{ $logs->onEachSide(3)->links('components.pagination', ['tab' => 'logs']) }}
+            {{ $logs->onEachSide(3)->links('components.pagination', ["query"=>['tab' => 'logs']]) }}
         </ul>
     </div>
 
