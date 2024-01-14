@@ -50,7 +50,7 @@
 
     </form>
 
-    <div class="flex flex-col overflow-hidden">
+    <div class="flex w-full flex-col overflow-hidden">
         <div
             class="flex-1 text-black h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 scrollbar overflow-y-auto ">
             @foreach ($histories as $history)
