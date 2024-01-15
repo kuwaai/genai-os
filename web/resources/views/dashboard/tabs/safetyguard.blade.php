@@ -1,8 +1,8 @@
-<div id="safety-guard-interface" class="w-full flex">
-    <div class="w-full overflow-hidden flex flex-1" style="display:none;">
-        <div class="flex flex-1 h-full mx-auto">
+<div id="safety-guard-interface" class="flex flex-1 overflow-hidden">
+    <div class="overflow-hidden flex flex-1" style="display:none;">
+        <div class="flex flex-1 h-full mx-auto overflow-hidden">
             <div
-                class="flex flex-col bg-white dark:bg-gray-700 p-2 text-white w-72 flex-shrink-0 relative overflow-hidden">
+                class="flex flex-col bg-white dark:bg-gray-700 p-2 text-white w-64 flex-shrink-0 relative overflow-hidden">
                 <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                     <button onclick="CreateRule()" id="new_rule_btn"
                         class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-green-500 dark:hover:bg-green-700 transition duration-300 bg-green-500 dark:bg-green-700">
@@ -23,20 +23,28 @@
                 <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">創建過濾規則</h3>
                 <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
                     action="{{ route('dashboard.safetyguard.create') }}"
-                    class="w-full max-w-2xl p-4 overflow-y-auto scrollbar overflow-x-hidden space-y-2">
+                    class="w-full  p-4 overflow-y-auto scrollbar overflow-x-hidden space-y-2">
                     @csrf
                     @method('patch')
                     <input name="id" style="display:none">
                     <div id="safetygard_targetInputsContainer"></div>
-                    <div class="flex flex-wrap -mx-3">
-                        <div class="w-full px-3">
+                    <div class="flex overflow-hidden -mx-3">
+                        <div class="flex flex-1 flex-col overflow-hidden px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
-                                for="link">
+                                for="ruleName">
                                 規則名稱
                             </label>
-                            <input name="link"
-                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="link" placeholder="規則名稱" value="">
+                            <div class="flex flex-1 justify-center items-center flex-nowrap">
+                                <input name="ruleName"
+                                    class="flex-1 appearance-none overflow-hidden block text-gray-700 mr-2 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    id="ruleName" placeholder="規則名稱" value="">
+
+                                <label
+                                    class="text-white font-bold py-3 px-4 rounded margin-t-auto bg-red-500 hover:bg-red-600"
+                                    for="rule_toggle"><i class="fas fa-power-off"></i></label>
+                                <input id="rule_toggle" type="checkbox" style="display:none;">
+
+                            </div>
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-3">
@@ -54,7 +62,7 @@
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label for="safetyguard_tagInput"
-                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定模型</label>
+                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定套用規則模型</label>
                             <div class="relative mt-1">
                                 <div id="safetyguard_tagContainer" class="mt-2 flex flex-wrap">
                                     <input id="safetyguard_tagInput" type="text"
@@ -76,23 +84,79 @@
                             </label>
                             <select id="action" name="action"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                <option value="none" selected>無行為</option>
-                                <option value="block">阻擋</option>
-                                <option value="warn">警告</option>
+                                <option value="block" selected>封鎖+(可選警告)</option>
+                                <option value="warn">純警告</option>
                             </select>
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
-                                for="description">
-                                警告提示訊息
+                                for="WarningAlert">
+                                警告提示訊息(可選)
                             </label>
-                            <input name="description"
+                            <input name="WarningAlert"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="description" placeholder="警告提示訊息">
+                                id="WarningAlert" placeholder="警告提示訊息">
                         </div>
                     </div>
+                    @php
+                        $filters = [['name' => 'KeywordInput', 'label' => 'Keyword輸入過濾', 'placeholder' => 'Keyword輸入過濾'], ['name' => 'EmbeddingInput', 'label' => 'Embedding輸入過濾', 'placeholder' => 'Embedding輸入過濾'], ['name' => 'KeywordOutput', 'label' => 'Keyword輸出過濾', 'placeholder' => 'Keyword輸出過濾'], ['name' => 'EmbeddingOutput', 'label' => 'Embedding輸出過濾', 'placeholder' => 'Embedding輸出過濾']];
+                    @endphp
+
+                    @foreach ($filters as $filter)
+                        <div id="dynamic-inputs">
+                            <div class="flex flex-wrap -mx-3 dynamic-input">
+                                <div class="w-full px-3">
+                                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
+                                        for="textarea-{{ $filter['name'] }}">
+                                        {{ $filter['label'] }}
+                                    </label>
+                                    <textarea name="textareas[]"
+                                        class="dynamic-textarea appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                        id="textarea-{{ $filter['name'] }}" placeholder="{{ $filter['label'] }}" data-label="{{ $filter['label'] }}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <script>
+                        $(document).ready(function() {
+                            $(document).on('input', '.dynamic-textarea', function() {
+                                const inputValue = $(this).val().trim();
+                                const dynamicInputs = $('#dynamic-inputs');
+
+                                // Remove empty textareas except the last one
+                                dynamicInputs.find('.dynamic-input:not(:last-child)').each(function() {
+                                    const textareaValue = $(this).find('.dynamic-textarea').val().trim();
+                                    if (textareaValue === '') {
+                                        $(this).remove();
+                                    }
+                                });
+
+                                // Add a new textarea if the last one is not empty
+                                if (inputValue !== '') {
+                                    const filterLabel = $(this).data('label');
+                                    const newInput = `
+                                        <div class="flex flex-wrap -mx-3 dynamic-input">
+                                            <div class="w-full px-3">
+                                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold" for="textarea-${filterLabel}">
+                                                    ${filterLabel}
+                                                </label>
+                                                <textarea 
+                                                    name="textareas[]" 
+                                                    class="dynamic-textarea appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+                                                    id="textarea-${filterLabel}" 
+                                                    placeholder="${filterLabel}" 
+                                                    data-label="${filterLabel}"></textarea>
+                                            </div>
+                                        </div>
+                                    `;
+                                    dynamicInputs.append(newInput);
+                                }
+                            });
+                        });
+                    </script>
                     <div class="text-center">
                         <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
                             class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -203,6 +267,7 @@
                 $('#safety-guard-interface >div:eq(1)').show();
             }
             $("#rule_list").empty()
+            $("#rule_list").append(`<p>已啟用規則</p><hr>`)
             data.forEach(function(rule) {
                 $("#rule_list").append(`<div
                         class="mb-2 border border-black dark:border-white border-1 rounded-l-full overflow-hidden">
@@ -218,6 +283,7 @@
                         </button>
                     </div>`)
             })
+            $("#rule_list").append(`<p>已停用規則</p><hr>`)
 
         },
         error: function() {

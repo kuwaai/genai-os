@@ -20,7 +20,7 @@
             <!-- Modal header -->
             <div class="px-6 py-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-base font-semibold text-gray-900 lg:text-xl dark:text-white">
-                    {{ __('Create Duel Chat') }}
+                    {{ __('Create Chat Room') }}
                 </h3>
             </div>
             <!-- Modal body -->
