@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{App\Models\DuelChat::findOrFail(request()->route("duel_id"))->name}}</title>
+    <title>{{App\Models\ChatRoom::findOrFail(request()->route("room_id"))->name}}</title>
 
     <!-- Fonts -->
     <link href="{{ asset('css/fontBunny.css') }}" rel="stylesheet" />
@@ -57,17 +57,17 @@
             ->orderby('llms.order')
             ->orderby('llms.created_at')
             ->get();
-        $DC = App\Models\DuelChat::leftJoin('chats', 'duelchat.id', '=', 'chats.dcID')
+        $DC = App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
             ->where('chats.user_id', Auth::user()->id)
             ->orderby('counts', 'desc')
-            ->select('duelchat.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.llm_id DESC) as identifier'), DB::raw('count(chats.id) as counts'))
-            ->groupBy('duelchat.id')
+            ->select('chatrooms.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.llm_id DESC) as identifier'), DB::raw('count(chats.id) as counts'))
+            ->groupBy('chatrooms.id')
             ->get()
             ->groupBy('identifier');
         try {
             if (!session('llms')) {
                 $identifier = collect(Illuminate\Support\Arr::flatten($DC->toarray(), 1))
-                    ->where('id', '=', request()->route('duel_id'))
+                    ->where('id', '=', request()->route('room_id'))
                     ->first()['identifier'];
                 $DC = $DC[$identifier];
                 $llms = App\Models\LLMs::whereIn('id', array_map('intval', explode(',', trim($identifier, '{}'))))
@@ -86,30 +86,30 @@
             $DC = null;
         }
     @endphp
-    <div class="flex h-full max-w-7xl mx-auto">
+    <div class="flex h-full">
         <div id="histories"
             class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl">
-            <x-duel.header :llms="$llms" :readonly="true" />
+            <x-room.header :llms="$llms" :readonly="true" />
             <div id="chatroom" class="flex-1 p-4 flex flex-col-reverse scrollbar bg-gray-200 dark:bg-gray-600">
                 <div>
                     @php
                         $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
 
-                        $duelId = request()->route('duel_id');
+                        $roomId = request()->route('room_id');
 
-                        $duelId = Illuminate\Support\Facades\Request::route('duel_id');
+                        $roomId = Illuminate\Support\Facades\Request::route('room_id');
 
                         $botChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
                             ->leftJoin('feedback', 'history_id', '=', 'histories.id')
                             ->join('llms', 'llms.id', '=', 'chats.llm_id')
                             ->where('isbot', true)
-                            ->whereIn('chats.id', App\Models\Chats::where('dcID', $duelId)->pluck('id'))
+                            ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
                             ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags');
 
                         $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
                             ->leftjoin('llms', 'llms.id', '=', 'chats.llm_id')
                             ->where('isbot', false)
-                            ->whereIn('chats.id', App\Models\Chats::where('dcID', $duelId)->pluck('id'))
+                            ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
                             ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', DB::raw('NULL as nice'), DB::raw('NULL as detail'), DB::raw('NULL as flags'));
 
                         $mergedChats = $botChats

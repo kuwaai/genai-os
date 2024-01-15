@@ -1,14 +1,14 @@
 @props(['llms'])
 
 <form method="post"
-    action="{{ route('duel.request') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
+    action="{{ route('room.request') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
     id="prompt_area">
     @foreach ($llms as $llm)
         <input id="chatsTo_{{ $llm->id }}" name="chatsTo[]" value="{{ $llm->id }}" style="display:none;">
     @endforeach
     <div class="flex">
         @csrf
-        <input name="duel_id" value="{{ request()->route('duel_id') }}" style="display:none;">
+        <input name="room_id" value="{{ request()->route('room_id') }}" style="display:none;">
         <input id="chained" style="display:none;" {{ \Session::get('chained') ? '' : 'disabled' }}>
         <button type="button" onclick="chain_toggle()" id="chain_btn"
             class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
@@ -54,7 +54,7 @@
     <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">
         {{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? '' }}</p>
 </form>
-<x-duel.prompt-area.chat-script :llms="$llms" />
+<x-room.prompt-area.chat-script :llms="$llms" />
 <script>
     function chain_toggle() {
         $.get("{{ route('chat.chain') }}", {
@@ -68,7 +68,7 @@
     }
 
     function abortGenerate() {
-        $.get("{{ route('duel.abort', request()->route('duel_id')) }}");
+        $.get("{{ route('room.abort', request()->route('room_id')) }}");
         return false;
     }
 </script>

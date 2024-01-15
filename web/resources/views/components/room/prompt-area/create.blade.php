@@ -1,6 +1,6 @@
 @props(['llms'])
 <form method="post"
-    action="{{ route('duel.create') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
+    action="{{ route('room.create') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}"
     id="prompt_area">
     <div class="flex flex-col items-end justify-end">
         @csrf
@@ -46,4 +46,4 @@
     <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">{{\App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? ''}}</p>
 
 </form>
-<x-duel.prompt-area.chat-script :llms="$llms" />
+<x-room.prompt-area.chat-script :llms="$llms" />

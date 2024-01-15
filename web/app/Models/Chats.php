@@ -11,5 +11,5 @@ class Chats extends Model
     use HasFactory;
 	use SoftDeletes;
     protected $table = 'chats';
-    protected $fillable = ['name', 'llm_id', 'user_id', 'dcID'];
+    protected $fillable = ['name', 'llm_id', 'user_id', 'roomID'];
 }

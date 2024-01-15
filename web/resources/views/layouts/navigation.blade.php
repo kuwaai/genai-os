@@ -18,10 +18,10 @@
                     </x-nav-link>
                 </div>
                 @endif
-                @if(Auth::user()->hasPerm('tab_Duel'))
+                @if(Auth::user()->hasPerm('tab_Room'))
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('duel.home')" :active="request()->routeIs('duel.*')">
-                        {{ __('Duel') }}
+                    <x-nav-link :href="route('room.home')" :active="request()->routeIs('room.*')">
+                        {{ __('Room') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -115,9 +115,9 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             @endif
-            @if(Auth::user()->hasPerm('tab_Duel'))
-            <x-responsive-nav-link :href="route('duel.home')" :active="request()->routeIs('duel.*')">
-                {{ __('Duel') }}
+            @if(Auth::user()->hasPerm('tab_Room'))
+            <x-responsive-nav-link :href="route('room.home')" :active="request()->routeIs('room.*')">
+                {{ __('Room') }}
             </x-responsive-nav-link>
             @endif
             @if(Auth::user()->hasPerm('tab_Chat'))

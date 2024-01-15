@@ -74,7 +74,7 @@ class BotController extends Controller
         if (Auth::user()->hasPerm("Chat_update_new_chat")){
             return view('play.bots');
         }else{
-            $result = Chats::where("llm_id", "=",$llm_id)->whereNull("dcID");
+            $result = Chats::where("llm_id", "=",$llm_id)->whereNull("roomID");
             if ($result->exists()){
                 return Redirect::route('play.bots.chat', $result->first()->id);
             }else{

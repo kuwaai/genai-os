@@ -6,11 +6,11 @@
                     $have = false;
                 @endphp
                 @foreach (App\Models\LLMs::where('enabled', false)->orderby('order')->orderby('created_at')->get() as $LLM)
-                    @if (App\Models\Chats::where('user_id', Auth::user()->id)->whereNull('dcID')->where('llm_id', $LLM->id)->count() > 0)
+                    @if (App\Models\Chats::where('user_id', Auth::user()->id)->whereNull('roomID')->where('llm_id', $LLM->id)->count() > 0)
                         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
                             <a href="{{ $LLM->link }}" target="_blank"
                                 class="inline-block menu-btn mt-2 w-auto ml-4 mr-auto h-6 transition duration-300 text-blue-800 dark:text-cyan-200">{{ $LLM->name }}</a>
-                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->whereNull('dcID')->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
+                            @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->whereNull('roomID')->where('llm_id', $LLM->id)->orderby('name')->get() as $chat)
                                 <div
                                     class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                                     <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"

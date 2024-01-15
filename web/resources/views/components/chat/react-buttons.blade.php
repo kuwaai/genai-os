@@ -23,8 +23,8 @@
     @if (
         (request()->routeIs('chat.*') &&
             request()->user()->hasPerm('Chat_update_react_message')) ||
-            (request()->routeIs('duel.*') &&
-                request()->user()->hasPerm('Duel_update_react_message')))
+            (request()->routeIs('room.*') &&
+                request()->user()->hasPerm('Room_update_react_message')))
         <button data-tooltip-target="react_quote" data-tooltip-placement="top"
             onclick="quote({{ $history->llm_id }}, {{ $history->id }}, this)"
             class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg">
@@ -42,8 +42,8 @@
     @if (
         (request()->routeIs('chat.*') &&
             request()->user()->hasPerm('Chat_update_feedback')) ||
-            (request()->routeIs('duel.*') &&
-                request()->user()->hasPerm('Duel_update_feedback')))
+            (request()->routeIs('room.*') &&
+                request()->user()->hasPerm('Room_update_feedback')))
         <button data-tooltip-target="react_like" data-tooltip-placement="top"
             class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
             data-modal-target="feedback" data-modal-toggle="feedback"
@@ -76,8 +76,8 @@
     @if (
         (request()->routeIs('chat.*') &&
             request()->user()->hasPerm('Chat_update_react_message')) ||
-            (request()->routeIs('duel.*') &&
-                request()->user()->hasPerm('Duel_update_react_message')))
+            (request()->routeIs('room.*') &&
+                request()->user()->hasPerm('Room_update_react_message')))
         <button data-tooltip-target="react_translate" data-tooltip-placement="top"
             onclick="translates(this, {{ $history->id }}, null)"
             class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg translates">

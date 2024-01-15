@@ -33,9 +33,9 @@
                 <div class="flex">
                     <input name="link" onclick="copyShare($(this), $('#copiedAlert'))"
                         class="block w-full text-black dark:text-white bg-gray-200 transition-colors dark:bg-gray-600 border border-gray-200 rounded-l-lg py-3 px-4 leading-tight focus:outline-none border-0"
-                        id="link" value="{{ request()->routeIs('chat.*') ? route('chat.share', request()->route('chat_id')) : route('duel.share', request()->route('duel_id')) }}" autocomplete="off"
+                        id="link" value="{{ request()->routeIs('chat.*') ? route('chat.share', request()->route('chat_id')) : route('room.share', request()->route('room_id')) }}" autocomplete="off"
                         readonly>
-                    <a href="{{ request()->routeIs('chat.*') ? route('chat.share', request()->route('chat_id')) : route('duel.share', request()->route('duel_id')) }}" target="_blank"
+                    <a href="{{ request()->routeIs('chat.*') ? route('chat.share', request()->route('chat_id')) : route('room.share', request()->route('room_id')) }}" target="_blank"
                         class="px-4 flex justify-center items-center rounded-r-lg bg-green-500 hover:bg-green-600 text-white">
                         <i class="fas fa-external-link-alt"></i>
                     </a>

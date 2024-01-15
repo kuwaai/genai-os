@@ -22,10 +22,10 @@
                 @endforeach
             </div>
             <div class="overflow-y-auto scrollbar">
-                @if (request()->user()->hasPerm('Duel_update_new_chat'))
+                @if (request()->user()->hasPerm('Room_update_new_chat'))
                 <div class="m-2 border border-green-400 border-1 rounded-lg overflow-hidden">
                     <form method="post"
-                        action="{{ route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
+                        action="{{ route('room.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
                         <div class="flex items-end justify-end">
                             @csrf
                             @foreach ($llms as $llm)
@@ -35,7 +35,7 @@
                                 class="flex menu-btn flex text-green-400 w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ session('llms') ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
                                 <p
                                     class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                    {{ __('Create Chat') }}</p>
+                                    {{ __('Create Room') }}</p>
                             </button>
                         </div>
                     </form>
@@ -44,8 +44,8 @@
                 @if ($DC)
                     @foreach ($DC as $dc)
                         <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                            <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                                href="{{ route('duel.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
+                            <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                                href="{{ route('room.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
                                 <p
                                     class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
                                     {{ $dc->name }}</p>
@@ -61,7 +61,7 @@
     @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
         <div class="flex flex-1 flex-col border border-black dark:border-white border-1 rounded-lg">
             <div class="flex px-2 scrollbar scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
-                @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
+                @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', $DC->first()->id)->orderby('llm_id')->get() as $chat)
                     <div
                         class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
                         <div class="h-full w-full"><img data-tooltip-target="llm_{{ $chat->llm_id }}"
@@ -77,10 +77,10 @@
                 @endforeach
             </div>
             <div class="overflow-y-auto scrollbar">
-                @if (request()->user()->hasPerm('Duel_update_new_chat'))
+                @if (request()->user()->hasPerm('Room_update_new_chat'))
                 <div class="m-2 border border-green-400 border-1 rounded-lg overflow-hidden">
                     <form method="post"
-                        action="{{ route('duel.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
+                        action="{{ route('room.new') . (request()->input('limit') > 0 ? '' : '?limit=' . request()->input('limit')) }}">
                         <div class="flex items-end justify-end">
                             @csrf
                             @foreach ($llms as $llm)
@@ -90,7 +90,7 @@
                                 class="flex menu-btn flex text-green-400 w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ session('llms') ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
                                 <p
                                     class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                    {{ __('Create Chat') }}</p>
+                                    {{ __('Create Room') }}</p>
                             </button>
                         </div>
                     </form>
@@ -98,8 +98,8 @@
                 @endif
                 @foreach ($DC as $dc)
                     <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
-                        <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('duel_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
-                            href="{{ route('duel.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
+                        <a class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
+                            href="{{ route('room.chat', $dc->id) . (request()->input('limit') > 0 ? '?limit=' . request()->input('limit') : '') }}">
                             <p
                                 class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
                                 {{ $dc->name }}</p>

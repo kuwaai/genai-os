@@ -1,9 +1,9 @@
 @props(['llms', 'readonly' => false])
 
 @if (!session('llms'))
-    <form id="editChat" action="{{ route('duel.edit') }}" method="post" class="hidden">
+    <form id="editChat" action="{{ route('room.edit') }}" method="post" class="hidden">
         @csrf
-        <input name="id" value="{{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->id }}" />
+        <input name="id" value="{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->id }}" />
         <input name="new_name" />
         <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
     </form>
@@ -11,7 +11,7 @@
 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 text-gray-700 dark:text-white flex">
 
     @if ($readonly)
-        @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', request()->route('duel_id'))->orderby('llm_id')->get() as $chat)
+        @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', request()->route('room_id'))->orderby('llm_id')->get() as $chat)
             <div
                 class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                 <img data-tooltip-target="llm_{{ $chat->llm_id }}_toggle" data-tooltip-placement="top"
@@ -41,7 +41,7 @@
         @if (session('llms'))
             {{ __('New Chatroom') }}
         @else
-            {{ App\Models\DuelChat::findOrFail(request()->route('duel_id'))->name }}
+            {{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}
         @endif
     </p>
 
@@ -68,7 +68,7 @@
                     </div>
                 @endforeach
             @elseif(!$readonly)
-                @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('dcID', request()->route('duel_id'))->orderby('llm_id')->get() as $chat)
+                @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', request()->route('room_id'))->orderby('llm_id')->get() as $chat)
                     <div
                         class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                         <img data-tooltip-target="llm_{{ $chat->llm_id }}_toggle" data-tooltip-placement="top"
@@ -125,7 +125,7 @@
         </div>
         @if (!$readonly)
             @if (!session('llms'))
-                @if (request()->user()->hasPerm('Duel_read_export_chat'))
+                @if (request()->user()->hasPerm('Room_read_export_chat'))
                     <button onclick="export_chat()" data-modal-target="exportModal" data-modal-toggle="exportModal"
                         class="bg-green-500 mr-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                         <i class="fas fa-share-alt"></i>
@@ -197,14 +197,14 @@
                     class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                     <i class="fas fa-pen"></i>
                 </button>
-                @if (request()->user()->hasPerm('Duel_delete_chatroom'))
+                @if (request()->user()->hasPerm('Room_delete_chatroom'))
                     <button data-modal-target="delete_chat_modal" data-modal-toggle="delete_chat_modal"
                         class="bg-red-500 ml-3 hover:bg-red-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                         <i class="fas fa-trash"></i>
                     </button>
                 @endif
             @else
-                @if (request()->user()->hasPerm('Duel_update_import_chat'))
+                @if (request()->user()->hasPerm('Room_update_import_chat'))
                     <div class="flex">
                         <button data-modal-target="importModal" data-modal-toggle="importModal"
                             class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">

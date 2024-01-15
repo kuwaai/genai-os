@@ -406,7 +406,7 @@ class ChatController extends Controller
             return view('chat');
         } else {
             $result = Chats::where('llm_id', '=', $llm_id)
-                ->whereNull('dcID')
+                ->whereNull('roomID')
                 ->where('user_id', '=', Auth::user()->id);
             if ($result->exists()) {
                 return Redirect::route('chat.chat', $result->first()->id);
@@ -499,8 +499,8 @@ class ChatController extends Controller
         if ($history_id) {
             $tmp = Histories::find($history_id);
             if ($tmp) {
-                $tmp = Chats::find($tmp->chat_id)->dcID;
-                if (($tmp != null && Auth::user()->hasPerm('Duel_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
+                $tmp = Chats::find($tmp->chat_id)->roomID;
+                if (($tmp != null && Auth::user()->hasPerm('Room_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
                     $nice = $request->input('type') == '1';
                     $detail = $request->input('feedbacks');
                     $flag = $request->input('feedback');

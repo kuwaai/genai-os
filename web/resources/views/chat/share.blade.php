@@ -59,7 +59,7 @@
     @endphp
 
     <x-chat.functions />
-    <div class="flex h-full mx-auto">
+    <div class="flex h-full">
         <div id="histories"
             class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 ">
             <x-chat.header :llmId="request()->route('llm_id')" :chatId="request()->route('chat_id')" :LLM="$LLM" :readonly="true" />
