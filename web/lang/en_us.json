@@ -23,5 +23,11 @@
     "Room_update_react_message": "React Buttons",
     "Room_read_export_chat": "Export Chat",
     "Room_delete_chatroom": "Delete Chatroom",
-    "Chat_update_react_message": "React Buttons"
+    "Chat_update_react_message": "React Buttons",
+    "Dashboard_read_statistics":"Statistics",
+    "Dashboard_read_blacklist":"Blacklist",
+    "Dashboard_read_feedbacks":"Feedbacks",
+    "Dashboard_read_logs":"Logs",
+    "Dashboard_read_safetyguard":"Safety Guard",
+    "Dashboard_read_inspect":"Inspect"
 }

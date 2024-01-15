@@ -269,5 +269,12 @@
     "The password must be hashed using bcrypt.":"密碼必須經由bcrypt加密過",
     "Safety Guard Check":"安全檢查",
     "Footer Warning":"對話底部警告",
-    "Share link (For now, Only you can access)":"分享連結 (目前只有自己可存取)"
+    "Share link (For now, Only you can access)":"分享連結 (目前只有自己可存取)",
+    "Announcement":"公告",
+    "Dashboard_read_statistics":"統計資訊",
+    "Dashboard_read_blacklist":"黑名單",
+    "Dashboard_read_feedbacks":"回饋資料",
+    "Dashboard_read_logs":"系統日誌",
+    "Dashboard_read_safetyguard":"安全過濾",
+    "Dashboard_read_inspect":"訊息瀏覽器"
 }
