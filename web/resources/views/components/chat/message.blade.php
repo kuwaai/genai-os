@@ -74,7 +74,7 @@
         @if (!$history->isbot)
             <div
                 class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                {{ mb_substr(request()->user()->name, 0, 1, 'UTF-8') }}
+                {{ $readonly ? "User" : mb_substr(request()->user()->name, 0, 1, 'UTF-8') }}
             </div>
         @endif
     </div>

@@ -1,6 +1,12 @@
 @php
     $histories = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id');
 
+    if (session('start_date')) {
+        $histories->where('histories.created_at', '>=', session('start_date'));
+    }
+    if (session('end_date')) {
+        $histories->where('histories.created_at', '<=', session('end_date'));
+    }
     if (session('search')) {
         $chatIds = $histories
             ->where('msg', 'like', '%' . session('search') . '%')
@@ -28,13 +34,21 @@
         class="flex flex-col bg-white dark:bg-gray-700 p-2 text-white w-72 flex-shrink-0 relative overflow-y-auto overflow-x-hidden scrollbar">
         @csrf
         <input name="tab" value="inspect" hidden>
+        <label for="inspect_start_date" class="block uppercase tracking-wide dark:text-white">開始日期</label>
+        <input type="datetime-local" placeholder="開始日期" id="inspect_start_date" name="start_date"
+            value="{{ session('start_date') }}" onchange="$(this).closest('form').submit()"
+            class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        <label for="inspect_end_date" class="block uppercase tracking-wide dark:text-white">結束日期</label>
+        <input type="datetime-local" placeholder="結束日期" id="inspect_end_date" name="end_date"
+            value="{{ session('end_date') }}" onchange="$(this).closest('form').submit()"
+            class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
         <label for="inspect_searchbox" class="block uppercase tracking-wide dark:text-white">搜尋訊息</label>
-        <input placeholder="過濾內容" id="inspect_searchbox" name="search" value="{{session('search')}}"
+        <input placeholder="過濾內容" id="inspect_searchbox" name="search" value="{{ session('search') }}"
             class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
         <div id="inspect_targetInputsContainer"></div>
         <div class="flex flex-wrap -mx-3">
             <div class="w-full px-3">
-                <label for="tagInput" class="block uppercase tracking-wide dark:text-white">過濾模型</label>
+                <label for="inspect_tagInput" class="block uppercase tracking-wide dark:text-white">過濾模型</label>
                 <div class="relative mt-1">
                     <div id="inspect_tagContainer" class="mt-2 flex flex-wrap">
                         <input id="inspect_tagInput" type="text"
