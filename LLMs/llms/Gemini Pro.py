@@ -38,7 +38,7 @@ def llm_compute(data):
         msg = msg[:-1]
         chat = model.start_chat(history=msg)
         proc = True
-        for i in chat.send_message(quiz, stream=True):
+        for i in chat.send_message(quiz, stream=True,safety_settings={'HARASSMENT':'block_none','HARM_CATEGORY_DANGEROUS_CONTENT':'block_none','HARM_CATEGORY_HATE_SPEECH':'block_none',"HARM_CATEGORY_SEXUALLY_EXPLICIT":"block_none"}):
             for o in i.text:
                 yield o
                 print(end=o)

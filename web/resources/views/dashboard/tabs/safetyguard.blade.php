@@ -15,54 +15,59 @@
                         autocomplete="off"> <input type="hidden" name="_method" value="delete"> <input name="id">
                 </form>
                 <div class="flex-1 overflow-y-auto scrollbar pr-2 text-black dark:text-white" id="rule_list">
-
+                    <div class="my-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden hidden">
+                        <button 
+                            class="flex menu-btn items-center justify-center w-full dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
+                            <div class="flex flex-1">
+                                <div class="flex flex-1 flex-col h-[48px]">
+                                    <span class="overflow-x-auto scrollbar break-all flex flex-col flex-1 items-center justify-center"></span>
+                                    <span class="overflow-x-auto scrollbar break-all text-sm flex flex-col flex-1 items-center justify-center text-gray-300"></span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div id="edit_llm" style=""
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                 <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">創建過濾規則</h3>
-                <form id="update_LLM_by_ID" method="post" enctype="multipart/form-data" autocomplete="off"
+                <form id="safetyguard_create_rule" method="post" enctype="multipart/form-data" autocomplete="off"
+                    onsubmit="$(this).find('.dynamic-textarea').each(function() {
+                    const textareaValue = $(this).val().trim();
+                    if (textareaValue === '') { $(this).remove(); } });"
                     action="{{ route('dashboard.safetyguard.create') }}"
                     class="w-full  p-4 overflow-y-auto scrollbar overflow-x-hidden space-y-2">
                     @csrf
-                    @method('patch')
-                    <input name="id" style="display:none">
+                    <input name="tab" value="safetyguard" hidden>
                     <div id="safetygard_targetInputsContainer"></div>
                     <div class="flex overflow-hidden -mx-3">
                         <div class="flex flex-1 flex-col overflow-hidden px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="ruleName">
-                                規則名稱
+                                規則名稱<span class="text-red-400">*</span>
                             </label>
-                            <div class="flex flex-1 justify-center items-center flex-nowrap">
-                                <input name="ruleName"
-                                    class="flex-1 appearance-none overflow-hidden block text-gray-700 mr-2 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                    id="ruleName" placeholder="規則名稱" value="">
-
-                                <label
-                                    class="text-white font-bold py-3 px-4 rounded margin-t-auto bg-red-500 hover:bg-red-600"
-                                    for="rule_toggle"><i class="fas fa-power-off"></i></label>
-                                <input id="rule_toggle" type="checkbox" style="display:none;">
-
-                            </div>
+                            <input name="ruleName"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                id="ruleName" placeholder="規則名稱" value="" required>
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
-                                for="link">
+                                for="description">
                                 規則敘述
                             </label>
-                            <input name="link"
+                            <input name="description"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="link" placeholder="規則敘述" value="">
+                                id="description" placeholder="規則敘述" value="">
                         </div>
                     </div>
                     <hr>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label for="safetyguard_tagInput"
-                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定套用規則模型</label>
+                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定套用規則模型<span
+                                    class="text-red-400">*</span></label>
                             <div class="relative mt-1">
                                 <div id="safetyguard_tagContainer" class="mt-2 flex flex-wrap">
                                     <input id="safetyguard_tagInput" type="text"
@@ -80,11 +85,12 @@
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="action">
-                                規則行為
+                                規則行為<span class="text-red-400">*</span>
                             </label>
                             <select id="action" name="action"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                <option value="block" selected>封鎖+(可選警告)</option>
+                                <option value="none" selected>無行為</option>
+                                <option value="block">封鎖+(可選警告)</option>
                                 <option value="warn">純警告</option>
                             </select>
                         </div>
@@ -92,69 +98,72 @@
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
-                                for="WarningAlert">
+                                for="message">
                                 警告提示訊息(可選)
                             </label>
-                            <input name="WarningAlert"
+                            <input name="message"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="WarningAlert" placeholder="警告提示訊息">
+                                id="message" placeholder="警告提示訊息">
                         </div>
                     </div>
                     @php
-                        $filters = [['name' => 'KeywordInput', 'label' => 'Keyword輸入過濾', 'placeholder' => 'Keyword輸入過濾'], ['name' => 'EmbeddingInput', 'label' => 'Embedding輸入過濾', 'placeholder' => 'Embedding輸入過濾'], ['name' => 'KeywordOutput', 'label' => 'Keyword輸出過濾', 'placeholder' => 'Keyword輸出過濾'], ['name' => 'EmbeddingOutput', 'label' => 'Embedding輸出過濾', 'placeholder' => 'Embedding輸出過濾']];
+                        $filters = ['keyword' => ['name' => 'Keyword 規則', 'filters' => ['pre-filter' => ['name' => '輸入過濾'], 'post-filter' => ['name' => '輸出過濾']]], 'embedding' => ['name' => 'Embedding 規則', 'filters' => ['pre-filter' => ['name' => '輸入過濾'], 'post-filter' => ['name' => '輸出過濾']]]];
                     @endphp
-
-                    @foreach ($filters as $filter)
-                        <div id="dynamic-inputs">
-                            <div class="flex flex-wrap -mx-3 dynamic-input">
-                                <div class="w-full px-3">
-                                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
-                                        for="textarea-{{ $filter['name'] }}">
-                                        {{ $filter['label'] }}
-                                    </label>
-                                    <textarea name="textareas[]"
-                                        class="dynamic-textarea appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                        id="textarea-{{ $filter['name'] }}" placeholder="{{ $filter['label'] }}" data-label="{{ $filter['label'] }}"></textarea>
+                    <div id="accordion-collapse" data-accordion="collapse"
+                        class="rounded-lg overflow-hidden bg-gray-300 dark:bg-gray-500">
+                        @foreach ($filters as $index => $topfilter)
+                            @php
+                                $topfilterId = "accordion-collapse-heading-$index";
+                                $accordionBodyId = "accordion-collapse-body-$index";
+                            @endphp
+                            <div id="{{ $topfilterId }}">
+                                <button type="button"
+                                    class="flex items-center justify-between w-full p-3 text-black dark:text-white gap-3 border border-1 border-gray-300 dark:border-gray-800"
+                                    data-accordion-target="#{{ $accordionBodyId }}" aria-expanded="true"
+                                    aria-controls="{{ $accordionBodyId }}">
+                                    <span class="text-black dark:text-white">{{ $topfilter['name'] }}</span>
+                                    <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M9 5 5 1 1 5" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="{{ $accordionBodyId }}" class="hidden" aria-labelledby="{{ $topfilterId }}">
+                                <div
+                                    class="p-2 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900 flex flex-col md:flex-row">
+                                    @foreach ($topfilter['filters'] as $subindex => $subfilter)
+                                        <div class="flex-1 p-1" id="{{ $index . '-' . $subindex }}">
+                                            <p class="text-center">{{ $subfilter['name'] }}</p>
+                                            <textarea name="{{ $index . '-' . $subindex }}[]" rows='1' max-rows="2"
+                                                class="dynamic-textarea mb-2 resize-none scrollbar appearance-none block w-full text-gray-700 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
+                                                placeholder="{{ $subfilter['name'] }}"></textarea>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
+
 
                     <script>
-                        $(document).ready(function() {
-                            $(document).on('input', '.dynamic-textarea', function() {
-                                const inputValue = $(this).val().trim();
-                                const dynamicInputs = $('#dynamic-inputs');
+                        $(document).on('input', '.dynamic-textarea', function() {
+                            const inputValue = $(this).val().trim();
+                            const dynamicInputs = $(this).parent();
 
-                                // Remove empty textareas except the last one
-                                dynamicInputs.find('.dynamic-input:not(:last-child)').each(function() {
-                                    const textareaValue = $(this).find('.dynamic-textarea').val().trim();
-                                    if (textareaValue === '') {
-                                        $(this).remove();
-                                    }
-                                });
-
-                                // Add a new textarea if the last one is not empty
-                                if (inputValue !== '') {
-                                    const filterLabel = $(this).data('label');
-                                    const newInput = `
-                                        <div class="flex flex-wrap -mx-3 dynamic-input">
-                                            <div class="w-full px-3">
-                                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold" for="textarea-${filterLabel}">
-                                                    ${filterLabel}
-                                                </label>
-                                                <textarea 
-                                                    name="textareas[]" 
-                                                    class="dynamic-textarea appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
-                                                    id="textarea-${filterLabel}" 
-                                                    placeholder="${filterLabel}" 
-                                                    data-label="${filterLabel}"></textarea>
-                                            </div>
-                                        </div>
-                                    `;
-                                    dynamicInputs.append(newInput);
+                            dynamicInputs.find('.dynamic-textarea:not(:last)').each(function() {
+                                const textareaValue = $(this).val().trim();
+                                if (textareaValue === '') {
+                                    $(this).remove();
                                 }
                             });
+
+                            if (dynamicInputs.find('.dynamic-textarea:last').val().trim() !== '') {
+                                const newInput = $(this).clone()
+                                newInput.val('');
+                                dynamicInputs.append(newInput);
+                            }
+                            adjustTextareaRows(this)
                         });
                     </script>
                     <div class="text-center">
@@ -266,24 +275,18 @@
                 $('#safety-guard-interface >div:eq(0)').hide();
                 $('#safety-guard-interface >div:eq(1)').show();
             }
-            $("#rule_list").empty()
+            $("#rule_list").find(">:not(div.hidden)").remove();
             $("#rule_list").append(`<p>已啟用規則</p><hr>`)
             data.forEach(function(rule) {
-                $("#rule_list").append(`<div
-                        class="mb-2 border border-black dark:border-white border-1 rounded-l-full overflow-hidden">
-                        <button onclick="edit_llm(90)" id="edit_llm_btn_90"
-                            class="flex menu-btn items-center justify-center w-full dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
-                            <div class="flex flex-1">
-                                <div class="flex m-auto w-[48px] h-[48px] justify-center items-center"></div>
-                                <div class="flex flex-1 flex-col  h-[48px]">
-                                    <span
-                                        class="overflow-x-auto scrollbar break-all flex flex-col flex-1 items-center justify-center">e.1.1.0</span>
-                                </div>
-                            </div>
-                        </button>
-                    </div>`)
+                cloned = $("#rule_list").find("div.hidden:first()").clone();
+                cloned.removeClass("hidden");
+                console.log(rule);
+                cloned.find("span:first()").text(rule["name"])
+                cloned.find("span:nth-child(2)").text(rule["description"])
+                $("#rule_list").append(cloned)
             })
             $("#rule_list").append(`<p>已停用規則</p><hr>`)
+            $data = data;
 
         },
         error: function() {

@@ -9,7 +9,7 @@ use App\Models\Histories;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
 use App\Models\Logs;
-
+use Illuminate\Support\Facades\Http;
 class DashboardController extends Controller
 {
     function home(Request $request)
@@ -221,47 +221,51 @@ class DashboardController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    function guard_delete()
+    function guard_delete(Request $request)
     {
         if ($this->healthCheck()) {
             return response()->json(['error' => 'Guard offline'], 500);
         }
     }
-    function guard_update()
+    function guard_update(Request $request)
     {
         if ($this->healthCheck()) {
             return response()->json(['error' => 'Guard offline'], 500);
         }
     }
-    function guard_create()
+    function guard_create(Request $request)
     {
         if ($this->healthCheck()) {
             return response()->json(['error' => 'Guard offline'], 500);
         }
         $request->validate([
-            'target' => 'required|array',
-            'preFilterKeyword' => 'required|array',
-            'preFilterEmbedding' => 'required|array',
-            'postFilterKeyword' => 'required|array',
-            'postFilterEmbedding' => 'required|array',
-            'block' => 'required|boolean',
+            'action' => 'required|string',
+            'ruleName' => 'required|string',
+            'description' => 'required|string',
             'message' => 'required|string',
+            'target' => 'required|array',
+            'keyword-pre-filter' => 'required|array',
+            'keyword-post-filter' => 'required|array',
+            'embedding-pre-filter' => 'required|array',
+            'embedding-post-filter' => 'required|array',
         ]);
 
         // Transform data to the desired structure
         $requestData = $request->all();
 
         $transformedData = [
+            'name' => $requestData['ruleName'],
+            'description' => $requestData['description'],
             'target' => $requestData['target'],
             'pre-filter' => [
-                'keyword' => $requestData['preFilterKeyword'],
-                'embedding' => $requestData['preFilterEmbedding'],
+                'keyword' => $requestData['keyword-pre-filter'],
+                'embedding' => $requestData['embedding-pre-filter'],
             ],
             'post-filter' => [
-                'keyword' => $requestData['postFilterKeyword'],
-                'embedding' => $requestData['postFilterEmbedding'],
+                'keyword' => $requestData['keyword-post-filter'],
+                'embedding' => $requestData['embedding-post-filter'],
             ],
-            'block' => $requestData['block'],
+            'action' => $requestData['action'],
             'message' => $requestData['message'],
         ];
 
@@ -270,7 +274,9 @@ class DashboardController extends Controller
 
         // Check the response and return accordingly
         if ($response->successful()) {
-            return response()->json($response->json(), 201);
+            return Redirect::route('dashboard.home')
+                ->with('last_tab', $request->input('tab'))
+                ->with('rule_id', $response->json()['id']);
         } else {
             return response()->json(['error' => 'Failed to create rule'], $response->status());
         }

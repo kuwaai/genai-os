@@ -331,7 +331,6 @@ xmlns="http://www.w3.org/2000/svg">
             const lineHeight = parseInt(textarea.css('line-height'));
 
             textarea.attr('rows', 1);
-
             const contentHeight = textarea[0].scrollHeight;
             const rowsToDisplay = Math.floor(contentHeight / lineHeight);
 
