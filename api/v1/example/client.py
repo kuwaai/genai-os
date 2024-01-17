@@ -4,17 +4,19 @@ import logging
 
 # Type definition
 from detection_pb2 import (
-    MessageFilterRequest,
-    QaFilterRequest,
-    CheckingResponse
+    FilterRequest,
+    CheckingResponse,
+    ChatRecord
 )
 # Client stub definition
 from detection_pb2_grpc import DetectionStub
 
 def print_checking_result(resp: CheckingResponse):
     print(f'Safe: {resp.safe}')
-    if resp.detail:
-        print(f'Detail: {resp.detail}')
+    if not resp.safe:
+        print(f'Action: {resp.action}')
+        if resp.message:
+            print(f'Message: {resp.message}')
 
 def run():
 
@@ -26,19 +28,30 @@ def run():
     
     stub = DetectionStub(channel)
 
-    print("Calling MessageFilter()")
+    print("Calling PreFilter()")
     try:
-        response = stub.MessageFilter(
-            MessageFilterRequest(message="Test message filter."),
+        response = stub.PreFilter(
+            FilterRequest(
+                model_id = 'test-model',
+                chat_records=[
+                    ChatRecord(role=ChatRecord.ROLE_USER, content='ping')
+                ]
+            ),
         )
         print_checking_result(response)
     except Exception as e:
         logging.exception("Failed to make RPC.")
 
     # Or use the 'wait_for_ready' option to wait until the server is ready.
-    print("Calling QaFilter()")
-    response = stub.QaFilter(
-        QaFilterRequest(prompt="Test prompt.", response="Test response."),
+    print("Calling PostFilter()")
+    response = stub.PostFilter(
+        FilterRequest(
+            model_id = 'test-model',
+            chat_records=[
+                ChatRecord(role=ChatRecord.ROLE_USER, content='ping'),
+                ChatRecord(role=ChatRecord.ROLE_ASSISTANT, content='pong'),
+            ]
+        ),
         wait_for_ready=True
     )
     print_checking_result(response)

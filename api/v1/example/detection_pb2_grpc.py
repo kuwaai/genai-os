@@ -14,14 +14,14 @@ class DetectionStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.MessageFilter = channel.unary_unary(
-                '/Detection/MessageFilter',
-                request_serializer=detection__pb2.MessageFilterRequest.SerializeToString,
+        self.PreFilter = channel.unary_unary(
+                '/Detection/PreFilter',
+                request_serializer=detection__pb2.FilterRequest.SerializeToString,
                 response_deserializer=detection__pb2.CheckingResponse.FromString,
                 )
-        self.QaFilter = channel.unary_unary(
-                '/Detection/QaFilter',
-                request_serializer=detection__pb2.QaFilterRequest.SerializeToString,
+        self.PostFilter = channel.unary_unary(
+                '/Detection/PostFilter',
+                request_serializer=detection__pb2.FilterRequest.SerializeToString,
                 response_deserializer=detection__pb2.CheckingResponse.FromString,
                 )
 
@@ -29,15 +29,15 @@ class DetectionStub(object):
 class DetectionServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def MessageFilter(self, request, context):
-        """Perform the safety check on a single message.
+    def PreFilter(self, request, context):
+        """Check whether the user input is safe.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def QaFilter(self, request, context):
-        """Perform the safety check on a prompt-response pair.
+    def PostFilter(self, request, context):
+        """Check whether the model output is safe.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -46,14 +46,14 @@ class DetectionServicer(object):
 
 def add_DetectionServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'MessageFilter': grpc.unary_unary_rpc_method_handler(
-                    servicer.MessageFilter,
-                    request_deserializer=detection__pb2.MessageFilterRequest.FromString,
+            'PreFilter': grpc.unary_unary_rpc_method_handler(
+                    servicer.PreFilter,
+                    request_deserializer=detection__pb2.FilterRequest.FromString,
                     response_serializer=detection__pb2.CheckingResponse.SerializeToString,
             ),
-            'QaFilter': grpc.unary_unary_rpc_method_handler(
-                    servicer.QaFilter,
-                    request_deserializer=detection__pb2.QaFilterRequest.FromString,
+            'PostFilter': grpc.unary_unary_rpc_method_handler(
+                    servicer.PostFilter,
+                    request_deserializer=detection__pb2.FilterRequest.FromString,
                     response_serializer=detection__pb2.CheckingResponse.SerializeToString,
             ),
     }
@@ -67,7 +67,7 @@ class Detection(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def MessageFilter(request,
+    def PreFilter(request,
             target,
             options=(),
             channel_credentials=None,
@@ -77,14 +77,14 @@ class Detection(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/Detection/MessageFilter',
-            detection__pb2.MessageFilterRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/Detection/PreFilter',
+            detection__pb2.FilterRequest.SerializeToString,
             detection__pb2.CheckingResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def QaFilter(request,
+    def PostFilter(request,
             target,
             options=(),
             channel_credentials=None,
@@ -94,8 +94,8 @@ class Detection(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/Detection/QaFilter',
-            detection__pb2.QaFilterRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/Detection/PostFilter',
+            detection__pb2.FilterRequest.SerializeToString,
             detection__pb2.CheckingResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
