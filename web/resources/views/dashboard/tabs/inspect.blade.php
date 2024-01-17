@@ -116,7 +116,7 @@
 
         <div class="mt-auto">
             <ul class="pagination">
-                {{ $histories->onEachSide(3)->links('components.pagination', ['query' => ['tab' => 'inspect', 'search' => session('search'), 'target' => session('target')]]) }}
+                {{ $histories->onEachSide(3)->links('components.pagination', ['query' => ['tab' => 'inspect', 'search' => session('search'), 'target' => session('target'), 'start_date' => session('start_date'), 'end_date' => session('end_date')]]) }}
             </ul>
         </div>
     </div>
