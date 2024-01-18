@@ -6,7 +6,7 @@ Welcome to the API usage guide for our service! This guide will help you underst
 
 The base URL for our API endpoint is:
 ```
-http://localhost/v1.0/chat/completions
+http://127.0.0.1/v1.0/chat/completions
 ```
 
 ## Authentication
@@ -35,10 +35,10 @@ You can use the `curl` command line tool to make POST requests to our API. Here'
 ```bash
 curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d '{
     "messages": [
-        { "isbot": false, "msg": "你好" }
+        { "isbot": false, "msg": "請自我介紹" }
     ],
     "model": "gemini-pro"
-}' http://localhost/v1.0/chat/completions
+}' http://127.0.0.1/v1.0/chat/completions
 ```
 
 ### Using `curl` (Windows)
@@ -46,7 +46,7 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_
 For Windows you need to escape these characters, here's how to do it:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": false, \"msg\": \"你好\" }],\"model\": \"gemini-pro\"}" http://localhost/v1.0/chat/completions
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": false, \"msg\": \"請自我介紹\" }],\"model\": \"gemini-pro\"}" http://127.0.0.1/v1.0/chat/completions
 ```
 
 ### Using JavaScript (Ajax)
@@ -56,13 +56,13 @@ You can also use JavaScript and the `fetch` API to send a single message to our 
 // Define the request payload as an object.
 const requestData = {
     messages: [
-        { isbot: false, msg: "你好" }
+        { isbot: false, msg: "請自我介紹" }
     ],
     model: "gemini-pro"
 };
 
 // Define the API endpoint and authentication headers.
-const apiUrl = 'http://localhost/v1.0/chat/completions';
+const apiUrl = 'http://127.0.0.1/v1.0/chat/completions';
 const headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_AUTH_TOKEN'
@@ -75,21 +75,63 @@ fetch(apiUrl, {
     body: JSON.stringify(requestData)
 })
 .then(response => {
-    if (response.status === 200) {
-        return response.json(); // Parse the JSON response when the status code is 200.
-    } else {
-        throw new Error('Request failed with status: ' + response.status);
+    if (!response.body) {
+        throw new Error('ReadableStream not supported');
     }
-})
-.then(data => {
-    // Handle the response data.
-    console.log(data); // Log the response data to the console.
+
+    // Create a reader for the response stream.
+    const reader = response.body.getReader();
+
+    // Function to read the stream and concatenate chunks.
+    function readStream(reader, buffer = "") {
+        return reader.read().then(({ done, value }) => {
+            if (done) {
+                // Handle the last chunk and end the stream.
+                handleStreamData(buffer);
+                return;
+            }
+
+            // Convert the chunk to a string.
+            const chunk = new TextDecoder().decode(value);
+
+            // Split the chunk into lines.
+            const lines = (buffer + chunk).split("data:");
+
+            // Process each line.
+            lines.forEach(line => {
+                if (line.trim() !== "") {
+                    // Handle the current line (remove any leading/trailing whitespace).
+                    handleStreamData(line.trim());
+                }
+            });
+
+            // Continue reading the next chunk.
+            return readStream(reader, lines[lines.length - 1]);
+        });
+    }
+
+    // Start reading the stream.
+    return readStream(reader);
 })
 .catch(error => {
     // Handle errors.
     console.error('Error:', error);
 });
 
+// Function to handle each data point in the stream.
+function handleStreamData(line) {
+    if (line === "event: end") {
+        // Handle the end of the stream.
+        console.log("Stream ended");
+        return;
+    }
+
+    try {
+        const data = JSON.parse(line)["choices"][0]["delta"]["content"];
+        console.log(data); 
+    } catch (error) {
+    }
+}
 ```
 
 ### Using Python
@@ -97,10 +139,10 @@ fetch(apiUrl, {
 Here's an example of how to send a single message using Python and the `requests` library:
 
 ```python
-import requests
+import requests, json
 
 # Define the API endpoint and authentication headers.
-api_url = 'http://localhost/v1.0/chat/completions'
+api_url = 'http://127.0.0.1/v1.0/chat/completions'
 headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_AUTH_TOKEN'
@@ -109,20 +151,23 @@ headers = {
 # Define the request payload as a dictionary for single round chatting.
 request_data = {
     "messages": [
-        { "isbot": False, "msg": "你好" }
+        { "isbot": False, "msg": "請自我介紹" }
     ],
     "model": "gemini-pro"
 }
 
 # Perform the HTTP request using the requests library.
-response = requests.post(api_url, headers=headers, json=request_data)
-
-if response.status_code == 200:
-    data = response.json()
-    # Handle the response data.
-    print(data)
-else:
-    print(f'Error: Request failed with status {response.status_code}')
+with requests.post(api_url, headers=headers, json=request_data, stream=True,timeout=60) as response:
+    for line in response.iter_lines(decode_unicode=True):
+        if line:
+            if line == "event: end":
+                break
+            elif line.startswith("data: "):
+                try:
+                    tmp = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
+                    print(end=tmp[-1], flush=True)
+                except Exception as e:
+                    print(e)
 ```
 
 ### Multiple Rounds Chatting
@@ -141,15 +186,23 @@ You can continue to add user and bot messages to this `messages` array to mainta
 
 ## Handling Responses
 
-Once you make a successful request to our API, you will receive a JSON response.
+Once you make a successful request to our API, you will receive a JSON response like this.
 
 ```json
 {
-  "status": "success",
-  "message": "Authentication successful",
-  "tokenable_id": 1,
-  "name": "Drift",
-  "output": "哈囉!我是一個樂於助人的助手,您好!我是身為協助者的角色,竭誠幫助主人公實現其目標或完成任務。您有何需要協助或指引的嗎?請別擔心地問,我竭誠照顧您的需求。"
+    "choices": [
+        {
+            "delta": {
+                "content": "你好，我是由Google開發的大型語言模型，又稱「對話式AI」，或稱「聊天機器人」。我透過文字進行互動，接受過大量資料的訓練，具備學習和理解的能力，能夠回答各種問題、撰寫不同的內容。\n我目前仍然在發展階段，但已經能夠執行多種語言任務，包括以下項目：\n\n* 翻譯語言\n* 回答問題\n* 撰寫故事、詩歌等不同類型的文本\n* 理解和生成程式碼\n* 玩遊戲\n* 提供書寫建議等等\n\n我的目標是成為一個功能強大的工具，幫助人們完成各種任務，並提供有用的資訊。隨著我繼續學習和成長，我希望能越來越好，為人們提供更好的服務。\n\n如果今天想請我幫忙的話，您可以提出您的要求。我將盡力提供您需要且有用的資訊",
+                "role": null
+            }
+        }
+    ],
+    "created": 1705602791,
+    "id": "chatcmpl-xxxxx",
+    "model": "gemini-pro",
+    "object": "chat.completion",
+    "usage": []
 }
 ```
 
