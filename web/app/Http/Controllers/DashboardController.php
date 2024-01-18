@@ -241,13 +241,13 @@ class DashboardController extends Controller
         $request->validate([
             'action' => 'required|string',
             'ruleName' => 'required|string',
-            'description' => 'required|string',
-            'message' => 'required|string',
+            'description' => 'string',
+            'message' => 'string',
             'target' => 'required|array',
-            'keyword-pre-filter' => 'required|array',
-            'keyword-post-filter' => 'required|array',
-            'embedding-pre-filter' => 'required|array',
-            'embedding-post-filter' => 'required|array',
+            'keyword-pre-filter' => 'array',
+            'keyword-post-filter' => 'array',
+            'embedding-pre-filter' => 'array',
+            'embedding-post-filter' => 'array',
         ]);
 
         // Transform data to the desired structure
@@ -255,18 +255,18 @@ class DashboardController extends Controller
 
         $transformedData = [
             'name' => $requestData['ruleName'],
-            'description' => $requestData['description'],
+            'description' => $requestData['description'] ?? "",
             'target' => $requestData['target'],
             'pre-filter' => [
-                'keyword' => $requestData['keyword-pre-filter'],
-                'embedding' => $requestData['embedding-pre-filter'],
+                'keyword' => $requestData['keyword-pre-filter'] ?? [],
+                'embedding' => $requestData['embedding-pre-filter'] ?? [],
             ],
             'post-filter' => [
-                'keyword' => $requestData['keyword-post-filter'],
-                'embedding' => $requestData['embedding-post-filter'],
+                'keyword' => $requestData['keyword-post-filter'] ?? [],
+                'embedding' => $requestData['embedding-post-filter'] ?? [],
             ],
             'action' => $requestData['action'],
-            'message' => $requestData['message'],
+            'message' => $requestData['message'] ?? "",
         ];
 
         // Proxy the transformed data to the server

@@ -6,7 +6,7 @@
                 <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                     <button onclick="CreateRule()" id="new_rule_btn"
                         class="flex menu-btn flex items-center justify-center w-full h-12 hover:bg-green-500 dark:hover:bg-green-700 transition duration-300 bg-green-500 dark:bg-green-700">
-                        <p class="flex-1 text-center text-white">新增規則</p>
+                        <p class="flex-1 text-center text-white">{{ __('dashboard.button.create_rule') }}</p>
                     </button>
                 </div>
                 <form id="delete_rule_by_id" method="post" action="{{ route('dashboard.safetyguard.delete', '') }}"
@@ -30,9 +30,10 @@
                     </div>
                 </div>
             </div>
-            <div id="edit_llm"
+            <div id="edit_rule"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">創建過濾規則</h3>
+                <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">
+                    {{ __('dashboard.header.create_rule') }}</h3>
                 <form id="safetyguard_create_rule" method="post" enctype="multipart/form-data" autocomplete="off"
                     onsubmit="$(this).find('.dynamic-textarea').each(function() {
                     const textareaValue = $(this).val().trim();
@@ -40,6 +41,7 @@
                     action="{{ route('dashboard.safetyguard.create') }}"
                     class="w-full  p-4 overflow-y-auto scrollbar overflow-x-hidden space-y-2">
                     @csrf
+                    @method('patch')
                     <input name="tab" value="safetyguard" hidden>
                     <div id="safetygard_targetInputsContainer"></div>
                     <div class="flex overflow-hidden -mx-3">
@@ -150,7 +152,6 @@
 
                     <script>
                         $(document).on('input', '.dynamic-textarea', function() {
-                            const inputValue = $(this).val().trim();
                             const dynamicInputs = $(this).parent();
 
                             dynamicInputs.find('.dynamic-textarea:not(:last)').each(function() {
@@ -278,24 +279,24 @@
                 $('#safety-guard-interface >div:eq(1)').show();
             }
             $("#rule_list").find(">:not(div.hidden)").remove();
-            $("#rule_list").append(`<p>已啟用規則</p><hr>`)
+            $("#rule_list").append(`<p>{{ __('dashboard.header.enabled_rules') }}</p><hr>`)
 
 
             for (let key in data) {
                 if (data.hasOwnProperty(key)) {
                     rule = data[key]
-                    console.log(rule);
                     cloned = $("#rule_list").find("div.hidden:first()").clone();
                     cloned.removeClass("hidden");
                     cloned.find("span:first()").text(rule["name"])
                     cloned.find("span:nth-child(2)").text(rule["description"]);
+                    cloned.attr("id", "rule_" + key)
                     cloned.on('click', () => {
                         edit_rule(key)
                     })
                     $("#rule_list").append(cloned)
                 }
             }
-            $("#rule_list").append(`<p>已停用規則</p><hr>`)
+            $("#rule_list").append(`<p>{{ __('dashboard.header.disabled_rules') }}</p><hr>`)
             $rules = data;
         },
         error: function() {
@@ -410,34 +411,95 @@
             safetygard_targetInputsContainer.appendChild(input);
         });
     }
+    last_rule_id = null;
 
     function edit_rule(id) {
+        $("#edit_rule input:eq(1)").prop("disabled", false)
+        $("#edit_rule form").attr("action", `{{ route('dashboard.safetyguard.update','') }}/` + id);
+        $("#new_rule_btn").removeClass("bg-green-500 dark:bg-green-700").addClass("bg-green-400 dark:bg-green-600")
         rule = $rules[id];
-        console.log(rule)
-        $('#edit_user_form p').text("{{ __('Edit Rule') }} " + id)
-        $('#edit_user_form input[name=id]').val(id)
-        $('#edit_user_form input[name=name]').val($users[id][0])
-        $('#edit_user_form input[name=group]').val($users[id][2] == -1 ? "" : $groupnames[$users[id][2]])
-        $('#edit_user_form input[name=email]').val($users[id][1])
-        $('#edit_user_form input[name=detail]').val($users[id][3])
-        $('#user_id').text('ID:' + id)
-        $("#delete_user_btn").attr("onclick", `delete_user(${id})`)
+        $("#delete_button").show()
+        $('#edit_rule >h3').text(`{{ __('dashboard.header.update_rule') }} ${rule["name"]}`)
+        $('#edit_rule input[name=ruleName]').val(rule["name"])
+        $('#edit_rule input[name=description]').val(rule["description"])
+        $('#edit_rule select[name=action]').val(rule["action"])
+        $('#edit_rule input[name=message]').val(rule["message"])
 
-        if (last_user_id != id) {
-            $("#edit_user_form").show()
+        $("#safetyguard_tagContainer >div").click()
+        rule["target"].forEach((target) => {
+            safetyguard_render_tagSuggestions(safetyguard_filterTags(""))
+            $(`#safetyguard_tagSuggestions div:contains('${target}')`).filter((index, element) => {
+                return $(element).text().trim() === target;
+            }).click();
+        });
+        ["pre-filter", "post-filter"].forEach((element1) => {
+            ["embedding", "keyword"].forEach((element2) => {
+                dynamicInputs = $("#" + element2 + "-" + element1)
+                dynamicInputs.find('.dynamic-textarea:not(:last)').remove();
+                last = dynamicInputs.find('.dynamic-textarea:last')
+                if (last.val().trim() !== '') {
+                    last.val("")
+                }
+                rule[element1][element2].forEach((element3) => {
+                    changed = $("#" + element2 + "-" + element1 + " >textarea:last()")
+                    changed.val(element3)
+                    dynamicInputs.find('.dynamic-textarea:not(:last)').each(function() {
+                        const textareaValue = $(this).val().trim();
+                        if (textareaValue === '') {
+                            $(this).remove();
+                        }
+                    });
+
+                    if (dynamicInputs.find('.dynamic-textarea:last').val().trim() !== '') {
+                        const newInput = $(changed).clone()
+                        newInput.val('');
+                        dynamicInputs.append(newInput);
+                    }
+                    adjustTextareaRows(changed)
+                })
+            })
+        })
+
+
+        //$("#delete_user_btn").attr("onclick", `delete_user(${id})`)
+
+        if (last_rule_id != id) {
+            $("#edit_rule").show()
+            $("#rule_list").find(">:not(div.hidden)").removeClass("bg-gray-600")
+            $("#rule_" + id).addClass("bg-gray-600");
         } else {
-            $("#edit_user_form").toggle();
+            $("#edit_rule").toggle();
+            $("#rule_" + id).toggleClass("bg-gray-600");
         }
-        last_user_id = id;
-        if ($("#edit_user_form").is(":visible")) update_stepper(['Menu', $("#fuzzy_selector").is(":visible") ?
-            'Fuzzy Search' : 'Group Selector', $groupnames[$users[id][2]],
-            $users[id][0]
-        ]);
-        else {
-            update_stepper(['Menu', $("#fuzzy_selector").is(":visible") ? 'Fuzzy Search' : 'Group Selector',
-                $groupnames[$users[id][2]]
-            ]);
-
-        }
+        last_rule_id = id;
     }
+
+    function CreateRule() {
+        $("#edit_rule input:eq(1)").prop("disabled", true)
+        $("#edit_rule form").attr("action", "{{ route('dashboard.safetyguard.create') }}");
+        $("#new_rule_btn").addClass("bg-green-500 dark:bg-green-700").removeClass("bg-green-400 dark:bg-green-600")
+        $("#rule_list").find(">:not(div.hidden)").removeClass("bg-gray-600")
+        last_rule_id = null;
+        $("#safetyguard_tagContainer >div").click()
+        $("#delete_button").hide();
+        $('#edit_rule >h3').text("{{ __('dashboard.header.create_rule') }}");
+        $('#edit_rule input[name=ruleName]').val("");
+        $('#edit_rule input[name=description]').val("");
+        $('#edit_rule select[name=action]').val("none");
+        $('#edit_rule input[name=message]').val("");
+        ["pre-filter", "post-filter"].forEach((element1) => {
+            ["embedding", "keyword"].forEach((element2) => {
+                dynamicInputs = $("#" + element2 + "-" + element1)
+                dynamicInputs.find('.dynamic-textarea:not(:last)').remove();
+                last = dynamicInputs.find('.dynamic-textarea:last')
+                if (last.val().trim() !== '') {
+                    last.val("")
+                }
+                adjustTextareaRows(last)
+            })
+        })
+    }
+    $(this).on("load",()=>{
+        CreateRule();
+    })
 </script>

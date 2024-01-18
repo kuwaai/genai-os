@@ -37,4 +37,10 @@ return [
     "msg.MustHave1Model" => "You have to select at least 1 model to export",
     "msg.InvalidJSONFormat"=>"Invalid JSON format",
 
+    //Tab_SafetyGuard
+    "header.create_rule" => "Create rule",
+    "header.update_rule" => "Update rule",
+    "header.enabled_rules" => "Enabled rules",
+    "header.disabled_rules" => "Disabled rules",
+    "button.create_rule" => "New Rule",
 ];

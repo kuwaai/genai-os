@@ -76,7 +76,7 @@
                                 ->where('chat_id', '=', $history->chat_id)
                                 ->orderby('histories.created_at')
                                 ->orderby('histories.id', 'desc')
-                                ->select('*', 'histories.id as id')
+                                ->select('*', 'histories.id as id', 'histories.created_at')
                                 ->get();
                             $botMsg = $history;
                             $outputs = [];
@@ -106,6 +106,7 @@
                             $outputs[] = $botMsg;
 
                         @endphp
+                        <p class="text-black dark:text-gray-200 text-sm text-center">{{$outputs[0]->created_at}}</p>
                         @foreach ($outputs as $chat_history)
                             <x-chat.message :history="$chat_history" :readonly="true" />
                         @endforeach

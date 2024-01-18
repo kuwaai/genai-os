@@ -36,6 +36,12 @@ return [
     "button.ConvertAndDownload" => "轉換並下載",
     "msg.MustHave1Model" => "你必須選取至少一個模型來匯出",
     "msg.InvalidJSONFormat"=>"JSON格式錯誤",
+    
     //Tab_SafetyGuard
+    "header.create_rule" => "創建過濾規則",
+    "header.update_rule" => "更新過濾規則",
+    "header.enabled_rules" => "已啟用規則",
+    "header.disabled_rules" => "已停用規則",
+    "button.create_rule" => "新增規則",
 
 ];
