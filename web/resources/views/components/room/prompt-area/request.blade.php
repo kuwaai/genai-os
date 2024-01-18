@@ -9,9 +9,9 @@
     <div class="flex">
         @csrf
         <input name="room_id" value="{{ request()->route('room_id') }}" style="display:none;">
-        <input id="chained" style="display:none;" {{ \Session::get('chained') ? '' : 'disabled' }}>
+        <input id="chained" style="display:none;" {{ (\Session::get('chained') ?? true) ? '' : 'disabled' }}>
         <button type="button" onclick="chain_toggle()" id="chain_btn"
-            class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ? __('Chained') : __('Unchain') }}</button>
+            class="whitespace-nowrap my-auto text-white mr-3 {{ (\Session::get('chained') ?? true) ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ (\Session::get('chained') ?? true) ? __('Chained') : __('Unchain') }}</button>
         <div class="flex flex-1 items-end justify-end flex-col">
             <div class="flex mr-auto dark:text-white mb-2 select-none">
                 <div>

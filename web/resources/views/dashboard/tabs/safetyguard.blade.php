@@ -14,21 +14,23 @@
                     <input type="hidden" name="_token" value="peVbyoqldUsaKepgauW6QqWNoX7x2EerbE3W6cOq"
                         autocomplete="off"> <input type="hidden" name="_method" value="delete"> <input name="id">
                 </form>
-                <div class="flex-1 overflow-y-auto scrollbar pr-2 text-black dark:text-white" id="rule_list">
+                <div class="flex-1 overflow-y-auto scrollbar text-black dark:text-white" id="rule_list">
                     <div class="my-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden hidden">
-                        <button 
+                        <button
                             class="flex menu-btn items-center justify-center w-full dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
                             <div class="flex flex-1">
                                 <div class="flex flex-1 flex-col h-[48px]">
-                                    <span class="overflow-x-auto scrollbar break-all flex flex-col flex-1 items-center justify-center"></span>
-                                    <span class="overflow-x-auto scrollbar break-all text-sm flex flex-col flex-1 items-center justify-center text-gray-300"></span>
+                                    <span
+                                        class="overflow-x-auto scrollbar break-all flex flex-col flex-1 items-center justify-center"></span>
+                                    <span
+                                        class="overflow-x-auto scrollbar break-all text-sm flex flex-col flex-1 items-center justify-center text-gray-300"></span>
                                 </div>
                             </div>
                         </button>
                     </div>
                 </div>
             </div>
-            <div id="edit_llm" style=""
+            <div id="edit_llm"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                 <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">創建過濾規則</h3>
                 <form id="safetyguard_create_rule" method="post" enctype="multipart/form-data" autocomplete="off"
@@ -277,17 +279,24 @@
             }
             $("#rule_list").find(">:not(div.hidden)").remove();
             $("#rule_list").append(`<p>已啟用規則</p><hr>`)
-            data.forEach(function(rule) {
-                cloned = $("#rule_list").find("div.hidden:first()").clone();
-                cloned.removeClass("hidden");
-                console.log(rule);
-                cloned.find("span:first()").text(rule["name"])
-                cloned.find("span:nth-child(2)").text(rule["description"])
-                $("#rule_list").append(cloned)
-            })
-            $("#rule_list").append(`<p>已停用規則</p><hr>`)
-            $data = data;
 
+
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    rule = data[key]
+                    console.log(rule);
+                    cloned = $("#rule_list").find("div.hidden:first()").clone();
+                    cloned.removeClass("hidden");
+                    cloned.find("span:first()").text(rule["name"])
+                    cloned.find("span:nth-child(2)").text(rule["description"]);
+                    cloned.on('click', () => {
+                        edit_rule(key)
+                    })
+                    $("#rule_list").append(cloned)
+                }
+            }
+            $("#rule_list").append(`<p>已停用規則</p><hr>`)
+            $rules = data;
         },
         error: function() {
             // If the GET request fails, show the offline message div and hide rulesSection
@@ -400,5 +409,35 @@
             input.value = tag;
             safetygard_targetInputsContainer.appendChild(input);
         });
+    }
+
+    function edit_rule(id) {
+        rule = $rules[id];
+        console.log(rule)
+        $('#edit_user_form p').text("{{ __('Edit Rule') }} " + id)
+        $('#edit_user_form input[name=id]').val(id)
+        $('#edit_user_form input[name=name]').val($users[id][0])
+        $('#edit_user_form input[name=group]').val($users[id][2] == -1 ? "" : $groupnames[$users[id][2]])
+        $('#edit_user_form input[name=email]').val($users[id][1])
+        $('#edit_user_form input[name=detail]').val($users[id][3])
+        $('#user_id').text('ID:' + id)
+        $("#delete_user_btn").attr("onclick", `delete_user(${id})`)
+
+        if (last_user_id != id) {
+            $("#edit_user_form").show()
+        } else {
+            $("#edit_user_form").toggle();
+        }
+        last_user_id = id;
+        if ($("#edit_user_form").is(":visible")) update_stepper(['Menu', $("#fuzzy_selector").is(":visible") ?
+            'Fuzzy Search' : 'Group Selector', $groupnames[$users[id][2]],
+            $users[id][0]
+        ]);
+        else {
+            update_stepper(['Menu', $("#fuzzy_selector").is(":visible") ? 'Fuzzy Search' : 'Group Selector',
+                $groupnames[$users[id][2]]
+            ]);
+
+        }
     }
 </script>

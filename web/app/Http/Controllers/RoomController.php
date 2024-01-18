@@ -411,7 +411,7 @@ class RoomController extends Controller
         $roomId = $request->input('room_id');
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
-        $chained = Session::get('chained') == true;
+        $chained = (Session::get('chained') ?? true) == true;
         if (count($selectedLLMs) > 0 && $roomId && $input) {
             $chats = Chats::where('roomID', $request->input('room_id'))->get();
             if (

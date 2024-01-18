@@ -1,5 +1,5 @@
 @props([
-    'chained' => false,
+    'chained' => true,
     'chatId' => request()->route('chat_id'),
     'disabled' => false,
 ])

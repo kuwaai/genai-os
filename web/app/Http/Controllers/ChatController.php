@@ -161,7 +161,7 @@ class ChatController extends Controller
 
     public function update_chain(Request $request)
     {
-        $state = $request->input('switch') == 'true';
+        $state = ($request->input('switch') ?? true) == 'true';
         Session::put('chained', $state);
     }
     public function import(Request $request)
@@ -636,7 +636,7 @@ class ChatController extends Controller
                 $llm_id = $llm_id->llm_id;
             }
             $input = $request->input('input');
-            $chained = Session::get('chained') == 'true';
+            $chained = (Session::get('chained') ?? true) == 'true';
             if ($chatId && $input && $llm_id && in_array($llm_id, $result)) {
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);
