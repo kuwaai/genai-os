@@ -28,7 +28,7 @@
                 </a>
             </div>
         @endif
-        @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('dcID')->orderby('name')->get() as $chat)
+        @foreach (App\Models\Chats::where('user_id', Auth::user()->id)->where('llm_id', $LLM->id)->whereNull('roomID')->orderby('name')->get() as $chat)
             <div class="m-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                 <a style="word-break: break-all"
                     class="flex menu-btn flex text-gray-700 dark:text-white w-full h-12 overflow-y-auto overflow-x-hidden scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('chat_id') == $chat->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
