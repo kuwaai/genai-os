@@ -2,6 +2,7 @@ langchain
 accelerate
 torch
 transformers
+protobuf
 sentence-transformers
 textract
 bs4
@@ -10,6 +11,6 @@ faiss-cpu
 chevron
 trafilatura
 jsonlines
-tokenizers
 requests-oauthlib
 requests
+selenium

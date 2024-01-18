@@ -7,8 +7,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Histories;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Client;
 use App\Models\Logs;
-
+use Illuminate\Support\Facades\Http;
 class DashboardController extends Controller
 {
     function home(Request $request)
@@ -22,7 +23,9 @@ class DashboardController extends Controller
                 ->with('action', $request->input('action'))
                 ->with('description', $request->input('description'))
                 ->with('user_id', $request->input('user_id'))
-                ->with('ip_address', $request->input('ip_address'));
+                ->with('ip_address', $request->input('ip_address'))
+                ->with('target', $request->input('target'))
+                ->with('search', $request->input('search'));
         }
         return view('dashboard.home');
     }
@@ -193,5 +196,103 @@ class DashboardController extends Controller
         } catch (\Throwable) {
         }
         return Redirect::route('dashboard.home')->with('last_tab', 'feedbacks');
+    }
+    private $apiBaseUrl = 'http://127.0.0.1:8080/v1/management';
+    function guard_fetch(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+        $client = new Client(['timeout' => 20]);
+        $url = $this->apiBaseUrl . '/rule'; // URL to fetch all rules
+
+        try {
+            $response = $client->request('GET', $url);
+
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                $rules = json_decode($response->getBody(), true);
+                // Process $rules here, it contains the fetched rules
+                return response()->json($rules, 200);
+            } else {
+                return response()->json(['error' => 'Failed to fetch rules'], $statusCode);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    function guard_delete(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+    }
+    function guard_update(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+    }
+    function guard_create(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+        $request->validate([
+            'action' => 'required|string',
+            'ruleName' => 'required|string',
+            'description' => 'required|string',
+            'message' => 'required|string',
+            'target' => 'required|array',
+            'keyword-pre-filter' => 'required|array',
+            'keyword-post-filter' => 'required|array',
+            'embedding-pre-filter' => 'required|array',
+            'embedding-post-filter' => 'required|array',
+        ]);
+
+        // Transform data to the desired structure
+        $requestData = $request->all();
+
+        $transformedData = [
+            'name' => $requestData['ruleName'],
+            'description' => $requestData['description'],
+            'target' => $requestData['target'],
+            'pre-filter' => [
+                'keyword' => $requestData['keyword-pre-filter'],
+                'embedding' => $requestData['embedding-pre-filter'],
+            ],
+            'post-filter' => [
+                'keyword' => $requestData['keyword-post-filter'],
+                'embedding' => $requestData['embedding-post-filter'],
+            ],
+            'action' => $requestData['action'],
+            'message' => $requestData['message'],
+        ];
+
+        // Proxy the transformed data to the server
+        $response = Http::post($this->apiBaseUrl . '/rule', $transformedData);
+
+        // Check the response and return accordingly
+        if ($response->successful()) {
+            return Redirect::route('dashboard.home')
+                ->with('last_tab', $request->input('tab'))
+                ->with('rule_id', $response->json()['id']);
+        } else {
+            return response()->json(['error' => 'Failed to create rule'], $response->status());
+        }
+    }
+    function healthCheck()
+    {
+        try {
+            $client = new Client(['timeout' => 5]);
+            $url = $this->apiBaseUrl . '/health';
+            $response = $client->request('GET', $url);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 204) {
+                return false;
+            }
+        } catch (\Throwable $e) {
+        }
+        return true;
     }
 }

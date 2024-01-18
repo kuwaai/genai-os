@@ -5,7 +5,7 @@ import chevron
 import logging
 from pathlib import Path
 from dataclasses import dataclass
-from tokenizers import Tokenizer
+from transformers import AutoTokenizer
 
 from worker_framework.datatype import ChatRecord, Role
 from abc import ABC, abstractmethod
@@ -45,14 +45,14 @@ class TaideLlm(ABC):
     def __init__(self,
                  token_limit = 3500,
                  prompt_template_path = 'prompt_template/taide.mustache',
-                 tokenizer_path = '/llm/tokenizer.json',
+                 tokenizer_path = '/llm/',
                  ):
 
         self.input_token_limit = token_limit
         
         prompt_template_file = Path(prompt_template_path)
         self.prompt_template = prompt_template_file.read_text()
-        self.tokenizer = Tokenizer.from_file(tokenizer_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 
     def is_too_long(self, chat_history: [ChatRecord]) -> bool:
         """
@@ -69,7 +69,7 @@ class TaideLlm(ABC):
         Calculate whether the number of tokens of given sentence exceeds the threshold.
         """
 
-        tokens_without_bos = self.tokenizer.encode(sentence).tokens[1:]
+        tokens_without_bos = self.tokenizer.encode(sentence, add_special_tokens=False)
         num_tokens = len(tokens_without_bos)
         return num_tokens >= self.input_token_limit, num_tokens
 
@@ -95,7 +95,17 @@ class TaideLlm(ABC):
 
         return prompt
     
-    async def complete(self, chat_history: [ChatRecord]): 
+    async def complete(self, chat_history: [ChatRecord]) -> str:
+        """
+        Generate the response based on the chat history.
+        
+        Parameters:
+        chat_history: The list of chat record.
+        
+        Return:
+        The generated response.
+        """
+    
         result = ''
         try:
             
@@ -148,8 +158,8 @@ class TaideLlmFactory:
             from .remote_taide_llm import NchcTaideLlm
             return NchcTaideLlm(*args, **kwargs)
         elif model_location == 'remote-llmproject':
-            from .llm_project_taide_llm import LLMProjectTaideLlm
-            return LLMProjectTaideLlm(*args, **kwargs)
+            from .remote_taide_llm import LlmProjectTaideLlm
+            return LlmProjectTaideLlm(*args, **kwargs)
         else:
             raise ValueError(f'Unknown model_location {model_location}')
             return None

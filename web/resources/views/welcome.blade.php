@@ -27,9 +27,9 @@
                             <a href="{{ url('/dashboard') }}"
                                 class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Dashboard') }}</a>
                         @endif
-                        @if (Auth::user()->hasPerm('tab_Duel'))
-                            <a href="{{ route('duel.home') }}"
-                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Duel') }}</a>
+                        @if (Auth::user()->hasPerm('tab_Room'))
+                            <a href="{{ route('room.home') }}"
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Room') }}</a>
                         @endif
                         @if (Auth::user()->hasPerm('tab_Chat'))
                             <a href="{{ route('chat.home') }}"

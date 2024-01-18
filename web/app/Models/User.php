@@ -28,7 +28,8 @@ class User extends Authenticatable implements MustVerifyEmail, LdapAuthenticatab
         'group_id',
         'term_accepted',
         'guid',
-        'domain'
+        'domain',
+        'detail'
     ];
 
     /**

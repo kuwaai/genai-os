@@ -26,6 +26,16 @@ use Session;
 
 class ChatController extends Controller
 {
+    public function share(Request $request)
+    {
+        $chat = Chats::find($request->route("chat_id"));
+        if ($chat && $chat->user_id == Auth::user()->id){
+            return view('chat.share');
+        }else{
+            return redirect()->route('chat.home');
+        }
+    }
+
     public function abort(Request $request)
     {
         $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))
@@ -94,30 +104,64 @@ class ChatController extends Controller
         $history = new APIHistories();
         $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => Auth::user()->id]);
         $history->save();
+        $response = new StreamedResponse();
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        $response->headers->set('charset', 'utf-8');
+        $response->headers->set('Connection', 'close');
 
-        RequestChat::dispatch($tmp, $access_code, Auth::user()->id, -$history->id, Auth::user()->openai_token, 'api_' . $history->id);
+        $response->setCallback(function () use ($history, $tmp, $access_code) {
+            $client = new Client(['timeout' => 300]);
+            Redis::rpush('api_' . Auth::user()->id, $history->id);
+            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, Auth::user()->openai_token, 'api_' . $history->id);
 
-        $client = new Client(['timeout' => 300]);
-        $req = $client->get(route('api.stream'), [
-            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-            'query' => [
-                'key' => config('app.API_Key'),
-                'channel' => 'api_' . $history->id,
-            ],
-            'stream' => true,
-        ]);
+            $req = $client->get(route('api.stream'), [
+                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                'query' => [
+                    'key' => config('app.API_Key'),
+                    'user_id' => Auth::user()->id,
+                    'history_id' => $history->id,
+                ],
+                'stream' => true,
+            ]);
+            $stream = $req->getBody();
+            $result = '';
+            $line = '';
+            while (!$stream->eof()) {
+                $char = $stream->read(1);
 
-        $result = explode('[ENDEDPLACEHOLDERUWU]', $req->getBody()->getContents())[0];
-
-        $history->fill(['output' => $result]);
-        $history->save();
-
-        return response($result, 200)->header('Content-Type', 'text/plain');
+                if ($char === "\n") {
+                    $line = trim($line);
+                    if (substr($line, 0, 5) === 'data:') {
+                        $jsonData = (object) json_decode(trim(substr($line, 5)));
+                        if ($jsonData !== null) {
+                            $tmp = mb_substr($jsonData->msg, mb_strlen($jsonData->msg, 'UTF-8') - 1, 1, 'UTF-8');
+                            $result .= $tmp;
+                            echo $tmp;
+                            ob_flush();
+                            flush();
+                        }
+                    } elseif (substr($line, 0, 6) === 'event:') {
+                        if (trim(substr($line, 5)) == 'end') {
+                            $client->disconnect();
+                            break;
+                        }
+                    }
+                    $line = '';
+                } else {
+                    $line .= $char;
+                }
+            }
+            $history->fill(['output' => $result]);
+            $history->save();
+        });
+        return $response;
     }
 
     public function update_chain(Request $request)
     {
-        $state = $request->input('switch') == 'true';
+        $state = ($request->input('switch') ?? true) == 'true';
         Session::put('chained', $state);
     }
     public function import(Request $request)
@@ -156,7 +200,11 @@ class ChatController extends Controller
                         foreach ($rows as $index => $row) {
                             if ($index === 0) {
                                 $headers = explode("\t", $row);
-                                continue;
+                                if (in_array('content', $headers)) {
+                                    continue;
+                                } else {
+                                    $headers = ['content'];
+                                }
                             }
                             if ($headers === null) {
                                 break;
@@ -358,7 +406,7 @@ class ChatController extends Controller
             return view('chat');
         } else {
             $result = Chats::where('llm_id', '=', $llm_id)
-                ->whereNull('dcID')
+                ->whereNull('roomID')
                 ->where('user_id', '=', Auth::user()->id);
             if ($result->exists()) {
                 return Redirect::route('chat.chat', $result->first()->id);
@@ -451,8 +499,8 @@ class ChatController extends Controller
         if ($history_id) {
             $tmp = Histories::find($history_id);
             if ($tmp) {
-                $tmp = Chats::find($tmp->chat_id)->dcID;
-                if (($tmp != null && Auth::user()->hasPerm('Duel_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
+                $tmp = Chats::find($tmp->chat_id)->roomID;
+                if (($tmp != null && Auth::user()->hasPerm('Room_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
                     $nice = $request->input('type') == '1';
                     $detail = $request->input('feedbacks');
                     $flag = $request->input('feedback');
@@ -588,7 +636,7 @@ class ChatController extends Controller
                 $llm_id = $llm_id->llm_id;
             }
             $input = $request->input('input');
-            $chained = Session::get('chained') == 'true';
+            $chained = (Session::get('chained') ?? true) == 'true';
             if ($chatId && $input && $llm_id && in_array($llm_id, $result)) {
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);

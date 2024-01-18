@@ -26,9 +26,10 @@ class DocumentQa:
 
   log_path = os.environ.get('llm_log_path','/var/log/doc_qa/qa.jsonl')
 
-  def __init__(self, document_store:str = None):
+  def __init__(self, document_store:str = None, with_ref = True):
     self.logger = logging.getLogger(__name__)
     self.llm = TaideLlmFactory.get_taide_llm(model_location=os.environ.get('MODEL_LOCATION','remote-nchc'))
+    self.with_ref = with_ref
     self.document_store:DocumentStore = None
     if document_store != None:
       self.document_store = DocumentStore.load(document_store)
@@ -39,7 +40,8 @@ class DocumentQa:
     llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
-      'question': question
+      'question': question,
+      'ref': self.with_ref
     })
 
     return llm_input
@@ -47,6 +49,15 @@ class DocumentQa:
   def replace_chat_history(self, chat_history, task, question, related_docs):
     llm_input = self.generate_llm_input(task, question, related_docs)
     modified_chat_history = chat_history[:-1] + [ChatRecord(llm_input, Role.USER)]
+    if modified_chat_history[0].msg is None:
+      if len(modified_chat_history) != 2: # Multi-round
+        modified_chat_history[0].msg = '請提供這篇文章的摘要'
+      else: # Single-round
+        modified_chat_history = modified_chat_history[1:]
+    modified_chat_history = [
+      ChatRecord('[Empty message]', r.role) if r.msg == '' else r
+      for r in modified_chat_history
+    ]
 
     return modified_chat_history
   

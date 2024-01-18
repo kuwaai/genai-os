@@ -29,7 +29,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - /var/models/llama2-7b-chat-b5.0.0:/llm/:ro
+      - /var/models/taide-b.11:/llm/:ro
       - log:/var/log/doc_qa
 
 # Connect to the network created by web_agent and squid

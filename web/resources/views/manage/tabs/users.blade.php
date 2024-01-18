@@ -135,6 +135,15 @@
                         placeholder="{{__('Password')}}" required>
                 </div>
             </div>
+            <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
+                <div class="md:col-span-2 lg:col-span-1">
+                    <label for="create_user_detail"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Detail")}}</label>
+                    <input type="text" id="create_user_detail" name="detail" autocomplete="off"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="{{__('Detail')}}">
+                </div>
+            </div>
         </div>
     </form>
     <div class="flex flex-1 overflow-hidden">
@@ -269,7 +278,7 @@
                         <div class="flex-1 overflow-y-auto scrollbar">
                             @foreach (App\Models\User::where('group_id', '=', session('list_group') == -1 ? null : session('list_group'))->orderby('name')->get() as $user)
                             <script>
-                                $users[{{ $user->id }}] = {!! json_encode([$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id], JSON_HEX_APOS) !!}
+                                $users[{{ $user->id }}] = {!! json_encode([$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id, $user->detail], JSON_HEX_APOS) !!}
                             </script>
 
                             <div
@@ -295,7 +304,9 @@
             <input name="list_group_id" hidden value="{{ session('list_group') }}">
             <input name="id" hidden>
             <div class="w-full bg-gray-300 text-white dark:bg-gray-600 p-3 flex items-center justify-center">
-                <p class="text-lg mr-auto text-black dark:text-white">{{__("Edit User")}}</p><a id="delete_user_btn" onclick="delete_user(undefined)"
+                <p class="text-lg mr-auto text-black dark:text-white">{{__("Edit User")}}</p>
+                <span id="user_id" class="mr-2">ID:null</span>
+                <a id="delete_user_btn" onclick="delete_user(undefined)"
                     data-modal-target="delete_user_modal" data-modal-toggle="delete_user_modal"
                     class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">{{__("Delete")}}</a>
                 <button
@@ -343,6 +354,15 @@
                             placeholder="{{__('New Password')}}">
                     </div>
                 </div>
+                <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
+                    <div class="md:col-span-2 lg:col-span-1">
+                        <label for="edit_detail"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Detail")}}</label>
+                        <input type="text" id="edit_detail" name="detail" autocomplete="off"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="{{__('Detail')}}">
+                    </div>
+                </div>
             </div>
         </form>
         @endif
@@ -382,12 +402,13 @@
     }
 
     function edit_group_user(id) {
-
         $('#edit_user_form p').text("{{__('Edit User')}} " + $users[id][0])
         $('#edit_user_form input[name=id]').val(id)
         $('#edit_user_form input[name=name]').val($users[id][0])
         $('#edit_user_form input[name=group]').val($users[id][2] == -1 ? "" : $groupnames[$users[id][2]])
         $('#edit_user_form input[name=email]').val($users[id][1])
+        $('#edit_user_form input[name=detail]').val($users[id][3])
+        $('#user_id').text('ID:' + id)
         $("#delete_user_btn").attr("onclick", `delete_user(${id})`)
 
         if (last_user_id != id) {

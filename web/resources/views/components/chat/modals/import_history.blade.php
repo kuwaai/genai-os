@@ -27,7 +27,7 @@
                     class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Import from file') }}</label>
                 <hr class="my-4 border-black border-gray-300 dark:border-gray-600" />
                 <form method="post"
-                    action="{{ request()->routeIs('duel.*') ? route('duel.import') : route('chat.import') }}">
+                    action="{{ request()->routeIs('room.*') ? route('room.import') : route('chat.import') }}">
                     @csrf
                     @if (request()->route('llm_id'))
                         <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">

@@ -2,11 +2,13 @@ import asyncio
 import requests
 import functools
 import logging
+import json
 from os import environ
 from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
 
 from .taide_llm import TaideLlm
+from worker_framework.datatype import ChatRecord, Role
 
 logger = logging.getLogger(__name__)
 
@@ -109,3 +111,82 @@ class NchcTaideLlm(TaideLlm):
             raise
         finally:
             return result, output_tokens
+
+class LlmProjectTaideLlm(TaideLlm):
+    def __init__(self):
+        super(LlmProjectTaideLlm, self).__init__()
+        self.api_endpoint = environ.get(
+            'LLM_PROJECT_TAIDE_API_ENDPOINT',
+            'https://chatdev.gai.tw/v1.0/chat/completions'
+        )
+        assert 'LLM_PROJECT_TAIDE_API_TOKEN' in environ, 'Environment variable "LLM_PROJECT_TAIDE_API_TOKEN" is not set to use the LLM_PROJECT TAIDE API.'
+        assert 'LLM_PROJECT_TAIDE_ACCESS_CODE' in environ, 'Environment variable "LLM_PROJECT_TAIDE_ACCESS_CODE" is not set to use the LLM_PROJECT TAIDE API.'
+        self.api_token = environ['LLM_PROJECT_TAIDE_API_TOKEN']
+        self.model_access_code = environ['LLM_PROJECT_TAIDE_ACCESS_CODE']
+
+    async def call_api(self, messages: [dict]):
+        # Define the API endpoint and authentication headers.
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.api_token}'
+        }
+        logger.debug("------------------")
+        logger.debug(f"Using access_code: {self.model_access_code}")
+        logger.debug(f"Input messages: {messages}")
+        logger.debug("------------------")
+
+        request_data = {
+            "messages": messages,
+            "model": self.model_access_code
+        }
+        
+        # Perform the HTTP request.
+        response = await self.call_sse_api(
+            url=self.api_endpoint,
+            headers=headers,
+            data=request_data
+        )
+        logger.debug(response)
+        
+        return response
+
+    async def call_sse_api(self, url, headers, data):
+        
+        def handle_sse():
+            nonlocal url, headers, data
+            buffer = ''
+            with requests.post(url, headers=headers, json=data, stream=True,timeout=60) as resp:
+                if not resp.ok:
+                    raise RuntimeError(f'Request failed with status {response.status_code}')
+                for line in resp.iter_lines(decode_unicode=True):
+                    if not line or line == "event: end": break
+                    elif line.startswith("data: "):
+                        chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
+                        buffer += chunk[-1]
+            return buffer
+
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, handle_sse)
+
+    async def complete(self, chat_history: [ChatRecord]) -> str:
+        chat_history = [
+            {
+                'isbot': bool(record.role != Role.USER),
+                'msg': record.msg
+            }
+            for record in chat_history
+        ]
+        
+        result = ''
+        try:
+            result = await self.call_api(chat_history)
+            logger.debug(f'Reply from API: {result}')
+            return result
+            
+        except Exception as e:
+            result = ''
+            logger.exception('Generation failed.')
+            raise
+        
+    async def _complete(self, prompt:list, tokens:int)-> (str, int):
+        raise NotImplementedError()

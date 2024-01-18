@@ -26,6 +26,8 @@ from langchain.utils.html import extract_sub_links
 import aiohttp
 import textract
 import trafilatura
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 
 if TYPE_CHECKING:
     import aiohttp
@@ -240,6 +242,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
             )
             raise
         content = self.extractor(raw_content, url, content_type)
+
         if content:
             yield Document(
                 page_content=content,
@@ -306,7 +309,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
             async with session.get(url, proxy=self.cache_proxy_url) as response:
                 content_type = response.headers.get('content-type')
                 if 'text/' in content_type:
-                    raw_content = await response.text()
+                    raw_content = await response.text(errors='ignore')
                 else:
                     raw_content = await response.read()
                 if self.check_response_status and 400 <= response.status <= 599:
@@ -321,6 +324,14 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
             raise
         results = []
         content = await self.extractor(raw_content, url, content_type)
+        if not content: content=''
+        
+        # Ugly hot patch to fetch the content of Client-Side rendering page
+        csr_threshold = 100
+        if 'text/' in content_type and len(content) < csr_threshold:
+            raw_content = await self.fetch_page_by_browser(url)
+            content = await self.extractor(raw_content, url, content_type)
+
         if content:
             results.append(
                 Document(
@@ -359,6 +370,28 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         if close_session:
             await session.close()
         return results
+
+    async def fetch_page_by_browser(self, url:str):
+
+        service = Service()
+
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")  
+        options.add_argument("--disable-gpu") 
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-infobars")
+        options.add_argument("--start-maximized")
+        options.add_argument("--disable-notifications")
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+
+
+        loop = asyncio.get_running_loop()
+        browser = webdriver.Chrome(service=service, options=options)
+        await loop.run_in_executor(None, browser.get, url)
+        html = browser.page_source
+        browser.quit()
+        return html
 
     def lazy_load(self) -> Iterator[Document]:
         """Lazy load web pages.
