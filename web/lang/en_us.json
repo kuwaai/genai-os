@@ -29,5 +29,7 @@
     "Dashboard_read_feedbacks":"Feedbacks",
     "Dashboard_read_logs":"Logs",
     "Dashboard_read_safetyguard":"Safety Guard",
-    "Dashboard_read_inspect":"Inspect"
+    "Dashboard_read_inspect":"Inspect",
+    "Chat_update_detail_feedback":"Detail Feedback",
+    "Room_update_detail_feedback":"Detail Feedback"
 }

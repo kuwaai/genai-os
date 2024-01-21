@@ -12,12 +12,6 @@
         <div class="flex mr-auto dark:text-white mb-2 select-none">
             <div>
                 <div class="flex justify-center items-center">{{ __('Send to:') }}
-                    
-                    @env('arena')
-                    @php
-                    $llms = $llms->shuffle();
-                    @endphp
-                    @endenv
                     @foreach ($llms as $llm)
                         <span @env('arena')  @else data-tooltip-target="llm_{{ $llm->id }}_toggle" data-tooltip-placement="top" @endenv
                             id="btn_{{ $llm->id }}_toggle"

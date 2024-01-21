@@ -278,5 +278,8 @@
     "Dashboard_read_logs":"系統日誌",
     "Dashboard_read_safetyguard":"安全過濾",
     "Dashboard_read_inspect":"訊息瀏覽器",
+    "Chat_update_detail_feedback":"詳細回饋",
+    "Room_update_detail_feedback":"詳細回饋",
+    "Permission to give detailed feedbacks":"給予回答更詳細的回饋標籤",
     "Detail":"詳細說明"
 }
