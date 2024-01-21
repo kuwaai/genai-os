@@ -87,7 +87,7 @@ xmlns="http://www.w3.org/2000/svg">
                     var match = $h5.text().match(pattern);
                     if (match) {
                         var refNumber = match[1];
-                        $msg = $("#history_" + refNumber).text().trim()
+                        $msg = $("#history_" + refNumber + " div.text-sm.space-y-3.break-words").text().trim()
                         $h5.html(
                             `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
                         );
@@ -163,7 +163,7 @@ xmlns="http://www.w3.org/2000/svg">
     }
 
     function refToolTip(refID) {
-        $msg = $("#history_" + refID).text().trim()
+        $msg = $("#history_" + refID + " div.text-sm.space-y-3.break-words").text().trim()
         $('#ref-tooltip').text($msg);
     }
     let quoted = [];

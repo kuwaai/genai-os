@@ -9,22 +9,34 @@
     <div class="flex">
         @csrf
         <input name="room_id" value="{{ request()->route('room_id') }}" style="display:none;">
-        <input id="chained" style="display:none;" {{ (\Session::get('chained') ?? true) ? '' : 'disabled' }}>
+        <input id="chained" style="display:none;" {{ \Session::get('chained') ?? true ? '' : 'disabled' }}>
         <button type="button" onclick="chain_toggle()" id="chain_btn"
-            class="whitespace-nowrap my-auto text-white mr-3 {{ (\Session::get('chained') ?? true) ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ (\Session::get('chained') ?? true) ? __('Chained') : __('Unchain') }}</button>
+            class="whitespace-nowrap my-auto text-white mr-3 {{ \Session::get('chained') ?? true ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">{{ \Session::get('chained') ?? true ? __('Chained') : __('Unchain') }}</button>
         <div class="flex flex-1 items-end justify-end flex-col">
             <div class="flex mr-auto dark:text-white mb-2 select-none">
                 <div>
                     <div class="flex justify-center items-center">{{ __('Send to:') }}
+                        @env('arena')
+                        @php
+                            $llms = $llms->shuffle();
+                        @endphp
+                        @endenv
                         @foreach ($llms as $llm)
-                            <span data-tooltip-target="llm_{{ $llm->id }}_toggle" data-tooltip-placement="top"
+                            <span
+                                @env('arena')  @else data-tooltip-target="llm_{{ $llm->id }}_toggle" data-tooltip-placement="top" @endenv
                                 id="btn_{{ $llm->id }}_toggle"
                                 onclick="$('#chatsTo_{{ $llm->id }}').prop('disabled',(i,val)=>{return !val}); $(this).toggleClass('bg-green-500 hover:bg-green-600 bg-red-500 hover:bg-red-600')"
                                 class="cursor-pointer flex py-1 px-2 mx-1 bg-green-500 hover:bg-green-600 rounded-full">
                                 <div
                                     class="inline h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black overflow-hidden">
+
+                                    @env('arena')
+                                    <div class="h-full w-full bg-black flex justify-center items-center text-white">?
+                                    </div>
+                                @else
                                     <img
                                         src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}">
+                                    @endenv
                                 </div>
                             </span>
                         @endforeach

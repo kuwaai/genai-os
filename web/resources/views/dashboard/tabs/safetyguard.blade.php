@@ -35,9 +35,9 @@
                 <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">
                     {{ __('dashboard.header.create_rule') }}</h3>
                 <form id="safetyguard_create_rule" method="post" enctype="multipart/form-data" autocomplete="off"
-                    onsubmit="$(this).find('.dynamic-textarea').each(function() {
-                    const textareaValue = $(this).val().trim();
-                    if (textareaValue === '') { $(this).remove(); } });"
+                    onsubmit="$(this).find('.dynamic-input').each(function() {
+                    const inputValue = $(this).val().trim();
+                    if (inputValue === '') { $(this).remove(); } });"
                     action="{{ route('dashboard.safetyguard.create') }}"
                     class="w-full  p-4 overflow-y-auto scrollbar overflow-x-hidden space-y-2">
                     @csrf
@@ -139,9 +139,9 @@
                                     @foreach ($topfilter['filters'] as $subindex => $subfilter)
                                         <div class="flex-1 p-1" id="{{ $index . '-' . $subindex }}">
                                             <p class="text-center">{{ $subfilter['name'] }}</p>
-                                            <textarea name="{{ $index . '-' . $subindex }}[]" rows='1' max-rows="2"
-                                                class="dynamic-textarea mb-2 resize-none scrollbar appearance-none block w-full text-gray-700 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
-                                                placeholder="{{ $subfilter['name'] }}"></textarea>
+                                            <input name="{{ $index . '-' . $subindex }}[]" rows='1' max-rows="2"
+                                                class="dynamic-input mb-2 px-2 py-1 resize-none scrollbar appearance-none block w-full text-gray-700 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
+                                                placeholder="{{ $subfilter['name'] }}">
                                         </div>
                                     @endforeach
                                 </div>
@@ -151,22 +151,21 @@
 
 
                     <script>
-                        $(document).on('input', '.dynamic-textarea', function() {
+                        $(document).on('input', '.dynamic-input', function() {
                             const dynamicInputs = $(this).parent();
 
-                            dynamicInputs.find('.dynamic-textarea:not(:last)').each(function() {
-                                const textareaValue = $(this).val().trim();
-                                if (textareaValue === '') {
+                            dynamicInputs.find('.dynamic-input:not(:last)').each(function() {
+                                const inputValue = $(this).val().trim();
+                                if (inputValue === '') {
                                     $(this).remove();
                                 }
                             });
 
-                            if (dynamicInputs.find('.dynamic-textarea:last').val().trim() !== '') {
+                            if (dynamicInputs.find('.dynamic-input:last').val().trim() !== '') {
                                 const newInput = $(this).clone()
                                 newInput.val('');
                                 dynamicInputs.append(newInput);
                             }
-                            adjustTextareaRows(this)
                         });
                     </script>
                     <div class="text-center">
@@ -435,27 +434,26 @@
         ["pre-filter", "post-filter"].forEach((element1) => {
             ["embedding", "keyword"].forEach((element2) => {
                 dynamicInputs = $("#" + element2 + "-" + element1)
-                dynamicInputs.find('.dynamic-textarea:not(:last)').remove();
-                last = dynamicInputs.find('.dynamic-textarea:last')
+                dynamicInputs.find('.dynamic-input:not(:last)').remove();
+                last = dynamicInputs.find('.dynamic-input:last')
                 if (last.val().trim() !== '') {
                     last.val("")
                 }
                 rule[element1][element2].forEach((element3) => {
-                    changed = $("#" + element2 + "-" + element1 + " >textarea:last()")
+                    changed = $("#" + element2 + "-" + element1 + " >input:last()")
                     changed.val(element3)
-                    dynamicInputs.find('.dynamic-textarea:not(:last)').each(function() {
-                        const textareaValue = $(this).val().trim();
-                        if (textareaValue === '') {
+                    dynamicInputs.find('.dynamic-input:not(:last)').each(function() {
+                        const inputValue = $(this).val().trim();
+                        if (inputValue === '') {
                             $(this).remove();
                         }
                     });
 
-                    if (dynamicInputs.find('.dynamic-textarea:last').val().trim() !== '') {
+                    if (dynamicInputs.find('.dynamic-input:last').val().trim() !== '') {
                         const newInput = $(changed).clone()
                         newInput.val('');
                         dynamicInputs.append(newInput);
                     }
-                    adjustTextareaRows(changed)
                 })
             })
         })
@@ -490,12 +488,11 @@
         ["pre-filter", "post-filter"].forEach((element1) => {
             ["embedding", "keyword"].forEach((element2) => {
                 dynamicInputs = $("#" + element2 + "-" + element1)
-                dynamicInputs.find('.dynamic-textarea:not(:last)').remove();
-                last = dynamicInputs.find('.dynamic-textarea:last')
+                dynamicInputs.find('.dynamic-input:not(:last)').remove();
+                last = dynamicInputs.find('.dynamic-input:last')
                 if (last.val().trim() !== '') {
                     last.val("")
                 }
-                adjustTextareaRows(last)
             })
         })
     }

@@ -97,8 +97,7 @@
                                     </button>
                                 @endif
                                 @if (request()->user()->hasPerm('Room_update_import_chat'))
-                                    <button data-modal-target="importModal"
-                                        data-modal-toggle="importModal"
+                                    <button data-modal-target="importModal" data-modal-toggle="importModal"
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 {{ request()->user()->hasPerm('Room_update_new_chat')? 'rounded-r-lg ': 'rounded-lg w-full' }} flex items-center justify-center">
                                         {{ request()->user()->hasPerm('Room_update_new_chat')? '': '匯入對話　' }}
                                         <i class="fas fa-file-import"></i>
@@ -156,27 +155,64 @@
                                 $mergedMessages = [];
                                 // Filter and merge the chats based on the condition
                                 $filteredChats = $mergedChats->filter(function ($chat) use (&$mergedMessages) {
-                                    // Check if the chat is non-bot and if its message hasn't been merged before
-    if (!$chat->isbot && !in_array($chat->msg, $mergedMessages)) {
-        // Add the message to the merged messages array
-        $mergedMessages[] = $chat->msg;
-        return true; // Keep this chat in the final result
-    } elseif ($chat->isbot) {
-        $mergedMessages = [];
-        return true; // Keep bot chats in the final result
-    }
-    return false; // Exclude duplicate non-bot chats
-});
+                                    if (!$chat->isbot && !in_array($chat->msg, $mergedMessages)) {
+                                        // Add the message to the merged messages array
+                                        $mergedMessages[] = $chat->msg;
+                                        return true; // Keep this chat in the final result
+                                    } elseif ($chat->isbot) {
+                                        $mergedMessages = [];
+                                        return true; // Keep bot chats in the final result
+                                    }
+                                    return false; // Exclude duplicate non-bot chats
+                                });
 
-// Sort the filtered chats
-$mergedChats = $filteredChats->sortBy(function ($chat) {
-    return [$chat->created_at, $chat->llm_id, -$chat->id];
-});
-$refers = $mergedChats->where('isbot', '=', true);
+                                // Sort the filtered chats
+                                $mergedChats = $filteredChats->sortBy(function ($chat) {
+                                    return [$chat->created_at, $chat->llm_id, -$chat->id];
+                                });
+                                $refers = $mergedChats->where('isbot', '=', true);
                             @endphp
+                            @env('arena')
+                            @php
+                                $output = collect();
+                                $bufferedBotMessages = [];
+                                foreach ($mergedChats as $history) {
+                                    if ($history->isbot) {
+                                        // If the current element is a bot message, buffer it
+                                        $bufferedBotMessages[] = $history;
+                                    } else {
+                                        // If the current element is not a bot message, check if there are buffered bot messages
+                                        if (!empty($bufferedBotMessages)) {
+                                            shuffle($bufferedBotMessages);
+                                            // If there are buffered bot messages, push them into the output collection
+                                            $output = $output->merge($bufferedBotMessages);
+
+                                            // Reset the buffered bot messages array
+                                            $bufferedBotMessages = [];
+                                        }
+
+                                        // Push the current non-bot message into the output collection
+                                        $output->push($history);
+                                    }
+                                }
+                                if (!empty($bufferedBotMessages)) {
+                                    shuffle($bufferedBotMessages);
+                                    // If there are buffered bot messages, push them into the output collection
+                                    $output = $output->merge($bufferedBotMessages);
+
+                                    // Reset the buffered bot messages array
+                                    $bufferedBotMessages = [];
+                                }
+                                $mergedChats = $output;
+                            @endphp
+                            @foreach ($mergedChats as $history)
+                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" :anonymous="true" />
+                            @endforeach
+                        @else
                             @foreach ($mergedChats as $history)
                                 <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
                             @endforeach
+                            @endenv
                         @endif
                         <div style="display:none;"
                             class="bg-red-100 border border-red-400 mt-2 text-red-700 px-4 py-3 rounded relative"

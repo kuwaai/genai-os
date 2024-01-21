@@ -31,8 +31,12 @@
             } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
                 tmp = ""
                 for (var i in quoted) {
-                    tmp +=
-                        `${$("#llm_" + quoted[i][0] + "_chat").text().trim()}:"""${histories[quoted[i][1]]}"""\n`
+                    @env('arena')
+                        tmp += `"""${histories[quoted[i][1]]}"""\n`
+                    @else
+                        tmp +=
+                            `${$("#llm_" + quoted[i][0] + "_chat").text().trim()}:"""${histories[quoted[i][1]]}"""\n`
+                    @endenv
                 }
                 tmp = tmp.trim()
                 $("#chat_input").val($("#chat_input").val().trim() + "\n" + tmp)
