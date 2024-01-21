@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Safety Guard Management API
-  version: 1.0.1
+  version: 1.0.2
 servers:
   - url: http://localhost/v1/management
     description: Development server
@@ -85,7 +85,7 @@ paths:
         '200':
           description: Rule updated successfully.
         '409':
-          description: The rule changes after the "retrival-timestamp". For consistency, please fetch the rule again.
+          description: The rule changes after the "retrieval-timestamp". For consistency, please fetch the rule again.
         '404':
           description: Rule not found.
 
@@ -129,7 +129,7 @@ components:
           description: A brief description or additional information about the rule.
           example: "在有關 TAIDE 認知問題後方加註警語。"
 
-        retrival-timestamp:
+        retrieval-timestamp:
           type: integer
           description: The server timestamp when the rule is retrieved.
           example: 1641916800
