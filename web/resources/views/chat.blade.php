@@ -23,6 +23,11 @@
         }
     @endphp
 
+    @env('arena')
+    @php
+        $result = $result->where('access_code', '=', 'feedback');
+    @endphp
+    @endenv
     <x-chat.functions />
     @if (request()->user()->hasPerm('Chat_update_import_chat') && request()->route('llm_id'))
         <x-chat.modals.import_history />
@@ -32,7 +37,8 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         @if (request()->route('chat_id') || request()->route('llm_id'))
             <x-chat.rooms.drawer :LLM="$LLM" />
-            @if (request()->route('chat_id') && request()->user()->hasPerm('Chat_update_feedback'))
+            @if (request()->route('chat_id') &&
+                    request()->user()->hasPerm('Chat_update_feedback'))
                 <x-chat.modals.feedback />
             @endif
         @endif

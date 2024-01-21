@@ -138,9 +138,47 @@
                         });
                         $refers = $mergedChats->where('isbot', '=', true);
                     @endphp
+                    @env('arena')
+                    @php
+                        $output = collect();
+                        $bufferedBotMessages = [];
+                        foreach ($mergedChats as $history) {
+                            if ($history->isbot) {
+                                // If the current element is a bot message, buffer it
+                                $bufferedBotMessages[] = $history;
+                            } else {
+                                // If the current element is not a bot message, check if there are buffered bot messages
+                                if (!empty($bufferedBotMessages)) {
+                                    shuffle($bufferedBotMessages);
+                                    // If there are buffered bot messages, push them into the output collection
+                                    $output = $output->merge($bufferedBotMessages);
+
+                                    // Reset the buffered bot messages array
+                                    $bufferedBotMessages = [];
+                                }
+
+                                // Push the current non-bot message into the output collection
+                                $output->push($history);
+                            }
+                        }
+                        if (!empty($bufferedBotMessages)) {
+                            shuffle($bufferedBotMessages);
+                            // If there are buffered bot messages, push them into the output collection
+                            $output = $output->merge($bufferedBotMessages);
+
+                            // Reset the buffered bot messages array
+                            $bufferedBotMessages = [];
+                        }
+                        $mergedChats = $output;
+                    @endphp
                     @foreach ($mergedChats as $history)
-                        <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" :readonly="true" />
+                        <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" :anonymous="true" />
                     @endforeach
+                @else
+                    @foreach ($mergedChats as $history)
+                        <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
+                    @endforeach
+                @endenv
                 </div>
             </div>
         </div>

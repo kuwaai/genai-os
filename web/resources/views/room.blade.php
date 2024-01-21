@@ -16,6 +16,11 @@
             ->orderby('llms.created_at')
             ->get();
     @endphp
+    @env('arena')
+    @php
+        $result = $result->where('access_code', '!=', 'feedback');
+    @endphp
+    @endenv
     <x-chat.functions />
     @if (request()->user()->hasPerm('Room_update_import_chat') && !request()->route('room_id'))
         <x-chat.modals.import_history />
@@ -173,45 +178,45 @@
                                 $refers = $mergedChats->where('isbot', '=', true);
                             @endphp
                             @env('arena')
-                            @php
-                                $output = collect();
-                                $bufferedBotMessages = [];
-                                foreach ($mergedChats as $history) {
-                                    if ($history->isbot) {
-                                        // If the current element is a bot message, buffer it
-                                        $bufferedBotMessages[] = $history;
-                                    } else {
-                                        // If the current element is not a bot message, check if there are buffered bot messages
-                                        if (!empty($bufferedBotMessages)) {
-                                            shuffle($bufferedBotMessages);
-                                            // If there are buffered bot messages, push them into the output collection
-                                            $output = $output->merge($bufferedBotMessages);
-
-                                            // Reset the buffered bot messages array
-                                            $bufferedBotMessages = [];
-                                        }
-
-                                        // Push the current non-bot message into the output collection
-                                        $output->push($history);
-                                    }
-                                }
-                                if (!empty($bufferedBotMessages)) {
-                                    shuffle($bufferedBotMessages);
-                                    // If there are buffered bot messages, push them into the output collection
-                                    $output = $output->merge($bufferedBotMessages);
-
-                                    // Reset the buffered bot messages array
+                                @php
+                                    $output = collect();
                                     $bufferedBotMessages = [];
-                                }
-                                $mergedChats = $output;
-                            @endphp
-                            @foreach ($mergedChats as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" :anonymous="true" />
-                            @endforeach
-                        @else
-                            @foreach ($mergedChats as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
-                            @endforeach
+                                    foreach ($mergedChats as $history) {
+                                        if ($history->isbot) {
+                                            // If the current element is a bot message, buffer it
+                                            $bufferedBotMessages[] = $history;
+                                        } else {
+                                            // If the current element is not a bot message, check if there are buffered bot messages
+                                            if (!empty($bufferedBotMessages)) {
+                                                shuffle($bufferedBotMessages);
+                                                // If there are buffered bot messages, push them into the output collection
+                                                $output = $output->merge($bufferedBotMessages);
+
+                                                // Reset the buffered bot messages array
+                                                $bufferedBotMessages = [];
+                                            }
+
+                                            // Push the current non-bot message into the output collection
+                                            $output->push($history);
+                                        }
+                                    }
+                                    if (!empty($bufferedBotMessages)) {
+                                        shuffle($bufferedBotMessages);
+                                        // If there are buffered bot messages, push them into the output collection
+                                        $output = $output->merge($bufferedBotMessages);
+
+                                        // Reset the buffered bot messages array
+                                        $bufferedBotMessages = [];
+                                    }
+                                    $mergedChats = $output;
+                                @endphp
+                                @foreach ($mergedChats as $history)
+                                    <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" :anonymous="true" />
+                                @endforeach
+                            @else
+                                @foreach ($mergedChats as $history)
+                                    <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
+                                @endforeach
                             @endenv
                         @endif
                         <div style="display:none;"
