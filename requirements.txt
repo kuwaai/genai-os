@@ -9,3 +9,6 @@ langchain-community
 sentence-transformers
 faiss-cpu
 grpc-io
+
+sqlalchemy
+psycopg2
