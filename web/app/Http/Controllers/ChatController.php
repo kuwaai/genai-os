@@ -187,7 +187,7 @@ class ChatController extends Controller
                     ->get()
                     ->pluck('id')
                     ->toarray();
-                if (in_array($llm_id, $result)) {
+                if (in_array($llm_id, $result) || $access_code === "feedback") {
                     $historys = json_decode($historys);
                     if ($historys !== null && isset($historys->messages) && is_array($historys->messages) && count($historys->messages) > 1) {
                         // JSON format
@@ -251,7 +251,7 @@ class ChatController extends Controller
                                 $model = isset($message->model) && is_string($message->model) ? $message->model : $access_code;
                                 $content = isset($message->content) && is_string($message->content) ? $message->content : '';
 
-                                if ($model === $access_code) {
+                                if ($model === $access_code || $access_code === "feedback") {
                                     $flag = false;
                                     if ($chainValue === true) {
                                         $message->chain = $chainValue;
