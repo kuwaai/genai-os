@@ -8,6 +8,7 @@ import enum
 
 from .base import Base
 from .embedding import Embedding
+from .association_table import detector_embedding_table
 
 class DetectorTypeEnum(str, enum.Enum):
     keyword_guard = 'keyword-guard'
@@ -18,18 +19,6 @@ class DetectorTypeEnum(str, enum.Enum):
 class ChainEnum(str, enum.Enum):
     pre_filter = 'pre-filter'
     post_filter = 'post-filter'
-
-detector_embedding_table = Table(
-    "detector_embeddings",
-    Base.metadata,
-    Column("detector_id", ForeignKey("detectors.id")),
-    Column("embedding_sentence", String, nullable=False),
-    Column("embedding_model", String, nullable=False),
-    ForeignKeyConstraint(
-        ["embedding_sentence", "embedding_model"],
-        ["embeddings.sentence", "embeddings.model"]
-    )
-)
 
 class Detector(Base):
     __tablename__ = "detectors"
@@ -42,4 +31,7 @@ class Detector(Base):
     allow_list:Mapped[List[str]] = mapped_column(ARRAY(item_type=String), nullable=True)
 
     rule:Mapped["Rule"] = relationship(back_populates='detectors')
-    embeddings:Mapped[List["Embedding"]] = relationship(secondary=detector_embedding_table)
+    embeddings:Mapped[List["Embedding"]] = relationship(
+        secondary=detector_embedding_table,
+        back_populates='detectors'
+    )

@@ -1,32 +1,58 @@
 version: '3'
-name: safety-guard
 
 services:
-  api:
-    runtime: nvidia
-    image: safety-guard
-    build:
-      context: .
-      args:
-        - HF_TOKEN=${HF_TOKEN}
-    container_name: safety-guard-api-${PORT}
-    restart: unless-stopped
+  embedding-inference:
+    image: michaelf34/infinity:latest
+    command:
+      - --model-name-or-path=thenlper/gte-large-zh
+      - --port=8080
+      - --batch-size=1024
+      - --log-level=info
     deploy:
       resources:
         reservations:
-          devices:
-          - driver: nvidia
-            device_ids: ["${GPU_ID}"]
-            capabilities: [gpu]
-    env_file: .env
-    environment:
-      - PORT=${PORT}
+          # Deploy with docker swarm
+          generic_resources:
+            - discrete_resource_spec:
+                kind: "NVIDIA-GPU"
+                value: 1
+          # Local deployment
+          # devices:
+          # - driver: nvidia
+          #   count: 1
+          #   capabilities: [gpu]
     volumes:
-      - /var/models/hub:/root/.cache/huggingface/hub:rw # Huggingface download location
+      - cache:/app/.cache/torch
+  
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: app
+      POSTGRES_USER: app
+    volumes:
+      - db_data:/var/lib/postgresql
+
+  adminer:
+    image: adminer
+    restart: always
     ports:
-      - ${PORT}:${PORT}
-    healthcheck:
-      test: "curl --fail http://localhost:${PORT}/health || exit 1"
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - 8080:8080
+  
+  manager:
+    image: safety-guard-manager:latest
+    build:
+      context: .
+      dockerfile: manager.Dockerfile
+    environment:
+      EMBED_HOST: http://embedding-inference:8080
+      EMBED_MODEL: thenlper/gte-large-zh
+      DB_CONN: postgresql+psycopg2://app:app@db/app
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: "8000"
+    ports:
+      - 8000:8000
+
+volumes:
+  cache:
+  db_data:
