@@ -9,7 +9,7 @@ app.LLM_name = "debug"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
-public_ip = "api"
+public_ip = None
 if public_ip == None: public_ip = socket.gethostbyname(socket.gethostname())
 # The port to use, by choosing None, it'll assign an unused port
 app.port = 9001 
