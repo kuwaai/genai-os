@@ -59,7 +59,7 @@
 
                 function loadFile(fileInput, input) {
                     const file = fileInput.files[0];
-                    $("#import_file_name").val(file.name)
+                    $("#import_file_name").val(file.name.split(".")[0])
                     if (file) {
                         if (file.type === 'text/plain' || file.type === 'application/json') {
                             const reader = new FileReader();

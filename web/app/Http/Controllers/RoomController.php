@@ -68,6 +68,7 @@ class RoomController extends Controller
     {
         $historys = $request->input('history');
         $llm_ids = $request->input('llm_ids');
+        $filename = $request->input('import_file_name');
         if ($historys) {
             $result = DB::table(function ($query) {
                 $query
@@ -227,7 +228,7 @@ class RoomController extends Controller
                     if (count($historys) > 0) {
                         //Start loading
                         $Room = new ChatRoom();
-                        $Room->fill(['name' => $historys[0]->content, 'user_id' => $request->user()->id]);
+                        $Room->fill(['name' => $filename ?? $historys[0]->content, 'user_id' => $request->user()->id]);
                         $Room->save();
                         $deltaTime = count($historys);
                         foreach ($llm_ids->pluck('id') as $id) {
