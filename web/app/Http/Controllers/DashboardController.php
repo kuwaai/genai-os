@@ -197,7 +197,7 @@ class DashboardController extends Controller
         }
         return Redirect::route('dashboard.home')->with('last_tab', 'feedbacks');
     }
-    private $apiBaseUrl = 'http://127.0.0.1:8080/v1/management';
+    private $apiBaseUrl = 'http://25.28.96.121:8000/v1/management';
     function guard_fetch(Request $request)
     {
         if ($this->healthCheck()) {
@@ -215,7 +215,7 @@ class DashboardController extends Controller
                 // Process $rules here, it contains the fetched rules
                 return response()->json($rules, 200);
             } else {
-                return response()->json(['error' => 'Failed to fetch rules'], $statusCode);
+                return response()->json($response->json(), $response->status());
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -226,14 +226,15 @@ class DashboardController extends Controller
         if ($this->healthCheck()) {
             return response()->json(['error' => 'Guard offline'], 500);
         }
-    }
-    function guard_update(Request $request)
-    {
-        if ($this->healthCheck()) {
-            return response()->json(['error' => 'Guard offline'], 500);
+        $response = Http::delete($this->apiBaseUrl . '/rule/' . $request->route('rule_id'));
+        // Check the response and return accordingly
+        if ($response->successful()) {
+            return Redirect::route('dashboard.home')->with('last_tab', $request->input('tab'));
+        } else {
+            return response()->json($response->json(), $response->status());
         }
     }
-    function guard_create(Request $request)
+    function guard_update(Request $request)
     {
         if ($this->healthCheck()) {
             return response()->json(['error' => 'Guard offline'], 500);
@@ -241,21 +242,18 @@ class DashboardController extends Controller
         $request->validate([
             'action' => 'required|string',
             'ruleName' => 'required|string',
-            'description' => 'string',
-            'message' => 'string',
             'target' => 'required|array',
-            'keyword-pre-filter' => 'array',
-            'keyword-post-filter' => 'array',
-            'embedding-pre-filter' => 'array',
-            'embedding-post-filter' => 'array',
+            'keyword-pre-filter' => ['array', 'required_without_all:keyword-post-filter,embedding-pre-filter,embedding-post-filter'],
+            'keyword-post-filter' => ['array', 'required_without_all:keyword-pre-filter,embedding-pre-filter,embedding-post-filter'],
+            'embedding-pre-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-post-filter'],
+            'embedding-post-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-pre-filter'],
         ]);
 
         // Transform data to the desired structure
         $requestData = $request->all();
-
         $transformedData = [
             'name' => $requestData['ruleName'],
-            'description' => $requestData['description'] ?? "",
+            'description' => $requestData['description'] ?? '',
             'target' => $requestData['target'],
             'pre-filter' => [
                 'keyword' => $requestData['keyword-pre-filter'] ?? [],
@@ -266,19 +264,61 @@ class DashboardController extends Controller
                 'embedding' => $requestData['embedding-post-filter'] ?? [],
             ],
             'action' => $requestData['action'],
-            'message' => $requestData['message'] ?? "",
+            'message' => $requestData['message'] ?? '',
+            'retrieval-timestamp' => $request->input("last_change") ?? -1
         ];
+        // Proxy the transformed data to the server
+        $response = Http::put($this->apiBaseUrl . '/rule/' . $request->route('rule_id'), $transformedData);
+        // Check the response and return accordingly
+        if ($response->successful()) {
+            return Redirect::route('dashboard.home')
+                ->with('last_tab', $request->input('tab'))
+                ->with('rule_id', $request->route('rule_id'));
+        } else {
+            return response()->json($response->json(), $response->status());
+        }
+    }
+    function guard_create(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+        $request->validate([
+            'action' => 'required|string',
+            'ruleName' => 'required|string',
+            'target' => 'required|array',
+            'keyword-pre-filter' => ['array', 'required_without_all:keyword-post-filter,embedding-pre-filter,embedding-post-filter'],
+            'keyword-post-filter' => ['array', 'required_without_all:keyword-pre-filter,embedding-pre-filter,embedding-post-filter'],
+            'embedding-pre-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-post-filter'],
+            'embedding-post-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-pre-filter'],
+        ]);
 
+        // Transform data to the desired structure
+        $requestData = $request->all();
+        $transformedData = [
+            'name' => $requestData['ruleName'],
+            'description' => $requestData['description'] ?? '',
+            'target' => $requestData['target'],
+            'pre-filter' => [
+                'keyword' => $requestData['keyword-pre-filter'] ?? [],
+                'embedding' => $requestData['embedding-pre-filter'] ?? [],
+            ],
+            'post-filter' => [
+                'keyword' => $requestData['keyword-post-filter'] ?? [],
+                'embedding' => $requestData['embedding-post-filter'] ?? [],
+            ],
+            'action' => $requestData['action'],
+            'message' => $requestData['message'] ?? '',
+        ];
         // Proxy the transformed data to the server
         $response = Http::post($this->apiBaseUrl . '/rule', $transformedData);
-
         // Check the response and return accordingly
         if ($response->successful()) {
             return Redirect::route('dashboard.home')
                 ->with('last_tab', $request->input('tab'))
                 ->with('rule_id', $response->json()['id']);
         } else {
-            return response()->json(['error' => 'Failed to create rule'], $response->status());
+            return response()->json($response->json(), $response->status());
         }
     }
     function healthCheck()

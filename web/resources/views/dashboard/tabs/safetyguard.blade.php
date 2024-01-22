@@ -9,10 +9,10 @@
                         <p class="flex-1 text-center text-white">{{ __('dashboard.button.create_rule') }}</p>
                     </button>
                 </div>
-                <form id="delete_rule_by_id" method="post" action="{{ route('dashboard.safetyguard.delete', '') }}"
-                    style="display:none">
-                    <input type="hidden" name="_token" value="peVbyoqldUsaKepgauW6QqWNoX7x2EerbE3W6cOq"
-                        autocomplete="off"> <input type="hidden" name="_method" value="delete"> <input name="id">
+                <form id="delete_rule_by_id" method="post" action="" style="display:none">
+                    @csrf
+                    @method('delete')
+                    <input name="tab" value="safetyguard" hidden>
                 </form>
                 <div class="flex-1 overflow-y-auto scrollbar text-black dark:text-white" id="rule_list">
                     <div class="my-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden hidden">
@@ -34,16 +34,25 @@
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                 <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">
                     {{ __('dashboard.header.create_rule') }}</h3>
+                @if ($errors->any())
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                        <p class="font-bold">Oops! Something went wrong:</p>
+                        <ul class="list-disc ml-5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form id="safetyguard_create_rule" method="post" enctype="multipart/form-data" autocomplete="off"
-                    onsubmit="$(this).find('.dynamic-input').each(function() {
-                    const inputValue = $(this).val().trim();
-                    if (inputValue === '') { $(this).remove(); } });"
-                    action="{{ route('dashboard.safetyguard.create') }}"
+                    onsubmit="return create_validate()" action="{{ route('dashboard.safetyguard.create') }}"
                     class="w-full  p-4 overflow-y-auto scrollbar overflow-x-hidden space-y-2">
                     @csrf
                     @method('patch')
                     <input name="tab" value="safetyguard" hidden>
+                    <input name='last_change' hidden>
                     <div id="safetygard_targetInputsContainer"></div>
+                    <div id="validationErrorsContainer"></div>
                     <div class="flex overflow-hidden -mx-3">
                         <div class="flex flex-1 flex-col overflow-hidden px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
@@ -113,12 +122,12 @@
                     @php
                         $filters = ['keyword' => ['name' => 'Keyword 規則', 'filters' => ['pre-filter' => ['name' => '輸入過濾'], 'post-filter' => ['name' => '輸出過濾']]], 'embedding' => ['name' => 'Embedding 規則', 'filters' => ['pre-filter' => ['name' => '輸入過濾'], 'post-filter' => ['name' => '輸出過濾']]]];
                     @endphp
-                    <div id="accordion-collapse" data-accordion="collapse"
+                    <div id="safetyguard-collapse" data-accordion="collapse"
                         class="rounded-lg overflow-hidden bg-gray-300 dark:bg-gray-500">
                         @foreach ($filters as $index => $topfilter)
                             @php
-                                $topfilterId = "accordion-collapse-heading-$index";
-                                $accordionBodyId = "accordion-collapse-body-$index";
+                                $topfilterId = "safetyguard-collapse-heading-$index";
+                                $accordionBodyId = "safetyguard-collapse-body-$index";
                             @endphp
                             <div id="{{ $topfilterId }}">
                                 <button type="button"
@@ -139,7 +148,8 @@
                                     @foreach ($topfilter['filters'] as $subindex => $subfilter)
                                         <div class="flex-1 p-1" id="{{ $index . '-' . $subindex }}">
                                             <p class="text-center">{{ $subfilter['name'] }}</p>
-                                            <input name="{{ $index . '-' . $subindex }}[]" rows='1' max-rows="2"
+                                            <input name="{{ $index . '-' . $subindex }}[]" rows='1'
+                                                max-rows="2"
                                                 class="dynamic-input mb-2 px-2 py-1 resize-none scrollbar appearance-none block w-full text-gray-700 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
                                                 placeholder="{{ $subfilter['name'] }}">
                                         </div>
@@ -239,7 +249,7 @@
                                         </svg>
                                         <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                                             您確定要刪除這個語言模型設定檔嗎</h3>
-                                        <button id="delete_llm" data-modal-hide="popup-modal" type="button"
+                                        <button id="delete_rule_btn" data-modal-hide="popup-modal" type="button"
                                             class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                             是，我確定
                                         </button>
@@ -279,24 +289,36 @@
             }
             $("#rule_list").find(">:not(div.hidden)").remove();
             $("#rule_list").append(`<p>{{ __('dashboard.header.enabled_rules') }}</p><hr>`)
-
-
+            tmp = [];
             for (let key in data) {
-                if (data.hasOwnProperty(key)) {
-                    rule = data[key]
-                    cloned = $("#rule_list").find("div.hidden:first()").clone();
-                    cloned.removeClass("hidden");
-                    cloned.find("span:first()").text(rule["name"])
-                    cloned.find("span:nth-child(2)").text(rule["description"]);
-                    cloned.attr("id", "rule_" + key)
-                    cloned.on('click', () => {
-                        edit_rule(key)
-                    })
+                cloned = $("#rule_list").find("div.hidden:first()").clone();
+                cloned.removeClass("hidden");
+                cloned.find("span:first()").text(data[key]["name"])
+                if (data[key]["description"]) cloned.find("span:nth-child(2)").text(data[key][
+                    "description"
+                ]);
+                else cloned.find("span:nth-child(2)").remove();
+                cloned.attr("id", "rule_" + data[key]['id'])
+                cloned.on('click', () => {
+                    edit_rule(data[key]['id'])
+                })
+                if (data[key]['action'] !== 'none') {
                     $("#rule_list").append(cloned)
+                } else {
+                    tmp.push(cloned);
                 }
             }
             $("#rule_list").append(`<p>{{ __('dashboard.header.disabled_rules') }}</p><hr>`)
-            $rules = data;
+            for (let key in tmp) {
+                $("#rule_list").append(tmp[key])
+            }
+            $rules = data.reduce((dict, item) => {
+                dict[item.id] = item;
+                return dict;
+            }, {});;
+            @if (session('rule_id'))
+                $('#rule_{{ session('rule_id') }}').click();
+            @endif
         },
         error: function() {
             // If the GET request fails, show the offline message div and hide rulesSection
@@ -414,12 +436,13 @@
 
     function edit_rule(id) {
         $("#edit_rule input:eq(1)").prop("disabled", false)
-        $("#edit_rule form").attr("action", `{{ route('dashboard.safetyguard.update','') }}/` + id);
+        $("#edit_rule form").attr("action", `{{ route('dashboard.safetyguard.update', '') }}/` + id);
         $("#new_rule_btn").removeClass("bg-green-500 dark:bg-green-700").addClass("bg-green-400 dark:bg-green-600")
         rule = $rules[id];
         $("#delete_button").show()
         $('#edit_rule >h3').text(`{{ __('dashboard.header.update_rule') }} ${rule["name"]}`)
         $('#edit_rule input[name=ruleName]').val(rule["name"])
+        $('#edit_rule input[name=last_change]').val(rule["retrieval-timestamp"])
         $('#edit_rule input[name=description]').val(rule["description"])
         $('#edit_rule select[name=action]').val(rule["action"])
         $('#edit_rule input[name=message]').val(rule["message"])
@@ -431,6 +454,7 @@
                 return $(element).text().trim() === target;
             }).click();
         });
+        safetyguard_clearSuggestions();
         ["pre-filter", "post-filter"].forEach((element1) => {
             ["embedding", "keyword"].forEach((element2) => {
                 dynamicInputs = $("#" + element2 + "-" + element1)
@@ -439,27 +463,27 @@
                 if (last.val().trim() !== '') {
                     last.val("")
                 }
-                rule[element1][element2].forEach((element3) => {
-                    changed = $("#" + element2 + "-" + element1 + " >input:last()")
-                    changed.val(element3)
-                    dynamicInputs.find('.dynamic-input:not(:last)').each(function() {
-                        const inputValue = $(this).val().trim();
-                        if (inputValue === '') {
-                            $(this).remove();
-                        }
-                    });
+                if (rule[element1] !== undefined && Array.isArray(rule[element1][element2])) {
+                    rule[element1][element2].forEach((element3) => {
+                        changed = $("#" + element2 + "-" + element1 + " >input:last()")
+                        changed.val(element3)
+                        dynamicInputs.find('.dynamic-input:not(:last)').each(function() {
+                            if ($(this).val().trim() === '') {
+                                $(this).remove();
+                            }
+                        });
 
-                    if (dynamicInputs.find('.dynamic-input:last').val().trim() !== '') {
-                        const newInput = $(changed).clone()
-                        newInput.val('');
-                        dynamicInputs.append(newInput);
-                    }
-                })
+                        if (dynamicInputs.find('.dynamic-input:last').val().trim() !== '') {
+                            const newInput = $(changed).clone()
+                            newInput.val('');
+                            dynamicInputs.append(newInput);
+                        }
+                    })
+                }
             })
         })
 
-
-        //$("#delete_user_btn").attr("onclick", `delete_user(${id})`)
+        $("#delete_rule_btn").attr("onclick", `DeleteRule(${id})`)
 
         if (last_rule_id != id) {
             $("#edit_rule").show()
@@ -470,6 +494,11 @@
             $("#rule_" + id).toggleClass("bg-gray-600");
         }
         last_rule_id = id;
+    }
+
+    function DeleteRule(id) {
+        $("#delete_rule_by_id").attr("action", "{{ route('dashboard.safetyguard.delete', '') }}/" + id)
+        $("#delete_rule_by_id").submit();
     }
 
     function CreateRule() {
@@ -496,7 +525,44 @@
             })
         })
     }
-    $(this).on("load",()=>{
+
+    function create_validate() {
+        const inputs = $("#safetygard_targetInputsContainer input");
+        const errorContainer = $("#validationErrorsContainer");
+        errorContainer.empty(); // Clear previous error messages
+
+        errorMessage = `Must select one llm to apply rules.`;
+        if (inputs.length > 0) {
+            let check = false;
+
+            errorMessage = `Must have at least one rule.`;
+            $("#safetyguard-collapse .dynamic-input").each(function() {
+                if ($(this).val().trim() !== '') {
+                    check = true;
+                }
+            });
+
+            if (check) {
+                $("#safetyguard-collapse .dynamic-input").each(function() {
+                    if ($(this).val().trim() === '') {
+                        $(this).remove();
+                    }
+                });
+                return true;
+            }
+        }
+
+        // Display error message
+        errorContainer.append(`<p class="text-red-600">${errorMessage}</p>`);
+        errorContainer[0].scrollIntoView({
+            behavior: 'smooth'
+        });
+
+        return false;
+    }
+
+
+    $(this).on("load", () => {
         CreateRule();
     })
 </script>
