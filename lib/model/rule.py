@@ -8,19 +8,13 @@ from typing import List
 import enum
 
 from .base import Base
+from .association_table import rule_target_table
 
 class ActionEnum(str, enum.Enum):
     none = 'none'
     warn = 'warn'
     block = 'block'
     rewrite = 'rewrite'
-
-rule_target_table = Table(
-    "rule_targets",
-    Base.metadata,
-    Column("rule_id", ForeignKey("rules.id")),
-    Column("target_id", ForeignKey("targets.id")),
-)
 
 class Rule(Base):
     __tablename__ = "rules"
@@ -32,8 +26,14 @@ class Rule(Base):
     action:Mapped[ActionEnum] = mapped_column(Enum(ActionEnum))
     message:Mapped[str] = mapped_column(nullable=True)
     
-    targets:Mapped[List["Target"]] = relationship(secondary=rule_target_table, back_populates='rule')
-    detectors:Mapped[List["Detector"]] = relationship(back_populates='rule')
+    targets:Mapped[List["Target"]] = relationship(
+        secondary=rule_target_table,
+        back_populates='rules'
+    )
+    detectors:Mapped[List["Detector"]] = relationship(
+        cascade='all,delete-orphan',
+        back_populates='rule'
+    )
 
 class Target(Base):
     __tablename__ = "targets"
@@ -41,4 +41,7 @@ class Target(Base):
     model_id:Mapped[str] = mapped_column()
     user_id:Mapped[str] = mapped_column(nullable=True)
 
-    rule:Mapped["Rule"] = relationship(secondary=rule_target_table, back_populates='targets')
+    rules:Mapped[List["Rule"]] = relationship(
+        secondary=rule_target_table,
+        back_populates='targets'
+    )

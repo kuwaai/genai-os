@@ -1,7 +1,9 @@
 import json
 import os
 import logging
+import inspect
 
+from collections import OrderedDict
 from contextlib import contextmanager
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
@@ -27,12 +29,30 @@ class Database:
 def open_db_session(db=Database()):
     try:
         session = db.session()
-        yield session
     except Exception:
         logger.exception('Failed to open the database session.')
+
+    try:
+        yield session
     finally:
         session.close()
         logger.debug('Database session closed.')
+
+# Decorator for FastAPI endpoints
+# This decorator will pass a database session as a parameter "db" to the target
+# function.
+def awith_db_session(func):
+    async def wrap(*args, **kwargs):
+        with open_db_session() as session:
+            return await func(db=session, *args, **kwargs)
+
+    # Correct the signature to compatible with pydantic.
+    sig = inspect.signature(func)
+    params = sig.parameters.values()
+    params = tuple(filter(lambda p: p.name != 'db', params))
+    exposed_sig = sig.replace(parameters=params)
+    wrap.__signature__ = exposed_sig
+    return wrap
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -64,7 +84,7 @@ if __name__ == '__main__':
             ),
             Detector(
                 type=DetectorTypeEnum.vector_guard,
-                chain=ChainEnum.pre_filter,
+                chain=ChainEnum.post_filter,
                 deny_list=[e.sentence for e in embeddings],
                 embeddings=embeddings
             ),
@@ -77,8 +97,8 @@ if __name__ == '__main__':
     )
 
     with open_db_session() as session:
-        # session.add_all([rule])
-        # session.commit()
+        session.add_all([rule])
+        session.commit()
 
         stmt = select(Rule)
         for rule in session.scalars(stmt):

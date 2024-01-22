@@ -10,14 +10,14 @@ class AlchemyEncoder(json.JSONEncoder):
         self.visited_objs = []
 
     def default(self, obj):
+        self.visited_objs.append(obj)
+
         if isinstance(obj, datetime):
             return str(obj)
         if not isinstance(obj, DeclarativeBase):
             return json.JSONEncoder.default(self, obj)
         
         # Encode a SQLalchemy object
-        self.visited_objs.append(obj)
-
         # Go through each field in this SQLalchemy class
         fields = {}
         for field in [x for x in dir(obj) if not x.startswith('_') and x not in ['metadata', 'registry']]:
