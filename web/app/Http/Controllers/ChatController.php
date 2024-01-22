@@ -170,6 +170,7 @@ class ChatController extends Controller
             $llm_id = $request->input('llm_id');
             $access_code = LLMs::find($llm_id)->access_code;
             $historys = $request->input('history');
+            $filename = $request->input('import_file_name');
             if ($llm_id && $historys) {
                 $result = DB::table(function ($query) {
                     $query
@@ -276,7 +277,7 @@ class ChatController extends Controller
                         $historys = $data;
                         $first = array_shift($historys);
                         $chat = new Chats();
-                        $chatname = $first->content;
+                        $chatname = $filename ?? $first->content;
                         if (strpos(LLMs::find($llm_id)->access_code, 'doc-qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'doc_qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'web_qa') === 0) {
                             function getWebPageTitle($url)
                             {

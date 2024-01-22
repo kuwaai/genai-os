@@ -64,20 +64,22 @@
                         <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
                             <img class="w-[150px]" src="{{ asset('images/csie.png') }}">
                         </a>
+                        @env('nuk')
+                        <div class="flex flex-col ml-4 text-[50px]">
+                            <span>LLM</span>
+                            <span class="pt-4">Workspace</span>
+                        </div>
+                        @else
                         <div class="flex ml-4 justify-center items-end space-x-5">
-                            @env('nuk')
-                                <span>LLM</span>
-                                <span class="pt-4">Workspace</span>
-                            @else
-                                <span class="text-[72px] text-orange-300">Kuwa</span>
-                                @env('kuwa')
-                                <span class="text-[60px]">Chat</span>
-                                @endenv
-                                @env('arena')
-                                    <span class="text-[60px]">Arena</span>
-                                @endenv
+                            <span class="text-[72px] text-orange-300">Kuwa</span>
+                            @env('kuwa')
+                            <span class="text-[60px]">Chat</span>
+                            @endenv
+                            @env('arena')
+                            <span class="text-[60px]">Arena</span>
                             @endenv
                         </div>
+                        @endenv
                     </div>
                 </h3>
             @else
@@ -381,10 +383,10 @@
                     @env('nuk')
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         href="https://www.nuk.edu.tw/" target="_blank">國立高雄大學</a>
-                    @else
+                @else
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         href="https://www.gai.tw/" target="_blank">Kuwa</a>
-                        @endenv
+                    @endenv
                 @else
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         href="https://www.twcc.ai/" target="_blank">{{ __('Powered by TWCC') }}</a>
