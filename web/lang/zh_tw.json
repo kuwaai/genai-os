@@ -105,7 +105,7 @@
     "Group name": "群組名稱",
     "System Settings": "系統設定",
     "All the system settings here": "所有關於系統的設定都可在此調整",
-    "Agent API Location": "Agent API位置",
+    "Agent API Location": "Agent API連線位置",
     "Allow Register": "允許註冊",
     "Reset Redis Caches": "重設Redis緩存",
     "Saved.": "已儲存",
@@ -281,5 +281,6 @@
     "Chat_update_detail_feedback":"詳細回饋",
     "Room_update_detail_feedback":"詳細回饋",
     "Permission to give detailed feedbacks":"給予回答更詳細的回饋標籤",
-    "Detail":"詳細說明"
+    "Detail":"詳細說明",
+    "Safety Guard Location":"安全檢查連線位置"
 }

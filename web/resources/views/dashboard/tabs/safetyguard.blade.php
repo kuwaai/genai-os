@@ -23,7 +23,7 @@
                                     <span
                                         class="px-2 my-auto truncate-text overflow-ellipsis overflow-hidden whitespace-nowrap"></span>
                                     <span
-                                        class="px-2 my-auto text-sm text-gray-300 truncate-text overflow-ellipsis overflow-hidden whitespace-nowrap"></span>
+                                        class="px-2 my-auto text-sm text-gray-500 dark:text-gray-300 truncate-text overflow-ellipsis overflow-hidden whitespace-nowrap"></span>
                                 </div>
                             </div>
                         </button>
@@ -34,16 +34,6 @@
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                 <h3 class="my-4 text-xl font-medium text-gray-900 dark:text-white">
                     {{ __('dashboard.header.create_rule') }}</h3>
-                @if ($errors->any())
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-                        <p class="font-bold">Oops! Something went wrong:</p>
-                        <ul class="list-disc ml-5">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
                 <form id="safetyguard_create_rule" method="post" enctype="multipart/form-data" autocomplete="off"
                     onsubmit="return create_validate()" action="{{ route('dashboard.safetyguard.create') }}"
                     class="w-full  p-4 overflow-y-auto scrollbar overflow-x-hidden space-y-2">
@@ -52,38 +42,48 @@
                     <input name="tab" value="safetyguard" hidden>
                     <input name='last_change' hidden>
                     <div id="safetygard_targetInputsContainer"></div>
+                    @if ($errors->any())
+                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                            <p class="font-bold">{{__("dashboard.msg.SomethingWentWrong")}}</p>
+                            <ul class="list-disc ml-5">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <div class="flex overflow-hidden -mx-3">
                         <div class="flex flex-1 flex-col overflow-hidden px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="ruleName">
-                                規則名稱<span class="text-red-400">*</span>
+                                {{__("dashboard.rule.name")}}<span class="text-red-400">*</span>
                             </label>
                             <input name="ruleName"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="ruleName" placeholder="規則名稱" value="" required>
+                                id="ruleName" placeholder="{{__("dashboard.rule.name")}}" value="" required>
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="description">
-                                規則敘述
+                                {{__("dashboard.rule.description")}}
                             </label>
                             <input name="description"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="description" placeholder="規則敘述" value="">
+                                id="description" placeholder="{{__("dashboard.rule.description")}}" value="">
                         </div>
                     </div>
                     <hr>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label for="safetyguard_tagInput"
-                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定套用規則模型</label>
+                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">{{__("dashboard.rule.target")}}</label>
                             <div class="relative mt-1">
                                 <div id="safetyguard_tagContainer" class="mt-2 flex flex-wrap">
                                     <input id="safetyguard_tagInput" type="text"
                                         class="bg-transparent border-2 rounded-lg placeholder:text-black dark:placeholder:text-white"
-                                        placeholder="請選擇模型">
+                                        placeholder="{{__("dashboard.msg.choose_target")}}">
                                 </div>
                                 <div id="safetyguard_tagSuggestions" style="display:none;"
                                     class="absolute z-10 mt-2 bg-white border border-gray-300 rounded-md shadow-lg p-2">
@@ -96,14 +96,14 @@
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="action">
-                                規則行為<span class="text-red-400">*</span>
+                                {{__("dashboard.rule.action")}}<span class="text-red-400">*</span>
                             </label>
                             <select id="action" name="action"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                <option value="none" selected>無行為</option>
-                                <option value="overwrite">改寫(由系統決定內容)</option>
-                                <option value="block">封鎖+(可選警告)</option>
-                                <option value="warn">純警告</option>
+                                <option value="none" selected>{{ __('dashboard.action.none') }}</option>
+                                <option value="overwrite">{{ __('dashboard.action.overwrite') }}</option>
+                                <option value="block">{{ __('dashboard.action.block') }}</option>
+                                <option value="warn">{{ __('dashboard.action.warn') }}</option>
                             </select>
                         </div>
                     </div>
@@ -111,15 +111,15 @@
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="message">
-                                警告提示訊息(可選)
+                                {{__("dashboard.rule.warning")}}
                             </label>
                             <input name="message"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="message" placeholder="警告提示訊息">
+                                id="message" placeholder="{{__("dashboard.rule.warning")}}">
                         </div>
                     </div>
                     @php
-                        $filters = ['keyword' => ['name' => 'Keyword 規則', 'filters' => ['pre-filter' => ['name' => '輸入過濾'], 'post-filter' => ['name' => '輸出過濾']]], 'embedding' => ['name' => 'Embedding 規則', 'filters' => ['pre-filter' => ['name' => '輸入過濾'], 'post-filter' => ['name' => '輸出過濾']]]];
+                        $filters = ['keyword' => ['name' => __("dashboard.rule.filter.keyword"), 'filters' => ['pre-filter' => ['name' => __("dashboard.rule.filter.input")], 'post-filter' => ['name' => __("dashboard.rule.filter.output")]]], 'embedding' => ['name' => __("dashboard.rule.filter.embedding"), 'filters' => ['pre-filter' => ['name' => __("dashboard.rule.filter.input")], 'post-filter' => ['name' => __("dashboard.rule.filter.output")]]]];
                     @endphp
                     <div id="safetyguard-collapse" data-accordion="collapse"
                         class="rounded-lg overflow-hidden bg-gray-300 dark:bg-gray-500">
@@ -178,9 +178,9 @@
                         });
                     </script>
                     <div class="text-center">
-                        <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
+                        <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2" id="rule_update_create_btn"
                             class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                            儲存
+                            {{ __('dashboard.button.create') }}
                         </button>
                         <div id="popup-modal2" data-modal-backdrop="static" tabindex="-2"
                             class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center">
@@ -206,13 +206,13 @@
                                                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                            您確定要創建這個設定檔？</h3>
+                                            {{ __('dashboard.msg.create_rule') }}</h3>
                                         <button data-modal-hide="popup-modal2" type="submit"
                                             class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                            是，我確定
+                                            {{ __('dashboard.button.create') }}
                                         </button>
                                         <button data-modal-hide="popup-modal2" type="button"
-                                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">否，取消</button>
+                                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('dashboard.button.cancel') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -221,7 +221,7 @@
                             id="delete_button"
                             class="bg-red-500 hover:bg-red-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
                             style="display: none;">
-                            刪除
+                            {{ __('dashboard.button.delete') }}
                         </button>
                         <div id="popup-modal" data-modal-backdrop="static" tabindex="-2"
                             class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center">
@@ -247,13 +247,13 @@
                                                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                            您確定要刪除這個語言模型設定檔嗎</h3>
+                                            {{ __('dashboard.msg.delete_rule') }}</h3>
                                         <button id="delete_rule_btn" data-modal-hide="popup-modal" type="button"
                                             class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                            是，我確定
+                                            {{ __('dashboard.button.delete') }}
                                         </button>
                                         <button data-modal-hide="popup-modal" type="button"
-                                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">否，取消</button>
+                                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('dashboard.button.cancel') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -287,19 +287,25 @@
                 $('#safety-guard-interface >div:eq(1)').show();
             }
             $("#rule_list").find(">:not(div.hidden)").remove();
-            $("#rule_list").append(`<p>{{ __('dashboard.header.enabled_rules') }}</p><hr>`)
-
             data = data.reduce((dict, item) => {
                 dict[item.id] = item;
                 return dict;
             }, {});;
-            tmp = [];
+            tmp = [
+                [],
+                [],
+                [],
+                []
+            ];
             keys = Object.keys(data).sort((a, b) => b - a);
             for (let index in keys) {
                 cloned = $("#rule_list").find("div.hidden:first()").clone();
                 cloned.removeClass("hidden");
-                cloned.find("span:first()").text("ID:" + data[keys[index]]["id"] + " " + data[keys[index]]["name"])
-                if (data[keys[index]]["description"]) cloned.find("span:nth-child(2)").text(data[keys[index]][
+                cloned.find("span:first()").text("ID:" + data[keys[index]]["id"] + " " + data[keys[index]][
+                    "name"
+                ])
+                if (data[keys[index]]["description"]) cloned.find("span:nth-child(2)").text(data[keys[
+                    index]][
                     "description"
                 ])
                 else cloned.find("span:nth-child(2)").remove();
@@ -307,19 +313,36 @@
                 cloned.on('click', () => {
                     edit_rule(data[keys[index]]['id'])
                 })
-                if (data[keys[index]]['id'] >= 1 && data[keys[index]]['id'] <= 10) cloned.children(0).addClass(
-                    "bg-blue-800 hover:bg-blue-700").removeClass(
-                    "dark:hover:bg-gray-600 hover:bg-gray-200")
-                if (data[keys[index]]['action'] !== 'none') {
-                    $("#rule_list").append(cloned)
-                } else {
-                    tmp.push(cloned);
+                if (data[keys[index]]['id'] >= 1 && data[keys[index]]['id'] <= 10) cloned.children(0)
+                    .addClass(
+                        "bg-blue-500 hover:bg-blue-600 dark:bg-blue-800 dark:hover:bg-blue-700 text-white")
+                    .removeClass(
+                        "dark:hover:bg-gray-600 hover:bg-gray-200").find("span:last()").removeClass(
+                        "text-gray-500 dark:text-gray-300").addClass("text-gray-300")
+                if (data[keys[index]]['action'] === 'none') {
+                    tmp[3].push(cloned);
+                } else if (data[keys[index]]['action'] === 'warn') {
+                    tmp[2].push(cloned);
+                } else if (data[keys[index]]['action'] === 'overwrite') {
+                    tmp[0].push(cloned);
+                } else if (data[keys[index]]['action'] === 'block') {
+                    tmp[1].push(cloned);
                 }
             }
-            $("#rule_list").append(`<p>{{ __('dashboard.header.disabled_rules') }}</p><hr>`)
-            for (let key in tmp) {
-                $("#rule_list").append(tmp[key])
+            const actions = [
+                '{{ __('dashboard.action.overwrite') }}',
+                '{{ __('dashboard.action.block') }}',
+                '{{ __('dashboard.action.warn') }}',
+                '{{ __('dashboard.action.none') }}'
+            ];
+
+            for (let i = 0; i < actions.length; i++) {
+                $("#rule_list").append(`<p>${actions[i]}</p><hr>`);
+                for (let key in tmp[i]) {
+                    $("#rule_list").append(tmp[i][key]);
+                }
             }
+
             $rules = data;
             @if (session('rule_id'))
                 $('#rule_{{ session('rule_id') }}').click();
@@ -441,11 +464,14 @@
     last_rule_id = null;
 
     function edit_rule(id) {
+        $("#rule_update_create_btn").text("{{ __('dashboard.button.update') }}")
+        $("#popup-modal2 h3").text("{{ __('dashboard.msg.update_rule') }}")
+        $("#popup-modal2 button:nth(1)").text("{{ __('dashboard.button.update') }}")
         $("#edit_rule input:eq(1)").prop("disabled", false)
         $("#edit_rule form").attr("action", `{{ route('dashboard.safetyguard.update', '') }}/` + id);
         $("#new_rule_btn").removeClass("bg-green-500 dark:bg-green-700").addClass("bg-green-400 dark:bg-green-600")
         rule = $rules[id];
-        $('#edit_rule >h3').text(`ID: ${id} {{ __('dashboard.header.update_rule') }} ${rule["name"]}`)
+        $('#edit_rule >h3').text(`ID: ${id} {{ __('dashboard.header.update_rule') }} "${rule['name']}"`)
         $('#edit_rule input[name=ruleName]').val(rule["name"])
         $('#edit_rule input[name=last_change]').val(rule["retrieval-timestamp"])
         $('#edit_rule input[name=description]').val(rule["description"])
@@ -509,11 +535,21 @@
 
         if (last_rule_id != id) {
             $("#edit_rule").show()
-            $("#rule_list").find(">:not(div.hidden)").removeClass("bg-gray-600")
-            $("#rule_" + id).addClass("bg-gray-600");
+            $("#rule_list").find(">:not(div.hidden)").children(0).removeClass("bg-gray-200 dark:bg-gray-600")
+            $("#rule_list").find(">div .hover\\:bg-blue-600:not(div.hidden)").addClass("bg-blue-500 dark:bg-blue-800")
+                .removeClass("bg-blue-600 dark:bg-blue-700")
+            $("#rule_" + id).children(0).addClass("bg-gray-200 dark:bg-gray-600");
+            if (id >= 1 && id <= 10) {
+                $("#rule_" + id).children(0).removeClass("bg-blue-500 dark:bg-blue-800").addClass(
+                    "bg-blue-600 dark:bg-blue-700");
+            }
         } else {
             $("#edit_rule").toggle();
-            $("#rule_" + id).toggleClass("bg-gray-600");
+            if (id >= 1 && id <= 10) {
+                $("#rule_" + id).children(0).toggleClass("bg-blue-500 dark:bg-blue-800 bg-blue-600 dark:bg-blue-700");
+            } else {
+                $("#rule_" + id).children(0).toggleClass("bg-gray-200 dark:bg-gray-600");
+            }
         }
         last_rule_id = id;
     }
@@ -524,10 +560,15 @@
     }
 
     function CreateRule() {
+        $("#rule_update_create_btn").text("{{ __('dashboard.button.create') }}")
+        $("#popup-modal2 h3").text("{{ __('dashboard.msg.create_rule') }}")
+        $("#popup-modal2 button:nth(1)").text("{{ __('dashboard.button.create') }}")
         $("#edit_rule input:eq(1)").prop("disabled", true)
         $("#edit_rule form").attr("action", "{{ route('dashboard.safetyguard.create') }}");
         $("#new_rule_btn").addClass("bg-green-500 dark:bg-green-700").removeClass("bg-green-400 dark:bg-green-600")
-        $("#rule_list").find(">:not(div.hidden)").removeClass("bg-gray-600")
+        $("#rule_list").find(">:not(div.hidden)").children(0).removeClass("bg-gray-200 dark:bg-gray-600")
+        $("#rule_list").find(">div .hover\\:bg-blue-600:not(div.hidden)").addClass("bg-blue-500 dark:bg-blue-800")
+            .removeClass("bg-blue-600 dark:bg-blue-700")
         last_rule_id = null;
         $("#safetyguard_tagContainer >div").click()
         $("#delete_button").hide();

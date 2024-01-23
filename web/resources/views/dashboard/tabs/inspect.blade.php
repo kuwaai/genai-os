@@ -43,7 +43,7 @@
             value="{{ session('end_date') }}" onchange="$(this).closest('form').submit()"
             class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
         <label for="inspect_searchbox" class="block uppercase tracking-wide dark:text-white">搜尋訊息</label>
-        <input placeholder="過濾內容" id="inspect_searchbox" name="search" value="{{ session('search') }}"
+        <input placeholder="過濾內容" id="inspect_searchbox" name="search" value="{{ session('search') }}" autocomplete="off"
             class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
         <div id="inspect_targetInputsContainer"></div>
         <div class="flex flex-wrap -mx-3">
