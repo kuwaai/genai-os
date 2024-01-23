@@ -14,7 +14,7 @@ class ActionEnum(str, enum.Enum):
     none = 'none'
     warn = 'warn'
     block = 'block'
-    rewrite = 'rewrite'
+    overwrite = 'overwrite'
 
 class Rule(Base):
     __tablename__ = "rules"

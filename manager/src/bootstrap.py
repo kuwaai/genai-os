@@ -16,7 +16,7 @@ def add_special_rules(db: Session):
             id=10,
             name='簡體偵測/轉繁',
             description='偵測到輸出簡體字就執行指定行為。若規則行為為「改寫」，則會進行簡繁轉換，且有轉換錯誤的風險。',
-            action=ActionEnum.rewrite,
+            action=ActionEnum.overwrite,
             message='',
             targets=[],
             detectors=[
