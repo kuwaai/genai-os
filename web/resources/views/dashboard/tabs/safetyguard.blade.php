@@ -44,7 +44,7 @@
                     <div id="safetygard_targetInputsContainer"></div>
                     @if ($errors->any())
                         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-                            <p class="font-bold">{{__("dashboard.msg.SomethingWentWrong")}}</p>
+                            <p class="font-bold">{{ __('dashboard.msg.SomethingWentWrong') }}</p>
                             <ul class="list-disc ml-5">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -56,34 +56,34 @@
                         <div class="flex flex-1 flex-col overflow-hidden px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="ruleName">
-                                {{__("dashboard.rule.name")}}<span class="text-red-400">*</span>
+                                {{ __('dashboard.rule.name') }}<span class="text-red-400">*</span>
                             </label>
                             <input name="ruleName"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="ruleName" placeholder="{{__("dashboard.rule.name")}}" value="" required>
+                                id="ruleName" placeholder="{{ __('dashboard.rule.name') }}" value="" required>
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="description">
-                                {{__("dashboard.rule.description")}}
+                                {{ __('dashboard.rule.description') }}
                             </label>
                             <input name="description"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="description" placeholder="{{__("dashboard.rule.description")}}" value="">
+                                id="description" placeholder="{{ __('dashboard.rule.description') }}" value="">
                         </div>
                     </div>
                     <hr>
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label for="safetyguard_tagInput"
-                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">{{__("dashboard.rule.target")}}</label>
+                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">{{ __('dashboard.rule.target') }}</label>
                             <div class="relative mt-1">
                                 <div id="safetyguard_tagContainer" class="mt-2 flex flex-wrap">
                                     <input id="safetyguard_tagInput" type="text"
                                         class="bg-transparent border-2 rounded-lg placeholder:text-black dark:placeholder:text-white"
-                                        placeholder="{{__("dashboard.msg.choose_target")}}">
+                                        placeholder="{{ __('dashboard.msg.choose_target') }}">
                                 </div>
                                 <div id="safetyguard_tagSuggestions" style="display:none;"
                                     class="absolute z-10 mt-2 bg-white border border-gray-300 rounded-md shadow-lg p-2">
@@ -96,7 +96,7 @@
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="action">
-                                {{__("dashboard.rule.action")}}<span class="text-red-400">*</span>
+                                {{ __('dashboard.rule.action') }}<span class="text-red-400">*</span>
                             </label>
                             <select id="action" name="action"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -111,15 +111,15 @@
                         <div class="w-full px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
                                 for="message">
-                                {{__("dashboard.rule.warning")}}
+                                {{ __('dashboard.rule.warning') }}
                             </label>
                             <input name="message"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="message" placeholder="{{__("dashboard.rule.warning")}}">
+                                id="message" placeholder="{{ __('dashboard.rule.warning') }}">
                         </div>
                     </div>
                     @php
-                        $filters = ['keyword' => ['name' => __("dashboard.rule.filter.keyword"), 'filters' => ['pre-filter' => ['name' => __("dashboard.rule.filter.input")], 'post-filter' => ['name' => __("dashboard.rule.filter.output")]]], 'embedding' => ['name' => __("dashboard.rule.filter.embedding"), 'filters' => ['pre-filter' => ['name' => __("dashboard.rule.filter.input")], 'post-filter' => ['name' => __("dashboard.rule.filter.output")]]]];
+                        $filters = ['keyword' => ['name' => __('dashboard.rule.filter.keyword'), 'filters' => ['pre-filter' => ['name' => __('dashboard.rule.filter.input')], 'post-filter' => ['name' => __('dashboard.rule.filter.output')]]], 'embedding' => ['name' => __('dashboard.rule.filter.embedding'), 'filters' => ['pre-filter' => ['name' => __('dashboard.rule.filter.input')], 'post-filter' => ['name' => __('dashboard.rule.filter.output')]]]];
                     @endphp
                     <div id="safetyguard-collapse" data-accordion="collapse"
                         class="rounded-lg overflow-hidden bg-gray-300 dark:bg-gray-500">
@@ -178,7 +178,8 @@
                         });
                     </script>
                     <div class="text-center">
-                        <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2" id="rule_update_create_btn"
+                        <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
+                            id="rule_update_create_btn"
                             class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                             {{ __('dashboard.button.create') }}
                         </button>
@@ -538,10 +539,11 @@
             $("#rule_list").find(">:not(div.hidden)").children(0).removeClass("bg-gray-200 dark:bg-gray-600")
             $("#rule_list").find(">div .hover\\:bg-blue-600:not(div.hidden)").addClass("bg-blue-500 dark:bg-blue-800")
                 .removeClass("bg-blue-600 dark:bg-blue-700")
-            $("#rule_" + id).children(0).addClass("bg-gray-200 dark:bg-gray-600");
             if (id >= 1 && id <= 10) {
                 $("#rule_" + id).children(0).removeClass("bg-blue-500 dark:bg-blue-800").addClass(
                     "bg-blue-600 dark:bg-blue-700");
+            } else {
+                $("#rule_" + id).children(0).addClass("bg-gray-200 dark:bg-gray-600");
             }
         } else {
             $("#edit_rule").toggle();
