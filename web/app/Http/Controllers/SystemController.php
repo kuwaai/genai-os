@@ -14,9 +14,35 @@ class SystemController extends Controller
 {
     public function update(Request $request): RedirectResponse
     {
+        function extractBaseUrl($url)
+        {
+            $parsedUrl = parse_url($url);
+
+            // Check if the URL has a scheme (http, https)
+            if (isset($parsedUrl['scheme'])) {
+                $baseUrl = $parsedUrl['scheme'] . '://';
+            } else {
+                $baseUrl = '';
+            }
+
+            // Check if the URL has a host (domain)
+            if (isset($parsedUrl['host'])) {
+                $baseUrl .= $parsedUrl['host'];
+
+                // Include port if present
+                if (isset($parsedUrl['port'])) {
+                    $baseUrl .= ':' . $parsedUrl['port'];
+                }
+            }
+
+            return $baseUrl;
+        }
         $result = 'success';
         $model = SystemSetting::where('key', 'agent_location')->first();
-        $model->value = $request->input('agent_location');
+        $model->value = extractBaseUrl($request->input('agent_location'));
+        $model->save();
+        $model = SystemSetting::where('key', 'safety_guard_location')->first();
+        $model->value = extractBaseUrl($request->input('safety_guard_location'));
         $model->save();
 
         if ($request->input('allow_register') == 'allow') {
@@ -42,23 +68,23 @@ class SystemController extends Controller
 
         $model = SystemSetting::where('key', 'announcement')->first();
         $oldanno = $model->value;
-        $model->value = $request->input('announcement') ?? "";
+        $model->value = $request->input('announcement') ?? '';
         $model->save();
 
-        if ($oldanno != $model->value ){
+        if ($oldanno != $model->value) {
             User::query()->update(['announced' => false]);
         }
 
         $model = SystemSetting::where('key', 'warning_footer')->first();
-        $model->value = $request->input('warning_footer') ?? "";
-        $model->save();
-        
-        $model = SystemSetting::where('key', 'tos')->first();
-        $oldtos = $model->value;
-        $model->value = $request->input('tos') ?? "";
+        $model->value = $request->input('warning_footer') ?? '';
         $model->save();
 
-        if ($oldtos != $model->value ){
+        $model = SystemSetting::where('key', 'tos')->first();
+        $oldtos = $model->value;
+        $model->value = $request->input('tos') ?? '';
+        $model->save();
+
+        if ($oldtos != $model->value) {
             User::query()->update(['term_accepted' => false]);
         }
 

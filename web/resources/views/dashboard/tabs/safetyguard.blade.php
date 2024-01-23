@@ -18,12 +18,12 @@
                     <div class="my-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden hidden">
                         <button
                             class="flex menu-btn items-center justify-center w-full dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
-                            <div class="flex flex-1">
-                                <div class="flex flex-1 flex-col h-[48px]">
+                            <div class="flex flex-1 overflow-hidden">
+                                <div class="flex flex-1 flex-col h-[48px] overflow-hidden">
                                     <span
-                                        class="overflow-x-auto scrollbar break-all flex flex-col flex-1 items-center justify-center"></span>
+                                        class="px-2 my-auto truncate-text overflow-ellipsis overflow-hidden whitespace-nowrap"></span>
                                     <span
-                                        class="overflow-x-auto scrollbar break-all text-sm flex flex-col flex-1 items-center justify-center text-gray-300"></span>
+                                        class="px-2 my-auto text-sm text-gray-300 truncate-text overflow-ellipsis overflow-hidden whitespace-nowrap"></span>
                                 </div>
                             </div>
                         </button>
@@ -52,7 +52,6 @@
                     <input name="tab" value="safetyguard" hidden>
                     <input name='last_change' hidden>
                     <div id="safetygard_targetInputsContainer"></div>
-                    <div id="validationErrorsContainer"></div>
                     <div class="flex overflow-hidden -mx-3">
                         <div class="flex flex-1 flex-col overflow-hidden px-3">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold"
@@ -79,8 +78,7 @@
                     <div class="flex flex-wrap -mx-3">
                         <div class="w-full px-3">
                             <label for="safetyguard_tagInput"
-                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定套用規則模型<span
-                                    class="text-red-400">*</span></label>
+                                class="block uppercase tracking-wide dark:text-white text-xs font-bold">指定套用規則模型</label>
                             <div class="relative mt-1">
                                 <div id="safetyguard_tagContainer" class="mt-2 flex flex-wrap">
                                     <input id="safetyguard_tagInput" type="text"
@@ -103,6 +101,7 @@
                             <select id="action" name="action"
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                 <option value="none" selected>無行為</option>
+                                <option value="overwrite">改寫(由系統決定內容)</option>
                                 <option value="block">封鎖+(可選警告)</option>
                                 <option value="warn">純警告</option>
                             </select>
@@ -293,15 +292,18 @@
             for (let key in data) {
                 cloned = $("#rule_list").find("div.hidden:first()").clone();
                 cloned.removeClass("hidden");
-                cloned.find("span:first()").text(data[key]["name"])
+                cloned.find("span:first()").text("ID:" + data[key]["id"] + " " + data[key]["name"])
                 if (data[key]["description"]) cloned.find("span:nth-child(2)").text(data[key][
                     "description"
-                ]);
+                ])
                 else cloned.find("span:nth-child(2)").remove();
                 cloned.attr("id", "rule_" + data[key]['id'])
                 cloned.on('click', () => {
                     edit_rule(data[key]['id'])
                 })
+                if (data[key]['id'] >= 1 && data[key]['id'] <= 10) cloned.children(0).addClass(
+                    "bg-blue-800 hover:bg-blue-700").removeClass(
+                    "dark:hover:bg-gray-600 hover:bg-gray-200")
                 if (data[key]['action'] !== 'none') {
                     $("#rule_list").append(cloned)
                 } else {
@@ -391,10 +393,10 @@
         $(safetyguard_tagSuggestions).hide();
     }
 
-    function safetyguard_addTag(tag) {
+    function safetyguard_addTag(tag, notFound = false) {
         safetyguard_selectedTags.push(tag);
 
-        const tagElement = safetyguard_createTagElement(tag);
+        const tagElement = safetyguard_createTagElement(tag, notFound);
         safetyguard_tagContainer.prepend(tagElement);
         safetyguard_updateTargetInput();
         safetyguard_tagInput.value = '';
@@ -403,9 +405,10 @@
         tagElement.addEventListener('click', () => safetyguard_removeTag(tag, tagElement));
     }
 
-    function safetyguard_createTagElement(tag) {
+    function safetyguard_createTagElement(tag, notFound = false) {
         const tagElement = document.createElement('div');
-        tagElement.className = 'bg-blue-500 hover:bg-red-600 text-white px-2 py-1 rounded-md cursor-pointer mr-2 mb-2';
+        tagElement.className = 'text-white px-2 py-1 rounded-md cursor-pointer mr-2 mb-2 ' + (notFound ?
+            "bg-orange-400 hover:bg-red-700" : "bg-blue-500 hover:bg-red-600");
         tagElement.textContent = tag;
         return tagElement;
     }
@@ -439,21 +442,37 @@
         $("#edit_rule form").attr("action", `{{ route('dashboard.safetyguard.update', '') }}/` + id);
         $("#new_rule_btn").removeClass("bg-green-500 dark:bg-green-700").addClass("bg-green-400 dark:bg-green-600")
         rule = $rules[id];
-        $("#delete_button").show()
-        $('#edit_rule >h3').text(`{{ __('dashboard.header.update_rule') }} ${rule["name"]}`)
+        $('#edit_rule >h3').text(`ID: ${id} {{ __('dashboard.header.update_rule') }} ${rule["name"]}`)
         $('#edit_rule input[name=ruleName]').val(rule["name"])
         $('#edit_rule input[name=last_change]').val(rule["retrieval-timestamp"])
         $('#edit_rule input[name=description]').val(rule["description"])
         $('#edit_rule select[name=action]').val(rule["action"])
         $('#edit_rule input[name=message]').val(rule["message"])
-
+        if (id >= 1 && id <= 10) {
+            $("#safetyguard-collapse").hide()
+            $("#delete_button").hide()
+        } else {
+            $("#safetyguard-collapse").show()
+            $("#delete_button").show()
+        }
         $("#safetyguard_tagContainer >div").click()
+        let missingTargets = [];
         rule["target"].forEach((target) => {
             safetyguard_render_tagSuggestions(safetyguard_filterTags(""))
-            $(`#safetyguard_tagSuggestions div:contains('${target}')`).filter((index, element) => {
+            let $matchingElement = $(`#safetyguard_tagSuggestions div:contains('${target}')`).filter((index,
+                element) => {
                 return $(element).text().trim() === target;
-            }).click();
+            });
+            if ($matchingElement.length === 0) {
+                missingTargets.push(target);
+            } else {
+                // Click on the target if it is found
+                $matchingElement.click();
+            }
         });
+        for (let key in missingTargets) {
+            safetyguard_addTag(missingTargets[key], true);
+        }
         safetyguard_clearSuggestions();
         ["pre-filter", "post-filter"].forEach((element1) => {
             ["embedding", "keyword"].forEach((element2) => {
@@ -509,6 +528,7 @@
         last_rule_id = null;
         $("#safetyguard_tagContainer >div").click()
         $("#delete_button").hide();
+        $("#safetyguard-collapse").show()
         $('#edit_rule >h3').text("{{ __('dashboard.header.create_rule') }}");
         $('#edit_rule input[name=ruleName]').val("");
         $('#edit_rule input[name=description]').val("");
@@ -527,38 +547,12 @@
     }
 
     function create_validate() {
-        const inputs = $("#safetygard_targetInputsContainer input");
-        const errorContainer = $("#validationErrorsContainer");
-        errorContainer.empty(); // Clear previous error messages
-
-        errorMessage = `Must select one llm to apply rules.`;
-        if (inputs.length > 0) {
-            let check = false;
-
-            errorMessage = `Must have at least one rule.`;
-            $("#safetyguard-collapse .dynamic-input").each(function() {
-                if ($(this).val().trim() !== '') {
-                    check = true;
-                }
-            });
-
-            if (check) {
-                $("#safetyguard-collapse .dynamic-input").each(function() {
-                    if ($(this).val().trim() === '') {
-                        $(this).remove();
-                    }
-                });
-                return true;
+        $("#safetyguard-collapse .dynamic-input").each(function() {
+            if ($(this).val().trim() === '') {
+                $(this).remove();
             }
-        }
-
-        // Display error message
-        errorContainer.append(`<p class="text-red-600">${errorMessage}</p>`);
-        errorContainer[0].scrollIntoView({
-            behavior: 'smooth'
         });
-
-        return false;
+        return true;
     }
 
 

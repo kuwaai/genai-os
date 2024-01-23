@@ -197,14 +197,13 @@ class DashboardController extends Controller
         }
         return Redirect::route('dashboard.home')->with('last_tab', 'feedbacks');
     }
-    private $apiBaseUrl = 'http://25.28.96.121:8000/v1/management';
     function guard_fetch(Request $request)
     {
         if ($this->healthCheck()) {
             return response()->json(['error' => 'Guard offline'], 500);
         }
         $client = new Client(['timeout' => 20]);
-        $url = $this->apiBaseUrl . '/rule'; // URL to fetch all rules
+        $url = \App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule'; // URL to fetch all rules
 
         try {
             $response = $client->request('GET', $url);
@@ -226,7 +225,11 @@ class DashboardController extends Controller
         if ($this->healthCheck()) {
             return response()->json(['error' => 'Guard offline'], 500);
         }
-        $response = Http::delete($this->apiBaseUrl . '/rule/' . $request->route('rule_id'));
+        if ($request->route('rule_id') >= 1 && $request->route('rule_id') <= 10) {
+            // 1 ~ 10 Can't be deleted
+            return Redirect::route('dashboard.home')->with('last_tab', $request->input('tab'));
+        }
+        $response = Http::delete(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule/' . $request->route('rule_id'));
         // Check the response and return accordingly
         if ($response->successful()) {
             return Redirect::route('dashboard.home')->with('last_tab', $request->input('tab'));
@@ -242,11 +245,6 @@ class DashboardController extends Controller
         $request->validate([
             'action' => 'required|string',
             'ruleName' => 'required|string',
-            'target' => 'required|array',
-            'keyword-pre-filter' => ['array', 'required_without_all:keyword-post-filter,embedding-pre-filter,embedding-post-filter'],
-            'keyword-post-filter' => ['array', 'required_without_all:keyword-pre-filter,embedding-pre-filter,embedding-post-filter'],
-            'embedding-pre-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-post-filter'],
-            'embedding-post-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-pre-filter'],
         ]);
 
         // Transform data to the desired structure
@@ -254,7 +252,7 @@ class DashboardController extends Controller
         $transformedData = [
             'name' => $requestData['ruleName'],
             'description' => $requestData['description'] ?? '',
-            'target' => $requestData['target'],
+            'target' => $requestData['target'] ?? [],
             'pre-filter' => [
                 'keyword' => $requestData['keyword-pre-filter'] ?? [],
                 'embedding' => $requestData['embedding-pre-filter'] ?? [],
@@ -265,10 +263,10 @@ class DashboardController extends Controller
             ],
             'action' => $requestData['action'],
             'message' => $requestData['message'] ?? '',
-            'retrieval-timestamp' => $request->input("last_change") ?? -1
+            'retrieval-timestamp' => $request->input('last_change') ?? -1,
         ];
         // Proxy the transformed data to the server
-        $response = Http::put($this->apiBaseUrl . '/rule/' . $request->route('rule_id'), $transformedData);
+        $response = Http::put(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule/' . $request->route('rule_id'), $transformedData);
         // Check the response and return accordingly
         if ($response->successful()) {
             return Redirect::route('dashboard.home')
@@ -286,11 +284,6 @@ class DashboardController extends Controller
         $request->validate([
             'action' => 'required|string',
             'ruleName' => 'required|string',
-            'target' => 'required|array',
-            'keyword-pre-filter' => ['array', 'required_without_all:keyword-post-filter,embedding-pre-filter,embedding-post-filter'],
-            'keyword-post-filter' => ['array', 'required_without_all:keyword-pre-filter,embedding-pre-filter,embedding-post-filter'],
-            'embedding-pre-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-post-filter'],
-            'embedding-post-filter' => ['array', 'required_without_all:keyword-pre-filter,keyword-post-filter,embedding-pre-filter'],
         ]);
 
         // Transform data to the desired structure
@@ -298,7 +291,7 @@ class DashboardController extends Controller
         $transformedData = [
             'name' => $requestData['ruleName'],
             'description' => $requestData['description'] ?? '',
-            'target' => $requestData['target'],
+            'target' => $requestData['target'] ?? [],
             'pre-filter' => [
                 'keyword' => $requestData['keyword-pre-filter'] ?? [],
                 'embedding' => $requestData['embedding-pre-filter'] ?? [],
@@ -311,7 +304,7 @@ class DashboardController extends Controller
             'message' => $requestData['message'] ?? '',
         ];
         // Proxy the transformed data to the server
-        $response = Http::post($this->apiBaseUrl . '/rule', $transformedData);
+        $response = Http::post(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule', $transformedData);
         // Check the response and return accordingly
         if ($response->successful()) {
             return Redirect::route('dashboard.home')
@@ -323,9 +316,12 @@ class DashboardController extends Controller
     }
     function healthCheck()
     {
+        if (!\App\Models\SystemSetting::where('key', 'safety_guard_location')->exists()) {
+            return false;
+        }
         try {
             $client = new Client(['timeout' => 5]);
-            $url = $this->apiBaseUrl . '/health';
+            $url = \App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/health';
             $response = $client->request('GET', $url);
             $statusCode = $response->getStatusCode();
             if ($statusCode === 204) {
