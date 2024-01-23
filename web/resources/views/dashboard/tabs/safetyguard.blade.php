@@ -288,23 +288,29 @@
             }
             $("#rule_list").find(">:not(div.hidden)").remove();
             $("#rule_list").append(`<p>{{ __('dashboard.header.enabled_rules') }}</p><hr>`)
+
+            data = data.reduce((dict, item) => {
+                dict[item.id] = item;
+                return dict;
+            }, {});;
             tmp = [];
-            for (let key in data) {
+            keys = Object.keys(data).sort((a, b) => b - a);
+            for (let index in keys) {
                 cloned = $("#rule_list").find("div.hidden:first()").clone();
                 cloned.removeClass("hidden");
-                cloned.find("span:first()").text("ID:" + data[key]["id"] + " " + data[key]["name"])
-                if (data[key]["description"]) cloned.find("span:nth-child(2)").text(data[key][
+                cloned.find("span:first()").text("ID:" + data[keys[index]]["id"] + " " + data[keys[index]]["name"])
+                if (data[keys[index]]["description"]) cloned.find("span:nth-child(2)").text(data[keys[index]][
                     "description"
                 ])
                 else cloned.find("span:nth-child(2)").remove();
-                cloned.attr("id", "rule_" + data[key]['id'])
+                cloned.attr("id", "rule_" + data[keys[index]]['id'])
                 cloned.on('click', () => {
-                    edit_rule(data[key]['id'])
+                    edit_rule(data[keys[index]]['id'])
                 })
-                if (data[key]['id'] >= 1 && data[key]['id'] <= 10) cloned.children(0).addClass(
+                if (data[keys[index]]['id'] >= 1 && data[keys[index]]['id'] <= 10) cloned.children(0).addClass(
                     "bg-blue-800 hover:bg-blue-700").removeClass(
                     "dark:hover:bg-gray-600 hover:bg-gray-200")
-                if (data[key]['action'] !== 'none') {
+                if (data[keys[index]]['action'] !== 'none') {
                     $("#rule_list").append(cloned)
                 } else {
                     tmp.push(cloned);
@@ -314,10 +320,7 @@
             for (let key in tmp) {
                 $("#rule_list").append(tmp[key])
             }
-            $rules = data.reduce((dict, item) => {
-                dict[item.id] = item;
-                return dict;
-            }, {});;
+            $rules = data;
             @if (session('rule_id'))
                 $('#rule_{{ session('rule_id') }}').click();
             @endif
