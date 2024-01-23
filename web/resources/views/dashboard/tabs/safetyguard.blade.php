@@ -147,10 +147,9 @@
                                     @foreach ($topfilter['filters'] as $subindex => $subfilter)
                                         <div class="flex-1 p-1" id="{{ $index . '-' . $subindex }}">
                                             <p class="text-center">{{ $subfilter['name'] }}</p>
-                                            <input name="{{ $index . '-' . $subindex }}[]" rows='1'
-                                                max-rows="2"
+                                            <textarea name="{{ $index . '-' . $subindex }}[]" rows='1' max-rows="1"
                                                 class="dynamic-input mb-2 px-2 py-1 resize-none scrollbar appearance-none block w-full text-gray-700 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
-                                                placeholder="{{ $subfilter['name'] }}">
+                                                placeholder="{{ $subfilter['name'] }}"></textarea>
                                         </div>
                                     @endforeach
                                 </div>
@@ -162,20 +161,91 @@
                     <script>
                         $(document).on('input', '.dynamic-input', function() {
                             const dynamicInputs = $(this).parent();
+                            const inputDatas = $(this).val().trim().split("\n");
 
+                            // Set the value of the current input field to the first line
+                            $(this).val(inputDatas[0].trim());
+
+                            // Clone and append new input fields for each additional line
+                            for (let i = 1; i < inputDatas.length; i++) {
+                                const newInput = $(this).clone().val(inputDatas[i].trim());
+                                dynamicInputs.append(newInput);
+                            }
+
+                            // Remove empty input fields and focus on the previous input if needed
                             dynamicInputs.find('.dynamic-input:not(:last)').each(function() {
                                 const inputValue = $(this).val().trim();
                                 if (inputValue === '') {
+                                    const prevInput = $(this).prev('.dynamic-input');
+                                    if (prevInput.length) {
+                                        prevInput.focus();
+                                    }
                                     $(this).remove();
                                 }
                             });
 
+                            // Add a new empty input field at the end if the last input field is not empty
                             if (dynamicInputs.find('.dynamic-input:last').val().trim() !== '') {
-                                const newInput = $(this).clone()
-                                newInput.val('');
+                                const newInput = $(this).clone().val('');
                                 dynamicInputs.append(newInput);
                             }
                         });
+                        var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                        if (!isMac) {
+                            $(document).on('keydown', '.dynamic-input', function(event) {
+                                const textarea = $(this)[0]; // Get the actual DOM element
+
+                                if (event.which === 13) { // 13 is the key code for "Enter"
+                                    event.preventDefault(); // Prevent the default behavior of the Enter key
+                                    const cursorPosition = textarea.selectionStart;
+                                    const inputValue = textarea.value.trim();
+                                    const textAfterCursor = inputValue.substring(cursorPosition);
+
+                                    if (textAfterCursor !== '' && cursorPosition !== 0) {
+                                        const newInput = $(this).clone();
+                                        newInput.val(textAfterCursor);
+                                        textarea.value = inputValue.substring(0, cursorPosition).trim();
+                                        $(this).after(newInput);
+                                        newInput.focus();
+                                        newInput[0].selectionStart = 0;
+                                        newInput[0].selectionEnd = 0;
+                                    } else {
+                                        const nextInput = $(this).next('.dynamic-input');
+                                        if (nextInput.length) {
+                                            nextInput.focus();
+                                        }
+                                    }
+                                } else if (event.which === 8) { // 8 is the key code for "Backspace"
+                                    const inputValue = textarea.value.trim();
+                                    const selectionStart = textarea.selectionStart;
+                                    const selectionEnd = textarea.selectionEnd;
+
+                                    if (inputValue === '') {
+                                        event.preventDefault();
+                                        const prevInput = $(this).prev('.dynamic-input');
+                                        if (prevInput.length) {
+                                            prevInput.focus();
+                                        }
+                                    } else {
+                                        if (selectionStart === 0 && selectionEnd === 0 && $(this).prev('.dynamic-input').length !==
+                                            0) {
+                                            event.preventDefault();
+                                            const prevInput = $(this).prev('.dynamic-input');
+                                            if (prevInput.length) {
+                                                prevInput.focus();
+                                                pos = prevInput.val().length;
+                                                const prevValue = prevInput.val() + inputValue;
+                                                prevInput.val(prevValue);
+                                                prevInput[0].selectionStart = pos;
+                                                prevInput[0].selectionEnd = pos;
+                                                $(this).remove();
+                                            }
+                                        }
+                                    }
+                                }
+
+                            });
+                        }
                     </script>
                     <div class="text-center">
                         <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
