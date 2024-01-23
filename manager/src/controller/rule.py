@@ -20,6 +20,7 @@ rule_router = APIRouter(prefix="/v1/management")
 @awith_db_session
 async def create_rule(rule: RuleApiModel, db: Session):
     new_rule = await RuleModelConverter.api2db(rule)
+    new_rule = db.merge(new_rule)
     db.add(new_rule)
     db.commit()
     db.refresh(new_rule)
@@ -30,7 +31,7 @@ async def create_rule(rule: RuleApiModel, db: Session):
 @awith_db_session
 async def get_all_rules(db: Session):
     rules = []
-    rules = db.query(RuleDbModel).all()
+    rules = db.query(RuleDbModel).order_by(RuleDbModel.id.asc()).all()
     rules = [RuleModelConverter.db2api(r) for r in rules]
     return rules
 
@@ -60,16 +61,9 @@ async def update_rule(rule_id: int, rule: RuleApiModel, db: Session):
             detail="The rule changes after the \"retrieval-timestamp\". For consistency, please fetch the rule again."
         )
     
-    # _delete_rule(orig_rule, db)
-
     new_rule = await RuleModelConverter.api2db(rule)
     new_rule.id = orig_rule.id
     new_rule = db.merge(new_rule)
-
-    db.flush()
-
-    # for key, value in rule.dict().items():
-    #     setattr(rule_db, key, value)
 
     db.commit()
     return {}

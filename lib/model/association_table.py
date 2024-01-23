@@ -8,7 +8,7 @@ rule_target_table = Table(
     "rule_targets",
     Base.metadata,
     Column("rule_id", ForeignKey("rules.id")),
-    Column("target_id", ForeignKey("targets.id")),
+    Column("target_model_id", ForeignKey("targets.model_id")),
 )
 
 detector_embedding_table = Table(

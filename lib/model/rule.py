@@ -37,9 +37,8 @@ class Rule(Base):
 
 class Target(Base):
     __tablename__ = "targets"
-    id:Mapped[int] = mapped_column(primary_key=True)
-    model_id:Mapped[str] = mapped_column()
-    user_id:Mapped[str] = mapped_column(nullable=True)
+    model_id:Mapped[str] = mapped_column(primary_key=True)
+    # user_id:Mapped[str] = mapped_column(nullable=True)
 
     rules:Mapped[List["Rule"]] = relationship(
         secondary=rule_target_table,

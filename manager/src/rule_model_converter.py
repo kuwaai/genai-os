@@ -27,7 +27,7 @@ class RuleApiModel(BaseModel):
 
     id: Optional[int] = None
     description: Optional[str] = None
-    retrieval_timestamp: Optional[int] = Field(default=None, alias='retrieval-timestamp')
+    retrieval_timestamp: Optional[int] = Field(alias='retrieval-timestamp', default=None)
     message: Optional[str] = None
 
 class RuleModelConverter:
@@ -78,6 +78,9 @@ class RuleModelConverter:
             detector_type_map[d.type.value]: d.deny_list
             for d in detectors if d.type in detector_type_map
         }
+        for filter_type in detector_type_map.values():
+            val = result.get(filter_type, [])
+            result[filter_type] = val
 
         return result
 
@@ -90,6 +93,7 @@ class RuleModelConverter:
 
         result = []
         for filter_type, deny_list in filters.items():
+            if len(deny_list) == 0: continue
             data = {}
             if filter_type == 'embedding':
                 # Calculate embedding

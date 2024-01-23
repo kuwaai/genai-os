@@ -38,21 +38,33 @@ def open_db_session(db=Database()):
         session.close()
         logger.debug('Database session closed.')
 
-# Decorator for FastAPI endpoints
+# Decorators for FastAPI endpoints
 # This decorator will pass a database session as a parameter "db" to the target
 # function.
+def with_db_session(func):
+    def wrap(*args, **kwargs):
+        with open_db_session() as session:
+            return func(db=session, *args, **kwargs)
+
+    wrap = _remove_db_from_signature(func, wrap)
+    return wrap
+
 def awith_db_session(func):
     async def wrap(*args, **kwargs):
         with open_db_session() as session:
             return await func(db=session, *args, **kwargs)
+    wrap = _remove_db_from_signature(func, wrap)
+    return wrap
 
+def _remove_db_from_signature(ref, target):
+    
     # Correct the signature to compatible with pydantic.
-    sig = inspect.signature(func)
+    sig = inspect.signature(ref)
     params = sig.parameters.values()
     params = tuple(filter(lambda p: p.name != 'db', params))
     exposed_sig = sig.replace(parameters=params)
-    wrap.__signature__ = exposed_sig
-    return wrap
+    target.__signature__ = exposed_sig
+    return target
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
