@@ -12,6 +12,7 @@ from model.rule import Target, ActionEnum
 from model.detector import Detector, DetectorTypeEnum, ChainEnum
 from model.embedding import Embedding
 from ..rule_model_converter import RuleApiModel, RuleModelConverter
+from ..bootstrap import RESERVED_RULE_IDS
 
 rule_router = APIRouter(prefix="/v1/management")
 
@@ -63,6 +64,11 @@ async def update_rule(rule_id: int, rule: RuleApiModel, db: Session):
     
     new_rule = await RuleModelConverter.api2db(rule)
     new_rule.id = orig_rule.id
+    # Preserve special rules. This should be removed after the API is updated.
+    new_rule.detectors += [
+        d for d in orig_rule.detectors
+        if d.type != DetectorTypeEnum.keyword_guard or d.type != DetectorTypeEnum.vector_guard
+    ]
     new_rule = db.merge(new_rule)
 
     db.commit()
@@ -72,7 +78,8 @@ async def update_rule(rule_id: int, rule: RuleApiModel, db: Session):
 @rule_router.delete("/rule/{rule_id}", response_model=None, status_code=204)
 @awith_db_session
 async def delete_rule(rule_id: int, db: Session):
-    await _delete_rule(rule_id=rule_id, db=db)
+    if not rule_id in RESERVED_RULE_IDS:
+        await _delete_rule(rule_id=rule_id, db=db)
     return None
 
 # The internal deleting procedure.

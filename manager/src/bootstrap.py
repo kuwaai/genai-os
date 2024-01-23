@@ -7,6 +7,8 @@ from model.rule import Rule, Target, ActionEnum
 from model.detector import Detector, DetectorTypeEnum, ChainEnum
 from model.embedding import Embedding
 
+RESERVED_RULE_IDS = list(range(11))
+
 # Hardcoded special rules since the current API can't create them.
 # The rule ID from 1 to 10 are reserved for special rules.
 @with_db_session
