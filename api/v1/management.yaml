@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Safety Guard Management API
-  version: 1.1.0
+  version: 1.1.1
 servers:
   - url: http://localhost/v1/management
     description: Development server
@@ -154,13 +154,13 @@ components:
 
         action:
           type: string
-          enum: [none, block, warn, rewrite]
+          enum: [none, block, warn, overwrite]
           description: |
             The action after the rule is triggered.
             none: The rule is disabled.
             block: Stop generation and terminate the session.
             warn: Output a message alongside the original output.
-            rewrite: Rewrite the output with the detector-provided content.
+            overwrite: Overwrite the output with the detector-provided content.
           example: warn
 
         message:
