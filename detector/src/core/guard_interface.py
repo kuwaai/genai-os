@@ -4,7 +4,7 @@ from typing import Any
 class GuardInterface(ABC):
 
   @abstractmethod
-  def add_rule(self, rule_id: int, desc: str, black_list: [str], white_list: [str]=[]) -> bool:
+  async def add_rule(self, rule_id: int, desc: str, black_list: [str], white_list: [str]=[]) -> bool:
     """
     Add a rule to guard.
     Input:
@@ -19,18 +19,19 @@ class GuardInterface(ABC):
     raise NotImplementedError()
 
   @abstractmethod
-  def score(self, records: [dict[str, str]]) -> dict[int, float]:
+  async def score(self, records: [dict[str, str]]) -> dict[int, float]:
     """
     Return {rule_id: score}
     """
     raise NotImplementedError()
 
   @abstractmethod
-  def check(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
+  async def check(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
     """
     Return {
       rule_id: {
         'violate': bool,
+        'message': str [optional] // Output message precedence: DB > Guard (currently only charset guard) > Default (if any)
         'detail': str [optional]
       }
     }

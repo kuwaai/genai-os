@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import (
     Enum, func,
-    Table, Column, ForeignKey
+    Table, Column, ForeignKey,
+    event, DDL
 )
 from datetime import datetime
 from typing import List
@@ -44,3 +45,9 @@ class Target(Base):
         secondary=rule_target_table,
         back_populates='targets'
     )
+
+event.listen(
+    Rule.__table__,
+    "after_create",
+    DDL("ALTER SEQUENCE %(table)s_id_seq RESTART WITH 11")
+)

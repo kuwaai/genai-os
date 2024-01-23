@@ -17,9 +17,9 @@ from serializer import AlchemyEncoder
 logger = logging.getLogger(__name__)
 
 class Database:
-    def __init__(self, echo=True, autocommit=False, autoflush=False):
+    def __init__(self, echo=False, autocommit=False, autoflush=False, pool_per_ping=True):
         conn_str = os.environ.get('DB_CONN', "postgresql+psycopg2://app:app@localhost/app")
-        self.engine = create_engine(conn_str, echo=echo)
+        self.engine = create_engine(conn_str, echo=echo, pool_pre_ping=pool_per_ping)
         Base.metadata.create_all(self.engine)
         self.session = sessionmaker(autocommit=autocommit, autoflush=autoflush, bind=self.engine)
 

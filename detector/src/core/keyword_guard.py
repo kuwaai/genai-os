@@ -48,7 +48,7 @@ class KeywordGuard(GuardInterface):
     self.word_segmenter = CkipWordSegmenter(model=ws_model)
     self.coder = WordListCoder()
 
-  def add_rule(self, rule_id: int, desc: str, black_list: [str], white_list: [str]=[]) -> bool:
+  async def add_rule(self, rule_id: int, desc: str, black_list: [str], white_list: [str]=[]) -> bool:
     if rule_id in self.kw_filters: return False
 
     # Since we segment the input string into a list of words,
@@ -69,15 +69,15 @@ class KeywordGuard(GuardInterface):
     self.kw_filters[rule_id] = keyword_filter
     return True
 
-  def score(self, records: [dict[str, str]]) -> dict[int, float]:
-    check_result = self.check(records)
+  async def score(self, records: [dict[str, str]]) -> dict[int, float]:
+    check_result = await self.check(records)
     result = {
       i: 1 if v['violate'] else 0
       for i, v in check_result.items()
     }
     return result
 
-  def check(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
+  async def check(self, records: [dict[str, str]]) -> dict[int, dict[str, Any]]:
     result = {}
     text = records[-1]['msg']
 

@@ -23,6 +23,33 @@ services:
           #   capabilities: [gpu]
     volumes:
       - cache:/app/.cache/torch
+    # ports:
+      # - 8181:8080
+  
+  tgi:
+    image: ghcr.io/huggingface/text-generation-inference:1.3
+    shm_size: '1gb'
+    command:
+      - --model-id=meta-llama/LlamaGuard-7b
+    env_file:
+      - .env
+    deploy:
+      resources:
+        reservations:
+          # Deploy with docker swarm
+          generic_resources:
+            - discrete_resource_spec:
+                kind: "NVIDIA-GPU"
+                value: 1
+          # Local deployment
+          # devices:
+          # - driver: nvidia
+          #   count: 1
+          #   capabilities: [gpu]
+    volumes:
+      - cache:/data
+    ports:
+      - 8182:80
   
   db:
     image: postgres
@@ -32,6 +59,8 @@ services:
       POSTGRES_USER: app
     volumes:
       - db_data:/var/lib/postgresql
+    ports:
+      - 5432:5432
 
   adminer:
     image: adminer
@@ -56,3 +85,8 @@ services:
 volumes:
   cache:
   db_data:
+
+networks:
+  taide:
+    name: taide
+    external: true
