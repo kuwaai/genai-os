@@ -584,7 +584,7 @@
                 }
                 if (rule[element1] !== undefined && Array.isArray(rule[element1][element2])) {
                     rule[element1][element2].forEach((element3) => {
-                        changed = $("#" + element2 + "-" + element1 + " >input:last()")
+                        changed = $("#" + element2 + "-" + element1 + " >textarea:last()")
                         changed.val(element3)
                         dynamicInputs.find('.dynamic-input:not(:last)').each(function() {
                             if ($(this).val().trim() === '') {
