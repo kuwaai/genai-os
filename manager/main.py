@@ -3,9 +3,6 @@ import logging
 import uvicorn
 from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
-
-
-
 class EndpointFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         return record.getMessage().find("/health") == -1
@@ -17,9 +14,13 @@ if __name__ == "__main__":
     from src.controller.rule import rule_router
     from src.controller.internal import internal_router
     from src.controller.health import health_router
+    from src.bootstrap import add_special_rules
 
     # Filter out /health
     logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+    
+    # Bootstrap
+    add_special_rules()
 
     # FastAPI app
     app = FastAPI()
