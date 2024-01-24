@@ -335,7 +335,7 @@
         </div>
     </div>
     <div class="w-full overflow-hidden flex justify-center items-center">
-        <p class="text-red-500 text-center text-lg">Safety guard offline</p>
+        <p class="text-red-500 text-center text-lg">{{__("Safety guard offline")}}</p>
     </div>
 </div>
 

@@ -282,5 +282,6 @@
     "Room_update_detail_feedback":"詳細回饋",
     "Permission to give detailed feedbacks":"給予回答更詳細的回饋標籤",
     "Detail":"詳細說明",
-    "Safety Guard Location":"安全檢查連線位置"
+    "Safety Guard Location":"安全過濾連線位置",
+    "Safety guard offline":"安全過濾系統處於離線狀態"
 }
