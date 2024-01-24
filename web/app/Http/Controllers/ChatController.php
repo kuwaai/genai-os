@@ -28,10 +28,10 @@ class ChatController extends Controller
 {
     public function share(Request $request)
     {
-        $chat = Chats::find($request->route("chat_id"));
-        if ($chat && $chat->user_id == Auth::user()->id){
+        $chat = Chats::find($request->route('chat_id'));
+        if ($chat && $chat->user_id == Auth::user()->id) {
             return view('chat.share');
-        }else{
+        } else {
             return redirect()->route('chat.home');
         }
     }
@@ -44,7 +44,7 @@ class ChatController extends Controller
             ->toArray();
         $client = new Client(['timeout' => 300]);
         $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
-        $response = $client->post($agent_location . RequestChat::$agent_version . '/chat/abort', [
+        $response = $client->post($agent_location . '/' . RequestChat::$agent_version . '/chat/abort', [
             'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
             'form_params' => [
                 'history_id' => json_encode($list),
@@ -187,7 +187,7 @@ class ChatController extends Controller
                     ->get()
                     ->pluck('id')
                     ->toarray();
-                if (in_array($llm_id, $result) || $access_code === "feedback") {
+                if (in_array($llm_id, $result) || $access_code === 'feedback') {
                     $historys = json_decode($historys);
                     if ($historys !== null && isset($historys->messages) && is_array($historys->messages) && count($historys->messages) > 1) {
                         // JSON format
@@ -251,7 +251,7 @@ class ChatController extends Controller
                                 $model = isset($message->model) && is_string($message->model) ? $message->model : $access_code;
                                 $content = isset($message->content) && is_string($message->content) ? $message->content : '';
 
-                                if ($model === $access_code || $access_code === "feedback") {
+                                if ($model === $access_code || $access_code === 'feedback') {
                                     $flag = false;
                                     if ($chainValue === true) {
                                         $message->chain = $chainValue;
