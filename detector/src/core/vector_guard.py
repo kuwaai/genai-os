@@ -59,11 +59,11 @@ class VectorGuard(GuardInterface):
     for rule_id, (index, doc_map) in self.vector_db.items():
       embeddings = await embedding_model.aembed([msg])
       # doc, score = db.vector_store.similarity_search_with_relevance_scores(msg, k=1)[0]
-      distance, idx = index.search(embeddings, 1)
-      score = VectorGuard._euclidean_relevance_score_fn(distance)
+      distance, idx = index.search(np.array(embeddings), 1)
+      score = VectorGuard._euclidean_relevance_score_fn(distance[0][0])
       result[rule_id] = {
         'score': max(0, score),
-        'doc': doc_map[idx]
+        'doc': doc_map[idx[0][0]]
       }
     return result
   

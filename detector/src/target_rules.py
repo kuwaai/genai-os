@@ -53,8 +53,7 @@ class TargetRules:
         guard_rules = []
         actions = {}
 
-        for i, r in enumerate(rules):
-            skipped = True
+        for r in rules:
             for d in r.detectors:
                 if d.chain != chain: continue
                 guard_rules.append(dict(
@@ -63,8 +62,6 @@ class TargetRules:
                     black_list = d.deny_list,
                     white_list = d.allow_list
                 ))
-                skipped = False
-            if not skipped:
-                actions[i] = dict(action=r.action, message=r.message)
+                actions[len(actions)] = dict(action=r.action, message=r.message)
 
         return guard_rules, actions

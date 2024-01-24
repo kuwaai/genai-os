@@ -54,6 +54,7 @@ class KeywordGuard(GuardInterface):
     # Since we segment the input string into a list of words,
     # we need to perform the same operation on the keywords, too. 
     black_list = self.word_segmenter(input_text=list(set(black_list)), show_progress=False)
+    black_list = [[w.strip() for w in b] for b in black_list]
 
     # In order to utilize C-based implementation of substring searching algorithm,
     # we encode the word list of each keyword into a UTF-8 string.
@@ -86,6 +87,7 @@ class KeywordGuard(GuardInterface):
     # However, since we use a C-based substring searching algorithm, we need to encode
     # the words into a UTF-8 string.
     words = self.word_segmenter(input_text=[text], show_progress=False)[0]
+    words = [w.strip() for w in words]
     words = self.coder.encode(words, append_new_code=False)
 
     # Match each keyword filter and provide the matched keywords in the detail field.
