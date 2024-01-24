@@ -39,6 +39,7 @@ message CheckingResponse {
     ACTION_UNSPECIFIED = 0; // Equivelant to ACTION_NONE.
     ACTION_WARN = 1;        // Output a specified warning message without terminate the session.
     ACTION_BLOCK = 2;       // Terminate the session with optional warning message.
+    ACTION_OVERWRITE = 3;   // Overwrite the message by the system.
   }
 
   bool safe = 1; // A boolean to indicate whether the request is safe.

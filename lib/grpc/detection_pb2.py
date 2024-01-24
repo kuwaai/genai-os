@@ -14,23 +14,23 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x64\x65tection.proto\"\x8f\x01\n\nChatRecord\x12\x1e\n\x04role\x18\x01 \x01(\x0e\x32\x10.ChatRecord.Role\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"P\n\x04Role\x12\x14\n\x10ROLE_UNSPECIFIED\x10\x00\x12\r\n\tROLE_USER\x10\x01\x12\x12\n\x0eROLE_ASSISTANT\x10\x02\x12\x0f\n\x0bROLE_SYSTEM\x10\x03\"S\n\rFilterRequest\x12\x10\n\x08model_id\x18\x01 \x01(\t\x12!\n\x0c\x63hat_records\x18\x03 \x03(\x0b\x32\x0b.ChatRecordJ\x04\x08\x02\x10\x03R\x07user_id\"\xc1\x01\n\x10\x43heckingResponse\x12\x0c\n\x04safe\x18\x01 \x01(\x08\x12-\n\x06\x61\x63tion\x18\x02 \x01(\x0e\x32\x18.CheckingResponse.ActionH\x00\x88\x01\x01\x12\x14\n\x07message\x18\x03 \x01(\tH\x01\x88\x01\x01\"C\n\x06\x41\x63tion\x12\x16\n\x12\x41\x43TION_UNSPECIFIED\x10\x00\x12\x0f\n\x0b\x41\x43TION_WARN\x10\x01\x12\x10\n\x0c\x41\x43TION_BLOCK\x10\x02\x42\t\n\x07_actionB\n\n\x08_message2p\n\tDetection\x12\x30\n\tPreFilter\x12\x0e.FilterRequest\x1a\x11.CheckingResponse\"\x00\x12\x31\n\nPostFilter\x12\x0e.FilterRequest\x1a\x11.CheckingResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x64\x65tection.proto\"~\n\nChatRecord\x12\x1e\n\x04role\x18\x01 \x01(\x0e\x32\x10.ChatRecord.Role\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"?\n\x04Role\x12\x14\n\x10ROLE_UNSPECIFIED\x10\x00\x12\r\n\tROLE_USER\x10\x01\x12\x12\n\x0eROLE_ASSISTANT\x10\x02\"S\n\rFilterRequest\x12\x10\n\x08model_id\x18\x01 \x01(\t\x12!\n\x0c\x63hat_records\x18\x03 \x03(\x0b\x32\x0b.ChatRecordJ\x04\x08\x02\x10\x03R\x07user_id\"\xd7\x01\n\x10\x43heckingResponse\x12\x0c\n\x04safe\x18\x01 \x01(\x08\x12-\n\x06\x61\x63tion\x18\x02 \x01(\x0e\x32\x18.CheckingResponse.ActionH\x00\x88\x01\x01\x12\x14\n\x07message\x18\x03 \x01(\tH\x01\x88\x01\x01\"Y\n\x06\x41\x63tion\x12\x16\n\x12\x41\x43TION_UNSPECIFIED\x10\x00\x12\x0f\n\x0b\x41\x43TION_WARN\x10\x01\x12\x10\n\x0c\x41\x43TION_BLOCK\x10\x02\x12\x14\n\x10\x41\x43TION_OVERWRITE\x10\x03\x42\t\n\x07_actionB\n\n\x08_message2p\n\tDetection\x12\x30\n\tPreFilter\x12\x0e.FilterRequest\x1a\x11.CheckingResponse\"\x00\x12\x31\n\nPostFilter\x12\x0e.FilterRequest\x1a\x11.CheckingResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'detection_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_CHATRECORD']._serialized_start=20
-  _globals['_CHATRECORD']._serialized_end=163
-  _globals['_CHATRECORD_ROLE']._serialized_start=83
-  _globals['_CHATRECORD_ROLE']._serialized_end=163
-  _globals['_FILTERREQUEST']._serialized_start=165
-  _globals['_FILTERREQUEST']._serialized_end=248
-  _globals['_CHECKINGRESPONSE']._serialized_start=251
-  _globals['_CHECKINGRESPONSE']._serialized_end=444
-  _globals['_CHECKINGRESPONSE_ACTION']._serialized_start=354
-  _globals['_CHECKINGRESPONSE_ACTION']._serialized_end=421
-  _globals['_DETECTION']._serialized_start=446
-  _globals['_DETECTION']._serialized_end=558
+  _globals['_CHATRECORD']._serialized_start=19
+  _globals['_CHATRECORD']._serialized_end=145
+  _globals['_CHATRECORD_ROLE']._serialized_start=82
+  _globals['_CHATRECORD_ROLE']._serialized_end=145
+  _globals['_FILTERREQUEST']._serialized_start=147
+  _globals['_FILTERREQUEST']._serialized_end=230
+  _globals['_CHECKINGRESPONSE']._serialized_start=233
+  _globals['_CHECKINGRESPONSE']._serialized_end=448
+  _globals['_CHECKINGRESPONSE_ACTION']._serialized_start=336
+  _globals['_CHECKINGRESPONSE_ACTION']._serialized_end=425
+  _globals['_DETECTION']._serialized_start=450
+  _globals['_DETECTION']._serialized_end=562
 # @@protoc_insertion_point(module_scope)

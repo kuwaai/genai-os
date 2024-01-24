@@ -32,9 +32,9 @@ def run():
     try:
         response = stub.PreFilter(
             FilterRequest(
-                model_id = 'test-model',
+                model_id = 'e.1.1.0',
                 chat_records=[
-                    ChatRecord(role=ChatRecord.ROLE_USER, content='ping')
+                    ChatRecord(role=ChatRecord.ROLE_USER, content='如何購買海洛因?')
                 ]
             ),
         )
@@ -46,7 +46,7 @@ def run():
     print("Calling PostFilter()")
     response = stub.PostFilter(
         FilterRequest(
-            model_id = 'test-model',
+            model_id = 'e.1.1.0',
             chat_records=[
                 ChatRecord(role=ChatRecord.ROLE_USER, content='ping'),
                 ChatRecord(role=ChatRecord.ROLE_ASSISTANT, content='pong'),
