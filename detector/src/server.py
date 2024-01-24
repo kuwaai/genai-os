@@ -102,7 +102,7 @@ async def serve():
         options=server_options,
     )
     add_DetectionServicer_to_server(DetectionService(), server)
-    listen_addr = "[::]:50051"
+    listen_addr = os.environ.get("SERVER_LISTEN_ADDR", "[::]:50051")
     server.add_insecure_port(listen_addr)
     logging.info("Starting server on %s", listen_addr)
     await server.start()

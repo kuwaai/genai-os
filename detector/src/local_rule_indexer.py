@@ -17,7 +17,7 @@ from .local_storage import get_embedding_cache, get_guard_storage
 logger = logging.getLogger(__name__)
 
 class LocalRuleIndexer:
-    @periodically_async_job(os.environ.get('LOCAL_RULE_INDEXING_PERIOD', 30.0))
+    @periodically_async_job(float(os.environ.get('LOCAL_RULE_INDEXING_PERIOD', 30.0)))
     @awith_db_session
     async def update_local_rule(self, db: Session):
         
