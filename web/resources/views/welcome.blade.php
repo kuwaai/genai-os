@@ -69,7 +69,6 @@
                             <span>LLM</span>
                             <span class="pt-4">Workspace</span>
                         </div>
-                        <div class="text-black dark:text-white text-center">由於高雄大學例行電力保養<br>本站將於1/27~1/28暫停服務</div>
                         @else
                         <div class="flex ml-4 justify-center items-end space-x-5">
                             <span class="text-[72px] text-orange-300">Kuwa</span>
@@ -96,6 +95,10 @@
                 @endenv
             </div>
 
+            @env('nuk')
+            <div class="text-black dark:text-white text-center">由於高雄大學例行電力保養<br>本站將於1/27~1/28暫停服務</div>
+
+            @endenv
 
             <div class="mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
