@@ -155,7 +155,7 @@
                                     ->union($nonBotChats)
                                     ->get()
                                     ->sortBy(function ($chat) {
-                                        return [$chat->created_at, $chat->llm_id, -$chat->history_id];
+                                        return [$chat->created_at,$chat->id, $chat->llm_id, -$chat->history_id];
                                     });
                                 $mergedMessages = [];
                                 // Filter and merge the chats based on the condition
