@@ -5,7 +5,6 @@
 
     function translate_msg($msg) {
         let msgTranslations = {
-
             "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}",
             "[Sorry, something is broken, please try again later!]": "{{ __('[Sorry, something is broken, please try again later!]') }}",
             "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}",
@@ -34,8 +33,21 @@ d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.82
 fill="currentFill" />
 </svg>`);
             } else {
+                let warnings = /<<<WARNING>>>([\s\S]*?)<<<\/WARNING>>>/g.exec($(this).text());
+                $(this).text($(this).text().replace(/<<<WARNING>>>[\s\S]*?<<<\/WARNING>>>/g, ''));
                 $msg = $(this).text()
                 if ($(this).hasClass("bot-msg")) {
+                    if (warnings) {
+                        warnings = warnings[1].split("\n")
+                        var listItems = warnings.map(function(line) {
+                            return '<li>' + line + '</li>';
+                        });
+                        //Clear previous warning
+                        $(this).parent().find("ul.text-red-600.list-inside.list-disc").remove();
+                        // Append the list items after the target element
+                        $(this).after('<ul class="text-red-600 list-inside list-disc">' + listItems.join('') + '</ul>');
+                        console.log(warnings);
+                    }
                     $msg = translate_msg($msg);
                 }
                 $(this).html(DOMPurify.sanitize((marked.parse($msg))));
@@ -87,7 +99,8 @@ xmlns="http://www.w3.org/2000/svg">
                     var match = $h5.text().match(pattern);
                     if (match) {
                         var refNumber = match[1];
-                        $msg = $("#history_" + refNumber + " div.text-sm.space-y-3.break-words").text().trim()
+                        $msg = $("#history_" + refNumber + " div.text-sm.space-y-3.break-words").text()
+                            .trim()
                         $h5.html(
                             `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
                         );
@@ -203,6 +216,7 @@ xmlns="http://www.w3.org/2000/svg">
             .then(response => {
                 const reader = response.body.getReader();
                 var output = "";
+
                 function streamRead() {
                     reader.read().then(({
                         done,
