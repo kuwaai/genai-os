@@ -23,8 +23,7 @@
             </div>
             <!-- Modal body -->
             <div class="p-6">
-                <!--
-                <div class="flex items-center space-x-2">
+                <!--<div class="flex items-center space-x-2">
                     <label class="block text-black dark:text-white" for="link">
                         {{ __('Share link (For now, Only you can access)') }}
                     </label>

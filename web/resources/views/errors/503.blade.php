@@ -20,24 +20,40 @@
         class="min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white flex items-center justify-center">
         <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
             <div class="flex items-center flex-col">
-                @env('nuk')
+                @env(['kuwa', 'arena', 'nuk'])
                 <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
                     <div class="flex items-center justify-center overflow-hidden">
                         <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
                             <img class="w-[150px]" src="{{ asset('images/csie.png') }}">
                         </a>
+                        @env('nuk')
                         <div class="flex flex-col ml-4 text-[50px]">
                             <span>LLM</span>
                             <span class="pt-4">Workspace</span>
                         </div>
+                    @else
+                        <div class="flex ml-4 justify-center items-end space-x-5">
+                            <span class="text-[72px] text-orange-300">Kuwa</span>
+                            @env('kuwa')
+                            <span class="text-[60px]">Chat</span>
+                            @endenv
+                            @env('arena')
+                            <span class="text-[60px]">Arena</span>
+                            @endenv
+                        </div>
+                        @endenv
                     </div>
                 </h3>
             @else
-                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200"><a class="flex items-center"
-                        href="https://taide.tw/" target="_blank"><img class="mr-3 hidden dark:block"
-                            src="{{ asset('images/TAIDE2.png') }}"><img class="mr-3 dark:hidden block"
-                            src="{{ asset('images/TAIDE2_dark.png') }}"><span class="pt-4"
-                            style="font-size:75px;">Chat</span></a></h3>
+                <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
+                    <a class="flex items-center overflow-hidden" href="https://taide.tw/" target="_blank">
+                        <div>
+                            <img class="mr-3 hidden dark:block" src="{{ asset('images/TAIDE2.png') }}">
+                            <img class="mr-3 dark:hidden block" src="{{ asset('images/TAIDE2_dark.png') }}">
+                        </div>
+                        <span class="pt-4 text-[75px]">Chat</span>
+                    </a>
+                </h3>
                 @endenv
             </div>
             <div class="mt-4">

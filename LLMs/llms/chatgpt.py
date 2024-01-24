@@ -18,11 +18,7 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = 1024*3
-model_loc = "gpt-3.5-turbo"
-api_key = None
-usr_token = None
-tc_model = None
+limit = 1024*2
 # -- Config ends --
 
 global proc
@@ -38,20 +34,33 @@ def llm_compute(data):
             if len(msg) > 0 and len(chatgpt_apitoken) > 0:
                 openai.api_key = chatgpt_apitoken
                 proc = True
-                for i in openai.chat.completions.create(model="gpt-3.5-turbo",
-                      max_tokens=limit,
-                      temperature=0.5,
-                      messages=msg, stream=True):
-                    if i.choices[0].delta.content:
-                        print(i.choices[0].delta.content)
-                        yield i.choices[0].delta.content
-                    if not proc: break
+                limit = 1000*3+512 - len(str(msg))
+                if limit < 256: limit = 1000*16 - len(str(msg))
+                if limit <= 1000*3+512:
+                    for i in openai.chat.completions.create(model="gpt-3.5-turbo",
+                          max_tokens=limit,
+                          temperature=0.5,
+                          messages=msg, stream=True):
+                        if i.choices[0].delta.content:
+                            if ("This model's maximum context length is" in i.choices[0].delta.content):
+                                limit = 1000*16 - len(str(msg))
+                                break
+                            print(end=i.choices[0].delta.content)
+                            yield i.choices[0].delta.content
+                        if not proc: break
+                if limit > 1000*3+512:
+                    for i in openai.chat.completions.create(model="gpt-3.5-turbo-16k",
+                          max_tokens=limit,
+                          temperature=0.5,
+                          messages=msg, stream=True):
+                        if i.choices[0].delta.content:
+                            yield i.choices[0].delta.content
+                        if not proc: break
+                print(limit)
                 openai.api_key = None
             else:
-                time.sleep(2)
                 yield "[請在網站的使用者設定中，將您的OpenAI API Token填入，才能使用該模型]" if len(msg) > 0 else "[沒有輸入任何訊息]"
         else:
-            time.sleep(2)
             yield "[請在網站的使用者設定中，將您的OpenAI API Token填入，才能使用該模型]" if msg else "[沒有輸入任何訊息]"
     except Exception as e:
         print(e)

@@ -43,10 +43,18 @@
                     <x-text-input id="agent_location" name="agent_location" type="text"
                         class="mr-2 mb-1 block w-full"
                         value="{{ \App\Models\SystemSetting::where('key', 'agent_location')->first()->value }}" required
-                        autocomplete="no" />
+                        autocomplete="off" />
                 </div>
             </div>
-
+            <div>
+                <x-input-label for="safety_guard_location" :value="__('Safety Guard Location')" />
+                <div class="flex items-center">
+                    <x-text-input id="safety_guard_location" name="safety_guard_location" type="text"
+                        class="mr-2 mb-1 block w-full"
+                        value="{{ \App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value }}"
+                        autocomplete="off" />
+                </div>
+            </div>
             <div>
                 <x-input-label for="announcement" :value="__('System Announcement')" />
                 <div class="flex items-center">

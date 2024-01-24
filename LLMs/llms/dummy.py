@@ -26,10 +26,18 @@ def llm_compute(data):
     global proc
     try:
         proc = True
-        for i in "The crisp morning air tickled my face as I stepped outside. The sun was just starting to rise, casting a warm orange glow over the cityscape. I took a deep breath in, relishing in the freshness of the morning. As I walked down the street, the sounds of cars and chatter filled my ears. I could see people starting to emerge from their homes, ready to start their day.":
+        for i in """你好我是個語言模型很高興認識你...之類的xD
+<<<WARNING>>>
+這是一個測試警告
+<<</WARNING>>>
+中途可以輸出警告
+<<<WARNING>>>
+警告2，嗨
+<<</WARNING>>>
+輸出文字模擬結束""":
             yield i
-            time.sleep(0.02)
-            if proc: break
+            time.sleep(0.1)
+            if not proc: break
     except Exception as e:
         print(e)
     finally:

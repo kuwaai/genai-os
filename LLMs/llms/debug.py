@@ -1,10 +1,10 @@
-import socket, os
+import socket, os, time
 from base import *
 
 # -- Configs --
-app.config["REDIS_URL"] = "redis://localhost:6379/0"
+app.config["REDIS_URL"] = "redis://127.0.0.1:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-app.agent_endpoint = "http://localhost:9000/"
+app.agent_endpoint = "http://127.0.0.1:9000/"
 app.LLM_name = "debug_network"
 app.version_code = "v1.0"
 app.ignore_agent = False
@@ -27,7 +27,9 @@ tc_model = None
 
 def llm_compute(data): 
     try:
-        yield [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))][-1].strip()
+        for i in "".join([i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]).strip():
+            yield i
+            time.sleep(0.02)
     except Exception as e:
         print(e)
     finally:

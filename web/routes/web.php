@@ -58,9 +58,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 ->name('dashboard.feedback');
             Route::middleware(AdminMiddleware::class . ':Dashboard_read_safetyguard')->prefix('safetyguard')->group(function () {
                 Route::get('/rule', [DashboardController::class, 'guard_fetch'])->name('dashboard.safetyguard.fetch');
-                Route::delete('/delete/{rule_id}', [DashboardController::class, 'guard_delete'])->name('dashboard.safetyguard.delete');
-                Route::patch('/update/{rule_id}', [DashboardController::class, 'guard_update'])->name('dashboard.safetyguard.update');
-                Route::post('/create', [DashboardController::class, 'guard_create'])->name('dashboard.safetyguard.create');
+                Route::delete('/rule/{rule_id}', [DashboardController::class, 'guard_delete'])->name('dashboard.safetyguard.delete');
+                Route::patch('/rule/{rule_id}', [DashboardController::class, 'guard_update'])->name('dashboard.safetyguard.update');
+                Route::post('/rule', [DashboardController::class, 'guard_create'])->name('dashboard.safetyguard.create');
             });
         });
     });

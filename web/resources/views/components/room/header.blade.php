@@ -178,6 +178,7 @@
                                 if (isBot) {
                                     var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
                                         .attr("access_code");
+                                    if (model == undefined) model = "";
                                     row = `assistant	${model}	${msgText}	${chained}\n`;
                                 } else {
                                     row = `user		${msgText}	\n`;
