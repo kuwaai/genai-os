@@ -186,7 +186,17 @@ class RequestChat implements ShouldQueue
                                     if ($warningMessages) {
                                         $outputTmp .= '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
                                     }
-                                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
+                                    if ($this->channel != $this->history_id) {
+                                        // Loop over each character in the UTF-8 string
+                                        for ($i = 0; $i < mb_strlen($outputTmp, 'UTF-8'); $i++) {
+                                            // Get the current character
+                                            $char = mb_substr($outputTmp, $i, 1, 'UTF-8');
+                                            // Publish the character to Redis
+                                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
+                                        }
+                                    } else {
+                                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
+                                    }
                                 } else {
                                     //start caching
                                     $cached .= $message;
@@ -203,7 +213,18 @@ class RequestChat implements ShouldQueue
                                         if ($warningMessages) {
                                             $outputTmp .= '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
                                         }
-                                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
+
+                                        if ($this->channel != $this->history_id) {
+                                            // Loop over each character in the UTF-8 string
+                                            for ($i = 0; $i < mb_strlen($outputTmp, 'UTF-8'); $i++) {
+                                                // Get the current character
+                                                $char = mb_substr($outputTmp, $i, 1, 'UTF-8');
+                                                // Publish the character to Redis
+                                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
+                                            }
+                                        } else {
+                                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
+                                        }
                                         $cached = '';
                                     } elseif ($message === '>' && (str_ends_with($cached, '<<</WARNING>>>') || str_ends_with($cached, '<<<\/WARNING>>>'))) {
                                         $warningMessages[] = trim(str_replace(['<<<WARNING>>>', '<<</WARNING>>>', '<<<\/WARNING>>>'], '', $cached));
