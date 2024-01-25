@@ -52,6 +52,8 @@ services:
     restart: unless-stopped
     deploy:
       replicas: 1 # arbitrary value. The optimal value is TBD.
+    ports:
+      - 50051:50051
   
   embed-infer:
     image: michaelf34/infinity:latest

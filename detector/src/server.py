@@ -75,7 +75,7 @@ class DetectionService(DetectionServicer):
             safe = False
             action = actions[k]['action']
             if action == ActionEnum.overwrite:
-                message = v.get('violate')
+                message = v.get('message', None)
             else:
                 message = actions[k]['message']
         action = {
