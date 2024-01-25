@@ -172,6 +172,7 @@ class RequestChat implements ShouldQueue
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 if ($this->channel != $this->history_id) {
+                                    $tmp .= $message;
                                     Redis::publish($this->channel, 'New ' . json_encode(['msg' => $message]));
                                 } else {
                                     if ($message === '<' && !$cache) {
