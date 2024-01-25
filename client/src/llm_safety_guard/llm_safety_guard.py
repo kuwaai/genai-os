@@ -68,7 +68,7 @@ class LlmSafetyGuard:
             if action == ActionEnum.block: return
 
         # Post-filter
-        seen_msgs = [] # To prevent output duplicated warning messages.
+        seen_msgs = [msg] # To prevent output duplicated warning messages.
         finished = False
         while not finished:
             try:
