@@ -219,7 +219,7 @@ class RequestChat implements ShouldQueue
                         }*/
                     }
 
-                    if (trim($tmp) == '') {
+                    if (trim($tmp) == '' && $warningMessages ) {
                         $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
                     } else {
                         if ($this->channel != $this->history_id) {
