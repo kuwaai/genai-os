@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Jobs\RequestChat;
 use App\Jobs\ImportChat;
-use App\Models\DuelChat;
+use App\Models\ChatRoom;
 use App\Models\Histories;
 use App\Models\Chats;
 use App\Models\LLMs;
@@ -17,11 +17,20 @@ use GuzzleHttp\Client;
 use DB;
 use Session;
 
-class DuelController extends Controller
+class RoomController extends Controller
 {
+    public function share(Request $request)
+    {
+        $chat = ChatRoom::find($request->route("room_id"));
+        if ($chat && $chat->user_id == Auth::user()->id){
+            return view('room.share');
+        }else{
+            return redirect()->route('room.home');
+        }
+    }
     public function abort(Request $request)
     {
-        $chatIDs = Chats::where('dcID', '=', $request->route('duel_id'))
+        $chatIDs = Chats::where('roomID', '=', $request->route('room_id'))
             ->pluck('id')
             ->toArray();
         $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))
@@ -30,7 +39,7 @@ class DuelController extends Controller
             ->toArray();
         $client = new Client(['timeout' => 300]);
         $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
-        $response = $client->post($agent_location . RequestChat::$agent_version . '/chat/abort', [
+        $response = $client->post($agent_location . "/" . RequestChat::$agent_version . '/chat/abort', [
             'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
             'form_params' => [
                 'history_id' => json_encode($list),
@@ -41,17 +50,17 @@ class DuelController extends Controller
     }
     public function main(Request $request)
     {
-        $duel_id = $request->route('duel_id');
-        if ($duel_id) {
-            $chat = DuelChat::findOrFail($duel_id);
+        $room_id = $request->route('room_id');
+        if ($room_id) {
+            $chat = ChatRoom::findOrFail($room_id);
             if ($chat->user_id != Auth::user()->id) {
-                return redirect()->route('duel.home');
+                return redirect()->route('room.home');
             } elseif (true) {
                 #LLMs::findOrFail($chat->llm_id)->enabled == true) {
-                return view('duel');
+                return view('room');
             }
         }
-        return view('duel');
+        return view('room');
         #return redirect()->route('archives', $request->route('chat_id'));
     }
 
@@ -59,6 +68,7 @@ class DuelController extends Controller
     {
         $historys = $request->input('history');
         $llm_ids = $request->input('llm_ids');
+        $filename = $request->input('import_file_name');
         if ($historys) {
             $result = DB::table(function ($query) {
                 $query
@@ -217,13 +227,13 @@ class DuelController extends Controller
                     $historys = $data;
                     if (count($historys) > 0) {
                         //Start loading
-                        $Duel = new DuelChat();
-                        $Duel->fill(['name' => $historys[0]->content, 'user_id' => $request->user()->id]);
-                        $Duel->save();
+                        $Room = new ChatRoom();
+                        $Room->fill(['name' => $filename ?? $historys[0]->content, 'user_id' => $request->user()->id]);
+                        $Room->save();
                         $deltaTime = count($historys);
                         foreach ($llm_ids->pluck('id') as $id) {
                             $chat = new Chats();
-                            $chat->fill(['name' => 'Duel Chat', 'llm_id' => $id, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
+                            $chat->fill(['name' => 'Room Chat', 'llm_id' => $id, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
                             $chat->save();
                             $chatIds[] = $chat->id;
                         }
@@ -260,12 +270,12 @@ class DuelController extends Controller
                             }
                         }
                         ImportChat::dispatch($ids, Auth::user()->id);
-                        return Redirect::route('duel.chat', $Duel->id);
+                        return Redirect::route('room.chat', $Room->id);
                     }
                 }
             }
         }
-        return redirect()->route('duel.home');
+        return redirect()->route('room.home');
     }
 
     public function create(Request $request): RedirectResponse
@@ -301,14 +311,14 @@ class DuelController extends Controller
                 }
             }
             $input = $request->input('input');
-            $Duel = new DuelChat();
-            $Duel->fill(['name' => $input, 'user_id' => Auth::user()->id]);
-            $Duel->save();
+            $Room = new ChatRoom();
+            $Room->fill(['name' => $input, 'user_id' => Auth::user()->id]);
+            $Room->save();
             $ct = date('Y-m-d H:i:s');
             $dct = date('Y-m-d H:i:s', strtotime($ct . ' +1 second'));
             foreach ($llms as $llm) {
                 $chat = new Chats();
-                $chat->fill(['name' => 'Duel Chat', 'llm_id' => $llm, 'user_id' => Auth::user()->id, 'dcID' => $Duel->id]);
+                $chat->fill(['name' => 'Room Chat', 'llm_id' => $llm, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
                 $chat->save();
                 if (in_array($llm, $selectedLLMs)) {
                     $history = new Histories();
@@ -323,7 +333,7 @@ class DuelController extends Controller
             }
         }
         return redirect()
-            ->to(route('duel.chat', $Duel->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
+            ->to(route('room.chat', $Room->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
             ->with('selLLMs', $selectedLLMs);
     }
 
@@ -333,7 +343,7 @@ class DuelController extends Controller
         if (
             request()
                 ->user()
-                ->hasPerm('Duel_update_new_chat') &&
+                ->hasPerm('Room_update_new_chat') &&
             count($llms) > 1
         ) {
             $result = DB::table(function ($query) {
@@ -359,55 +369,55 @@ class DuelController extends Controller
             }
 
             return redirect()
-                ->route('duel.home')
+                ->route('room.home')
                 ->with('llms', $llms);
         }
 
-        return redirect()->route('duel.home');
+        return redirect()->route('room.home');
     }
 
     public function delete(Request $request): RedirectResponse
     {
         try {
             $ids = [];
-            $chats = DuelChat::findOrFail($request->input('id'));
-            foreach (Chats::where('dcID', '=', $chats->id)->get() as $chat) {
+            $chats = ChatRoom::findOrFail($request->input('id'));
+            foreach (Chats::where('roomID', '=', $chats->id)->get() as $chat) {
                 $ids[] = $chat->llm_id;
                 Histories::where('chat_id', '=', $chat->id)->delete();
             }
-            Chats::where('dcID', '=', $chats->id)->delete();
+            Chats::where('roomID', '=', $chats->id)->delete();
             $chats->delete();
         } catch (ModelNotFoundException $e) {
             Log::error('Chat not found: ' . $request->input('id'));
         }
         return redirect()
-            ->to(route('duel.home') . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
+            ->to(route('room.home') . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
             ->with('llms', $ids);
     }
 
     public function edit(Request $request): RedirectResponse
     {
         try {
-            $chat = DuelChat::findOrFail($request->input('id'));
+            $chat = ChatRoom::findOrFail($request->input('id'));
             $chat->fill(['name' => $request->input('new_name')]);
             $chat->save();
         } catch (ModelNotFoundException $e) {
             Log::error('Chat not found: ' . $request->input('id'));
         }
-        return redirect()->to(route('duel.chat', $request->input('id')) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''));
+        return redirect()->to(route('room.chat', $request->input('id')) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''));
     }
 
     public function request(Request $request): RedirectResponse
     {
-        $duelId = $request->input('duel_id');
+        $roomId = $request->input('room_id');
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
-        $chained = Session::get('chained') == true;
-        if (count($selectedLLMs) > 0 && $duelId && $input) {
-            $chats = Chats::where('dcID', $request->input('duel_id'))->get();
+        $chained = (Session::get('chained') ?? true) == true;
+        if (count($selectedLLMs) > 0 && $roomId && $input) {
+            $chats = Chats::where('roomID', $request->input('room_id'))->get();
             if (
                 Chats::join('llms', 'llms.id', '=', 'llm_id')
-                    ->where('dcID', $request->input('duel_id'))
+                    ->where('roomID', $request->input('room_id'))
                     ->get()
                     ->where('enabled', false)
                     ->count() == 0
@@ -480,7 +490,7 @@ class DuelController extends Controller
             }
         }
         return redirect()
-            ->to(route('duel.chat', $duelId) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
+            ->to(route('room.chat', $roomId) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
             ->with('selLLMs', $selectedLLMs);
     }
 }

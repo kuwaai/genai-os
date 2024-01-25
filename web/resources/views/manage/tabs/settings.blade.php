@@ -43,16 +43,24 @@
                     <x-text-input id="agent_location" name="agent_location" type="text"
                         class="mr-2 mb-1 block w-full"
                         value="{{ \App\Models\SystemSetting::where('key', 'agent_location')->first()->value }}" required
-                        autocomplete="no" />
+                        autocomplete="off" />
                 </div>
             </div>
-
+            <div>
+                <x-input-label for="safety_guard_location" :value="__('Safety Guard Location')" />
+                <div class="flex items-center">
+                    <x-text-input id="safety_guard_location" name="safety_guard_location" type="text"
+                        class="mr-2 mb-1 block w-full"
+                        value="{{ \App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value }}"
+                        autocomplete="off" />
+                </div>
+            </div>
             <div>
                 <x-input-label for="announcement" :value="__('System Announcement')" />
                 <div class="flex items-center">
                     <textarea id="announcement" name="announcement" type="text" oninput="adjustTextareaRows(this)" rows="1"
                         max-rows="5"
-                        class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 mb-1 block w-full resize-none">{{ \App\Models\SystemSetting::where('key', 'announcement')->first()->value }}</textarea>
+                        class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 mb-1 block w-full resize-none scrollbar">{{ \App\Models\SystemSetting::where('key', 'announcement')->first()->value }}</textarea>
                 </div>
             </div>
 
@@ -60,7 +68,7 @@
                 <x-input-label for="tos" :value="__('Terms of Service')" />
                 <div class="flex items-center">
                     <textarea id="tos" name="tos" type="text" oninput="adjustTextareaRows(this)" rows="1" max-rows="5"
-                        class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 mb-1 block w-full resize-none">{{ \App\Models\SystemSetting::where('key', 'tos')->first()->value }}</textarea>
+                        class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 mb-1 block w-full resize-none scrollbar">{{ \App\Models\SystemSetting::where('key', 'tos')->first()->value }}</textarea>
                 </div>
             </div>
             <div>

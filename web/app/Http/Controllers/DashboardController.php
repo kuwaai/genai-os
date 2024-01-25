@@ -7,8 +7,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Histories;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Client;
 use App\Models\Logs;
-
+use Illuminate\Support\Facades\Http;
 class DashboardController extends Controller
 {
     function home(Request $request)
@@ -22,7 +23,9 @@ class DashboardController extends Controller
                 ->with('action', $request->input('action'))
                 ->with('description', $request->input('description'))
                 ->with('user_id', $request->input('user_id'))
-                ->with('ip_address', $request->input('ip_address'));
+                ->with('ip_address', $request->input('ip_address'))
+                ->with('target', $request->input('target'))
+                ->with('search', $request->input('search'));
         }
         return view('dashboard.home');
     }
@@ -193,5 +196,139 @@ class DashboardController extends Controller
         } catch (\Throwable) {
         }
         return Redirect::route('dashboard.home')->with('last_tab', 'feedbacks');
+    }
+    function guard_fetch(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+        $client = new Client(['timeout' => 20]);
+        $url = \App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule'; // URL to fetch all rules
+
+        try {
+            $response = $client->request('GET', $url);
+
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                $rules = json_decode($response->getBody(), true);
+                // Process $rules here, it contains the fetched rules
+                return response()->json($rules, 200);
+            } else {
+                return response()->json($response->json(), $response->status());
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    function guard_delete(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+        if ($request->route('rule_id') >= 1 && $request->route('rule_id') <= 10) {
+            // 1 ~ 10 Can't be deleted
+            return Redirect::route('dashboard.home')->with('last_tab', $request->input('tab'));
+        }
+        $response = Http::delete(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule/' . $request->route('rule_id'));
+        // Check the response and return accordingly
+        if ($response->successful()) {
+            return Redirect::route('dashboard.home')->with('last_tab', $request->input('tab'));
+        } else {
+            return response()->json($response->json(), $response->status());
+        }
+    }
+    function guard_update(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+        $request->validate([
+            'action' => 'required|string',
+            'ruleName' => 'required|string',
+        ]);
+
+        // Transform data to the desired structure
+        $requestData = $request->all();
+        $transformedData = [
+            'name' => $requestData['ruleName'],
+            'description' => $requestData['description'] ?? '',
+            'target' => $requestData['target'] ?? [],
+            'pre-filter' => [
+                'keyword' => $requestData['keyword-pre-filter'] ?? [],
+                'embedding' => $requestData['embedding-pre-filter'] ?? [],
+            ],
+            'post-filter' => [
+                'keyword' => $requestData['keyword-post-filter'] ?? [],
+                'embedding' => $requestData['embedding-post-filter'] ?? [],
+            ],
+            'action' => $requestData['action'],
+            'message' => $requestData['message'] ?? '',
+            'retrieval-timestamp' => $request->input('last_change') ?? -1,
+        ];
+        // Proxy the transformed data to the server
+        $response = Http::put(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule/' . $request->route('rule_id'), $transformedData);
+        // Check the response and return accordingly
+        if ($response->successful()) {
+            return Redirect::route('dashboard.home')
+                ->with('last_tab', $request->input('tab'))
+                ->with('rule_id', $request->route('rule_id'));
+        } else {
+            return response()->json($response->json(), $response->status());
+        }
+    }
+    function guard_create(Request $request)
+    {
+        if ($this->healthCheck()) {
+            return response()->json(['error' => 'Guard offline'], 500);
+        }
+        $request->validate([
+            'action' => 'required|string',
+            'ruleName' => 'required|string',
+        ]);
+
+        // Transform data to the desired structure
+        $requestData = $request->all();
+        $transformedData = [
+            'name' => $requestData['ruleName'],
+            'description' => $requestData['description'] ?? '',
+            'target' => $requestData['target'] ?? [],
+            'pre-filter' => [
+                'keyword' => $requestData['keyword-pre-filter'] ?? [],
+                'embedding' => $requestData['embedding-pre-filter'] ?? [],
+            ],
+            'post-filter' => [
+                'keyword' => $requestData['keyword-post-filter'] ?? [],
+                'embedding' => $requestData['embedding-post-filter'] ?? [],
+            ],
+            'action' => $requestData['action'],
+            'message' => $requestData['message'] ?? '',
+        ];
+        // Proxy the transformed data to the server
+        $response = Http::post(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule', $transformedData);
+        // Check the response and return accordingly
+        if ($response->successful()) {
+            return Redirect::route('dashboard.home')
+                ->with('last_tab', $request->input('tab'))
+                ->with('rule_id', $response->json()['id']);
+        } else {
+            return response()->json($response->json(), $response->status());
+        }
+    }
+    function healthCheck()
+    {
+        if (!\App\Models\SystemSetting::where('key', 'safety_guard_location')->exists()) {
+            return false;
+        }
+        try {
+            $client = new Client(['timeout' => 5]);
+            $url = \App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/health';
+            $response = $client->request('GET', $url);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 204) {
+                return false;
+            }
+        } catch (\Throwable $e) {
+        }
+        return true;
     }
 }

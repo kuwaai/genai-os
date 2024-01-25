@@ -1,7 +1,7 @@
 @props(['llmId' => request()->route('llm_id')])
 
 @if (request()->user()->hasPerm('Chat_update_upload_file'))
-    <form method="post" action="{{ route('chat.upload') }}" class="m-auto" enctype="multipart/form-data">
+    <form method="post" action="{{ route('chat.upload') }}" class="flex flex-col justify-center items-center" enctype="multipart/form-data">
         @csrf
         <input name="llm_id" style="display:none;" value="{{ $llmId }}">
         <input id="upload" type="file" name="file" style="display: none;" onchange="uploadcheck()">

@@ -39,20 +39,20 @@
     
             <div class="flex flex-col">
                 <label for="action">{{__("dashboard.filter.Action")}}</label>
-                <input class="text-black" type="text" id="action" name="action">
+                <input class="text-black" type="text" id="action" name="action" autocomplete="off">
             </div>
             <div class="flex flex-col">
                 <label for="description">{{__("dashboard.filter.Description")}}</label>
-                <input class="text-black" type="text" id="description" name="description">
+                <input class="text-black" type="text" id="description" name="description" autocomplete="off">
             </div>
             <div class="flex flex-col">
                 <label for="user_id">{{__("dashboard.filter.UserID")}}</label>
-                <input class="text-black" type="text" id="user_id" name="user_id">
+                <input class="text-black" type="text" id="user_id" name="user_id" autocomplete="off">
             </div>
     
             <div class="flex flex-col">
                 <label for="ip_address">{{__("dashboard.filter.IPAddress")}}</label>
-                <input class="text-black" type="text" id="ip_address" name="ip_address">
+                <input class="text-black" type="text" id="ip_address" name="ip_address" autocomplete="off">
             </div>
         </div>
 
@@ -78,7 +78,7 @@
 
     <div class="mt-auto">
         <ul class="pagination">
-            {{ $logs->onEachSide(3)->links('components.pagination', ['tab' => 'logs']) }}
+            {{ $logs->onEachSide(3)->links('components.pagination', ["query"=>['tab' => 'logs']]) }}
         </ul>
     </div>
 

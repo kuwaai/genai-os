@@ -27,7 +27,7 @@
                     class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Import from file') }}</label>
                 <hr class="my-4 border-black border-gray-300 dark:border-gray-600" />
                 <form method="post"
-                    action="{{ request()->routeIs('duel.*') ? route('duel.import') : route('chat.import') }}">
+                    action="{{ request()->routeIs('room.*') ? route('room.import') : route('chat.import') }}">
                     @csrf
                     @if (request()->route('llm_id'))
                         <input name="llm_id" value="{{ request()->route('llm_id') }}" style="display:none;">
@@ -39,7 +39,8 @@
                     <textarea name="history" id="import_json" rows="5" max-rows="15" oninput="adjustTextareaRows(this)"
                         placeholder="{{ __('You may drop your file here as well...') }}"
                         class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
-                </form>
+                        <input id="import_file_name" name="import_file_name" type='text' hidden>
+                    </form>
 
                 <input id="import_file_input" type='file' hidden>
             </div>
@@ -58,6 +59,7 @@
 
                 function loadFile(fileInput, input) {
                     const file = fileInput.files[0];
+                    $("#import_file_name").val(file.name.split(".")[0])
                     if (file) {
                         if (file.type === 'text/plain' || file.type === 'application/json') {
                             const reader = new FileReader();

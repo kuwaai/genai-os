@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
-use App\Http\Controllers\DuelController;
+use App\Http\Controllers\RoomController;
 use App\Http\Controllers\PlayController;
 use App\Http\Controllers\ManageController;
 use App\Http\Controllers\BotController;
@@ -41,7 +41,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return back();
     })->name('lang');
 
-
     # This will auth the user token that is used to connect.
     Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
     Route::post('/v1.0/chat/abort', [ProfileController::class, 'api_abort']);
@@ -54,7 +53,15 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     Route::middleware('auth', 'verified', AdminMiddleware::class . ':tab_Dashboard')->group(function () {
         Route::group(['prefix' => 'dashboard'], function () {
             Route::get('/', [DashboardController::class, 'home'])->name('dashboard.home');
-            Route::post('/feedback', [DashboardController::class, 'feedback'])->name('dashboard.feedback');
+            Route::middleware(AdminMiddleware::class . ':Dashboard_read_feedbacks')
+                ->post('/feedback', [DashboardController::class, 'feedback'])
+                ->name('dashboard.feedback');
+            Route::middleware(AdminMiddleware::class . ':Dashboard_read_safetyguard')->prefix('safetyguard')->group(function () {
+                Route::get('/rule', [DashboardController::class, 'guard_fetch'])->name('dashboard.safetyguard.fetch');
+                Route::delete('/rule/{rule_id}', [DashboardController::class, 'guard_delete'])->name('dashboard.safetyguard.delete');
+                Route::patch('/rule/{rule_id}', [DashboardController::class, 'guard_update'])->name('dashboard.safetyguard.update');
+                Route::post('/rule', [DashboardController::class, 'guard_create'])->name('dashboard.safetyguard.create');
+            });
         });
     });
 
@@ -120,12 +127,14 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->post('/request', [ChatController::class, 'request'])
                     ->name('chat.request');
                 Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-                Route::post('/feedback', [ChatController::class, 'feedback'])
-                    ->name('chat.feedback');
+                Route::post('/feedback', [ChatController::class, 'feedback'])->name('chat.feedback');
 
                 Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
                     ->delete('/delete', [ChatController::class, 'delete'])
                     ->name('chat.delete');
+                Route::middleware(AdminMiddleware::class . ':Chat_read_export_chat')
+                    ->get('/share/{chat_id}', [ChatController::class, 'share'])
+                    ->name('chat.share');
             })
             ->name('chat');
 
@@ -143,30 +152,33 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             })
             ->name('archive');
 
-        #---Duel
-        Route::middleware(AdminMiddleware::class . ':tab_Duel')
-            ->prefix('duel')
+        #---Room
+        Route::middleware(AdminMiddleware::class . ':tab_Room')
+            ->prefix('room')
             ->group(function () {
-                Route::get('/', [DuelController::class, 'main'])->name('duel.home');
+                Route::get('/', [RoomController::class, 'main'])->name('room.home');
 
-                Route::post('/new', [DuelController::class, 'new'])->name('duel.new');
-                Route::middleware(AdminMiddleware::class . ':Duel_update_new_chat')
-                    ->post('/create', [DuelController::class, 'create'])
-                    ->name('duel.create');
-                Route::get('/{duel_id}', [DuelController::class, 'main'])->name('duel.chat');
-                Route::get('/abort/{duel_id}', [DuelController::class, 'abort'])->name('duel.abort');
-                Route::post('/edit', [DuelController::class, 'edit'])->name('duel.edit');
-                Route::middleware(AdminMiddleware::class . ':Duel_delete_chatroom')
-                    ->delete('/delete', [DuelController::class, 'delete'])
-                    ->name('duel.delete');
-                Route::middleware(AdminMiddleware::class . ':Duel_update_send_message')
-                    ->post('/request', [DuelController::class, 'request'])
-                    ->name('duel.request');
-                Route::middleware(AdminMiddleware::class . ':Duel_update_import_chat')
-                    ->post('/import', [DuelController::class, 'import'])
-                    ->name('duel.import');
+                Route::post('/new', [RoomController::class, 'new'])->name('room.new');
+                Route::middleware(AdminMiddleware::class . ':Room_update_new_chat')
+                    ->post('/create', [RoomController::class, 'create'])
+                    ->name('room.create');
+                Route::get('/{room_id}', [RoomController::class, 'main'])->name('room.chat');
+                Route::get('/abort/{room_id}', [RoomController::class, 'abort'])->name('room.abort');
+                Route::post('/edit', [RoomController::class, 'edit'])->name('room.edit');
+                Route::middleware(AdminMiddleware::class . ':Room_delete_chatroom')
+                    ->delete('/delete', [RoomController::class, 'delete'])
+                    ->name('room.delete');
+                Route::middleware(AdminMiddleware::class . ':Room_update_send_message')
+                    ->post('/request', [RoomController::class, 'request'])
+                    ->name('room.request');
+                Route::middleware(AdminMiddleware::class . ':Room_update_import_chat')
+                    ->post('/import', [RoomController::class, 'import'])
+                    ->name('room.import');
+                Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
+                    ->get('/share/{room_id}', [RoomController::class, 'share'])
+                    ->name('room.share');
             })
-            ->name('duel');
+            ->name('room');
 
         #---Play
         Route::middleware(AdminMiddleware::class . ':tab_Play')

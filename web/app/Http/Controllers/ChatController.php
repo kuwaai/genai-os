@@ -26,6 +26,16 @@ use Session;
 
 class ChatController extends Controller
 {
+    public function share(Request $request)
+    {
+        $chat = Chats::find($request->route('chat_id'));
+        if ($chat && $chat->user_id == Auth::user()->id) {
+            return view('chat.share');
+        } else {
+            return redirect()->route('chat.home');
+        }
+    }
+
     public function abort(Request $request)
     {
         $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))
@@ -34,7 +44,7 @@ class ChatController extends Controller
             ->toArray();
         $client = new Client(['timeout' => 300]);
         $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
-        $response = $client->post($agent_location . RequestChat::$agent_version . '/chat/abort', [
+        $response = $client->post($agent_location . '/' . RequestChat::$agent_version . '/chat/abort', [
             'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
             'form_params' => [
                 'history_id' => json_encode($list),
@@ -151,7 +161,7 @@ class ChatController extends Controller
 
     public function update_chain(Request $request)
     {
-        $state = $request->input('switch') == 'true';
+        $state = ($request->input('switch') ?? true) == 'true';
         Session::put('chained', $state);
     }
     public function import(Request $request)
@@ -160,6 +170,7 @@ class ChatController extends Controller
             $llm_id = $request->input('llm_id');
             $access_code = LLMs::find($llm_id)->access_code;
             $historys = $request->input('history');
+            $filename = $request->input('import_file_name');
             if ($llm_id && $historys) {
                 $result = DB::table(function ($query) {
                     $query
@@ -176,7 +187,7 @@ class ChatController extends Controller
                     ->get()
                     ->pluck('id')
                     ->toarray();
-                if (in_array($llm_id, $result)) {
+                if (in_array($llm_id, $result) || $access_code === 'feedback') {
                     $historys = json_decode($historys);
                     if ($historys !== null && isset($historys->messages) && is_array($historys->messages) && count($historys->messages) > 1) {
                         // JSON format
@@ -240,7 +251,7 @@ class ChatController extends Controller
                                 $model = isset($message->model) && is_string($message->model) ? $message->model : $access_code;
                                 $content = isset($message->content) && is_string($message->content) ? $message->content : '';
 
-                                if ($model === $access_code) {
+                                if ($model === $access_code || $access_code === 'feedback') {
                                     $flag = false;
                                     if ($chainValue === true) {
                                         $message->chain = $chainValue;
@@ -266,7 +277,7 @@ class ChatController extends Controller
                         $historys = $data;
                         $first = array_shift($historys);
                         $chat = new Chats();
-                        $chatname = $first->content;
+                        $chatname = $filename ?? $first->content;
                         if (strpos(LLMs::find($llm_id)->access_code, 'doc-qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'doc_qa') === 0 || strpos(LLMs::find($llm_id)->access_code, 'web_qa') === 0) {
                             function getWebPageTitle($url)
                             {
@@ -396,7 +407,7 @@ class ChatController extends Controller
             return view('chat');
         } else {
             $result = Chats::where('llm_id', '=', $llm_id)
-                ->whereNull('dcID')
+                ->whereNull('roomID')
                 ->where('user_id', '=', Auth::user()->id);
             if ($result->exists()) {
                 return Redirect::route('chat.chat', $result->first()->id);
@@ -489,8 +500,8 @@ class ChatController extends Controller
         if ($history_id) {
             $tmp = Histories::find($history_id);
             if ($tmp) {
-                $tmp = Chats::find($tmp->chat_id)->dcID;
-                if (($tmp != null && Auth::user()->hasPerm('Duel_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
+                $tmp = Chats::find($tmp->chat_id)->roomID;
+                if (($tmp != null && Auth::user()->hasPerm('Room_update_feedback')) || ($tmp == null && Auth::user()->hasPerm('Chat_update_feedback'))) {
                     $nice = $request->input('type') == '1';
                     $detail = $request->input('feedbacks');
                     $flag = $request->input('feedback');
@@ -626,7 +637,7 @@ class ChatController extends Controller
                 $llm_id = $llm_id->llm_id;
             }
             $input = $request->input('input');
-            $chained = Session::get('chained') == 'true';
+            $chained = (Session::get('chained') ?? true) == 'true';
             if ($chatId && $input && $llm_id && in_array($llm_id, $result)) {
                 $history = new Histories();
                 $history->fill(['msg' => $input, 'chat_id' => $chatId, 'isbot' => false]);

@@ -53,7 +53,7 @@
                             [
                                 $group->name,
                                 $group->describe ? $group->describe : '',
-                                App\Models\GroupPermissions::where('group_id', '=', $group->id)->orderby("perm_id")->pluck('perm_id'),
+                                App\Models\GroupPermissions::where('group_id', '=', $group->id)->orderby('perm_id')->pluck('perm_id'),
                                 $group->invite_token,
                             ],
                             JSON_HEX_APOS,
@@ -195,13 +195,33 @@
                         @endforeach
                     </div>
                 </div>
-                <div class="w-full px-3 mb-3">
+                <div class="w-full mb-3 mt-2">
                     <span
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions') }}</span>
-                    <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Enabled LLM)') }}</span>
+                    <div
+                        class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                         @foreach (DB::table(function ($query) {
         $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
-    }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->select('p.id as id', 'llms.name as name')->get() as $LLM)
+    }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->where('enabled', '=', true)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
+                            <div
+                                class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
+                                    value="{{ $LLM->id }}" name="permissions[]"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                    style="box-shadow:none;"> <label for="create_checkbox_{{ $LLM->id }}"
+                                    class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="w-full mb-3">
+                    <span
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Disabled LLM)') }}</span>
+                    <div
+                        class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                        @foreach (DB::table(function ($query) {
+        $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
+    }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->where('enabled', '=', false)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
                             <div
                                 class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                                 <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
@@ -273,7 +293,8 @@
                         <label for="edit_group_invite_code"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Invite Code') }}</label>
                         <div class="flex rounded-lg overflow-hidden">
-                            <label class="bg-gray-300 dark:bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
+                            <label
+                                class="bg-gray-300 dark:bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
                                 for="edit_enable_invite_code">
                                 <input type="checkbox" style="box-shadow:none;" id="edit_enable_invite_code"
                                     onclick="$(this).parent().next().val('');$(this).parent().next().prop('disabled', !$(this).prop('checked')); $(this).parent().next().next().attr('style',!$(this).prop('checked') ? 'display:none':'')">
@@ -375,13 +396,33 @@
                             </div>
                         @endforeach
                     </div>
-                    <div class="w-full mb-3">
+                    <div class="w-full mb-3 mt-2">
                         <span
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions') }}</span>
-                        <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Enabled LLM)') }}</span>
+                        <div
+                            class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                             @foreach (DB::table(function ($query) {
         $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
-    }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->select('p.id as id', 'llms.name as name')->get() as $LLM)
+    }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->where('enabled', '=', true)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
+                                <div
+                                    class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                    <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
+                                        value="{{ $LLM->id }}" name="permissions[]"
+                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                        style="box-shadow:none;"> <label for="edit_checkbox_{{ $LLM->id }}"
+                                        class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="w-full mb-3">
+                        <span
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Disabled LLM)') }}</span>
+                        <div
+                            class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                            @foreach (DB::table(function ($query) {
+        $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
+    }, 'p')->join('llms', 'llms.id', '=', DB::raw('p.model_id::bigint'))->where('enabled', '=', false)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
                                 <div
                                     class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                                     <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"

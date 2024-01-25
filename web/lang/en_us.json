@@ -15,5 +15,21 @@
     "Profile_read_api_token": "Read Web API Token",
     "Profile_delete_account": "Delete Account",
     "Change Language": "Language",
-    "Dashboard":"Dashboard"
+    "Dashboard":"Dashboard",
+    "Room_update_import_chat": "Import Chat",
+    "Room_update_new_chat": "Create New Chat",
+    "Room_update_feedback": "Giving feedback",
+    "Room_update_send_message": "Sending Message",
+    "Room_update_react_message": "React Buttons",
+    "Room_read_export_chat": "Export Chat",
+    "Room_delete_chatroom": "Delete Chatroom",
+    "Chat_update_react_message": "React Buttons",
+    "Dashboard_read_statistics":"Statistics",
+    "Dashboard_read_blacklist":"Blacklist",
+    "Dashboard_read_feedbacks":"Feedbacks",
+    "Dashboard_read_logs":"Logs",
+    "Dashboard_read_safetyguard":"Safety Guard",
+    "Dashboard_read_inspect":"Inspect",
+    "Chat_update_detail_feedback":"Detail Feedback",
+    "Room_update_detail_feedback":"Detail Feedback"
 }

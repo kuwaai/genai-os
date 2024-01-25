@@ -20,11 +20,11 @@
             <!-- Modal header -->
             <div class="px-6 py-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-base font-semibold text-gray-900 lg:text-xl dark:text-white">
-                    {{ __('Create Duel Chat') }}
+                    {{ __('Create Chat Room') }}
                 </h3>
             </div>
             <!-- Modal body -->
-            <form method="post" action="{{ route('duel.new') }}" class="p-6" id="create_duel"
+            <form method="post" action="{{ route('room.new') }}" class="p-6" id="create_room"
                 onsubmit="return checkForm()">
                 @csrf
                 <input type="hidden" name="limit"
@@ -73,7 +73,7 @@
 
 <script>
     function checkForm() {
-        if ($("#create_duel input[name='llm[]']:checked").length > 1) {
+        if ($("#create_room input[name='llm[]']:checked").length > 1) {
             return true;
         } else {
             $("#create_error").show().delay(3000).fadeOut();

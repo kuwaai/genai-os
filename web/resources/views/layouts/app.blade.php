@@ -25,7 +25,7 @@
 </head>
 
 <body class="font-sans antialiased h-full">
-    @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' && !Auth::user()->announced)
+    @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
         <div data-modal-target="system_announcement_modal"></div>
         <div id="system_announcement_modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
             class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -61,7 +61,7 @@
             </div>
         </div>
     @endif
-    @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '' && !Auth::user()->term_accepted)
+    @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
         <div data-modal-target="tos_modal"></div>
         <div id="tos_modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
             class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -194,8 +194,8 @@ xmlns="http://www.w3.org/2000/svg">
             });
             $modal1.show();
         @endif
-            markdown($("#system_announcement_modal .content"))
-            markdown($("#tos_modal .content"))
+        markdown($("#system_announcement_modal .content"))
+        markdown($("#tos_modal .content"))
     </script>
 </body>
 

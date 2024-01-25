@@ -133,7 +133,7 @@ class ManageController extends Controller
         } else {
             $group_id = null;
         }
-        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id]);
+        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail'=>$request->input("detail")]);
         if ($request->input('password')) {
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }
@@ -160,6 +160,7 @@ class ManageController extends Controller
             'password' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'group' => 'nullable|string',
+            'detail' => 'nullable|string',
         ]);
         if ($validator->fails()) {
             return Redirect::route('manage.home')
@@ -171,7 +172,7 @@ class ManageController extends Controller
         } else {
             $group_id = null;
         }
-        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id]);
+        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, "detail"=>$request->input("detail")]);
         if ($request->input('password')) {
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }
