@@ -7,13 +7,6 @@ from timeit import default_timer
 from typing import Optional
 from urllib.parse import urlparse
 
-# [TODO] Health check
-# from grpc_health.v1.health_pb2 import (
-#     HealthCheckRequest,
-#     HealthCheckResponse
-# )
-# from grpc_health.v1.health_pb2_grpc import HealthStub
-
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 # Type definition
 from detection_pb2 import (
@@ -46,13 +39,7 @@ class DetectionClient:
         service_config_json = json.dumps({"healthCheckConfig": {"serviceName": "Detection"}})
         options = [("grpc.service_config", service_config_json)]
         self.channel = grpc.insecure_channel(server_url.netloc)
-        self.detection_stub = DetectionStub(channel)
-        # self.health_stub = HealthStub(channel)
-
-        # self.health_check_period_sec = health_check_period_sec
-        # self.last_health_check_time = -1
-        self.health = True
-        # self.health_check()
+        self.detection_stub = DetectionStub(self.channel)
     
     def pre_filter(self, chat_history:[dict], model_id:str) -> (bool, ActionEnum, str|None):
         try:
@@ -86,24 +73,14 @@ class DetectionClient:
         """
         Check connection health
         """
-        # if (default_timer()-self.last_health_check_time) > self.health_check_period_sec:
-            # self.health_check()
-        # return self.health
 
-    # def health_check(self):
-    #     self.last_health_check_time = default_timer()
-    #     try:
-    #         request = HealthCheckRequest(service="Detection")
-    #         resp = self.health_stub.Check(request)
-    #         if resp.status == HealthCheckResponse.SERVING:
-    #             self.health = True
-    #         elif resp.status == HealthCheckResponse.NOT_SERVING:
-    #             raise RuntimeWarning('Health check to safety guard failed.')
-    #     except Exception:
-    #         self.health = False
-    #         logging.warning("Detector stopped serving")
-    #     print('Healthy', self.health)
-    
+        try:
+            grpc.channel_ready_future(self.channel).result(timeout=1)
+            return True
+        except grpc.FutureTimeoutError:
+            logger.warning('Detector channel is unhealthy.')
+            return False
+
     def parse_chat_history(self, chat_history:[dict], response:Optional[str]=None):
         role_map = {
             'user': ChatRecord.ROLE_USER,
