@@ -1,5 +1,5 @@
 import inspect
-from typing import List, Any
+from typing import List, Any, Callable
 from types import GeneratorType
 from enum import Enum
 import logging
@@ -38,7 +38,7 @@ class LlmSafetyGuard:
         result.
         """
 
-        def wrap(chat_history:List[dict], model_id:str, *args, **kwargs):
+        def wrap(chat_history:List[dict], model_id:str, at_exit:Callable=None, *args, **kwargs):
 
             # Bypass if can't connect to the detector or the model does not need
             # to be guarded.
@@ -47,7 +47,12 @@ class LlmSafetyGuard:
             else:
                 orig_result = func(chat_history=chat_history, model_id=model_id, *args, **kwargs)
                 orig_gen, orig_return_type = self._get_original_generator(orig_result)
-                gen = self._guard_impl(chat_history=chat_history, model_id=model_id, orig_gen=orig_gen)
+                gen = self._guard_impl(
+                    chat_history=chat_history,
+                    model_id=model_id,
+                    orig_gen=orig_gen,
+                    at_exit=at_exit,
+                )
                 if orig_return_type == AcceptedReturnType.generator:
                     return gen
                 if orig_return_type == AcceptedReturnType.generator_with_other:
@@ -64,21 +69,28 @@ class LlmSafetyGuard:
 
         LlmSafetyGuard.target_cache.update_list()
     
-    def _guard_impl(self, chat_history:str, model_id:str, orig_gen):
+    def _guard_impl(self, chat_history:str, model_id:str, orig_gen, at_exit:Callable=None):
         """
         A generator that implements the guarding function.
         Arguments:
             chat_history, model_id: Same as the description in the "guard" method.
             orig_gen: The original function to handel the request. The function is
             expected return a generator as the generation result.
+            at_exit (optional): The function that will be always called at the end.
         """
         
         # Pre-filter
-        safe, action, msg = self.detector.pre_filter(chat_history, model_id)
+        try:
+            safe, action, msg = self.detector.pre_filter(chat_history, model_id)
+        except Exception as e:
+            logger.exception('Pre-filter failed')
+            safe, action, msg = (True, ActionEnum.none, None)
         logger.debug(f'pre-filter: safe={safe}, action={action}, msg={msg}')
         if not safe:
             if msg: yield self._format_warning_message(msg)
-            if action == ActionEnum.block: return
+            if action == ActionEnum.block:
+                if at_exit: at_exit()
+                return
 
         # Post-filter
         seen_msgs = [msg] # To prevent output duplicated warning messages.
@@ -100,7 +112,12 @@ class LlmSafetyGuard:
 
             # Check whether the chunk is safe
             response += chunk
-            safe, action, msg = self.detector.post_filter(chat_history, response, model_id)
+            try:
+                safe, action, msg = self.detector.post_filter(chat_history, response, model_id)
+            except Exception as e:
+                logger.exception('Post-filter failed')
+                safe, action, msg = (True, ActionEnum.none, None)
+
             logger.debug(f'post-filter: safe={safe}, action={action}, msg={msg}')
             if not safe:
                 if action == ActionEnum.overwrite:
@@ -109,9 +126,11 @@ class LlmSafetyGuard:
                     seen_msgs.append(msg)
                     yield self._format_warning_message(msg)
                 if action == ActionEnum.block:
+                    if at_exit: at_exit()
                     return
 
             yield chunk
+        if at_exit: at_exit()
 
     @staticmethod
     def _format_warning_message(msg:str):
