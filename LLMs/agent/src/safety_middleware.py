@@ -56,7 +56,15 @@ def to_completions_backend_signature(func):
             {'role': 'assistant' if r['isbot'] else 'user', 'content': r['msg']}
             for r in inputs
         ]
-        return func(chat_history=inputs, model_id=llm_name, *args, **kwargs)
+        def at_exit():
+            nonlocal kwargs
+            dest = kwargs['dest']
+            dest[3] = -1
+            dest[2] = -1
+            dest[1] = "READY"
+            print("Done")
+
+        return func(chat_history=inputs, model_id=llm_name, at_exit=at_exit, *args, **kwargs)
     return wrap
 
 def update_safety_guard():
