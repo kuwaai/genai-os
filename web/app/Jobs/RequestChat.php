@@ -171,38 +171,14 @@ class RequestChat implements ShouldQueue
                         if ($messageLength !== null) {
                             $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
                             if (mb_check_encoding($message, 'UTF-8')) {
-                                if ($message === '<' && !$cache) {
-                                    $cache = true;
-                                }
-                                if (!$cache) {
-                                    $tmp .= $message;
-                                    $outputTmp = $tmp;
-                                    if ($this->channel == $this->history_id) {
-                                        $outputTmp .= '...';
-                                    }
-                                    if ($taide_flag && $this->channel == $this->history_id) {
-                                        $outputTmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
-                                    }
-                                    if ($warningMessages) {
-                                        $outputTmp .= '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
-                                    }
-                                    if ($this->channel != $this->history_id) {
-                                        // Loop over each character in the UTF-8 string
-                                        for ($i = 0; $i < mb_strlen($outputTmp, 'UTF-8'); $i++) {
-                                            // Get the current character
-                                            $char = mb_substr($outputTmp, $i, 1, 'UTF-8');
-                                            // Publish the character to Redis
-                                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
-                                        }
-                                    } else {
-                                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
-                                    }
+                                if ($this->channel != $this->history_id) {
+                                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => $message]));
                                 } else {
-                                    //start caching
-                                    $cached .= $message;
-                                    if (!(strpos('<<<WARNING>>>', $cached) !== false || strpos($cached, '<<<WARNING>>>') !== false)) {
-                                        $cache = false;
-                                        $tmp .= $cached;
+                                    if ($message === '<' && !$cache) {
+                                        $cache = true;
+                                    }
+                                    if (!$cache) {
+                                        $tmp .= $message;
                                         $outputTmp = $tmp;
                                         if ($this->channel == $this->history_id) {
                                             $outputTmp .= '...';
@@ -214,25 +190,44 @@ class RequestChat implements ShouldQueue
                                             $outputTmp .= '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
                                         }
 
-                                        if ($this->channel != $this->history_id) {
-                                            // Loop over each character in the UTF-8 string
-                                            for ($i = 0; $i < mb_strlen($outputTmp, 'UTF-8'); $i++) {
-                                                // Get the current character
-                                                $char = mb_substr($outputTmp, $i, 1, 'UTF-8');
-                                                // Publish the character to Redis
-                                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
+                                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
+                                    } else {
+                                        //start caching
+                                        $cached .= $message;
+                                        if (!(strpos('<<<WARNING>>>', $cached) !== false || strpos($cached, '<<<WARNING>>>') !== false)) {
+                                            $cache = false;
+                                            $tmp .= $cached;
+                                            $outputTmp = $tmp;
+                                            if ($this->channel == $this->history_id) {
+                                                $outputTmp .= '...';
                                             }
-                                        } else {
-                                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
+                                            if ($taide_flag && $this->channel == $this->history_id) {
+                                                $outputTmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
+                                            }
+                                            if ($warningMessages) {
+                                                $outputTmp .= '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
+                                            }
+
+                                            if ($this->channel != $this->history_id) {
+                                                // Loop over each character in the UTF-8 string
+                                                for ($i = 0; $i < mb_strlen($outputTmp, 'UTF-8'); $i++) {
+                                                    // Get the current character
+                                                    $char = mb_substr($outputTmp, $i, 1, 'UTF-8');
+                                                    // Publish the character to Redis
+                                                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
+                                                }
+                                            } else {
+                                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => $outputTmp]));
+                                            }
+                                            $cached = '';
+                                        } elseif ($message === '>' && (str_ends_with($cached, '<<</WARNING>>>') || str_ends_with($cached, '<<<\/WARNING>>>'))) {
+                                            $warningMessages[] = trim(str_replace(['<<<WARNING>>>', '<<</WARNING>>>', '<<<\/WARNING>>>'], '', $cached));
+                                            $cache = false;
+                                            $cached = '';
                                         }
-                                        $cached = '';
-                                    } elseif ($message === '>' && (str_ends_with($cached, '<<</WARNING>>>') || str_ends_with($cached, '<<<\/WARNING>>>'))) {
-                                        $warningMessages[] = trim(str_replace(['<<<WARNING>>>', '<<</WARNING>>>', '<<<\/WARNING>>>'], '', $cached));
-                                        $cache = false;
-                                        $cached = '';
                                     }
+                                    $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                                 }
-                                $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
                             }
                         }
                         /*if (mb_strlen($tmp) > 3500) {
@@ -244,16 +239,6 @@ class RequestChat implements ShouldQueue
                         $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
                     } else {
                         if ($this->channel != $this->history_id) {
-                            if ($warningMessages) {
-                                $text = '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
-                                // Loop over each character in the UTF-8 string
-                                for ($i = 0; $i < mb_strlen($text, 'UTF-8'); $i++) {
-                                    // Get the current character
-                                    $char = mb_substr($text, $i, 1, 'UTF-8');
-                                    // Publish the character to Redis
-                                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
-                                }
-                            }
                             Redis::publish($this->channel, 'Ended Ended');
                         } elseif ($taide_flag) {
                             $tmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
