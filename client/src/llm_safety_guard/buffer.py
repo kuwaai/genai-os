@@ -10,7 +10,7 @@ class PassageBuffer:
         normal = 'normal'
         finalized = 'finalized'
 
-    stop_charters = ',，。\n'
+    stop_charters = ',，。!！?？\n'
 
     def __init__(self, n_max_buffer=100, streaming=True):
         """
