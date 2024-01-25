@@ -5,6 +5,7 @@ import grpc
 from enum import Enum
 from timeit import default_timer
 from typing import Optional
+from urllib.parse import urlparse
 
 # [TODO] Health check
 # from grpc_health.v1.health_pb2 import (
@@ -36,12 +37,15 @@ class DetectionClient:
     The client for the Detection API.
     """
     def __init__(self, health_check_period_sec=30):
-        server = os.environ.get('SAFETY_GUARD_DETECTOR', 'localhost:50051')
+        server_url = os.environ.get('SAFETY_GUARD_DETECTOR_URL', 'grpc://localhost:50051')
+        server_url = urlparse(server_url)
+        # Currently, we only support the grpc scheme.
+        assert server_url.scheme == 'grpc'
 
         # Enable the health checking top the server.
         service_config_json = json.dumps({"healthCheckConfig": {"serviceName": "Detection"}})
         options = [("grpc.service_config", service_config_json)]
-        channel = grpc.insecure_channel(server)
+        self.channel = grpc.insecure_channel(server_url.netloc)
         self.detection_stub = DetectionStub(channel)
         # self.health_stub = HealthStub(channel)
 
@@ -53,7 +57,6 @@ class DetectionClient:
     def pre_filter(self, chat_history:[dict], model_id:str) -> (bool, ActionEnum, str|None):
         try:
             chat_records = self.parse_chat_history(chat_history) 
-            print(chat_records)
             response = self.detection_stub.PreFilter(
                 FilterRequest(
                     model_id = model_id,
@@ -65,10 +68,9 @@ class DetectionClient:
             logging.exception("Failed to make pre-filter RPC.")
             return (True, ActionEnum.none, None)
     
-    def post_filter(self, chat_history:[dict], chunk:str, model_id:str) -> (bool, ActionEnum, str|None):
+    def post_filter(self, chat_history:[dict], response:str, model_id:str) -> (bool, ActionEnum, str|None):
         try:
-            chat_records = self.parse_chat_history(chat_history, chunk) 
-            print(chat_records)
+            chat_records = self.parse_chat_history(chat_history, response) 
             response = self.detection_stub.PostFilter(
                 FilterRequest(
                     model_id = model_id,
@@ -87,7 +89,6 @@ class DetectionClient:
         # if (default_timer()-self.last_health_check_time) > self.health_check_period_sec:
             # self.health_check()
         # return self.health
-        return True
 
     # def health_check(self):
     #     self.last_health_check_time = default_timer()
@@ -103,7 +104,7 @@ class DetectionClient:
     #         logging.warning("Detector stopped serving")
     #     print('Healthy', self.health)
     
-    def parse_chat_history(self, chat_history:[dict], resp_chunk:Optional[str]=None):
+    def parse_chat_history(self, chat_history:[dict], response:Optional[str]=None):
         role_map = {
             'user': ChatRecord.ROLE_USER,
             'assistant': ChatRecord.ROLE_ASSISTANT
@@ -112,8 +113,8 @@ class DetectionClient:
             ChatRecord(role=role_map[r['role']], content=r['content'])
             for r in chat_history
         ]
-        if resp_chunk:
-            result.append(ChatRecord(role=role_map['assistant'], content=resp_chunk))
+        if response:
+            result.append(ChatRecord(role=role_map['assistant'], content=response))
         return result
     
     def parse_checking_result(self, resp: CheckingResponse):

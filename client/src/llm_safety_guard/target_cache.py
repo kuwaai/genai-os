@@ -1,6 +1,7 @@
 import os
 import logging
 import requests
+from urllib.parse import urljoin
 
 logger = logging.getLogger(__name__)
 
@@ -11,8 +12,8 @@ class TargetCache:
     """
 
     def __init__(self):
-        base_url = os.environ.get('SAFETY_GUARD_BASE_URL', 'http://127.0.0.1:8000')
-        self.endpoint = f'{base_url}/v1/internal/targets'
+        base_url = os.environ.get('SAFETY_GUARD_MANAGER_URL', 'http://localhost:8000')
+        self.endpoint = urljoin(base_url, '/v1/internal/targets')
         self.targets = []
 
     def should_guard(self, model_id:str):
