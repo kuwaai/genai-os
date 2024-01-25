@@ -20,10 +20,10 @@ def safety_middleware(func):
             return func(*args, **kwargs)
         
         safety_guard = LlmSafetyGuard(n_max_buffer=50, streaming=True)
-        func = to_safety_guard_signature(func)
-        func = safety_guard.guard(func)
-        func = to_completions_backend_signature(func)
-        return func(*args, **kwargs)
+        local_func = to_safety_guard_signature(func)
+        local_func = safety_guard.guard(local_func)
+        local_func = to_completions_backend_signature(local_func)
+        return local_func(*args, **kwargs)
     
     wrap.__signature__ = inspect.signature(func)
     return wrap
