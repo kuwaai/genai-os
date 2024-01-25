@@ -54,7 +54,7 @@ def add_special_rules(db: Session):
     note = " 為特殊規則，可停用但無法刪除。"
     for r in special_rules:
         r.description += note
+        if db.query(Rule).filter(Rule.id==r.id).count() == 0:
+            db.add(r)
 
-    special_rules = [db.merge(r) for r in special_rules]
-    db.add_all(special_rules)
     db.commit()

@@ -40,12 +40,17 @@ class DetectionService(DetectionServicer):
             ChainEnum.post_filter: ChatRecord.ROLE_ASSISTANT
             }
         assert request.chat_records[-1].role == last_role_map[chain]
-        print(request)
+        logger.debug(request)
         chat_records = DetectionService.convert_chat_records(request.chat_records)
         store = get_guard_storage()
         target_rules = store.get(request.model_id, chain)
-        checking_result = await target_rules.guard.check(chat_records)
-        return DetectionService.gen_checking_response(checking_result, target_rules.actions)
+        if target_rules:
+            checking_result = await target_rules.guard.check(chat_records)
+            actions = target_rules.actions
+        else:
+            checking_result = {}
+            actions = {}
+        return DetectionService.gen_checking_response(checking_result, actions)
 
     @staticmethod
     def convert_chat_records(records: List[ChatRecord]) -> [Dict[str, str]]:
@@ -79,7 +84,7 @@ class DetectionService(DetectionServicer):
             else:
                 message = actions[k]['message']
         action = {
-            ActionEnum.none: None,
+            ActionEnum.none: CheckingResponse.ACTION_UNSPECIFIED,
             ActionEnum.warn: CheckingResponse.ACTION_WARN,
             ActionEnum.block: CheckingResponse.ACTION_BLOCK,
             ActionEnum.overwrite: CheckingResponse.ACTION_OVERWRITE,
