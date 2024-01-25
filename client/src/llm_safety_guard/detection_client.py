@@ -67,7 +67,7 @@ class DetectionClient:
     
     def post_filter(self, chat_history:[dict], chunk:str, model_id:str) -> (bool, ActionEnum, str|None):
         try:
-            chat_records = self.parse_chat_history(chat_history) 
+            chat_records = self.parse_chat_history(chat_history, chunk) 
             print(chat_records)
             response = self.detection_stub.PostFilter(
                 FilterRequest(
