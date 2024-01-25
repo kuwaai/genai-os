@@ -243,6 +243,7 @@ class RequestChat implements ShouldQueue
                                 }
                                 $history->fill(['msg' => $result]);
                                 $history->save();
+                                $tmp = $result;
                             }
                         }
                     } catch (Exception $e) {
