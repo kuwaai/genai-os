@@ -2,10 +2,13 @@ import inspect
 from typing import List, Any
 from types import GeneratorType
 from enum import Enum
+import logging
 
 from .target_cache import get_target_cache
 from .buffer import PassageBuffer
 from .detection_client import DetectionClient, ActionEnum
+
+logger = logging.getLogger(__name__)
 
 class AcceptedReturnType(Enum):
     unrecognized = 'unrecognized'
@@ -16,9 +19,11 @@ class LlmSafetyGuard:
     """
     The public API to use the Safety Guard.
     """
+    
+    # The singleton target cache
+    target_cache = get_target_cache()
 
     def __init__(self, n_max_buffer=100, streaming=True):
-        self.target_cache = get_target_cache()
         self.buffer = PassageBuffer(n_max_buffer=n_max_buffer, streaming=streaming)
         self.detector = DetectionClient()
 
@@ -41,8 +46,8 @@ class LlmSafetyGuard:
                 return func(chat_history=chat_history, model_id=model_id, *args, **kwargs)
             else:
                 orig_result = func(chat_history=chat_history, model_id=model_id, *args, **kwargs)
-                orig_gen, orig_return_type = self.get_original_generator(orig_result)
-                gen = self.guard_impl(chat_history=chat_history, model_id=model_id, orig_gen=orig_gen)
+                orig_gen, orig_return_type = self._get_original_generator(orig_result)
+                gen = self._guard_impl(chat_history=chat_history, model_id=model_id, orig_gen=orig_gen)
                 if orig_return_type == AcceptedReturnType.generator:
                     return gen
                 if orig_return_type == AcceptedReturnType.generator_with_other:
@@ -50,8 +55,16 @@ class LlmSafetyGuard:
         
         wrap.__signature__ = inspect.signature(func)
         return wrap
+
+    @staticmethod
+    def update():
+        """
+        The exposed API to update the internal state.
+        """
+
+        LlmSafetyGuard.target_cache.update_list()
     
-    def guard_impl(self, chat_history:str, model_id:str, orig_gen):
+    def _guard_impl(self, chat_history:str, model_id:str, orig_gen):
         """
         A generator that implements the guarding function.
         Arguments:
@@ -62,14 +75,15 @@ class LlmSafetyGuard:
         
         # Pre-filter
         safe, action, msg = self.detector.pre_filter(chat_history, model_id)
-        print('pre-filter', safe, action, msg)
+        logger.debug(f'pre-filter: safe={safe}, action={action}, msg={msg}')
         if not safe:
-            if msg: yield self.format_warning_message(msg)
+            if msg: yield self._format_warning_message(msg)
             if action == ActionEnum.block: return
 
         # Post-filter
         seen_msgs = [msg] # To prevent output duplicated warning messages.
         finished = False
+        response = ''
         while not finished:
             try:
                 output = next(orig_gen)
@@ -85,25 +99,26 @@ class LlmSafetyGuard:
             if not chunk: continue
 
             # Check whether the chunk is safe
-            safe, action, msg = self.detector.post_filter(chat_history, chunk, model_id)
-            print('post-filter', safe, action, msg)
+            response += chunk
+            safe, action, msg = self.detector.post_filter(chat_history, response, model_id)
+            logger.debug(f'post-filter: safe={safe}, action={action}, msg={msg}')
             if not safe:
                 if action == ActionEnum.overwrite:
                     chunk = msg
                 elif msg and msg not in seen_msgs:
                     seen_msgs.append(msg)
-                    yield self.format_warning_message(msg)
+                    yield self._format_warning_message(msg)
                 if action == ActionEnum.block:
                     return
 
             yield chunk
 
     @staticmethod
-    def format_warning_message(msg:str):
+    def _format_warning_message(msg:str):
         return f'<<<WARNING>>>{msg}<<</WARNING>>>'
     
     @staticmethod
-    def get_original_generator(orig_result:Any):
+    def _get_original_generator(orig_result:Any):
         orig_gen = None
         return_type = AcceptedReturnType.unrecognized
         if isinstance(orig_result, GeneratorType):
