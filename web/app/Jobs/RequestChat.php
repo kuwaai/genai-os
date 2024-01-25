@@ -224,7 +224,14 @@ class RequestChat implements ShouldQueue
                     } else {
                         if ($this->channel != $this->history_id) {
                             if ($warningMessages) {
-                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>']));
+                                $text = '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
+                                // Loop over each character in the UTF-8 string
+                                for ($i = 0; $i < mb_strlen($text, 'UTF-8'); $i++) {
+                                    // Get the current character
+                                    $char = mb_substr($text, $i, 1, 'UTF-8');
+                                    // Publish the character to Redis
+                                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
+                                }
                             }
                             Redis::publish($this->channel, 'Ended Ended');
                         } elseif ($taide_flag) {
@@ -232,8 +239,20 @@ class RequestChat implements ShouldQueue
                         }
                     }
                 } catch (Exception $e) {
-                    Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . '\n[Sorry, something is broken, please try again later!]']));
+                    if ($this->channel != $this->history_id) {
+                        $text = '\n[Sorry, something is broken, please try again later!]';
+                        // Loop over each character in the UTF-8 string
+                        for ($i = 0; $i < mb_strlen($text, 'UTF-8'); $i++) {
+                            // Get the current character
+                            $char = mb_substr($text, $i, 1, 'UTF-8');
+                            // Publish the character to Redis
+                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => $char]));
+                        }
+                    } else {
+                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => $tmp . '\n[Sorry, something is broken, please try again later!]']));
+                    }
                     $tmp .= "\n[Sorry, something is broken, please try again later!]";
+
                     Log::channel('analyze')->Debug('failJob ' . $this->history_id);
                 } finally {
                     try {
