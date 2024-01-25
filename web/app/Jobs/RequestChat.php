@@ -223,6 +223,9 @@ class RequestChat implements ShouldQueue
                         $tmp = '[Oops, the LLM returned empty message, please try again later or report to admins!]';
                     } else {
                         if ($this->channel != $this->history_id) {
+                            if ($warningMessages) {
+                                Redis::publish($this->channel, 'New ' . json_encode(['msg' => '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>']));
+                            }
                             Redis::publish($this->channel, 'Ended Ended');
                         } elseif ($taide_flag) {
                             $tmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
