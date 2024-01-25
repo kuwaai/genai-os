@@ -72,7 +72,7 @@
                 @if (!$anonymous && $history->isbot) onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif
                 class="p-3 transition-colors {{ $history->isbot ? (!$anonymous ? 'focus:cursor-auto cursor-pointer ' : '') . 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-cyan-500 text-white rounded-l-lg rounded-br-lg' }}">
                 {{-- blade-formatter-disable --}}
-                <div class="text-sm space-y-3 break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ __($message) }}</div>
+                <div class="text-sm space-y-3 break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ $message }}</div>
                 {{-- blade-formatter-enable --}}
                 @if (!$readonly && $history->isbot)
                     <x-chat.react-buttons :history="$history" :showOnFinished='false' />

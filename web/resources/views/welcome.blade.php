@@ -93,6 +93,9 @@
                     </a>
                 </h3>
                 @endenv
+                @env('nuk')
+                <div class="text-black dark:text-white text-center">由於高雄大學例行電力保養<br>本站將於1/27~1/28暫停服務</div>
+                @endenv
             </div>
 
 
@@ -130,7 +133,7 @@
                                     <div>
                                         <div class="p-3 bg-gray-300 rounded-r-lg rounded-bl-lg">
                                             <p class="text-sm">
-                                                哈囉!我是一個樂於助人的助手,您好!我是身為協助者的角色,竭誠幫助主人公實現其目標或完成任務。您有何需要協助或指引的嗎?請別擔心地問,我竭誠照顧您的需求。
+                                                您好！我是TAIDE，一個來自台灣的AI助理，樂於以台灣人的立場幫助您，使用繁體中文來回答您的問題。請您隨時提出問題，我將盡我所能給予協助。
                                             </p>
                                         </div>
                                     </div>
