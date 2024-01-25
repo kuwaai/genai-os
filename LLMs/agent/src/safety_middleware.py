@@ -5,7 +5,7 @@ from typing import List
 
 from .functions import log
 
-def safety_middleware(func):
+def safety_middleware(func, n_max_buffer=50, streaming=True):
     bypass = True
     try:
         from llm_safety_guard import LlmSafetyGuard
@@ -19,7 +19,10 @@ def safety_middleware(func):
         if bypass:
             return func(*args, **kwargs)
         
-        safety_guard = LlmSafetyGuard(n_max_buffer=50, streaming=True)
+        # Forward path: Flask --[Convert]--> Safety Guard --[Convert]--> Chat completion backend.
+        # Normal return path:  Chat completion backend --> Safety Guard --> Flask
+        # Return path under violation of pre-filter rules:  Safety Guard --> Flask
+        safety_guard = LlmSafetyGuard(n_max_buffer=n_max_buffer, streaming=streaming)
         local_func = to_safety_guard_signature(func)
         local_func = safety_guard.guard(local_func)
         local_func = to_completions_backend_signature(local_func)
@@ -57,8 +60,12 @@ def to_completions_backend_signature(func):
     return wrap
 
 def update_safety_guard():
+    """
+    The cronjob to update the safety guard.
+    """
+
     try:
-        from llm_safety_guard import get_target_cache
-        get_target_cache().update_list()
+        from llm_safety_guard import LlmSafetyGuard
+        LlmSafetyGuard.update()
     except ImportError:
         pass

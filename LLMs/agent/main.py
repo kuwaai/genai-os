@@ -10,9 +10,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from routes.worker import worker
 from routes.chat import chat
 
-import logging
-logging.basicConfig(level=logging.INFO)
-
 if __name__ == '__main__':
     # Setup logfile location
     init_folder(log_folder)
@@ -34,11 +31,12 @@ if __name__ == '__main__':
     if os.path.exists(record_file):
         loadRecords(load_variable_from_file(record_file))
 
+    # Schedule background job to update the Safety Guard
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         func=update_safety_guard,
         trigger="interval",
-        seconds=30,
+        seconds=safety_guard_update_interval_sec,
         next_run_time=datetime.now()
     )
     scheduler.start()
