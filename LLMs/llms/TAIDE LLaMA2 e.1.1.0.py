@@ -2,9 +2,9 @@ import socket, os
 from base import *
 
 # -- Configs --
-app.config["REDIS_URL"] = "redis://192.168.211.4:6379/0"
+app.config["REDIS_URL"] = "redis://127.0.0.1:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-app.agent_endpoint = "http://192.168.211.4:9000/"
+app.agent_endpoint = "http://127.0.0.1:9000/"
 app.LLM_name = "e.1.1.0"
 app.version_code = "v1.0"
 app.ignore_agent = False
@@ -62,8 +62,8 @@ def llm_compute(data):
             thread = Thread(target=model.generate, kwargs=dict(input_ids=encoding['input_ids'], streamer=streamer,
                 generation_config=GenerationConfig(
                     max_new_tokens=4096,
-                    temperature = 0.2,
-                    do_sample=True,
+                   
+                    do_sample=False,
                     repetition_penalty = 1.0
                 ),stopping_criteria=StoppingCriteriaList([CustomStoppingCriteria()])),daemon=True)
             thread.start()
