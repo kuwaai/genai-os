@@ -3,8 +3,10 @@ import time, re, os, logging, click, requests
 from datetime import datetime
 from src.variable import *
 from src.functions import *
+from src.safety_middleware import update_safety_guard
 from flask import Flask
 from flask_sse import ServerSentEventsBlueprint
+from apscheduler.schedulers.background import BackgroundScheduler
 from routes.worker import worker
 from routes.chat import chat
 
@@ -28,7 +30,17 @@ if __name__ == '__main__':
     # Load savefile
     if os.path.exists(record_file):
         loadRecords(load_variable_from_file(record_file))
-    
+
+    # Schedule background job to update the Safety Guard
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(
+        func=update_safety_guard,
+        trigger="interval",
+        seconds=safety_guard_update_interval_sec,
+        next_run_time=datetime.now()
+    )
+    scheduler.start()
+
     # Init Flask Apps
     app = Flask(__name__)
     app.config["REDIS_URL"] = "redis://localhost:6379/0"

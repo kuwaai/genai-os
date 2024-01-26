@@ -29,6 +29,7 @@ def llm_compute(data):
         for i in """你好我是個語言模型很高興認識你...之類的xD
 <<<WARNING>>>
 這是一個測試警告
+這是二個測試警告
 <<</WARNING>>>
 中途可以輸出警告
 <<<WARNING>>>
