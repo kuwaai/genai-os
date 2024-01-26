@@ -15,8 +15,7 @@ class TestBuffer(unittest.TestCase):
     def test_finalized(self):
         test_passage = "在一疊舊照片中，有一張照片深深地烙印在我的記憶裡。這張照片的印象深刻的原因，是它記錄了我成長的過程、與他人的情景、環境的變遷和美麗"
         buffer = PassageBuffer(streaming=True)
-        buffer.append(test_passage)
-        buffer.finalize()
+        buffer.append(test_passage, last=True)
         chunk = buffer.get_chunk()
         self.assertEqual(chunk, test_passage)
     
