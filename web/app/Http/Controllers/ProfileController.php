@@ -357,10 +357,14 @@ class ProfileController extends Controller
                                             if ($jsonData !== null) {
                                                 $resp['choices'][0]['delta']['content'] = $jsonData->msg;
                                                 echo 'data: ' . json_encode($resp) . "\n";
+                                                ob_flush();
+                                                flush();
                                             }
                                         } elseif (substr($line, 0, 6) === 'event:') {
                                             if (trim(substr($line, 5)) == 'end') {
                                                 echo "event: end\n\n";
+                                                ob_flush();
+                                                flush();
                                                 $client->disconnect();
                                                 break;
                                             }
