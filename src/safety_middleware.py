@@ -1,6 +1,7 @@
 import logging
 import inspect
 import json
+import requests
 from typing import List
 
 from .functions import log
@@ -59,6 +60,7 @@ def to_completions_backend_signature(func):
         def at_exit():
             nonlocal kwargs
             dest = kwargs['dest']
+            requests.get(dest[0] + "/abort", timeout=10)
             dest[3] = -1
             dest[2] = -1
             dest[1] = "READY"
