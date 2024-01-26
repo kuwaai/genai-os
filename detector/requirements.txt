@@ -9,6 +9,7 @@ pyahocorasick
 # sentence-transformers
 faiss-cpu
 grpcio
+grpcio-health-checking
 aiohttp
 jinja2
 sqlalchemy

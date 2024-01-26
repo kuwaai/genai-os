@@ -3,6 +3,10 @@ import grpc
 import logging
 from typing import List, Dict, Any
 
+from grpc_health.v1 import health
+from grpc_health.v1 import health_pb2
+from grpc_health.v1 import health_pb2_grpc
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib/grpc'))
 
@@ -91,6 +95,12 @@ class DetectionService(DetectionServicer):
         }[action]
         return CheckingResponse(safe=safe, action=action, message=message)
 
+def _configure_health_server(server: grpc.Server):
+    health_servicer = health.HealthServicer(
+        experimental_non_blocking=True,
+    )
+    health_servicer.set("Detection", health_pb2.HealthCheckResponse.SERVING)
+    health_pb2_grpc.add_HealthServicer_to_server(health_servicer, server)
 
 async def serve():
     server_options = [
@@ -103,10 +113,11 @@ async def serve():
         ("grpc.http2.max_pings_without_data", 5),
         ("grpc.keepalive_permit_without_calls", 1),
     ]
-    server = grpc.aio.server(
-        options=server_options,
-    )
-    add_DetectionServicer_to_server(DetectionService(), server)
+    server = grpc.aio.server(options=server_options)
+    detection_servicer = DetectionService()
+    add_DetectionServicer_to_server(detection_servicer, server)
+    _configure_health_server(server)
+    
     listen_addr = os.environ.get("SERVER_LISTEN_ADDR", "[::]:50051")
     server.add_insecure_port(listen_addr)
     logging.info("Starting server on %s", listen_addr)

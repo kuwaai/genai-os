@@ -45,7 +45,7 @@ services:
       - embed-infer
       - tgi
     healthcheck:
-      test: /bin/grpc_health_probe -addr=:50051 || exit 1"
+      test: /bin/grpc_health_probe -addr=:50051 || exit 1
       interval: 10s
       timeout: 5s
       retries: 5
@@ -88,9 +88,11 @@ services:
     shm_size: '1gb'
     command:
       - --model-id=meta-llama/LlamaGuard-7b
-      - --max-input-length=15900
-      - --max-batch-prefill-tokens=15900
-      - --max-total-tokens=16000
+      - --max-input-length=4090
+      - --max-total-tokens=4096
+      - --max-batch-prefill-tokens=17900
+      - --max-batch-total-tokens=18000
+      - --quantize=eetq # 8-bits
     env_file:
       - .env # For HUGGING_FACE_HUB_TOKEN
     restart: unless-stopped
