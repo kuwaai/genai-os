@@ -1,8 +1,9 @@
 import inspect
+import logging
 from typing import List, Any, Callable
 from types import GeneratorType
 from enum import Enum
-import logging
+from timeit import default_timer
 
 from .target_cache import get_target_cache
 from .buffer import PassageBuffer
@@ -80,11 +81,7 @@ class LlmSafetyGuard:
         """
         
         # Pre-filter
-        try:
-            safe, action, msg = self.detector.pre_filter(chat_history, model_id)
-        except Exception as e:
-            logger.exception('Pre-filter failed')
-            safe, action, msg = (True, ActionEnum.none, None)
+        safe, action, msg = self.detector.pre_filter(chat_history, model_id)
         logger.debug(f'pre-filter: safe={safe}, action={action}, msg={msg}')
         if not safe:
             if msg: yield self._format_warning_message(msg)
@@ -97,26 +94,16 @@ class LlmSafetyGuard:
         finished = False
         response = ''
         while not finished:
-            try:
-                output = next(orig_gen)
-            except StopIteration:
-                finished = True
-            
             # Construct the chunk
-            if not finished:
-                self.buffer.append(output)
-            else:
-                self.buffer.finalize()
+            output, finished = self._get_unread_contents(orig_gen)
+            if not output: continue
+            self.buffer.append(output, finished)
             chunk = self.buffer.get_chunk()
             if not chunk: continue
 
             # Check whether the chunk is safe
             response += chunk
-            try:
-                safe, action, msg = self.detector.post_filter(chat_history, response, model_id)
-            except Exception as e:
-                logger.exception('Post-filter failed')
-                safe, action, msg = (True, ActionEnum.none, None)
+            safe, action, msg = self.detector.post_filter(chat_history, response, model_id)
 
             logger.debug(f'post-filter: safe={safe}, action={action}, msg={msg}')
             if not safe:
@@ -131,6 +118,22 @@ class LlmSafetyGuard:
 
             yield chunk
         if at_exit: at_exit()
+
+    def _get_unread_contents(self, gen: GeneratorType, time_budget_sec=0.05) -> (str, bool):
+        """
+        Get all content from the generator within the buffer.
+        """
+
+        result = ''
+        finished = False
+        try:
+            begin_t = t = default_timer()
+            while t-begin_t < time_budget_sec:
+                result += next(gen)
+                t = default_timer()
+        except StopIteration:
+            finished = True
+        return result, finished
 
     @staticmethod
     def _format_warning_message(msg:str):

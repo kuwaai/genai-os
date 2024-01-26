@@ -1,5 +1,8 @@
+import logging
 from enum import Enum
 from collections import deque
+
+logger = logging.getLogger(__name__)
 
 class PassageBuffer:
     """
@@ -23,8 +26,16 @@ class PassageBuffer:
         self.state = PassageBuffer.State.normal
         self.q = ''
     
-    def append(self, text: str):
+    def append(self, text:str, last:bool = False):
+        """
+        Append "text" to the queue.
+        If "last" equals true, indicating there's no more data.
+        Then the next get_chunk() should return all data in the buffer.
+        """
         self.q += text
+
+        if last:
+            self.state = PassageBuffer.State.finalized
 
     def get_chunk(self) -> str | None:
         if self.state == PassageBuffer.State.finalized:
@@ -46,11 +57,6 @@ class PassageBuffer:
         self.q = self.q[split_index+1:]
         if len(chunk) == 0: chunk = None
 
-        return chunk
+        logger.info(f'Buffer remain {len(self.q)} charters.')
 
-    def finalize(self):
-        """
-        Indicate there's no more data.
-        The next get_chunk() should return all data in the buffer.
-        """
-        self.state = PassageBuffer.State.finalized
+        return chunk
