@@ -26,6 +26,9 @@
         @media print {
             .new-page {
                 page-break-after: auto;
+                p {
+                    color:black;
+                }
             }
 
             #chatroom {

@@ -8,7 +8,7 @@
         <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
     </form>
 @endif
-<div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 text-gray-700 dark:text-white flex">
+<div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 text-gray-700 dark:text-white flex items-center">
     @if ($readonly)
         @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', request()->route('room_id'))->orderby('llm_id')->get() as $chat)
             <div
@@ -36,7 +36,7 @@
             <i class="fas fa-bars"></i>
         </button>
     @endif
-    <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
+    <p class="flex-1 flex flex-wrap items-center mx-2 overflow-y-auto overflow-x-hidden scrollbar">
         @if (session('llms'))
             {{ __('New Chatroom') }}
         @else
