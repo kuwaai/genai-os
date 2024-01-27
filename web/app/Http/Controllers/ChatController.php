@@ -200,7 +200,7 @@ class ChatController extends Controller
 
                         foreach ($rows as $index => $row) {
                             if ($index === 0) {
-                                $headers = explode("\t", $row);
+                                $headers = explode("\t", str_replace("    ", "\t", $row));
                                 if (in_array('content', $headers)) {
                                     continue;
                                 } else {
@@ -210,7 +210,7 @@ class ChatController extends Controller
                             if ($headers === null) {
                                 break;
                             }
-                            $columns = explode("\t", $row);
+                            $columns = explode("\t", str_replace("    ", "\t", $row));
 
                             $record = [];
                             foreach ($headers as $columnIndex => $header) {

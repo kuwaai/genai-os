@@ -176,7 +176,7 @@
                     @endforeach
                 @else
                     @foreach ($mergedChats as $history)
-                        <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
+                        <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" :readonly="true" />
                     @endforeach
                 @endenv
                 </div>

@@ -9,7 +9,6 @@
     </form>
 @endif
 <div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 text-gray-700 dark:text-white flex">
-
     @if ($readonly)
         @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', request()->route('room_id'))->orderby('llm_id')->get() as $chat)
             <div

@@ -38,6 +38,8 @@ class CustomStoppingCriteria(StoppingCriteria):
 model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained(model_loc)
 prompts = " USER: {0} ASSISTANT: {1}"
+stopwords = ["USER:", "</s>"]
+bufferLength = max([len(k) for k in stopwords]) if stopwords else -1
 
 global proc
 proc = None
@@ -62,15 +64,32 @@ def llm_compute(data):
             thread = Thread(target=model.generate, kwargs=dict(input_ids=encoding['input_ids'], streamer=streamer,
                 generation_config=GenerationConfig(
                     max_new_tokens=4096,
-                   
                     do_sample=False,
                     repetition_penalty = 1.0
                 ),stopping_criteria=StoppingCriteriaList([CustomStoppingCriteria()])),daemon=True)
             thread.start()
             proc = thread
+            buffer = ""
+            if bufferLength: print("buffering with", bufferLength, "length")
             for i in streamer:
-                print(end=i.replace("</s>",""),flush=True)
-                yield i.replace("</s>","")
+                if bufferLength != -1:
+                    buffer += i
+                    for o in stopwords:
+                        if o in buffer: 
+                            proc = None
+                            print(o,"founded!")
+                            buffer = buffer.split(o)[0]
+                            break
+                    if len(buffer) > bufferLength:
+                        print(end=buffer[0],flush=True)
+                        yield buffer[0]
+                        buffer = buffer[1:]
+                    if not proc:
+                        print(end=buffer,flush=True)
+                        yield buffer # clear buffer
+                else:
+                    print(end=i.replace("</s>",""),flush=True)
+                    yield i.replace("</s>","")
                 if not proc: break
             thread.join()
             torch.cuda.empty_cache()
