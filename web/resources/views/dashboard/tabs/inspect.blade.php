@@ -81,13 +81,13 @@
                             $botMsg = $history;
                             $outputs = [];
                             if ($botMsg->chained) {
-                                $skip = true;
-                                foreach ($chat_histories->reverse() as $chat_history) {
+                                $skip = false;
+                                foreach ($chat_histories as $chat_history) {
+                                    if ($chat_history->id == $botMsg->id) {
+                                        $skip = true;
+                                    }
                                     if (!$skip) {
                                         $outputs[] = $chat_history;
-                                    }
-                                    if ($chat_history->id == $botMsg->id) {
-                                        $skip = false;
                                     }
                                 }
                             } else {
