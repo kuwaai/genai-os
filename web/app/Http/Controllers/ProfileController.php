@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\APIHistories;
+use App\Models\Histories;
 use Illuminate\View\View;
 use App\Jobs\RequestChat;
 use GuzzleHttp\Client;
