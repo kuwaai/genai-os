@@ -20,8 +20,8 @@
     }
 
     function switchLang($this) {
-        $($this).parent().parent().parent().find("div.flex.bg-red-200").remove()
-        $($this).parent().parent().parent().find("div.flex.bg-green-200").remove()
+        $($this).parent().parent().parent().find("div.flex.bg-red-200.whitespace-pre-wrap").remove()
+        $($this).parent().parent().parent().find("div.flex.bg-green-200.whitespace-pre-wrap").remove()
         $($this).parent().parent().next()[0].classList = "hljs language-" + $($this).val()
         if ($($this).parent().next().attr("onclick") == "compileVerilog(this)") $($this).parent().next().remove();
         if ($($this).val() == "verilog") $($this).parent().after(
@@ -416,7 +416,7 @@ xmlns="http://www.w3.org/2000/svg">
                     $($this).addClass("bg-red-600 hover:bg-red-700")
                     $($this).text("{{ __('Failed') }}")
                 }
-                $($this).parent().after(`<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'}">${JSON.parse(data).message}</div>`)
+                $($this).parent().after(`<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'} whitespace-pre-wrap">${JSON.parse(data).message}</div>`)
             }
         });
     }
