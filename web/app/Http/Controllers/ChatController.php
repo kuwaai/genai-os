@@ -22,6 +22,7 @@ use App\Models\LLMs;
 use App\Models\User;
 use App\Models\Feedback;
 use App\Models\APIHistories;
+use App\Models\Groups;
 use DB;
 use Session;
 
@@ -71,7 +72,11 @@ class ChatController extends Controller
 
         $access_code = $request->input('model');
         $msg = $record->msg;
-        if ($access_code == null) {
+        if (strpos(Groups::find($request->user()->group_id)->describe, '!verilog_translate!') === 0){
+            $access_code = LLMs::find($chat->llm_id)->access_code;
+            $msg = "請將程式碼轉成verilog。\n" . $msg;
+        }
+        else if ($access_code == null) {
             $access_code = LLMs::find($chat->llm_id)->access_code;
             $msg = "以下提供內容，請幫我翻譯成中文。\n" . $msg;
         }
