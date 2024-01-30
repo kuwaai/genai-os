@@ -20,9 +20,13 @@
     }
 
     function switchLang($this) {
+        $($this).parent().parent().parent().find("div.flex.bg-red-200").remove()
+        $($this).parent().parent().parent().find("div.flex.bg-green-200").remove()
         $($this).parent().parent().next()[0].classList = "hljs language-" + $($this).val()
-        if ($($this).parent().next().attr("onclick") == "compileVerilog(this)")$($this).parent().next().remove();
-        if ($($this).val() == "verilog")$($this).parent().after(`<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>`)
+        if ($($this).parent().next().attr("onclick") == "compileVerilog(this)") $($this).parent().next().remove();
+        if ($($this).val() == "verilog") $($this).parent().after(
+            `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>`
+            )
 
         $($this).parent().parent().next().text($($this).parent().parent().next().text())
         $($this).parent().parent().next()[0].dataset.highlighted = '';
@@ -412,6 +416,7 @@ xmlns="http://www.w3.org/2000/svg">
                     $($this).addClass("bg-red-600 hover:bg-red-700")
                     $($this).text("{{ __('Failed') }}")
                 }
+                $($this).parent().after(`<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'}">${JSON.parse(data).message}</div>`)
             }
         });
     }
