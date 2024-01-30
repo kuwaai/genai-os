@@ -422,9 +422,7 @@ class ProfileController extends Controller
         if ($result->exists()) {
             $user = $result->first();
             if (User::find($user->id)->hasPerm('Chat_read_access_to_api')) {
-                $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('api_' . $user->tokenable_id, 0, -1))
-                    ->pluck('id')
-                    ->toArray();
+                $list = \Illuminate\Support\Facades\Redis::lrange('api_' . $user->tokenable_id, 0, -1);
                 $client = new Client(['timeout' => 300]);
                 $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
                 $msg = $client->post($agent_location . '/' . RequestChat::$agent_version . '/chat/abort', [
