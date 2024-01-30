@@ -19,7 +19,23 @@
         return $msg;
     }
 
+    function switchLang($this) {
+        $($this).parent().parent().next()[0].classList = "hljs language-" + $($this).val()
+        if ($($this).parent().next().attr("onclick") == "compileVerilog(this)")$($this).parent().next().remove();
+        if ($($this).val() == "verilog")$($this).parent().after(`<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>`)
+
+        $($this).parent().parent().next().text($($this).parent().parent().next().text())
+        $($this).parent().parent().next()[0].dataset.highlighted = '';
+        hljs.highlightElement($($this).parent().parent().next()[0]);
+    }
+
     function chatroomFormatter(node) {
+        if ($("#language_list").length == 0) {
+            $("head").prepend(`<datalist id="language_list"></datalist>`)
+            hljs.listLanguages().forEach($val => {
+                $("#language_list").prepend(`<option value="${$val}">`)
+            })
+        }
         $(node).find('div.text-sm.space-y-3.break-words').each(function() {
             if ($(this).text() == "<pending holder>") {
                 $(this).html(`<svg aria-hidden="true"
@@ -87,7 +103,7 @@ fill="currentFill" />
                         ``
                     $(this).prepend(
                         `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
-<span class="pl-4 py-2 mr-auto">${languageClass}</span>
+<span class="pl-4 py-2 mr-auto"><input class="bg-gray-900" list="language_list" oninput="switchLang(this)" value="${languageClass}"></span>
 ${verilog}
 <button onclick="copytext(this, $(this).parent().parent().children('code').text().trim())"
 class="flex items-center px-2 py-2 hover:bg-gray-900"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"

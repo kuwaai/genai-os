@@ -69,7 +69,9 @@
             $("#chat_input").prop("readonly", false)
             adjustTextareaRows($("#chat_input"))
             $(".show-on-finished").attr("style", "")
-            hljs.configure({languages:hljs.listLanguages()}); //enable auto detect
+            hljs.configure({
+                languages: hljs.listLanguages()
+            }); //enable auto detect
             $('#chatroom div.text-sm.space-y-3.break-words pre >div').remove()
             $('#chatroom div.text-sm.space-y-3.break-words pre code').each(function() {
                 $(this).text($(this).text())
@@ -78,19 +80,19 @@
                 hljs.highlightElement($(this)[0]);
             });
             $('#chatroom div.text-sm.space-y-3.break-words pre').each(function() {
-                    let languageClass = '';
-                    $(this).children("code")[0].classList.forEach(cName => {
-                        if (cName.startsWith('language-')) {
-                            languageClass = cName.replace('language-', '');
-                            return;
-                        }
-                    })
-                    verilog = languageClass == "verilog" ?
-                        `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>` :
-                        ``
-                    $(this).prepend(
-                        `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
-<span class="pl-4 py-2 mr-auto">${languageClass}</span>
+                let languageClass = '';
+                $(this).children("code")[0].classList.forEach(cName => {
+                    if (cName.startsWith('language-')) {
+                        languageClass = cName.replace('language-', '');
+                        return;
+                    }
+                })
+                verilog = languageClass == "verilog" ?
+                    `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>` :
+                    ``
+                $(this).prepend(
+                    `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
+<span class="pl-4 py-2 mr-auto"><input class="bg-gray-900" list="language_list" oninput="switchLang(this)" value="${languageClass}"></span>
 ${verilog}
 <button onclick="copytext(this, $(this).parent().parent().children('code').text().trim())"
 class="flex items-center px-2 py-2 hover:bg-gray-900"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"
@@ -105,15 +107,17 @@ stroke-linejoin="round" class="icon-sm" style="display:none;" height="1em" width
 xmlns="http://www.w3.org/2000/svg">
 <polyline points="20 6 9 17 4 12"></polyline>
 </svg><span>{{ __('Copy') }}</span></button></div>`
-                    )
-                })
+                )
+            })
         } else {
             data = JSON.parse(event.data)
             number = parseInt(data["history_id"]);
             $('#task_' + number).text(data["msg"]);
             histories[number] = $("#history_" + number + " div.text-sm.space-y-3.break-words")
                 .text()
-            hljs.configure({languages:[]}); // disable auto detect
+            hljs.configure({
+                languages: []
+            }); // disable auto detect
             chatroomFormatter($("#history_" + data["history_id"])[0]);
             if ($("#abort_btn")) $("#abort_btn").show();
         }
