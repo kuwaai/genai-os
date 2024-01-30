@@ -283,5 +283,10 @@
     "Permission to give detailed feedbacks":"給予回答更詳細的回饋標籤",
     "Detail":"詳細說明",
     "Safety Guard Location":"安全過濾連線位置",
-    "Safety guard offline":"安全過濾系統處於離線狀態"
+    "Safety guard offline":"安全過濾系統處於離線狀態",
+    "Compile Test":"編譯測試",
+    "Backend Offline":"後端離線",
+    "Compiling":"編譯中",
+    "Success":"成功",
+    "Failed":"失敗"
 }

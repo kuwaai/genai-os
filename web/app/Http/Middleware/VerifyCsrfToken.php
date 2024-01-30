@@ -15,6 +15,7 @@ class VerifyCsrfToken extends Middleware
         'chats/stream',
 		'v1.0/chat/completions',
 		'v1.0/chat/abort',
-        "/api/register"
+        "/api/register",
+        '/compile-verilog'
     ];
 }

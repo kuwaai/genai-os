@@ -46,7 +46,7 @@ fill="currentFill" />
   </svg>
   <span class="sr-only">Info</span>
   <div class="ml-2">
-    <span class="font-medium">`+line+`</span>
+    <span class="font-medium">` + line + `</span>
   </div>
 </div>`;
                         });
@@ -82,11 +82,15 @@ fill="currentFill" />
                             return;
                         }
                     })
+                    verilog = languageClass == "verilog" ?
+                        `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>` :
+                        ``
                     $(this).prepend(
-                        `<div class="flex items-center text-gray-200 bg-gray-800 px-4 py-2 rounded-t-lg">
-<span class="mr-auto">${languageClass}</span>
+                        `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
+<span class="pl-4 py-2 mr-auto">${languageClass}</span>
+${verilog}
 <button onclick="copytext(this, $(this).parent().parent().children('code').text().trim())"
-class="flex items-center"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"
+class="flex items-center px-2 py-2 hover:bg-gray-900"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"
 stroke-linejoin="round" class="icon-sm" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
 </path>
@@ -97,7 +101,7 @@ stroke-linejoin="round" class="icon-sm" height="1em" width="1em" xmlns="http://w
 stroke-linejoin="round" class="icon-sm" style="display:none;" height="1em" width="1em"
 xmlns="http://www.w3.org/2000/svg">
 <polyline points="20 6 9 17 4 12"></polyline>
-</svg><span class="ml-2">{{ __('Copy') }}</span></button></div>`
+</svg><span>{{ __('Copy') }}</span></button></div>`
                     )
                 })
 
@@ -358,5 +362,41 @@ xmlns="http://www.w3.org/2000/svg">
 
             textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
         }
+    }
+
+    function compileVerilog($this) {
+        // Get Verilog code from the parent's parent element
+        var verilogCode = $($this).parent().parent().children('code').text().trim();
+        // Prepare data in JSON format
+        var requestData = {
+            "verilog_code": verilogCode
+        };
+        $($this).text("{{ __('Compiling') }}")
+        $($this).removeClass("hover:bg-gray-900")
+        $($this).attr("disabled", true)
+
+        // Send a POST request to the specified URL
+        $.post("{{ route('compile.verilog') }}", requestData, function(data, status) {
+            // Handle the response
+            $result = data
+            if ($result.error == "Backend compiler offline") {
+                $($this).text("{{ __('Backend Offline') }}")
+                $($this).addClass("bg-orange-600 hover:bg-orange-700")
+                setTimeout(function() {
+                    $($this).text("{{ __('Compile Test') }}")
+                    $($this).removeClass("bg-orange-600 hover:bg-orange-700")
+                    $($this).addClass("hover:bg-gray-900")
+                    $($this).attr("disabled", false)
+                }, 3000);
+            } else {
+                if (JSON.parse(data).success) {
+                    $($this).addClass("bg-green-600 hover:bg-green-700")
+                    $($this).text("{{ __('Success') }}")
+                } else {
+                    $($this).addClass("bg-red-600 hover:bg-red-700")
+                    $($this).text("{{ __('Failed') }}")
+                }
+            }
+        });
     }
 </script>

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
 use App\Models\Histories;
@@ -200,7 +201,7 @@ class ChatController extends Controller
 
                         foreach ($rows as $index => $row) {
                             if ($index === 0) {
-                                $headers = explode("\t", str_replace("    ", "\t", $row));
+                                $headers = explode("\t", str_replace('    ', "\t", $row));
                                 if (in_array('content', $headers)) {
                                     continue;
                                 } else {
@@ -210,7 +211,7 @@ class ChatController extends Controller
                             if ($headers === null) {
                                 break;
                             }
-                            $columns = explode("\t", str_replace("    ", "\t", $row));
+                            $columns = explode("\t", str_replace('    ', "\t", $row));
 
                             $record = [];
                             foreach ($headers as $columnIndex => $header) {
@@ -792,5 +793,23 @@ class ChatController extends Controller
         });
 
         return $response;
+    }
+
+    public function compile_verilog(Request $request)
+    {
+        $verilogCode = $request->input('verilog_code');
+        $result = true;
+        try {
+            $response = Http::post('http://127.0.0.1:13579/compile-verilog', [
+                'verilog_code' => $verilogCode,
+            ]);
+        } catch (\Throwable) {
+            $result = false;
+        }
+        if ($result && $response->successful()) {
+            return $response;
+        } else {
+            return response()->json(['error' => $result ? "Compile failed" : 'Backend compiler offline'], 200);
+        }
     }
 }
