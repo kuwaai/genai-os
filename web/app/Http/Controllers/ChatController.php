@@ -211,7 +211,11 @@ class ChatController extends Controller
                             if ($headers === null) {
                                 break;
                             }
-                            $columns = explode("\t", str_replace('    ', "\t", $row));
+                            if (count($headers) === 1){
+                                $columns = [str_replace('    ', "\t", $row)];
+                            }else{
+                                $columns = explode("\t", str_replace('    ', "\t", $row));
+                            }
 
                             $record = [];
                             foreach ($headers as $columnIndex => $header) {
@@ -221,6 +225,7 @@ class ChatController extends Controller
                                 $value = $columns[$columnIndex];
                                 if ($header === 'content') {
                                     $value = trim(json_decode('"' . $value . '"'), '"');
+                                    if ($value === "") $value = str_replace("\\n", "\n", str_replace("\\t", "\t", $columns[$columnIndex]));
                                 }
                                 $record[$header] = $value;
                             }
