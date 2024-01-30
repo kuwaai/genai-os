@@ -72,7 +72,7 @@ class ChatController extends Controller
 
         $access_code = $request->input('model');
         $msg = $record->msg;
-        if (strpos(Groups::find($request->user()->group_id)->describe, '!verilog_translate!') === 0){
+        if ($access_code == null && strpos(Groups::find($request->user()->group_id)->describe, '!verilog_translate!') === 0){
             $access_code = LLMs::find($chat->llm_id)->access_code;
             $msg = "請將程式碼轉成verilog。\n" . $msg;
         }
