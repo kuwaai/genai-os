@@ -58,7 +58,7 @@
 
         <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
             <div class="flex items-center flex-col">
-                @env(['kuwa', 'arena', 'nuk'])
+                @env(['kuwa', 'arena', 'nuk', 'chipllm', 'icdesign'])
                 <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
                     <div class="flex items-center justify-center overflow-hidden">
                         <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
@@ -69,7 +69,8 @@
                             <span>LLM</span>
                             <span class="pt-4">Workspace</span>
                         </div>
-                        @else
+                        @endenv
+                        @env('kuwa', 'arena', 'chipllm')
                         <div class="flex ml-4 justify-center items-end space-x-5">
                             <span class="text-[72px] text-orange-300">Kuwa</span>
                             @env('kuwa')
@@ -78,6 +79,15 @@
                             @env('arena')
                             <span class="text-[60px]">Arena</span>
                             @endenv
+                            @env('chipllm')
+                            <span class="text-[60px]">Chip</span>
+                            @endenv
+                        </div>
+                        @endenv
+                        @env("icdesign")
+                        <div class="flex flex-col ml-4 text-[50px]">
+                            <span class="text-[72px] text-orange-300">Kuwa</span>
+                            <span class="text-[60px]">IC Design</span>
                         </div>
                         @endenv
                     </div>
@@ -92,9 +102,6 @@
                         <span class="pt-4 text-[75px]">Chat</span>
                     </a>
                 </h3>
-                @endenv
-                @env('nuk')
-                <div class="text-black dark:text-white text-center">由於高雄大學例行電力保養<br>本站將於1/27~1/28暫停服務</div>
                 @endenv
             </div>
 
