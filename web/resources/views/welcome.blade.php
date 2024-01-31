@@ -61,9 +61,21 @@
                 @env(['kuwa', 'arena', 'nuk', 'chipllm', 'icdesign'])
                 <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
                     <div class="flex items-center justify-center overflow-hidden">
+                        @env(['nuk'])
                         <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
                             <img class="w-[150px]" src="{{ asset('images/csie.png') }}">
                         </a>
+                        @endenv
+                        @env(['kuwa', 'arena'])
+                        <a class="rounded-full overflow-hidden" href="https://www.gai.tw/" target="_blank">
+                            <img class="w-[150px]" src="{{ asset('images/csie.png') }}">
+                        </a>
+                        @endenv
+                        @env(['chipllm', 'icdesign'])
+                        <a class="rounded-full overflow-hidden" href="https://www.gai.tw/" target="_blank">
+                            <img class="w-[150px]" src="{{ asset('images/brainchip2.gif') }}">
+                        </a>
+                        @endenv
                         @env('nuk')
                         <div class="flex flex-col ml-4 text-[50px]">
                             <span>LLM</span>
@@ -112,7 +124,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 {{ __('Comparative') }}
                             @else
                                 {{ __('Translation') }}
@@ -120,7 +132,7 @@
                             </h2>
                             <div id="chatroom"
                                 class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
@@ -224,7 +236,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 {{ __('Deployment') }}
                             @else
                                 {{ __('Composition') }}
@@ -232,7 +244,7 @@
                             </h2>
                             <div id="chatroom"
                                 class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 <div class="flex justify-center items-center">
                                     <img class="w-auto dark:hidden" src="{{ asset('images/deployment_light.png') }}">
                                     <img class="w-auto hidden dark:block"
@@ -276,7 +288,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 {{ __('Export & Import') }}
                             @else
                                 {{ __('Communication') }}
@@ -285,7 +297,7 @@
                             <div id="chatroom"
                                 class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
 
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 <div class="flex justify-center items-center">
                                     <img class="w-auto dark:hidden" src="{{ asset('images/feedback.png') }}">
                                     <img class="w-auto hidden dark:block" src="{{ asset('images/feedback.png') }}">
@@ -325,7 +337,7 @@
                         class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 {{ __('Application') }}
                             @else
                                 {{ __('Summarization') }}
@@ -333,7 +345,7 @@
                             </h2>
                             <div id="chatroom"
                                 class="flex-1 p-4 justify-center overflow-hidden flex flex-col scrollbar rounded-lg">
-                                @env(['kuwa', 'arena', 'nuk'])
+                                @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                                 <div class="flex justify-center items-center">
                                     <img class="w-auto dark:hidden" src="{{ asset('images/rag_light.png') }}">
                                     <img class="w-auto hidden dark:block" src="{{ asset('images/rag_dark.png') }}">
@@ -375,7 +387,7 @@
             <div class="flex justify-center mt-4 px-0 sm:items-center sm:justify-between">
                 <div class="text-center text-sm text-gray-500 dark:text-gray-400 sm:text-left">
                     <div class="flex items-center gap-4">
-                        @env(['kuwa', 'arena', 'nuk'])
+                        @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                         <a href="https://www.gai.tw/" target="_blank"
                             class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">由國立高雄大學
                             資訊工程學系<br>開發與維護的語言模型平台</a>
@@ -389,7 +401,7 @@
                 </div>
 
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-                    @env(['kuwa', 'arena', 'nuk'])
+                    @env(['kuwa', 'arena', 'nuk', 'chipllm', "icdesign"])
                     @env('nuk')
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         href="https://www.nuk.edu.tw/" target="_blank">國立高雄大學</a>
