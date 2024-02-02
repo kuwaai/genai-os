@@ -124,10 +124,7 @@
 
                             $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
                                 var historyId = $(element).prop("id").replace("history_", "");
-                                var msgText = JSON.stringify(histories[historyId]);
-                                if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
-                                    msgText = msgText.substring(1, msgText.length - 1);
-                                }
+                                var msgText = histories[historyId].replace("\n", "\\n").replace("\t", "\\t");
                                 var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
                                 var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
 

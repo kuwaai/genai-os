@@ -23,30 +23,35 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $request->authenticate();
 
         $request->session()->regenerate();
+        if ($request->input("_token") == null){
+            return response()->noContent();
+        }
+        
         if (Auth::user()->hasPerm('tab_Chat')){
-            return redirect()->intended(RouteServiceProvider::HOME);
+            return redirect()->intended("/chats");
         }else{
             return redirect()->intended("/");
-
         }
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
-
+        if ($request->input("_token") == null){
+            return response()->noContent();
+        }
         return redirect('/');
     }
 }

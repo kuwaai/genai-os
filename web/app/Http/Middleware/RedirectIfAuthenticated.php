@@ -21,7 +21,14 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                if ($request->input("_token") == null){
+                    return response()->noContent();
+                }
+                if (Auth::user()->hasPerm('tab_Chat')){
+                    return redirect()->intended("/chats");
+                }else{
+                    return redirect()->intended("/");
+                }
             }
         }
 

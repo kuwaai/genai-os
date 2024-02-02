@@ -30,7 +30,7 @@ class RegisteredUserController extends Controller
         ) {
             return view('auth.register');
         }
-        return Redirect::route('/');
+        return redirect()->intended("/");
     }
 
     /**
@@ -88,7 +88,14 @@ class RegisteredUserController extends Controller
 
             Auth::login($user);
 
-            return redirect("/chats");
+            if (Auth::user()->hasVerifiedEmail()){
+                if (Auth::user()->hasPerm('tab_Chat')){
+                    return redirect()->intended("/chats");
+                }else{
+                    return redirect()->intended("/");
+                }
+            }
+            return redirect()->intended("/verify-email");
         }
         return redirect("/");
     }

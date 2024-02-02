@@ -11,22 +11,18 @@
     $visable = true;
     if (!$history->isbot && $refers) {
         foreach ($refers->where('id', '<', $history->id) as $refer) {
-            for ($i = 0; $i <= 1; $i++) {
-                $referMsg = trim(str_replace(["\r\n"], "\n", $refer->msg));
-                if ($i == 0) {
-                    $referMsg = '"""' . $referMsg . '"""';
+            $referMsg = trim(str_replace(["\r\n"], "\n", $refer->msg));
+                $referMsg = '"""' . $referMsg . '"""';
+
+            if ($refer->id !== $history->id) {
+                if ($message === $referMsg) {
+                    $visable = false;
+                    break;
                 }
+                $pos = strpos($message, $referMsg);
 
-                if ($refer->id !== $history->id) {
-                    if ($message === $referMsg) {
-                        $visable = false;
-                        break;
-                    }
-                    $pos = strpos($message, $referMsg);
-
-                    if ($pos !== false) {
-                        $message = substr_replace($message, "\n##### <%ref-{$refer->id}%>\n", $pos, strlen($referMsg));
-                    }
+                if ($pos !== false) {
+                    $message = substr_replace($message, "\n##### <%ref-{$refer->id}%>\n", $pos, strlen($referMsg));
                 }
             }
         }
