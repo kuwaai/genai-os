@@ -1,28 +1,14 @@
-Safety Guard Client
-===
-
-This is the client library of the safety guard system. The library is expected
-to be integrated into the proxy server on the primary prompt/response path.
-
-## Usage
-1. Set the following environment variable before importing the Safety Guard client library
-```shell
-# variable=default
-SAFETY_GUARD_MANAGER_URL=http://localhost:8000
-SAFETY_GUARD_DETECTOR_URL=grpc://localhost:50051
-```
-2. Install the client library of the Safety Guard
-```shell
-pip install -e .
-```
-3. Apply the decorator as a middleware to the processing function.
-The processing function is expected to have the following signature.
-An adaptor may be needed to convert the signature.
-```python
+import uvicorn
+import logging
+from datetime import datetime
+from typing import List
 from fastapi import FastAPI
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from llm_safety_guard import LlmSafetyGuard
 
 app = FastAPI()
+logger = logging.getLogger(__name__)
 
 def at_exit():
     print('Generation done')
@@ -99,17 +85,10 @@ def chat_completion(req: dict):
     # return generator, {'Content-Type': 'text/plain'}
     # or
     return generator(chat_history)
-```
-
-4. Moreover, the client is expected to periodically update the guarded model list from the control plane.
-You can achieve that with the [APScheduler](https://pypi.org/project/APScheduler/) package. The example is shown below.
-
-```python
-import datetime
-from apscheduler.schedulers.background import BackgroundScheduler
-from llm_safety_guard import LlmSafetyGuard
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+
     safety_guard_update_interval_sec = 30
     scheduler = BackgroundScheduler()
     scheduler.add_job(
@@ -119,34 +98,4 @@ if __name__ == "__main__":
         next_run_time=datetime.now()
     )
     scheduler.start()
-```
-
-## Example Server
-- An OpenAI API-compatible server example is in `example/openai_api.py`
-1. Install the extra dependency that is listed in `example/requirements.txt` to get this example to work
-2. Start the Safety Guard sub-system
-3. Start the example server
-```shell
-python example/openai_api.py
-```
-
-4. Issue a test request
-```shell
-curl http://localhost:8080/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "guarded-model",
-    "messages": [
-      {
-        "role": "user",
-        "content": "Hello!"
-      }
-    ]
-  }'
-```
-
-5. If the model is guarded, the following two lines should be printed on the server console.
-```
-DEBUG:llm_safety_guard.llm_safety_guard:pre-filter: ...
-DEBUG:llm_safety_guard.llm_safety_guard:post-filter: ...
-```
+    uvicorn.run(app, host="127.0.0.1", port=8080)
