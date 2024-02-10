@@ -10,7 +10,7 @@
         $("#prompt_area").submit(function(event) {
             event.preventDefault();
             if ($chattable && $("#chat_input").val().trim() == "" && quoted.length == 1) {
-                $("#chat_input").val(histories[quoted[0][1]])
+                $("#chat_input").val(`"""${histories[quoted[0][1]]}"""`)
                 this.submit();
                 $chattable = false
                 $("#submit_msg").hide()
