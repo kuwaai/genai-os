@@ -54,7 +54,7 @@
             }
         })
     }
-    task = new EventSource("{{ route('chat.sse') }}", {
+    task = new EventSource("{{ route('room.sse') }}", {
         withCredentials: false
     });
     task.addEventListener('error', error => {

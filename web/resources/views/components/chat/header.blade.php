@@ -143,11 +143,11 @@
                         }
                     </script>
                 @endif
-                <button onclick="saveChat()"
+                <button onclick="saveChat(this)"
                     class="bg-green-500 ml-3 hover:bg-green-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center hidden">
                     <i class="fas fa-save"></i>
                 </button>
-                <button onclick="editChat()"
+                <button onclick="editChat(this)"
                     class="bg-orange-500 ml-3 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded flex items-center justify-center">
                     <i class="fas fa-pen"></i>
                 </button>

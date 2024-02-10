@@ -1,12 +1,4 @@
 {
-    "Chat_update_send_message": "Send Message",
-    "Chat_update_new_chat": "New Chatroom",
-    "Chat_update_upload_file": "Upload File",
-    "Chat_update_feedback": "Give Feedback",
-    "Chat_update_import_chat": "Import Chat",
-    "Chat_read_access_to_api": "Use API",
-    "Chat_read_export_chat": "Export Chat",
-    "Chat_delete_chatroom": "Delete Chat",
     "Profile_update_api_token": "Update Web API Token",
     "Profile_update_name": "Update Username",
     "Profile_update_email": "Update Email",
@@ -23,13 +15,11 @@
     "Room_update_react_message": "React Buttons",
     "Room_read_export_chat": "Export Chat",
     "Room_delete_chatroom": "Delete Chatroom",
-    "Chat_update_react_message": "React Buttons",
     "Dashboard_read_statistics":"Statistics",
     "Dashboard_read_blacklist":"Blacklist",
     "Dashboard_read_feedbacks":"Feedbacks",
     "Dashboard_read_logs":"Logs",
     "Dashboard_read_safetyguard":"Safety Guard",
     "Dashboard_read_inspect":"Inspect",
-    "Chat_update_detail_feedback":"Detail Feedback",
     "Room_update_detail_feedback":"Detail Feedback"
 }

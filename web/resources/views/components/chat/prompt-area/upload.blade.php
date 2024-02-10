@@ -1,7 +1,7 @@
 @props(['llmId' => request()->route('llm_id')])
 
-@if (request()->user()->hasPerm('Chat_update_upload_file'))
-    <form method="post" action="{{ route('chat.upload') }}" class="flex flex-col justify-center items-center" enctype="multipart/form-data">
+@if (request()->user()->hasPerm('Room_update_upload_file'))
+    <form method="post" action="{{ route('room.upload') }}" class="flex flex-col justify-center items-center" enctype="multipart/form-data">
         @csrf
         <input name="llm_id" style="display:none;" value="{{ $llmId }}">
         <input id="upload" type="file" name="file" style="display: none;" onchange="uploadcheck()">
@@ -25,7 +25,6 @@
             $("#upload_btn").text('{{ __('File Too Large') }}')
             $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
             $("#upload").val("");
-
 
             setTimeout(function() {
                 $("#upload_btn").text('{{ __('Upload file') }}')

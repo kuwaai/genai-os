@@ -25,20 +25,6 @@
                         </x-nav-link>
                     </div>
                 @endif
-                @if (Auth::user()->hasPerm('tab_Chat'))
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
-                            {{ __('Chat') }}
-                        </x-nav-link>
-                    </div>
-                @endif
-                @if (Auth::user()->hasPerm('tab_Archive'))
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
-                            {{ __('Archive') }}
-                        </x-nav-link>
-                    </div>
-                @endif
                 @if (Auth::user()->hasPerm('tab_Play'))
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
@@ -135,16 +121,6 @@
             @if (Auth::user()->hasPerm('tab_Room'))
                 <x-responsive-nav-link :href="route('room.home')" :active="request()->routeIs('room.*')">
                     {{ __('Room') }}
-                </x-responsive-nav-link>
-            @endif
-            @if (Auth::user()->hasPerm('tab_Chat'))
-                <x-responsive-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
-                    {{ __('Chat') }}
-                </x-responsive-nav-link>
-            @endif
-            @if (Auth::user()->hasPerm('tab_Archive'))
-                <x-responsive-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
-                    {{ __('Archive') }}
                 </x-responsive-nav-link>
             @endif
             @if (Auth::user()->hasPerm('tab_Play'))

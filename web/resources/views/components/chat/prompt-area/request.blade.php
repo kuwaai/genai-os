@@ -39,7 +39,7 @@
 
 <script>
     function chain_toggle() {
-        $.get("{{ route('chat.chain') }}", {
+        $.get("{{ route('room.chain') }}", {
             switch: $('#chained').prop('disabled')
         }, function() {
             $('#chained').prop('disabled', !$('#chained').prop('disabled'));
@@ -50,7 +50,7 @@
     }
 
     function abortGenerate() {
-        $.get("{{ route('chat.abort', $chatId) }}");
+        $.get("{{ route('room.abort', $chatId) }}");
         return false;
     }
 

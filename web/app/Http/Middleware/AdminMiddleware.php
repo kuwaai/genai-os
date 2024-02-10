@@ -22,7 +22,7 @@ class AdminMiddleware
                 ->hasPerm($config)
         ) {
             return $next($request);
-        } elseif ($config == 'tab_Chat') {
+        } elseif ($config == 'tab_Room') {
             return redirect('/');
         }
 

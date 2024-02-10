@@ -70,7 +70,7 @@
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ $message }}</div>
                 {{-- blade-formatter-enable --}}
-                @if (!$readonly && $history->isbot)
+                @if (!$readonly)
                     <x-chat.react-buttons :history="$history" :showOnFinished='false' />
                 @endif
             </div>

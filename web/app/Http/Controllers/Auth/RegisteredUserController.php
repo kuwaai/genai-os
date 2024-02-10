@@ -89,8 +89,8 @@ class RegisteredUserController extends Controller
             Auth::login($user);
 
             if (Auth::user()->hasVerifiedEmail()){
-                if (Auth::user()->hasPerm('tab_Chat')){
-                    return redirect()->intended("/chats");
+                if (Auth::user()->hasPerm('tab_Room')){
+                    return redirect()->intended("/room");
                 }else{
                     return redirect()->intended("/");
                 }

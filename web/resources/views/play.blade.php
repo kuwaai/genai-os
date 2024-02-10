@@ -18,7 +18,7 @@
                                 <a class="text-blue-400 hover:text-blue-500"
                                     href="{{ route('play.ai_elections.home') }}">AI Election</a>
                             @endif
-                            @if (request()->user()->hasPerm('tab_Chat'))
+                            @if (request()->user()->hasPerm('tab_Room'))
                                 <a class="text-blue-400 hover:text-blue-500 mr-3"
                                     href="{{ route('play.bots.home') }}">Bots</a>
                             @endif

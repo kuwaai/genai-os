@@ -3,9 +3,9 @@
 <div id="create-model-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
     tabindex="-1" aria-hidden="true"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-md max-h-full">
+    <div class="relative w-full max-w-md flex max-h-full overflow-hidden">
         <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 overflow-hidden max-h-full flex flex-col w-full">
             <button type="button"
                 class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
                 data-modal-hide="create-model-modal">
@@ -24,14 +24,12 @@
                 </h3>
             </div>
             <!-- Modal body -->
-            <form method="post" action="{{ route('room.new') }}" class="p-6" id="create_room"
+            <form method="post" action="{{ route('room.new') }}" class="p-6 overflow-hidden flex-1 flex-col flex" id="create_room"
                 onsubmit="return checkForm()">
                 @csrf
-                <input type="hidden" name="limit"
-                    value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
                     {{ __('Select the LLMs you want to use at the same time.') }}</p>
-                <ul class="my-4 space-y-3">
+                <ul class="my-4 space-y-3 overflow-auto scrollbar flex-1">
                     @foreach ($result as $LLM)
                         <li>
                             <input type="checkbox" name="llm[]" id="llm_create_check_{{ $LLM->id }}"
@@ -65,7 +63,7 @@
                     </div>
                 </div>
                 <span id="create_error" class="font-medium text-sm text-red-800 rounded-lg dark:text-red-400 hidden"
-                    role="alert">{{ __('You must select at least 2 LLMs') }}</span>
+                    role="alert">{{ __('You must select at least 1 LLMs') }}</span>
             </form>
         </div>
     </div>
@@ -73,7 +71,7 @@
 
 <script>
     function checkForm() {
-        if ($("#create_room input[name='llm[]']:checked").length > 1) {
+        if ($("#create_room input[name='llm[]']:checked").length > 0) {
             return true;
         } else {
             $("#create_error").show().delay(3000).fadeOut();

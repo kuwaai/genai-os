@@ -5,6 +5,7 @@
         $("#chat_input").prop("readonly", true)
         $("#chat_input").val("訊息處理中...請稍後...")
         $("#submit_msg").hide()
+        if ($("#upload_btn")) $("#upload_btn").hide()
         if ($("#abort_btn")) $("#abort_btn").hide()
         $chattable = false
     }
@@ -24,6 +25,7 @@
                 this.submit();
                 $chattable = false
                 $("#submit_msg").hide()
+                if ($("#upload_btn")) $("#upload_btn").hide()
                 if (!isMac) {
                     $("#chat_input").val("訊息處理中...請稍後...")
                 }
@@ -43,6 +45,16 @@
                 this.submit();
                 $chattable = false
                 $("#submit_msg").hide()
+                if ($("#upload_btn")) $("#upload_btn").hide()
+                if (!isMac) {
+                    $("#chat_input").val("訊息處理中...請稍後...")
+                }
+                $("#chat_input").prop("readonly", true)
+            } else if ($("#upload")[0].files.length > 0) {
+                this.submit();
+                $chattable = false
+                $("#submit_msg").hide()
+                if ($("#upload_btn")) $("#upload_btn").hide()
                 if (!isMac) {
                     $("#chat_input").val("訊息處理中...請稍後...")
                 }
@@ -67,7 +79,7 @@
             }
         })
     }
-    task = new EventSource("{{ route('chat.sse') }}", {
+    task = new EventSource("{{ route('room.sse') }}", {
         withCredentials: false
     });
     task.addEventListener('error', error => {
@@ -78,6 +90,7 @@
             $chattable = true
             $("#submit_msg").show()
             if ($("#abort_btn")) $("#abort_btn").hide();
+            if ($("#upload_btn")) $("#upload_btn").show()
             $("#chat_input").val("")
             $("#chat_input").prop("readonly", false)
             adjustTextareaRows($("#chat_input"))
@@ -86,7 +99,7 @@
                 languages: hljs.listLanguages()
             }); //enable auto detect
             $('#chatroom div.text-sm.space-y-3.break-words pre >div').remove()
-            $('#chatroom div.text-sm.space-y-3.break-words pre code').each(function() {
+            $('#chatroom div.text-sm.space-y-3.break-words pre code.language-undefined').each(function() {
                 $(this).text($(this).text())
                 $(this)[0].dataset.highlighted = '';
                 $(this)[0].classList = ""
@@ -133,6 +146,7 @@ xmlns="http://www.w3.org/2000/svg">
             }); // disable auto detect
             chatroomFormatter($("#history_" + data["history_id"])[0]);
             if ($("#abort_btn")) $("#abort_btn").show();
+            if ($("#upload_btn")) $("#upload_btn").hide()
         }
     });
 
