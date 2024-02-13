@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Models\Chatroom;
+use App\Models\ChatRoom;
 use App\Models\Chats;
 
 return new class extends Migration
@@ -17,7 +17,7 @@ return new class extends Migration
             DB::beginTransaction(); // Start a database transaction
             $chats = Chats::withTrashed()->whereNull("roomID")->get();
             foreach ($chats as $chat){
-                $room = new Chatroom();
+                $room = new ChatRoom();
                 $room->fill(["name"=> $chat->name, "user_id"=>$chat->user_id]);
                 if ($chat->deleted_at !== null) $room->deleted_at = $chat->deleted_at;
                 $room->save();
