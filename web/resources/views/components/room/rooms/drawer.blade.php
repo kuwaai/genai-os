@@ -7,6 +7,6 @@
         <a href="{{ route('room.home') }}"
             class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
             {{ __('Return to Menu') }}</a>
-            <x-room.rooms.list :llms="$llms" :DC="$DC" :result="$result" />
+            <x-room.rooms.list :llms="$llms" :DC="$DC" :result="$result" :channel="1" />
     </div>
 </div>
