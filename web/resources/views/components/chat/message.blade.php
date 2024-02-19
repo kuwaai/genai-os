@@ -2,8 +2,7 @@
 
 @php
     try {
-        $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail($history->chat_id)->llm_id)->image;
-        $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
+        $botimgurl = strpos($history->image, 'data:image/png;base64') === 0 ? $history->image : asset(Storage::url($history->image));
     } catch (\Throwable $e) {
         $botimgurl = '';
     }
@@ -35,7 +34,7 @@
             @if ($anonymous)
                 <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
             @else
-                <img data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
+                <img data-tooltip-target="llm_{{ $history->bot_id }}_chat" data-tooltip-placement="top"
                     src="{{ $botimgurl }}" class="h-full w-full">
             @endif
         </div>
@@ -58,7 +57,7 @@
                 @if ($anonymous)
                     <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
                 @else
-                    <img data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
+                    <img data-tooltip-target="llm_{{ $history->bot_id }}_chat" data-tooltip-placement="top"
                         src="{{ $botimgurl }}" class="h-full w-full">
                 @endif
             </div>

@@ -37,10 +37,6 @@
                     @endif
                     @if (request()->route('room_id'))
                         <input name="room_id" value="{{ request()->route('room_id') }}" hidden>
-                    @elseif (session('llms'))
-                        @foreach (session('llms') as $llm_id)
-                            <input name="llm_ids[]" value="{{ $llm_id }}" hidden>
-                        @endforeach
                     @endif
                     <textarea name="history" id="import_json" rows="5" max-rows="15" oninput="adjustTextareaRows(this)"
                         placeholder="{{ __('You may drop your file here as well...') }}"

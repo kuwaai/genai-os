@@ -218,8 +218,11 @@
     "Disallow": "不允許",
     "Toggle Chain": "單筆多輪切換",
     "Default State": "問答預設使用",
-    "Feedbacks": "回饋機制",
-    "Translate": "翻譯機制",
+    "Allow Feedback": "允許回饋",
+    "Allow Translate": "允許翻譯",
+    "Allow Quote": "允許引用",
+    "Allow Other": "允許其他",
+    "React Buttons":"反應按鈕",
     "System prompt": "系統提示詞",
     "System Prompt for the model": "模型預設會使用的系統提示詞",
     "Copy message": "複製",
@@ -280,5 +283,6 @@
     "Success":"成功",
     "Failed":"失敗",
     "Edit Chat Name":"編輯聊天室名稱",
-    "Save Chat Name":"編輯聊天室名稱"
+    "Save Chat Name":"編輯聊天室名稱",
+    "Store":"商店"
 }

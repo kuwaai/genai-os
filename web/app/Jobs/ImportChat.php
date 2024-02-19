@@ -14,6 +14,7 @@ use App\Models\Histories;
 use App\Models\User;
 use App\Models\Chats;
 use App\Models\LLMs;
+use App\Models\Bots;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use DB;
@@ -43,7 +44,7 @@ class ImportChat implements ShouldQueue
         $dispatchedids = [];
         foreach ($this->ids as $id) {
             $history = Histories::find($id);
-            $access_code = LLMs::find(Chats::find($history->chat_id)->llm_id)->access_code;
+            $access_code = LLMs::find(Bots::find(Chats::find($history->chat_id)->bot_id)->model_id)->access_code;
             if (in_array($access_code, $dispatchedAccessCodes)) {
                 while (count($dispatchedAccessCodes) > 0) {
                     // Retrieve the data from Redis
@@ -55,7 +56,7 @@ class ImportChat implements ShouldQueue
                         return !in_array($history_id, $redisData);
                     });
                     foreach ($filteredData as $id2){
-                        $access_code2 = LLMs::find(Chats::find(Histories::find($id2)->chat_id)->llm_id)->access_code;
+                        $access_code2 = LLMs::find(Bots::find(Chats::find(Histories::find($id2)->chat_id)->bot_id)->model_id)->access_code;
                         unset($dispatchedAccessCodes[array_search($access_code2, $dispatchedAccessCodes)]);
                         unset($dispatchedids[array_search($id2, $dispatchedids)]);
                     }

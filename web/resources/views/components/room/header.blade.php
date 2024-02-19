@@ -1,5 +1,4 @@
 @props(['llms', 'readonly' => false])
-
 @if (!session('llms'))
     <form id="editChat" action="{{ route('room.edit') }}" method="post" class="hidden">
         @csrf
@@ -10,18 +9,18 @@
 <div id="chatHeader"
     class="bg-gray-300 dark:bg-gray-900/70 p-2 sm:p-4 h-20 text-gray-700 dark:text-white items-center flex">
     @if ($readonly)
-        @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', request()->route('room_id'))->orderby('llm_id')->get() as $chat)
+        @foreach ($llms as $chat)
             <div
                 class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                <img data-tooltip-target="llm_{{ $chat->llm_id }}_toggle" data-tooltip-placement="top"
+                <img data-tooltip-target="llm_{{ $chat->id }}_toggle" data-tooltip-placement="top"
                     class="h-full w-full"
                     src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}">
-                <div id="llm_{{ $chat->llm_id }}_toggle" role="tooltip"
+                <div id="llm_{{ $chat->id }}_toggle" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                     {{ $chat->name }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
-                <div id="llm_{{ $chat->llm_id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
+                <div id="llm_{{ $chat->id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                     {{ $chat->name }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
@@ -66,18 +65,18 @@
                     </div>
                 @endforeach
             @elseif(!$readonly)
-                @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', request()->route('room_id'))->orderby('llm_id')->get() as $chat)
+                @foreach ($llms as $chat)
                     <div
                         class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                        <img data-tooltip-target="llm_{{ $chat->llm_id }}_toggle" data-tooltip-placement="top"
+                        <img data-tooltip-target="llm_{{ $chat->id }}_toggle" data-tooltip-placement="top"
                             class="h-full w-full"
                             src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}">
-                        <div id="llm_{{ $chat->llm_id }}_toggle" role="tooltip"
+                        <div id="llm_{{ $chat->id }}_toggle" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                             {{ $chat->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
                         </div>
-                        <div id="llm_{{ $chat->llm_id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
+                        <div id="llm_{{ $chat->id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                             {{ $chat->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
@@ -234,10 +233,7 @@
 
             $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
                 var historyId = $(element).prop("id").replace("history_", "");
-                var msgText = JSON.stringify(histories[historyId]);
-                if (msgText.charAt(0) === '"' && msgText.charAt(msgText.length - 1) === '"') {
-                    msgText = msgText.substring(1, msgText.length - 1);
-                }
+                var msgText = histories[historyId].replaceAll("\n","\\n").replaceAll("\t","\\t");
                 var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
                 var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
 

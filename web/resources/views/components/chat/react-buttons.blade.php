@@ -20,13 +20,10 @@
         </svg>
     </button>
     @if ($history->isbot)
-        @if (
-            (request()->routeIs('chat.*') &&
-                request()->user()->hasPerm('Chat_update_react_message')) ||
-                (request()->routeIs('room.*') &&
-                    request()->user()->hasPerm('Room_update_react_message')))
+        @if (in_array('quote', json_decode($history->config)->react_btn ?? []) &&
+                request()->user()->hasPerm('Room_update_react_message'))
             <button data-tooltip-target="react_quote" data-tooltip-placement="top"
-                onclick="quote({{ $history->llm_id }}, {{ $history->id }}, this)"
+                onclick="quote({{ $history->bot_id }}, {{ $history->id }}, this)"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" height="8" width="8" viewBox="0 0 512 512">
                     <path
@@ -39,18 +36,11 @@
                 </svg>
             </button>
         @endif
-        @if (
-            (request()->routeIs('chat.*') &&
-                request()->user()->hasPerm('Chat_update_feedback')) ||
-                (request()->routeIs('room.*') &&
-                    request()->user()->hasPerm('Room_update_feedback')))
+        @if (in_array('feedback', json_decode($history->config)->react_btn ?? []) &&
+                request()->user()->hasPerm('Room_update_feedback'))
             <button data-tooltip-target="react_like" data-tooltip-placement="top"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
-                @if (
-                    (request()->routeIs('chat.*') &&
-                        request()->user()->hasPerm('Chat_update_detail_feedback')) ||
-                        (request()->routeIs('room.*') &&
-                            request()->user()->hasPerm('Room_update_detail_feedback'))) data-modal-target="feedback" data-modal-toggle="feedback" @endif
+                @if (request()->user()->hasPerm('Room_update_detail_feedback')) data-modal-target="feedback" data-modal-toggle="feedback" @endif
                 onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
                     json_encode(['detail' => $history->detail, 'flags' => $history->flags, 'nice' => $history->nice]),
                 ) !!});">
@@ -77,11 +67,8 @@
                 </svg>
             </button>
         @endif
-        @if (
-            (request()->routeIs('chat.*') &&
-                request()->user()->hasPerm('Chat_update_react_message')) ||
-                (request()->routeIs('room.*') &&
-                    request()->user()->hasPerm('Room_update_react_message')))
+        @if (in_array('translate', json_decode($history->config)->react_btn ?? []) &&
+                request()->user()->hasPerm('Room_update_react_message'))
             <button data-tooltip-target="react_translate" data-tooltip-placement="top"
                 onclick="translates(this, {{ $history->id }}, null)"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg translates">
@@ -112,6 +99,9 @@
                         d="M504 256c0 137-111 248-248 248S8 393 8 256C8 119.1 119 8 256 8s248 111.1 248 248zm-248 50c-25.4 0-46 20.6-46 46s20.6 46 46 46 46-20.6 46-46-20.6-46-46-46zm-43.7-165.3l7.4 136c.3 6.4 5.6 11.3 12 11.3h48.5c6.4 0 11.6-5 12-11.3l7.4-136c.4-6.9-5.1-12.7-12-12.7h-63.4c-6.9 0-12.4 5.8-12 12.7z" />
                 </svg>
             </button>
+        @endif
+        @if (in_array('other', json_decode($history->config)->react_btn ?? []) &&
+                request()->user()->hasPerm('Room_update_react_message'))
             <button data-tooltip-target="react_safetyGuard" data-tooltip-placement="top"
                 onclick="translates(this, {{ $history->id }}, 'safety-guard')"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg translates">

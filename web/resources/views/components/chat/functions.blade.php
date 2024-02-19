@@ -183,7 +183,7 @@ xmlns="http://www.w3.org/2000/svg">
             $prevUserMsg = $prevUser.find('div div div').text().trim()
             $refRecord = $(node).parent().parent().prevAll('div').filter(function() {
                 $msgWindow = $(this).find('div div div.bot-msg');
-                return $msgWindow.length != 0 && $msgWindow.text().trim() == $prevUserMsg;
+                return $msgWindow.length != 0 && `"""${$msgWindow.text().trim()}"""` == $prevUserMsg;
             }).first().find("div div")
             if ($refRecord.length > 0) {
                 if (flag) {
