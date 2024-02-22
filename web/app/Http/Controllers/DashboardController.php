@@ -15,17 +15,7 @@ class DashboardController extends Controller
     function home(Request $request)
     {
         if ($request->input('tab')) {
-            return Redirect::route('dashboard.home')
-                ->with('last_tab', $request->input('tab'))
-                ->with('page', $request->input('page'))
-                ->with('start_date', $request->input('start_date'))
-                ->with('end_date', $request->input('end_date'))
-                ->with('action', $request->input('action'))
-                ->with('description', $request->input('description'))
-                ->with('user_id', $request->input('user_id'))
-                ->with('ip_address', $request->input('ip_address'))
-                ->with('target', $request->input('target'))
-                ->with('search', $request->input('search'));
+            return Redirect::route('dashboard.home')->with('last_tab', $request->input('tab'))->with('page', $request->input('page'))->with('start_date', $request->input('start_date'))->with('end_date', $request->input('end_date'))->with('action', $request->input('action'))->with('description', $request->input('description'))->with('user_id', $request->input('user_id'))->with('ip_address', $request->input('ip_address'))->with('target', $request->input('target'))->with('search', $request->input('search'));
         }
         return view('dashboard.home');
     }
@@ -93,19 +83,15 @@ class DashboardController extends Controller
                     $filePath = storage_path('app/' . $fileName);
 
                     // Return the file as a downloadable response
-                    return response()
-                        ->download($filePath)
-                        ->deleteFileAfterSend(true);
+                    return response()->download($filePath)->deleteFileAfterSend(true);
                 } catch (\Throwable) {
                 }
-                return Redirect::route('dashboard.home')
-                    ->with('last_tab', 'feedbacks')
-                    ->with('rawdata', $request->input('rawdata'))
-                    ->with('status', 'rawdata-error');
+                return Redirect::route('dashboard.home')->with('last_tab', 'feedbacks')->with('rawdata', $request->input('rawdata'))->with('status', 'rawdata-error');
             } elseif ($request->input('models')) {
                 $data = Histories::withTrashed()
                     ->Join('chats', 'histories.chat_id', '=', 'chats.id')
-                    ->Join('llms', 'llm_id', '=', 'llms.id')
+                    ->join("bots","bots.id", "=","chats.bot_id")
+                    ->Join('llms', 'bots.model_id', '=', 'llms.id')
                     ->leftjoin('feedback', 'histories.id', '=', 'history_id')
                     ->select('histories.msg as content', 'histories.created_at', 'histories.updated_at', 'histories.deleted_at', 'histories.chained as chain', 'histories.chat_id as id', 'histories.isbot', 'chats.user_id', 'histories.id as history_id', 'llms.access_code', 'feedback.detail', 'feedback.flags', 'feedback.nice')
                     ->orderby('access_code')
@@ -113,7 +99,7 @@ class DashboardController extends Controller
                     ->orderby('id')
                     ->orderby('created_at')
                     ->orderby('histories.id', 'desc')
-                    ->whereIn('llm_id', $request->input('models'))
+                    ->whereIn('llms.id', $request->input('models'))
                     ->get()
                     ->groupBy('access_code', 'user_id', 'id')
                     ->filter(function ($access_codes) {
@@ -189,11 +175,10 @@ class DashboardController extends Controller
                 $filePath = storage_path('app/' . $fileName);
 
                 // Return the file as a downloadable response
-                return response()
-                    ->download($filePath)
-                    ->deleteFileAfterSend(true);
+                return response()->download($filePath)->deleteFileAfterSend(true);
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            dd($e);
         }
         return Redirect::route('dashboard.home')->with('last_tab', 'feedbacks');
     }
@@ -269,9 +254,7 @@ class DashboardController extends Controller
         $response = Http::put(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value . '/v1/management/rule/' . $request->route('rule_id'), $transformedData);
         // Check the response and return accordingly
         if ($response->successful()) {
-            return Redirect::route('dashboard.home')
-                ->with('last_tab', $request->input('tab'))
-                ->with('rule_id', $request->route('rule_id'));
+            return Redirect::route('dashboard.home')->with('last_tab', $request->input('tab'))->with('rule_id', $request->route('rule_id'));
         } else {
             return response()->json($response->json(), $response->status());
         }

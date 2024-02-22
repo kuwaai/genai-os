@@ -17,6 +17,7 @@ use App\Jobs\ImportChat;
 use App\Jobs\RequestChat;
 use App\Models\Chats;
 use App\Models\LLMs;
+use App\Models\Bots;
 use App\Models\User;
 use App\Models\Feedback;
 use DB;
@@ -26,24 +27,24 @@ class BotController extends Controller
 {
     public function home(Request $request)
     {
-        $result = DB::table(function ($query) {
-            $query
-                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                ->from('group_permissions')
-                ->join('permissions', 'perm_id', '=', 'permissions.id')
-                ->where('group_id', Auth()->user()->group_id)
-                ->where('name', 'like', 'model_%')
-                ->get();
-        }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-            ->select('tmp.*', 'llms.*')
-            ->where('llms.enabled', true)
-            ->orderby('llms.order')
-            ->orderby('llms.created_at');
-        if ($result->count() == 1 && Auth::user()->hasPerm('Chat_update_new_chat')) {
-            return redirect()->route('store.new', $result->first()->id);
-        } else {
-            return view('store');
+        return view('store');
+    }
+    public function create(Request $request)
+    {
+        $model_id = LLMs::where('name', '=', $request->input('llm_name'))->first()->id;
+        if ($model_id) {
+            $bot = new Bots();
+            $bot->fill(['name' => $request->input('bot-name'), 'type' => 'prompt', 'visibility' => 1, "description"=>$request->input('bot-describe'),"model_id"=>$model_id]); // 1 for public
+            $bot->save();
+            $request->input('startup-prompt');
+            $request->input('welcome-message');
         }
+
+        return redirect()->route('store.home');
+    }
+    public function update(Request $request)
+    {
+        
+        return redirect()->route('store.home');
     }
 }

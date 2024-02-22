@@ -177,7 +177,8 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             ->prefix('store')
             ->group(function () {
                 Route::get('/', [BotController::class, 'home'])->name('store.home');
-
+                Route::post('/create', [BotController::class, 'create'])->name('store.create');
+                Route::patch('/update', [BotController::class, 'update'])->name('store.update');
             })
             ->name('store');
         #---Manage
