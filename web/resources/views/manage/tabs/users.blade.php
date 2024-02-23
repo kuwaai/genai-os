@@ -201,7 +201,7 @@
                         <div class="flex-1 overflow-y-auto scrollbar">
                             @foreach ($fuzzy_result as $user)
                             <script>
-                                $users[{{ $user->id }}] = {!! json_encode([$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id], JSON_HEX_APOS) !!}
+                                $users[{{ $user->id }}] = {!! json_encode([$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id, $user->detail], JSON_HEX_APOS) !!}
                             </script>
 
                             <div
