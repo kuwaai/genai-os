@@ -3,6 +3,22 @@
     <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
         <div class="flex items-center justify-center overflow-hidden">
             @env(['nuk'])
+            <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
+                <a class="flex items-center overflow-hidden" href="https://www.nuk.edu.tw/" target="_blank">
+                    <div class="hidden md:block">
+                        <img class="mr-3 hidden dark:block" src="{{ asset('images/nuk.png') }}">
+                        <img class="mr-3 dark:hidden block" src="{{ asset('images/nuk_dark.png') }}">
+                    </div>
+                    <img class="block md:hidden rounded-full w-[150px]" src="{{ asset('images/nuk_logo.jpg') }}">
+                    <div class="flex md:hidden flex-col ml-4 text-[50px]">
+                        <span>NUK</span>
+                        <span class="pt-4">Chat</span>
+                    </div>
+                    <span class="hidden md:block text-[75px]">Chat</span>
+                </a>
+            </h3>
+            @endenv
+            @env(['csie'])
             <a class="rounded-full overflow-hidden" href="https://www.csie.nuk.edu.tw/" target="_blank">
                 <img class="w-[150px]" src="{{ asset('images/csie.png') }}">
             </a>
@@ -17,7 +33,7 @@
                 <img class="w-[150px]" src="{{ asset('images/icdesign.jpg') }}">
             </a>
             @endenv
-            @env('nuk')
+            @env('csie')
             <div class="flex flex-col ml-4 text-[50px]">
                 <span>LLM</span>
                 <span class="pt-4">Workspace</span>
@@ -37,7 +53,7 @@
                 @endenv
             </div>
             @endenv
-            @env("icdesign")
+            @env('icdesign')
             <div class="flex flex-col ml-4 text-[50px]">
                 <span class="text-[72px] text-orange-300">Kuwa</span>
                 <span class="text-[60px]">IC Design</span>
@@ -45,7 +61,7 @@
             @endenv
         </div>
     </h3>
-    @else
+@else
     <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
         <a class="flex items-center overflow-hidden" href="https://taide.tw/" target="_blank">
             <div>
