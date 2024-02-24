@@ -34,7 +34,7 @@ class BotController extends Controller
         $model_id = LLMs::where('name', '=', $request->input('llm_name'))->first()->id;
         if ($model_id) {
             $bot = new Bots();
-            $bot->fill(['name' => $request->input('bot-name'), 'type' => 'prompt', 'visibility' => 1, "description"=>$request->input('bot-describe'),"model_id"=>$model_id]); // 1 for public
+            $bot->fill(['name' => $request->input('bot-name'), 'type' => 'prompt', 'visibility' => 1, "description"=>$request->input('bot-describe'),"model_id"=>$model_id, "config"=>null]); // 1 for public
             $bot->save();
             $request->input('startup-prompt');
             $request->input('welcome-message');
