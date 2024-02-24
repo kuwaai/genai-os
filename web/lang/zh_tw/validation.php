@@ -157,4 +157,7 @@ return [
     'url' => '該 :attribute 欄位必須為有效的 URL。 ',
     'ulid' => '該 :attribute 欄位必須為有效的 ULID。 ',
     'uuid' => '該 :attribute 欄位必須為有效的 UUID。 ',
+    'email_domain' => [
+        'invalid' => '該 :attribute 必須是有效的電子郵件網域。',
+    ],
 ];

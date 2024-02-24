@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('ipCheck','auth:sanctum')->group(function () {
 
     Route::get('user', function (Request $request) {
         // Get the user data
@@ -34,7 +34,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $filteredUserData;
     });
 });
-
-Route::get('islogin', function (Request $request) {
+Route::middleware('ipCheck')->get('islogin', function (Request $request) {
     return ['logged_in' => $request->user() ? true : false];
 });

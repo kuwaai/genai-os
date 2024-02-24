@@ -286,5 +286,7 @@
     "Store":"商店",
     "Offical Bots":"官方Bot",
     "You must select a base model":"你必須選一個基底模型",
-    "Community Bots":"社群Bot"
+    "Community Bots":"社群Bot",
+    "This service only allow internal IPs":"該服務只允許內部IP",
+    "The service only allows the use of campus IP addresses":"該服務只允許校內IP使用"
 }

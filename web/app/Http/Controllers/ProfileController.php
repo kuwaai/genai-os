@@ -55,6 +55,50 @@ class ProfileController extends Controller
         ]);
     }
 
+    public static function isIPInCIDRList($ipAddress, $cidrList)
+    {
+        $ipVersion = filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 4 : (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 6 : null);
+
+        // Filter CIDR list based on IP version
+        $filteredCIDRList = array_filter($cidrList, function ($cidr) use ($ipVersion) {
+            return strpos($cidr, '/') !== false && filter_var(explode('/', $cidr)[0], FILTER_VALIDATE_IP, $ipVersion === 4 ? FILTER_FLAG_IPV4 : FILTER_FLAG_IPV6) !== false;
+        });
+
+        foreach ($filteredCIDRList as $cidr) {
+            [$subnet, $mask] = explode('/', $cidr);
+            $mask = (int) $mask;
+
+            if ($ipVersion === 4) {
+                $subnetLong = ip2long($subnet);
+                $ipLong = ip2long($ipAddress);
+                $network = $subnetLong & (-1 << 32 - $mask);
+                $ipNetwork = $ipLong & (-1 << 32 - $mask);
+
+                if ($network === $ipNetwork) {
+                    return true;
+                }
+            } elseif ($ipVersion === 6) {
+                $subnetBinary = inet_pton($subnet);
+                $ipBinary = inet_pton($ipAddress);
+                $subnetChunks = unpack('n*', $subnetBinary);
+                $ipChunks = unpack('n*', $ipBinary);
+
+                for ($i = 1; $i <= $mask / 16; $i++) {
+                    $networkChunk = $subnetChunks[$i] & (-1 << 16 - min($mask - ($i - 1) * 16, 16));
+                    $ipNetworkChunk = $ipChunks[$i] & (-1 << 16 - min($mask - ($i - 1) * 16, 16));
+
+                    if ($networkChunk !== $ipNetworkChunk) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function api_register(Request $request)
     {
         $lockoutCount = RateLimiter::attempts($request->ip());
@@ -68,50 +112,7 @@ class ProfileController extends Controller
             $allowlist = $path . '/allowlist.txt';
             $allowlist = Storage::exists($allowlist) ? explode("\n", Storage::get($allowlist)) : null;
 
-            function isIPInCIDRList($ipAddress, $cidrList)
-            {
-                $ipVersion = filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 4 : (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 6 : null);
-
-                // Filter CIDR list based on IP version
-                $filteredCIDRList = array_filter($cidrList, function ($cidr) use ($ipVersion) {
-                    return strpos($cidr, '/') !== false && filter_var(explode('/', $cidr)[0], FILTER_VALIDATE_IP, $ipVersion === 4 ? FILTER_FLAG_IPV4 : FILTER_FLAG_IPV6) !== false;
-                });
-
-                foreach ($filteredCIDRList as $cidr) {
-                    [$subnet, $mask] = explode('/', $cidr);
-                    $mask = (int) $mask;
-
-                    if ($ipVersion === 4) {
-                        $subnetLong = ip2long($subnet);
-                        $ipLong = ip2long($ipAddress);
-                        $network = $subnetLong & (-1 << 32 - $mask);
-                        $ipNetwork = $ipLong & (-1 << 32 - $mask);
-
-                        if ($network === $ipNetwork) {
-                            return true;
-                        }
-                    } elseif ($ipVersion === 6) {
-                        $subnetBinary = inet_pton($subnet);
-                        $ipBinary = inet_pton($ipAddress);
-                        $subnetChunks = unpack('n*', $subnetBinary);
-                        $ipChunks = unpack('n*', $ipBinary);
-
-                        for ($i = 1; $i <= $mask / 16; $i++) {
-                            $networkChunk = $subnetChunks[$i] & (-1 << 16 - min($mask - ($i - 1) * 16, 16));
-                            $ipNetworkChunk = $ipChunks[$i] & (-1 << 16 - min($mask - ($i - 1) * 16, 16));
-
-                            if ($networkChunk !== $ipNetworkChunk) {
-                                return false;
-                            }
-                        }
-
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            if ($allowlist ? isIPInCIDRList($request->ip(), $allowlist) : true) {
+            if ($allowlist ? $this->isIPInCIDRList($request->ip(), $allowlist) : true) {
                 if (isset($encryptedData[3])) {
                     $privKey = Storage::get($path . '/priv.pem');
                     $pubKey = Storage::get($path . '/pub.pem');
