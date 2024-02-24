@@ -1,5 +1,5 @@
 <div class="flex items-center flex-col">
-    @env(['kuwa', 'arena', 'nuk', 'chipllm', 'icdesign'])
+    @env(['kuwa', 'arena', 'nuk', 'csie', 'chipllm', 'icdesign'])
     <h3 class="text-5xl font-bold mb-2 text-blue-600 dark:text-cyan-200">
         <div class="flex items-center justify-center overflow-hidden">
             @env(['nuk'])
