@@ -288,5 +288,7 @@
     "Backend Offline":"後端離線",
     "Compiling":"編譯中",
     "Success":"成功",
-    "Failed":"失敗"
+    "Failed":"失敗",
+    "This service only allow internal IPs":"該服務只允許內部IP",
+    "The service only allows the use of campus IP addresses":"該服務只允許校內IP使用"
 }
