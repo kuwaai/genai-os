@@ -15,6 +15,7 @@ use Illuminate\View\View;
 use App\Models\SystemSetting;
 use App\Models\Groups;
 use App\Models\User;
+use App\Rules\AllowedEmailDomain;
 
 class RegisteredUserController extends Controller
 {
@@ -47,11 +48,10 @@ class RegisteredUserController extends Controller
         ) {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class, new AllowedEmailDomain],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
                 'invite_token' => ['max:32'],
             ]);
-
             if (
                 SystemSetting::where('key', 'register_need_invite')
                     ->where('value', 'true')
@@ -73,8 +73,8 @@ class RegisteredUserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-            if ($request->invite_token) {
-                $group = Groups::where('invite_token', '=', $request->invite_token);
+            if ($request->invite_token ?? env('DEFAULT_GROUP')) {
+                $group = Groups::where('invite_token', '=', $request->invite_token ?? env('DEFAULT_GROUP'));
                 if ($group->exists()) {
                     $user->group_id = $group->first()->id;
                     $user->save();
