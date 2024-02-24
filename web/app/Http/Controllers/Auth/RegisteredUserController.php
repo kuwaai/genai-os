@@ -24,14 +24,10 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
-        if (
-            SystemSetting::where('key', 'allowRegister')
-                ->where('value', 'true')
-                ->exists()
-        ) {
+        if (SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists()) {
             return view('auth.register');
         }
-        return redirect()->intended("/");
+        return redirect()->intended('/');
     }
 
     /**
@@ -41,22 +37,14 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (
-            SystemSetting::where('key', 'allowRegister')
-                ->where('value', 'true')
-                ->exists()
-        ) {
+        if (SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists()) {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class, new AllowedEmailDomain],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class, new AllowedEmailDomain()],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
                 'invite_token' => ['max:32'],
             ]);
-            if (
-                SystemSetting::where('key', 'register_need_invite')
-                    ->where('value', 'true')
-                    ->exists()
-            ) {
+            if (SystemSetting::where('key', 'register_need_invite')->where('value', 'true')->exists()) {
                 $request->validate([
                     'invite_token' => [
                         'required',
@@ -73,12 +61,19 @@ class RegisteredUserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-            if ($request->invite_token ?? env('DEFAULT_GROUP')) {
-                $group = Groups::where('invite_token', '=', $request->invite_token ?? env('DEFAULT_GROUP'));
-                if ($group->exists()) {
-                    $user->group_id = $group->first()->id;
-                    $user->save();
-                }
+            
+            $defaultGroup = env('DEFAULT_GROUP');
+            $inviteToken = $request->invite_token ?? $defaultGroup;
+            
+            $group = Groups::where('invite_token', '=', $inviteToken)->first();
+            
+            if (!$group && $request->invite_token && $defaultGroup) {
+                $group = Groups::where('invite_token', '=', $defaultGroup)->first();
+            }
+            
+            if ($group) {
+                $user->group_id = $group->id;
+                $user->save();
             }
 
             $user->tokens()->delete();
@@ -95,8 +90,8 @@ class RegisteredUserController extends Controller
                     return redirect()->intended("/");
                 }
             }
-            return redirect()->intended("/verify-email");
+            return redirect()->intended('/verify-email');
         }
-        return redirect("/");
+        return redirect('/');
     }
 }
