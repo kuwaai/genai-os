@@ -40,10 +40,10 @@ class DetectionService(DetectionServicer):
 
     async def _filter(self, request, context, chain:ChainEnum):
         last_role_map = {
-            ChainEnum.pre_filter: ChatRecord.ROLE_USER,
-            ChainEnum.post_filter: ChatRecord.ROLE_ASSISTANT
+            ChainEnum.pre_filter: [ChatRecord.ROLE_USER, ChatRecord.ROLE_ASSISTANT],
+            ChainEnum.post_filter: [ChatRecord.ROLE_ASSISTANT]
             }
-        assert request.chat_records[-1].role == last_role_map[chain]
+        assert request.chat_records[-1].role in last_role_map[chain]
         logger.debug(request)
         chat_records = DetectionService.convert_chat_records(request.chat_records)
         store = get_guard_storage()
