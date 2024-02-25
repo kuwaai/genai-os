@@ -91,6 +91,7 @@
     "Tab Permissions": "頁面權限",
     "Description": "敘述",
     "Invite Token": "邀請碼",
+    "Invite Token (Optional)": "邀請碼 (選填)",
     "Register": "註冊",
     "Already registered?": "已經註冊了？登入",
     "A document is required in order to use this LLM, <br>Please upload a file first.": "需要由一個文件起頭才能使用該模型，<br>請先上傳一個文件檔案(上限10MB)。",

@@ -39,11 +39,12 @@
         </div>
 
         <div class="mt-4">
-            <x-input-label for="invite_token" :value="__('Invite Token')" />
-            @if (App\Models\SystemSetting::where('key', 'register_need_invite')->where("value",'true')->exists())
+            @if (App\Models\SystemSetting::where('key', 'register_need_invite')->where('value', 'true')->exists())
+                <x-input-label for="invite_token" :value="__('Invite Token')" />
                 <x-text-input id="invite_token" class="block mt-1 w-full" type="text" name="invite_token"
                     autocomplete="off" required />
             @else
+                <x-input-label for="invite_token" :value="__('Invite Token (Optional)')" />
                 <x-text-input id="invite_token" class="block mt-1 w-full" type="text" name="invite_token"
                     autocomplete="off" />
             @endif
