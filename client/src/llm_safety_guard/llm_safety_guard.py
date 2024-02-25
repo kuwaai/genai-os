@@ -19,6 +19,7 @@ class AcceptedReturnType(Enum):
 class LlmSafetyGuard:
     """
     The public API to use the Safety Guard.
+    A LlmSafetyGuard object should handle exactly one request-response pair.
     """
     
     # The singleton target cache
@@ -27,6 +28,8 @@ class LlmSafetyGuard:
     def __init__(self, n_max_buffer=100, streaming=True):
         self.buffer = PassageBuffer(n_max_buffer=n_max_buffer, streaming=streaming)
         self.detector = DetectionClient()
+        self.seen_msgs = [] # To prevent output duplicated warning messages.
+        self.response_accumulator = ''
 
     def guard(self, func):
         """
@@ -69,8 +72,91 @@ class LlmSafetyGuard:
         """
 
         LlmSafetyGuard.target_cache.update_list()
+
+    def pre_filter(
+        self,
+        chat_history:List[dict],
+        model_id:str
+    ) -> (bool, str | None):
+        """
+        Public API to check the user input. The caller is responsible for
+        outputting the warning message if necessary, and terminating the session
+        if the request is blocked.
+
+        Arguments:
+            chat_history, model_id: Same as the description in the "guard" method.
+        
+        Return: (block, message)
+            block: Boolean value indicating whether the session should be terminated.
+            message: The warning message. The value "None" means no message need to be output.
+        """
+
+        # Bypass if can't connect to the detector or the model does not need
+        # to be guarded.
+        if not self.target_cache.should_guard(model_id) or not self.detector.is_online():
+            return False, None
+
+        safe, action, msg = self.detector.pre_filter(chat_history, model_id)
+        logger.debug(f'pre-filter: safe={safe}, action={action}, msg={msg}')
+        msg = None if safe or not msg else self._format_warning_message(msg)
+        block = not safe and action == ActionEnum.block
+        self.seen_msgs.append(msg)
+
+        return block, msg
+
+    def post_filter(
+        self,
+        chat_history:List[dict],
+        model_id:str,
+        chunk:str,
+        last:bool
+    ) -> (str | None, bool, str | None):
+        """
+        Public API to check the assistant output. The caller is responsible for
+        outputting the warning message if necessary, and terminating the session
+        if the request is blocked.
+
+        Arguments:
+            chat_history, model_id: Same as the description in the "guard" method.
+            chunk: The response chunk generated from the assistant. The internal state will accumulate the response chunk automatically.
+            last: Boolean value indicating whether the response chunk is the last chunk.
+        
+        Return: (chunk, block, message)
+            chunk: The response chunk that the SafetyGuard generates. Note that the output chunk is not necessarily equal to the input chunk due to the buffering mechanism and overwrite mechanism.
+            block: Boolean value indicating whether the session should be terminated.
+            message: The warning message. The value "None" means no message need to be output.
+        """
+        
+        # Bypass if can't connect to the detector or the model does not need
+        # to be guarded.
+        if not self.target_cache.should_guard(model_id) or not self.detector.is_online():
+            return chunk, False, None
+        
+        # Construct the chunk
+        self.buffer.append(chunk, last)
+        chunk = self.buffer.get_chunk()
+        if not chunk:
+            return None, False, None
+
+        # Check whether the chunk is safe
+        self.response_accumulator += chunk
+        safe, action, msg = self.detector.post_filter(chat_history, self.response_accumulator, model_id)
+
+        logger.debug(f'post-filter: safe={safe}, action={action}, msg={msg}')
+        block = False
+        warn_msg = None
+        if not safe:
+            if action == ActionEnum.overwrite:
+                chunk = msg
+            elif msg and msg not in self.seen_msgs:
+                self.seen_msgs.append(msg)
+                warn_msg = self._format_warning_message(msg)
+            if action == ActionEnum.block:
+                block, chunk = True, warn_msg
+
+        return chunk, block, warn_msg
     
-    def _guard_impl(self, chat_history:str, model_id:str, orig_gen, at_exit:Callable=None):
+    def _guard_impl(self, chat_history:List[dict], model_id:str, orig_gen, at_exit:Callable=None):
         """
         A generator that implements the guarding function.
         Arguments:
@@ -81,40 +167,26 @@ class LlmSafetyGuard:
         """
         
         # Pre-filter
-        safe, action, msg = self.detector.pre_filter(chat_history, model_id)
-        logger.debug(f'pre-filter: safe={safe}, action={action}, msg={msg}')
-        if not safe:
-            if msg: yield self._format_warning_message(msg)
-            if action == ActionEnum.block:
-                if at_exit: at_exit()
-                return
-
+        block, msg = self.pre_filter(chat_history, model_id)
+        if msg: yield msg
+        if block:
+            if at_exit: at_exit()
+            return
+        
         # Post-filter
-        seen_msgs = [msg] # To prevent output duplicated warning messages.
         finished = False
-        response = ''
         while not finished:
-            # Construct the chunk
+            # Consume the original generator.
             output, finished = self._get_unread_contents(orig_gen)
-            if not output: continue
-            self.buffer.append(output, finished)
-            chunk = self.buffer.get_chunk()
+            if not output and not finished: continue
+
+            chunk, block, msg = self.post_filter(chat_history, model_id, output, finished)
             if not chunk: continue
 
-            # Check whether the chunk is safe
-            response += chunk
-            safe, action, msg = self.detector.post_filter(chat_history, response, model_id)
-
-            logger.debug(f'post-filter: safe={safe}, action={action}, msg={msg}')
-            if not safe:
-                if action == ActionEnum.overwrite:
-                    chunk = msg
-                elif msg and msg not in seen_msgs:
-                    seen_msgs.append(msg)
-                    yield self._format_warning_message(msg)
-                if action == ActionEnum.block:
-                    if at_exit: at_exit()
-                    return
+            if msg: yield msg
+            if block:
+                if at_exit: at_exit()
+                return
 
             yield chunk
         if at_exit: at_exit()
@@ -131,6 +203,7 @@ class LlmSafetyGuard:
             while t-begin_t < time_budget_sec:
                 result += next(gen)
                 t = default_timer()
+                break
         except StopIteration:
             finished = True
         return result, finished

@@ -88,7 +88,7 @@ class DetectionClient:
         }
         result = [
             ChatRecord(role=role_map[r['role']], content=r['content'])
-            for r in chat_history
+            for r in chat_history if r['role'] in role_map
         ]
         if response:
             result.append(ChatRecord(role=role_map['assistant'], content=response))
