@@ -11,18 +11,23 @@ def completions():
     # Forward SSE stream to the READY state LLM API, If no exist then return empty message
     # Parameters: name, input, history_id, user_id
     llm_name, inputs, history_id, chatgpt_apitoken, user_id = request.form.get("name"), request.form.get("input"), request.form.get("history_id"), request.form.get("chatgpt_apitoken"), request.form.get("user_id")
+
+    #Find the scheduled worker. The default worker is the executor if there's no such worker named llm_name.
+    dest = data.get(executor_name, [])
     if data.get(llm_name):
         dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == history_id and i[3] == user_id]
-        if len(dest) > 0:
-            dest = dest[0]
-            result = completions_backend(
-                inputs=inputs,
-                llm_name=llm_name,
-                dest=dest,
-                chatgpt_apitoken=chatgpt_apitoken
-            )
-            return result
-    return ""
+    
+    result = ""
+    if len(dest) > 0:
+        dest = dest[0]
+        result = completions_backend(
+            inputs=inputs,
+            llm_name=llm_name,
+            dest=dest,
+            chatgpt_apitoken=chatgpt_apitoken
+        )
+    
+    return result
 
 @safety_middleware
 def completions_backend(inputs:list, llm_name:str, dest:List, chatgpt_apitoken:Optional[str]):
@@ -43,7 +48,12 @@ def completions_backend(inputs:list, llm_name:str, dest:List, chatgpt_apitoken:O
     """
 
     try:
-        response = requests.post(dest[0], data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken}, stream=True, timeout=60)
+        response = requests.post(
+            dest[0],
+            data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken, "bot_id": llm_name},
+            stream=True,
+            timeout=60
+        )
         def event_stream(dest, response):
             dest[1] = "BUSY"
             try:

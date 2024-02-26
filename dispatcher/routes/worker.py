@@ -16,6 +16,9 @@ def status():
                     i[3] = user_id
                     log(0, f"Scheduled {llm_name},{i[0]} for {history_id},{user_id}")
                     return "READY"
+        elif data.get(executor_name):
+            log(0, f"Scheduled {executor_name},{data[executor_name][0][0]} for {history_id},{user_id}")
+            return "READY"
         else:
             log(0, f"No machine for {llm_name} has founded, returning NOMACHINE code")
             return "NOMACHINE"

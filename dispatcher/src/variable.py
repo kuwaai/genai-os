@@ -6,6 +6,8 @@ data = {}
 log_folder = "logs"
 record_file = "records.pickle"
 
+executor_name = 'EXECUTOR'
+
 port = 9000
 ip = "0.0.0.0"
 
