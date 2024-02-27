@@ -33,5 +33,5 @@ class ExecutorProcess(GeneralProcessInterface):
 
   async def abort(self, job_id:str):
     if job_id in self.running_bots:
-      self.running_bots[job_id].abort()
-    self.stop.set()
+      await self.running_bots[job_id].abort(job_id)
+      print(f'Aborted job {job_id}')

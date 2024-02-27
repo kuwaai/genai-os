@@ -1,4 +1,5 @@
 model_framework
+aiohttp
 # opencc
 # torch
 # transformers
