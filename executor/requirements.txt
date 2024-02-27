@@ -1,0 +1,8 @@
+model_framework
+# opencc
+# torch
+# transformers
+# sentenct-transformers
+# accelerate
+# sentencepiece
+# openai
