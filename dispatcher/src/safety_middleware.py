@@ -9,7 +9,9 @@ from .functions import log
 def safety_middleware(func, n_max_buffer=50, streaming=True):
     bypass = True
     try:
+        import llm_safety_guard
         from llm_safety_guard import LlmSafetyGuard
+        log(0, f'Loaded llm-safety-guard version {llm_safety_guard.__version__}')
         bypass = False
     except ImportError:
         logging.exception('Bypassing')

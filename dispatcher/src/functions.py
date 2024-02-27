@@ -1,4 +1,5 @@
 import os, logging, re, gzip, pickle, requests
+import uuid
 from urllib.parse import urlparse
 from flask import make_response
 from json import dumps
@@ -60,3 +61,7 @@ def loadRecords(var, keep_state = False):
                     log(0,f"Healthy check failed in {i} at {k[0]}, removed")
         if len(data[i]) == 0: del data[i]
     log(0,"Records loaded, Here's After\n",data)
+
+def get_job_id(user_id:str, history_id:str):
+    unique_id = str(user_id)+str(history_id)
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, unique_id))

@@ -17,6 +17,7 @@ def completions():
     if data.get(llm_name):
         dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == history_id and i[3] == user_id]
     
+    job_id = get_job_id(user_id, history_id)
     result = ""
     if len(dest) > 0:
         dest = dest[0]
@@ -24,13 +25,14 @@ def completions():
             inputs=inputs,
             llm_name=llm_name,
             dest=dest,
+            job_id=job_id,
             chatgpt_apitoken=chatgpt_apitoken
         )
     
     return result
 
 @safety_middleware
-def completions_backend(inputs:list, llm_name:str, dest:List, chatgpt_apitoken:Optional[str]):
+def completions_backend(inputs:list, llm_name:str, dest:List, job_id:str, chatgpt_apitoken:Optional[str]):
     """
     The backend portion of the completions endpoint. It forwards the user
     request to the backend.  This separation enables middleware can be installed
@@ -50,7 +52,7 @@ def completions_backend(inputs:list, llm_name:str, dest:List, chatgpt_apitoken:O
     try:
         response = requests.post(
             dest[0],
-            data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken, "bot_id": llm_name},
+            data={"input": inputs, "chatgpt_apitoken":chatgpt_apitoken, "bot_id": llm_name, "job_id": job_id},
             stream=True,
             timeout=60
         )
@@ -81,5 +83,6 @@ def abort():
         for i, o in data.items():
             dest = [k for k in o if int(k[2]) in history_id and k[3] == user_id]
             for d in dest:
-                requests.get(d[0] + "/abort", timeout=10)
+                job_id = get_job_id(user_id, d[2])
+                requests.get(d[0] + "/abort", params={"job_id": job_id}, timeout=10)
     return "Success"
