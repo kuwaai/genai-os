@@ -1,6 +1,7 @@
 @php
     $allowedCIDRs = array_filter(explode(',', env('ALLOWED_IPS', '')), 'strlen');
-    $ip_allowed = !$allowedCIDRs || App\Http\Controllers\ProfileController::isIPInCIDRList(request()->ip(), $allowedCIDRs);
+    $ip_allowed =
+        !$allowedCIDRs || App\Http\Controllers\ProfileController::isIPInCIDRList(request()->ip(), $allowedCIDRs);
 @endphp
 
 
@@ -73,9 +74,12 @@
             </div>
         @endif
 
-
         <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
-            <x-logo />
+            @if (File::exists(resource_path('views/components/custom/logo.blade.php')))
+                <x-custom.logo />
+            @else
+                <x-logo />
+            @endif
             <div class="mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <div
