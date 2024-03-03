@@ -24,8 +24,8 @@
             </a>
             @endenv
             @env(['kuwa', 'arena'])
-            <a class="rounded-full overflow-hidden" href="https://www.gai.tw/" target="_blank">
-                <img class="w-[150px]" src="{{ asset('images/csie.png') }}">
+            <a class="overflow-hidden" href="https://www.gai.tw/" target="_blank">
+                <img class="w-[150px]" src="{{ asset('images/kuwa2.png') }}">
             </a>
             @endenv
             @env(['chipllm', 'icdesign'])
@@ -40,23 +40,20 @@
             </div>
             @endenv
             @env('kuwa', 'arena', 'chipllm')
-            <div class="flex ml-4 justify-center items-end space-x-5">
-                <span class="text-[72px] text-orange-300">Kuwa</span>
+            <div class="flex flex-col ml-4 text-[50px]">
+                <span class="text-[60px] dark:text-green-300">Kuwa</span>
                 @env('kuwa')
-                <span class="text-[60px]">Chat</span>
+                <span class="text-[72px]">Chat</span>
                 @endenv
                 @env('arena')
-                <span class="text-[60px]">Arena</span>
+                <span class="text-[72px]">Arena</span>
                 @endenv
                 @env('chipllm')
-                <span class="text-[60px]">Chip</span>
+                <span class="text-[72px]">Chip</span>
                 @endenv
-            </div>
-            @endenv
-            @env('icdesign')
-            <div class="flex flex-col ml-4 text-[50px]">
-                <span class="text-[72px] text-orange-300">Kuwa</span>
-                <span class="text-[60px]">IC Design</span>
+                @env('icdesign')
+                <span class="text-[72px]">IC Design</span>
+                @endenv
             </div>
             @endenv
         </div>
