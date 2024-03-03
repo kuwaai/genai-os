@@ -75,7 +75,7 @@
         @endif
 
         <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
-            @if (File::exists(resource_path('views/components/custom/logo.blade.php')))
+            @if (Illuminate\Support\Facades\View::exists('components.custom.logo'))
                 <x-custom.logo />
             @else
                 <x-logo />
