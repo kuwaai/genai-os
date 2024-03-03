@@ -39,7 +39,7 @@
                 <span class="pt-4">Workspace</span>
             </div>
             @endenv
-            @env('kuwa', 'arena', 'chipllm')
+            @env('kuwa', 'arena', 'chipllm', 'icdesign')
             <div class="flex flex-col ml-4 text-[50px]">
                 <span class="text-[60px] dark:text-green-300">Kuwa</span>
                 @env('kuwa')
