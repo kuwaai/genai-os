@@ -143,7 +143,7 @@
                                 if (isBot) {
                                     var message = {
                                         "role": "assistant",
-                                        "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                        "model": $("#" + $.escapeSelector($(element).children("div").children("img").attr("data-tooltip-target")))
                                             .attr("access_code"),
                                         "content": msgText,
                                         "chain": chained
@@ -175,7 +175,7 @@
 
                                 var row = "";
                                 if (isBot) {
-                                    var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").attr("data-tooltip-target")))
                                         .attr("access_code");
                                     if (model == undefined) model = "";
                                     row = `assistant	${model}	${msgText}	${chained}\n`;
