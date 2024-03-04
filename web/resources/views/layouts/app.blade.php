@@ -108,7 +108,7 @@
     <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script>
         function markdown(node) {
-            $(node).html((marked.parse(DOMPurify.sanitize($(node).text()))));
+            $(node).html(marked.parse(DOMPurify.sanitize($(node).html())));
 
             $(node).find('table').addClass('table-auto');
             $(node).find('table *').addClass(
@@ -154,13 +154,20 @@ xmlns="http://www.w3.org/2000/svg">
             $(node).find("h5").each(function() {
                 var $h5 = $(this);
                 var pattern = /<%ref-(\d+)%>/;
-                var match = $h5.text().match(pattern);
+                var match = $h5.html().match(pattern);
                 if (match) {
                     var refNumber = match[1];
                     $msg = $("#history_" + refNumber).text().trim()
-                    $h5.html(
-                        `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
-                    );
+                    var $button = $("<button>")
+                        .addClass("bg-gray-700 rounded p-2 hover:bg-gray-800")
+                        .data("tooltip-target", "ref-tooltip")
+                        .data("tooltip-placement", "top")
+                        .attr("onmouseover", "refToolTip(" + refNumber + ")")
+                        .attr("onclick", "scrollToRef(" + refNumber + ")")
+                        .text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
+
+                    $h5.html($button);
+
                 }
             });
         }
