@@ -7,8 +7,7 @@
         <input name="new_name" />
     </form>
 @endif
-<div id="chatHeader"
-    class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 max-h-20 text-gray-700 dark:text-white flex">
+<div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 max-h-20 text-gray-700 dark:text-white flex">
     @if (!$readonly)
         <button
             class="block sm:hidden text-center text-white bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2 dark:bg-gray-700 dark:hover:bg-gray-800 focus:outline-none dark:focus:ring-blue-800"
@@ -20,11 +19,11 @@
     <div
         class="flex-shrink-0 mx-2 my-auto h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
         @if (!$readonly)
-        <div id="llm_{{ $LLM->id }}_chat" role="tooltip" access_code="{{ $LLM->access_code }}"
-            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-            {{ $LLM->name }}
-            <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
+            <div id="llm_{{ $LLM->id }}_chat" role="tooltip" access_code="{{ $LLM->access_code }}"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                {{ $LLM->name }}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
             <div id="react_copy" role="tooltip"
                 class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                 {{ __('Copy message') }}
@@ -101,7 +100,8 @@
                                 if (isBot) {
                                     var message = {
                                         "role": "assistant",
-                                        "model": $(document.getElementById($.escapeSelector($(element).find("div > img").data("tooltip-target")))).attr("access_code"),
+                                        "model": $(document.getElementById($.escapeSelector($(element).find("div > img").data(
+                                            "tooltip-target")))).attr("access_code"),
                                         "content": msgText,
                                         "chain": chained
                                     };
@@ -129,7 +129,8 @@
 
                                 var row = "";
                                 if (isBot) {
-                                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").data("tooltip-target")))
+                                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").data(
+                                            "tooltip-target")))
                                         .attr("access_code");
                                     row = `assistant	${model}	${msgText}	${chained}\n`;
                                 } else {
@@ -172,14 +173,15 @@
             node.removeClass("hover:bg-green-600 hover:text-white");
         }, 2000);
     }
+
     function editChat() {
         $("#chatHeader button").find('.fa-pen').parent().addClass('hidden');
         $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
-        name = $("#chatHeader >p:eq(0)").text().trim();
-        $("#chatHeader >p:eq(0)").html(
-            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`
-        )
-
+        name = $("#chatHeader > p:eq(0)").text().trim();
+        $("#chatHeader > p:eq(0)").html(
+            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border'/>`
+        );
+        $("#chatHeader > p:eq(0) input").val(name).attr('old', name);
         $("#chatHeader >p >input:eq(0)").keypress(function(e) {
             if (e.which == 13) saveChat();
         });

@@ -108,7 +108,7 @@
     <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script>
         function markdown(node) {
-            $(node).html(DOMPurify.sanitize((marked.parse($(node).text()))));
+            $(node).html((marked.parse(DOMPurify.sanitize($(node).text()))));
 
             $(node).find('table').addClass('table-auto');
             $(node).find('table *').addClass(
