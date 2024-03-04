@@ -101,7 +101,7 @@
                                 if (isBot) {
                                     var message = {
                                         "role": "assistant",
-                                        "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                                        "model": $("#" + $.escapeSelector($(element).children("div").children("img").attr("data-tooltip-target")))
                                             .attr("access_code"),
                                         "content": msgText,
                                         "chain": chained
