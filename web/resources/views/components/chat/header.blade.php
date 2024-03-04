@@ -101,7 +101,7 @@
                                 if (isBot) {
                                     var message = {
                                         "role": "assistant",
-                                        "model": $(document.getElementById($.escapeSelector($(element).find("div > img").attr("data-tooltip-target")))).attr("access_code"),
+                                        "model": $(document.getElementById($.escapeSelector($(element).find("div > img").data("tooltip-target")))).attr("access_code"),
                                         "content": msgText,
                                         "chain": chained
                                     };
@@ -129,7 +129,7 @@
 
                                 var row = "";
                                 if (isBot) {
-                                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").attr("data-tooltip-target")))
+                                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").data("tooltip-target")))
                                         .attr("access_code");
                                     row = `assistant	${model}	${msgText}	${chained}\n`;
                                 } else {
