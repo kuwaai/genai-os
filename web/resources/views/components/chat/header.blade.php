@@ -99,10 +99,13 @@
                                 var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
                                 var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
                                 if (isBot) {
+                                    var targetElementId = $($($.escapeSelector(element)).children("div").children("img").attr("data-tooltip-target")).attr("id");
+                                    var targetElement = $("#" + $.escapeSelector(targetElementId));
+                                    var accessCode = targetElement.attr("access_code");
+
                                     var message = {
                                         "role": "assistant",
-                                        "model": $("#" + $.escapeSelector($($.escapeSelector(element)).children("div").children("img").attr("data-tooltip-target")))
-                                            .attr("access_code"),
+                                        "model": accessCode,
                                         "content": msgText,
                                         "chain": chained
                                     };
