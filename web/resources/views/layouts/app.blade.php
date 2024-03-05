@@ -122,6 +122,7 @@
                 'text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500').prop('target',
                 '_blank');
             $(node).find('pre code').each(function() {
+                $(this).html(this.textContent)
                 hljs.highlightElement($(this)[0]);
             });
             $(node).find('pre code').addClass(
@@ -154,8 +155,8 @@ xmlns="http://www.w3.org/2000/svg">
             })
 
             $(node).find("h5").each(function() {
-                var pattern = /&amp;lt;%ref-(\d+)%&amp;gt;/;
-                var match = DOMPurify.sanitize(this).match(pattern);
+                var pattern = /<%ref-(\d+)%>/;
+                var match = DOMPurify.sanitize(this).replaceAll("&lt;", "<").replaceAll("&gt;", ">").match(pattern);
                 if (match) {
                     var refNumber = match[1];
                     $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(1) div div")[
