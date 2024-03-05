@@ -18,7 +18,6 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('js/socket.io.min.js') }}"></script>
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>
@@ -167,8 +166,7 @@ xmlns="http://www.w3.org/2000/svg">
                         .attr("onmouseover", "refToolTip(" + refNumber + ")")
                         .attr("onclick", "scrollToRef(" + refNumber + ")")
                         .text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
-
-                    $(this).html($button);
+                    $(this).empty().append($button);
                 }
             });
         }

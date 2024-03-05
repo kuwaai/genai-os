@@ -53,8 +53,10 @@ d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.82
 fill="currentFill" />
 </svg>`);
             } else {
-                let warnings = /&lt;&lt;&lt;WARNING&gt;&gt;&gt;([\s\S]*?)&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g.exec(DOMPurify.sanitize(this));
-                $(this).text(DOMPurify.sanitize(this.innerHTML).replace(/&lt;&lt;&lt;WARNING&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g, ''));
+                let warnings = /&lt;&lt;&lt;WARNING&gt;&gt;&gt;([\s\S]*?)&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g
+                    .exec(DOMPurify.sanitize(this));
+                $(this).text(DOMPurify.sanitize(this.innerHTML).replace(
+                    /&lt;&lt;&lt;WARNING&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g, ''));
                 $msg = this
                 if ($(this).hasClass("bot-msg")) {
                     if (warnings) {
@@ -141,7 +143,7 @@ xmlns="http://www.w3.org/2000/svg">
                             .attr("onclick", "scrollToRef(" + refNumber + ")")
                             .text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
 
-                        $(this).html($button);
+                        $(this).empty().append($button);
                     }
                 });
             }
