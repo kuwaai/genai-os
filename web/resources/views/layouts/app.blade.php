@@ -108,7 +108,10 @@
     <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script>
         function markdown(node) {
-            var sanitizedHtml = DOMPurify.sanitize($(node).html());
+            var sanitizedHtml = DOMPurify.sanitize($(node).html(), {
+                ALLOWED_TAGS: [],
+                ALLOWED_ATTR: []
+            });
             $(node).html(marked.parse(sanitizedHtml));
 
 
