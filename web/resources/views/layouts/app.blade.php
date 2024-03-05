@@ -108,12 +108,10 @@
     <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script>
         function markdown(node) {
-            var sanitizedHtml = DOMPurify.sanitize($(node).html(), {
+            $(node).html(marked.parse(DOMPurify.sanitize(node, {
                 ALLOWED_TAGS: [],
                 ALLOWED_ATTR: []
-            });
-            $(node).html(marked.parse(sanitizedHtml));
-
+            })));
 
             $(node).find('table').addClass('table-auto');
             $(node).find('table *').addClass(
@@ -157,9 +155,8 @@ xmlns="http://www.w3.org/2000/svg">
             })
 
             $(node).find("h5").each(function() {
-                var $h5 = $(this);
                 var pattern = /<%ref-(\d+)%>/;
-                var match = DOMPurify.sanitize($h5.text()).match(pattern);
+                var match = DOMPurify.sanitize($(this)).match(pattern);
                 if (match) {
                     var refNumber = match[1];
                     $msg = $("#history_" + refNumber).text().trim()
