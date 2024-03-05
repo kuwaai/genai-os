@@ -55,7 +55,7 @@ fill="currentFill" />
             } else {
                 let warnings = /&lt;&lt;&lt;WARNING&gt;&gt;&gt;([\s\S]*?)&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g
                     .exec(DOMPurify.sanitize(this));
-                $(this).text(DOMPurify.sanitize(this.innerHTML).replace(
+                $(this).html(DOMPurify.sanitize(this.innerHTML).replace(
                     /&lt;&lt;&lt;WARNING&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g, ''));
                 $msg = this
                 if ($(this).hasClass("bot-msg")) {
@@ -94,6 +94,7 @@ fill="currentFill" />
                     'text-blue-700 hover:text-blue-900').prop('target',
                     '_blank');
                 $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
+                    $(this).html($(this).text())
                     hljs.highlightElement($(this)[0]);
                 });
                 $(node).find('div.text-sm.space-y-3.break-words pre code').addClass(
@@ -130,8 +131,8 @@ xmlns="http://www.w3.org/2000/svg">
                 })
 
                 $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
-                    var pattern = /&amp;lt;%ref-(\d+)%&amp;gt;/;
-                    var match = DOMPurify.sanitize(this).match(pattern);
+                    var pattern = /<%ref-(\d+)%>/;
+                    var match = DOMPurify.sanitize(this).replaceAll("&lt;","<").replaceAll("&gt;",">").match(pattern);
                     if (match) {
                         var refNumber = match[1];
                         $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(1) div div")[
