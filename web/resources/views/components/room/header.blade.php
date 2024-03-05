@@ -202,25 +202,26 @@
             //JSON format
             var chatMessages = [];
 
-            $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
-                var history_id = $(element).prop("id").replace("history_", "")
-                var msgText = histories[history_id]
-                var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
-                var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
-                if (isBot) {
-                    var message = {
-                        "role": "assistant",
-                        "model": $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
-                            .attr("access_code"),
-                        "content": msgText,
-                        "chain": chained
-                    };
-                } else {
-                    var message = {
-                        "role": "user",
-                        "content": msgText,
-                    };
-                }
+                            $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
+                                var history_id = $(element).prop("id").replace("history_", "")
+                                var msgText = histories[history_id]
+                                var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg")
+                                var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
+                                if (isBot) {
+                                    var message = {
+                                        "role": "assistant",
+                                        "model": $("#" + $.escapeSelector($(element).children("div").children("img").data(
+                                                "tooltip-target")))
+                                            .attr("access_code"),
+                                        "content": msgText,
+                                        "chain": chained
+                                    };
+                                } else {
+                                    var message = {
+                                        "role": "user",
+                                        "content": msgText,
+                                    };
+                                }
 
                 chatMessages.push(message);
             });
@@ -239,7 +240,8 @@
 
                 var row = "";
                 if (isBot) {
-                    var model = $("#" + $(element).children("div").children("img").attr("data-tooltip-target"))
+                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").data(
+                                            "tooltip-target")))
                         .attr("access_code");
                     if (model == undefined) model = "";
                     row = `assistant	${model}	${msgText}	${chained}\n`;

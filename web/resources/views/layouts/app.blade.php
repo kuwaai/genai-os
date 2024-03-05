@@ -18,7 +18,6 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('js/socket.io.min.js') }}"></script>
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>
@@ -108,7 +107,10 @@
     <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script>
         function markdown(node) {
-            $(node).html(DOMPurify.sanitize((marked.parse($(node).text()))));
+            $(node).html(marked.parse(DOMPurify.sanitize(node, {
+                ALLOWED_TAGS: [],
+                ALLOWED_ATTR: []
+            })));
 
             $(node).find('table').addClass('table-auto');
             $(node).find('table *').addClass(
@@ -120,6 +122,7 @@
                 'text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500').prop('target',
                 '_blank');
             $(node).find('pre code').each(function() {
+                $(this).html(this.textContent)
                 hljs.highlightElement($(this)[0]);
             });
             $(node).find('pre code').addClass(
@@ -152,15 +155,24 @@ xmlns="http://www.w3.org/2000/svg">
             })
 
             $(node).find("h5").each(function() {
-                var $h5 = $(this);
                 var pattern = /<%ref-(\d+)%>/;
-                var match = $h5.text().match(pattern);
+                var match = DOMPurify.sanitize(this).replaceAll("&lt;", "<").replaceAll("&gt;", ">").match(pattern);
                 if (match) {
                     var refNumber = match[1];
-                    $msg = $("#history_" + refNumber).text().trim()
-                    $h5.html(
-                        `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
-                    );
+                    $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(1) div div")[
+                        0], {
+                        ALLOWED_TAGS: [],
+                        ALLOWED_ATTR: []
+                    }).trim()
+                    var $button = $("<button>")
+                        .addClass("bg-gray-700 rounded p-2 hover:bg-gray-800")
+                        .data("tooltip-target", "ref-tooltip")
+                        .data("tooltip-placement", "top")
+                        .attr("onmouseover", "refToolTip(" + refNumber + ")")
+                        .attr("onclick", "scrollToRef(" + refNumber + ")");
+                    $button.text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
+
+                    $(this).empty().append($button);
                 }
             });
         }

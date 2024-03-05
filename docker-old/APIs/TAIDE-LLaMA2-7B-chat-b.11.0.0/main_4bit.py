@@ -23,7 +23,7 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = 1024*3
+limit = 1024*4
 model_loc = "em7wns48-epoch=17-step=234"
 tokenizer_loc = "em7wns48-epoch=17-step=234"
 api_key = None
@@ -45,8 +45,8 @@ generation_config = GenerationConfig(
     # no_repeat_ngram_size=7,
     # repetition_penalty = 1.0, 
 )
-system_prompt_fmt = "<<SYS>>\n{0}\n<</SYS>>\n\n {1}"
-system_text = "You are a helpful assistant. 你是一個樂於助人的助手。"
+system_prompt_fmt = "<<SYS>>\n{0}\n<</SYS>>\n\n{1}"
+system_text = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
 prompt_fmt = "<s>[INST] {0} [/INST]"
 answer_fmt = " {0} </s>"
 

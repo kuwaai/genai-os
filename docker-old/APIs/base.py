@@ -15,10 +15,19 @@ def api():
         resp = Response(app.llm_compute(data), mimetype='text/event-stream')
         resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
         if data: return resp
-        print("I didn't see your input!")
+        print("Request received, but no data is here!")
         app.Ready[0] = True
-    return ""
-
+    return Response(status=404)
+    
+@app.route('/health')
+def health_check():
+    return Response(status=204)
+    
+@app.route("/abort", methods=["GET"])
+def abort():
+    if app.abort:
+        return Response(app.abort(), mimetype='text/plain')
+    return "No abort method configured"
 
 def shut():
     if app.registered:
@@ -46,5 +55,5 @@ def start():
             sys.exit(0)
     else:
         print("Registered")
-    app.run(port=app.port, host="0.0.0.0")
+    app.run(port=app.port, host="0.0.0.0", threaded=True)
     shut()

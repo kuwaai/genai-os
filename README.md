@@ -12,12 +12,11 @@
 * [Finished] Mobile UI
 * [Finished] Markdown output supported
 * [Finished] Highlight the input output prompt
+* [Finished] Blinded model feedback testing
 * [WIP] Regenerate & Edit message button
 * [WIP] Rule-based control in Model worker
-* [WIP] First play ground game: AI Election
 * [WIP] Bot stores
 * [WIP] A fully working API
-* [WIP] Blinded model feedback testing
 * [WIP] Live streaming chat
 * [WIP] Auto scaling models
 * [WIP] ODT chat history export

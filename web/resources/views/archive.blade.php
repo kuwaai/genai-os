@@ -33,7 +33,7 @@
                 @if (!$have)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        {{__("No disabled LLM history found!")}}
+                        {{ __('No disabled LLM history found!') }}
                     </div>
                 @endif
             </div>
@@ -41,7 +41,9 @@
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                {!!__("This is where disabled LLM history located<br>They might back to online soon or just gone forever<br>You're still able to view the history or delete them")!!}
+                {!! __(
+                    "This is where disabled LLM history located<br>They might back to online soon or just gone forever<br>You're still able to view the history or delete them",
+                ) !!}
             </div>
         @else
             <div id="histories"
@@ -83,7 +85,13 @@
                 <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
                     @if (request()->route('chat_id'))
                         @php
-                            $botimgurl = asset(Storage::url(App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id)->image));
+                            $botimgurl = asset(
+                                Storage::url(
+                                    App\Models\LLMs::findOrFail(
+                                        App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id,
+                                    )->image,
+                                ),
+                            );
                         @endphp
                         @foreach (App\Models\Histories::where('chat_id', request()->route('chat_id'))->orderby('updated_at', 'desc')->get() as $history)
                             <div class="flex w-full mt-2 space-x-3 {{ $history->isbot ? '' : 'ml-auto justify-end' }}">
@@ -119,11 +127,11 @@
                     function editChat() {
                         $("#chatHeader button").find('.fa-pen').parent().addClass('hidden');
                         $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
-                        name = $("#chatHeader >p:eq(0)").text().trim();
-                        $("#chatHeader >p:eq(0)").html(
-                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`
-                            )
-
+                        name = $("#chatHeader > p:eq(0)").text().trim();
+                        $("#chatHeader > p:eq(0)").html(
+                            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border'/>`
+                        );
+                        $("#chatHeader > p:eq(0) input").val(name).attr('old', name);
                         $("#chatHeader >p >input:eq(0)").keypress(function(e) {
                             if (e.which == 13) saveChat();
                         });

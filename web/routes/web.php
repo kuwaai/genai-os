@@ -169,12 +169,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         return view('play');
                     })->name('play.home');
 
-                Route::prefix('ai_election')
-                    ->group(function () {
-                        Route::get('/', [PlayController::class, 'play'])->name('play.ai_elections.home');
-                        Route::patch('/update', [PlayController::class, 'update'])->name('play.ai_elections.update');
-                    })
-                    ->name('play.ai_elections');
             })
             ->name('play');
 

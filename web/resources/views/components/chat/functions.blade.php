@@ -26,7 +26,7 @@
         if ($($this).parent().next().attr("onclick") == "compileVerilog(this)") $($this).parent().next().remove();
         if ($($this).val() == "verilog") $($this).parent().after(
             `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>`
-            )
+        )
 
         $($this).parent().parent().next().text($($this).parent().parent().next().text())
         $($this).parent().parent().next()[0].dataset.highlighted = '';
@@ -53,9 +53,11 @@ d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.82
 fill="currentFill" />
 </svg>`);
             } else {
-                let warnings = /<<<WARNING>>>([\s\S]*?)<<<\/WARNING>>>/g.exec($(this).text());
-                $(this).text($(this).text().replace(/<<<WARNING>>>[\s\S]*?<<<\/WARNING>>>/g, ''));
-                $msg = $(this).text()
+                let warnings = /&lt;&lt;&lt;WARNING&gt;&gt;&gt;([\s\S]*?)&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g
+                    .exec(DOMPurify.sanitize(this));
+                $(this).html(DOMPurify.sanitize(this.innerHTML).replace(
+                    /&lt;&lt;&lt;WARNING&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g, ''));
+                $msg = this
                 if ($(this).hasClass("bot-msg")) {
                     if (warnings) {
                         warnings = warnings[1].split("\n")
@@ -75,10 +77,12 @@ fill="currentFill" />
                         // Append the list items after the target element
                         $(this).after(listItems.join(''));
                     }
-                    $msg = translate_msg($msg);
+                    $msg = translate_msg(DOMPurify.sanitize($msg));
                 }
-                $(this).html(DOMPurify.sanitize((marked.parse($msg))));
-
+                $(this).html(marked.parse(DOMPurify.sanitize($msg, {
+                    ALLOWED_TAGS: [],
+                    ALLOWED_ATTR: []
+                })));
                 $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
                 $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
                     'border border-2 border-gray-500 border-solid p-1');
@@ -89,6 +93,7 @@ fill="currentFill" />
                     'text-blue-700 hover:text-blue-900').prop('target',
                     '_blank');
                 $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
+                    $(this).html(this.textContent)
                     hljs.highlightElement($(this)[0]);
                 });
                 $(node).find('div.text-sm.space-y-3.break-words pre code').addClass(
@@ -125,16 +130,24 @@ xmlns="http://www.w3.org/2000/svg">
                 })
 
                 $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
-                    var $h5 = $(this);
                     var pattern = /<%ref-(\d+)%>/;
-                    var match = $h5.text().match(pattern);
+                    var match = DOMPurify.sanitize(this).replaceAll("&lt;","<").replaceAll("&gt;",">").match(pattern);
                     if (match) {
                         var refNumber = match[1];
-                        $msg = $("#history_" + refNumber + " div.text-sm.space-y-3.break-words").text()
-                            .trim()
-                        $h5.html(
-                            `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
-                        );
+                        $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(1) div div")[
+                            0], {
+                            ALLOWED_TAGS: [],
+                            ALLOWED_ATTR: []
+                        }).trim()
+                        var $button = $("<button>")
+                            .addClass("bg-gray-700 rounded p-2 hover:bg-gray-800")
+                            .data("tooltip-target", "ref-tooltip")
+                            .data("tooltip-placement", "top")
+                            .attr("onmouseover", "refToolTip(" + refNumber + ")")
+                            .attr("onclick", "scrollToRef(" + refNumber + ")");
+                        $button.text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
+
+                        $(this).empty().append($button);
                     }
                 });
             }
@@ -415,7 +428,10 @@ xmlns="http://www.w3.org/2000/svg">
                     $($this).addClass("bg-red-600 hover:bg-red-700")
                     $($this).text("{{ __('Failed') }}")
                 }
-                $($this).parent().after(`<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'} whitespace-pre-wrap">${JSON.parse(data).message}</div>`)
+                $($this).parent().after(
+                    `<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'} whitespace-pre-wrap"></div>`
+                );
+                $($this).next().text(JSON.parse(data).message);
             }
         });
     }
