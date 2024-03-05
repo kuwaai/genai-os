@@ -144,8 +144,8 @@ xmlns="http://www.w3.org/2000/svg">
                             .data("tooltip-target", "ref-tooltip")
                             .data("tooltip-placement", "top")
                             .attr("onmouseover", "refToolTip(" + refNumber + ")")
-                            .attr("onclick", "scrollToRef(" + refNumber + ")")
-                            .text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
+                            .attr("onclick", "scrollToRef(" + refNumber + ")");
+                        $button.text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
 
                         $(this).empty().append($button);
                     }
