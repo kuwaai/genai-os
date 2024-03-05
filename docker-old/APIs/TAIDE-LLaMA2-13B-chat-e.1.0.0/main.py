@@ -10,7 +10,7 @@ sys.path.remove('../')
 # -- Configs --
 app.config["REDIS_URL"] = "redis://redis:6379/0"
 app.agent_endpoint = "http://web:9000/"
-app.LLM_name = "taide2_7b_chat_b11"
+app.LLM_name = "taide2_7b_chat_e1"
 app.version_code = "v1.0"
 app.ignore_agent = False
 # This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent
@@ -23,9 +23,9 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = 1024*4
-model_loc = "em7wns48-epoch=17-step=234"
-tokenizer_loc = "em7wns48-epoch=17-step=234"
+limit = 1024*3
+model_loc = "llama2-13b-ccw_tw8-tv_tulu2_xwin"
+tokenizer_loc = "llama2-13b-ccw_tw8-tv_tulu2_xwin"
 api_key = None
 usr_token = None
 tc_model = None
@@ -38,17 +38,13 @@ model = AutoModelForCausalLM.from_pretrained(model_loc, device_map="auto",torch_
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_loc, add_bos_token=False)
 set_seed(42)
 generation_config = GenerationConfig(
-    # temperature= 0.2, 
-    # top_p=0.92, 
-    # top_k=0, 
-    do_sample = False,
-    # no_repeat_ngram_size=7,
-    # repetition_penalty = 1.0, 
+    temperature=0.2,
+    repetition_penalty=1.0
 )
-system_prompt_fmt = "<<SYS>>\n{0}\n<</SYS>>\n\n{1}"
+system_prompt_fmt = "<s>{0} USER: {1} ASSISTANT:"
 system_text = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
-prompt_fmt = "<s>[INST] {0} [/INST]"
-answer_fmt = " {0} </s>"
+prompt_fmt = " USER: {0} ASSISTANT:"
+answer_fmt = "{0}"
 
 def process(data):
     try:
@@ -57,11 +53,12 @@ def process(data):
             del history[0]
             del history[0]
         if len(history) != 0:
-            history[0] = system_prompt_fmt.format(system_text, history[0])
             history_process = []
             for i in range(0, len(history), 2):
                 tmp_txt = ""
-                if i == (len(history)-1):
+                if i == 0:
+                    tmp_txt = system_prompt_fmt.format(system_text, history[i])
+                elif i == (len(history)-1):
                     tmp_txt = prompt_fmt.format(history[i])
                 else:
                     tmp_txt = prompt_fmt.format(history[i])+answer_fmt.format(history[i+1])

@@ -1,3 +1,6 @@
+apt update
+apt install -y php8.1-pgsql php8.1-xml php8.1 php8.1-curl php8.1-ldap php8.1-redis composer redis
+update-alternatives --set php /usr/bin/php8.1
 cd /var/www/html
 # Install packages
 # cp /.env /var/www/html/LLM_Project/
