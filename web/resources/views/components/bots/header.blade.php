@@ -62,15 +62,16 @@
     function editChat() {
         $("#chatHeader button").find('.fa-pen').parent().addClass('hidden');
         $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
-        name = $("#chatHeader >p:eq(0)").text().trim();
-        $("#chatHeader >p:eq(0)").html(
-            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`
-        )
-
+        name = $("#chatHeader > p:eq(0)").text().trim();
+        $("#chatHeader > p:eq(0)").html(
+            `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border'/>`
+        );
+        $("#chatHeader > p:eq(0) input").val(name).attr('old', name);
         $("#chatHeader >p >input:eq(0)").keypress(function(e) {
             if (e.which == 13) saveChat();
         });
     }
+
 
     function saveChat() {
         input = $("#chatHeader >p >input:eq(0)")

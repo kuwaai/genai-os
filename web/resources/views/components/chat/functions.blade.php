@@ -53,9 +53,9 @@ d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.82
 fill="currentFill" />
 </svg>`);
             } else {
-                let warnings = /<<<WARNING>>>([\s\S]*?)<<<\/WARNING>>>/g.exec($(this).text());
-                $(this).text($(this).text().replace(/<<<WARNING>>>[\s\S]*?<<<\/WARNING>>>/g, ''));
-                $msg = $(this).text()
+                let warnings = /&lt;&lt;&lt;WARNING&gt;&gt;&gt;([\s\S]*?)&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g.exec(DOMPurify.sanitize(this));
+                $(this).text(DOMPurify.sanitize(this.innerHTML).replace(/&lt;&lt;&lt;WARNING&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g, ''));
+                $msg = this
                 if ($(this).hasClass("bot-msg")) {
                     if (warnings) {
                         warnings = warnings[1].split("\n")
@@ -76,10 +76,12 @@ fill="currentFill" />
                         $(this).after(listItems.join(''));
                         console.log(warnings);
                     }
-                    $msg = translate_msg($msg);
+                    $msg = translate_msg(DOMPurify.sanitize($msg));
                 }
-                $(this).html(DOMPurify.sanitize((marked.parse($msg))));
-
+                $(this).html(marked.parse(DOMPurify.sanitize($msg, {
+                    ALLOWED_TAGS: [],
+                    ALLOWED_ATTR: []
+                })));
                 $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
                 $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
                     'border border-2 border-gray-500 border-solid p-1');
@@ -126,16 +128,20 @@ xmlns="http://www.w3.org/2000/svg">
                 })
 
                 $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
-                    var $h5 = $(this);
-                    var pattern = /<%ref-(\d+)%>/;
-                    var match = $h5.text().match(pattern);
+                    var pattern = /&lt;%ref-(\d+)%&gt;/;
+                    var match = DOMPurify.sanitize(this).match(pattern);
                     if (match) {
                         var refNumber = match[1];
-                        $msg = $("#history_" + refNumber + " div.text-sm.space-y-3.break-words").text()
-                            .trim()
-                        $h5.html(
-                            `<button class="bg-gray-700 rounded p-2 hover:bg-gray-800" data-tooltip-target='ref-tooltip' data-tooltip-placement='top' onmouseover="refToolTip(${refNumber})" onclick="scrollToRef(${refNumber})">${$msg.substring(0, 30) + ($msg.length < 30 ? "" : "...")}</button>`
-                        );
+                        $msg = $("#history_" + refNumber).text().trim()
+                        var $button = $("<button>")
+                            .addClass("bg-gray-700 rounded p-2 hover:bg-gray-800")
+                            .data("tooltip-target", "ref-tooltip")
+                            .data("tooltip-placement", "top")
+                            .attr("onmouseover", "refToolTip(" + refNumber + ")")
+                            .attr("onclick", "scrollToRef(" + refNumber + ")")
+                            .text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
+
+                        $(this).html($button);
                     }
                 });
             }
@@ -418,7 +424,7 @@ xmlns="http://www.w3.org/2000/svg">
                 }
                 $($this).parent().after(
                     `<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'} whitespace-pre-wrap"></div>`
-                    );
+                );
                 $($this).next().text(JSON.parse(data).message);
             }
         });

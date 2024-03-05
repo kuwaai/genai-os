@@ -155,8 +155,8 @@ xmlns="http://www.w3.org/2000/svg">
             })
 
             $(node).find("h5").each(function() {
-                var pattern = /<%ref-(\d+)%>/;
-                var match = DOMPurify.sanitize($(this)).match(pattern);
+                var pattern = /&lt;%ref-(\d+)%&gt;/;
+                var match = DOMPurify.sanitize(this).match(pattern);
                 if (match) {
                     var refNumber = match[1];
                     $msg = $("#history_" + refNumber).text().trim()
@@ -168,8 +168,7 @@ xmlns="http://www.w3.org/2000/svg">
                         .attr("onclick", "scrollToRef(" + refNumber + ")")
                         .text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
 
-                    $h5.html($button);
-
+                    $(this).html($button);
                 }
             });
         }

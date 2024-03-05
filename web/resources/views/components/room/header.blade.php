@@ -8,7 +8,8 @@
         <input type="hidden" name="limit" value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
     </form>
 @endif
-<div id="chatHeader" class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 text-gray-700 dark:text-white flex items-center">
+<div id="chatHeader"
+    class="bg-gray-300 dark:bg-gray-700 p-2 sm:p-4 h-20 text-gray-700 dark:text-white flex items-center">
     @if ($readonly)
         @foreach (App\Models\Chats::join('llms', 'llms.id', '=', 'llm_id')->where('user_id', Auth::user()->id)->where('roomID', request()->route('room_id'))->orderby('llm_id')->get() as $chat)
             <div
@@ -143,7 +144,8 @@
                                 if (isBot) {
                                     var message = {
                                         "role": "assistant",
-                                        "model": $("#" + $.escapeSelector($(element).children("div").children("img").data("tooltip-target")))
+                                        "model": $("#" + $.escapeSelector($(element).children("div").children("img").data(
+                                                "tooltip-target")))
                                             .attr("access_code"),
                                         "content": msgText,
                                         "chain": chained
@@ -175,7 +177,8 @@
 
                                 var row = "";
                                 if (isBot) {
-                                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").data("tooltip-target")))
+                                    var model = $("#" + $.escapeSelector($(element).children("div").children("img").data(
+                                            "tooltip-target")))
                                         .attr("access_code");
                                     if (model == undefined) model = "";
                                     row = `assistant	${model}	${msgText}	${chained}\n`;
@@ -222,15 +225,16 @@
         function editChat() {
             $("#chatHeader button").find('.fa-pen').parent().addClass('hidden');
             $("#chatHeader button").find('.fa-save').parent().removeClass('hidden');
-            name = $("#chatHeader >p:eq(0)").text().trim();
-            $("#chatHeader >p:eq(0)").html(
-                `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border' value='${name}' old='${name}'/>`
-            )
-
+            name = $("#chatHeader > p:eq(0)").text().trim();
+            $("#chatHeader > p:eq(0)").html(
+                `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border'/>`
+            );
+            $("#chatHeader > p:eq(0) input").val(name).attr('old', name);
             $("#chatHeader >p >input:eq(0)").keypress(function(e) {
                 if (e.which == 13) saveChat();
             });
         }
+
 
         function saveChat() {
             input = $("#chatHeader >p >input:eq(0)")
