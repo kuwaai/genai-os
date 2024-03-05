@@ -119,7 +119,22 @@
                         </div>
                     </div>
                     @php
-                        $filters = ['keyword' => ['name' => __('dashboard.rule.filter.keyword'), 'filters' => ['pre-filter' => ['name' => __('dashboard.rule.filter.input')], 'post-filter' => ['name' => __('dashboard.rule.filter.output')]]], 'embedding' => ['name' => __('dashboard.rule.filter.embedding'), 'filters' => ['pre-filter' => ['name' => __('dashboard.rule.filter.input')], 'post-filter' => ['name' => __('dashboard.rule.filter.output')]]]];
+                        $filters = [
+                            'keyword' => [
+                                'name' => __('dashboard.rule.filter.keyword'),
+                                'filters' => [
+                                    'pre-filter' => ['name' => __('dashboard.rule.filter.input')],
+                                    'post-filter' => ['name' => __('dashboard.rule.filter.output')],
+                                ],
+                            ],
+                            'embedding' => [
+                                'name' => __('dashboard.rule.filter.embedding'),
+                                'filters' => [
+                                    'pre-filter' => ['name' => __('dashboard.rule.filter.input')],
+                                    'post-filter' => ['name' => __('dashboard.rule.filter.output')],
+                                ],
+                            ],
+                        ];
                     @endphp
                     <div id="safetyguard-collapse" data-accordion="collapse"
                         class="rounded-lg overflow-hidden bg-gray-300 dark:bg-gray-500">
@@ -168,7 +183,9 @@
 
                             // Clone and append new input fields for each additional line
                             for (let i = 1; i < inputDatas.length; i++) {
-                                const newInput = $(this).clone().val(inputDatas[i].trim());
+                                const sanitizedValue = inputDatas[i].trim().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                                const newInput = $(this).clone();
+                                newInput.val(sanitizedValue);
                                 dynamicInputs.append(newInput);
                             }
 
@@ -186,7 +203,8 @@
 
                             // Add a new empty input field at the end if the last input field is not empty
                             if (dynamicInputs.find('.dynamic-input:last').val().trim() !== '') {
-                                const newInput = $(this).clone().val('');
+                                const newInput = $(this).clone();
+                                newInput.val('');
                                 dynamicInputs.append(newInput);
                             }
                         });
@@ -335,7 +353,7 @@
         </div>
     </div>
     <div class="w-full overflow-hidden flex justify-center items-center">
-        <p class="text-red-500 text-center text-lg">{{__("Safety guard offline")}}</p>
+        <p class="text-red-500 text-center text-lg">{{ __('Safety guard offline') }}</p>
     </div>
 </div>
 
