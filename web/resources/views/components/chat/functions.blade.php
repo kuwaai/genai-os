@@ -94,7 +94,7 @@ fill="currentFill" />
                     'text-blue-700 hover:text-blue-900').prop('target',
                     '_blank');
                 $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
-                    $(this).html($(this).text())
+                    $(this).html(this.textContent)
                     hljs.highlightElement($(this)[0]);
                 });
                 $(node).find('div.text-sm.space-y-3.break-words pre code').addClass(
