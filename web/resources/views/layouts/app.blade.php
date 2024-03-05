@@ -154,11 +154,15 @@ xmlns="http://www.w3.org/2000/svg">
             })
 
             $(node).find("h5").each(function() {
-                var pattern = /&lt;%ref-(\d+)%&gt;/;
+                var pattern = /&amp;lt;%ref-(\d+)%&amp;gt;/;
                 var match = DOMPurify.sanitize(this).match(pattern);
                 if (match) {
                     var refNumber = match[1];
-                    $msg = $("#history_" + refNumber).text().trim()
+                    $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(1) div div")[
+                        0], {
+                        ALLOWED_TAGS: [],
+                        ALLOWED_ATTR: []
+                    }).trim()
                     var $button = $("<button>")
                         .addClass("bg-gray-700 rounded p-2 hover:bg-gray-800")
                         .data("tooltip-target", "ref-tooltip")
@@ -166,6 +170,7 @@ xmlns="http://www.w3.org/2000/svg">
                         .attr("onmouseover", "refToolTip(" + refNumber + ")")
                         .attr("onclick", "scrollToRef(" + refNumber + ")")
                         .text($msg.substring(0, 30) + ($msg.length < 30 ? "" : "..."));
+
                     $(this).empty().append($button);
                 }
             });
