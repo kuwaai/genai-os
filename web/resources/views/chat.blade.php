@@ -46,20 +46,20 @@
             class="{{ request()->route('chat_id') || request()->route('llm_id') ? 'w-64 hidden sm:flex' : 'sm:w-64 w-full flex' }} bg-white dark:bg-gray-800 text-black dark:text-white flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 flex flex-1 flex-col overflow-y-auto scrollbar">
                 @if (!($result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id'))))
-                    <h2 class="block sm:hidden text-xl text-center">{{ __('Chat') }}</h2>
+                    <h2 class="block sm:hidden text-xl text-center">{{ __('chat.route') }}</h2>
                     @if ($result->count() == 0)
                         <div
                             class="text-center rounded-r-lg flex flex-1 overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                             {!! __('No available LLM to chat with<br>Please come back later!') !!}
                         </div>
                     @else
-                        <p class="block sm:hidden text-center">{{ __('Select a chatroom to begin with') }}</p>
+                        <p class="block sm:hidden text-center">{{ __('chat.hint.select_a_chatroom') }}</p>
                     @endif
                 @endif
                 @if ($result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id')))
                     <a href="{{ route('chat.home') }}"
                         class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
-                        {{ __('Return to Menu') }}</a>
+                        {{ __('chat.return_to_menu') }}</a>
                 @endif
                 @if (request()->route('chat_id') || request()->route('llm_id'))
                     <x-chat.rooms.list :LLM="$LLM" />
@@ -71,7 +71,7 @@
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
                 class="hidden sm:flex flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                {{ __('Select a chatroom to begin with') }}
+                {{ __('chat.hint.select_a_chatroom') }}
             </div>
         @else
             <div id="histories"
@@ -104,7 +104,7 @@
                         @elseif(request()->route('llm_id') &&
                                 (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc_qa') === 0 ||
                                     strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'doc-qa') === 0))
-                            <p class="m-auto text-black dark:text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
+                            <p class="m-auto text-black dark:text-white">{!! __('chat.hint.file_required') !!}</p>
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['feedback']))
                             <p class="m-auto text-black dark:text-white">{!! __('This is for human feedback, Only import/export is allowed here.') !!}</p>

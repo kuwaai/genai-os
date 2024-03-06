@@ -2,6 +2,7 @@
 
 return [
     'interface.header' => 'Dashboard Interface',
+    'route' => 'Dashboard',
 
     'tab.statistics' => 'Statistics',
     'tab.blacklist' => 'Blacklist',

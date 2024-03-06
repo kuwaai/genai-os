@@ -20,7 +20,7 @@
             <!-- Modal header -->
             <div class="px-6 py-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-base font-semibold text-gray-900 lg:text-xl dark:text-white">
-                    {{ __('Create Chat Room') }}
+                    {{ __('room.modal.create_room.header') }}
                 </h3>
             </div>
             <!-- Modal body -->
@@ -30,7 +30,7 @@
                 <input type="hidden" name="limit"
                     value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    {{ __('Select the LLMs you want to use at the same time.') }}</p>
+                    {{ __('room.modal.label') }}</p>
                 <ul class="my-4 space-y-3">
                     @foreach ($result as $LLM)
                         <li>
@@ -47,7 +47,7 @@
                                     <div class="pl-2 overflow-hidden">
                                         {{-- blade-formatter-disable --}}
                                                 <div class="w-full text-lg font-semibold leading-none whitespace-pre-line break-words">{{ $LLM->name }}</div>
-                                                <div class="w-full text-sm leading-none whitespace-pre-line break-words">{{ $LLM->description ? $LLM->description : __('This LLM is currently available!') }}</div>
+                                                <div class="w-full text-sm leading-none whitespace-pre-line break-words">{{ $LLM->description ? $LLM->description : __('chat.llm.describe_default') }}</div>
                                                 {{-- blade-formatter-enable --}}
                                     </div>
                                 </div>
@@ -59,7 +59,7 @@
                     <div class="border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                         <button type="submit"
                             class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-500 hover:bg-gray-400 transition duration-300">
-                            <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('Create') }}
+                            <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('room.button.create') }}
                             </p>
                         </button>
                     </div>

@@ -9,6 +9,27 @@
     if ($("#prompt_area")) {
         $("#prompt_area").submit(function(event) {
             event.preventDefault();
+
+            @if (request()->route('llm_id'))
+                @if (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'web_qa') === 0)
+                    if ($("#prompt_area")) {
+                        $("#prompt_area").on("submit", function(event) {
+                            event.preventDefault();
+                            if (isValidURL($("#chat_input").val().trim())) {
+                                $("#prompt_area")[0].submit()
+                            } else {
+                                $("#error_alert >span").text(
+                                    "{{ __('chat.hint.first_url') }}")
+                                $("#error_alert").fadeIn();
+                                setTimeout(function() {
+                                    $("#error_alert").fadeOut();
+                                }, 3000);
+                            }
+                        })
+                    }
+                @endif
+            @endif
+
             if ($chattable && $("#chat_input").val().trim() == "" && quoted.length == 1) {
                 $("#chat_input").val(`"""${histories[quoted[0][1]]}"""`)
                 this.submit();
@@ -40,12 +61,12 @@
             } else {
                 if ($("#chat_input").val().trim() == "") {
                     $("#error_alert >span").text(
-                        "{{ __('You cannot send a empty message!') }}")
+                        "{{ __('chat.hint.send.empty') }}")
                 } else if (!$chattable) {
                     $("#error_alert >span").text(
-                        "{{ __('Still processing a request, If this take too long, Please refresh.') }}")
+                        "{{ __('chat.hint.send.still_processing') }}")
                 } else {
-                    $("#error_alert >span").text("{{ __('Something went wrong! Please refresh the page.') }}")
+                    $("#error_alert >span").text("{{ __('chat.hint.please_refresh') }}")
                 }
                 $("#error_alert").fadeIn();
                 setTimeout(function() {

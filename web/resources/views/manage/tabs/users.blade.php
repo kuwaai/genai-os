@@ -157,7 +157,7 @@
                 <button
                     class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
                     onclick="update_stepper(['Menu']);$('#fuzzy_selector').hide();$('#edit_user_form').hide(); $('#menu').show();">←
-                    {{ __('Return to Menu') }}</button>
+                    {{ __('chat.return_to_menu') }}</button>
                 <form class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
                     action="{{ route('manage.user.search') }}" method="post">
                     @csrf
@@ -239,7 +239,7 @@
                     <button
                         class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
                         onclick="update_stepper(['Menu']);$('#group_selector').hide(); $('#menu').show();">←
-                        {{ __('Return to Menu') }}</button>
+                        {{ __('chat.return_to_menu') }}</button>
                     <div
                         class="mb-2 border border-orange-400 dark:border-orange-400 border-1 rounded-lg overflow-hidden">
                         <button onclick='update_tab("users","group_selector",-1)'

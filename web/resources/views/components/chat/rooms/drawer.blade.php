@@ -6,7 +6,7 @@
     <div class="flex flex-col h-full">
         <a href="{{ route('chat.home') }}"
             class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
-            {{ __('Return to Menu') }}</a>
+            {{ __('chat.return_to_menu') }}</a>
         <x-chat.rooms.list :LLM="$LLM" />
     </div>
 </div>

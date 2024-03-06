@@ -23,7 +23,7 @@
                 <a class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 {{ request()->route('llm_id') == $LLM->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                     href="{{ route('chat.new', $LLM->id) }}">
                     <p class="flex-1 text-center text-gray-700 dark:text-white">
-                        {{ __('New Chat') }}
+                        {{ __('chat.button.new_chat') }}
                     </p>
                 </a>
             </div>

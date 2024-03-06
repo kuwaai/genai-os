@@ -5,10 +5,10 @@
 
     function translate_msg($msg) {
         let msgTranslations = {
-            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}",
-            "[Sorry, something is broken, please try again later!]": "{{ __('[Sorry, something is broken, please try again later!]') }}",
-            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}",
-            "[Sorry, The input message is too huge!]": "{{ __('[Sorry, The input message is too huge!]') }}"
+            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('chat.hint.llm_returned_empty') }}",
+            "[Sorry, something is broken, please try again later!]": "{{ __('chat.hint.please_retry_later') }}",
+            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('chat.hint.no_worker') }}",
+            "[Sorry, The input message is too huge!]": "{{ __('chat.hint.input_too_large') }}"
         };
 
         for (let original in msgTranslations) {
@@ -155,6 +155,10 @@ xmlns="http://www.w3.org/2000/svg">
         });
     }
 
+    function isValidURL(url) {
+        var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
+        return urlPattern.test(url);
+    }
     function scrollToRef(refNumber) {
         $('#chatroom').animate({
             scrollTop: $(`#history_${refNumber}`).offset().top - $('#chatroom').offset().top + $('#chatroom')
@@ -280,7 +284,7 @@ xmlns="http://www.w3.org/2000/svg">
                             $(node).children("svg").addClass("hidden");
                             $(node).children("svg").eq(3).removeClass("hidden");
                             $("#error_alert >span").text(
-                                "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
+                                "{{ __('chat.hint.no_worker') }}"
                             )
                             $("#error_alert").fadeIn();
                             setTimeout(function() {

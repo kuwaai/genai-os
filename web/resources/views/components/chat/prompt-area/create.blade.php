@@ -6,7 +6,7 @@
         @csrf
         <input name="llm_id" value="{{ $llmId }}" style="display:none;">
         <textarea tabindex="0" data-id="root"
-            placeholder="{{ $llmId && in_array(App\Models\LLMs::find($llmId)->access_code, ['web_qa', 'web_qa_b5']) ? __('An URL is required to create a chatroom') : __('Send a message') }}"
+            placeholder="{{ $llmId && in_array(App\Models\LLMs::find($llmId)->access_code, ['web_qa', 'web_qa_b5']) ? __('chat.hint.url_required') : __('chat.prompt_area.hint') }}"
             rows="1" max-rows="5" oninput="adjustTextareaRows(this)" id="chat_input" name="input"
             class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
         <div class="ml-auto right-[12px] relative bottom-[4px] flex justify-end items-end">
@@ -23,5 +23,4 @@
     </div>
     <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">
         {{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? '' }}</p>
-
 </form>

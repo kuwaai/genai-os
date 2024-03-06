@@ -23,7 +23,7 @@
     </div>
     @if ($llmId)
         <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
-            {{ __('New Chat with') }}
+            {{ __('chat.header.new_chat') }}
             {{ App\Models\LLMs::findOrFail($llmId)->name }}</p>
         @if (request()->user()->hasPerm('Chat_update_import_chat'))
             <div class="flex">

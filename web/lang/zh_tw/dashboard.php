@@ -2,6 +2,7 @@
 
 return [
     'interface.header' => '儀錶板管理介面',
+    'route' => '儀錶板',
 
     'tab.statistics' => '統計資訊',
     'tab.blacklist' => '黑名單',

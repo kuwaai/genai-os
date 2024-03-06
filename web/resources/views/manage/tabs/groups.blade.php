@@ -129,7 +129,7 @@
                                     <label for="create_checkbox_{{ $perm->id }}">
                                         <span
                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ __(substr($perm->name, 4)) }}
+                                            {{ __(strtolower(substr($perm->name, 4)) . ".route") }}
                                         </span>
                                         <input id="create_checkbox_{{ $perm->id }}" type="checkbox"
                                             onclick="$(this).closest('div').next().toggle();$(this).closest('div').next().next().toggle();$(this).closest('div').parent().find('input').prop('disabled',!$(this).prop('checked')).prop('checked',false); $(this).prop('checked',!$(this).prop('disabled')).prop('disabled',false)"
@@ -330,7 +330,7 @@
                                     <label for="edit_checkbox_{{ $perm->id }}">
                                         <span
                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ __(substr($perm->name, 4)) }}
+                                            {{ __(strtolower(substr($perm->name, 4)) . ".route") }}
                                         </span>
                                         <input id="edit_checkbox_{{ $perm->id }}" type="checkbox"
                                             onclick="$(this).closest('div').next().toggle();$(this).closest('div').next().next().toggle();$(this).closest('div').parent().find('input').prop('disabled',!$(this).prop('checked')).prop('checked',false); $(this).prop('checked',!$(this).prop('disabled')).prop('disabled',false)"

@@ -35,7 +35,7 @@
                                 class="flex menu-btn flex text-green-400 w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ session('llms') ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
                                 <p
                                     class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                    {{ __('Create Room') }}</p>
+                                    {{ __('room.button.create_room') }}</p>
                             </button>
                         </div>
                     </form>
@@ -90,7 +90,7 @@
                                 class="flex menu-btn flex text-green-400 w-full h-12 overflow-y-auto scrollbar dark:hover:bg-gray-700 hover:bg-gray-200 {{ session('llms') ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300">
                                 <p
                                     class="flex-1 flex items-center my-auto justify-center text-center leading-none self-baseline">
-                                    {{ __('Create Room') }}</p>
+                                    {{ __('room.button.create_room') }}</p>
                             </button>
                         </div>
                     </form>
