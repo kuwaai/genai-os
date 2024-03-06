@@ -51,9 +51,9 @@
                             fill="currentColor"></path>
                     </svg>
                 </button>
-                <!--<button id='abort_btn' style='display:none;' onclick="return abortGenerate()"
+                <button id='abort_btn' style='display:none;' onclick="return abortGenerate()"
                     class="text-white inline-flex items-center justify-center fixed w-[32px] bg-orange-600 h-[32px] rounded hover:bg-orange-500 dark:hover:bg-orange-700">
-                    <i class="far fa-stop-circle"></i></button>-->
+                    <i class="far fa-stop-circle"></i></button>
             </div>
         </div>
     </div>

@@ -23,7 +23,7 @@
             </div>
             <!-- Modal body -->
             <div class="p-6">
-                <!--<div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-2">
                     <label class="block text-black dark:text-white" for="link">
                         {{ __('chat.label.share_link') }}
                     </label>
@@ -41,7 +41,7 @@
                         class="px-4 flex justify-center items-center rounded-r-lg bg-green-500 hover:bg-green-600 text-white">
                         <i class="fas fa-external-link-alt"></i>
                     </a>
-                </div>-->
+                </div>
                 <label class="text-black dark:text-white" for="export_json">{{ __('chat.label.JSON') }}</label>
                 <textarea id="export_json" rows="5" readonly
                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
