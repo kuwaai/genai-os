@@ -9,7 +9,7 @@
                     <section class="flex flex-col h-full overflow-hidden">
                         <header>
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                {{ __('Management Interface') }}
+                                {{ __('manage.interface.header') }}
                             </h2>
                         </header>
                         <div class="flex-1 flex overflow-hidden flex-col border-gray-700 rounded border-2">
@@ -19,25 +19,25 @@
                                     <li class="mr-2" role="presentation">
                                         <button class="inline-block p-4 border-b-2 rounded-t-lg" id="groups-tab"
                                             data-tabs-target="#groups" type="button" role="tab"
-                                            aria-controls="groups" aria-selected="{{session('last_tab') ? 'false' : 'true'}}">{{__("Groups")}}</button>
+                                            aria-controls="groups" aria-selected="{{session('last_tab') ? 'false' : 'true'}}">{{__('manage.tab.groups')}}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
                                         <button
                                             class="inline-block p-4 border-b-2 rounded-t-lg"
                                             id="users-tab" data-tabs-target="#users" type="button" role="tab"
-                                            aria-controls="users" aria-selected="{{session('last_tab') == 'users' ? 'true' : 'false'}}">{{__("Users")}}</button>
+                                            aria-controls="users" aria-selected="{{session('last_tab') == 'users' ? 'true' : 'false'}}">{{__('manage.tab.users')}}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
                                         <button
                                             class="inline-block p-4 border-b-2 rounded-t-lg"
                                             id="llms-tab" data-tabs-target="#llms" type="button" role="tab"
-                                            aria-controls="llms" aria-selected="{{session('last_tab') == 'llms' ? 'true' : 'false'}}">{{__("LLMs")}}</button>
+                                            aria-controls="llms" aria-selected="{{session('last_tab') == 'llms' ? 'true' : 'false'}}">{{__('manage.tab.llms')}}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
                                         <button
                                             class="inline-block p-4 border-b-2 rounded-t-lg"
                                             id="settings-tab" data-tabs-target="#settings" type="button" role="tab"
-                                            aria-controls="settings" aria-selected="{{session('last_tab') == 'settings' ? 'true' : 'false'}}">{{__("Settings")}}</button>
+                                            aria-controls="settings" aria-selected="{{session('last_tab') == 'settings' ? 'true' : 'false'}}">{{__('manage.tab.settings')}}</button>
                                     </li>
                                 </ul>
                             </div>

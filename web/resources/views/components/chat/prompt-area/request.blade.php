@@ -11,9 +11,9 @@
         <input id="chained" style="display:none;" {{ $chained ? '' : 'disabled' }}>
         <button type="button" onclick="chain_toggle()" id="chain_btn"
             class="whitespace-nowrap my-auto text-white mr-3 {{ $chained ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-3 py-2 rounded">
-            {{ $chained ? __('Chained') : __('Unchain') }}
+            {{ $chained ? __('chat.button.chained') : __('chat.button.unchain') }}
         </button>
-        <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
+        <textarea tabindex="0" data-id="root" placeholder="{{ __('chat.prompt_area.hint') }}" rows="1" max-rows="5"
             oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
             class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
         <div class="ml-auto right-[12px] relative bottom-[4px] flex justify-end items-end">
@@ -44,8 +44,8 @@
         }, function() {
             $('#chained').prop('disabled', !$('#chained').prop('disabled'));
             $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
-            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
-                '{{ __('Chained') }}')
+            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('chat.button.unchain') }}' :
+                '{{ __('chat.button.chained') }}')
         })
     }
 
@@ -53,28 +53,4 @@
         $.get("{{ route('chat.abort', $chatId) }}");
         return false;
     }
-
-    function isValidURL(url) {
-        var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
-        return urlPattern.test(url);
-    }
-    @if (request()->route('llm_id'))
-        @if (strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'web_qa') === 0)
-            if ($("#prompt_area")) {
-                $("#prompt_area").on("submit", function(event) {
-                    event.preventDefault();
-                    if (isValidURL($("#chat_input").val().trim())) {
-                        $("#prompt_area")[0].submit()
-                    } else {
-                        $("#error_alert >span").text(
-                            "{{ __('The first message for this LLM allows URL only!') }}")
-                        $("#error_alert").fadeIn();
-                        setTimeout(function() {
-                            $("#error_alert").fadeOut();
-                        }, 3000);
-                    }
-                })
-            }
-        @endif
-    @endif
 </script>

@@ -87,7 +87,7 @@
                     @if ($result->count() == 0)
                         <div
                             class="text-center rounded-r-lg flex flex-1 overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                            {!! __('No available LLM to chat with<br>Please come back later!') !!}
+                            {!! __('chat.hint.no_llms') !!}
                         </div>
                     @else
                         <p class="block sm:hidden text-center text-black dark:text-white">
@@ -97,7 +97,7 @@
                 @if ($result->count() > 1 && (request()->route('chat_id') || request()->route('llm_id')))
                     <a href="{{ route('chat.home') }}"
                         class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
-                        {{ __('Return to Menu') }}</a>
+                        {{ __('chat.return_to_menu') }}</a>
                 @endif
                 @if (request()->route('chat_id') || request()->route('llm_id'))
                     <x-bots.rooms.list :LLM="$LLM" />
@@ -115,7 +115,7 @@
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
                 class="hidden sm:flex flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                {{ __('Select a chatroom to begin with') }}
+                {{ __('chat.hint.select_a_chatroom') }}
             </div>
         @else
             <div id="histories"
@@ -138,7 +138,7 @@
                             @endforeach
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['doc_qa', 'doc_qa_b5']))
-                            <p class="m-auto text-black dark:text-white">{!! __('A document is required in order to use this LLM, <br>Please upload a file first.') !!}</p>
+                            <p class="m-auto text-black dark:text-white">{!! __('chat.hint.file_required') !!}</p>
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['web_qa', 'web_qa_b5']))
                         @endif

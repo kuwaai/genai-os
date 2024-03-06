@@ -8,7 +8,7 @@
             <!-- Modal header -->
             <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    {{ __('Export Chat') }}
+                    {{ __('chat.button.export_chat') }}
                 </h3>
                 <button type="button"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -25,7 +25,7 @@
             <div class="p-6">
                 <!--<div class="flex items-center space-x-2">
                     <label class="block text-black dark:text-white" for="link">
-                        {{ __('Share link (For now, Only you can access)') }}
+                        {{ __('chat.label.share_link') }}
                     </label>
                     <p id="copiedAlert" class="text-sm text-gray-600 dark:text-green-400" style="display: none;">
                         {{ __('Copied') }}</p>
@@ -42,11 +42,11 @@
                         <i class="fas fa-external-link-alt"></i>
                     </a>
                 </div>-->
-                <label class="text-black dark:text-white" for="export_json">{{ __('JSON format') }}</label>
+                <label class="text-black dark:text-white" for="export_json">{{ __('chat.label.JSON') }}</label>
                 <textarea id="export_json" rows="5" readonly
                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
 
-                <label class="text-black dark:text-white" for="export_tsv">{{ __('Tab Separate Values') }}</label>
+                <label class="text-black dark:text-white" for="export_tsv">{{ __('chat.label.TSV') }}</label>
                 <textarea id="export_tsv" rows="5" readonly
                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                 <a id="download_holder_json" style="display:none;" download="{{ $name . '.json' }}"></a>
@@ -58,24 +58,24 @@
                     class="absolute z-10 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm tooltip dark:bg-gray-600 opacity-0 invisible"
                     style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(352.8px, -108px, 0px);"
                     data-popper-placement="top">
-                    {{ __('Unescaped JSON Format') }}
+                    {{ __('chat.tooltip.json_btn') }}
                     <div class="tooltip-arrow" data-popper-arrow=""
                         style="position: absolute; left: 0px; transform: translate3d(89.6px, 0px, 0px);"></div>
                 </div>
                 <button data-modal-hide="exportModal" data-tooltip-target="export_json_btn"
                     onclick='$("#download_holder_json").attr("href",window.URL.createObjectURL(new Blob([$("#export_json").val()], { type: "text/plain" }))); $("#download_holder_json")[0].click();'
-                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download JSON') }}</button>
+                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.download.JSON') }}</button>
                 <div id="export_txt_btn" role="tooltip"
                     class="absolute z-10 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm tooltip dark:bg-gray-600 opacity-0 invisible"
                     style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(352.8px, -108px, 0px);"
                     data-popper-placement="top">
-                    {{ __('Tab Separated Value') }}
+                    {{ __('chat.tooltip.TSV') }}
                     <div class="tooltip-arrow" data-popper-arrow=""
                         style="position: absolute; left: 0px; transform: translate3d(89.6px, 0px, 0px);"></div>
                 </div>
                 <button data-modal-hide="exportModal" data-tooltip-target="export_txt_btn"
                     onclick='$("#download_holder_tsv").attr("href",window.URL.createObjectURL(new Blob([$("#export_tsv").val()], { type: "text/plain" }))); $("#download_holder_tsv")[0].click();'
-                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('Download TXT') }}</button>
+                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.download.TXT') }}</button>
             </div>
         </div>
     </div>

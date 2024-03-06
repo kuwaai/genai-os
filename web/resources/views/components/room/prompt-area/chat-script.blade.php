@@ -50,15 +50,15 @@
             } else {
                 if ($("#chat_input").val().trim() == "") {
                     $("#error_alert >span").text(
-                        "{{ __('You cannot send a empty message!') }}")
+                        "{{ __('chat.hint.send.empty') }}")
                 } else if (!$chattable) {
                     $("#error_alert >span").text(
-                        "{{ __('Still processing a request, If this take too long, Please refresh.') }}")
+                        "{{ __('chat.hint.send.still_processing') }}")
                 } else if (allDisabled) {
                     $("#error_alert >span").text(
-                        "{{ __('You selected no LLM to chat with. Please select one first!') }}")
+                        "{{ __('chat.hint.must_select_llm') }}")
                 } else {
-                    $("#error_alert >span").text("{{ __('Something went wrong! Please refresh the page.') }}")
+                    $("#error_alert >span").text("{{ __('chat.hint.please_refresh') }}")
                 }
                 $("#error_alert").fadeIn();
                 setTimeout(function() {
@@ -101,7 +101,7 @@
                     }
                 })
                 verilog = languageClass == "verilog" ?
-                    `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>` :
+                    `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>` :
                     ``
                 $(this).prepend(
                     `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">

@@ -39,7 +39,7 @@
     @endif
     <p class="flex-1 flex flex-wrap items-center mx-2 overflow-y-auto overflow-x-hidden scrollbar">
         @if (session('llms'))
-            {{ __('New Chatroom') }}
+            {{ __('room.header.new_room') }}
         @else
             {{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}
         @endif
@@ -88,32 +88,32 @@
                 @endforeach
                 <div id="react_copy" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('Copy message') }}
+                    {{ __('chat.react_btn.copy') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_like" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('Like the message') }}
+                    {{ __('chat.react_btn.like') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_dislike" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('Dislike the message') }}
+                    {{ __('chat.react_btn.dislike') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_translate" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('Translate by the model') }}
+                    {{ __('chat.react_btn.translate') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_safetyGuard" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('Safety Guard Check') }}
+                    {{ __('chat.react_btn.safety_guard') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="react_quote" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('Quote this message') }}
+                    {{ __('chat.react_btn.quote') }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <div id="ref-tooltip" role="tooltip"

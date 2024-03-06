@@ -77,19 +77,19 @@
                 @if ($result->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        {!! __('No available LLM to chat with<br>Please come back later!') !!}
+                        {!! __('chat.hint.no_llms') !!}
                     </div>
                 @else
                     @if (request()->route('room_id') || session('llms'))
                         <a href="{{ route('room.home') }}"
                             class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2">←
-                            {{ __('Return to Menu') }}</a>
+                            {{ __('chat.return_to_menu') }}</a>
                         <x-room.rooms.list :llms="$llms" :DC="$DC" :result="$result" />
                     @else
-                        <h2 class="block sm:hidden text-xl text-center text-black dark:text-white">{{ __('Room') }}
+                        <h2 class="block sm:hidden text-xl text-center text-black dark:text-white">{{ __('room.route') }}
                         </h2>
                         <p class="block sm:hidden text-center text-black dark:text-white">
-                            {{ __('Select a chatroom to begin with') }}</p>
+                            {{ __('chat.hint.select_a_chatroom') }}</p>
                         <div class="mb-2">
                             <div class="flex">
                                 @if (request()->user()->hasPerm('Room_update_new_chat'))
@@ -97,7 +97,7 @@
                                         data-modal-toggle="create-model-modal"
                                         class="flex rounded-{{ request()->user()->hasPerm('Room_update_import_chat')? 'l-': '' }}lg border border-black dark:border-white border-1 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
                                         <p class="flex-1 text-center text-gray-700 dark:text-white">
-                                            {{ __('Create Room') }}
+                                            {{ __('room.button.create_room') }}
                                         </p>
                                     </button>
                                 @endif
@@ -118,7 +118,7 @@
         @if (!request()->route('room_id') && !session('llms'))
             <div id="histories_hint"
                 class="flex-1 h-full hidden sm:flex flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                {{ __('Select a chatroom to begin with') }}
+                {{ __('chat.hint.select_a_chatroom') }}
             </div>
         @else
             @if (request()->user()->hasPerm('Room_delete_chatroom') && !session('llms'))

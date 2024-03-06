@@ -5,10 +5,10 @@
 
     function translate_msg($msg) {
         let msgTranslations = {
-            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('[Oops, the LLM returned empty message, please try again later or report to admins!]') }}",
-            "[Sorry, something is broken, please try again later!]": "{{ __('[Sorry, something is broken, please try again later!]') }}",
-            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}",
-            "[Sorry, The input message is too huge!]": "{{ __('[Sorry, The input message is too huge!]') }}"
+            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('chat.hint.llm_returned_empty') }}",
+            "[Sorry, something is broken, please try again later!]": "{{ __('chat.hint.please_retry_later') }}",
+            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('chat.hint.no_worker') }}",
+            "[Sorry, The input message is too huge!]": "{{ __('chat.hint.input_too_large') }}"
         };
 
         for (let original in msgTranslations) {
@@ -25,7 +25,7 @@
         $($this).parent().parent().next()[0].classList = "hljs language-" + $($this).val()
         if ($($this).parent().next().attr("onclick") == "compileVerilog(this)") $($this).parent().next().remove();
         if ($($this).val() == "verilog") $($this).parent().after(
-            `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>`
+            `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>`
         )
 
         $($this).parent().parent().next().text($($this).parent().parent().next().text())
@@ -108,7 +108,7 @@ fill="currentFill" />
                         }
                     })
                     verilog = languageClass == "verilog" ?
-                        `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>` :
+                        `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>` :
                         ``
                     $(this).prepend(
                         `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
@@ -155,6 +155,10 @@ xmlns="http://www.w3.org/2000/svg">
         });
     }
 
+    function isValidURL(url) {
+        var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
+        return urlPattern.test(url);
+    }
     function scrollToRef(refNumber) {
         $('#chatroom').animate({
             scrollTop: $(`#history_${refNumber}`).offset().top - $('#chatroom').offset().top + $('#chatroom')
@@ -280,7 +284,7 @@ xmlns="http://www.w3.org/2000/svg">
                             $(node).children("svg").addClass("hidden");
                             $(node).children("svg").eq(3).removeClass("hidden");
                             $("#error_alert >span").text(
-                                "{{ __('[Sorry, There\'re no machine to process this LLM right now! Please report to Admin or retry later!]') }}"
+                                "{{ __('chat.hint.no_worker') }}"
                             )
                             $("#error_alert").fadeIn();
                             setTimeout(function() {
@@ -404,7 +408,7 @@ xmlns="http://www.w3.org/2000/svg">
         var requestData = {
             "verilog_code": verilogCode
         };
-        $($this).text("{{ __('Compiling') }}")
+        $($this).text("{{ __('chat.label.compiling') }}")
         $($this).removeClass("hover:bg-gray-900")
         $($this).attr("disabled", true)
 
@@ -413,10 +417,10 @@ xmlns="http://www.w3.org/2000/svg">
             // Handle the response
             $result = data
             if ($result.error == "Backend compiler offline") {
-                $($this).text("{{ __('Backend Offline') }}")
+                $($this).text("{{ __('chat.hint.backend_offline') }}")
                 $($this).addClass("bg-orange-600 hover:bg-orange-700")
                 setTimeout(function() {
-                    $($this).text("{{ __('Compile Test') }}")
+                    $($this).text("{{ __('chat.button.verilog_compile_test') }}")
                     $($this).removeClass("bg-orange-600 hover:bg-orange-700")
                     $($this).addClass("hover:bg-gray-900")
                     $($this).attr("disabled", false)
@@ -424,10 +428,10 @@ xmlns="http://www.w3.org/2000/svg">
             } else {
                 if (JSON.parse(data).success) {
                     $($this).addClass("bg-green-600 hover:bg-green-700")
-                    $($this).text("{{ __('Success') }}")
+                    $($this).text("{{ __('chat.hint.success') }}")
                 } else {
                     $($this).addClass("bg-red-600 hover:bg-red-700")
-                    $($this).text("{{ __('Failed') }}")
+                    $($this).text("{{ __('chat.hint.failed') }}")
                 }
                 $($this).parent().after(
                     `<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'} whitespace-pre-wrap"></div>`

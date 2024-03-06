@@ -199,36 +199,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         return view('play');
                     })->name('play.home');
 
-                    Route::middleware(AdminMiddleware::class . ':tab_Chat')
-                        ->prefix('bots')
-                        ->group(function () {
-                            Route::get('/', [BotController::class, 'home'])->name('play.bots.home');
-
-                            Route::get('/new/{llm_id}', [BotController::class, 'new_chat'])->name('play.bots.new');
-
-                            Route::get('/chain', [BotController::class, 'update_chain'])->name('play.bots.chain');
-                            Route::get('/stream', [BotController::class, 'SSE'])->name('play.bots.sse');
-                            Route::get('/{chat_id}', [BotController::class, 'main'])->name('play.bots.chat');
-
-                            Route::middleware(AdminMiddleware::class . ':Chat_update_upload_file')
-                                ->post('/upload', [BotController::class, 'upload'])
-                                ->name('play.bots.upload');
-                            Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
-                                ->post('/create', [BotController::class, 'create'])
-                                ->name('play.bots.create');
-                            Route::middleware(AdminMiddleware::class . ':Chat_update_send_message')
-                                ->post('/request', [BotController::class, 'request'])
-                                ->name('play.bots.request');
-                            Route::post('/edit', [BotController::class, 'edit'])->name('play.bots.edit');
-                            Route::middleware(AdminMiddleware::class . ':Chat_update_feedback')
-                                ->post('/feedback', [BotController::class, 'feedback'])
-                                ->name('play.bots.feedback');
-
-                            Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
-                                ->delete('/delete', [BotController::class, 'delete'])
-                                ->name('play.bots.delete');
-                        })
-                        ->name('play.bots');
                 })
                 ->name('play');
             #---Play
