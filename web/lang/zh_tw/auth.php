@@ -17,4 +17,6 @@ return [
     'password' => '提供的密碼不正確。',
     'throttle' => '登錄嘗試次數過多。請在 :seconds 秒後再試一次。',    
 
+    'label.invite_token' => '邀請碼',
+    'label.invite_token.invite_token_optional' => '邀請碼 (選填)',
 ];

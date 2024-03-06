@@ -78,12 +78,12 @@
                         @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
                             <button
                                 class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
-                                onclick="$modal1 = new Modal(document.getElementById('system_announcement_modal'), {backdrop: 'static',closable: true,onHide: () => {}}); $modal1.show();">{{ __('Announcement') }}</button>
+                                onclick="$modal1 = new Modal(document.getElementById('system_announcement_modal'), {backdrop: 'static',closable: true,onHide: () => {}}); $modal1.show();">{{ __('manage.label.anno') }}</button>
                         @endif
                         @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
                             <button
                                 class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
-                                onclick="$modal2 = new Modal(document.getElementById('tos_modal'), {backdrop: 'static',closable: true,onHide: () => {}}); $modal2.show();">{{ __('Terms of Service') }}</button>
+                                onclick="$modal2 = new Modal(document.getElementById('tos_modal'), {backdrop: 'static',closable: true,onHide: () => {}}); $modal2.show();">{{ __('manage.label.tos') }}</button>
                         @endif
                         <hr class="border-gray-300 dark:border-gray-600">
                         <!-- Authentication -->

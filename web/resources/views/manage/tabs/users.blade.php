@@ -1,7 +1,7 @@
 <script>
     $users = {}
     $groupnames = {
-        "-1": "{{ __('Other Users') }}"
+        "-1": "{{ __('manage.label.other_users') }}"
     }
 </script>
 <form style="display:none;" id="list_users" method="post" action="{{ route('manage.tab') }}">
@@ -43,18 +43,18 @@
                             d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
                     <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                        {{ __('Are you sure you want to delete user') }} "<span>NULL</span>"?</h3>
+                        {{ __('manage.modal.delete_user.header') }} "<span>NULL</span>"?</h3>
                     <form action="{{ route('manage.user.delete') }}" method="post" class="inline-block">
                         @csrf
                         @method('delete')
                         <input name="id" type="hidden">
                         <button type="submit"
                             class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                            {{ __('Delete') }}
+                            {{ __('manage.button.delete') }}
                         </button>
                     </form>
                     <button data-modal-hide="delete_user_modal" type="button"
-                        class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('Cancel') }}</button>
+                        class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('manage.modal.delete_user.button.cancel') }}</button>
                 </div>
             </div>
         </div>
@@ -71,20 +71,20 @@
         <div class="grid flex flex-1 mx-auto max-w-screen-xl px-4 py-5 text-gray-900 dark:text-white sm:grid-cols-2">
             <button href="#" class="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 onclick="update_stepper(['Menu','Group Selector']);$('#menu').hide();$('#group_selector').show();">
-                <div class="font-semibold">{{ __('Group Selector') }}</div>
+                <div class="font-semibold">{{ __('manage.header.group_selector') }}</div>
                 <span
-                    class="text-sm text-gray-500 dark:text-gray-400">{{ __('List the group users to manage specific user') }}</span>
+                    class="text-sm text-gray-500 dark:text-gray-400">{{ __('manage.label.group_selector') }}</span>
             </button>
             <button href="#" class="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 onclick="update_stepper(['Menu','Fuzzy Search']);$('#menu').hide();$('#fuzzy_selector').show();">
-                <div class="font-semibold">{{ __('Fuzzy Search') }}</div>
+                <div class="font-semibold">{{ __('manage.header.fuzzy_search') }}</div>
                 <span
-                    class="text-sm text-gray-500 dark:text-gray-400">{{ __('Search the user by Email or Name') }}</span>
+                    class="text-sm text-gray-500 dark:text-gray-400">{{ __('manage.label.fuzzy_search') }}</span>
             </button>
             <button href="#" class="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 onclick="update_stepper(['Menu','Create User']);$('#menu').hide();$('#create_user_form').show();">
-                <div class="font-semibold">{{ __('Create User') }}</div>
-                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Create a new User profile') }}</span>
+                <div class="font-semibold">{{ __('manage.header.create_user') }}</div>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('manage.label.create_user') }}</span>
             </button>
         </div>
     </div>
@@ -92,28 +92,28 @@
         action="{{ route('manage.user.create') }}">
         @csrf
         <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 flex items-center justify-center">
-            <p class="text-lg mr-auto">{{ __('Create a new User') }}</p>
+            <p class="text-lg mr-auto">{{ __('manage.create_user.header') }}</p>
             <button type="submit"
-                class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300 text-white">{{ __('Create') }}</button>
+                class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300 text-white">{{ __('manage.button.create') }}</button>
         </div>
 
         <div class="scrollbar overflow-y-auto w-full">
             <div class="grid gap-3 md:grid-cols-4 w-full px-3 pt-2">
                 <div class="md:col-span-2 lg:col-span-1">
                     <label for="create_user_name"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Name') }}
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.name') }}
                         <span class="text-red-500">*</span></label>
                     <input type="text" id="create_user_name" name="name" autocomplete="off"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="{{ __('Username') }}" required>
+                        placeholder="{{ __('manage.placeholder.username') }}" required>
                 </div>
                 <div class="md:col-span-2 lg:col-span-1">
                     <label for="create_user_group"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Joined Group') }}</label>
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.create_user.joined_group') }}</label>
                     <input type="text" list="joinable_groups" name="group" autocomplete="off"
                         id="create_user_group"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="{{ __('Group name') }}">
+                        placeholder="{{ __('manage.placeholder.group_name') }}">
                     <datalist id="joinable_groups">
                         @foreach (App\Models\Groups::orderby('name')->get() as $group)
                             <option value="{{ $group->name }}">
@@ -122,30 +122,30 @@
                 </div>
                 <div class="md:col-span-4 lg:col-span-2">
                     <label for="create_user_email"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Email') }}
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.email') }}
                         <span class="text-red-500">*</span></label>
                     <input type="text" id="create_user_email" name="email" autocomplete="off"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="{{ __('the user\'s Email') }}" required>
+                        placeholder="{{ __('manage.placeholder.email') }}" required>
                 </div>
             </div>
             <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
                 <div class="md:col-span-2 lg:col-span-1">
                     <label for="create_user_password"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Password') }}
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.password') }}
                         <span class="text-red-500">*</span></label>
                     <input type="password" id="create_user_password" name="password" autocomplete="off"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="{{ __('Password') }}" required>
+                        placeholder="{{ __('manage.label.password') }}" required>
                 </div>
             </div>
             <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
                 <div class="md:col-span-2 lg:col-span-1">
                     <label for="create_user_detail"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Detail') }}</label>
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.detail') }}</label>
                     <input type="text" id="create_user_detail" name="detail" autocomplete="off"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="{{ __('Detail') }}">
+                        placeholder="{{ __('manage.label.detail') }}">
                 </div>
             </div>
         </div>
@@ -165,7 +165,7 @@
                         <div class="relative w-full">
                             <input type="search" type="submit" name="search" id="fuzzy_search_input"
                                 class="p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-lg border-l-gray-50 border-l-2 border border-gray-300 dark:bg-gray-700 dark:border-l-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
-                                placeholder="{{ __('Search Email or Name') }}" autocomplete="off"
+                                placeholder="{{ __('manage.placeholder.search_user') }}" autocomplete="off"
                                 value="{{ session('fuzzy_search') }}" required>
                             <button type="submit"
                                 class="absolute top-0 right-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -228,7 +228,7 @@
                         </div>
                     @endif
                 @else
-                    <p>{{ __('Press enter to search') }}</p>
+                    <p>{{ __('manage.hint.enter_to_search') }}</p>
                 @endif
             </div>
             <div id="group_selector" class="flex flex-1 h-full"
@@ -245,9 +245,9 @@
                         <button onclick='update_tab("users","group_selector",-1)'
                             class="flex menu-btn flex items-center justify-center w-full break-all min-h-12 dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
                             <p class="flex-1 text-center text-orange-400 dark:text-orange-400">
-                                <span class="block border-orange-400 border-b">{{ __('Other Users') }}</span>
+                                <span class="block border-orange-400 border-b">{{ __('manage.label.other_users') }}</span>
                                 <span
-                                    class="text-sm">{{ App\Models\User::where('group_id', null)->count() . ' ' . __('Members') }}</span>
+                                    class="text-sm">{{ App\Models\User::where('group_id', null)->count() . ' ' . __('manage.label.members') }}</span>
                             </p>
                         </button>
                     </div>
@@ -265,7 +265,7 @@
                                     <p class="flex-1 text-center text-gray-700 dark:text-white">
                                         <span
                                             class="block border-gray-700 dark:border-white border-b">{{ $group->name }}</span>
-                                        <span class="text-sm">{{ $group->members . ' ' . __('Members') }}</span>
+                                        <span class="text-sm">{{ $group->members . ' ' . __('manage.label.members') }}</span>
                                     </p>
                                 </button>
                             </div>
@@ -279,13 +279,13 @@
                         <button
                             class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
                             onclick="update_stepper(['Menu','Group Selector']);$('#group_userlist').hide(); $('#edit_user_form').hide(); $('#group_selector_list').show();">←
-                            {{ __('Return to Group List') }}</button>
+                            {{ __('manage.button.return_group_list') }}</button>
                         <form class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                             <div class="flex">
                                 <div class="relative w-full">
                                     <input type="search" oninput="search_group($(this).val())"
                                         class="p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-lg border-l-gray-50 border-l-2 border border-gray-300 dark:bg-gray-700 dark:border-l-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
-                                        placeholder="{{ __('Search Email or Name') }}" autocomplete="off">
+                                        placeholder="{{ __('manage.placeholder.search_user') }}" autocomplete="off">
                                 </div>
                             </div>
                         </form>
@@ -325,32 +325,32 @@
                 <input name="list_group_id" hidden value="{{ session('list_group') }}">
                 <input name="id" hidden>
                 <div class="w-full bg-gray-300 text-white dark:bg-gray-600 p-3 flex items-center justify-center">
-                    <p class="text-lg mr-auto text-black dark:text-white">{{ __('Edit User') }}</p>
+                    <p class="text-lg mr-auto text-black dark:text-white">{{ __('manage.group_selector.header') }}</p>
                     <span id="user_id" class="mr-2">ID:null</span>
                     <a id="delete_user_btn" onclick="delete_user(undefined)" data-modal-target="delete_user_modal"
                         data-modal-toggle="delete_user_modal"
-                        class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">{{ __('Delete') }}</a>
+                        class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">{{ __('manage.button.delete') }}</a>
                     <button
-                        class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{ __('Update') }}</button>
+                        class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{ __('manage.button.update') }}</button>
                 </div>
 
                 <div class="scrollbar overflow-y-auto w-full">
                     <div class="grid gap-3 md:grid-cols-4 w-full px-3 pt-2">
                         <div class="md:col-span-2 lg:col-span-1">
                             <label for="edit_user_name"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Name') }}
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.name') }}
                                 <span class="text-red-500">*</span></label>
                             <input type="text" id="edit_user_name" name="name" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('Username') }}" required>
+                                placeholder="{{ __('manage.placeholder.username') }}" required>
                         </div>
                         <div class="md:col-span-2 lg:col-span-1">
                             <label for="edit_joined_group"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Joined Group') }}</label>
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.create_user.joined_group') }}</label>
                             <input type="text" list="joinable_groups" name="group" autocomplete="off"
                                 id="edit_joined_group"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('Group name') }}">
+                                placeholder="{{ __('manage.placeholder.group_name') }}">
                             <datalist id="joinable_groups">
                                 @foreach (App\Models\Groups::orderby('name')->get() as $group)
                                     <option value="{{ $group->name }}">
@@ -359,29 +359,29 @@
                         </div>
                         <div class="md:col-span-4 lg:col-span-2">
                             <label for="edit_user_email"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Email') }}
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.email') }}
                                 <span class="text-red-500">*</span></label>
                             <input type="text" id="edit_user_email" name="email" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('the user\'s Email') }}" required>
+                                placeholder="{{ __('manage.placeholder.email') }}" required>
                         </div>
                     </div>
                     <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
                         <div class="md:col-span-2 lg:col-span-1">
                             <label for="edit_user_password"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Update Password') }}</label>
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.update_password') }}</label>
                             <input type="password" id="edit_user_password" name="password" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('New Password') }}">
+                                placeholder="{{ __('manage.placeholder.new_password') }}">
                         </div>
                     </div>
                     <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
                         <div class="md:col-span-2 lg:col-span-1">
                             <label for="edit_detail"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Detail') }}</label>
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.detail') }}</label>
                             <input type="text" id="edit_detail" name="detail" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('Detail') }}">
+                                placeholder="{{ __('manage.label.detail') }}">
                         </div>
                     </div>
                 </div>
@@ -423,7 +423,7 @@
     }
 
     function edit_group_user(id) {
-        $('#edit_user_form p').text("{{ __('Edit User') }} " + $users[id][0])
+        $('#edit_user_form p').text("{{ __('manage.group_selector.header') }} " + $users[id][0])
         $('#edit_user_form input[name=id]').val(id)
         $('#edit_user_form input[name=name]').val($users[id][0])
         $('#edit_user_form input[name=group]').val($users[id][2] == -1 ? "" : $groupnames[$users[id][2]])
@@ -462,10 +462,10 @@
             "Fuzzy Search": `update_stepper(['Menu', 'Fuzzy Search']);$('#edit_user_form').hide();`
         }
         parse = {
-            "Menu": "{{ __('Menu') }}",
-            "Group Selector": "{{ __('Group Selector') }}",
-            "Create User": "{{ __('Create User') }}",
-            "Fuzzy Search": "{{ __('Fuzzy Search') }}"
+            "Menu": "{{ __('manage.header.menu') }}",
+            "Group Selector": "{{ __('manage.header.group_selector') }}",
+            "Create User": "{{ __('manage.header.create_user') }}",
+            "Fuzzy Search": "{{ __('manage.header.fuzzy_search') }}"
         }
         $("ol").html("");
         for (var index in datas) {

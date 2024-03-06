@@ -26,7 +26,7 @@
                     <input name="id" type="hidden">
                     <button type="submit"
                         class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                        {{ __('Delete') }}
+                        {{ __('manage.button.delete') }}
                     </button>
                 </form>
                 <button data-modal-hide="delete_group_modal" type="button"
@@ -41,7 +41,7 @@
         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
             <button onclick="edit_group(undefined)" id="new_group_btn"
                 class="flex menu-btn flex items-center justify-center w-full h-12 bg-green-400 hover:bg-green-500 dark:bg-green-600 dark:hover:bg-green-700 transition duration-300">
-                <p class="flex-1 text-center text-white">{{ __('New Group') }}</p>
+                <p class="flex-1 text-center text-white">{{ __('manage.button.new_group') }}</p>
             </button>
         </div>
         <hr class="border-black dark:border-gray-300 mb-2">
@@ -75,23 +75,23 @@
             action="{{ route('manage.group.create') }}">
             @csrf
             <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 text-white flex items-center justify-center">
-                <p class="text-lg mr-auto text-gray-700 dark:text-white">{{ __('Create a new Group') }}</p>
+                <p class="text-lg mr-auto text-gray-700 dark:text-white">{{ __('manage.header.create_group') }}</p>
                 <button
-                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{ __('Create') }}</button>
+                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{ __('manage.button.create') }}</button>
             </div>
             <div class="scrollbar overflow-y-auto w-full">
                 <div class="grid gap-3 grid-cols-1 xl:grid-cols-4 md:grid-cols-2 w-full px-3 pt-2">
                     <div>
                         <label for="create_group_name"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Name') }}
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.group_name') }}
                             <span class="text-red-500">*</span></label>
                         <input type="text" id="create_group_name" name="name" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="{{ __('Group name') }}" required>
+                            placeholder="{{ __('manage.placeholder.group_name') }}" required>
                     </div>
                     <div>
                         <label for="create_group_invite_code"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Invite Code') }}</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.invite_code') }}</label>
                         <div class="flex rounded-lg overflow-hidden">
                             <label class="bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
                                 for="create_enable_invite_code">
@@ -100,7 +100,7 @@
                             </label>
                             <input type="text" id="create_group_invite_code" name="invite_code" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('Invite Code') }}" required disabled>
+                                placeholder="{{ __('manage.label.invite_code') }}" required disabled>
                             <div class="p-3 rounded-r-lg bg-green-500 hover:bg-green-600 cursor-pointer"
                                 style="display:none" onclick="$(this).prev().val(generateRandomString(12))"><svg
                                     xmlns="http://www.w3.org/2000/svg" height="1em" style="fill:white"
@@ -112,15 +112,15 @@
                     </div>
                     <div class="md:col-span-2">
                         <label for="create_group_describe"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Describe') }}</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.describe') }}</label>
                         <input type="text" id="create_group_describe" name="describe" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="{{ __('Details for the group') }}">
+                            placeholder="{{ __('manage.placeholder.group_detail') }}">
                     </div>
                 </div>
                 <div class="w-full p-3">
                     <span
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Tab Permissions') }}</span>
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.tab_permissions') }}</span>
                     <div id="edit_tab_permissions">
                         @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
                             <div
@@ -197,7 +197,7 @@
                 </div>
                 <div class="w-full mb-3 mt-2">
                     <span
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Enabled LLM)') }}</span>
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.enabled') }}</span>
                     <div
                         class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                         @foreach (DB::table(function ($query) {
@@ -216,7 +216,7 @@
                 </div>
                 <div class="w-full mb-3">
                     <span
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Disabled LLM)') }}</span>
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.disabled') }}</span>
                     <div
                         class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                         @foreach (DB::table(function ($query) {
@@ -244,9 +244,9 @@
                 <p class="text-lg mr-auto dark:text-white text-gray-700">Edit NULL</p><a id="delete_group_btn"
                     onclick="delete_group(undefined)" data-modal-target="delete_group_modal"
                     data-modal-toggle="delete_group_modal"
-                    class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">{{ __('Delete') }}</a>
+                    class="py-2 px-3 bg-red-600 rounded-lg hover:bg-red-700 transition mr-2 duration-300 cursor-pointer">{{ __('manage.button.delete') }}</a>
                 <button
-                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{ __('Update') }}</button>
+                    class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300">{{ __('manage.button.update') }}</button>
             </div>
             <div class="scrollbar overflow-y-auto w-full">
                 @if (session('last_action') === 'update')
@@ -283,15 +283,15 @@
                 <div class="grid gap-3 grid-cols-1 xl:grid-cols-4 md:grid-cols-2 w-full px-3 pt-2">
                     <div>
                         <label for="edit_group_name"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Name') }}
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.group_name') }}
                             <span class="text-red-500">*</span></label>
                         <input type="text" id="edit_group_name" name="name" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="{{ __('Group name') }}" required>
+                            placeholder="{{ __('manage.placeholder.group_name') }}" required>
                     </div>
                     <div>
                         <label for="edit_group_invite_code"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Invite Code') }}</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.invite_code') }}</label>
                         <div class="flex rounded-lg overflow-hidden">
                             <label
                                 class="bg-gray-300 dark:bg-gray-600 p-2 rounded-l-lg flex justify-center items-center"
@@ -301,7 +301,7 @@
                             </label>
                             <input type="text" id="edit_group_invite_code" name="invite_code" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('Invite Code') }}" required disabled>
+                                placeholder="{{ __('manage.label.invite_code') }}" required disabled>
                             <div class="p-3 rounded-r-lg bg-green-500 hover:bg-green-600 cursor-pointer"
                                 style="display:none" onclick="$(this).prev().val(generateRandomString(12))"><svg
                                     xmlns="http://www.w3.org/2000/svg" height="1em" style="fill:white"
@@ -313,15 +313,15 @@
                     </div>
                     <div class="md:col-span-2">
                         <label for="edit_group_describe"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Describe') }}</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.describe') }}</label>
                         <input type="text" id="edit_group_describe" name="describe" autocomplete="off"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="{{ __('Details for the group') }}">
+                            placeholder="{{ __('manage.placeholder.group_detail') }}">
                     </div>
                 </div>
                 <div class="w-full p-3">
                     <span
-                        class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">{{ __('Tab Permissions') }}</span>
+                        class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.tab_permissions') }}</span>
                     <div id="edit_tab_permissions">
                         @foreach (App\Models\Permissions::where('name', 'Like', 'tab_%')->get() as $perm)
                             <div
@@ -357,7 +357,7 @@
                                                         for="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                         <span
                                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                            {{ __($action) }}
+                                                            {{ __("manage.label." . strtolower($action)) }}
                                                         </span>
                                                         <input type="checkbox"
                                                             id="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
@@ -398,7 +398,7 @@
                     </div>
                     <div class="w-full mb-3 mt-2">
                         <span
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Enabled LLM)') }}</span>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.enabled') }}</span>
                         <div
                             class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                             @foreach (DB::table(function ($query) {
@@ -417,7 +417,7 @@
                     </div>
                     <div class="w-full mb-3">
                         <span
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Model Permissions (Disabled LLM)') }}</span>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.disabled') }}</span>
                         <div
                             class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                             @foreach (DB::table(function ($query) {
@@ -471,7 +471,7 @@
             $('#create_group_form').hide();
             $('#new_group_btn').addClass("bg-green-600 hover:bg-green-700")
             $('#new_group_btn').removeClass("hover:bg-gray-600")
-            $("#edit_group_form >div >p").text("{{ __('Edit group') }} " + data[0])
+            $("#edit_group_form >div >p").text("{{ __('manage.header.edit_group') }} " + data[0])
             $("#edit_group_form input[type=checkbox]").prop("checked", false)
             $("#edit_group_id").val(index)
             $("#edit_group_name").val(data[0])
