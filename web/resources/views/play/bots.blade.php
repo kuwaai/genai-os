@@ -87,7 +87,7 @@
                     @if ($result->count() == 0)
                         <div
                             class="text-center rounded-r-lg flex flex-1 overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                            {!! __('No available LLM to chat with<br>Please come back later!') !!}
+                            {!! __('chat.hint.no_llms') !!}
                         </div>
                     @else
                         <p class="block sm:hidden text-center text-black dark:text-white">

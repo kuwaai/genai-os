@@ -19,7 +19,7 @@
                         d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    {{ __('Are you sure you want to delete group') }}"<span>NULL</span>"?</h3>
+                    {{ __('manage.modal.delete_group.header') }}"<span>NULL</span>"?</h3>
                 <form action="{{ route('manage.group.delete') }}" method="post" class="inline-block">
                     @csrf
                     @method('delete')
@@ -260,7 +260,7 @@
                                 <path
                                     d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                             </svg>
-                            <div class="ml-3 text-sm font-medium">{{ __('Group Updated!') }}
+                            <div class="ml-3 text-sm font-medium">{{ __('manage.hint.group_updated') }}
                             </div>
                         </div>
                     @endif
@@ -378,13 +378,13 @@
                                                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                                                 style="box-shadow:none;" disabled>
                                                             <label for="edit_checkbox_{{ $sub_perm->id }}"
-                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __($sub_perm->name) }}</label>
+                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __("manage.perm.".$sub_perm->name) }}</label>
 
                                                         </div>
                                                         <div id="edit_checkbox_{{ $sub_perm->id }}_tooltip"
                                                             role="tooltip"
                                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                                            {{ __($sub_perm->describe) }}
+                                                            {{ __("manage.perm." . $sub_perm->name . ".describe") }}
                                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                                         </div>
                                                     @endforeach

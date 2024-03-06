@@ -101,7 +101,7 @@
                     }
                 })
                 verilog = languageClass == "verilog" ?
-                    `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>` :
+                    `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>` :
                     ``
                 $(this).prepend(
                     `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">

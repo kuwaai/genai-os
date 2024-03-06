@@ -93,7 +93,7 @@
                             </x-dropdown-link>
                         @endif
                         <x-dropdown-link :href="route('lang')">
-                            {{ __('Change Language') }}
+                            {{ __('profile.button.change_lang') }}
                         </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -101,7 +101,7 @@
                             <x-dropdown-link :href="route('logout')"
                                 onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Sign out') }}
+                                {{ __('login.button.sign_out') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -173,7 +173,7 @@
                     </x-responsive-nav-link>
                 @endif
                 <x-responsive-nav-link :href="route('lang')">
-                    {{ __('Change Language') }}
+                    {{ __('profile.button.change_lang') }}
                 </x-responsive-nav-link>
                 <a class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
                     href="https://taide.tw/" target="_blank">{{ __('Information') }}</a>
@@ -183,7 +183,7 @@
                     <x-responsive-nav-link :href="route('logout')"
                         onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Sign out') }}
+                        {{ __('login.button.sign_out') }}
                     </x-responsive-nav-link>
                 </form>
             </div>

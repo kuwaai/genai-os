@@ -43,21 +43,21 @@
                                     class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('chat.route') }}</a>
                             @endif
                             <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign out') }}</a>
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_out') }}</a>
                             <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                                href="{{ route('lang') }}">{{ __('Change Language') }}</a>
+                                href="{{ route('lang') }}">{{ __('profile.button.change_lang') }}</a>
                         </form>
                     @else
                         <a href="{{ route('login') }}"
-                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign in') }}</a>
+                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_in') }}</a>
 
                         @if (Route::has('register') &&
                                 \App\Models\SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists())
                             <a href="{{ route('register') }}"
-                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('Sign up') }}</a>
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_up') }}</a>
                         @endif
                         <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                            href="{{ route('lang') }}">{{ __('Change Language') }}</a>
+                            href="{{ route('lang') }}">{{ __('profile.button.change_lang') }}</a>
                     @endauth
                 @else
                     @env('nuk')
@@ -68,7 +68,7 @@
                         class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('This service only allow internal IPs') }}</a>
                     @endenv
                     <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                        href="{{ route('lang') }}">{{ __('Change Language') }}</a>
+                        href="{{ route('lang') }}">{{ __('profile.button.change_lang') }}</a>
                 @endif
             </div>
         @endif
@@ -83,9 +83,9 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
-                                {{ __('Comparative') }}
+                                {{ __('welcome.comparative') }}
                             @else
-                                {{ __('Translation') }}
+                                {{ __('welcome.translate') }}
                                 @endenv
                             </h2>
                             <div id="chatroom"
@@ -195,9 +195,9 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
-                                {{ __('Deployment') }}
+                                {{ __('welcome.deployment') }}
                             @else
-                                {{ __('Composition') }}
+                                {{ __('welcome.composition') }}
                                 @endenv
                             </h2>
                             <div id="chatroom"
@@ -247,9 +247,9 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
-                                {{ __('Export & Import') }}
+                                {{ __('welcome.export_and_import') }}
                             @else
-                                {{ __('Communication') }}
+                                {{ __('welcome.communication') }}
                                 @endenv
                             </h2>
                             <div id="chatroom"
@@ -296,9 +296,9 @@
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
-                                {{ __('Application') }}
+                                {{ __('welcome.application') }}
                             @else
-                                {{ __('Summarization') }}
+                                {{ __('welcome.summarization') }}
                                 @endenv
                             </h2>
                             <div id="chatroom"
@@ -352,7 +352,7 @@
                     @else
                         <a href="https://www.nuk.edu.tw/" target="_blank"
                             class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
-                            {!! __('Developed by NUK and NARLabs') !!}
+                            {!! __('welcome.develope_by') !!}
                         </a>
                         @endenv
                     </div>
@@ -369,9 +369,9 @@
                     @endenv
                 @else
                     <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                        href="https://www.twcc.ai/" target="_blank">{{ __('Powered by TWCC') }}</a>
+                        href="https://www.twcc.ai/" target="_blank">{{ __('welcome.powered_by') }}</a>
                     @endenv
-                    <span class="text-black dark:text-white flex justify-end text-sm">{{ __('Version') }}
+                    <span class="text-black dark:text-white flex justify-end text-sm">{{ __('welcome.version') }}
                         0.1.0.1</span>
                 </div>
             </div>

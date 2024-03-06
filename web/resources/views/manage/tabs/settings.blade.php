@@ -103,23 +103,6 @@
             @endif
         </div>
     </form>
-    
-    <!--<div class="space-y-6 flex-1 m-4 border-2 border-gray-500 rounded p-2">
-        <header>
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                {{ __('play.route') }}
-            </h2>
-
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {{ __('You can configure games in this area') }}
-            </p>
-        </header>
-        <div class="mt-3 mx-auto flex">
-
-        </div>
-        <div class="flex items-center gap-4">
-        </div>
-    </div>-->
 </div>
 
 <script>

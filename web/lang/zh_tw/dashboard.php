@@ -27,6 +27,7 @@ return [
 
     //Tab_feedback
     'hint.PasteRawDataHere' => '請貼上要轉換的原始資料，也可以將檔案拖移至此。',
+    "hint.wip_option"=>"待完成，目前暫無選項",
     'header.ActiveModels' => '已啟用模型',
     'header.InactiveModels' => '已停用模型',
     'header.ModelFilter' => '過濾模型：',
@@ -39,6 +40,7 @@ return [
     'msg.InvalidJSONFormat' => 'JSON格式錯誤',
 
     //Tab_SafetyGuard
+    "hint.safety_guard_offline"=>"安全過濾系統處於離線狀態",
     'header.create_rule' => '創建過濾規則',
     'header.update_rule' => '更新過濾規則',
     'rule.filter.keyword' => 'Keyword 規則',

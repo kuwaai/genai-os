@@ -54,7 +54,7 @@
                     <div
                         class="flex items-center p-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                         <button data-modal-hide="system_announcement_modal" type="button" onclick="$modal1.hide();"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('Close') }}</button>
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('manage.button.close') }}</button>
                     </div>
                 </div>
             </div>
@@ -81,7 +81,7 @@
                     <div
                         class="flex items-center p-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                         <button data-modal-hide="tos_modal" type="button" onclick="$modal2.hide();"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('I accepted') }}</button>
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('manage.button.accept') }}</button>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
     <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script>
         function markdown(node) {
-            $(node).html(marked.parse(DOMPurify.sanitize(node, {
+            $(node).html(marked.parse(DOMPurify.sanitize(node[0], {
                 ALLOWED_TAGS: [],
                 ALLOWED_ATTR: []
             })));

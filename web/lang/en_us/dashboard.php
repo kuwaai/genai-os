@@ -27,6 +27,7 @@ return [
 
     //Tab_feedback
     'hint.PasteRawDataHere' => 'Please insert raw data here',
+    "hint.wip_option"=>"WIP, No option available",
     'header.ActiveModels' => 'Active Models',
     'header.InactiveModels' => 'Inactive Models',
     'header.ModelFilter' => 'Model Filter:',
@@ -39,6 +40,7 @@ return [
     'msg.InvalidJSONFormat' => 'Invalid JSON format',
 
     //Tab_SafetyGuard
+    "hint.safety_guard_offline"=>"Safety guard offline",
     'header.create_rule' => 'Create rule',
     'header.update_rule' => 'Update rule',
     'rule.filter.keyword' => 'Keyword Rule',

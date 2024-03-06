@@ -50,7 +50,7 @@
                     @if ($result->count() == 0)
                         <div
                             class="text-center rounded-r-lg flex flex-1 overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                            {!! __('No available LLM to chat with<br>Please come back later!') !!}
+                            {!! __('chat.hint.no_llms') !!}
                         </div>
                     @else
                         <p class="block sm:hidden text-center">{{ __('chat.hint.select_a_chatroom') }}</p>
@@ -107,7 +107,7 @@
                             <p class="m-auto text-black dark:text-white">{!! __('chat.hint.file_required') !!}</p>
                         @elseif(request()->route('llm_id') &&
                                 in_array(App\Models\LLMs::find(request()->route('llm_id'))->access_code, ['feedback']))
-                            <p class="m-auto text-black dark:text-white">{!! __('This is for human feedback, Only import/export is allowed here.') !!}</p>
+                            <p class="m-auto text-black dark:text-white">{{ __('chat.hint.human_feedback_only') }}</p>
                         @elseif(request()->route('llm_id') &&
                                 strpos(App\Models\LLMs::find(request()->route('llm_id'))->access_code, 'web_qa') === 0)
                         @endif

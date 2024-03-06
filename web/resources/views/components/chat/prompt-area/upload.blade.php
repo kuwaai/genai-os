@@ -12,7 +12,7 @@
     </form>
 @else
     <p class="text-black dark:text-white mx-auto">
-        {{ __("Sorry, but it seems like you don't have permission to upload a file.") }}
+        {{ __("chat.hint.no_permission_to_upload_file") }}
     </p>
 @endif
 

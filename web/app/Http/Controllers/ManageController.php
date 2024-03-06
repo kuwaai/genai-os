@@ -258,7 +258,7 @@ class ManageController extends Controller
         $model->fill($validated);
         $model->save();
         $perm = new Permissions();
-        $perm->fill(['name' => 'model_' . $model->id, 'describe' => 'Permission for model id ' . $model->id]);
+        $perm->fill(['name' => 'model_' . $model->id]);
         $perm->save();
         return Redirect::route('manage.home')
             ->with('last_tab', 'llms')

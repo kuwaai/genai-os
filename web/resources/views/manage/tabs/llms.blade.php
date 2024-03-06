@@ -182,56 +182,6 @@
                         id="description" placeholder="{{ __('manage.placeholder.description') }}">
                 </div>
             </div>
-
-            <!--<div class="flex flex-wrap -mx-3 mb-2">
-                <div class="w-full px-3">
-                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
-                        for="system_prompt">
-                        {{ __('System prompt') }}
-                    </label>
-                    <input name="system_prompt"
-                        class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="system_prompt" placeholder="{{ __('System Prompt for the model') }}">
-                </div>
-            </div>
-            <div class="flex flex-wrap -mx-3 mb-2">
-                <div class="w-full md:w-1/2 lg:w-1/4 px-3 mb-6 lg:mb-0">
-                    <label for="chain_toggle"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Toggle Chain")}}</label>
-                    <select id="chain_toggle"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected value="1">{{__("Allow")}}</option>
-                        <option value="0">{{__("Disallow")}}</option>
-                    </select>
-                </div>
-                <div class="w-full md:w-1/2 lg:w-1/4 px-3 mb-6 lg:mb-0">
-                    <label for="chain_default"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Default State")}}</label>
-                    <select id="chain_default"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected value="1">{{__("Chained")}}</option>
-                        <option value="0">{{__("Unchain")}}</option>
-                    </select>
-                </div>
-                <div class="w-full md:w-1/2 lg:w-1/4 px-3 mb-6 lg:mb-0">
-                    <label for="feedback"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Feedbacks")}}</label>
-                    <select id="feedback"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected value="1">{{__("Allow")}}</option>
-                        <option value="0">{{__("Disallow")}}</option>
-                    </select>
-                </div>
-                <div class="w-full md:w-1/2 lg:w-1/4 px-3 mb-6 lg:mb-0">
-                    <label for="translate"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{__("Translate")}}</label>
-                    <select id="translate"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected value="1">{{__("Allow")}}</option>
-                        <option value="0">{{__("Disallow")}}</option>
-                    </select>
-                </div>
-            </div>-->
             <div class="text-center">
                 <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
                     class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -260,7 +210,7 @@
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('Are you sure you want to UPDATE this LLM Profile?') }}</h3>
+                                    {{ __('modal.update_model.header') }}</h3>
                                 <button data-modal-hide="popup-modal2" type="submit"
                                     class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                     {{ __('manage.button.yes') }}
@@ -299,7 +249,7 @@
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('Are you sure you want to DELETE this LLM Profile?') }}</h3>
+                                    {{ __('modal.delete_model.header') }}</h3>
                                 <button id="delete_llm" data-modal-hide="popup-modal" type="button"
                                     class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                     {{ __('manage.button.yes') }}
@@ -331,8 +281,8 @@
             DeleteRow($llms[data][5]);
         });
         $("#edit_llm h3:eq(0)").text("{{ __('manage.header.update_model') }}")
-        $("#edit_llm h3:eq(1)").text("{{ __('Are you sure you want to UPDATE this LLM Profile?') }}")
-        $("#edit_llm h3:eq(2)").text("{{ __('Are you sure you want to DELETE this LLM Profile?') }}")
+        $("#edit_llm h3:eq(1)").text("{{ __('modal.update_model.header') }}")
+        $("#edit_llm h3:eq(2)").text("{{ __('modal.delete_model.header') }}")
         $("#delete_button").show()
         $("#edit_llm_btns > button").removeClass("bg-gray-200 dark:bg-gray-600")
         $("#edit_llm_btn_" + $llms[data][5]).addClass("bg-gray-200 dark:bg-gray-600")

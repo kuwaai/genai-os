@@ -33,7 +33,7 @@
                 @if (!$have)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        {{ __('No disabled LLM history found!') }}
+                        {{ __('archive.hint.no_archived') }}
                     </div>
                 @endif
             </div>
@@ -41,9 +41,7 @@
         @if (!request()->route('chat_id') && !request()->route('llm_id'))
             <div id="histories_hint"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                {!! __(
-                    "This is where disabled LLM history located<br>They might back to online soon or just gone forever<br>You're still able to view the history or delete them",
-                ) !!}
+                {!! __('archive.hint.introduce') !!}
             </div>
         @else
             <div id="histories"

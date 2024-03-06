@@ -77,7 +77,7 @@
                 @if ($result->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        {!! __('No available LLM to chat with<br>Please come back later!') !!}
+                        {!! __('chat.hint.no_llms') !!}
                     </div>
                 @else
                     @if (request()->route('room_id') || session('llms'))

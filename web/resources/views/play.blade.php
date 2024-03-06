@@ -14,7 +14,7 @@
                             </p>
                         </header>
                         <div class="mt-3 mx-auto flex">
-                            {{__('Sorry, No games availiable for now.')}}
+                            {{__('play.hint.no_games')}}
                         </div>
                     </section>
                 </div>

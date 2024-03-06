@@ -25,7 +25,7 @@
         $($this).parent().parent().next()[0].classList = "hljs language-" + $($this).val()
         if ($($this).parent().next().attr("onclick") == "compileVerilog(this)") $($this).parent().next().remove();
         if ($($this).val() == "verilog") $($this).parent().after(
-            `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>`
+            `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>`
         )
 
         $($this).parent().parent().next().text($($this).parent().parent().next().text())
@@ -108,7 +108,7 @@ fill="currentFill" />
                         }
                     })
                     verilog = languageClass == "verilog" ?
-                        `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('Compile Test') }}</span></button>` :
+                        `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>` :
                         ``
                     $(this).prepend(
                         `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
@@ -408,7 +408,7 @@ xmlns="http://www.w3.org/2000/svg">
         var requestData = {
             "verilog_code": verilogCode
         };
-        $($this).text("{{ __('Compiling') }}")
+        $($this).text("{{ __('chat.label.compiling') }}")
         $($this).removeClass("hover:bg-gray-900")
         $($this).attr("disabled", true)
 
@@ -417,10 +417,10 @@ xmlns="http://www.w3.org/2000/svg">
             // Handle the response
             $result = data
             if ($result.error == "Backend compiler offline") {
-                $($this).text("{{ __('Backend Offline') }}")
+                $($this).text("{{ __('chat.hint.backend_offline') }}")
                 $($this).addClass("bg-orange-600 hover:bg-orange-700")
                 setTimeout(function() {
-                    $($this).text("{{ __('Compile Test') }}")
+                    $($this).text("{{ __('chat.button.verilog_compile_test') }}")
                     $($this).removeClass("bg-orange-600 hover:bg-orange-700")
                     $($this).addClass("hover:bg-gray-900")
                     $($this).attr("disabled", false)
@@ -428,10 +428,10 @@ xmlns="http://www.w3.org/2000/svg">
             } else {
                 if (JSON.parse(data).success) {
                     $($this).addClass("bg-green-600 hover:bg-green-700")
-                    $($this).text("{{ __('Success') }}")
+                    $($this).text("{{ __('chat.hint.success') }}")
                 } else {
                     $($this).addClass("bg-red-600 hover:bg-red-700")
-                    $($this).text("{{ __('Failed') }}")
+                    $($this).text("{{ __('chat.hint.failed') }}")
                 }
                 $($this).parent().after(
                     `<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'} whitespace-pre-wrap"></div>`
