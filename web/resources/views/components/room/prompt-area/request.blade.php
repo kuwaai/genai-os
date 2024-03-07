@@ -42,11 +42,11 @@
                         </div>
                     </div>
                     <button type="button" onclick="chain_toggle()" id="chain_btn"
-                        class="whitespace-nowrap ml-2 text-white {{ \Session::get('chained') ?? true ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-2 py-1 rounded">{{ \Session::get('chained') ?? true ? __('Chained') : __('Unchain') }}</button>
+                        class="whitespace-nowrap ml-2 text-white {{ \Session::get('chained') ?? true ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-2 py-1 rounded">{{ \Session::get('chained') ?? true ? __('chat.button.chained') : __('chat.button.unchain') }}</button>
                 </div>
             @else
                 <button type="button" onclick="chain_toggle()" id="chain_btn"
-                    class="whitespace-nowrap h-full mr-2 text-white {{ \Session::get('chained') ?? true ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-2 py-1 rounded">{{ \Session::get('chained') ?? true ? __('Chained') : __('Unchain') }}</button>
+                    class="whitespace-nowrap h-full mr-2 text-white {{ \Session::get('chained') ?? true ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-2 py-1 rounded">{{ \Session::get('chained') ?? true ? __('chat.button.chained') : __('chat.button.unchain') }}</button>
             @endif
 
             <textarea tabindex="0" data-id="root" placeholder="{{ __('chat.prompt_area.hint') }}" rows="1" max-rows="5"

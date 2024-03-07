@@ -64,38 +64,19 @@
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
                             <label for="bot-name"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Name') }}</label>
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.name') }}</label>
                             <input readonly type="text" name="bot-name" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('Bot Name') }}">
+                                placeholder="{{ __('store.bot.name.label') }}">
                         </div>
                     </div>
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
                             <label for="bot-describe"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Description') }}</label>
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.description') }}</label>
                             <input readonly type="text" name="bot-describe" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('Bot Description') }}">
-                        </div>
-                    </div>
-                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
-                        <div class="w-full">
-                            <p class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Startup Prompt') }}</p>
-                            
-                            <x-store.prompt-form prefix="detail_" />
-                        </div>
-                    </div>
-                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
-                        <div class="w-full">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                for="welcome-message">{{ __('Welcome message') }}</label>
-                            <div class="flex items-center">
-                                <textarea readonly name="welcome-message" type="text" oninput="adjustTextareaRows(this)"
-                                    rows="0" max-rows="5"
-                                    placeholder="{{ __('Welcome message that shows but won\'t be passed inside when chatting.') }}"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
-                            </div>
+                                placeholder="{{ __('store.bot.description.label') }}">
                         </div>
                     </div>
                 </ul>
@@ -110,8 +91,5 @@
         $("#detail-modal input[name=bot-name]").val(data.name)
         $("#detail-modal img").attr("src",data.image)
         $("#detail-modal input[name=bot-describe]").val(data.description)
-        config = JSON.parse(data.config);
-        $("#detail-modal textarea[name=startup-prompt]").val(JSON.stringify(config.startup_prompt))
-        $("#detail-modal textarea[name=welcome-prompt]").val(JSON.stringify(config.welcome-prompt))
     }
 </script>

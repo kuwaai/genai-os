@@ -34,12 +34,12 @@
                 data-modal-target="create-bot-modal" data-modal-toggle="create-bot-modal">
                 <button
                     class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
-                    <p class="flex-1 text-center text-green-500">{{ __('Create Bot') }}</p>
+                    <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
                 </button>
             </div>
             @if ($bots->where('visibility', '=', 0)->count() > 0)
                 <div class="w-full p-4">
-                    <p class="mb-2">{{ __('Offical Bots') }}</p>
+                    <p class="mb-2">{{ __('store.label.offical_bots') }}</p>
                     <x-store.bot-showcase :bots="$bots->where('visibility', '=', 0)" />
                 </div>
             @endif
@@ -51,7 +51,7 @@
             @endif
             @if ($bots->where('visibility', '=', 1)->count() > 0)
                 <div class="w-full p-4">
-                    <p class="mb-2">{{ __('Community Bots') }}</p>
+                    <p class="mb-2">{{ __('store.label.community_bots') }}</p>
                     <x-store.bot-showcase :bots="$bots->where('visibility', '=', 1)" />
                 </div>
             @endif

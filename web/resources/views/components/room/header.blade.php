@@ -137,30 +137,30 @@
                     @if (!session('llms') && request()->user()->hasPerm('Room_read_export_chat'))
                         <x-dropdown-link onclick="event.preventDefault();export_chat()" href="#"
                             data-modal-target="exportModal" data-modal-toggle="exportModal">
-                            {{ __('Export Chat') }}
+                            {{ __('chat.modal.export.header') }}
                         </x-dropdown-link>
                     @endif
                     @if (request()->user()->hasPerm('Room_update_import_chat'))
                         <x-dropdown-link href="#" onclick="event.preventDefault();"
                             data-modal-target="importModal" data-modal-toggle="importModal">
-                            {{ __('Import Chat') }}
+                            {{ __('chat.modal.import.header') }}
                         </x-dropdown-link>
                     @endif
                     @if (!session('llms'))
                         <x-dropdown-link id="edit_chat_name_btn" href="#"
                             onclick="event.preventDefault();editChat()">
-                            {{ __('Edit Chat Name') }}
+                            {{ __('room.button.edit_chatname') }}
                         </x-dropdown-link>
                         <x-dropdown-link class="!text-green-500 hover:!text-green-600"
                             href="{{ route('room.share', request()->route('room_id')) }}" target="_blank">
-                            {{ __('Share link') }}
+                            {{ __('room.button.share_link') }}
                         </x-dropdown-link>
                         @if (request()->user()->hasPerm('Room_delete_chatroom'))
                             <x-dropdown-link href="#"
                                 onclick="event.preventDefault();$('#deleteChat input[name=id]').val({{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->id }});$('#deleteChat h3 span:eq(1)').text('{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}');"
                                 class="!text-red-500 hover:!text-red-600" data-modal-target="delete_chat_modal"
                                 data-modal-toggle="delete_chat_modal">
-                                {{ __('Delete') }}
+                                {{ __('room.button.delete') }}
                             </x-dropdown-link>
                         @endif
                     @endif

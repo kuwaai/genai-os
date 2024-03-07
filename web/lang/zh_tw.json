@@ -8,11 +8,5 @@
     "Regards" : "敬上",
     "Reset Password":"重設密碼",
     "Reset Password Notification":"密碼重設請求",
-    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:" : "如果你無法點擊\":actionText\"的按鈕，您可以將該連結複製貼上到瀏覽器打開來驗證：",
-    "Edit Chat Name":"編輯聊天室名稱",
-    "Save Chat Name":"編輯聊天室名稱",
-    "Store":"商店",
-    "Offical Bots":"官方Bot",
-    "You must select a base model":"你必須選一個基底模型",
-    "Community Bots":"社群Bot",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:" : "如果你無法點擊\":actionText\"的按鈕，您可以將該連結複製貼上到瀏覽器打開來驗證："
 }

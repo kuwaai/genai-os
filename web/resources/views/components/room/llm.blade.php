@@ -73,14 +73,14 @@
                             aria-labelledby="dropdownDefaultButton">
                             <li>
                                 <a href="{{ route('room.share', $dc->id) }}" target="_blank"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white !text-green-500 hover:!text-green-600">{{ __('Share link') }}</a>
+                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white !text-green-500 hover:!text-green-600">{{ __('room.button.share_link') }}</a>
                             </li>
                             @if (request()->user()->hasPerm('Room_delete_chatroom'))
                                 <li>
                                     <a href="#" data-modal-target="delete_chat_modal"
                                         data-modal-toggle="delete_chat_modal"
                                         onclick="event.preventDefault();$('#deleteChat input[name=id]').val({{ $dc->id }});$('#deleteChat h3 span:eq(1)').text('{{ $dc->name }}');"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white !text-red-500 hover:!text-red-600">{{ __('Delete') }}</a>
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white !text-red-500 hover:!text-red-600">{{ __('room.button.delete') }}</a>
                                 </li>
                             @endif
                         </ul>
