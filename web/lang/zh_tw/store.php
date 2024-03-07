@@ -2,7 +2,7 @@
 
 return [
     'route' => '商店',
-    'button.create' => '創建Bot',
+    'button.create' => '建立Bot',
     'label.offical_bots' => '官方Bot',
     'hint.must_select_base_model' => '你必須選一個基底模型',
     'label.community_bots' => '社群Bot',

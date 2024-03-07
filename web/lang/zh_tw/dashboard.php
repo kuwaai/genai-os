@@ -41,7 +41,7 @@ return [
 
     //Tab_SafetyGuard
     "hint.safety_guard_offline"=>"安全過濾系統處於離線狀態",
-    'header.create_rule' => '創建過濾規則',
+    'header.create_rule' => '建立過濾規則',
     'header.update_rule' => '更新過濾規則',
     'rule.filter.keyword' => 'Keyword 規則',
     'rule.filter.embedding' => 'Embedding 規則',
@@ -53,7 +53,7 @@ return [
 
     'msg.SomethingWentWrong' => '有東西出錯了...',
     'msg.choose_target' => '請選擇模型',
-    'msg.create_rule' => '你確定要創建該規則嗎？',
+    'msg.create_rule' => '你確定要建立該規則嗎？',
     'msg.delete_rule' => '你確定要刪除該規則嗎？',
     'msg.update_rule' => '你確定要更新該規則嗎？',
 
@@ -66,7 +66,7 @@ return [
     'rule.filter.output' => '輸出過濾',
 
     'button.create_rule' => '新增規則',
-    'button.create' => '創建',
+    'button.create' => '建立',
     'button.cancel' => '取消',
     'button.delete' => '刪除',
     'button.update' => '更新',
