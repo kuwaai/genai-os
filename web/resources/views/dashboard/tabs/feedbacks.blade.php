@@ -8,7 +8,7 @@
                 <div class="flex-1 px-4 py-5 overflow-y-auto scrollbar">
                     <p class="text-center">{{ __('dashboard.header.ExportSetting') }}</p>
                     <div class="mb-2">
-                        <p class="text-red-500">WIP, No option available</p>
+                        <p class="text-red-500">{{__("dashboard.hint.wip_option")}}</p>
                         <!--
                         <input id="feedback" name="feedback_only" type="checkbox" disabled>
                         <label for="feedback">Include Feedback Datas</label>-->

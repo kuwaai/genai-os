@@ -6,15 +6,15 @@
                     <section>
                         <header>
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                {{ __('Play Ground') }}
+                                {{ __('play.interface.header') }}
                             </h2>
 
                             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                {{ __("There're our experiment games with LLMs") }}
+                                {{ __('play.label.intro') }}
                             </p>
                         </header>
                         <div class="mt-3 mx-auto flex">
-                            Sorry, Not yet finished!
+                            {{__('play.hint.no_games')}}
                         </div>
                     </section>
                 </div>

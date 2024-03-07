@@ -6,7 +6,7 @@
         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
             <button onclick="CreateRow()" id="new_llm_btn"
                 class="flex menu-btn flex items-center justify-center w-full h-12 bg-green-400 hover:bg-green-500 dark:bg-green-600 dark:hover:bg-green-700 transition duration-300">
-                <p class="flex-1 text-center text-white">{{ __('New LLM') }}</p>
+                <p class="flex-1 text-center text-white">{{ __('manage.button.new_model') }}</p>
             </button>
         </div>
         <form id="del_LLM_by_ID" method="post" action="{{ route('manage.llms.delete') }}" style="display:none">
@@ -15,7 +15,7 @@
             <input name="id">
         </form>
         <div class="flex-1 overflow-y-auto scrollbar pr-2 text-black dark:text-white">
-            <p>{{ __('Enabled Models') }}</p>
+            <p>{{ __('manage.label.enabled_models') }}</p>
             <hr class="mb-2 border-black dark:border-white">
             @foreach (App\Models\LLMs::orderby('order')->orderby('order')->where('enabled', '=', true)->get() as $LLM)
                 <div id="edit_llm_btns"
@@ -52,7 +52,7 @@
                     </button>
                 </div>
             @endforeach
-            <p>{{ __('Disabled Models') }}</p>
+            <p>{{ __('manage.label.disabled_models') }}</p>
             <hr class="mb-2">
             @foreach (App\Models\LLMs::orderby('order')->orderby('order')->where('enabled', '=', false)->get() as $LLM)
                 <div id="edit_llm_btns"
@@ -106,7 +106,7 @@
                         <div class="w-full px-3 flex flex-col items-center">
                             <label for="update_img">
                                 <span class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
-                                    {{ __('LLM Image') }}
+                                    {{ __('manage.label.model_image') }}
                                 </span>
                                 <img id="image"
                                     class="rounded-full border border-gray-400 dark:border-gray-900 m-auto bg-black"
@@ -120,11 +120,11 @@
                     <div class="w-full md:w-5/6">
                         <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                             for="llm_name">
-                            {{ __('LLM Name') }}
+                            {{ __('manage.label.model_name') }}
                         </label>
                         <input name="name" required
                             class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                            id="llm_name" placeholder="{{ __('LLM Name') }}">
+                            id="llm_name" placeholder="{{ __('manage.label.model_name') }}">
                     </div>
                     <div class="md:w-1/6 pl-3">
                         <a id="toggle_llm_btn" class="text-white font-bold py-3 px-4 rounded margin-t-auto">
@@ -136,39 +136,39 @@
             <div class="flex flex-wrap -mx-3 mb-2">
                 <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2" for="version">
-                        {{ __('Version') }}
+                        {{ __('manage.label.version') }}
                     </label>
                     <input name="version"
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="version" type="text" placeholder="{{ __('Version') }}">
+                        id="version" type="text" placeholder="{{ __('manage.label.version') }}">
                 </div>
                 <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                         for="access_code">
-                        {{ __('Access Code') }}
+                        {{ __('manage.label.access_code') }}
                     </label>
                     <input name="access_code" required
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="access_code" type="text" placeholder="{{ __('Access Code') }}">
+                        id="access_code" type="text" placeholder="{{ __('manage.label.access_code') }}">
                 </div>
                 <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2" for="order">
-                        {{ __('Order') }}
+                        {{ __('manage.label.order') }}
                     </label>
                     <input name="order"
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="order" type="text" placeholder="{{ __('Order') }}">
+                        id="order" type="text" placeholder="{{ __('manage.label.order') }}">
                 </div>
             </div>
             <div class="flex flex-wrap -mx-3 mb-2">
                 <div class="w-full px-3">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                         for="link">
-                        {{ __('Link') }}
+                        {{ __('manage.label.link') }}
                     </label>
                     <input name="link"
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="link" placeholder="{{ __('Link for more information to this LLM') }}"
+                        id="link" placeholder="{{ __('manage.placeholder.link') }}"
                         value="">
                 </div>
             </div>
@@ -176,11 +176,11 @@
                 <div class="w-full px-3">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                         for="description">
-                        {{ __('Description') }}
+                        {{ __('manage.label.description') }}
                     </label>
                     <input name="description"
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="description" placeholder="{{ __('Description for this LLM') }}">
+                        id="description" placeholder="{{ __('manage.placeholder.description') }}">
                 </div>
             </div>
 
@@ -217,7 +217,7 @@
             <div class="text-center">
                 <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
                     class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                    {{ __('Save') }}
+                    {{ __('manage.button.save') }}
                 </button>
                 <div id="popup-modal2" data-modal-backdrop="static" tabindex="-2"
                     class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -242,13 +242,13 @@
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('Are you sure you want to UPDATE this LLM Profile?') }}</h3>
+                                    {{ __('modal.update_model.header') }}</h3>
                                 <button data-modal-hide="popup-modal2" type="submit"
                                     class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                    {{ __("Yes, I'm sure") }}
+                                    {{ __('manage.button.yes') }}
                                 </button>
                                 <button data-modal-hide="popup-modal2" type="button"
-                                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('No, cancel') }}</button>
+                                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('manage.button.no') }}</button>
                             </div>
                         </div>
                     </div>
@@ -256,7 +256,7 @@
                 <button data-modal-target="popup-modal" data-modal-toggle="popup-modal" type="button"
                     id="delete_button"
                     class="bg-red-500 hover:bg-red-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                    {{ __('Delete') }}
+                    {{ __('manage.button.delete') }}
                 </button>
                 <div id="popup-modal" data-modal-backdrop="static" tabindex="-2"
                     class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -281,13 +281,13 @@
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('Are you sure you want to DELETE this LLM Profile?') }}</h3>
+                                    {{ __('modal.delete_model.header') }}</h3>
                                 <button id="delete_llm" data-modal-hide="popup-modal" type="button"
                                     class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                    {{ __("Yes, I'm sure") }}
+                                    {{ __('manage.button.yes') }}
                                 </button>
                                 <button data-modal-hide="popup-modal" type="button"
-                                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('No, cancel') }}</button>
+                                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('manage.button.no') }}</button>
                             </div>
                         </div>
                     </div>
@@ -320,9 +320,9 @@
         $("#delete_llm").off('click').on('click', function() {
             DeleteRow($llms[data][5]);
         });
-        $("#edit_llm h3:eq(0)").text("{{ __('Modify LLM Profile') }}")
-        $("#edit_llm h3:eq(1)").text("{{ __('Are you sure you want to UPDATE this LLM Profile?') }}")
-        $("#edit_llm h3:eq(2)").text("{{ __('Are you sure you want to DELETE this LLM Profile?') }}")
+        $("#edit_llm h3:eq(0)").text("{{ __('manage.header.update_model') }}")
+        $("#edit_llm h3:eq(1)").text("{{ __('modal.update_model.header') }}")
+        $("#edit_llm h3:eq(2)").text("{{ __('modal.delete_model.header') }}")
         $("#delete_button").show()
         $("#edit_llm_btns > button").removeClass("bg-gray-200 dark:bg-gray-600")
         $("#edit_llm_btn_" + $llms[data][5]).addClass("bg-gray-200 dark:bg-gray-600")
@@ -351,8 +351,8 @@
         $("#update_LLM_by_ID input[name='version']").val("")
         $("#update_LLM_by_ID input[name='system_prompt']").val("")
         $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", false);
-        $("#edit_llm h3:eq(0)").text("{{ __('Create LLM Profile') }}")
-        $("#edit_llm h3:eq(1)").text("{{ __('Are you sure you want to CREATE this LLM Profile?') }}")
+        $("#edit_llm h3:eq(0)").text("{{ __('manage.header.create_model') }}")
+        $("#edit_llm h3:eq(1)").text("{{ __('manage.modal.create_model.header') }}")
         $("#edit_llm_btns > button").removeClass("bg-gray-600")
         $("#new_llm_btn").removeClass("bg-green-400 dark:bg-green-600")
         $("#new_llm_btn").addClass("bg-green-500 dark:bg-green-700")

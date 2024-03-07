@@ -17,7 +17,7 @@
 
         @if (count($llms) > 1)
         <div class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
-            <p>{{ __('Send to:') }}</p>
+            <p>{{ __('chat.label.send_to') }}</p>
             <div class="flex flex-1 items-center overflow-hidden">
                 <div class="flex mr-auto overflow-auto scrollbar scrollbar-3 min-w-[36px]">
                     @foreach ($llms as $llm)
@@ -43,7 +43,7 @@
             </div>
         </div>
         @endif
-        <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
+        <textarea tabindex="0" data-id="root" placeholder="{{ __('chat.prompt_area.hint') }}" rows="1" max-rows="5"
             oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
             class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
         <div class="ml-auto right-[12px] relative bottom-[4px] flex justify-end items-end">

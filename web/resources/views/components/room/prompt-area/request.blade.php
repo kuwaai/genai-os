@@ -18,7 +18,7 @@
             @if (count($llms) > 1)
                 <div
                     class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
-                    <p>{{ __('Send to:') }}</p>
+                    <p>{{ __('chat.label.send_to') }}</p>
                     <div class="flex flex-1 items-center overflow-hidden">
                         <div class="flex flex-1 mr-auto overflow-auto scrollbar scrollbar-3">
                             @foreach ($llms as $llm)
@@ -31,9 +31,7 @@
                                         class="inline h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black overflow-hidden">
 
                                         @env('arena')
-                                        <div class="h-full w-full bg-black flex justify-center items-center text-white">
-                                            ?
-                                        </div>
+                                        <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
                                     @else
                                         <img
                                             src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}">
@@ -51,7 +49,7 @@
                     class="whitespace-nowrap h-full mr-2 text-white {{ \Session::get('chained') ?? true ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-2 py-1 rounded">{{ \Session::get('chained') ?? true ? __('Chained') : __('Unchain') }}</button>
             @endif
 
-            <textarea tabindex="0" data-id="root" placeholder="{{ __('Send a message') }}" rows="1" max-rows="5"
+            <textarea tabindex="0" data-id="root" placeholder="{{ __('chat.prompt_area.hint') }}" rows="1" max-rows="5"
                 oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
                 class="w-full pl-4 pr-24 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
             <div class="ml-auto right-[12px] relative bottom-[4px] flex justify-end items-end">
@@ -86,8 +84,8 @@
         }, function() {
             $('#chained').prop('disabled', !$('#chained').prop('disabled'));
             $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
-            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('Unchain') }}' :
-                '{{ __('Chained') }}')
+            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('chat.button.unchain') }}' :
+                '{{ __('chat.button.chained') }}')
         })
     }
 
