@@ -23,13 +23,13 @@
             <div class="mt-4 flex flex-col items-center">
                 @env(['nuk'])
                 <p style="font-size:30px;" class="my-auto text-center text-blue-600 dark:text-blue-400">
-                    {{ __('The service only allows the use of campus IP addresses') }}</p>
+                    {{ __('welcome.service_campus_only') }}</p>
                 @else
                 <p style="font-size:30px;" class="my-auto text-center text-blue-600 dark:text-blue-400">
-                    {{ __('This service only allow internal IPs') }}</p>
+                    {{ __('welcome.service_internal_only') }}</p>
                 @endenv
                 <a href="/"
-                    class="p-2 mt-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white">{{ __('Return Home') }}</a>
+                    class="p-2 mt-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white">{{ __('welcome.button.return_home') }}</a>
             </div>
         </div>
     </div>

@@ -169,7 +169,7 @@ class ProfileController extends Controller
                             $user->save();
                             $user->markEmailAsVerified();
 
-                            return response()->json(['message' => __('User created successfully')], 201, [], JSON_UNESCAPED_UNICODE);
+                            return response()->json(['message' => __('auth.hint.user_created_success')], 201, [], JSON_UNESCAPED_UNICODE);
                         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                         }
                     }

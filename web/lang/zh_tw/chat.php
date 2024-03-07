@@ -67,4 +67,5 @@ return [
     'label.compiling' => '編譯中',
     'hint.success' => '成功',
     'hint.failed' => '失敗',
+    "hint.copied"=> "已複製",
 ];

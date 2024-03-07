@@ -16,4 +16,5 @@ return [
     'button.send_reset_password_link' => '送出密碼重置信',
     'button.return' => '返回',
     "button.register"=>"註冊",
+    'button.resend_auth_email' => '重送驗證信',
 ];

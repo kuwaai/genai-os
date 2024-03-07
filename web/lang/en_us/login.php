@@ -15,6 +15,6 @@ return [
     'button.reset_password' => 'Reset Password',
     'button.send_reset_password_link' => 'Email Password Reset Link',
     'button.return' => 'Return',
-    
-    "button.register"=> "Register",
+    'button.register' => 'Register',
+    'button.resend_auth_email' => 'Resend Verification Email',
 ];

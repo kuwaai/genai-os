@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cookie;
 
 class LanguageMiddleware
 {
@@ -16,10 +17,11 @@ class LanguageMiddleware
     {
         if (session()->has('locale')) {
             App::setLocale(session('locale'));
+            Cookie::queue('locale', session('locale'), 60);
         } else {
             App::setLocale(config('app.locale'));
+            Cookie::queue('locale', config('app.locale'), 60);
         }
-
         return $next($request);
     }
 }

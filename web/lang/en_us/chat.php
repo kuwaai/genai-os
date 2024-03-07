@@ -67,4 +67,5 @@ return [
     'label.compiling' => 'Compiling',
     'hint.success' => 'Success',
     'hint.failed' => 'Failed',
+    "hint.copied"=> "Copied",
 ];
