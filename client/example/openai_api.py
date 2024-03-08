@@ -28,7 +28,7 @@ async def chat_completion(req: dict):
         result = await handle_streaming_req(req, safety_guard)
     else:
         result = await handle_non_streaming_req(req, safety_guard)
-    
+
     return result
 
 async def handle_non_streaming_req(req: dict, safety_guard:LlmSafetyGuard):
@@ -36,10 +36,10 @@ async def handle_non_streaming_req(req: dict, safety_guard:LlmSafetyGuard):
     chat_history = req['messages']
     model = req['model']
     prompt_len = sum([len(msg['content']) for msg in req['messages']])
-    
+
     # Pre-filter
     pre_filter_block, pre_filter_msg = safety_guard.pre_filter(chat_history=chat_history, model_id=model)
-    
+
     assistant_response = ''
     post_filter_msg = ''
     if not pre_filter_block:
@@ -52,10 +52,10 @@ async def handle_non_streaming_req(req: dict, safety_guard:LlmSafetyGuard):
             chunk=assistant_response,
             last=True
         )
-    
+
     # Concat the warning message from both the pre-filter and post-filter.
     assistant_response = str(pre_filter_msg or '') + assistant_response + str(post_filter_msg or '')
-    
+
     data = {
         "id": "chatcmpl-123",
         "object": "chat.completion",
@@ -80,13 +80,13 @@ async def handle_non_streaming_req(req: dict, safety_guard:LlmSafetyGuard):
         }
     }
 
-    return JSONResponse(data)
+    return JSONResponse(data, safe=False, json_dumps_params={'ensure_ascii': False})
 
 async def handle_streaming_req(req: dict, safety_guard:LlmSafetyGuard):
-    
+
     chat_history = req['messages']
     model = req['model']
-    
+
     return StreamingResponse(
         stream_last_message(chat_history, model, safety_guard),
         media_type="text/event-stream"
@@ -119,16 +119,16 @@ async def stream_last_message(chat_history: List[dict], model: str, safety_guard
                     }
                 ]
             }
-        yield f'data: {json.dumps(data)}\n'
-    
+        yield f'data: {json.dumps(data, ensure_ascii=False)}\n'
+
         if pre_filter_block:
             yield 'data: [DONE]'
             return
-    
-    assistant_response = chat_history[-1]['content'] 
+
+    assistant_response = chat_history[-1]['content']
 
     for i, token in enumerate(assistant_response):
-        
+
         # Post-filter
         chunk, post_filter_block, post_filter_msg = safety_guard.post_filter(
             chat_history=chat_history,
@@ -142,7 +142,7 @@ async def stream_last_message(chat_history: List[dict], model: str, safety_guard
             finish_reason = "content_filter"
         elif i == len(assistant_response)-1:
             finish_reason = "stop"
-        
+
         data = {
             "id": "chatcmpl-123",
             "object": "chat.completion.chunk",
@@ -162,8 +162,8 @@ async def stream_last_message(chat_history: List[dict], model: str, safety_guard
                 ]
             }
 
-        yield f'data: {json.dumps(data)}\n'
-        
+        yield f'data: {json.dumps(data, ensure_ascii=False)}\n'
+
         if post_filter_block:
             break
     yield 'data: [DONE]'
