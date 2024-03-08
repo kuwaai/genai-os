@@ -16,3 +16,5 @@ sqlalchemy
 psycopg2-binary
 numpy
 python-dotenv
+opencc==1.1.6
+# jieba_fast

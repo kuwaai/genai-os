@@ -25,7 +25,8 @@ def add_special_rules(db: Session):
                 Detector(
                     type=DetectorTypeEnum.charset_guard,
                     chain=ChainEnum.post_filter,
-                    deny_list=[]
+                    deny_list=['gb2312'],
+                    allow_list=['big5[0x01, 0xc67e]'] # Syntax: "{charset}([{range begin}, {range end}])"
                 )
             ]
         ),
