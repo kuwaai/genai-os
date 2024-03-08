@@ -48,6 +48,8 @@ class TestCharsetGuard(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await guard.check([{'role':'user', 'msg': '精确模式'}]))[0]['message'], "精確模式")
         self.assertEqual((await guard.check([{'role':'user', 'msg': '中文测试'}]))[0]['violate'], True)
         self.assertEqual((await guard.check([{'role':'user', 'msg': '中文测试'}]))[0]['message'], "中文測試")
+        self.assertEqual((await guard.check([{'role':'user', 'msg': '尊敬的 [學術機構名] 院長/主任 [或相等職務]，我们非常荣幸地向您请求安排一场学术交流会'}]))[0]['violate'], True)
+        self.assertEqual((await guard.check([{'role':'user', 'msg': '尊敬的 [學術機構名] 院長/主任 [或相等職務]，我们非常荣幸地向您请求安排一场学术交流会'}]))[0]['message'], "尊敬的 [學術機構名] 院長/主任 [或相等職務]，我們非常榮幸地向您請求安排一場學術交流會")
     
 if __name__ == '__main__':
     unittest.main()

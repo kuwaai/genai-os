@@ -37,7 +37,11 @@ class CharsetRange:
     """
 
     codes = [int.from_bytes(t.encode(self.charset, errors='ignore'), byteorder="big") for t in text]
-    return all([c != 0 and self.range_begin <= c <= self.range_end for c in codes])
+    result = [c != 0 and self.range_begin <= c <= self.range_end for c in codes]
+    return all(result)
+  
+  def __repr__(self)->str:
+    return f"{self.charset}[0x{self.range_begin:04x}, 0x{self.range_end:04x}]"
 
 class CharsetGuard(GuardInterface):
   """
@@ -69,9 +73,9 @@ class CharsetGuard(GuardInterface):
     text = records[-1]['msg']
 
     for rule_id, rule in self.rules.items():
-      in_black_list = any([c.in_range(text) for c in rule['black_list']])
-      in_white_list = any([c.in_range(text) for c in rule['white_list']])
-      violate = in_black_list and not in_white_list
+      in_black_list = lambda x: any([c.in_range(x) for c in rule['black_list']])
+      in_white_list = lambda x: any([c.in_range(x) for c in rule['white_list']])
+      violate = any([in_black_list(t) and not in_white_list(t) for t in text])
       result[rule_id] = {'violate': violate}
       if not violate: continue
 
