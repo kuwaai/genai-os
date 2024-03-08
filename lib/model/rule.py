@@ -17,6 +17,21 @@ class ActionEnum(str, enum.Enum):
     block = 'block'
     overwrite = 'overwrite'
 
+    def __lt__(self, other):
+        """
+        Compare the priority between Actions.
+        Action with higher priority will override the lower one.
+        """
+        priority = {
+            'none': 0,
+            'warn': 1,
+            'overwrite': 2,
+            'block': 3
+        }
+        if self.__class__ is other.__class__:
+            return priority[self.value] < priority[other.value]
+        return NotImplemented
+
 class Rule(Base):
     __tablename__ = "rules"
     id:Mapped[int] = mapped_column(primary_key=True)

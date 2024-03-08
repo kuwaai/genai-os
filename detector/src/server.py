@@ -82,6 +82,8 @@ class DetectionService(DetectionServicer):
         for k, v in checking_result.items():
             if not v['violate']: continue
             safe = False
+            if actions[k]['action'] < action: continue
+
             action = actions[k]['action']
             if action == ActionEnum.overwrite:
                 message = v.get('message', None)
