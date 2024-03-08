@@ -19,12 +19,16 @@ class DummyDetector:
     def pre_filter(self, chat_history:[dict], model_id:str) -> (bool, ActionEnum, str|None):
         return (self.pre_filter_action==ActionEnum.none, self.pre_filter_action, 'msg')
     
-    def post_filter(self, chat_history:[dict], chunk:str, model_id:str) -> (bool, ActionEnum, str|None):
+    def post_filter(self, chat_history:[dict], response:str, model_id:str) -> (bool, ActionEnum, str|None):
         self.post_filter_cnt += 1
         if self.post_filter_cnt < self.post_filter_trigger_cnt:
             return (True, ActionEnum.none, '')
         else:
-            return (self.post_filter_action==ActionEnum.none, self.post_filter_action, 'msg')
+            return (
+                self.post_filter_action==ActionEnum.none,
+                self.post_filter_action,
+                'msg' if self.post_filter_action != ActionEnum.overwrite else '*'*len(response)
+            )
 
     def is_online(self) -> bool:
         return True
@@ -99,7 +103,7 @@ class TestLlmSafetyGuard(unittest.TestCase):
         get_target_cache().targets=['test-model']
         gen = safety_guard.guard(dummy_generator)
         result = ''.join([s for s in gen(chat_history=[], model_id='test-model')[0]])
-        expected_result = "在一疊舊照片中，msgmsgmsg"
+        expected_result = "在一疊舊照片中，************************************************************"
         self.assertEqual(result, expected_result)
 
 if __name__ == '__main__':
