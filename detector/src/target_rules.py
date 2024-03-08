@@ -30,7 +30,7 @@ class TargetRules:
 
         result = cls(
             guard = guard,
-            actions= actions
+            actions = actions
         )
 
         return result
