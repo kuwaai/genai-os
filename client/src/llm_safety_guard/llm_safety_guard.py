@@ -139,20 +139,21 @@ class LlmSafetyGuard:
             return None, False, None
 
         # Check whether the chunk is safe
-        self.response_accumulator += chunk
-        safe, action, msg = self.detector.post_filter(chat_history, self.response_accumulator, model_id)
+        safe, action, msg = self.detector.post_filter(chat_history, self.response_accumulator + chunk, model_id)
 
         logger.debug(f'post-filter: safe={safe}, action={action}, msg={msg}')
         block = False
         warn_msg = None
         if not safe:
             if action == ActionEnum.overwrite:
-                chunk = msg
+                original_len = len(self.response_accumulator)
+                chunk = msg[original_len:]
             elif msg and msg not in self.seen_msgs:
                 self.seen_msgs.append(msg)
                 warn_msg = self._format_warning_message(msg)
             if action == ActionEnum.block:
                 block, chunk = True, warn_msg
+        self.response_accumulator += chunk
 
         return chunk, block, warn_msg
     
