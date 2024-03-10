@@ -9,6 +9,8 @@ return [
     'button.new_chat' => 'New Chat',
     'button.unchain' => 'Unchain',
     'button.chained' => 'Chained',
+    'button.cancel' => 'Cancel',
+    'button.delete' => 'Delete',
     'react_btn.safety_guard' => 'Safety Guard Check',
     'return_to_menu' => 'Return to Menu',
     'tooltip.json_btn' => 'Unescaped JSON Format',

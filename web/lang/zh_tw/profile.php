@@ -7,6 +7,7 @@ return [
     'button.copy' => '複製',
     'button.renew' => '重新產生',
     'button.update' => '更新',
+    'button.confirm' => '確認',
     "button.change_lang"=>"語言切換",
     'hint.updated' => '更新成功',
     'hint.saved' => '已儲存',

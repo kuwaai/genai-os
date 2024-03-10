@@ -7,6 +7,7 @@ return [
     'button.copy' => 'Copy',
     'button.renew' => 'Renew',
     'button.update' => 'Update',
+    'button.confirm' => 'Confirm',
     "button.change_lang"=>"Language",
     'hint.updated' => 'Updated',
     'hint.saved' => 'Saved',

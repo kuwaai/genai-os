@@ -2,8 +2,6 @@
 
 return [
     'route' => '聊天室',
-    'button.delete'=>'刪除',
-    'button.cancel'=>'取消',
     'button.create_room' => '新增聊天室',
     'header.new_room' => '新聊天室',
     'modal.create_room.header' => '新增聊天室',
