@@ -9,6 +9,8 @@ return [
     'button.new_chat' => '新對話',
     'button.unchain' => '單筆問答',
     'button.chained' => '連貫問答',
+    'button.cancel' => '取消',
+    'button.delete' => '刪除',
     'react_btn.safety_guard' => '安全檢查',
     'return_to_menu' => '回到主選單',
     'button.export_chat' => '匯出聊天紀錄',

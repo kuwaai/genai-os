@@ -9,8 +9,9 @@ return [
     'button.save' => '儲存',
     'button.yes' => '是，我確定',
     'button.no' => '否，取消',
-    'button.close'=>'關閉',
-    "button.accept"=> "我同意",
+    'button.cancel' => '取消',
+    'button.close' => '關閉',
+    'button.accept' => '我同意',
 
     //Tabs
     'tab.groups' => '群組',
@@ -35,8 +36,9 @@ return [
     'label.llm_permission.disabled' => '模型使用權限(已停用模型)',
     'label.llm_permission.enabled' => '模型使用權限(已啟用模型)',
     'header.edit_group' => '編輯群組',
-    "hint.group_updated"=> "群組更新成功！",
-    "modal.delete_group.header"=> "您確定要刪除該群組",
+    'hint.group_updated' => '群組更新成功！',
+    'hint.group_created' => '群組建立成功！',
+    'modal.delete_group.header' => '您確定要刪除該群組',
 
     //Users
     'header.menu' => '主選單',
@@ -60,7 +62,7 @@ return [
     'placeholder.username' => '使用者名稱',
     'label.name' => '名稱',
     'modal.delete_user.header' => '確定要刪除使用者',
-    'modal.delete_user.button.cancel' => '取消',
+    'button.cancel' => '取消',
     'label.email' => '電子郵件',
     'label.password' => '密碼',
     'label.update_password' => '更新密碼',
@@ -83,8 +85,8 @@ return [
     'placeholder.link' => '該模型的外部相關連結',
     'header.update_model' => '編輯模型設定檔',
     'label.description' => '敘述',
-    "modal.update_model.header"=> "您確定要更新這個語言模型設定檔嗎",
-    "modal.delete_model.header"=> "您確定要刪除這個語言模型設定檔嗎",
+    'modal.update_model.header' => '您確定要更新這個語言模型設定檔嗎',
+    'modal.delete_model.header' => '您確定要刪除這個語言模型設定檔嗎',
 
     //setting
     'header.settings' => '系統設定',
@@ -156,8 +158,8 @@ return [
     'perm.Room_read_export_chat.describe' => '匯出聊天紀錄的權限',
     'perm.Chat_update_import_chat.describe' => '匯入聊天紀錄的權限（仍需要建立對話的權限）',
     'perm.Room_update_import_chat.describe' => '匯入聊天紀錄的權限（仍需要建立對話的權限）',
-    "perm.Chat_update_react_message.describe" => "對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)",
-    "perm.Room_update_react_message.describe" => "對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)",
+    'perm.Chat_update_react_message.describe' => '對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)',
+    'perm.Room_update_react_message.describe' => '對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)',
     'perm.Dashboard_read_statistics.describe' => '存取統計資訊',
     'perm.Dashboard_read_blacklist.describe' => '存取黑名單',
     'perm.Dashboard_read_feedbacks.describe' => '存取回饋資料',

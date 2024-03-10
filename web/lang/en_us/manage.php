@@ -9,8 +9,9 @@ return [
     'button.save' => 'Save',
     'button.yes' => "Yes, I'm sure",
     'button.no' => 'No, cancel',
-    'button.close'=>'Close',
-    "button.accept"=> "I accepted",
+    'button.cancel' => 'Cancel',
+    'button.close' => 'Close',
+    'button.accept' => 'I accepted',
 
     //Tabs
     'tab.groups' => 'Groups',
@@ -35,8 +36,9 @@ return [
     'label.llm_permission.disabled' => 'Model Permissions (Disabled LLM)',
     'label.llm_permission.enabled' => 'Model Permissions (Enabled LLM)',
     'header.edit_group' => 'Edit group',
-    "hint.group_updated"=> "Group Updated!",
-    "modal.delete_group.header"=> "Are you sure you want to delete group",
+    'hint.group_updated' => 'Group Updated!',
+    'hint.group_created' => 'Group Created!',
+    'modal.delete_group.header' => 'Are you sure you want to delete group',
 
     //Users
     'header.menu' => 'Menu',
@@ -60,7 +62,6 @@ return [
     'placeholder.username' => 'Username',
     'label.name' => 'Name',
     'modal.delete_user.header' => 'Are you sure you want to delete user',
-    'modal.delete_user.button.cancel' => 'Cancel',
     'label.email' => 'Email',
     'label.password' => 'Password',
     'label.update_password' => 'Update Password',
@@ -83,8 +84,8 @@ return [
     'placeholder.link' => 'Link for more information to this Model',
     'header.update_model' => 'Modify Model Profile',
     'label.description' => 'Description',
-    "modal.update_model.header"=> "Are you sure you want to UPDATE this LLM Profile?",
-    "modal.delete_model.header"=> "Are you sure you want to DELETE this LLM Profile?",
+    'modal.update_model.header' => 'Are you sure you want to UPDATE this LLM Profile?',
+    'modal.delete_model.header' => 'Are you sure you want to DELETE this LLM Profile?',
 
     //setting
     'header.settings' => 'System Settings',
@@ -132,7 +133,7 @@ return [
     'perm.Profile_update_openai_token' => 'Update OpenAI Token',
     'perm.Profile_read_api_token' => 'Read Web API Token',
     'perm.Profile_delete_account' => 'Delete Account',
-    
+
     'perm.Chat_update_detail_feedback.describe' => 'Permission to give detailed feedbacks',
     'perm.Room_update_detail_feedback.describe' => 'Permission to give detailed feedbacks',
     'perm.Profile_update_name.describe' => 'Permission to update name',
@@ -156,8 +157,8 @@ return [
     'perm.Room_read_export_chat.describe' => 'Permission to export chat history',
     'perm.Chat_update_import_chat.describe' => 'Permission to import history',
     'perm.Room_update_import_chat.describe' => 'Permission to import history',
-    "perm.Chat_update_react_message.describe" => "Permission to use extra react buttons",
-    "perm.Room_update_react_message.describe" => "Permission to use extra react buttons",
+    'perm.Chat_update_react_message.describe' => 'Permission to use extra react buttons',
+    'perm.Room_update_react_message.describe' => 'Permission to use extra react buttons',
     'perm.Dashboard_read_statistics.describe' => 'Permission to access statistics tab',
     'perm.Dashboard_read_blacklist.describe' => 'Permission to access blacklist tab',
     'perm.Dashboard_read_feedbacks.describe' => 'Permission to access feedbacks tab',
