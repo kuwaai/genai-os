@@ -160,7 +160,7 @@
                                 onclick="event.preventDefault();$('#deleteChat input[name=id]').val({{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->id }});$('#deleteChat h3 span:eq(1)').text('{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}');"
                                 class="!text-red-500 hover:!text-red-600" data-modal-target="delete_chat_modal"
                                 data-modal-toggle="delete_chat_modal">
-                                {{ __('room.button.delete') }}
+                                {{ __('chat.button.delete') }}
                             </x-dropdown-link>
                         @endif
                     @endif
