@@ -129,7 +129,7 @@
                                     <label for="create_checkbox_{{ $perm->id }}">
                                         <span
                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ __(strtolower(substr($perm->name, 4)) . ".route") }}
+                                            {{ __(strtolower(substr($perm->name, 4)) . '.route') }}
                                         </span>
                                         <input id="create_checkbox_{{ $perm->id }}" type="checkbox"
                                             onclick="$(this).closest('div').next().toggle();$(this).closest('div').next().next().toggle();$(this).closest('div').parent().find('input').prop('disabled',!$(this).prop('checked')).prop('checked',false); $(this).prop('checked',!$(this).prop('disabled')).prop('disabled',false)"
@@ -145,7 +145,11 @@
                                 <div style="display:none;">
                                     @foreach (['Update', 'Read', 'Delete'] as $action)
                                         @php
-                                            $sub_perms = App\Models\Permissions::where('name', 'Like', substr($perm->name, 4) . '_' . strtolower($action) . '_%')->get();
+                                            $sub_perms = App\Models\Permissions::where(
+                                                'name',
+                                                'Like',
+                                                substr($perm->name, 4) . '_' . strtolower($action) . '_%',
+                                            )->get();
                                         @endphp
                                         @if (count($sub_perms) > 0)
                                             <div
@@ -156,7 +160,7 @@
                                                         for="create_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                         <span
                                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                            {{ __($action) }}
+                                                            {{ __('manage.label.' . strtolower($action)) }}
                                                         </span>
                                                         <input type="checkbox"
                                                             id="create_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
@@ -177,12 +181,12 @@
                                                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                                                 style="box-shadow:none;" disabled> <label
                                                                 for="create_checkbox_{{ $sub_perm->id }}"
-                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __($sub_perm->name) }}</label>
+                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.perm.' . $sub_perm->name) }}</label>
                                                         </div>
                                                         <div id="create_checkbox_{{ $sub_perm->id }}_tooltip"
                                                             role="tooltip"
                                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                                            {{ __($sub_perm->describe) }}
+                                                            {{ __('manage.perm.' . $sub_perm->name . '.describe') }}
                                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                                         </div>
                                                     @endforeach
@@ -194,7 +198,6 @@
                             </div>
                         @endforeach
                     </div>
-                </div>
                 <div class="w-full mb-3 mt-2">
                     <span
                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.enabled') }}</span>
@@ -233,6 +236,7 @@
                         @endforeach
                     </div>
                 </div>
+            </div>
             </div>
         </form>
         <form class="flex flex-col w-full h-full" style="display:none;" id="edit_group_form" method="post"
@@ -330,7 +334,7 @@
                                     <label for="edit_checkbox_{{ $perm->id }}">
                                         <span
                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ __(strtolower(substr($perm->name, 4)) . ".route") }}
+                                            {{ __(strtolower(substr($perm->name, 4)) . '.route') }}
                                         </span>
                                         <input id="edit_checkbox_{{ $perm->id }}" type="checkbox"
                                             onclick="$(this).closest('div').next().toggle();$(this).closest('div').next().next().toggle();$(this).closest('div').parent().find('input').prop('disabled',!$(this).prop('checked')).prop('checked',false); $(this).prop('checked',!$(this).prop('disabled')).prop('disabled',false)"
@@ -346,7 +350,11 @@
                                 <div style="display:none;">
                                     @foreach (['Update', 'Read', 'Delete'] as $action)
                                         @php
-                                            $sub_perms = App\Models\Permissions::where('name', 'Like', substr($perm->name, 4) . '_' . strtolower($action) . '_%')->get();
+                                            $sub_perms = App\Models\Permissions::where(
+                                                'name',
+                                                'Like',
+                                                substr($perm->name, 4) . '_' . strtolower($action) . '_%',
+                                            )->get();
                                         @endphp
                                         @if (count($sub_perms) > 0)
                                             <div
@@ -357,7 +365,7 @@
                                                         for="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}">
                                                         <span
                                                             class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                            {{ __("manage.label." . strtolower($action)) }}
+                                                            {{ __('manage.label.' . strtolower($action)) }}
                                                         </span>
                                                         <input type="checkbox"
                                                             id="edit_quickCheck_{{ substr($perm->name, 4) }}_{{ $action }}"
@@ -378,13 +386,13 @@
                                                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                                                 style="box-shadow:none;" disabled>
                                                             <label for="edit_checkbox_{{ $sub_perm->id }}"
-                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __("manage.perm.".$sub_perm->name) }}</label>
+                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.perm.' . $sub_perm->name) }}</label>
 
                                                         </div>
                                                         <div id="edit_checkbox_{{ $sub_perm->id }}_tooltip"
                                                             role="tooltip"
                                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                                            {{ __("manage.perm." . $sub_perm->name . ".describe") }}
+                                                            {{ __('manage.perm.' . $sub_perm->name . '.describe') }}
                                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                                         </div>
                                                     @endforeach

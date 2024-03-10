@@ -19,7 +19,7 @@ return [
     'label.invite_token' => '邀請碼',
     'label.invite_token.invite_token_optional' => '邀請碼 (選填)',
 
-    'hint.user_created_success' => '使用者創建成功',
+    'hint.user_created_success' => '使用者建立成功',
 
     //Email verify
     'email.thanks_for_signup' => '感謝您的註冊！在開始之前，需要先對您的信箱做驗證，請前往信箱接收我們剛才寄出的信件，裡面有一個驗證連結，如果您沒有收到該信件，我們可以重送一份。',
