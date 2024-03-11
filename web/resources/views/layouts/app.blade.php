@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-hidden h-full">
+@php
+    $languages = json_decode(env('LANGUAGES', '{"en_us":"English (US)","zh_tw":"中文 (繁體)"}'), true);
+@endphp
 
 <head>
     <meta charset="utf-8">
@@ -9,16 +12,16 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
+    <link href="{{ asset('css/flowbite.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/fontBunny.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/font_awesome..all.min.css') }}" />
-    <link href="{{ asset('css/flowbite.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/highlight_default.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/dracula.css') }}" rel="stylesheet" />
 
     <!-- Scripts -->
+    <script src="{{ asset('js/flowbite.min.js') }}"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>

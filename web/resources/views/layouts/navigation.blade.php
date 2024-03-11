@@ -48,6 +48,8 @@
                 @endif
             </div>
 
+
+
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-dropdown align="right" width="48">
@@ -85,9 +87,29 @@
                                 {{ __('profile.route') }}
                             </x-dropdown-link>
                         @endif
-                        <x-dropdown-link :href="route('lang')">
-                            {{ __('profile.button.change_lang') }}
-                        </x-dropdown-link>
+                        <div data-dropdown-toggle="language-dropdown-menu"
+                            data-dropdown-trigger="hover" data-dropdown-delay="100"
+                            class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
+                            {{ $languages[session('locale') ?? config('app.locale')] }}
+                        </div>
+                        <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800"
+                            id="language-dropdown-menu">
+                            <ul class="py-2 font-medium" role="none">
+                                @foreach ($languages as $key => $value)
+                                    @unless ($key == session('locale', config('app.locale')))
+                                        <li>
+                                            <a href="/lang/{{ $key }}"
+                                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                role="menuitem">
+                                                <div class="inline-flex items-center">
+                                                    {{ $value }}
+                                                </div>
+                                            </a>
+                                        </li>
+                                    @endunless
+                                @endforeach
+                            </ul>
+                        </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
 
@@ -160,9 +182,29 @@
                         {{ __('profile.route') }}
                     </x-responsive-nav-link>
                 @endif
-                <x-responsive-nav-link :href="route('lang')">
-                    {{ __('profile.button.change_lang') }}
-                </x-responsive-nav-link>
+                <button type="button" data-dropdown-toggle="language-dropdown-menu2" data-dropdown-trigger="hover"
+                    data-dropdown-delay="100"
+                    class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out">
+                    {{ $languages[session('locale') ?? config('app.locale')] }}
+                </button>
+                <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700"
+                    id="language-dropdown-menu2">
+                    <ul class="py-2 font-medium" role="none">
+                        @foreach ($languages as $key => $value)
+                            @unless ($key == session('locale', config('app.locale')))
+                                <li>
+                                    <a href="/lang/{{ $key }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                                        role="menuitem">
+                                        <div class="inline-flex items-center">
+                                            {{ $value }}
+                                        </div>
+                                    </a>
+                                </li>
+                            @endunless
+                        @endforeach
+                    </ul>
+                </div>
                 <a class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
                     href="https://taide.tw/" target="_blank">{{ __('welcome.button.information') }}</a>
                 <form method="POST" action="{{ route('logout') }}">

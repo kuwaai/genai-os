@@ -12,6 +12,7 @@
         <link href="{{asset('css/flowbite.min.css')}}" rel="stylesheet" />
 
         <!-- Scripts -->
+        <script src="{{asset('js/flowbite.min.js')}}"></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
@@ -26,6 +27,5 @@
                 {{ $slot }}
             </div>
         </div>
-        <script src="{{asset('js/flowbite.min.js')}}"></script>
     </body>
 </html>

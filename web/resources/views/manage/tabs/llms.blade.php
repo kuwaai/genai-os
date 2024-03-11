@@ -242,7 +242,7 @@
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('modal.update_model.header') }}</h3>
+                                    {{ __('manage.modal.update_model.header') }}</h3>
                                 <button data-modal-hide="popup-modal2" type="submit"
                                     class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                     {{ __('manage.button.yes') }}
@@ -281,7 +281,7 @@
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('modal.delete_model.header') }}</h3>
+                                    {{ __('manage.modal.delete_model.header') }}</h3>
                                 <button id="delete_llm" data-modal-hide="popup-modal" type="button"
                                     class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                     {{ __('manage.button.yes') }}
@@ -321,8 +321,8 @@
             DeleteRow($llms[data][5]);
         });
         $("#edit_llm h3:eq(0)").text("{{ __('manage.header.update_model') }}")
-        $("#edit_llm h3:eq(1)").text("{{ __('modal.update_model.header') }}")
-        $("#edit_llm h3:eq(2)").text("{{ __('modal.delete_model.header') }}")
+        $("#edit_llm h3:eq(1)").text("{{ __('manage.modal.update_model.header') }}")
+        $("#edit_llm h3:eq(2)").text("{{ __('manage.modal.delete_model.header') }}")
         $("#delete_button").show()
         $("#edit_llm_btns > button").removeClass("bg-gray-200 dark:bg-gray-600")
         $("#edit_llm_btn_" + $llms[data][5]).addClass("bg-gray-200 dark:bg-gray-600")

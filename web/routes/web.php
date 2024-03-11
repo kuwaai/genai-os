@@ -35,9 +35,13 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return view('welcome');
     })->name('/');
 
-    Route::get('/lang', function () {
-        session()->put('locale', session()->get('locale') ? (session()->get('locale') == 'en_us' ? 'zh_tw' : 'en_us') : 'en_us');
-
+    Route::get('/lang/{lang}', function ($lang) {
+        $allowedLangs = array_filter(explode(',', env('langs', 'zh_tw,en_us')), 'strlen');
+    
+        if (in_array($lang, $allowedLangs)) {
+            session()->put('locale', $lang);
+        }
+    
         return back();
     })->name('lang');
 
