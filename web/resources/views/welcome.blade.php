@@ -1,6 +1,7 @@
 @php
     $allowedCIDRs = array_filter(explode(',', env('ALLOWED_IPS', '')), 'strlen');
-    $ip_allowed = !$allowedCIDRs || App\Http\Controllers\ProfileController::isIPInCIDRList(request()->ip(), $allowedCIDRs);
+    $ip_allowed =
+        !$allowedCIDRs || App\Http\Controllers\ProfileController::isIPInCIDRList(request()->ip(), $allowedCIDRs);
 @endphp
 
 
@@ -18,70 +19,94 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
     <!-- Styles -->
+    <link href="{{ asset('css/flowbite.min.css') }}" rel="stylesheet" />
+    <script src="{{ asset('js/flowbite.min.js') }}"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="antialiased scrollbar">
     <div
         class="relative z-9999 min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
+
+        @php
+            $languages = json_decode(env('LANGUAGES','{"en_us":"English (US)","zh_tw":"中文 (繁體)"}'), true);
+        @endphp
+
         @if (Route::has('login'))
-            <div class="p-6 text-right">
+            <div class="flex justify-end p-6 text-right">
                 @if ($ip_allowed)
                     @auth
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             @if (Auth::user()->hasPerm('tab_Dashboard'))
                                 <a href="{{ url('/dashboard') }}"
-                                    class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('dashboard.route') }}</a>
+                                    class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('dashboard.route') }}</a>
                             @endif
                             @if (Auth::user()->hasPerm('tab_Room'))
                                 <a href="{{ route('room.home') }}"
-                                    class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('room.route') }}</a>
+                                    class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('room.route') }}</a>
                             @endif
                             @if (Auth::user()->hasPerm('tab_Chat'))
                                 <a href="{{ route('chat.home') }}"
-                                    class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('chat.route') }}</a>
+                                    class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('chat.route') }}</a>
                             @endif
-                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_out') }}</a>
-                            <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                                href="{{ route('lang') }}">{{ __('profile.button.change_lang') }}</a>
+                            <a href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); this.closest('form').submit();"
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_out') }}</a>
                         </form>
                     @else
                         <a href="{{ route('login') }}"
-                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_in') }}</a>
+                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_in') }}</a>
 
                         @if (Route::has('register') &&
                                 \App\Models\SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists())
                             <a href="{{ route('register') }}"
-                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_up') }}</a>
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_up') }}</a>
                         @endif
-
-                        
-                        <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                            href="{{ route('lang') }}">{{ __('profile.button.change_lang') }}</a>
                     @endauth
                 @else
                     @env('nuk')
                     <a
-                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('welcome.service_campus_only') }}</a>
+                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('welcome.service_campus_only') }}</a>
                 @else
                     <a
-                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">{{ __('welcome.service_internal_only') }}</a>
+                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('welcome.service_internal_only') }}</a>
                     @endenv
-                    <a class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                        href="{{ route('lang') }}">{{ __('profile.button.change_lang') }}</a>
                 @endif
+
+                <button type="button" data-dropdown-toggle="language-dropdown-menu" data-dropdown-trigger="hover"
+                    data-dropdown-delay="100"
+                    class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">
+                    {{ $languages[session('locale') ?? config('app.locale')] }}
+                </button>
             </div>
         @endif
 
+        <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700"
+            id="language-dropdown-menu">
+            <ul class="py-2 font-medium" role="none">
+                @foreach ($languages as $key => $value)
+                    @unless ($key == session('locale', config('app.locale')))
+                        <li>
+                            <a href="/lang/{{ $key }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                                role="menuitem">
+                                <div class="inline-flex items-center">
+                                    {{ $value }}
+                                </div>
+                            </a>
+                        </li>
+                    @endunless
+                @endforeach
+            </ul>
+        </div>
 
         <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
             <x-Logo />
             <div class="mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <div
-                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
@@ -166,7 +191,8 @@
                                 <div class="flex w-full mt-2 space-x-3 ml-auto justify-end">
                                     <div>
                                         <div class="p-3 bg-blue-600 text-white rounded-l-lg rounded-br-lg">
-                                            <p class="text-sm">請翻譯成繁體中文：The International Federation of the Phonographic
+                                            <p class="text-sm">請翻譯成繁體中文：The International Federation of the
+                                                Phonographic
                                                 Industry has announced it's latest Global Artist Chart, which features a
                                                 Taiwanese artist in the top 10. ...</p>
                                         </div>
@@ -193,7 +219,7 @@
                         </div>
                     </div>
                     <div
-                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
@@ -245,7 +271,7 @@
             <div class="mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <div
-                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
@@ -294,7 +320,7 @@
                     </div>
 
                     <div
-                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        class="scale-100 justify-center p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline-red-500">
                         <div class="flex flex-col w-full">
                             <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white">
                                 @env(['kuwa', 'arena', 'csie', 'chipllm', 'icdesign'])
@@ -349,11 +375,11 @@
                     <div class="flex items-center gap-4">
                         @env(['kuwa', 'arena', 'nuk', 'csie', 'chipllm', 'icdesign'])
                         <a href="https://www.gai.tw/" target="_blank"
-                            class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">由國立高雄大學
+                            class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:rounded-sm focus:outline-red-500">由國立高雄大學
                             資訊工程學系<br>開發與維護的語言模型平台</a>
                     @else
                         <a href="https://www.nuk.edu.tw/" target="_blank"
-                            class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
+                            class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:rounded-sm focus:outline-red-500">
                             {!! __('welcome.develope_by') !!}
                         </a>
                         @endenv
@@ -363,14 +389,14 @@
                 <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
                     @env(['kuwa', 'arena', 'nuk', 'csie', 'chipllm', 'icdesign'])
                     @env(['nuk', 'csie'])
-                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:rounded-sm focus:outline-red-500"
                         href="https://www.nuk.edu.tw/" target="_blank">國立高雄大學</a>
                 @else
-                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:rounded-sm focus:outline-red-500"
                         href="https://www.gai.tw/" target="_blank">Kuwa</a>
                     @endenv
                 @else
-                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                    <a class="group inline-flex items-center hover:text-gray-700 dark:hover:text-white focus:rounded-sm focus:outline-red-500"
                         href="https://www.twcc.ai/" target="_blank">{{ __('welcome.powered_by') }}</a>
                     @endenv
                     <span class="text-black dark:text-white flex justify-end text-sm">{{ __('welcome.version') }}
