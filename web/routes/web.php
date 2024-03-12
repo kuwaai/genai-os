@@ -36,19 +36,15 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     })->name('/');
 
     Route::get('/lang/{lang}', function ($lang) {
-        $allowedLangs = array_filter(explode(',', env('langs', 'zh_tw,en_us')), 'strlen');
-    
-        if (in_array($lang, $allowedLangs)) {
-            session()->put('locale', $lang);
-        }
-    
+        session()->put('locale', $lang);
+
         return back();
     })->name('lang');
 
     Route::get('/IPNotAllowed', function () {
         return view('errors.IPNotAllowed');
     })->name('errors.ipnotallowed');
-    
+
     # This allow other registering from other platform
     Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
 
@@ -202,7 +198,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     Route::get('/', function () {
                         return view('play');
                     })->name('play.home');
-
                 })
                 ->name('play');
             #---Play
