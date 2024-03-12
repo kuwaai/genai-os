@@ -2,6 +2,7 @@
     $allowedCIDRs = array_filter(explode(',', env('ALLOWED_IPS', '')), 'strlen');
     $ip_allowed =
         !$allowedCIDRs || App\Http\Controllers\ProfileController::isIPInCIDRList(request()->ip(), $allowedCIDRs);
+    $languages = json_decode(env('LANGUAGES'), true) ?: ['en_us' => 'English (US)', 'zh_tw' => '中文 (繁體)'];
 @endphp
 
 
@@ -27,10 +28,6 @@
 <body class="antialiased scrollbar">
     <div
         class="relative z-9999 min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-
-        @php
-            $languages = json_decode(env('LANGUAGES','{"en_us":"English (US)","zh_tw":"中文 (繁體)"}'), true);
-        @endphp
 
         @if (Route::has('login'))
             <div class="flex justify-end p-6 text-right">
