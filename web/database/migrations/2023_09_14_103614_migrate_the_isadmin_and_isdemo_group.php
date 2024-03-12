@@ -44,45 +44,43 @@ return new class extends Migration {
             // Insert all permissions into db
             Permissions::insert($PermissionsToAdd);
 
-            // Migrate the old columns to new group by values
-            $group = new Groups();
-            $group->fill(['name' => 'Admins', 'describe' => 'The old isAdmin users are all migrated into this group']);
-            $group->save();
-            $admin_group_id = $group->id;
-            $group = new Groups();
-            $group->fill(['name' => 'Demos', 'describe' => 'The old forDemo users are all migrated into this group']);
-            $group->save();
-            $demo_group_id = $group->id;
+            // Check if there are users for demo
+            $demoUsersCount = User::where('forDemo', true)->count();
+            // Check if there are admin users
+            $adminUsersCount = User::where('isAdmin', true)->count();
 
-            $perm_records = [];
-            $currentTimestamp = now();
-            // Giving all permissions to the migrated admin group
-            foreach (Permissions::get() as $perm) {
-                $perm_records[] = [
-                    'group_id' => $admin_group_id,
-                    'perm_id' => $perm->id,
-                    'created_at' => $currentTimestamp,
-                    'updated_at' => $currentTimestamp,
-                ];
+            // Create groups only if there are corresponding users
+            if ($demoUsersCount > 0) {
+                $demoGroup = new Groups();
+                $demoGroup->fill(['name' => 'Demos', 'describe' => 'The old forDemo users are all migrated into this group']);
+                $demoGroup->save();
+                User::where('forDemo', true)->update(['group_id' => $demoGroup->id]);
             }
-            // For the demo accounts, only give them the permission to chat tab
-            $perm_records[] = [
-                'group_id' => $demo_group_id,
-                'perm_id' => Permissions::where('name', '=', 'tab_Chat')->first()->id,
-                'created_at' => $currentTimestamp,
-                'updated_at' => $currentTimestamp,
-            ];
 
-            GroupPermissions::insert($perm_records);
+            if ($adminUsersCount > 0) {
+                $adminGroup = new Groups();
+                $adminGroup->fill(['name' => 'Admins', 'describe' => 'The old isAdmin users are all migrated into this group']);
+                $adminGroup->save();
+                // Migrate permissions for admin group
+                $perm_records = [];
+                foreach (Permissions::get() as $perm) {
+                    $perm_records[] = [
+                        'group_id' => $adminGroup->id,
+                        'perm_id' => $perm->id,
+                        'created_at' => $currentTimestamp,
+                        'updated_at' => $currentTimestamp,
+                    ];
+                }
+                GroupPermissions::insert($perm_records);
+                // Assign users to their respective groups
+                User::where('isAdmin', true)->update(['group_id' => $adminGroup->id]);
+            }
 
-            // Let these users join their groups
-            User::where('forDemo', true)->update(['group_id' => $demo_group_id]);
-            User::where('isAdmin', true)->update(['group_id' => $admin_group_id]);
-
+            // Remove old columns
             Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn('isAdmin');
-                $table->dropColumn('forDemo');
+                $table->dropColumn(['isAdmin', 'forDemo']);
             });
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback the transaction in case of an exception

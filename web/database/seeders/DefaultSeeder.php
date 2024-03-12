@@ -19,66 +19,40 @@ class DefaultSeeder extends Seeder
     {
         try {
             DB::beginTransaction(); // Start a database transaction
-            // Assume not yet seeded, try seeding the database
-            $group = new Groups();
-            if (Groups::where('name', '=', 'Admins')->exists()) {
-                $group = Groups::where('name', '=', 'Admins')->first();
-            } else {
-                $group->fill(['name' => 'Admins', 'describe' => 'Default seeded Admin group']);
-                $group->save();
-            }
-            $admin_group_id = $group->id;
 
-            $group = new Groups();
-            if (Groups::where('name', '=', 'Demos')->exists()) {
-                $group = Groups::where('name', '=', 'Demos')->first();
-            } else {
-                $group->fill(['name' => 'Demos', 'describe' => 'Default seeded Demo group']);
-                $group->save();
-            }
-            $demo_group_id = $group->id;
+            // Check if an admin user already exists
+            if (!User::where('name', '=', 'admin')->exists()) {
+                // Admin user does not exist, prompt user to enter details
+                $name = $this->command->ask('Enter admin username');
+                $email = $this->command->ask('Enter admin email');
+                $password = $this->command->secret('Enter admin password');
 
-            $perm_records = [];
-            $currentTimestamp = now();
-            // Giving all permissions to the migrated admin group
-            foreach (Permissions::get() as $perm) {
-                $perm_records[] = [
-                    'group_id' => $admin_group_id,
-                    'perm_id' => $perm->id,
-                    'created_at' => $currentTimestamp,
-                    'updated_at' => $currentTimestamp,
-                ];
-            }
-            // For the demo accounts, only give them the permission to chat tab
-            $perm_records[] = [
-                'group_id' => $demo_group_id,
-                'perm_id' => Permissions::where('name', '=', 'tab_Chat')->first()->id,
-                'created_at' => $currentTimestamp,
-                'updated_at' => $currentTimestamp,
-            ];
-            GroupPermissions::where('group_id', '=', $demo_group_id)->delete();
-            GroupPermissions::where('group_id', '=', $admin_group_id)->delete();
-            GroupPermissions::insert($perm_records);
-            if (!User::where('name', '=', 'dev')->exists()) {
-                $user = new User();
-                $user->fill([
-                    'name' => 'dev',
-                    'email' => 'dev@chat.gai.tw',
+                // Create a new admin user
+                $admin_group = Groups::firstOrCreate(['name' => 'Admins'], ['describe' => 'Default seeded Admin group']);
+                $admin_user = new User();
+                $admin_user->fill([
+                    'name' => $name,
+                    'email' => $email,
                     'email_verified_at' => now(),
-                    'password' => Hash::make('develope'),
-                    'group_id' => $admin_group_id,
+                    'password' => Hash::make($password),
+                    'group_id' => $admin_group->id,
                 ]);
-                $user->save();
-            } else {
-                User::where('name', '=', 'dev')->fill(['group_id' => $admin_group_id]);
+                $admin_user->save();
+
+                // Giving all permissions to the migrated admin group
+                $perm_records = [];
+                $currentTimestamp = now();
+                foreach (Permissions::get() as $perm) {
+                    $perm_records[] = [
+                        'group_id' => $admin_group->id,
+                        'perm_id' => $perm->id,
+                        'created_at' => $currentTimestamp,
+                        'updated_at' => $currentTimestamp,
+                    ];
+                }
+                GroupPermissions::insert($perm_records);
             }
 
-            if (!User::where('name', 'like', 'demo%')->exists()) {
-                $demousers = \App\Models\User::factory(3)->create();
-                $demousers->each(function ($user) use ($demo_group_id) {
-                    $user->update(['group_id' => $demo_group_id]);
-                });
-            }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback the transaction in case of an exception
