@@ -1,2 +1,3 @@
 exported_data.json
 converted_data.jsonl
+*.sqlite
