@@ -21,8 +21,13 @@ class PasswordController extends Controller
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
+        if ($request->current_password == $request->password){
+            return back()->with("status","password-nochange");
+        }
+
         $request->user()->update([
             'password' => Hash::make($validated['password']),
+            'require_change_password'=>false
         ]);
 
         return back()->with('status', 'password-updated');

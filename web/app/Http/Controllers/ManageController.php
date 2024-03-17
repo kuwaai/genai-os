@@ -88,15 +88,9 @@ class ManageController extends Controller
                 'ip_address' => $request->ip(),
             ]);
             $log->save();
-            return Redirect::route('manage.home')
-                ->with('last_tab', 'groups')
-                ->with('last_group', $id)
-                ->with('last_action', 'update')
-                ->with('status', 'success');
+            return Redirect::route('manage.home')->with('last_tab', 'groups')->with('last_group', $id)->with('last_action', 'update')->with('status', 'success');
         }
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'groups')
-            ->with('last_group', $id);
+        return Redirect::route('manage.home')->with('last_tab', 'groups')->with('last_group', $id);
     }
 
     public function group_delete(Request $request): RedirectResponse
@@ -104,7 +98,7 @@ class ManageController extends Controller
         $id = $request->input('id');
         if ($id) {
             $group = Groups::find($id);
-            User::where("group_id","=",$id)->update(["group_id"=>null]);
+            User::where('group_id', '=', $id)->update(['group_id' => null]);
             $group->delete();
             $log = new Logs();
             $log->fill([
@@ -114,15 +108,9 @@ class ManageController extends Controller
                 'ip_address' => $request->ip(),
             ]);
             $log->save();
-            return Redirect::route('manage.home')
-                ->with('last_tab', 'groups')
-                ->with('last_group', null)
-                ->with('last_action', 'delete')
-                ->with('status', 'success');
+            return Redirect::route('manage.home')->with('last_tab', 'groups')->with('last_group', null)->with('last_action', 'delete')->with('status', 'success');
         }
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'groups')
-            ->with('last_group', null);
+        return Redirect::route('manage.home')->with('last_tab', 'groups')->with('last_group', null);
     }
 
     public function user_update(Request $request): RedirectResponse
@@ -133,7 +121,7 @@ class ManageController extends Controller
         } else {
             $group_id = null;
         }
-        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail'=>$request->input("detail")]);
+        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail' => $request->input('detail'), 'require_change_password' => $request->input('require_change_password') ?? false]);
         if ($request->input('password')) {
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }
@@ -147,10 +135,7 @@ class ManageController extends Controller
 
     public function tab(Request $request): RedirectResponse
     {
-        return Redirect::route('manage.home')
-            ->with('last_tab', $request->input('last_tab'))
-            ->with('last_tool', $request->input('last_tool'))
-            ->with('list_group', $request->input('list_group'));
+        return Redirect::route('manage.home')->with('last_tab', $request->input('last_tab'))->with('last_tool', $request->input('last_tool'))->with('list_group', $request->input('list_group'));
     }
 
     public function user_create(Request $request): RedirectResponse
@@ -161,10 +146,10 @@ class ManageController extends Controller
             'email' => 'required|email|unique:users,email|max:255',
             'group' => 'nullable|string',
             'detail' => 'nullable|string',
+            'require_change_password' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return Redirect::route('manage.home')
-                ->with('last_tab', 'users');
+            return Redirect::route('manage.home')->with('last_tab', 'users');
         }
         $user = new User();
         if ($request->input('group')) {
@@ -172,7 +157,7 @@ class ManageController extends Controller
         } else {
             $group_id = null;
         }
-        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, "detail"=>$request->input("detail")]);
+        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail' => $request->input('detail'), 'require_change_password' => $request->input('require_change_password') ?? false]);
         if ($request->input('password')) {
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }
@@ -187,10 +172,7 @@ class ManageController extends Controller
 
     public function search_user(Request $request): RedirectResponse
     {
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'users')
-            ->with('last_tool', 'fuzzy_selector')
-            ->with('fuzzy_search', $request->input('search'));
+        return Redirect::route('manage.home')->with('last_tab', 'users')->with('last_tool', 'fuzzy_selector')->with('fuzzy_search', $request->input('search'));
     }
 
     public function user_delete(Request $request): RedirectResponse
@@ -205,9 +187,7 @@ class ManageController extends Controller
                 ->with('last_tool', 'group_selector')
                 ->with('list_group', $group_id == null ? -1 : $group_id);
         }
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'users')
-            ->with('last_tool', 'group_selector');
+        return Redirect::route('manage.home')->with('last_tab', 'users')->with('last_tool', 'group_selector');
     }
 
     public function llm_update(LLMUpdateRequest $request): RedirectResponse
@@ -226,9 +206,7 @@ class ManageController extends Controller
         }
         $model->fill($validated);
         $model->save();
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'llms')
-            ->with('last_llm_id', $request->input('id'));
+        return Redirect::route('manage.home')->with('last_tab', 'llms')->with('last_llm_id', $request->input('id'));
     }
 
     public function llm_delete(Request $request): RedirectResponse
@@ -237,9 +215,7 @@ class ManageController extends Controller
         Storage::delete($model->image);
         $model->delete();
         Permissions::where('name', '=', 'model_' . $request->input('id'))->delete();
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'llms')
-            ->with('last_llm_id', $request->input('id'));
+        return Redirect::route('manage.home')->with('last_tab', 'llms')->with('last_llm_id', $request->input('id'));
     }
 
     public function llm_create(LLMCreateRequest $request): RedirectResponse
@@ -270,8 +246,6 @@ class ManageController extends Controller
         $model = LLMs::findOrFail($request->route('llm_id'));
         $model->enabled = !$model->enabled;
         $model->save();
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'llms')
-            ->with('last_llm_id', $request->route('llm_id'));
+        return Redirect::route('manage.home')->with('last_tab', 'llms')->with('last_llm_id', $request->route('llm_id'));
     }
 }
