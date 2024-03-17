@@ -17,8 +17,9 @@ class LLMCreateRequest extends FormRequest
             'access_code' => ['string', 'max:255', Rule::unique('llms')],
             'order' => ['nullable','digits_between:-1000000,1000000'],
             'version' => ['nullable', 'max:255'],
-            'link' => ['nullable', 'max:1024'],
             'description' => ['nullable', 'max:255'],
+            "system_prompt"=>["nullable", "max:1024"],
+            "react_btn"=>["nullable", "array"],
         ];
     }
 }
