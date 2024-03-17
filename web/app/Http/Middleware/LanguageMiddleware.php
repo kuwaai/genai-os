@@ -15,7 +15,7 @@ class LanguageMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $languages = json_decode(env('LANGUAGES'), true) ?: ['en_us' => 'English (US)', 'zh_tw' => '中文 (繁體)'];
+        $languages = config('app.LANGUAGES');
         $locale = session('locale');
     
         if (!empty($locale) && array_key_exists($locale, $languages)) {

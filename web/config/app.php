@@ -13,6 +13,11 @@ return [
     'MAIL_ENCRYPTION' => env('MAIL_ENCRYPTION', null),
     'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS', null),
     'MAIL_FROM_NAME' => env('MAIL_FROM_NAME', null),
+    'LANGUAGES' => json_decode(env('LANGUAGES'), true) ?: [
+        'en_us' => 'English (US)',
+        'zh_tw' => '中文 (繁體)',
+        'jp_jp' => '日本語 (日本)',
+    ],
     /*
     |--------------------------------------------------------------------------
     | Application Name
