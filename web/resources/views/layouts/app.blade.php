@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-hidden h-full">
 @php
-    $languages = json_decode(env('LANGUAGES'), true) ?: ['en_us' => 'English (US)', 'zh_tw' => '中文 (繁體)'];
+    $languages = json_decode(env('LANGUAGES'), true) ?: ['en_us' => 'English (US)', 'zh_tw' => '中文 (繁體)',"jp_jp":"日本語 (日本)"];
 @endphp
 
 <head>
