@@ -146,9 +146,9 @@ return [
 
         'max-age' => 31536000,
 
-        'include-sub-domains' => true,
+        'include-sub-domains' => false,
 
-        'preload' => true,
+        'preload' => false,
     ],
 
     /*

@@ -35,11 +35,18 @@ class LanguageMiddleware
         }
     
         Cookie::queue('locale', App::getLocale(), 60);
+        // Force HTTPS on production
+        if (App::environment('production')) {
+            $response = $next($request);
 
-        //Force https on production
-        if (!$request->secure() && App::environment('production')) {
-            return redirect()->secure($request->getRequestUri());
+            // Add HSTS header
+            $response->headers->add([
+                'Strict-Transport-Security' => 'max-age=31536000'
+            ]);
+
+            return $response;
         }
+
         return $next($request);
     }
     
