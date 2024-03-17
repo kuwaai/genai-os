@@ -1,7 +1,13 @@
 @php
     $allowedCIDRs = array_filter(explode(',', env('ALLOWED_IPS', '')), 'strlen');
+<<<<<<< HEAD
     $ip_allowed = !$allowedCIDRs || App\Http\Controllers\ProfileController::isIPInCIDRList(request()->ip(), $allowedCIDRs);
     $languages = json_decode(env('LANGUAGES'), true) ?: ['en_us' => 'English (US)', 'zh_tw' => '中文 (繁體)'];
+=======
+    $ip_allowed =
+        !$allowedCIDRs || App\Http\Controllers\ProfileController::isIPInCIDRList(request()->ip(), $allowedCIDRs);
+    $languages = config('app.LANGUAGES');
+>>>>>>> a/main
 @endphp
 
 
