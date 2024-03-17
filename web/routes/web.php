@@ -80,7 +80,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 if (request()->user()->require_change_password){
                     return view('profile.change_password');
                 }
-                return redirect(route('chat.home'));
+                return redirect()->route('room.home');
             })->name('change_password');
 
             Route::middleware('auth.check')->group(function () {
