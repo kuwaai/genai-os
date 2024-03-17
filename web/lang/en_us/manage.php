@@ -67,6 +67,10 @@ return [
     'label.update_password' => 'Update Password',
     'label.detail' => 'Detail',
     'placeholder.new_password' => 'New Password',
+    'label.require_change_password' => 'Require to change password when login',
+    'label.extra_setting'=>'Extra Settings',
+    'label.created_at'=>"Created At",
+    'label.updated_at'=>'Updated At',
 
     //LLMs
     'button.new_model' => 'New Model',

@@ -29,7 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail, LdapAuthenticatab
         'term_accepted',
         'guid',
         'domain',
-        'detail'
+        'detail',
+        'require_change_password'
     ];
 
     /**

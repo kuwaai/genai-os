@@ -67,6 +67,10 @@ return [
     'label.update_password' => 'パスワードを更新',
     'label.detail' => '詳細',
     'placeholder.new_password' => '新しいパスワード',
+    'label.require_change_password' => '次回のログイン時にパスワードの変更を要求する',
+    'label.extra_setting'=>'追加設定',
+    'label.created_at'=>"作成日時",
+    'label.updated_at'=>'更新日時',
 
     //LLMs
     'button.new_model' => '新規モデル',

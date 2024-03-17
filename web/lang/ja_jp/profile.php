@@ -11,6 +11,9 @@ return [
     "button.change_lang"=>"言語切り替え",
     'hint.updated' => '更新しました',
     'hint.saved' => '保存しました',
+    'hint.nochange'=>'資料が同じで、更新がありません',
+    'hint.alert'=>'警告',
+    'hint.require_change_password'=>'システムのセキュリティ要件により、パスワードを変更する必要があります',
 
     //Personal Infos
     'header.personal_info' => 'ここで名前やメールアドレスを更新できます',
