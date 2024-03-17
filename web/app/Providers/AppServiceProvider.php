@@ -27,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Blade::component('Logo', Logo::class);
         Blade::component('APP-Logo', APPLogo::class);
+
+        if($this->app->environment('production')) {
+            \URL::forceScheme('https');
+        }
     }
 }
