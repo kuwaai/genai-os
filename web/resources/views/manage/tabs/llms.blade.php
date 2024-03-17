@@ -30,7 +30,6 @@
                                 $LLM->access_code,
                                 $LLM->id,
                                 $LLM->description,
-                                $LLM->version,
                                 $LLM->enabled,
                                 json_decode($LLM->config),
                             ],
@@ -67,7 +66,6 @@
                                 $LLM->access_code,
                                 $LLM->id,
                                 $LLM->description,
-                                $LLM->version,
                                 $LLM->enabled,
                             ],
                             JSON_HEX_APOS,
@@ -134,15 +132,7 @@
                 </div>
             </div>
             <div class="flex flex-wrap -mx-3 mb-2">
-                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2" for="version">
-                        {{ __('manage.label.version') }}
-                    </label>
-                    <input name="version"
-                        class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="version" type="text" placeholder="{{ __('manage.label.version') }}">
-                </div>
-                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                         for="access_code">
                         {{ __('manage.label.access_code') }}
@@ -151,7 +141,7 @@
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         id="access_code" type="text" placeholder="{{ __('manage.label.access_code') }}">
                 </div>
-                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2" for="order">
                         {{ __('manage.label.order') }}
                     </label>
@@ -307,12 +297,11 @@
         $("#update_LLM_by_ID input[name='access_code']").val($llms[data][4])
         $("#update_LLM_by_ID input[name='id']").val($llms[data][5])
         $("#update_LLM_by_ID input[name='description']").val($llms[data][6])
-        $("#update_LLM_by_ID input[name='version']").val($llms[data][7])
-        $("#update_LLM_by_ID input[name='system_prompt']").val($llms[data][9] && $llms[data][9].startup_prompt?.[0]
+        $("#update_LLM_by_ID input[name='system_prompt']").val($llms[data][8] && $llms[data][8].startup_prompt?.[0]
             ?.message || "")
         $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", false);
-        if ($llms[data][9] && $llms[data][9]["react_btn"]) {
-            $llms[data][9]["react_btn"].forEach((a) => {
+        if ($llms[data][8] && $llms[data][8]["react_btn"]) {
+            $llms[data][8]["react_btn"].forEach((a) => {
                 $(`#update_LLM_by_ID input[value='${a}']`).prop("checked", true);
             });
         }
@@ -330,7 +319,7 @@
         $("#new_llm_btn").removeClass("dark:bg-green-700 bg-green-500")
         $("#toggle_llm_btn").attr("href", "{{ route('manage.llms.toggle', '') }}" + "/" + $llms[data][5])
         $("#toggle_llm_btn").removeClass("bg-green-500 hover:bg-green-600 bg-red-500 hover:bg-red-600")
-        $("#toggle_llm_btn").addClass($llms[data][8] ? "bg-green-500 hover:bg-green-600" :
+        $("#toggle_llm_btn").addClass($llms[data][7] ? "bg-green-500 hover:bg-green-600" :
             "bg-red-500 hover:bg-red-600")
         $("#toggle_llm_btn").show()
         $("#edit_llm").show();
@@ -348,7 +337,6 @@
         $("#update_LLM_by_ID input[name='access_code']").val("")
         $("#update_LLM_by_ID input[name='id']").val("")
         $("#update_LLM_by_ID input[name='description']").val("")
-        $("#update_LLM_by_ID input[name='version']").val("")
         $("#update_LLM_by_ID input[name='system_prompt']").val("")
         $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", false);
         $("#edit_llm h3:eq(0)").text("{{ __('manage.header.create_model') }}")
