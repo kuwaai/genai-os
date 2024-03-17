@@ -241,6 +241,16 @@ class ManageController extends Controller
         if (is_null($validated['version'])) {
             unset($validated['version']);
         }
+        $validated['config'] = [];
+        if (isset($validated['system_prompt'])) {
+            $validated['config']['startup_prompt'] = [['role' => 'system', 'message' => $validated['system_prompt']]];
+            unset($validated['system_prompt']);
+        }
+        if (isset($validated['react_btn'])) {
+            $validated['config']['react_btn'] = $validated['react_btn'];
+            unset($validated['react_btn']);
+        }
+        $validated['config'] = json_encode($validated['config']);
         $model->fill($validated);
         $model->save();
         $perm = new Permissions();
