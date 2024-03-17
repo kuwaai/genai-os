@@ -148,7 +148,7 @@ return [
 
         'include-sub-domains' => true,
 
-        'preload' => false,
+        'preload' => true,
     ],
 
     /*
