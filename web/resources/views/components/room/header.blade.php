@@ -177,8 +177,9 @@
             name = $("#chatHeader >p:eq(0)").text().trim();
             $("#chatHeader >p").addClass("flex justify-end items-center")
             $("#chatHeader >p:eq(0)").html(
-                `<input type='text' class='form-input rounded-md bg-gray-200 dark:bg-gray-700 border-gray-300 border w-full mr-2 pr-10' value='${name}' old='${name}'/><div class="fixed mr-2 cursor-pointer py-2 px-3 text-white hover:text-gray-200" onclick="saveChat()"><i class="fas fa-check"></i></div>`
-            )
+                `<input type='text' class='form-input rounded-md w-full bg-gray-200 dark:bg-gray-700 border-gray-300 border'/>`
+            );
+            $("#chatHeader >p:eq(0) input").val(name).attr('old', name);
             $("#chatHeader >p:eq(0)").addClass("w-full")
 
             $("#chatHeader >p >input:eq(0)").keypress(function(e) {
