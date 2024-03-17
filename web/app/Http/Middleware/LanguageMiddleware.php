@@ -15,13 +15,29 @@ class LanguageMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (session()->has('locale')) {
-            App::setLocale(session('locale'));
-            Cookie::queue('locale', session('locale'), 60);
+        $languages = json_decode(env('LANGUAGES'), true) ?: ['en_us' => 'English (US)', 'zh_tw' => '中文 (繁體)'];
+        $locale = session('locale');
+    
+        if (!empty($locale) && array_key_exists($locale, $languages)) {
+            App::setLocale($locale);
         } else {
-            App::setLocale(config('app.locale'));
-            Cookie::queue('locale', config('app.locale'), 60);
+            $fallbackLocale = config('app.locale');
+            if (array_key_exists($fallbackLocale, $languages)) {
+                App::setLocale($fallbackLocale);
+                session(['locale' => $fallbackLocale]);
+            } else {
+                // If the fallback locale is not in $languages, use the first language as the default
+                reset($languages);
+                $defaultLocale = key($languages);
+                App::setLocale($defaultLocale);
+                session(['locale' => $defaultLocale]);
+            }
         }
+    
+        Cookie::queue('locale', App::getLocale(), 60);
+    
         return $next($request);
     }
+    
+    
 }

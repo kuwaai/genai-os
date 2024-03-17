@@ -121,7 +121,7 @@ class ManageController extends Controller
         } else {
             $group_id = null;
         }
-        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail' => $request->input('detail')]);
+        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail' => $request->input('detail'), 'require_change_password' => $request->input('require_change_password') ?? false]);
         if ($request->input('password')) {
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }
@@ -146,6 +146,7 @@ class ManageController extends Controller
             'email' => 'required|email|unique:users,email|max:255',
             'group' => 'nullable|string',
             'detail' => 'nullable|string',
+            'require_change_password' => 'nullable',
         ]);
         if ($validator->fails()) {
             return Redirect::route('manage.home')->with('last_tab', 'users');
@@ -156,7 +157,7 @@ class ManageController extends Controller
         } else {
             $group_id = null;
         }
-        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail' => $request->input('detail')]);
+        $user->fill(['name' => $request->input('name'), 'email' => $request->input('email'), 'group_id' => $group_id, 'detail' => $request->input('detail'), 'require_change_password' => $request->input('require_change_password') ?? false]);
         if ($request->input('password')) {
             $user->fill(['password' => Hash::make($request->input('password'))]);
         }

@@ -68,6 +68,10 @@ return [
     'label.update_password' => '更新密碼',
     'label.detail' => '詳細說明',
     'placeholder.new_password' => '新密碼',
+    'label.require_change_password' => '下次登入要求修改密碼',
+    'label.extra_setting'=>'額外設定',
+    'label.created_at'=>"創建於",
+    'label.updated_at'=>'更新於',
 
     //LLMs
     'button.new_model' => '新增模型',

@@ -72,14 +72,12 @@
             <button href="#" class="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 onclick="update_stepper(['Menu','Group Selector']);$('#menu').hide();$('#group_selector').show();">
                 <div class="font-semibold">{{ __('manage.header.group_selector') }}</div>
-                <span
-                    class="text-sm text-gray-500 dark:text-gray-400">{{ __('manage.label.group_selector') }}</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('manage.label.group_selector') }}</span>
             </button>
             <button href="#" class="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 onclick="update_stepper(['Menu','Fuzzy Search']);$('#menu').hide();$('#fuzzy_selector').show();">
                 <div class="font-semibold">{{ __('manage.header.fuzzy_search') }}</div>
-                <span
-                    class="text-sm text-gray-500 dark:text-gray-400">{{ __('manage.label.fuzzy_search') }}</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('manage.label.fuzzy_search') }}</span>
             </button>
             <button href="#" class="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 onclick="update_stepper(['Menu','Create User']);$('#menu').hide();$('#create_user_form').show();">
@@ -88,7 +86,7 @@
             </button>
         </div>
     </div>
-    <form class="flex flex-1 flex-col h-full" style="display:none;" id="create_user_form" method="post"
+    <form class="flex flex-col overflow-hidden" style="display:none;" id="create_user_form" method="post"
         action="{{ route('manage.user.create') }}">
         @csrf
         <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 flex items-center justify-center">
@@ -146,6 +144,23 @@
                     <input type="text" id="create_user_detail" name="detail" autocomplete="off"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="{{ __('manage.label.detail') }}">
+                </div>
+            </div>
+            <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
+                <div class="md:col-span-2 lg:col-span-1">
+                    <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
+                        {{ __('manage.label.extra_setting') }}
+                    </p>
+
+                    <div class="flex items-center">
+                        <input id="create_require_change_password" name="require_change_password" value="true"
+                            type="checkbox"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="create_require_change_password"
+                            class="ml-2 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            {{ __('manage.label.require_change_password') }}
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -208,7 +223,15 @@
                             @foreach ($fuzzy_result as $user)
                                 <script>
                                     $users[{{ $user->id }}] = {!! json_encode(
-                                        [$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id, $user->detail],
+                                        [
+                                            $user->name,
+                                            $user->email,
+                                            $user->group_id == null ? -1 : $user->group_id,
+                                            $user->detail,
+                                            $user->require_change_password,
+                                            $user->created_at,
+                                            $user->updated_at,
+                                        ],
                                         JSON_HEX_APOS,
                                     ) !!}
                                 </script>
@@ -245,7 +268,8 @@
                         <button onclick='update_tab("users","group_selector",-1)'
                             class="flex menu-btn flex items-center justify-center w-full break-all min-h-12 dark:hover:bg-gray-600 hover:bg-gray-200 transition duration-300">
                             <p class="flex-1 text-center text-orange-400 dark:text-orange-400">
-                                <span class="block border-orange-400 border-b">{{ __('manage.label.other_users') }}</span>
+                                <span
+                                    class="block border-orange-400 border-b">{{ __('manage.label.other_users') }}</span>
                                 <span
                                     class="text-sm">{{ App\Models\User::where('group_id', null)->count() . ' ' . __('manage.label.members') }}</span>
                             </p>
@@ -265,7 +289,8 @@
                                     <p class="flex-1 text-center text-gray-700 dark:text-white">
                                         <span
                                             class="block border-gray-700 dark:border-white border-b">{{ $group->name }}</span>
-                                        <span class="text-sm">{{ $group->members . ' ' . __('manage.label.members') }}</span>
+                                        <span
+                                            class="text-sm">{{ $group->members . ' ' . __('manage.label.members') }}</span>
                                     </p>
                                 </button>
                             </div>
@@ -295,7 +320,15 @@
                             @foreach (App\Models\User::where('group_id', '=', session('list_group') == -1 ? null : session('list_group'))->orderby('name')->get() as $user)
                                 <script>
                                     $users[{{ $user->id }}] = {!! json_encode(
-                                        [$user->name, $user->email, $user->group_id == null ? -1 : $user->group_id, $user->detail],
+                                        [
+                                            $user->name,
+                                            $user->email,
+                                            $user->group_id == null ? -1 : $user->group_id,
+                                            $user->detail,
+                                            $user->require_change_password,
+                                            $user->created_at,
+                                            $user->updated_at,
+                                        ],
                                         JSON_HEX_APOS,
                                     ) !!}
                                 </script>
@@ -384,6 +417,38 @@
                                 placeholder="{{ __('manage.label.detail') }}">
                         </div>
                     </div>
+                    <div class="grid gap-3 md:grid-cols-1 w-full px-3 pt-2">
+                        <div class="md:col-span-2 lg:col-span-1">
+                            <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
+                                {{ __('manage.label.extra_setting') }}
+                            </p>
+
+                            <div class="flex items-center">
+                                <input id="edit_require_change_password" name="require_change_password"
+                                    value="true" type="checkbox"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="edit_require_change_password"
+                                    class="ml-2 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    {{ __('manage.label.require_change_password') }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-3 md:grid-cols-2 w-full px-3 pt-2">
+                        <div class="md:col-span-2 lg:col-span-1">
+                            <div>
+                                <label for="edit_created_at">{{ __('manage.label.created_at') }}</label>
+                                <input readonly class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="edit_created_at" name="edit_created_at" type="datetime-local">
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-1">
+                            <div>
+                                <label for="edit_updated_at">{{ __('manage.label.updated_at') }}</label>
+                                <input readonly class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="edit_updated_at" name="edit_updated_at" type="datetime-local">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
         @endif
@@ -423,12 +488,15 @@
     }
 
     function edit_group_user(id) {
-        $('#edit_user_form p').text("{{ __('manage.group_selector.header') }} " + $users[id][0])
+        $('#edit_user_form >div >p').text("{{ __('manage.group_selector.header') }} " + $users[id][0])
         $('#edit_user_form input[name=id]').val(id)
         $('#edit_user_form input[name=name]').val($users[id][0])
         $('#edit_user_form input[name=group]').val($users[id][2] == -1 ? "" : $groupnames[$users[id][2]])
         $('#edit_user_form input[name=email]').val($users[id][1])
         $('#edit_user_form input[name=detail]').val($users[id][3])
+        $('#edit_user_form input[name=require_change_password]').attr("checked", $users[id][4])
+        $('#edit_user_form input[name=edit_created_at]').val(new Date($users[id][5]).toISOString().slice(0, 19))
+        $('#edit_user_form input[name=edit_updated_at]').val(new Date($users[id][6]).toISOString().slice(0, 19))
         $('#user_id').text('ID:' + id)
         $("#delete_user_btn").attr("onclick", `delete_user(${id})`)
 

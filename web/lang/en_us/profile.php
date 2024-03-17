@@ -11,6 +11,9 @@ return [
     "button.change_lang"=>"Language",
     'hint.updated' => 'Updated',
     'hint.saved' => 'Saved',
+    'hint.nochange'=>'No changes are made.',
+    'hint.alert'=>'Alert',
+    'hint.require_change_password'=>'You must change your password due to system security requirements',
 
     //Personal Infos
     'header.personal_info' => "Update your account\'s profile information and email address.",

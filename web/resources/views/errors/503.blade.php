@@ -16,8 +16,11 @@
 </head>
 
 @php
-    if (Cookie::get('locale')) {
-        App::setLocale(explode('|', Crypt::decrypt(Cookie::get('locale'), false))[1]);
+    try {
+        if (Cookie::get('locale')) {
+            App::setLocale(explode('|', Crypt::decrypt(Cookie::get('locale'), false))[1]);
+        }
+    } catch (\Exception $e) {
     }
 @endphp
 
