@@ -15,7 +15,7 @@ return [
     'MAIL_FROM_NAME' => env('MAIL_FROM_NAME', null),
     'LANGUAGES' => json_decode(env('LANGUAGES'), true) ?: [
         'en_us' => 'English (US)',
-        'zh_tw' => '中文 (繁體)',
+        'zh_tw' => '中文 (臺灣)',
         'ja_jp' => '日本語 (日本)',
         "de" => "Deutsch (Deutschland)",
     ],

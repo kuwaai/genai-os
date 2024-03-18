@@ -36,10 +36,6 @@ class LanguageMiddleware
     
         Cookie::queue('locale', App::getLocale(), 60);
 
-        //Force https on production
-        if (!$request->secure() && App::environment('production')) {
-            return redirect()->secure($request->getRequestUri());
-        }
         return $next($request);
     }
 }
