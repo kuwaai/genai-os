@@ -38,10 +38,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
 
     Route::get('/lang/{lang}', function ($lang) {
         session()->put('locale', $lang);
-
         return back();
     })->name('lang');
-
+    
     Route::get('/IPNotAllowed', function () {
         return view('errors.IPNotAllowed');
     })->name('errors.ipnotallowed');

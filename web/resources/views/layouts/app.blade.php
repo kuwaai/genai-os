@@ -28,8 +28,13 @@
 </head>
 
 <body class="font-sans antialiased h-full">
+    @if (Auth::user()->term_accepted)
+    <div data-modal-target="tos_modal"></div>
+    @endif
+    @if (Auth::user()->announced)
+    <div data-modal-target="system_announcement_modal"></div>
+    @endif
     @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
-        <div data-modal-target="system_announcement_modal"></div>
         <div id="system_announcement_modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
             class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative w-full max-w-2xl max-h-full">
@@ -65,7 +70,6 @@
         </div>
     @endif
     @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
-        <div data-modal-target="tos_modal"></div>
         <div id="tos_modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
             class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative w-full max-w-2xl max-h-full">
@@ -181,12 +185,17 @@ xmlns="http://www.w3.org/2000/svg">
             });
         }
 
-        @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '' && !Auth::user()->term_accepted)
+        @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
             $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
                 backdrop: 'static',
                 closable: true,
                 onHide: () => {
                     $.get("{{ route('announcement') }}")
+                    $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
+                        backdrop: 'static',
+                        closable: true,
+                        onHide: () => {}
+                    });
                 }
             });
             $modal2 = new Modal(document.getElementById('tos_modal'), {
@@ -197,19 +206,36 @@ xmlns="http://www.w3.org/2000/svg">
                     @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' && !Auth::user()->announced)
                         $modal1.show();
                     @endif
+                    $modal2 = new Modal(document.getElementById('tos_modal'), {
+                        backdrop: 'static',
+                        closable: true,
+                        onHide: () => {}
+                    });
                 }
             });
-            $modal2.show();
-        @elseif (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' && !Auth::user()->announced)
+        @elseif (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
             $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
                 backdrop: 'static',
                 closable: true,
                 onHide: () => {
                     $.get("{{ route('announcement') }}")
+                    $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
+                        backdrop: 'static',
+                        closable: true,
+                        onHide: () => {}
+                    });
                 }
             });
+        @endif
+
+
+        @if (!Auth::user()->term_accepted)
+            $modal2.show();
+        @elseif (!Auth::user()->announced)
             $modal1.show();
         @endif
+
+
         markdown($("#system_announcement_modal .content"))
         markdown($("#tos_modal .content"))
     </script>
