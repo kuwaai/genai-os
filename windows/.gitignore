@@ -1,1 +1,4 @@
-nginx*
+nginx*/
+node*/
+php*/
+composer.phar

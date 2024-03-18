@@ -31,9 +31,5 @@ class AppServiceProvider extends ServiceProvider
         Blade::component('APP-Logo', APPLogo::class);
         Blade::component('WelcomeBody', WelcomeBody::class);
         Blade::component('WelcomeFooter', WelcomeFooter::class);
-
-        if($this->app->environment('production')) {
-            \URL::forceScheme('https');
-        }
     }
 }
