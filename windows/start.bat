@@ -4,18 +4,14 @@ REM Include variables from separate file
 call variables.bat
 
 REM Start Kuwa workers
-pushd "..\web"
+pushd "..\windows\%php_folder%\"
+REM Define number of workers
+set numWorkers=10
 REM Redis workers
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
+for /l %%i in (1,1,%numWorkers%) do (
+	echo Started a model worker
+    start /b RunHiddenConsole.exe php.exe ..\web\artisan queue:work --verbose --timeout=600
+)
 popd
 
 REM Agent
@@ -65,8 +61,8 @@ REM Stop PHP-FPM gracefully
 echo "Stopping PHP-FPM..."
 pushd %php_folder%
 taskkill /F /IM "php-cgi.exe"
+taskkill /F /IM "php.exe"
 popd
 echo PHP-FPM stopped
-
 pause
 exit
