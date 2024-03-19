@@ -1,12 +1,13 @@
 @echo off
 
-REM Usage: download_extract.bat <url> <folder_name> <archive_name>
+REM Usage: download_extract.bat <url> <check_location> <folder_name> <archive_name>
 
 set "url=%1"
-set "folder_name=%2"
-set "archive_name=%3"
+set "check_location=%2"
+set "folder_name=%3"
+set "archive_name=%4"
 
-if not exist "%folder_name%" (
+if not exist "%check_location%" (
     echo Downloading %url%...
     curl -L -o %archive_name% %url%
     echo Extracting %archive_name%...

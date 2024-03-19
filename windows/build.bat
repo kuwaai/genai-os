@@ -4,16 +4,16 @@ REM Include variables from separate file
 call variables.bat
 
 REM Download and extract RunHiddenConsole if not exists
-call download_extract.bat %url_RunHiddenConsole% %RunHiddenConsole_folder% RunHiddenConsole.zip
+call download_extract.bat %url_RunHiddenConsole% %RunHiddenConsole_folder% %RunHiddenConsole_folder% RunHiddenConsole.zip
 
 REM Download and extract Node.js if not exists
-call download_extract.bat %url_NodeJS% . node.zip
+call download_extract.bat %url_NodeJS% %node_folder% . node.zip
 
 REM Download and extract PHP if not exists
-call download_extract.bat %url_PHP% %php_folder% php.zip
+call download_extract.bat %url_PHP% %php_folder% %php_folder% php.zip
 
 REM Download and extract Python if not exists
-call download_extract.bat %url_Python% %python_folder% python.zip
+call download_extract.bat %url_Python% %python_folder% %python_folder% python.zip
 
 REM Copy php.ini if not exists
 if not exist "%php_folder%\php.ini" (
@@ -21,6 +21,14 @@ if not exist "%php_folder%\php.ini" (
 ) else (
     echo PHP.ini already exists, skipping copy and pasting.
 )
+
+REM Copy php_redis.dll if not exists
+if not exist "%php_folder%\ext\php_redis.dll" (
+    copy php_redis.dll "%php_folder%\ext\php_redis.dll"
+) else (
+    echo php_redis.dll already exists, skipping copy and pasting.
+)
+
 
 REM Download composer.phar if not exists
 if not exist "composer.phar" (
@@ -56,6 +64,19 @@ REM Overwrite the python39._pth file
 echo Overwrite the python39._pth file.
 copy /Y python39._pth "%python_folder%\python39._pth"
 
+REM Download required pip packages
+pushd "%python_folder%"
+.\python.exe -m pip install -r ..\..\LLMs\agent\requirements.txt
+popd
+
+REM Check if .env file exists
+if not exist "..\web\.env" (
+    REM Kuwa Chat
+    echo Preparing Kuwa Chat
+    copy .env ..\web\
+) else (
+    echo .env file already exists, skipping copy.
+)
 
 REM Production update
 pushd "..\web"
@@ -75,20 +96,11 @@ call ..\windows\%php_folder%\php.exe artisan config:clear
 popd
 
 REM Download and extract Nginx if not exists
-call download_extract.bat %url_Nginx% . nginx.zip
+call download_extract.bat %url_Nginx% %nginx_folder% . nginx.zip
 
 REM Overwrite the nginx.conf file
 echo Overwrite the nginx.conf file.
 copy /Y nginx.conf "%nginx_folder%\conf\nginx.conf"
-
-REM Check if .env file exists
-if not exist "..\web\.env" (
-    REM Kuwa Chat
-    echo Preparing Kuwa Chat
-    copy .env ..\web\
-) else (
-    echo .env file already exists, skipping copy.
-)
 
 REM Remove folder nginx_folder/html
 echo Removing folder %nginx_folder%/html...
