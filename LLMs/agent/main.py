@@ -3,12 +3,6 @@ import time, re, os, logging, click, requests
 from datetime import datetime
 from src.variable import *
 from src.functions import *
-from src.safety_middleware import update_safety_guard
-from flask import Flask
-from flask_sse import ServerSentEventsBlueprint
-from apscheduler.schedulers.background import BackgroundScheduler
-from routes.worker import worker
-from routes.chat import chat
 
 if __name__ == '__main__':
     # Setup logfile location
@@ -26,6 +20,12 @@ if __name__ == '__main__':
     console_handler.setFormatter(log_formatter)
     console_handler.setLevel(logging.DEBUG)
     logger.addHandler(console_handler)
+    from src.safety_middleware import update_safety_guard
+    from flask import Flask
+    from flask_sse import ServerSentEventsBlueprint
+    from apscheduler.schedulers.background import BackgroundScheduler
+    from routes.worker import worker
+    from routes.chat import chat
     
     # Load savefile
     if os.path.exists(record_file):

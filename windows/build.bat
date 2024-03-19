@@ -1,24 +1,85 @@
 @echo off
 
-REM Inits
-set "url=https://nginx.org/download/nginx-1.24.0.zip"
-for %%I in ("%url%") do set "filename=%%~nxI"
+REM Include variables from separate file
+call variables.bat
 
-set "zipfile=%filename:~0,-4%"
-for /f "tokens=2 delims=-" %%v in ("%filename%") do set "version=%%v"
+REM Download and extract RunHiddenConsole if not exists
+call download_extract.bat %url_RunHiddenConsole% %RunHiddenConsole_folder% RunHiddenConsole.zip
 
-REM Check if nginx.exe exists
-if not exist "%zipfile%\nginx.exe" (
-    echo Preparing Nginx
-    echo Downloading %url%...
-    curl -L -o %filename% %url%
-    echo Extracting %filename%...
-    powershell Expand-Archive -Path %filename% -DestinationPath .
-    echo Cleaning up...
-    del %filename%
+REM Download and extract Node.js if not exists
+call download_extract.bat %url_NodeJS% . node.zip
+
+REM Download and extract PHP if not exists
+call download_extract.bat %url_PHP% %php_folder% php.zip
+
+REM Download and extract Python if not exists
+call download_extract.bat %url_Python% %python_folder% python.zip
+
+REM Copy php.ini if not exists
+if not exist "%php_folder%\php.ini" (
+    copy php.ini "%php_folder%\php.ini"
 ) else (
-    echo Nginx already exists, skipping download and extraction.
+    echo PHP.ini already exists, skipping copy and pasting.
 )
+
+REM Download composer.phar if not exists
+if not exist "composer.phar" (
+    curl -o composer.phar https://getcomposer.org/download/latest-stable/composer.phar
+) else (
+    echo Composer already exists, skipping download.
+)
+
+REM Prepare RunHiddenConsole.exe if not exists
+if not exist "%php_folder%\RunHiddenConsole.exe" (
+    copy %RunHiddenConsole_folder%\x64\RunHiddenConsole.exe %php_folder%\
+) else (
+    echo RunHiddenConsole.exe already exists, skipping copy.
+)
+
+REM Prepare get-pip.py
+if not exist "%python_folder%\get-pip.py" (
+	curl -o "%python_folder%\get-pip.py" https://bootstrap.pypa.io/get-pip.py
+) else (
+    echo get-pip.py already exists, skipping download.
+)
+
+REM Prepare pip for python
+if not exist "%python_folder%\Scripts\pip.exe" (
+	pushd "%python_folder%"
+	.\python.exe get-pip.py --no-warn-script-location
+	popd
+) else (
+    echo get-pip.py already exists, skipping download.
+)
+
+REM Overwrite the python39._pth file
+echo Overwrite the python39._pth file.
+copy /Y python39._pth "%python_folder%\python39._pth"
+
+
+REM Production update
+pushd "..\web"
+call ..\windows\%php_folder%\php.exe ..\windows\composer.phar update
+call ..\windows\%php_folder%\php.exe artisan key:generate --force
+call ..\windows\%php_folder%\php.exe artisan migrate --force
+call rmdir public\storage
+call ..\windows\%php_folder%\php.exe artisan storage:link
+call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js install
+call ..\windows\%php_folder%\php.exe ..\windows\composer.phar dump-autoload --optimize
+call ..\windows\%php_folder%\php.exe artisan route:cache
+call ..\windows\%php_folder%\php.exe artisan view:cache
+call ..\windows\%php_folder%\php.exe artisan optimize
+call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js run build
+call ..\windows\%php_folder%\php.exe artisan config:cache
+call ..\windows\%php_folder%\php.exe artisan config:clear
+popd
+
+REM Download and extract Nginx if not exists
+call download_extract.bat %url_Nginx% . nginx.zip
+
+REM Overwrite the nginx.conf file
+echo Overwrite the nginx.conf file.
+copy /Y nginx.conf "%nginx_folder%\conf\nginx.conf"
 
 REM Check if .env file exists
 if not exist "..\web\.env" (
@@ -29,27 +90,10 @@ if not exist "..\web\.env" (
     echo .env file already exists, skipping copy.
 )
 
-Rem update
-cd /d ..\web\executables\bat
-call .\production_update.bat
-cd /d ..\windows
+REM Remove folder nginx_folder/html
+echo Removing folder %nginx_folder%/html...
+rd /s /q "%nginx_folder%\html"
 
-REM Remove folder zipfile/html
-echo Removing folder %zipfile%/html...
-rd /s /q "%zipfile%\html"
-
-REM Make shortcut from zipfile/html to ../web/public
-echo Creating shortcut from %zipfile%/html to ../web/public...
-mklink /j "%zipfile%\html" "..\web\public"
-
-REM Start Nginx
-pushd "%zipfile%"
-echo "Nginx started!"
-start /b .\nginx.exe
-
-REM Trap any key press to stop Nginx
-echo Press any key to stop Nginx...
-pause > nul
-.\nginx.exe -s quit
-echo Nginx stopped
-popd
+REM Make shortcut from nginx_folder/html to ../web/public
+echo Creating shortcut from %nginx_folder%/html to ../web/public...
+mklink /j "%nginx_folder%\html" "..\web\public"
