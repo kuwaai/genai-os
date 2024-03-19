@@ -1,4 +1,6 @@
 nginx*/
 node*/
 php*/
+python*/
+RunHiddenConsole*/
 composer.phar

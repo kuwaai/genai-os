@@ -1,75 +1,62 @@
 @echo off
 
-REM Inits
-set "url=https://github.com/wenshui2008/RunHiddenConsole/releases/download/1.0/RunHiddenConsole.zip"
-for %%I in ("%url%") do set "filename=%%~nxI"
+REM Include variables from separate file
+call variables.bat
 
-set "RunHiddenConsole_folder=%filename:~0,-4%"
+REM Download and extract RunHiddenConsole if not exists
+call download_extract.bat %url_RunHiddenConsole% %RunHiddenConsole_folder% RunHiddenConsole.zip
 
-REM Check if the target file exists
-if not exist "%RunHiddenConsole_folder%" (
-    echo Downloading %url%...
-    curl -L -o %filename% %url%
-    echo Extracting %filename%...
-    powershell Expand-Archive -Path %filename% -DestinationPath "%RunHiddenConsole_folder%"
-    echo Cleaning up...
-    del %filename%
-	copy %RunHiddenConsole_folder%\x64\RunHiddenConsole.exe %php_folder%\
-) else (
-    echo Target file already exists, skipping download and extraction.
-)
+REM Download and extract Node.js if not exists
+call download_extract.bat %url_NodeJS% . node.zip
 
-REM Inits
-set "url=https://nodejs.org/dist/v20.11.1/node-v20.11.1-win-x64.zip"
-for %%I in ("%url%") do set "filename=%%~nxI"
+REM Download and extract PHP if not exists
+call download_extract.bat %url_PHP% %php_folder% php.zip
 
-set "node_folder=%filename:~0,-4%"
-for /f "tokens=2 delims=-" %%v in ("%filename%") do set "version=%%v"
+REM Download and extract Python if not exists
+call download_extract.bat %url_Python% %python_folder% python.zip
 
-REM Check if node.exe exists
-if not exist "%node_folder%\node.exe" (
-    echo Preparing Node.js
-    echo Downloading %url%...
-    curl -L -o %filename% %url%
-    echo Extracting %filename%...
-    powershell Expand-Archive -Path %filename% -DestinationPath .
-    echo Cleaning up...
-    del %filename%
-) else (
-    echo Node.js already exists, skipping download and extraction.
-)
-
-REM Inits
-set "url=https://windows.php.net/downloads/releases/php-8.1.27-Win32-vs16-x64.zip"
-for %%I in ("%url%") do set "filename=%%~nxI"
-
-set "php_folder=%filename:~0,-4%"
-for /f "tokens=2 delims=-" %%v in ("%filename%") do set "version=%%v"
-
-REM Check if php.exe exists
-if not exist "%php_folder%\php.exe" (
-    echo Preparing PHP
-    echo Downloading %url%...
-    curl -L -o %filename% %url%
-    echo Extracting %filename%...
-    powershell Expand-Archive -Path %filename% -DestinationPath "%php_folder%"
-    echo Cleaning up...
-    del %filename%
-) else (
-    echo PHP already exists, skipping download and extraction.
-)
-
+REM Copy php.ini if not exists
 if not exist "%php_folder%\php.ini" (
-	copy php.ini "%php_folder%\php.ini"
+    copy php.ini "%php_folder%\php.ini"
 ) else (
     echo PHP.ini already exists, skipping copy and pasting.
 )
 
+REM Download composer.phar if not exists
 if not exist "composer.phar" (
-	curl -o composer.phar https://getcomposer.org/download/latest-stable/composer.phar
+    curl -o composer.phar https://getcomposer.org/download/latest-stable/composer.phar
 ) else (
     echo Composer already exists, skipping download.
 )
+
+REM Prepare RunHiddenConsole.exe if not exists
+if not exist "%php_folder%\RunHiddenConsole.exe" (
+    copy %RunHiddenConsole_folder%\x64\RunHiddenConsole.exe %php_folder%\
+) else (
+    echo RunHiddenConsole.exe already exists, skipping copy.
+)
+
+REM Prepare get-pip.py
+if not exist "%python_folder%\get-pip.py" (
+	curl -o "%python_folder%\get-pip.py" https://bootstrap.pypa.io/get-pip.py
+) else (
+    echo get-pip.py already exists, skipping download.
+)
+
+REM Prepare pip for python
+if not exist "%python_folder%\Scripts\pip.exe" (
+	pushd "%python_folder%"
+	.\python.exe get-pip.py --no-warn-script-location
+	popd
+) else (
+    echo get-pip.py already exists, skipping download.
+)
+
+REM Overwrite the python39._pth file
+echo Overwrite the python39._pth file.
+copy /Y python39._pth "%python_folder%\python39._pth"
+
+
 REM Production update
 pushd "..\web"
 call ..\windows\%php_folder%\php.exe ..\windows\composer.phar update
@@ -87,26 +74,10 @@ call ..\windows\%php_folder%\php.exe artisan config:cache
 call ..\windows\%php_folder%\php.exe artisan config:clear
 popd
 
-REM Inits
-set "url=https://nginx.org/download/nginx-1.24.0.zip"
-for %%I in ("%url%") do set "filename=%%~nxI"
+REM Download and extract Nginx if not exists
+call download_extract.bat %url_Nginx% . nginx.zip
 
-set "nginx_folder=%filename:~0,-4%"
-for /f "tokens=2 delims=-" %%v in ("%filename%") do set "version=%%v"
-
-REM Check if nginx.exe exists
-if not exist "%nginx_folder%\nginx.exe" (
-    echo Preparing Nginx
-    echo Downloading %url%...
-    curl -L -o %filename% %url%
-    echo Extracting %filename%...
-    powershell Expand-Archive -Path %filename% -DestinationPath .
-    echo Cleaning up...
-    del %filename%
-) else (
-    echo Nginx already exists, skipping download and extraction.
-)
-REM Copy nginx.conf file to nginx_folder\conf\nginx.conf
+REM Overwrite the nginx.conf file
 echo Overwrite the nginx.conf file.
 copy /Y nginx.conf "%nginx_folder%\conf\nginx.conf"
 
@@ -126,22 +97,3 @@ rd /s /q "%nginx_folder%\html"
 REM Make shortcut from nginx_folder/html to ../web/public
 echo Creating shortcut from %nginx_folder%/html to ../web/public...
 mklink /j "%nginx_folder%\html" "..\web\public"
-
-REM Start Nginx
-pushd "%nginx_folder%"
-echo "Nginx started!"
-start /b .\nginx.exe
-pushd ..\%php_folder%
-RunHiddenConsole.exe php-cgi.exe -b 127.0.0.1:9123
-popd
-
-REM Trap any key press to stop Nginx
-echo Press any key to stop Nginx...
-pause > nul
-.\nginx.exe -s quit
-echo Nginx stopped
-popd
-REM Stop PHP-FPM gracefully
-echo "Stopping PHP-FPM..."
-taskkill /F /IM "%php_folder%\php-fpm.exe"
-echo PHP-FPM stopped
