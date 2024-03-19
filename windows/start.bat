@@ -45,6 +45,8 @@ start http://127.0.0.1
 
 REM Start Nginx and PHP-FPM
 pushd %php_folder%
+set PHP_FCGI_MAX_REQUESTS=0
+set PHP_FCGI_CHILDREN=20
 start /b RunHiddenConsole.exe php-cgi.exe -b 127.0.0.1:9123
 popd
 pushd "%nginx_folder%"
