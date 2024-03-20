@@ -10,7 +10,7 @@ use App\Models\GroupPermissions;
 use App\Models\Groups;
 use DB;
 
-class DefaultSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     /**
      * Seed the application's database.

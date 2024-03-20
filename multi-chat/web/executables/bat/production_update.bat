@@ -1,6 +1,7 @@
 cd ../..
 call composer update
 call php artisan key:generate --force
+call php artisan db:seed --class=InitSeeder --force
 call php artisan migrate --force
 call rmdir public\storage
 call php artisan storage:link
