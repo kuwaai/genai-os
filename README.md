@@ -1,3 +1,4 @@
+[正體中文Readme.md](./README_TW.md)
 
 <h1 align="center">
   <br>
@@ -9,6 +10,7 @@
 </h1>
 
 <h4 align="center">An open, free, secure, and privacy-focused Generative-AI Operating System.</h4>
+
 <p align="center">
   <a href="http://makeapullrequest.com">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
@@ -25,8 +27,8 @@
   <a href="#key-features">Key Features</a> •
   <a href="#dependencies">Architecture</a> •
   <a href="#installation-guide">Installation Guide</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#support">Support</a> •
+  <a href="#community">Community</a> •
+  <a href="#acknowledgements">Acknowledgements</a> •
   <a href="#license">License</a>
 </p>
 
