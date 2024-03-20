@@ -2,7 +2,7 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img style="border-radius:20px;" src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
+  <img target="_blank" src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
   <br>
   Open GenAI OS
   <br>
