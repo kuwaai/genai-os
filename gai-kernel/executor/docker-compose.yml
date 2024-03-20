@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  executor:
+    runtime: nvidia
+    build: .
+    # devices:
+      # - /dev/nvidia0:/dev/nvidia0
+    env_file: .env
+    healthcheck:
+      test: "curl --fail http://localhost:9001/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5

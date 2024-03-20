@@ -1,0 +1,20 @@
+ckip_transformers==0.3.4
+# torch
+# accelerate
+# transformers
+protobuf
+pyahocorasick
+# langchain
+# langchain-community
+# sentence-transformers
+faiss-cpu
+grpcio
+grpcio-health-checking
+aiohttp
+jinja2
+sqlalchemy
+psycopg2-binary
+numpy
+python-dotenv
+opencc==1.1.6
+# jieba_fast

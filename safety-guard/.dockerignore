@@ -1,0 +1,5 @@
+__pycahce__
+.venv
+.env*
+scripts/vector_guard_evaluation
+scripts/infinity_benckmark
