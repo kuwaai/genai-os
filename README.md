@@ -152,10 +152,10 @@ This software uses the following packages and programs:
 - [Nvidia CUDA](https://developer.nvidia.com/cuda-toolkit)
 
 ## Special Thanks
-<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/web/public/images/logo_NUK.png" height="100px"></a>
-<a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.png" height="100px"></a>
-<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.png" height="100px"></a>
-<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.png" height="100px"></a>
+<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/web/public/images/logo_NUK.jpg" height="100px"></a>
+<a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
+<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
+<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
 <a href="https://moda.gov.tw/"><img src="./multi-chat/web/public/images/logo_moda.png" height="100px"></a>
 
 ## License
