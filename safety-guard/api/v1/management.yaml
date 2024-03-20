@@ -1,0 +1,189 @@
+openapi: 3.0.0
+info:
+  title: Safety Guard Management API
+  version: 1.1.1
+servers:
+  - url: http://localhost/v1/management
+    description: Development server
+
+paths:
+  /rule:
+    get:
+      summary: Get all rules.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: the ID of the rule
+                  allOf:
+                    - $ref: '#/components/schemas/Rule'
+
+    post:
+      summary: Create a new rule.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '201':
+          description: Rule created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The ID of the newly created rule.
+
+  /rule/{id}:
+    get:
+      summary: Get a rule by ID.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the rule to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule not found.
+
+    put:
+      summary: Update a rule by ID.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the rule to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '200':
+          description: Rule updated successfully.
+        '409':
+          description: The rule changes after the "retrieval-timestamp". For consistency, please fetch the rule again.
+        '404':
+          description: Rule not found.
+
+    delete:
+      summary: Delete a rule by ID.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the rule to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Rule deleted successfully.
+  /health:
+    get:
+      summary: Health check endpoint.
+      responses:
+        '204':
+          description: Health check successful.
+
+components:
+  schemas:
+    Rule:
+      type: object
+      required:
+        - name
+        - target
+        - pre-filter
+        - post-filter
+        - action
+      properties:
+        name:
+          type: string
+          description: The name of the rule.
+          example: "TAIDE 認知"
+
+        description:
+          type: string
+          description: A brief description or additional information about the rule.
+          example: "在有關 TAIDE 認知問題後方加註警語。"
+
+        retrieval-timestamp:
+          type: integer
+          description: The server timestamp when the rule is retrieved.
+          example: 1641916800
+
+        target:
+          type: array
+          items:
+            type: string
+          description: An array of target models to which the rule is applied.
+          example: ["taide-0115"]
+
+        pre-filter:
+          allOf:
+            - $ref: '#/components/schemas/Detector'
+
+          description: Configuration for pre-filtering criteria.
+
+        post-filter:
+          allOf:
+            - $ref: '#/components/schemas/Detector'
+          description: Configuration for post-filtering criteria.
+
+        action:
+          type: string
+          enum: [none, block, warn, overwrite]
+          description: |
+            The action after the rule is triggered.
+            none: The rule is disabled.
+            block: Stop generation and terminate the session.
+            warn: Output a message alongside the original output.
+            overwrite: Overwrite the output with the detector-provided content.
+          example: warn
+
+        message:
+          type: string
+          nullable: true
+          description: A message that is shown after the rule is triggered.
+          example: "有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。"
+    
+    Detector:
+      type: object
+      properties:
+        keyword:
+          type: array
+          items:
+            type: string
+          description: Keywords to detect.
+          example: ["TAIDE", "Trustworthy AI Dialogue Engine"]
+        embedding:
+          type: array
+          items:
+            type: string
+          description: Sentences to detect.
+          example: ["Example sentence 1", "Example sentence 2"]
+          
+# [TODO]
+# - Firewall-like rule system
