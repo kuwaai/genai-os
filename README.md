@@ -2,7 +2,7 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img style="border-radius:20px;" src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
+  <img style="border-radius:10px;" src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
   <br>
   Open GenAI OS
   <br>
@@ -152,11 +152,23 @@ This software uses the following packages and programs:
 - [Nvidia CUDA](https://developer.nvidia.com/cuda-toolkit)
 
 ## Special Thanks
-<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/web/public/images/logo_NUK.png" height="100px"></a>
-<a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_TAIDE.png" height="100px"></a>
-<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.png" height="100px"></a>
-<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.png" height="100px"></a>
-<a href="https://moda.gov.tw/"><img src="./multi-chat/web/public/images/logo_moda.png" height="100px"></a>
+<div style="padding: 10px;">
+    <a href="https://www.nuk.edu.tw/" style="display: inline-block; background-color: white; border-radius: 10px; padding: 5px;">
+        <img src="./multi-chat/web/public/images/logo_NUK.png" style="max-height: 100px;">
+    </a>
+    <a href="https://taide.tw/" style="display: inline-block; background-color: white; border-radius: 10px; padding: 5px;">
+        <img src="./multi-chat/web/public/images/logo_taide.png" style="max-height: 100px;">
+    </a>
+    <a href="https://www.nstc.gov.tw/" style="display: inline-block; background-color: white; border-radius: 10px; padding: 5px;">
+        <img src="./multi-chat/web/public/images/logo_NSTCpng.png" style="max-height: 100px;">
+    </a>
+    <a href="https://www.narlabs.org.tw/" style="display: inline-block; background-color: white; border-radius: 10px; padding: 5px;">
+        <img src="./multi-chat/web/public/images/logo_NARlabs.png" style="max-height: 100px;">
+    </a>
+    <a href="https://moda.gov.tw/" style="display: inline-block; border-radius: 10px; padding: 5px;">
+        <img src="./multi-chat/web/public/images/logo_moda.png" style="max-height: 100px;">
+    </a>
+</div>
 
 ## License
 [MIT](./LICENSE)
