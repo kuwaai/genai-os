@@ -4,25 +4,21 @@ REM Include variables from separate file
 call variables.bat
 
 REM Start Kuwa workers
-pushd "..\web"
+REM Define number of workers
+set numWorkers=10
 REM Redis workers
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-start /b "" ..\windows\%php_folder%\php.exe artisan queue:work  --verbose --timeout=600
-popd
+for /l %%i in (1,1,%numWorkers%) do (
+	echo Started a model worker
+    start /b ..\windows\%php_folder%\php.exe ..\web\artisan queue:work --verbose --timeout=600
+)
 
 REM Agent
 pushd "..\LLMs\agent"
 del records.pickle
-start /b python main.py
+set PYTHONPATH=%PYTHONPATH%;%~dp0..\LLMs\agent\src
+start /b %~dp0%python_folder%\python.exe %~dp0..\LLMs\agent\main.py
 popd
+
 
 REM Wait for Agent online
 :CHECK_URL
@@ -49,6 +45,8 @@ start http://127.0.0.1
 
 REM Start Nginx and PHP-FPM
 pushd %php_folder%
+set PHP_FCGI_MAX_REQUESTS=0
+set PHP_FCGI_CHILDREN=20
 start /b RunHiddenConsole.exe php-cgi.exe -b 127.0.0.1:9123
 popd
 pushd "%nginx_folder%"
@@ -63,10 +61,8 @@ echo Nginx stopped
 popd
 REM Stop PHP-FPM gracefully
 echo "Stopping PHP-FPM..."
-pushd %php_folder%
-taskkill /F /IM "php-cgi.exe"
-popd
 echo PHP-FPM stopped
-
-pause
-exit
+taskkill /F /IM "nginx.exe"
+taskkill /F /IM "php-cgi.exe"
+taskkill /F /IM "php.exe"
+taskkill /F /IM "python.exe"

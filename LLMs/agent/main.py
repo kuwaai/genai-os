@@ -1,5 +1,6 @@
 # -#- coding: UTF-8 -*-
-import time, re, os, logging, click, requests
+import time, re, os, logging, click, requests, sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from datetime import datetime
 from src.variable import *
 from src.functions import *
