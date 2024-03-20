@@ -1,0 +1,9 @@
+model_framework
+aiohttp
+# opencc
+# torch
+# transformers
+# sentenct-transformers
+# accelerate
+# sentencepiece
+# openai

@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: Safety Guard Internal API
+  version: 1.0.0
+servers:
+  - url: http://localhost/v1/internal
+    description: Development server
+
+paths:
+  /targets:
+    get:
+      summary: Get all guarded targets. This endpoint is used by the Agent.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ['example-model']
+
+components:
+  schemas:
+    Rule:
+      type: object
+      required:
+        - name
+        - target
+        - pre-filter
+        - post-filter
+        - action
+      properties:
+        name:
+          type: string
+          description: The name of the rule.
+          example: "TAIDE 認知"
+
+        description:
+          type: string
+          description: A brief description or additional information about the rule.
+          example: "在有關 TAIDE 認知問題後方加註警語。"
+
+        retrieval-timestamp:
+          type: integer
+          description: The server timestamp when the rule is retrieved.
+          example: 1641916800
+
+        target:
+          type: array
+          items:
+            type: string
+          description: An array of target models to which the rule is applied.
+          example: ["taide-0115"]
+
+        pre-filter:
+          allOf:
+            - $ref: '#/components/schemas/Detector'
+
+          description: Configuration for pre-filtering criteria.
+
+        post-filter:
+          allOf:
+            - $ref: '#/components/schemas/Detector'
+          description: Configuration for post-filtering criteria.
+
+        action:
+          type: string
+          enum: [none, block, warn]
+          description: |
+            The action after the rule is triggered.
+            none: The rule is disabled.
+            block: Stop generation and terminate the session.
+            warn: Output a message alongside the original output.
+          example: warn
+
+        message:
+          type: string
+          nullable: true
+          description: A message that is shown after the rule is triggered.
+          example: "有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。"
+    
+    Detector:
+      type: object
+      properties:
+        keyword:
+          type: array
+          items:
+            type: string
+          description: Keywords to detect.
+          example: ["TAIDE", "Trustworthy AI Dialogue Engine"]
+        embedding:
+          type: array
+          items:
+            type: string
+          description: Sentences to detect.
+          example: ["Example sentence 1", "Example sentence 2"]
+          
+# [TODO]
+# - Firewall-like rule system
