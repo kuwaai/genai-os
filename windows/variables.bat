@@ -28,3 +28,9 @@ set "url_Python=https://www.python.org/ftp/python/3.9.5/python-3.9.5-embed-amd64
 for %%I in ("%url_Python%") do set "filename_Python=%%~nxI"
 set "python_folder=%filename_Python:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_Python%") do set "version_Python=%%v"
+
+REM Variables for Python 3.9.5
+set "url_Redis=https://github.com/redis-windows/redis-windows/releases/download/6.0.20/Redis-6.0.20-Windows-x64-msys2.zip"
+for %%I in ("%url_Redis%") do set "filename_Redis=%%~nxI"
+set "redis_folder=%filename_Redis:~0,-4%"
+for /f "tokens=2 delims=-" %%v in ("%filename_Redis%") do set "version_Redis=%%v"
