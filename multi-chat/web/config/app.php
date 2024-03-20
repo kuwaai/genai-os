@@ -14,10 +14,14 @@ return [
     'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS', null),
     'MAIL_FROM_NAME' => env('MAIL_FROM_NAME', null),
     'LANGUAGES' => json_decode(env('LANGUAGES'), true) ?: [
-        'en_us' => 'English (US)',
+        'en_us' => 'English',
         'zh_tw' => '中文 (台灣)',
+        "zh_cn" => "中文 (中国)",
         'ja_jp' => '日本語 (日本)',
         "de" => "Deutsch (Deutschland)",
+        "cs_cz" => "Čeština (Česká republika)",
+        "fr_fr" => "Français (France)",
+        "ko_kr" => "한국어 (대한민국)",
     ],
     /*
     |--------------------------------------------------------------------------
