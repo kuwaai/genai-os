@@ -2,8 +2,7 @@
 
 @php
     try {
-        $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail($history->chat_id)->llm_id)->image;
-        $botimgurl = strpos($img, 'data:image/png;base64') === 0 ? $img : asset(Storage::url($img));
+        $botimgurl = strpos($history->image, 'data:image/png;base64') === 0 ? $history->image : asset(Storage::url($history->image));
     } catch (\Throwable $e) {
         $botimgurl = '';
     }
@@ -35,7 +34,7 @@
             @if ($anonymous)
                 <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
             @else
-                <img data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
+                <img data-tooltip-target="llm_{{ $history->bot_id }}_chat" data-tooltip-placement="top"
                     src="{{ $botimgurl }}" class="h-full w-full">
             @endif
         </div>
@@ -58,7 +57,7 @@
                 @if ($anonymous)
                     <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
                 @else
-                    <img data-tooltip-target="llm_{{ $history->llm_id }}_chat" data-tooltip-placement="top"
+                    <img data-tooltip-target="llm_{{ $history->bot_id }}_chat" data-tooltip-placement="top"
                         src="{{ $botimgurl }}" class="h-full w-full">
                 @endif
             </div>
@@ -70,7 +69,7 @@
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{$history->chained ? ' chain-msg' : ''}}{{$history->isbot ? ' bot-msg' : ''}}">{{ $message }}</div>
                 {{-- blade-formatter-enable --}}
-                @if (!$readonly && $history->isbot)
+                @if (!$readonly)
                     <x-chat.react-buttons :history="$history" :showOnFinished='false' />
                 @endif
             </div>

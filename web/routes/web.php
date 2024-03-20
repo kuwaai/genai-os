@@ -79,7 +79,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 if (request()->user()->require_change_password){
                     return view('profile.change_password');
                 }
-                return redirect(route('chat.home'));
+                return redirect()->route('room.home');
             })->name('change_password');
 
             Route::middleware('auth.check')->group(function () {
@@ -113,63 +113,24 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                             ->patch('/chatgpt/api', [ProfileController::class, 'chatgpt_update'])
                             ->name('profile.chatgpt.api.update');
 
-                        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
-                        Route::middleware(AdminMiddleware::class . ':Profile_delete_account')
-                            ->delete('/', [ProfileController::class, 'destroy'])
-                            ->name('profile.destroy');
-                    });
+                Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+                Route::middleware(AdminMiddleware::class . ':Profile_delete_account')
+                    ->delete('/', [ProfileController::class, 'destroy'])
+                    ->name('profile.destroy');
+            });
+        #---Archives, disabled, should be updated like inspecter or just deleted and replaced by export all data button
+        /*Route::middleware(AdminMiddleware::class . ':tab_Archive')
+            ->prefix('archive')
+            ->group(function () {
+                Route::get('/', function () {
+                    return view('archive');
+                })->name('archive.home');
 
-                #---Chats
-                Route::middleware(AdminMiddleware::class . ':tab_Chat')
-                    ->prefix('chats')
-                    ->group(function () {
-                        Route::get('/', [ChatController::class, 'home'])->name('chat.home');
-                        Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('chat.translate');
-
-                        Route::get('/new/{llm_id}', [ChatController::class, 'new_chat'])->name('chat.new');
-
-                        Route::get('/chain', [ChatController::class, 'update_chain'])->name('chat.chain');
-                        Route::get('/stream', [ChatController::class, 'SSE'])->name('chat.sse');
-                        Route::get('/{chat_id}', [ChatController::class, 'main'])->name('chat.chat');
-                        Route::get('/abort/{chat_id}', [ChatController::class, 'abort'])->name('chat.abort');
-
-                        Route::middleware(AdminMiddleware::class . ':Chat_update_upload_file')
-                            ->post('/upload', [ChatController::class, 'upload'])
-                            ->name('chat.upload');
-                        Route::middleware(AdminMiddleware::class . ':Chat_update_import_chat')
-                            ->post('/import', [ChatController::class, 'import'])
-                            ->name('chat.import');
-                        Route::middleware(AdminMiddleware::class . ':Chat_update_new_chat')
-                            ->post('/create', [ChatController::class, 'create'])
-                            ->name('chat.create');
-                        Route::middleware(AdminMiddleware::class . ':Chat_update_send_message')
-                            ->post('/request', [ChatController::class, 'request'])
-                            ->name('chat.request');
-                        Route::post('/edit', [ChatController::class, 'edit'])->name('chat.edit');
-                        Route::post('/feedback', [ChatController::class, 'feedback'])->name('chat.feedback');
-
-                        Route::middleware(AdminMiddleware::class . ':Chat_delete_chatroom')
-                            ->delete('/delete', [ChatController::class, 'delete'])
-                            ->name('chat.delete');
-                        Route::middleware(AdminMiddleware::class . ':Chat_read_export_chat')
-                            ->get('/share/{chat_id}', [ChatController::class, 'share'])
-                            ->name('chat.share');
-                    })
-                    ->name('chat');
-
-                #---Archives
-                Route::middleware(AdminMiddleware::class . ':tab_Archive')
-                    ->prefix('archive')
-                    ->group(function () {
-                        Route::get('/', function () {
-                            return view('archive');
-                        })->name('archive.home');
-
-                        Route::get('/{chat_id}', [ArchiveController::class, 'main'])->name('archive.chat');
-                        Route::post('/edit', [ArchiveController::class, 'edit'])->name('archive.edit');
-                        Route::delete('/delete', [ArchiveController::class, 'delete'])->name('archive.delete');
-                    })
-                    ->name('archive');
+                Route::get('/{chat_id}', [ArchiveController::class, 'main'])->name('archive.chat');
+                Route::post('/edit', [ArchiveController::class, 'edit'])->name('archive.edit');
+                Route::delete('/delete', [ArchiveController::class, 'delete'])->name('archive.delete');
+            })
+            ->name('archive');*/
 
                 #---Room
                 Route::middleware(AdminMiddleware::class . ':tab_Room')
@@ -177,44 +138,64 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->group(function () {
                         Route::get('/', [RoomController::class, 'main'])->name('room.home');
 
-                        Route::post('/new', [RoomController::class, 'new'])->name('room.new');
-                        Route::middleware(AdminMiddleware::class . ':Room_update_new_chat')
-                            ->post('/create', [RoomController::class, 'create'])
-                            ->name('room.create');
-                        Route::get('/{room_id}', [RoomController::class, 'main'])->name('room.chat');
-                        Route::get('/abort/{room_id}', [RoomController::class, 'abort'])->name('room.abort');
-                        Route::post('/edit', [RoomController::class, 'edit'])->name('room.edit');
-                        Route::middleware(AdminMiddleware::class . ':Room_delete_chatroom')
-                            ->delete('/delete', [RoomController::class, 'delete'])
-                            ->name('room.delete');
-                        Route::middleware(AdminMiddleware::class . ':Room_update_send_message')
-                            ->post('/request', [RoomController::class, 'request'])
-                            ->name('room.request');
-                        Route::middleware(AdminMiddleware::class . ':Room_update_import_chat')
-                            ->post('/import', [RoomController::class, 'import'])
-                            ->name('room.import');
-                        Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
-                            ->get('/share/{room_id}', [RoomController::class, 'share'])
-                            ->name('room.share');
-                    })
-                    ->name('room');
+                Route::post('/new', [RoomController::class, 'new'])->name('room.new');
+                Route::middleware(AdminMiddleware::class . ':Room_update_new_chat')
+                    ->post('/create', [RoomController::class, 'create'])
+                    ->name('room.create');
+                Route::get('/stream', [ChatController::class, 'SSE'])->name('room.sse');
+                Route::get('/abort/{room_id}', [RoomController::class, 'abort'])->name('room.abort');
+                Route::post('/edit', [RoomController::class, 'edit'])->name('room.edit');
+                Route::middleware(AdminMiddleware::class . ':Room_delete_chatroom')
+                    ->delete('/delete', [RoomController::class, 'delete'])
+                    ->name('room.delete');
+                Route::middleware(AdminMiddleware::class . ':Room_update_send_message')
+                    ->post('/request', [RoomController::class, 'request'])
+                    ->name('room.request');
+                Route::middleware(AdminMiddleware::class . ':Room_update_import_chat')
+                    ->post('/import', [RoomController::class, 'import'])
+                    ->name('room.import');
+                Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
+                    ->get('/share/{room_id}', [RoomController::class, 'share'])
+                    ->name('room.share');
+                Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('room.translate');
 
-                #---Play
-                Route::middleware(AdminMiddleware::class . ':tab_Play')
-                    ->prefix('play')
-                    ->group(function () {
-                        Route::get('/', function () {
-                            return view('play');
-                        })->name('play.home');
-                    })
-                    ->name('play');
-                #---Play
-                Route::middleware(AdminMiddleware::class . ':tab_Manage')
-                    ->prefix('manage')
-                    ->group(function () {
-                        Route::get('/', function () {
-                            return view('manage.home');
-                        })->name('manage.home');
+                Route::get('/chain', [ChatController::class, 'update_chain'])->name('room.chain');
+
+                Route::middleware(AdminMiddleware::class . ':Room_update_upload_file')
+                    ->post('/upload', [ChatController::class, 'upload'])
+                    ->name('room.upload');
+                Route::post('/feedback', [ChatController::class, 'feedback'])->name('room.feedback');
+                Route::get('/{room_id}', [RoomController::class, 'main'])->name('room.chat');
+            })
+            ->name('room');
+
+            #---Play
+            Route::middleware(AdminMiddleware::class . ':tab_Play')
+                ->prefix('play')
+                ->group(function () {
+                    Route::get('/', function () {
+                        return view('play');
+                    })->name('play.home');
+
+            })
+            ->name('play');
+
+        #---Store
+        Route::middleware(AdminMiddleware::class . ':tab_Store')
+            ->prefix('store')
+            ->group(function () {
+                Route::get('/', [BotController::class, 'home'])->name('store.home');
+                Route::post('/create', [BotController::class, 'create'])->name('store.create');
+                Route::patch('/update', [BotController::class, 'update'])->name('store.update');
+            })
+            ->name('store');
+        #---Manage
+        Route::middleware(AdminMiddleware::class . ':tab_Manage')
+            ->prefix('manage')
+            ->group(function () {
+                Route::get('/', function () {
+                    return view('manage.home');
+                })->name('manage.home');
 
                         Route::prefix('group')
                             ->group(function () {

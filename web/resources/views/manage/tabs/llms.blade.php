@@ -25,13 +25,12 @@
                             [
                                 strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)),
                                 $LLM->name,
-                                $LLM->link,
                                 $LLM->order,
                                 $LLM->access_code,
                                 $LLM->id,
                                 $LLM->description,
-                                $LLM->version,
                                 $LLM->enabled,
+                                json_decode($LLM->config),
                             ],
                             JSON_HEX_APOS,
                         ) !!}
@@ -61,12 +60,10 @@
                             [
                                 strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)),
                                 $LLM->name,
-                                $LLM->link,
                                 $LLM->order,
                                 $LLM->access_code,
                                 $LLM->id,
                                 $LLM->description,
-                                $LLM->version,
                                 $LLM->enabled,
                             ],
                             JSON_HEX_APOS,
@@ -133,15 +130,7 @@
                 </div>
             </div>
             <div class="flex flex-wrap -mx-3 mb-2">
-                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2" for="version">
-                        {{ __('manage.label.version') }}
-                    </label>
-                    <input name="version"
-                        class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="version" type="text" placeholder="{{ __('manage.label.version') }}">
-                </div>
-                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                         for="access_code">
                         {{ __('manage.label.access_code') }}
@@ -150,25 +139,13 @@
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         id="access_code" type="text" placeholder="{{ __('manage.label.access_code') }}">
                 </div>
-                <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2" for="order">
                         {{ __('manage.label.order') }}
                     </label>
                     <input name="order"
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         id="order" type="text" placeholder="{{ __('manage.label.order') }}">
-                </div>
-            </div>
-            <div class="flex flex-wrap -mx-3 mb-2">
-                <div class="w-full px-3">
-                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
-                        for="link">
-                        {{ __('manage.label.link') }}
-                    </label>
-                    <input name="link"
-                        class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="link" placeholder="{{ __('manage.placeholder.link') }}"
-                        value="">
                 </div>
             </div>
             <div class="flex flex-wrap -mx-3 mb-2">
@@ -182,6 +159,37 @@
                         id="description" placeholder="{{ __('manage.placeholder.description') }}">
                 </div>
             </div>
+
+            <div class="flex flex-wrap -mx-3 mb-2">
+                <div class="w-full px-3">
+                    <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
+                        for="system_prompt">
+                        {{ __('System prompt') }}
+                    </label>
+                    <input name="system_prompt"
+                        class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        id="system_prompt" placeholder="{{ __('System Prompt for the model') }}">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
+                    {{ __('React Buttons') }}
+                </p>
+
+                @foreach (['Feedback', 'Translate', 'Quote', "Other"] as $label)
+                    @php $id = strtolower($label); @endphp
+                    <div class="flex items-center">
+                        <input checked id="{{ $id }}" name="react_btn[]" value="{{ $id }}"
+                            type="checkbox"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="{{ $id }}"
+                            class="ml-2 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            {{ __('Allow ' . $label) }}
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+
             <div class="text-center">
                 <button type="button" data-modal-target="popup-modal2" data-modal-toggle="popup-modal2"
                     class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -270,27 +278,33 @@
         $("#update_LLM_by_ID img").attr("src", $llms[data][0])
         $("#update_LLM_by_ID input[name='_method']").prop("disabled", false)
         $("#update_LLM_by_ID input[name='name']").val($llms[data][1])
-        $("#update_LLM_by_ID input[name='link']").val($llms[data][2])
-        $("#update_LLM_by_ID input[name='order']").val($llms[data][3])
-        $("#update_LLM_by_ID input[name='access_code']").val($llms[data][4])
-        $("#update_LLM_by_ID input[name='id']").val($llms[data][5])
-        $("#update_LLM_by_ID input[name='description']").val($llms[data][6])
-        $("#update_LLM_by_ID input[name='version']").val($llms[data][7])
+        $("#update_LLM_by_ID input[name='order']").val($llms[data][2])
+        $("#update_LLM_by_ID input[name='access_code']").val($llms[data][3])
+        $("#update_LLM_by_ID input[name='id']").val($llms[data][4])
+        $("#update_LLM_by_ID input[name='description']").val($llms[data][5])
+        $("#update_LLM_by_ID input[name='system_prompt']").val($llms[data][7] && $llms[data][7].startup_prompt?.[0]
+            ?.message || "")
+        $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", false);
+        if ($llms[data][7] && $llms[data][7]["react_btn"]) {
+            $llms[data][7]["react_btn"].forEach((a) => {
+                $(`#update_LLM_by_ID input[value='${a}']`).prop("checked", true);
+            });
+        }
         $("#edit_llm form").attr("action", "{{ route('manage.llms.update') }}")
         $("#delete_llm").off('click').on('click', function() {
-            DeleteRow($llms[data][5]);
+            DeleteRow($llms[data][4]);
         });
         $("#edit_llm h3:eq(0)").text("{{ __('manage.header.update_model') }}")
         $("#edit_llm h3:eq(1)").text("{{ __('manage.modal.update_model.header') }}")
         $("#edit_llm h3:eq(2)").text("{{ __('manage.modal.delete_model.header') }}")
         $("#delete_button").show()
         $("#edit_llm_btns > button").removeClass("bg-gray-200 dark:bg-gray-600")
-        $("#edit_llm_btn_" + $llms[data][5]).addClass("bg-gray-200 dark:bg-gray-600")
+        $("#edit_llm_btn_" + $llms[data][4]).addClass("bg-gray-200 dark:bg-gray-600")
         $("#new_llm_btn").addClass("bg-green-400 dark:bg-green-600")
         $("#new_llm_btn").removeClass("dark:bg-green-700 bg-green-500")
-        $("#toggle_llm_btn").attr("href", "{{ route('manage.llms.toggle', '') }}" + "/" + $llms[data][5])
+        $("#toggle_llm_btn").attr("href", "{{ route('manage.llms.toggle', '') }}" + "/" + $llms[data][4])
         $("#toggle_llm_btn").removeClass("bg-green-500 hover:bg-green-600 bg-red-500 hover:bg-red-600")
-        $("#toggle_llm_btn").addClass($llms[data][8] ? "bg-green-500 hover:bg-green-600" :
+        $("#toggle_llm_btn").addClass($llms[data][6] ? "bg-green-500 hover:bg-green-600" :
             "bg-red-500 hover:bg-red-600")
         $("#toggle_llm_btn").show()
         $("#edit_llm").show();
@@ -303,12 +317,12 @@
         )
         $("#update_LLM_by_ID input:eq(1)").prop("disabled", true)
         $("#update_LLM_by_ID input[name='name']").val("")
-        $("#update_LLM_by_ID input[name='link']").val("")
         $("#update_LLM_by_ID input[name='order']").val("")
         $("#update_LLM_by_ID input[name='access_code']").val("")
         $("#update_LLM_by_ID input[name='id']").val("")
         $("#update_LLM_by_ID input[name='description']").val("")
-        $("#update_LLM_by_ID input[name='version']").val("")
+        $("#update_LLM_by_ID input[name='system_prompt']").val("")
+        $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", false);
         $("#edit_llm h3:eq(0)").text("{{ __('manage.header.create_model') }}")
         $("#edit_llm h3:eq(1)").text("{{ __('manage.modal.create_model.header') }}")
         $("#edit_llm_btns > button").removeClass("bg-gray-600")

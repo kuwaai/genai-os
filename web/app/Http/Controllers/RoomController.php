@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Jobs\RequestChat;
 use App\Jobs\ImportChat;
@@ -13,6 +14,7 @@ use App\Models\ChatRoom;
 use App\Models\Histories;
 use App\Models\Chats;
 use App\Models\LLMs;
+use App\Models\Bots;
 use GuzzleHttp\Client;
 use DB;
 use Session;
@@ -21,25 +23,23 @@ class RoomController extends Controller
 {
     public function share(Request $request)
     {
-        $chat = ChatRoom::find($request->route("room_id"));
-        if ($chat && $chat->user_id == Auth::user()->id){
+        $chat = ChatRoom::find($request->route('room_id'));
+        if ($chat && $chat->user_id == Auth::user()->id) {
             return view('room.share');
-        }else{
+        } else {
             return redirect()->route('room.home');
         }
     }
     public function abort(Request $request)
     {
-        $chatIDs = Chats::where('roomID', '=', $request->route('room_id'))
-            ->pluck('id')
-            ->toArray();
+        $chatIDs = Chats::where('roomID', '=', $request->route('room_id'))->pluck('id')->toArray();
         $list = Histories::whereIn('id', \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1))
             ->whereIn('chat_id', $chatIDs)
             ->pluck('id')
             ->toArray();
         $client = new Client(['timeout' => 300]);
         $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
-        $response = $client->post($agent_location . "/" . RequestChat::$agent_version . '/chat/abort', [
+        $response = $client->post($agent_location . '/' . RequestChat::$agent_version . '/chat/abort', [
             'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
             'form_params' => [
                 'history_id' => json_encode($list),
@@ -56,7 +56,7 @@ class RoomController extends Controller
             if ($chat->user_id != Auth::user()->id) {
                 return redirect()->route('room.home');
             } elseif (true) {
-                #LLMs::findOrFail($chat->llm_id)->enabled == true) {
+                #LLMs::findOrFail($chat->bot_id)->enabled == true) {
                 return view('room');
             }
         }
@@ -67,24 +67,11 @@ class RoomController extends Controller
     public function import(Request $request)
     {
         $historys = $request->input('history');
-        $llm_ids = $request->input('llm_ids');
+        $bot_ids = $request->input('llm_ids');
+        $room_id = $request->input('room_id');
         $filename = $request->input('import_file_name');
         if ($historys) {
-            $result = DB::table(function ($query) {
-                $query
-                    ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                    ->from('group_permissions')
-                    ->join('permissions', 'perm_id', '=', 'permissions.id')
-                    ->where('group_id', Auth()->user()->group_id)
-                    ->where('name', 'like', 'model_%')
-                    ->get();
-            }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-                ->select('llms.id')
-                ->where('llms.enabled', true)
-                ->get()
-                ->pluck('id')
-                ->toarray();
+            $result = Bots::pluck('id')->toarray();
             $historys = json_decode($historys);
             if ($historys) {
                 //JSON format
@@ -98,7 +85,7 @@ class RoomController extends Controller
                 foreach ($rows as $index => $row) {
                     // Splitting each row into columns using tabs as delimiter
                     if ($index === 0) {
-                        $headers = explode("\t", str_replace("    ", "\t", $row));
+                        $headers = explode("\t", str_replace('    ', "\t", $row));
                         if (in_array('content', $headers)) {
                             continue;
                         } else {
@@ -108,9 +95,9 @@ class RoomController extends Controller
                     if ($headers === null) {
                         break;
                     }
-                    if (count($headers) === 1){
+                    if (count($headers) === 1) {
                         $columns = [str_replace('    ', "\t", $row)];
-                    }else{
+                    } else {
                         $columns = explode("\t", str_replace('    ', "\t", $row));
                     }
 
@@ -122,7 +109,9 @@ class RoomController extends Controller
                         $value = $columns[$columnIndex];
                         if ($header === 'content') {
                             $value = trim(json_decode('"' . $value . '"'), '"');
-                            if ($value === "") $value = str_replace("\\n", "\n", str_replace("\\t", "\t", $columns[$columnIndex]));
+                            if ($value === '') {
+                                $value = str_replace("\\n", "\n", str_replace("\\t", "\t", $columns[$columnIndex]));
+                            }
                         }
                         $record[$header] = $value;
                     }
@@ -142,18 +131,19 @@ class RoomController extends Controller
                         }
                     }
                 }
-                if ($access_codes || $llm_ids) {
-                    if ($access_codes) {
-                        $llm_ids = LLMs::whereIn('access_code', $access_codes)
-                            ->select('id', 'access_code')
-                            ->get();
+                if ($access_codes || $bot_ids || $room_id) {
+                    if ($bot_ids) {
+                        $bot_ids = Bots::whereIn('bots.id', $bot_ids)->join('llms', 'bots.model_id', '=', 'llms.id')->select('bots.id', 'access_code')->get();
                     } else {
-                        $llm_ids = LLMs::whereIn('id', $llm_ids)
-                            ->select('id', 'access_code')
-                            ->get();
+                        $bot_ids = collect([]);
                     }
+
+                    if ($access_codes) {
+                        $bot_ids = $bot_ids->merge(LLMs::whereIn('access_code', $access_codes)->join("bots","bots.model_id","=","llms.id")->where("visibility","=",0)->select('bots.id', 'access_code')->get())->unique('id');
+                    }
+
                     $access_codes = [];
-                    foreach ($llm_ids as $i) {
+                    foreach ($bot_ids as $i) {
                         if (in_array($i->id, $result)) {
                             $access_codes[] = $i->access_code;
                         }
@@ -181,7 +171,7 @@ class RoomController extends Controller
                                         $data[] = clone $newMessage;
                                     }
                                 }
-                                $chainValue = isset($message->chain) ? (bool) $message->chain : false;
+                                $chainValue = isset($message->chain) ? (bool) $message->chain : (Session::get('chained') ?? true) == true;
                                 if (!isset($message->role)) {
                                     $message->role = 'user';
                                 }
@@ -232,25 +222,34 @@ class RoomController extends Controller
                     $historys = $data;
                     if (count($historys) > 0) {
                         //Start loading
-                        $Room = new ChatRoom();
-                        $Room->fill(['name' => $filename ?? $historys[0]->content, 'user_id' => $request->user()->id]);
-                        $Room->save();
-                        $deltaTime = count($historys);
-                        foreach ($llm_ids->pluck('id') as $id) {
-                            $chat = new Chats();
-                            $chat->fill(['name' => 'Room Chat', 'llm_id' => $id, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
-                            $chat->save();
-                            $chatIds[] = $chat->id;
+                        if ($room_id) {
+                            $Room = ChatRoom::findorfail($room_id);
+                            $chats = Chats::where('roomID', '=', $room_id);
+                            $chatIds = $chats->pluck('id');
+                            foreach ($bot_ids->pluck('id')->diff($chats->pluck('bot_id')) as $id) {
+                                $chat = new Chats();
+                                $chat->fill(['name' => 'Room Chat', 'bot_id' => $id, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
+                                $chat->save();
+                                $chatIds[] = $chat->id;
+                            }
+                        } else {
+                            $Room = new ChatRoom();
+                            $Room->fill(['name' => $filename ?? $historys[0]->content, 'user_id' => $request->user()->id]);
+                            $Room->save();
+                            foreach ($bot_ids->pluck('id') as $id) {
+                                $chat = new Chats();
+                                $chat->fill(['name' => 'Room Chat', 'bot_id' => $id, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
+                                $chat->save();
+                                $chatIds[] = $chat->id;
+                            }
                         }
                         $flag = true;
                         $user_msg = null;
                         $appended = [];
                         $ids = [];
+                        $deltaTime = count($historys);
                         $t = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime . ' second'));
-                        $chatIds = Chats::join('llms', 'llm_id', '=', 'llms.id')
-                            ->whereIn('chats.id', $chatIds)
-                            ->select('chats.id', 'llms.access_code')
-                            ->get();
+                        $chatIds = Chats::join("bots","bots.id","=","chats.bot_id")->join('llms', 'bots.model_id', '=', 'llms.id')->whereIn('chats.id', $chatIds)->select('chats.id', 'llms.access_code')->get();
                         foreach ($historys as $history) {
                             $history->isbot = $history->role == 'user' ? false : true;
                             if ($history->isbot) {
@@ -275,7 +274,7 @@ class RoomController extends Controller
                             }
                         }
                         ImportChat::dispatch($ids, Auth::user()->id);
-                        return Redirect::route('room.chat', $Room->id);
+                        return Redirect::route('room.chat', $Room->id)->with('selLLMs', $bot_ids->pluck('id'));
                     }
                 }
             }
@@ -283,26 +282,70 @@ class RoomController extends Controller
         return redirect()->route('room.home');
     }
 
+    public function upload_file(Request $request)
+    {
+        if ($request->file()) {
+            $request->validate([
+                'file' => 'max:10240',
+            ]);
+            $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
+            $storagePath = public_path('storage/' . $directory); // Adjusted path
+            $fileName = time() . '_' . $request->file->getClientOriginalName();
+            $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
+
+            $files = File::files($storagePath);
+
+            if (count($files) > 5) {
+                usort($files, function ($a, $b) {
+                    return filectime($a) - filectime($b);
+                });
+
+                while (count($files) > 5) {
+                    $oldestFile = array_shift($files);
+                    File::delete($storagePath . '/' . $oldestFile->getFilename());
+                }
+            }
+            //Create a chat and send that url into the llm
+            $url = url('storage/' . $directory . '/' . rawurlencode($fileName));
+            return $url;
+        }
+        return null;
+    }
+    function getWebPageTitle($url)
+    {
+        // Try to fetch the HTML content of the URL
+        $html = @file_get_contents($url);
+
+        // If the URL is not accessible, return an empty string
+        if ($html === false) {
+            return '';
+        }
+
+        // Use regular expressions to extract the title from the HTML
+        if (preg_match('/<title>(.*?)<\/title>/i', $html, $matches)) {
+            return $matches[1];
+        } else {
+            // If no title is found, return an empty string
+            return '';
+        }
+    }
+    function getFilenameFromURL($url)
+    {
+        $path_parts = pathinfo($url);
+
+        if (isset($path_parts['filename'])) {
+            return $path_parts['filename'];
+        } else {
+            return '';
+        }
+    }
+
     public function create(Request $request): RedirectResponse
     {
         $llms = $request->input('llm');
         $selectedLLMs = $request->input('chatsTo');
-        if (count($selectedLLMs) > 0 && count($llms) > 1) {
-            $result = DB::table(function ($query) {
-                $query
-                    ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                    ->from('group_permissions')
-                    ->join('permissions', 'perm_id', '=', 'permissions.id')
-                    ->where('group_id', Auth()->user()->group_id)
-                    ->where('name', 'like', 'model_%')
-                    ->get();
-            }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-                ->select('llms.id')
-                ->where('llms.enabled', true)
-                ->get()
-                ->pluck('id')
-                ->toarray();
+        if (count($selectedLLMs) > 0 && count($llms) > 0) {
+            $result = Bots::pluck('bots.id')->toarray();
 
             foreach ($llms as $i) {
                 if (!in_array($i, $result)) {
@@ -316,14 +359,33 @@ class RoomController extends Controller
                 }
             }
             $input = $request->input('input');
+            $url = $this->upload_file($request);
+            if ($url) {
+                $input = trim($url . "\n" . $input);
+            }
+            $chatname = $input;
+            $first_url = preg_match('/\bhttps?:\/\/\S+/i', $input, $matches);
+            $firstUrl = isset($matches[0]) ? $matches[0] : null;
+            if ($firstUrl) {
+                $tmp = $this->getWebPageTitle($firstUrl);
+                if ($tmp != '') {
+                    $chatname = $tmp;
+                } else {
+                    $tmp = $this->getFilenameFromURL($firstUrl);
+                    if ($tmp != '') {
+                        $chatname = $tmp;
+                    }
+                }
+            }
+
             $Room = new ChatRoom();
-            $Room->fill(['name' => $input, 'user_id' => Auth::user()->id]);
+            $Room->fill(['name' => $chatname, 'user_id' => Auth::user()->id]);
             $Room->save();
             $ct = date('Y-m-d H:i:s');
             $dct = date('Y-m-d H:i:s', strtotime($ct . ' +1 second'));
             foreach ($llms as $llm) {
                 $chat = new Chats();
-                $chat->fill(['name' => 'Room Chat', 'llm_id' => $llm, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
+                $chat->fill(['name' => 'Room Chat', 'bot_id' => $llm, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
                 $chat->save();
                 if (in_array($llm, $selectedLLMs)) {
                     $history = new Histories();
@@ -332,40 +394,21 @@ class RoomController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $dct, 'updated_at' => $dct]);
                     $history->save();
-                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                 }
             }
         }
         return redirect()
-            ->to(route('room.chat', $Room->id) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
+            ->route('room.chat', $Room->id)
             ->with('selLLMs', $selectedLLMs);
     }
 
     public function new(Request $request): RedirectResponse
     {
         $llms = $request->input('llm');
-        if (
-            request()
-                ->user()
-                ->hasPerm('Room_update_new_chat') &&
-            count($llms) > 1
-        ) {
-            $result = DB::table(function ($query) {
-                $query
-                    ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                    ->from('group_permissions')
-                    ->join('permissions', 'perm_id', '=', 'permissions.id')
-                    ->where('group_id', Auth()->user()->group_id)
-                    ->where('name', 'like', 'model_%')
-                    ->get();
-            }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-                ->select('llms.id')
-                ->where('llms.enabled', true)
-                ->get()
-                ->pluck('id')
-                ->toarray();
+        if (request()->user()->hasPerm('Room_update_new_chat') && count($llms) > 0) {
+            $result = Bots::pluck('id')->toarray();
 
             foreach ($llms as $i) {
                 if (!in_array($i, $result)) {
@@ -373,9 +416,7 @@ class RoomController extends Controller
                 }
             }
 
-            return redirect()
-                ->route('room.home')
-                ->with('llms', $llms);
+            return redirect()->route('room.home')->with('llms', $llms);
         }
 
         return redirect()->route('room.home');
@@ -387,7 +428,7 @@ class RoomController extends Controller
             $ids = [];
             $chats = ChatRoom::findOrFail($request->input('id'));
             foreach (Chats::where('roomID', '=', $chats->id)->get() as $chat) {
-                $ids[] = $chat->llm_id;
+                $ids[] = $chat->bot_id;
                 Histories::where('chat_id', '=', $chat->id)->delete();
             }
             Chats::where('roomID', '=', $chats->id)->delete();
@@ -395,9 +436,7 @@ class RoomController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error('Chat not found: ' . $request->input('id'));
         }
-        return redirect()
-            ->to(route('room.home') . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
-            ->with('llms', $ids);
+        return redirect()->route('room.home')->with('llms', $ids);
     }
 
     public function edit(Request $request): RedirectResponse
@@ -409,7 +448,7 @@ class RoomController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error('Chat not found: ' . $request->input('id'));
         }
-        return redirect()->to(route('room.chat', $request->input('id')) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''));
+        return redirect()->route('room.chat', $request->input('id'));
     }
 
     public function request(Request $request): RedirectResponse
@@ -417,85 +456,67 @@ class RoomController extends Controller
         $roomId = $request->input('room_id');
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
+        $url = $this->upload_file($request);
+        if ($url) {
+            $input = trim($url . "\n" . $input);
+        }
+
         $chained = (Session::get('chained') ?? true) == true;
         if (count($selectedLLMs) > 0 && $roomId && $input) {
             $chats = Chats::where('roomID', $request->input('room_id'))->get();
-            if (
-                Chats::join('llms', 'llms.id', '=', 'llm_id')
-                    ->where('roomID', $request->input('room_id'))
-                    ->get()
-                    ->where('enabled', false)
-                    ->count() == 0
-            ) {
-                $result = DB::table(function ($query) {
-                    $query
-                        ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                        ->from('group_permissions')
-                        ->join('permissions', 'perm_id', '=', 'permissions.id')
-                        ->where('group_id', Auth()->user()->group_id)
-                        ->where('name', 'like', 'model_%')
-                        ->get();
-                }, 'tmp')
-                    ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-                    ->select('llms.id')
-                    ->where('llms.enabled', true)
-                    ->get()
-                    ->pluck('id')
-                    ->toarray();
+            $result = Bots::pluck('id')->toarray();
 
-                foreach ($chats->pluck('llm_id')->toarray() as $i) {
-                    if (!in_array($i, $result)) {
-                        return back();
-                    }
+            foreach ($chats->pluck('bot_id')->toarray() as $i) {
+                if (!in_array($i, $result)) {
+                    return back();
                 }
-                foreach ($selectedLLMs as $id) {
-                    if (!in_array($id, $chats->pluck('llm_id')->toarray())) {
-                        return back();
-                    }
+            }
+            foreach ($selectedLLMs as $id) {
+                if (!in_array($id, $chats->pluck('bot_id')->toarray())) {
+                    return back();
                 }
-                #Model permission checked
-                $start = date('Y-m-d H:i:s');
-                $deltaStart = date('Y-m-d H:i:s', strtotime($start . ' +1 second'));
-                foreach ($chats as $chat) {
-                    if (in_array($chat->llm_id, $selectedLLMs)) {
-                        $history = new Histories();
-                        $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false, 'created_at' => $start, 'updated_at' => $start]);
-                        $history->save();
-                        if (in_array(LLMs::find($chat->llm_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
-                            $tmp = json_encode([
-                                [
-                                    'msg' => Histories::where('chat_id', '=', $chat->id)
-                                        ->select('msg')
-                                        ->orderby('created_at')
-                                        ->orderby('id', 'desc')
-                                        ->get()
-                                        ->first()->msg,
-                                    'isbot' => false,
-                                ],
-                                ['msg' => $request->input('input'), 'isbot' => false],
-                            ]);
-                        } elseif ($chained) {
-                            $tmp = Histories::where('chat_id', '=', $chat->id)
-                                ->select('msg', 'isbot')
-                                ->orderby('created_at')
-                                ->orderby('id', 'desc')
-                                ->get()
-                                ->toJson();
-                        } else {
-                            $tmp = json_encode([['msg' => $input, 'isbot' => false]]);
-                        }
+            }
+            #Model permission checked
+            $start = date('Y-m-d H:i:s');
+            $deltaStart = date('Y-m-d H:i:s', strtotime($start . ' +1 second'));
+            foreach ($chats as $chat) {
+                if (in_array($chat->bot_id, $selectedLLMs)) {
+                    $history = new Histories();
+                    $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false, 'created_at' => $start, 'updated_at' => $start]);
+                    $history->save();
+                    $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
+                    if ((strpos($access_code, 'doc-qa') === 0 || strpos($access_code, 'doc_qa') === 0 || strpos($access_code, 'web_qa') === 0) && !$chained) {
+                        $tmp = json_encode([
+                            [
+                                'msg' => Histories::where('chat_id', '=', $chat->id)
+                                    ->select('msg')
+                                    ->orderby('created_at')
+                                    ->orderby('id', 'desc')
+                                    ->get()
+                                    ->first()->msg,
+                                'isbot' => false,
+                            ],
+                            ['msg' => $request->input('input'), 'isbot' => false],
+                        ]);
+                    } elseif ($chained) {
+                        $tmp = Histories::where('chat_id', '=', $chat->id)
+                            ->select('msg', 'isbot')
+                            ->orderby('created_at')
+                            ->orderby('id', 'desc')
+                            ->get()
+                            ->toJson();
+                    } else {
+                        $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
+                    }
 
-                        $history = new Histories();
-                        $history->fill(['msg' => '* ...thinking... *', 'chained' => $chained, 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $deltaStart, 'updated_at' => $deltaStart]);
-                        $history->save();
-                        RequestChat::dispatch($tmp, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
-                        Redis::rpush('usertask_' . Auth::user()->id, $history->id);
-                    }
+                    $history = new Histories();
+                    $history->fill(['msg' => '* ...thinking... *', 'chained' => $chained, 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $deltaStart, 'updated_at' => $deltaStart]);
+                    $history->save();
+                    RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, Auth::user()->openai_token);
+                    Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                 }
             }
         }
-        return redirect()
-            ->to(route('room.chat', $roomId) . ($request->input('limit') ? '?limit=' . $request->input('limit') : ''))
-            ->with('selLLMs', $selectedLLMs);
+        return redirect()->route('room.chat', $roomId)->with('selLLMs', $selectedLLMs);
     }
 }

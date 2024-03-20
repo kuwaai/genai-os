@@ -76,7 +76,6 @@ fill="currentFill" />
                         $(this).parent().find("div.warning_msg").remove();
                         // Append the list items after the target element
                         $(this).after(listItems.join(''));
-                        console.log(warnings);
                     }
                     $msg = translate_msg(DOMPurify.sanitize($msg));
                 }
@@ -201,7 +200,7 @@ xmlns="http://www.w3.org/2000/svg">
             $prevUserMsg = $prevUser.find('div div div').text().trim()
             $refRecord = $(node).parent().parent().prevAll('div').filter(function() {
                 $msgWindow = $(this).find('div div div.bot-msg');
-                return $msgWindow.length != 0 && $msgWindow.text().trim() == $prevUserMsg;
+                return $msgWindow.length != 0 && `"""${$msgWindow.text().trim()}"""` == $prevUserMsg;
             }).first().find("div div")
             if ($refRecord.length > 0) {
                 if (flag) {
@@ -259,7 +258,7 @@ xmlns="http://www.w3.org/2000/svg">
         $(node).children("svg").addClass("hidden");
         $(node).children("svg").eq(1).removeClass("hidden");
         $(node).prop("disabled", true);
-        const url = '{{ route('chat.translate', '') }}/' + history_id + (model ? "?model=" + model : "");
+        const url = '{{ route('room.translate', '') }}/' + history_id + (model ? "?model=" + model : "");
 
         fetch(url)
             .then(response => {

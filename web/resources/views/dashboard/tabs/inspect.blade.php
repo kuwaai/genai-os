@@ -1,5 +1,5 @@
 @php
-    $histories = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')->join('llms', 'llms.id', '=', 'chats.llm_id');
+    $histories = App\Models\Histories::join('chats', 'chats.id', '=', 'histories.chat_id')->join('bots', 'bots.id', '=', 'chats.bot_id')->join('llms', 'llms.id', '=', 'bots.model_id');
 
     if (session('start_date')) {
         $histories->where('histories.created_at', '>=', session('start_date'));
@@ -19,7 +19,7 @@
         $histories = $histories->whereIn('access_code', session('target'));
     }
     $histories = $histories->where('isbot', '=', true);
-    $histories = $histories->orderby('chats.llm_id')->paginate(15, ['*', 'histories.id as id'], 'page', session('page') ?? 1);
+    $histories = $histories->orderby('chats.bot_id')->paginate(15, ['*', 'histories.id as id'], 'page', session('page') ?? 1);
 @endphp
 <x-chat.functions />
 <div class="w-full overflow-hidden flex">
@@ -43,7 +43,8 @@
             value="{{ session('end_date') }}" onchange="$(this).closest('form').submit()"
             class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
         <label for="inspect_searchbox" class="block uppercase tracking-wide dark:text-white">搜尋訊息</label>
-        <input placeholder="過濾內容" id="inspect_searchbox" name="search" value="{{ session('search') }}" autocomplete="off"
+        <input placeholder="過濾內容" id="inspect_searchbox" name="search" value="{{ session('search') }}"
+            autocomplete="off"
             class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
         <div id="inspect_targetInputsContainer"></div>
         <div class="flex flex-wrap -mx-3">
@@ -106,7 +107,7 @@
                             $outputs[] = $botMsg;
 
                         @endphp
-                        <p class="text-black dark:text-gray-200 text-sm text-center">{{$outputs[0]->created_at}}</p>
+                        <p class="text-black dark:text-gray-200 text-sm text-center">{{ $outputs[0]->created_at }}</p>
                         @foreach ($outputs as $chat_history)
                             <x-chat.message :history="$chat_history" :readonly="true" />
                         @endforeach

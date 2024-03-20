@@ -28,8 +28,6 @@
             <form method="post" action="{{ route('room.new') }}" class="p-6 overflow-hidden flex-1 flex-col flex"
                 id="create_room" onsubmit="return checkForm()">
                 @csrf
-                <input type="hidden" name="limit"
-                    value="{{ request()->input('limit') > 0 ? request()->input('limit') : '0' }}">
                 <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
                     {{ __('room.modal.label') }}</p>
                 <ul class="my-4 space-y-3 overflow-auto scrollbar flex-1">
@@ -66,7 +64,7 @@
                     </div>
                 </div>
                 <span id="create_error" class="font-medium text-sm text-red-800 rounded-lg dark:text-red-400 hidden"
-                    role="alert">{{ __('You must select at least 2 LLMs') }}</span>
+                    role="alert">{{ __('You must select at least 1 LLMs') }}</span>
             </form>
         </div>
     </div>
@@ -74,7 +72,7 @@
 
 <script>
     function checkForm() {
-        if ($("#create_room input[name='llm[]']:checked").length > 1) {
+        if ($("#create_room input[name='llm[]']:checked").length > 0) {
             return true;
         } else {
             $("#create_error").show().delay(3000).fadeOut();

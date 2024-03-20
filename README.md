@@ -1,4 +1,4 @@
-# TAIDE Chat 0.1.0.1
+# TAIDE Chat 0.2.0.0
 ### Implements
 * [Finished] One or more LLMs chatting
 * [Finished] LLM management and internal API with proxy

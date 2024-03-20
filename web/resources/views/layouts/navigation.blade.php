@@ -25,24 +25,17 @@
                         </x-nav-link>
                     </div>
                 @endif
-                @if (Auth::user()->hasPerm('tab_Chat'))
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
-                            {{ __('chat.route') }}
-                        </x-nav-link>
-                    </div>
-                @endif
-                @if (Auth::user()->hasPerm('tab_Archive'))
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
-                            {{ __('archive.route') }}
-                        </x-nav-link>
-                    </div>
-                @endif
                 @if (Auth::user()->hasPerm('tab_Play'))
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
                             {{ __('play.route') }}
+                        </x-nav-link>
+                    </div>
+                @endif
+                @if (Auth::user()->hasPerm('tab_Store'))
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link :href="route('store.home')" :active="request()->routeIs('store.*')">
+                            {{ __('store.route') }}
                         </x-nav-link>
                     </div>
                 @endif
@@ -173,19 +166,14 @@
                     {{ __('room.route') }}
                 </x-responsive-nav-link>
             @endif
-            @if (Auth::user()->hasPerm('tab_Chat'))
-                <x-responsive-nav-link :href="route('chat.home')" :active="request()->routeIs('chat.*')">
-                    {{ __('chat.route') }}
-                </x-responsive-nav-link>
-            @endif
-            @if (Auth::user()->hasPerm('tab_Archive'))
-                <x-responsive-nav-link :href="route('archive.home')" :active="request()->routeIs('archive.*')">
-                    {{ __('archive.route') }}
-                </x-responsive-nav-link>
-            @endif
             @if (Auth::user()->hasPerm('tab_Play'))
                 <x-responsive-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
                     {{ __('play.route') }}
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->hasPerm('tab_Store'))
+                <x-responsive-nav-link :href="route('store.home')" :active="request()->routeIs('store.*')">
+                    {{ __('store.route') }}
                 </x-responsive-nav-link>
             @endif
             @if (Auth::user()->hasPerm('tab_Manage'))

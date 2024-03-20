@@ -24,8 +24,8 @@ class RedirectIfAuthenticated
                 if ($request->input("_token") == null){
                     return response()->noContent();
                 }
-                if (Auth::user()->hasPerm('tab_Chat')){
-                    return redirect()->intended("/chats");
+                if (Auth::user()->hasPerm('tab_Room')){
+                    return redirect()->intended("/room");
                 }else{
                     return redirect()->intended("/");
                 }

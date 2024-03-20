@@ -46,7 +46,7 @@
             </div>
             <!-- Modal body -->
             <div class="p-6">
-                <form id="feedback_form" action="{{ route('chat.feedback') }}" method="post">
+                <form id="feedback_form" action="{{ route('room.feedback') }}" method="post">
                     @csrf
                     <input name="history_id" style="display:none;">
                     <input name="type" style="display:none;">
@@ -128,7 +128,7 @@
                 }
 
             } else {
-                $.post("{{ route('chat.feedback') }}", {
+                $.post("{{ route('room.feedback') }}", {
                     type: type,
                     history_id: id,
                     init: true,
