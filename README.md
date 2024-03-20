@@ -2,7 +2,7 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img target="_blank" src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
+  <img src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
   <br>
   Open GenAI OS
   <br>
@@ -13,7 +13,7 @@
   <a href="http://makeapullrequest.com">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
   </a>
-  <a href="#contributors-">
+  <a href="#">
     <img src="https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square">
   </a>
   <a href="https://laravel.com/docs/10.x/releases">
