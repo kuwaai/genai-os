@@ -23,14 +23,19 @@
 
 <p align="center">
   <a href="#key-features">Key Features</a> •
-  <a href="#dependencies">Dependencies</a> •
-  <a href="#download">Download</a> •
+  <a href="#dependencies">Architecture</a> •
+  <a href="#installation-guide">Installation Guide</a> •
   <a href="#credits">Credits</a> •
   <a href="#support">Support</a> •
   <a href="#license">License</a>
 </p>
 
 ![screenshot](./multi-chat/web/public/images/demo.gif)
+
+## Architecture
+> **WARNING**: This draft is preliminary and subject to further changes.
+
+[![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## Key Features
 * Multi-lingual Support: Kuwa OS provides a turnkey solution for GenAI development and deployment in multiple languages.
@@ -151,7 +156,8 @@ This software uses the following packages and programs:
 - [highlight.js](https://highlightjs.org/)
 - [Nvidia CUDA](https://developer.nvidia.com/cuda-toolkit)
 
-## Special Thanks
+## Acknowledgements
+Many thanks to Taiwan NSTC TAIDE project and AI Academy for their early supports to this project.
 <a href="https://www.nuk.edu.tw/"><img src="./multi-chat/web/public/images/logo_NUK.jpg" height="100px"></a>
 <a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
