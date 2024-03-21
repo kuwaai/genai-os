@@ -49,6 +49,7 @@ class LoginRequest extends FormRequest
     public function authenticate()
     {
         $this->ensureIsNotRateLimited();
+        $this->email = strtolower($this->email);
 
         // Check if the optional file exists
         $optionalFile = __DIR__ . '/LoginRequestOverride.php';
