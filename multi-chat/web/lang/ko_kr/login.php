@@ -17,4 +17,5 @@ return [
     'button.return' => '돌아가기',
     'button.register' => '가입하기',
     'button.resend_auth_email' => '인증 이메일 재전송',
+    'label.account' => '사용자 계정',
 ];

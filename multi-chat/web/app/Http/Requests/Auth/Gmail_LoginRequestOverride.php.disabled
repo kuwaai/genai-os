@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Http\Requests\Auth;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
+class LoginRequestOverride extends FormRequest
+{
+    /**
+     * override the way to auth user
+     */
+    public function auth($email, $password, $remember): bool
+    {
+        $user = User::where('email', '=', $email . "@gmail.com");
+        if ($user->exists()) {
+            $user = $user->first();
+            if (Hash::check($password, $user->password)){
+                Auth::login($user, $remember);
+                return true;
+            }
+        }
+        Hash::make($password);
+        return false;
+
+    }
+}
