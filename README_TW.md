@@ -3,9 +3,9 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
+  <img src="./multi-chat/web/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
-  Open GenAI OS
+  Kuwa GenAI OS
   <br>
 </h1>
 
@@ -39,19 +39,19 @@
 [![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## 關鍵功能
-* 多語言支援: Kuwa OS 提供了多語言的 GenAI 開發和部署一站式解決方案。
+* 多語言支援: Kuwa GenAI OS 提供了多語言的 GenAI 開發和部署一站式解決方案。
 
 * 多模型聊天功能: 使用者可以享受同時多聊、引用、完整提示列表的導入/導出/共享等功能。
 
-* 靈活的提示詞編排: Kuwa OS 允許靈活編排提示詞、RAG、機器人、模型和硬體/GPU。
+* 靈活的提示詞編排: Kuwa GenAI OS 允許靈活編排提示詞、RAG、機器人、模型和硬體/GPU。
 
 * 硬體支援: 支援虛擬主機、筆記型電腦、個人電腦、伺服器和雲端等。
 
 * 深色/淺色模式: 提供深色和淺色模式供使用者選擇。
 
-* 跨平台相容性: Kuwa OS 現在和 Windows 和 Linux 相容，可在不同平台上使用。
+* 跨平台相容性: Kuwa GenAI OS 現在和 Windows 和 Linux 相容，可在不同平台上使用。
 
-* 開源: Kuwa OS 是一個開源項目，允許開發人員貢獻並根據自己的需求定製系統。
+* 開源: Kuwa GenAI OS 是一個開源項目，允許開發人員貢獻並根據自己的需求定製系統。
 
 ## 依賴套件
 
@@ -115,11 +115,11 @@
 6. **連線到應用程式:**
    - 首先您需要創建一個管理員帳號，前往 `multi-chat/web/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
-   - 使用您的管理員帳號登錄，開始使用Open GenAI OS
+   - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
 
 ## 下載
 
-您可以[下載](https://github.com/kuwaai/gai-os/releases)最新版本的開源GenAI OS，支持Windows和Linux。
+您可以[下載](https://github.com/kuwaai/gai-os/releases)最新版本的Kuwa GenAI OS，支持Windows和Linux。
 
 ## 社區
 
@@ -161,7 +161,7 @@
 <a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
 <a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://moda.gov.tw/"><img src="./multi-chat/web/public/images/logo_moda.png" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.png" height="100px"></a>
 
 ## 授權條款
 [MIT](./LICENSE)
