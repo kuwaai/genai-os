@@ -17,4 +17,5 @@ return [
     'button.return' => 'Return',
     'button.register' => 'Register',
     'button.resend_auth_email' => 'Resend Verification Email',
+    'label.account' => 'User Account',
 ];

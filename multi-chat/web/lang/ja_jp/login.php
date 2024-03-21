@@ -17,4 +17,5 @@ return [
     'button.return' => '戻る',
     "button.register"=>"登録",
     'button.resend_auth_email' => '認証メールを再送',
+    'label.account' => 'ユーザーアカウント',
 ];
