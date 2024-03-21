@@ -19,4 +19,5 @@ return [
     'button.return_home' => 'Retour à la page d\'accueil',
     'under_maintenance.label' => 'Nous effectuons actuellement des travaux de maintenance sur le site.<br>Merci de revenir plus tard !',
     'under_maintenance.header' => 'Service temporairement suspendu',
+    "opensource" => "Open Source",
 ];
