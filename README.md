@@ -3,9 +3,9 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img src="./multi-chat/web/public/images/kuwa.png" alt="Kuwa OS" width="200"></a>
+  <img src="./multi-chat/web/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
-  Kuwa OS
+  Kuwa GenAI OS
   <br>
 </h1>
 
@@ -40,19 +40,19 @@
 [![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## Key Features
-* Multi-lingual Support: Kuwa OS provides a turnkey solution for GenAI development and deployment in multiple languages.
+* Multi-lingual Support: Kuwa GenAI OS provides a turnkey solution for GenAI development and deployment in multiple languages.
 
 * Advanced Chat Features: Users can enjoy concurrent multi-chat, quoting, full prompt-list import/export/share, and more.
 
-* Flexible Prompt Orchestration: Kuwa OS allows flexible orchestration of prompts, RAGs, bots, models, and hardware/GPUs.
+* Flexible Prompt Orchestration: Kuwa GenAI OS allows flexible orchestration of prompts, RAGs, bots, models, and hardware/GPUs.
 
 * Hardware Support: Supports heterogeneous hardware from virtual hosts, laptops, PCs, servers to the cloud.
 
 * Dark/Light Mode: Offers both dark and light mode for user preference.
 
-* Cross-Platform Compatibility: Kuwa OS is now compatible with Windows, and Linux, making it accessible across different platforms.
+* Cross-Platform Compatibility: Kuwa GenAI OS is now compatible with Windows, and Linux, making it accessible across different platforms.
 
-* Open-Source: Kuwa OS is an open-source project, allowing developers to contribute and customize the system to their needs.
+* Open-Source: Kuwa GenAI OS is an open-source project, allowing developers to contribute and customize the system to their needs.
 
 ## Dependencies
 
@@ -116,13 +116,13 @@ Before continue, Please make sure you have installed all the dependency programs
 6. **Access the application:**
    - First you need to seed a account, go `multi-chat/web/` and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
    - Open your web browser and go to the application's URL.
-   - Login with your admin account and start using Kuwa OS
+   - Login with your admin account and start using Kuwa GenAI OS
 
 This should get your project up and running.
 
 ## Download
 
-You can [download](https://github.com/kuwaai/gai-os/releases) the latest release of Kuwa OS for Windows and Linux.
+You can [download](https://github.com/kuwaai/gai-os/releases) the latest release of Kuwa GenAI OS for Windows and Linux.
 
 ## Community
 

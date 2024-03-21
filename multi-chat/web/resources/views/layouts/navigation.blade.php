@@ -100,7 +100,11 @@
                         <div data-dropdown-toggle="language-dropdown-menu" data-dropdown-trigger="hover"
                             data-dropdown-delay="100"
                             class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
-                            {{ $languages[session('locale') ?? config('app.locale')] }}
+                            <div class="flex items-center">
+                                <i class="fas fa-language mr-2"></i>
+                                <p>{{ $languages[session('locale') ?? config('app.locale')] }}</p>
+                                <i class="fas fa-chevron-up mx-2 rotate-180" style="font-size:14px;"></i>
+                            </div>
                         </div>
                         <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800"
                             id="language-dropdown-menu">
@@ -211,7 +215,11 @@
                 <button type="button" data-dropdown-toggle="language-dropdown-menu2" data-dropdown-trigger="hover"
                     data-dropdown-delay="100"
                     class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out">
-                    {{ $languages[session('locale') ?? config('app.locale')] }}
+                    <div class="flex items-center">
+                        <i class="fas fa-language mr-2"></i>
+                        <p>{{ $languages[session('locale') ?? config('app.locale')] }}</p>
+                        <i class="fas fa-chevron-up mx-2 rotate-180" style="font-size:14px;"></i>
+                    </div>
                 </button>
                 <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700"
                     id="language-dropdown-menu2">
