@@ -1,6 +1,6 @@
 @props(['result'])
 
-@foreach (App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('chatrooms.*', DB::raw('array_agg(chats.bot_id ORDER BY chats.bot_id) as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('chatrooms.id')->get()->groupBy('identifier') as $DC)
+@foreach (App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('chatrooms.*', DB::raw( (config('database.default') == 'sqlite' ? 'GROUP_CONCAT(chats.llm_id, ",")' : 'array_agg(chats.bot_id ORDER BY chats.bot_id)') . ' as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('chatrooms.id')->get()->groupBy('identifier') as $DC)
     <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
         @if (request()->user()->hasPerm('Room_update_new_chat'))
             <form method="post" action="{{ route('room.new') }}">
