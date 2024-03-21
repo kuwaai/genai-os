@@ -18,6 +18,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('css/font_awesome..all.min.css') }}" />
 
     <!-- Styles -->
     <link href="{{ asset('css/flowbite.min.css') }}" rel="stylesheet" />
@@ -70,7 +71,11 @@
                 <button type="button" data-dropdown-toggle="language-dropdown-menu" data-dropdown-trigger="hover"
                     data-dropdown-delay="100"
                     class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">
-                    {{ $languages[session('locale') ?? config('app.locale')] }}
+                    <div class="flex items-center">
+                        <i class="fas fa-language mr-2"></i>
+                        <p>{{ $languages[session('locale') ?? config('app.locale')] }}</p>
+                        <i class="fas fa-chevron-up mx-2 rotate-180" style="font-size:14px;"></i>
+                    </div>
                 </button>
             </div>
         @endif
