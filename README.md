@@ -126,19 +126,19 @@ You can [download](https://github.com/kuwaai/gai-os/releases) the latest release
 
 ## Community
 
-[Discord](https://github.com/amitmerchant1990/markdownify-web) - Kuwa AI Discord community server
+[Discord](https://discord.gg/4HxYAkvdu5) - Kuwa AI Discord community server
 
 [Facebook](https://www.facebook.com/groups/g.kuwaai.org) - Kuwa AI Community
 
 [Facebook](https://www.facebook.com/groups/g.kuwaai.tw) - Kuwa AI 臺灣社群
 
-[Google Group](https://groups.google.com/g/kuwaai-dev) - kuwa-dev
+[Google Group](https://groups.google.com/g/kuwa-dev) - kuwa-dev
 
 ## Announcement
 
 [Facebook](https://www.facebook.com/kuwaai) - Kuwa AI
 
-[Google Group](https://groups.google.com/g/kuwaai-announce) - kuwa-announce
+[Google Group](https://groups.google.com/g/kuwa-announce) - kuwa-announce
 
 ## Support
 

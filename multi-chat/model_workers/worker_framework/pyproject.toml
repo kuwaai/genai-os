@@ -17,9 +17,9 @@ classifiers = [
 ]
 dependencies=[
   'uvicorn[standard]==0.23.2',
-  'starlette==0.31.1',
+  'starlette>=0.31.1',
   'sse-starlette==1.6.5',
-  'python-multipart==0.0.6',
+  'python-multipart>=0.0.6',
   'pyyaml==6.0.1',
   'requests==2.31.0',
   'dacite==1.8.1',
