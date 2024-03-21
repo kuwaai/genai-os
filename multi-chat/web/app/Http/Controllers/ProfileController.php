@@ -35,18 +35,8 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        if (
-            $request
-                ->user()
-                ->tokens()
-                ->where('name', 'API_Token')
-                ->count() != 1
-        ) {
-            $request
-                ->user()
-                ->tokens()
-                ->where('name', 'API_Token')
-                ->delete();
+        if ($request->user()->tokens()->where('name', 'API_Token')->count() != 1) {
+            $request->user()->tokens()->where('name', 'API_Token')->delete();
             $request->user()->createToken('API_Token', ['access_api']);
         }
 
@@ -198,27 +188,24 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $status = [];
-        if ($request->validated()) {
-            if ($request->validated()['name']) {
-                if ($request->user()->hasPerm('Profile_update_name')) {
-                    $request->user()->name = $request->validated()['name'];
-                } else {
-                    return Redirect::route('profile.edit')->with('status', 'no-changes');
-                }
-            }
-            if ($request->validated()['email']) {
-                if ($request->user()->hasPerm('Profile_update_email')) {
-                    $request->user()->email = $request->validated()['email'];
-                } else {
-                    return Redirect::route('profile.edit')->with('status', 'no-changes');
-                }
+        $validatedData = $request->validated();
+
+        if (!empty($validatedData)) {
+            $user = $request->user();
+
+            if (isset($validatedData['name']) && $user->hasPerm('Profile_update_name')) {
+                $user->name = $validatedData['name'];
             }
 
-            if ($request->user()->isDirty('email') || $request->user()->isDirty('name')) {
-                if ($request->user()->isDirty('email')) {
-                    $request->user()->email_verified_at = null;
+            if (isset($validatedData['email']) && $user->hasPerm('Profile_update_email')) {
+                $user->email = $validatedData['email'];
+            }
+
+            if ($user->isDirty('email') || $user->isDirty('name')) {
+                if ($user->isDirty('email')) {
+                    $user->email_verified_at = null;
                 }
-                $request->user()->save();
+                $user->save();
                 return Redirect::route('profile.edit')->with('status', 'profile-updated');
             }
         }
@@ -228,14 +215,11 @@ class ProfileController extends Controller
 
     public function chatgpt_update(Request $request)
     {
-        if (!$request->user()->forDemo) {
-            $request
-                ->user()
-                ->fill(['openai_token' => $request->input('openai_token')])
-                ->save();
-            return Redirect::route('profile.edit')->with('status', 'chatgpt-token-updated');
-        }
-        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
+        $request
+            ->user()
+            ->fill(['openai_token' => $request->input('openai_token')])
+            ->save();
+        return Redirect::route('profile.edit')->with('status', 'chatgpt-token-updated');
     }
 
     /**
@@ -243,17 +227,10 @@ class ProfileController extends Controller
      */
     public function renew(Request $request): RedirectResponse
     {
-        if (!$request->user()->forDemo) {
-            $request
-                ->user()
-                ->tokens()
-                ->where('name', 'API_Token')
-                ->delete();
-            $request->user()->createToken('API_Token', ['access_api']);
+        $request->user()->tokens()->where('name', 'API_Token')->delete();
+        $request->user()->createToken('API_Token', ['access_api']);
 
-            return Redirect::route('profile.edit')->with('status', 'apiToken-updated');
-        }
-        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
+        return Redirect::route('profile.edit')->with('status', 'apiToken-updated');
     }
 
     /**
@@ -261,24 +238,21 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        if (!$request->user()->forDemo) {
-            $request->validateWithBag('userDeletion', [
-                'password' => ['required', 'current-password'],
-            ]);
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current-password'],
+        ]);
 
-            $user = $request->user();
+        $user = $request->user();
 
-            Auth::logout();
+        Auth::logout();
 
-            $user->tokens()->delete();
-            $user->delete();
+        $user->tokens()->delete();
+        $user->delete();
 
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-            return Redirect::to('/');
-        }
-        return Redirect::route('profile.edit')->with('status', 'failed-demo-acc');
+        return Redirect::to('/');
     }
 
     public function api_auth(Request $request)
@@ -351,11 +325,11 @@ class ProfileController extends Controller
                                 $line = '';
                                 while (!$stream->eof()) {
                                     $char = $stream->read(1);
-                                
+
                                     if ($char === "\n") {
                                         $line = trim($line);
                                         if (substr($line, 0, 5) === 'data:') {
-                                            $jsonData = (object)json_decode(trim(substr($line, 5)));
+                                            $jsonData = (object) json_decode(trim(substr($line, 5)));
                                             if ($jsonData !== null) {
                                                 $resp['choices'][0]['delta']['content'] = $jsonData->msg;
                                                 echo 'data: ' . json_encode($resp) . "\n";
@@ -371,7 +345,7 @@ class ProfileController extends Controller
                                                 break;
                                             }
                                         }
-                                        $line = "";
+                                        $line = '';
                                     } else {
                                         $line .= $char;
                                     }
@@ -424,10 +398,10 @@ class ProfileController extends Controller
             $user = $result->first();
             if (User::find($user->id)->hasPerm('Chat_read_access_to_api')) {
                 $list = \Illuminate\Support\Facades\Redis::lrange('api_' . $user->tokenable_id, 0, -1);
-                $integers = array_map(function($element) {
-                    return is_string($element) ? -((int)$element) : null;
+                $integers = array_map(function ($element) {
+                    return is_string($element) ? -((int) $element) : null;
                 }, $list);
-                $integers = array_filter($integers, function($element) {
+                $integers = array_filter($integers, function ($element) {
                     return $element !== null;
                 });
                 $client = new Client(['timeout' => 300]);
