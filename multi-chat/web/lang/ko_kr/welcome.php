@@ -19,4 +19,5 @@ return [
     'button.return_home' => '홈으로 돌아가기',
     'under_maintenance.label' => '웹 사이트 유지 보수 중입니다.<br>잠시 후 다시 방문해주세요!',
     'under_maintenance.header' => '서비스 일시 중지',
+    "opensource" => "오픈소스",
 ];

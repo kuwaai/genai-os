@@ -19,4 +19,5 @@ return [
     'button.return_home' => '回首頁',
     'under_maintenance.label' => '我們正在進行網站維護，<br>請稍後再回來看看！',
     'under_maintenance.header' => '暫停服務',
+    "opensource" => "開放原始碼",
 ];
