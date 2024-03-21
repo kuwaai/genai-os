@@ -125,9 +125,9 @@
 
 [Discord](https://github.com/amitmerchant1990/markdownify-web) - Kuwa AI Discord 社區伺服器
 
-[Facebook](https://www.facebook.com/groups/kuwaai.org) - Kuwa AI 社區
+[Facebook](https://www.facebook.com/groups/g.kuwaai.org) - Kuwa AI 社區
 
-[Facebook](https://www.facebook.com/groups/kuwaai.tw) - Kuwa AI 臺灣社群
+[Facebook](https://www.facebook.com/groups/g.kuwaai.tw) - Kuwa AI 臺灣社群
 
 [Google Group](https://groups.google.com/g/kuwaai-dev) - kuwa-dev
 
@@ -141,7 +141,7 @@
 
 我們團隊目前只有兩個人，如果您對我們合力開發的這個專案感興趣，可以一起協助我們開發，幫助我們把這個開源專案做的更好，如果您願意協助，請不要猶豫，隨時與我們聯繫！
 
-## 貢獻者
+## 套件與程式
 
 該專案用到了以下套件和程式：
 
