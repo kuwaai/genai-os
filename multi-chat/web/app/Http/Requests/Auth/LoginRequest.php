@@ -28,10 +28,17 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
-        ];
+        if (config('app.Email_Required')){
+            return [
+                'email' => ['required', 'string', 'email'],
+                'password' => ['required', 'string'],
+            ];
+        }else{
+            return [
+                'email' => ['required', 'string'],
+                'password' => ['required', 'string'],
+            ];
+        }
     }
 
     /**
@@ -42,6 +49,19 @@ class LoginRequest extends FormRequest
     public function authenticate()
     {
         $this->ensureIsNotRateLimited();
+
+        // Check if the optional file exists
+        $optionalFile = __DIR__ . '/LoginRequestOverride.php';
+        if (file_exists($optionalFile)) {
+            include_once $optionalFile;
+            $overrideClass = new LoginRequestOverride();
+            $result = $overrideClass->auth($this->email, $this->password, $this->filled('remember'));
+            if ($result){
+                RateLimiter::clear($this->throttleKey());
+            }else{
+                RateLimiter::hit($this->throttleKey());
+            }
+        }
 
         $credentials = [
             'mail' => $this->email,
@@ -64,7 +84,7 @@ class LoginRequest extends FormRequest
                 Auth::user()->markEmailAsVerified();
             }
             $user = Auth::user();
-            if (preg_match('/^\$2a\$/', $user->password)){
+            if (preg_match('/^\$2a\$/', $user->password)) {
                 //rehash
                 $user->password = Hash::make($this->password);
                 $user->save();
@@ -72,7 +92,7 @@ class LoginRequest extends FormRequest
         } catch (\Illuminate\Database\UniqueConstraintViolationException) {
             #This means the user are already in the database record, But LDAP also have the same user,
             #Here we decide to override the Server DB's record
-            User::where("email",$this->email)->delete();
+            User::where('email', $this->email)->delete();
             if (!Auth::attempt($credentials, $this->filled('remember'))) {
                 RateLimiter::hit($this->throttleKey());
 

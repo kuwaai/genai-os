@@ -17,4 +17,5 @@ return [
     'button.return' => 'Zurück',
     'button.register' => 'Registrieren',
     'button.resend_auth_email' => 'Bestätigungsmail erneut senden',
+    'label.account' => 'Benutzerkonto',
 ];

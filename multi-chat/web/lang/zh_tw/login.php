@@ -17,4 +17,5 @@ return [
     'button.return' => '返回',
     "button.register"=>"註冊",
     'button.resend_auth_email' => '重送驗證信',
+    'label.account' => '使用者帳號',
 ];
