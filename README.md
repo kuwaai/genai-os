@@ -3,9 +3,9 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
+  <img src="./multi-chat/web/public/images/kuwa.png" alt="Kuwa OS" width="200"></a>
   <br>
-  Open GenAI OS
+  Kuwa OS
   <br>
 </h1>
 
@@ -116,13 +116,13 @@ Before continue, Please make sure you have installed all the dependency programs
 6. **Access the application:**
    - First you need to seed a account, go `multi-chat/web/` and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
    - Open your web browser and go to the application's URL.
-   - Login with your admin account and start using Open GenAI OS
+   - Login with your admin account and start using Kuwa OS
 
 This should get your project up and running.
 
 ## Download
 
-You can [download](https://github.com/kuwaai/gai-os/releases) the latest release of Open GenAI OS for Windows and Linux.
+You can [download](https://github.com/kuwaai/gai-os/releases) the latest release of Kuwa OS for Windows and Linux.
 
 ## Community
 
@@ -164,7 +164,7 @@ Many thanks to Taiwan NSTC TAIDE project and AI Academy for their early supports
 <a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
 <a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://moda.gov.tw/"><img src="./multi-chat/web/public/images/logo_moda.png" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.png" height="100px"></a>
 
 ## License
 [MIT](./LICENSE)

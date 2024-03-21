@@ -3,9 +3,9 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img src="./multi-chat/web/public/images/kuwa.png" alt="Open GenAI OS" width="200"></a>
+  <img src="./multi-chat/web/public/images/kuwa.png" alt="Kuwa OS" width="200"></a>
   <br>
-  Open GenAI OS
+  Kuwa OS
   <br>
 </h1>
 
@@ -115,11 +115,11 @@
 6. **連線到應用程式:**
    - 首先您需要創建一個管理員帳號，前往 `multi-chat/web/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
-   - 使用您的管理員帳號登錄，開始使用Open GenAI OS
+   - 使用您的管理員帳號登錄，開始使用Kuwa OS
 
 ## 下載
 
-您可以[下載](https://github.com/kuwaai/gai-os/releases)最新版本的開源GenAI OS，支持Windows和Linux。
+您可以[下載](https://github.com/kuwaai/gai-os/releases)最新版本的Kuwa OS，支持Windows和Linux。
 
 ## 社區
 
@@ -161,7 +161,7 @@
 <a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
 <a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://moda.gov.tw/"><img src="./multi-chat/web/public/images/logo_moda.png" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.png" height="100px"></a>
 
 ## 授權條款
 [MIT](./LICENSE)
