@@ -125,9 +125,9 @@
 
 [Discord](https://github.com/amitmerchant1990/markdownify-web) - Kuwa AI Discord 社區伺服器
 
-[Facebook](https://www.facebook.com/groups/kuwaai.org) - Kuwa AI 社區
+[Facebook](https://www.facebook.com/groups/g.kuwaai.org) - Kuwa AI 社區
 
-[Facebook](https://www.facebook.com/groups/kuwaai.tw) - Kuwa AI 臺灣社群
+[Facebook](https://www.facebook.com/groups/g.kuwaai.tw) - Kuwa AI 臺灣社群
 
 [Google Group](https://groups.google.com/g/kuwaai-dev) - kuwa-dev
 
