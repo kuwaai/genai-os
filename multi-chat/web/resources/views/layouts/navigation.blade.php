@@ -90,44 +90,6 @@
                                 {{ __('profile.route') }}
                             </x-dropdown-link>
                         @endif
-                        <div data-dropdown-toggle="language-dropdown-menu" data-dropdown-trigger="hover"
-                            data-dropdown-delay="100"
-                            class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
-                            <div class="flex items-center">
-                                <i class="fas fa-language mr-2"></i>
-                                <p>{{ $languages[session('locale') ?? config('app.locale')] }}</p>
-                                <i class="fas fa-chevron-up mx-2 rotate-180" style="font-size:14px;"></i>
-                            </div>
-                        </div>
-                        <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800"
-                            id="language-dropdown-menu">
-                            <ul class="py-2 font-medium" role="none">
-                                @foreach ($languages as $key => $value)
-                                    @unless ($key == session('locale', config('app.locale')))
-                                        <li>
-                                            <a href="#" onclick="changeLanguage('{{ $key }}')"
-                                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                role="menuitem">
-                                                <div class="inline-flex items-center">
-                                                    {{ $value }}
-                                                </div>
-                                            </a>
-                                        </li>
-                                    @endunless
-                                @endforeach
-                                <script>
-                                    function changeLanguage(locale) {
-                                        $.ajax({
-                                            url: '/lang/' + locale,
-                                            type: 'GET',
-                                            success: function() {
-                                                location.reload();
-                                            }
-                                        });
-                                    }
-                                </script>
-                            </ul>
-                        </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
 
@@ -136,7 +98,44 @@
                                                 this.closest('form').submit();">
                                 {{ __('login.button.sign_out') }}
                             </x-dropdown-link>
-                        </form>
+                        </form><div data-dropdown-toggle="language-dropdown-menu" data-dropdown-trigger="hover"
+                        data-dropdown-delay="100"
+                        class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
+                        <div class="flex items-center">
+                            <i class="fas fa-language mr-2"></i>
+                            <p>{{ $languages[session('locale') ?? config('app.locale')] }}</p>
+                            <i class="fas fa-chevron-up mx-2 rotate-180" style="font-size:14px;"></i>
+                        </div>
+                    </div>
+                    <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800"
+                        id="language-dropdown-menu">
+                        <ul class="py-2 font-medium" role="none">
+                            @foreach ($languages as $key => $value)
+                                @unless ($key == session('locale', config('app.locale')))
+                                    <li>
+                                        <a href="#" onclick="changeLanguage('{{ $key }}')"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                                            role="menuitem">
+                                            <div class="inline-flex items-center">
+                                                {{ $value }}
+                                            </div>
+                                        </a>
+                                    </li>
+                                @endunless
+                            @endforeach
+                            <script>
+                                function changeLanguage(locale) {
+                                    $.ajax({
+                                        url: '/lang/' + locale,
+                                        type: 'GET',
+                                        success: function() {
+                                            location.reload();
+                                        }
+                                    });
+                                }
+                            </script>
+                        </ul>
+                    </div>
                     </x-slot>
                 </x-dropdown>
             </div>
@@ -200,6 +199,29 @@
                         {{ __('profile.route') }}
                     </x-responsive-nav-link>
                 @endif
+                @if (env('INFORMATION_URL'))
+                    <a class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
+                        href="{{ env('INFORMATION_URL') }}" target="_blank">{{ __('welcome.button.information') }}</a>
+                @endif
+                @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
+                    <button
+                        class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
+                        onclick="$modal1.show();">{{ __('manage.label.anno') }}</button>
+                @endif
+                @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
+                    <button
+                        class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
+                        onclick="$modal2.show();">{{ __('manage.label.tos') }}</button>
+                @endif
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+
+                    <x-responsive-nav-link :href="route('logout')"
+                        onclick="event.preventDefault();
+                                        this.closest('form').submit();">
+                        {{ __('login.button.sign_out') }}
+                    </x-responsive-nav-link>
+                </form>
                 <button type="button" data-dropdown-toggle="language-dropdown-menu2" data-dropdown-trigger="hover"
                     data-dropdown-delay="100"
                     class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out">
@@ -227,29 +249,6 @@
                         @endforeach
                     </ul>
                 </div>
-                @if (env('INFORMATION_URL'))
-                    <a class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
-                        href="{{ env('INFORMATION_URL') }}" target="_blank">{{ __('welcome.button.information') }}</a>
-                @endif
-                @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
-                    <button
-                        class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
-                        onclick="$modal1.show();">{{ __('manage.label.anno') }}</button>
-                @endif
-                @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
-                    <button
-                        class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
-                        onclick="$modal2.show();">{{ __('manage.label.tos') }}</button>
-                @endif
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('login.button.sign_out') }}
-                    </x-responsive-nav-link>
-                </form>
             </div>
         </div>
     </div>
