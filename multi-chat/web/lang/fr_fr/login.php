@@ -17,4 +17,5 @@ return [
     'button.return' => 'Retour',
     "button.register"=>"S'inscrire",
     'button.resend_auth_email' => 'Renvoyer l\'e-mail d\'authentification',
+    'label.account' => 'compte utilisateur',
 ];
