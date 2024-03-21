@@ -17,4 +17,5 @@ return [
     'button.return' => 'Zpět',
     "button.register"=>"Registrovat",
     'button.resend_auth_email' => 'Znovu odeslat ověřovací e-mail',
+    'label.account' => 'uživatelský účet',
 ];
