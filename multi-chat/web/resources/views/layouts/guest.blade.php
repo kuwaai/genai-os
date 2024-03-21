@@ -10,6 +10,7 @@
         <!-- Fonts -->
         <link href="{{asset('css/fontBunny.css')}}" rel="stylesheet" />
         <link href="{{asset('css/flowbite.min.css')}}" rel="stylesheet" />
+        <link rel="stylesheet" href="{{ asset('css/font_awesome..all.min.css') }}" />
 
         <!-- Scripts -->
         <script src="{{asset('js/flowbite.min.js')}}"></script>
