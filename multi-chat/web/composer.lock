@@ -1612,16 +1612,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.48.3",
+            "version": "v10.48.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "5791c052b41c6b593556adc687076bfbdd13c501"
+                "reference": "7e0701bf59cb76a51f7c1f7bea51c0c0c29c0b72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/5791c052b41c6b593556adc687076bfbdd13c501",
-                "reference": "5791c052b41c6b593556adc687076bfbdd13c501",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/7e0701bf59cb76a51f7c1f7bea51c0c0c29c0b72",
+                "reference": "7e0701bf59cb76a51f7c1f7bea51c0c0c29c0b72",
                 "shasum": ""
             },
             "require": {
@@ -1726,7 +1726,7 @@
                 "league/flysystem-sftp-v3": "^3.0",
                 "mockery/mockery": "^1.5.1",
                 "nyholm/psr7": "^1.2",
-                "orchestra/testbench-core": "^8.18",
+                "orchestra/testbench-core": "^8.23.4",
                 "pda/pheanstalk": "^4.0",
                 "phpstan/phpstan": "^1.4.7",
                 "phpunit/phpunit": "^10.0.7",
@@ -1815,7 +1815,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2024-03-15T10:17:07+00:00"
+            "time": "2024-03-21T13:36:36+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -7415,16 +7415,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.13",
+            "version": "10.5.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "20a63fc1c6db29b15da3bd02d4b6cf59900088a7"
+                "reference": "4cf8824bab39c2dd57b57b9f6332f7135e2a3a49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/20a63fc1c6db29b15da3bd02d4b6cf59900088a7",
-                "reference": "20a63fc1c6db29b15da3bd02d4b6cf59900088a7",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4cf8824bab39c2dd57b57b9f6332f7135e2a3a49",
+                "reference": "4cf8824bab39c2dd57b57b9f6332f7135e2a3a49",
                 "shasum": ""
             },
             "require": {
@@ -7496,7 +7496,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.13"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.14"
             },
             "funding": [
                 {
@@ -7512,7 +7512,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-03-12T15:37:41+00:00"
+            "time": "2024-03-21T07:31:09+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -8868,5 +8868,5 @@
         "php": "^8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.6.0"
 }

@@ -19,4 +19,5 @@ return [
      'button.return_home' => '回首页',
      'under_maintenance.label' => '我们正在进行网站维护，<br>请稍后再回来看看！ ',
      'under_maintenance.header' => '暂停服务',
+     "opensource" => "开放原始码",
 ];
