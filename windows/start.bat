@@ -4,8 +4,16 @@ REM Include variables from separate file
 call variables.bat
 
 REM Start Kuwa workers
+
+REM Redis Server
+
+pushd %redis_folder%
+start /b start.bat
+popd
+
 REM Define number of workers
 set numWorkers=10
+
 REM Redis workers
 for /l %%i in (1,1,%numWorkers%) do (
 	echo Started a model worker
@@ -27,19 +35,6 @@ curl -s -o nul http://127.0.0.1:9000
 if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
-REM LLMs
-REM start /b b.11.0.0-4bits.py
-REM start /b chatgpt.py
-REM start /b b.11.0.0-llama_cpp_q4_0.py
-
-REM RAG Applications
-REM cd RAG
-REM start /b win_run_webqa.bat
-REM start /b win_run_docqa.bat
-REM start /b win_run_govqa.bat
-REM start /b win_run_nstc_searchqa.bat
-REM tart /b win_run_searchqa.bat
-
 REM Start web
 start http://127.0.0.1
 
@@ -66,3 +61,4 @@ taskkill /F /IM "nginx.exe"
 taskkill /F /IM "php-cgi.exe"
 taskkill /F /IM "php.exe"
 taskkill /F /IM "python.exe"
+taskkill /F /IM "redis-server.exe"

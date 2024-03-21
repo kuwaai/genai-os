@@ -19,4 +19,5 @@ return [
     'button.return_home' => 'Return Home',
     'under_maintenance.label' => 'We\'re under maintenance, <br>Please come back later.',
     'under_maintenance.header' => 'Under Maintenance',
+    "opensource" => "Open Source",
 ];

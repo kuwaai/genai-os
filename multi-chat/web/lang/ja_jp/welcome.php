@@ -19,4 +19,5 @@ return [
     'button.return_home' => 'ホームに戻る',
     'under_maintenance.label' => 'サイトのメンテナンス中です、<br>しばらくしてから再度お試しください！',
     'under_maintenance.header' => 'サービス停止中',
+    "opensource" => "オープンソース",
 ];
