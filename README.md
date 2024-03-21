@@ -144,7 +144,7 @@ You can [download](https://github.com/kuwaai/gai-os/releases) the latest release
 
 We're a small team of two, passionate about our project. If you're interested in what we've built, we'd love your contributions to help make our open-source project even better and more robust. Please don't hesitate to reach out if you're willing to lend a hand!
 
-## Credits
+## Package and Programs
 
 This software uses the following packages and programs:
 
@@ -164,7 +164,7 @@ Many thanks to Taiwan NSTC TAIDE project and AI Academy for their early supports
 <a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
 <a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.png" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.jpg" height="100px"></a>
 
 ## License
 [MIT](./LICENSE)

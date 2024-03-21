@@ -4,8 +4,13 @@ REM Include variables from separate file
 call variables.bat
 
 REM Start Kuwa workers
+
+REM Redis Server
+start /b %redis_folder%\start.bat
+
 REM Define number of workers
 set numWorkers=10
+
 REM Redis workers
 for /l %%i in (1,1,%numWorkers%) do (
 	echo Started a model worker
