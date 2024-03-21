@@ -164,7 +164,7 @@ Many thanks to Taiwan NSTC TAIDE project and AI Academy for their early supports
 <a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
 <a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.png" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.jpg" height="100px"></a>
 
 ## License
 [MIT](./LICENSE)
