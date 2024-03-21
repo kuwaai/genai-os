@@ -198,27 +198,24 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $status = [];
-        if ($request->validated()) {
-            if ($request->validated()['name']) {
-                if ($request->user()->hasPerm('Profile_update_name')) {
-                    $request->user()->name = $request->validated()['name'];
-                } else {
-                    return Redirect::route('profile.edit')->with('status', 'no-changes');
-                }
-            }
-            if ($request->validated()['email']) {
-                if ($request->user()->hasPerm('Profile_update_email')) {
-                    $request->user()->email = $request->validated()['email'];
-                } else {
-                    return Redirect::route('profile.edit')->with('status', 'no-changes');
-                }
-            }
+        $validatedData = $request->validated();
 
-            if ($request->user()->isDirty('email') || $request->user()->isDirty('name')) {
-                if ($request->user()->isDirty('email')) {
-                    $request->user()->email_verified_at = null;
+        if (!empty($validatedData)) {
+            $user = $request->user();
+        
+            if (isset($validatedData['name']) && $user->hasPerm('Profile_update_name')) {
+                $user->name = $validatedData['name'];
+            }
+        
+            if (isset($validatedData['email']) && $user->hasPerm('Profile_update_email')) {
+                $user->email = $validatedData['email'];
+            }
+        
+            if ($user->isDirty('email') || $user->isDirty('name')) {
+                if ($user->isDirty('email')) {
+                    $user->email_verified_at = null;
                 }
-                $request->user()->save();
+                $user->save();
                 return Redirect::route('profile.edit')->with('status', 'profile-updated');
             }
         }
