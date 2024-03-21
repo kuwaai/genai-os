@@ -19,4 +19,5 @@ return [
     'button.return_home' => 'Zpět na úvodní stránku',
     'under_maintenance.label' => 'Probíhá údržba webu,<br>zkuste to prosím později!',
     'under_maintenance.header' => 'Služba pozastavena',
+    "opensource" => "Open Source",
 ];
