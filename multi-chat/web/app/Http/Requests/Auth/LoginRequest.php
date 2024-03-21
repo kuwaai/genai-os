@@ -61,6 +61,9 @@ class LoginRequest extends FormRequest
                 RateLimiter::clear($this->throttleKey());
             } else {
                 RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => __('auth.failed'),
+                ]);
             }
         } else {
             $credentials = [
