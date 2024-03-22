@@ -66,7 +66,10 @@ To run this application, ensure you have the following dependencies installed on
 Please follow these steps to set up and run the project on both Windows and Linux:
 
 ## Installation Guide
-Before continuing, please make sure you have installed all the dependency programs listed above.
+
+We have a [portable version for Windows](./windows/README.md), only tested with Windows 10 x64. If you'd like to try it out easily, it's a good choice!
+
+Otherwise, you can install the system using the following guide after ensuring that you have installed all the dependency programs listed above.
 1. **Clone the repository:**
    ```sh
    git clone https://github.com/kuwaai/gai-os.git
@@ -115,7 +118,10 @@ Before continuing, please make sure you have installed all the dependency progra
    - Open your web browser and go to the application's URL.
    - Login with your admin account and start using Kuwa GenAI OS
 
-This should get your project up and running.
+7. **Setting up Models:**
+    - By default, there are no models installed. Please read [this README](./multi-chat/LLMs/llms/README.md) to set up some models.
+    - After setting up, the models will not appear on the website. Administrators must set the corresponding access_code on the website to access the model.
+    - Please note that the Agent must be started before setting up the model (you can check if `127.0.0.1:9000` is accessible to confirm).
 
 ## Download
 
