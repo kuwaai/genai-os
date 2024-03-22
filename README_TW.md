@@ -9,7 +9,7 @@
   <br>
 </h1>
 
-<h4 align="center">一個開放、免費、安全、注重隱私的生成式AI作業系統。</h4>
+<h4 align="center">一個自由、開放、安全、注重隱私的生成式AI作業系統。</h4>
 <p align="center">
   <a href="http://makeapullrequest.com">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
@@ -31,27 +31,24 @@
   <a href="#授權條款">授權條款</a>
 </p>
 
+## 關鍵功能
+
+* 提供多語言GenAI開發與部署的整體解決方案，支援Windows及Linux
+
+* 提供群聊、引用、完整 Prompt 列表的匯入/匯出/分享等友善使用功能
+
+* 可靈活組合 Prompt x RAGs x Bot x 模型 x 硬體/GPUs以滿足應用所需
+
+* 支援從虛擬主機、筆記型電腦、個人電腦、地端伺服器到公私雲端的各種環境
+
+* 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
+
 ![screenshot](./multi-chat/web/public/images/demo.gif)
 
 ## 架構
 > **警告**: 本草案為初步版本，可能會有進一步的更改。
 
 [![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
-
-## 關鍵功能
-* 多語言支援: Kuwa GenAI OS 提供了多語言的 GenAI 開發和部署一站式解決方案。
-
-* 多模型聊天功能: 使用者可以享受同時多聊、引用、完整提示列表的導入/導出/共享等功能。
-
-* 靈活的提示詞編排: Kuwa GenAI OS 允許靈活編排提示詞、RAG、機器人、模型和硬體/GPU。
-
-* 硬體支援: 支援虛擬主機、筆記型電腦、個人電腦、伺服器和雲端等。
-
-* 深色/淺色模式: 提供深色和淺色模式供使用者選擇。
-
-* 跨平台相容性: Kuwa GenAI OS 現在和 Windows 和 Linux 相容，可在不同平台上使用。
-
-* 開源: Kuwa GenAI OS 是一個開源項目，允許開發人員貢獻並根據自己的需求定製系統。
 
 ## 依賴套件
 
