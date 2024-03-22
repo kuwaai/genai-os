@@ -2,7 +2,6 @@ import socket, os, time
 from base import *
 
 # -- Configs --
-app.config["REDIS_URL"] = "redis://127.0.0.1:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://127.0.0.1:9000/"
 app.LLM_name = "debug_network"
@@ -18,11 +17,6 @@ if app.port == None:
         app.port = s.bind(('', 0)) or s.getsockname()[1]
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
-limit = None
-model_loc = None
-api_key = None
-usr_token = None
-tc_model = None
 # -- Config ends --
 
 def llm_compute(data): 

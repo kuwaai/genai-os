@@ -2,7 +2,6 @@ import socket, os
 from base import *
 
 # -- Configs --
-app.config["REDIS_URL"] = "redis://localhost:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://localhost:9000/"
 app.LLM_name = "debug_network"
