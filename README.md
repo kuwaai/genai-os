@@ -32,27 +32,24 @@
   <a href="#license">License</a>
 </p>
 
+## Key Features
+
+* Multi-lingual turnkey solution for GenAI development and deployment on Linux and Windows
+
+* Concurrent multi-chat, quoting, full prompt-list import/export/share and more for users
+
+* Flexible orchestration of prompts x RAGs x bots x models x hardware/GPUs
+
+* Heterogeneous supports from virtual hosts, laptops, PCs, edge servers to cloud
+
+* Open source, allowing developers to contribute and customize the system according to their needs
+
 ![screenshot](./multi-chat/web/public/images/demo.gif)
 
 ## Architecture
 > **WARNING**: This draft is preliminary and subject to further changes.
 
 [![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
-
-## Key Features
-* Multi-lingual Support: Kuwa GenAI OS provides a turnkey solution for GenAI development and deployment in multiple languages.
-
-* Advanced Chat Features: Users can enjoy concurrent multi-chat, quoting, full prompt-list import/export/share, and more.
-
-* Flexible Prompt Orchestration: Kuwa GenAI OS allows flexible orchestration of prompts, RAGs, bots, models, and hardware/GPUs.
-
-* Hardware Support: Supports heterogeneous hardware from virtual hosts, laptops, PCs, servers to the cloud.
-
-* Dark/Light Mode: Offers both dark and light mode for user preference.
-
-* Cross-Platform Compatibility: Kuwa GenAI OS is now compatible with Windows, and Linux, making it accessible across different platforms.
-
-* Open-Source: Kuwa GenAI OS is an open-source project, allowing developers to contribute and customize the system to their needs.
 
 ## Dependencies
 
@@ -69,7 +66,7 @@ To run this application, ensure you have the following dependencies installed on
 Please follow these steps to set up and run the project on both Windows and Linux:
 
 ## Installation Guide
-Before continue, Please make sure you have installed all the dependency programs above.
+Before continuing, please make sure you have installed all the dependency programs listed above.
 1. **Clone the repository:**
    ```sh
    git clone https://github.com/kuwaai/gai-os.git
