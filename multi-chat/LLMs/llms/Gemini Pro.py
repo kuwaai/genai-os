@@ -3,7 +3,6 @@ import google.generativeai as genai
 from base import *
 
 # -- Configs --
-app.config["REDIS_URL"] = "redis://127.0.0.1:6379/0"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://127.0.0.1:9000/"
 app.LLM_name = "gemini-pro"
@@ -20,10 +19,6 @@ if app.port == None:
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*3
-model_loc = "gpt-3.5-turbo-0613"
-api_key = None
-usr_token = None
-tc_model = None
 # -- Config ends --
 
 genai.configure(api_key = "YOURAPIKEY")
