@@ -66,7 +66,7 @@ To run this application, ensure you have the following dependencies installed on
 Please follow these steps to set up and run the project on both Windows and Linux:
 
 ## Installation Guide
-Before continue, Please make sure you have installed all the dependency programs above.
+Before continuing, please make sure you have installed all the dependency programs listed above.
 1. **Clone the repository:**
    ```sh
    git clone https://github.com/kuwaai/gai-os.git
