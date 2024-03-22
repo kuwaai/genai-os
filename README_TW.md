@@ -116,6 +116,11 @@
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
    - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
 
+7. **架設模型:**
+  - 預設是沒有模型的，請閱讀[這份README](./multi-chat/LLMs/llms/README_TW.md)來架設一些模型。
+  - 架設完畢後，模型不會屏空出現在網站上，管理員必須在網站上設定對應的access_code才能存取該模型。
+  - 請注意架設模型前Agent必須先啟動(你可以檢查`127.0.0.1:9000`是否可以連線來確定)
+
 ## 下載
 
 您可以[下載](https://github.com/kuwaai/gai-os/releases)最新版本的Kuwa GenAI OS，支持Windows和Linux。
