@@ -40,19 +40,16 @@
 [![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## Key Features
-* Multi-lingual Support: Kuwa GenAI OS provides a turnkey solution for GenAI development and deployment in multiple languages.
 
-* Advanced Chat Features: Users can enjoy concurrent multi-chat, quoting, full prompt-list import/export/share, and more.
+* Multi-lingual turnkey solution for GenAI development and deployment on Linux and Windows
 
-* Flexible Prompt Orchestration: Kuwa GenAI OS allows flexible orchestration of prompts, RAGs, bots, models, and hardware/GPUs.
+* Concurrent multi-chat, quoting, full prompt-list import/export/share and more for users
 
-* Hardware Support: Supports heterogeneous hardware from virtual hosts, laptops, PCs, servers to the cloud.
+* Flexible orchestration of prompts x RAGs x bots x models x hardware/GPUs
 
-* Dark/Light Mode: Offers both dark and light mode for user preference.
+* Heterogeneous supports from virtual hosts, laptops, PCs, edge servers to cloud
 
-* Cross-Platform Compatibility: Kuwa GenAI OS is now compatible with Windows, and Linux, making it accessible across different platforms.
-
-* Open-Source: Kuwa GenAI OS is an open-source project, allowing developers to contribute and customize the system to their needs.
+* Open source, allowing developers to contribute and customize the system according to their needs
 
 ## Dependencies
 
