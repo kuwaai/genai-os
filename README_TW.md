@@ -31,13 +31,6 @@
   <a href="#授權條款">授權條款</a>
 </p>
 
-![screenshot](./multi-chat/web/public/images/demo.gif)
-
-## 架構
-> **警告**: 本草案為初步版本，可能會有進一步的更改。
-
-[![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
-
 ## 關鍵功能
 
 * 提供多語言GenAI開發與部署的整體解決方案，支援Windows及Linux
@@ -49,6 +42,13 @@
 * 支援從虛擬主機、筆記型電腦、個人電腦、地端伺服器到公私雲端的各種環境
 
 * 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
+
+![screenshot](./multi-chat/web/public/images/demo.gif)
+
+## 架構
+> **警告**: 本草案為初步版本，可能會有進一步的更改。
+
+[![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## 依賴套件
 

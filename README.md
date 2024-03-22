@@ -32,13 +32,6 @@
   <a href="#license">License</a>
 </p>
 
-![screenshot](./multi-chat/web/public/images/demo.gif)
-
-## Architecture
-> **WARNING**: This draft is preliminary and subject to further changes.
-
-[![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
-
 ## Key Features
 
 * Multi-lingual turnkey solution for GenAI development and deployment on Linux and Windows
@@ -50,6 +43,13 @@
 * Heterogeneous supports from virtual hosts, laptops, PCs, edge servers to cloud
 
 * Open source, allowing developers to contribute and customize the system according to their needs
+
+![screenshot](./multi-chat/web/public/images/demo.gif)
+
+## Architecture
+> **WARNING**: This draft is preliminary and subject to further changes.
+
+[![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## Dependencies
 
