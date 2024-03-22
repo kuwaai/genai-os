@@ -65,7 +65,9 @@
 請按照以下步驟在 Windows 和 Linux 上設置和執行：
 
 ## 安裝指南
-在繼續之前，請確保您已經安裝了上述所有依賴套件。
+我們有提供一個[Windows可攜式版本](./windows/README_TW.md)，但只用Windows 10 x64環境測試過，如果你想嘗鮮試著快速跑起來玩玩，可以試試看！
+
+或者你可以參考以下步驟來將整套系統安裝在主機上，在繼續之前，請確保您已經安裝了上述所有依賴套件。
 1. **複製專案:**
    ```sh
    git clone https://github.com/kuwaai/gai-os.git
@@ -113,6 +115,11 @@
    - 首先您需要創建一個管理員帳號，前往 `multi-chat/web/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
    - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
+
+7. **架設模型:**
+  - 預設是沒有模型的，請閱讀[這份README](./multi-chat/LLMs/llms/README_TW.md)來架設一些模型。
+  - 架設完畢後，模型不會屏空出現在網站上，管理員必須在網站上設定對應的access_code才能存取該模型。
+  - 請注意架設模型前Agent必須先啟動(你可以檢查`127.0.0.1:9000`是否可以連線來確定)
 
 ## 下載
 
