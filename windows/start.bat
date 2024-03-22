@@ -8,7 +8,7 @@ REM Start Kuwa workers
 REM Redis Server
 
 pushd %redis_folder%
-start /b start.bat
+start /b "" "redis-server.exe" redis.conf
 popd
 
 REM Define number of workers
@@ -24,9 +24,8 @@ REM Agent
 pushd "..\multi-chat\LLMs\agent"
 del records.pickle
 set PYTHONPATH=%PYTHONPATH%;%~dp0..\multi-chat\LLMs\agent\src
-start /b %~dp0%python_folder%\python.exe %~dp0..\multi-chat\LLMs\agent\main.py
+start /b "" "%~dp0%python_folder%\python.exe" "%~dp0..\multi-chat\LLMs\agent\main.py"
 popd
-
 
 REM Wait for Agent online
 :CHECK_URL
