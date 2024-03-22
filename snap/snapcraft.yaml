@@ -1,0 +1,151 @@
+name: kuwa-os
+base: core22 # Since the core22 doesn't support the local plugin
+version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
+summary: An open, free, secure, and privacy-focused Generative-AI Operating System.
+description: |
+  Kuwa OS is an open, free, secure, and privacy-focused Generative-AI Operating
+  System, including user-friendly WebUI for LLMs, and novel GenAI kernel to
+  support AI-powered applications
+license: MIT
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+apps:
+  # Reference: nextcloud-snap
+  # Nginx daemon
+  nginx:
+    command: etc/init.d/nginx start
+    stop-command: etc/init.d/nginx stop
+    daemon: simple
+    restart-condition: always
+    plugs: [network, network-bind, removable-media]
+
+  # PostgreSQL daemon
+  mysql:
+    command: etc/init.d/postgresql start
+    stop-command: etc/init.d/postgresql stop
+    daemon: simple
+    restart-condition: always
+    plugs: [network, network-bind]
+
+  # PHP FPM daemon
+  php-fpm:
+    command: etc/init.d/php8.1-fpm start
+    stop-command: etc/init.d/php8.1-fpm stop
+    daemon: simple
+    restart-condition: always
+    plugs: [network, network-bind]
+
+  # Redis server daemon
+  redis-server:
+    command: etc/init.d/redis-server start
+    stop-command: etc/init.d/redis-server stop
+    daemon: simple
+    restart-condition: always
+    plugs: [network, network-bind]
+  
+  # Redis worker daemon
+  redis-worker:
+    command: usr/bin/run-redis-workers
+    daemon: simple
+    restart-condition: always
+    plugs: [network, network-bind]
+
+  # PostgreSQL client
+  psql:
+    command: usr/bin/psql
+    plugs: [network, network-bind]
+
+  pg-dump:
+    command: usr/bin/pg_dump
+    plugs: [network, network-bind]
+
+  # Web initializer
+  init:
+    command: usr/bin/init-web
+    plugs: [network, network-bind]
+
+package-repositories:
+ - type: apt
+   ppa: ondrej/php
+
+parts:
+  # Manually install Node.js
+  # This part will not included in the snap.
+  nodejs:
+    plugin: nil
+    override-build: |
+      curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+      apt-get install -y nodejs
+      echo Version of Node.js: $(node -v)
+      echo Version of NPM: $(npm -v)
+
+  # Manually install Composer
+  # This part will not included in the snap.
+  composer:
+    plugin: nil
+    build-packages: [php8.1, php8.1-cli]
+    override-build: |
+      update-alternatives --set php /usr/bin/php8.1
+      curl -s https://getcomposer.org/installer | php
+      mv composer.phar /usr/local/bin/composer
+      echo Version of Composer: $(composer --version)
+
+  multi-chat:
+    source: multi-chat/web
+    plugin: nil
+    after: [nodejs, composer]
+    build-packages: [
+      php8.1, php8.1-cli,
+      php8.1-curl, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-ldap,
+      php8.1-pgsql, php8.1-redis
+    ] 
+    override-build: |
+      set -xeu
+      
+      update-alternatives --set php /usr/bin/php8.1
+      sed -E -i 's/^;(extension=ldap)/\1/' /etc/php/8.1/cli/php.ini
+      mv .env.dev .env 2>/dev/null; true
+      
+      # Optimize Laravel
+      composer update
+      php artisan key:generate --force
+      rm -rf ./public/storage
+      php artisan storage:link
+      composer dump-autoload --optimize
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+      php artisan optimize
+      
+      # Build the front-end assets
+      npm install
+      npm run build
+
+      # Install
+      mkdir -p ${CRAFT_PART_INSTALL}/site/
+      cp -rf * ${CRAFT_PART_INSTALL}/site/
+      chown -R www-data:www-data ${CRAFT_PART_INSTALL}/site/
+      install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/ php.ini
+      install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/pool.d/ www.conf
+      install -v -T snap/nginx_config ${CRAFT_PART_INSTALL}/etc/nginx/sites-available/multi-chat
+      install -v -T snap/nginx_config ${CRAFT_PART_INSTALL}/etc/nginx/sites-enabled/multi-chat
+      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ snap/run-redis-workers
+      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ snap/init-web
+    
+    stage-packages: [
+      nginx, postgresql, postgresql-contrib, redis, 
+      php8.1, php8.1-fpm,
+      php8.1-curl, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-ldap,
+      php8.1-pgsql, php8.1-redis
+    ]
+    
+    organize:
+      'site' : var/www/html/multi-chat
+    stage:
+      - '*'
+    prime:
+      - -README*
+      - -var/www/html/multi-chat/demo
+      - -var/www/html/multi-chat/executables

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+N_WORKER=10
+
+cd /var/www/html/multi-chat
+
+for i in {1..$N_WORKER}
+do
+    php artisan queue:work --timeout=0 &
+done
+
+wait
