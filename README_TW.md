@@ -9,7 +9,7 @@
   <br>
 </h1>
 
-<h4 align="center">一個開放、免費、安全、注重隱私的生成式AI作業系統。</h4>
+<h4 align="center">一個自由、開放、安全、注重隱私的生成式AI作業系統。</h4>
 <p align="center">
   <a href="http://makeapullrequest.com">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
