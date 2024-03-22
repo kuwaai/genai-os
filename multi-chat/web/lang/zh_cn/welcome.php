@@ -20,4 +20,7 @@ return [
      'under_maintenance.label' => '我们正在进行网站维护，<br>请稍后再回来看看！ ',
      'under_maintenance.header' => '暂停服务',
      "opensource" => "开放原始码",
+     'concurrent_multichat'=>'同时多模型聊天',
+     'onedgecloud'=>'支援Windows和Linux边缘与云端运算',
+     'totalsolution'=>'生成式AI应用的完整解决方案',
 ];
