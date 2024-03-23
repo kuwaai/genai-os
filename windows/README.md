@@ -10,8 +10,8 @@ Here's a revised version of the installation guide with the commands integrated:
 
 1. **Clone the Repository and Navigate to the Windows Folder:**
    ```bat
-   git clone https://github.com/kuwaai/gai-os.git
-   cd gai-os/windows
+   git clone https://github.com/kuwaai/genai-os.git
+   cd genai-os/windows
    ```
 
 2. **Download Dependencies and Configure Packages:**
