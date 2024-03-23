@@ -9,8 +9,8 @@
 
 1. **複製專案並切換至專案內的 windows 資料夾：**
    ```bat
-   git clone https://github.com/kuwaai/gai-os.git
-   cd gai-os/windows
+   git clone https://github.com/kuwaai/genai-os.git
+   cd genai-os/windows
    ```
 
 2. **下載相依套件並設定：**
