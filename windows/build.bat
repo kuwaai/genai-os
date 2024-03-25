@@ -73,9 +73,9 @@ set "CMAKE_C_COMPILER=%~dp0%cmake_folder%"
 set "CMAKE_CXX_COMPILER=%~dp0%cmake_folder%"
 REM Download required pip packages
 pushd "%python_folder%"
-.\python.exe -m pip install -r ..\..\kernel\requirements.txt
-.\python.exe -m pip install -r ..\..\executor\requirements1.txt
-.\python.exe -m pip install -r ..\..\executor\requirements2.txt
+.\python.exe -m pip install --global-option="--make-spec=mingw" -r ..\..\kernel\requirements.txt
+.\python.exe -m pip install --global-option="--make-spec=mingw" -r ..\..\executor\requirements1.txt
+.\python.exe -m pip install --global-option="--make-spec=mingw" -r ..\..\executor\requirements2.txt
 popd
 
 REM Check if .env file exists
