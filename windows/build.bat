@@ -88,12 +88,12 @@ call ..\windows\%php_folder%\php.exe artisan key:generate --force
 call ..\windows\%php_folder%\php.exe artisan migrate --force
 call rmdir public\storage
 call ..\windows\%php_folder%\php.exe artisan storage:link
-call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js install
+call ..\windows\%node_folder%\npm.cmd install
 call ..\windows\%php_folder%\php.exe ..\windows\composer.phar dump-autoload --optimize
 call ..\windows\%php_folder%\php.exe artisan route:cache
 call ..\windows\%php_folder%\php.exe artisan view:cache
 call ..\windows\%php_folder%\php.exe artisan optimize
-call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js run build
+call ..\windows\%node_folder%\npm.cmd run build
 call ..\windows\%php_folder%\php.exe artisan config:cache
 call ..\windows\%php_folder%\php.exe artisan config:clear
 popd
