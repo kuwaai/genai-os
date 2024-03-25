@@ -3,7 +3,7 @@
 <h1 align="center">
   <br>
   <a href="https://dev.kuwaai.org/">
-  <img src="./multi-chat/web/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
+  <img src="./multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
   <br>
@@ -43,12 +43,12 @@
 
 * 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
 
-![screenshot](./multi-chat/web/public/images/demo.gif)
+![screenshot](./multi-chat/public/images/demo.gif)
 
 ## 架構
 > **警告**: 本草案為初步版本，可能會有進一步的更改。
 
-[![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
+[![screenshot](./multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## 依賴套件
 
@@ -71,7 +71,7 @@
 1. **複製專案:**
    ```sh
    git clone https://github.com/kuwaai/genai-os.git
-   cd genai-os/multi-chat/web/
+   cd genai-os/multi-chat/
    ```
 
 2. **安裝依賴套件:**
@@ -81,7 +81,7 @@
      cp .env.dev .env
      cd executable/sh
      ./production_update.sh
-     cd LLMs/agent
+     cd ../kernel
      pip install -r requirement.txt
      ```
 
@@ -90,14 +90,14 @@
      copy .env.dev .env
      cd executable/bat
      ./production_update.bat
-     cd LLMs/agent
+     cd ../kernel
      pip install -r requirement.txt
      ```
 
 3. **設定 PHP 和 PHP-FPM:**
    - 確保已安裝並正確設定了 PHP。
-   - 設定您的 Web 伺服器（Nginx 或 Apache），將 `multi-chat/web/public` 設置為網站根目錄。
-   - 範例設置文件: `multi-chat/web/nginx_config_example`, `multi-chat/web/php.ini`
+   - 設定您的 Web 伺服器（Nginx 或 Apache），將 `multi-chat/public` 設置為網站根目錄。
+   - 範例設置文件: `multi-chat/nginx_config_example`, `multi-chat/php.ini`
    - 推薦設置:
      - 為了RAG應用，PHP 最大上傳文件大小設置為至少 10MB。
      - 避免一些較慢的RAG或攏長的模型輸出，將Timeout設置為至少 120 秒或更長時間。
@@ -105,19 +105,19 @@
 4. **設定 Redis:**
    - 確保已安裝並執行 Redis 伺服器。
    - 可以從 `.env` 中設定相關資訊。
-   - 在 `multi-chat/web/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
+   - 在 `multi-chat/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
 
 5. **執行應用程式:**
    - 啟動您的 Web 伺服器和 PHP-FPM。
-   - 執行Agent `multi-chat/LLMs/agent/main.py`。建議在執行之前將該Agent資料夾複製到另一個位置。
+   - 執行Agent `kernel/main.py`。建議在執行之前將該Agent資料夾複製到另一個位置。
 
 6. **連線到應用程式:**
-   - 首先您需要創建一個管理員帳號，前往 `multi-chat/web/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
+   - 首先您需要創建一個管理員帳號，前往 `multi-chat/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
    - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
 
 7. **架設模型:**
-  - 預設是沒有模型的，請閱讀[這份README](./multi-chat/LLMs/llms/README_TW.md)來架設一些模型。
+  - 預設是沒有模型的，請閱讀[這份README](./multi-chat/executor/README_TW.md)來架設一些模型。
   - 架設完畢後，模型不會屏空出現在網站上，管理員必須在網站上設定對應的access_code才能存取該模型。
   - 請注意架設模型前Agent必須先啟動(你可以檢查`127.0.0.1:9000`是否可以連線來確定)
 
@@ -161,11 +161,11 @@
 
 ## 致謝
 在此感謝國科會TAIDE計畫、台灣人工智慧學校對本計畫初期開發時的協助。
-<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/web/public/images/logo_NUK.jpg" height="100px"></a>
-<a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
-<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
-<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.png" height="100px"></a>
+<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/public/images/logo_NUK.jpg" height="100px"></a>
+<a href="https://taide.tw/"><img src="./multi-chat/public/images/logo_taide.jpg" height="100px"></a>
+<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/public/images/logo_NSTCpng.jpg" height="100px"></a>
+<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/public/images/logo_NARlabs.jpg" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/public/images/logo_AIA.png" height="100px"></a>
 
 ## 授權條款
 [MIT](./LICENSE)
