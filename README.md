@@ -72,8 +72,8 @@ We have a [portable version for Windows](./windows/README.md), only tested with 
 Otherwise, you can install the system using the following guide after ensuring that you have installed all the dependency programs listed above.
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/kuwaai/gai-os.git
-   cd gai-os/multi-chat/web/
+   git clone https://github.com/kuwaai/genai-os.git
+   cd genai-os/multi-chat/web/
    ```
 
 2. **Install dependencies:**
@@ -125,7 +125,7 @@ Otherwise, you can install the system using the following guide after ensuring t
 
 ## Download
 
-You can [download](https://github.com/kuwaai/gai-os/releases) the latest release of Kuwa GenAI OS for Windows and Linux.
+You can [download](https://github.com/kuwaai/genai-os/releases) the latest release of Kuwa GenAI OS for Windows and Linux.
 
 ## Community
 
