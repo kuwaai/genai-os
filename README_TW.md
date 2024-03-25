@@ -4,6 +4,7 @@
   <br>
   <a href="https://dev.kuwaai.org/">
   <img src="./multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
+  <img src="./multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
   <br>
@@ -44,10 +45,12 @@
 * 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
 
 ![screenshot](./multi-chat/public/images/demo.gif)
+![screenshot](./multi-chat/public/images/demo.gif)
 
 ## 架構
 > **警告**: 本草案為初步版本，可能會有進一步的更改。
 
+[![screenshot](./multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 [![screenshot](./multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## 依賴套件
@@ -72,6 +75,7 @@
    ```sh
    git clone https://github.com/kuwaai/genai-os.git
    cd genai-os/multi-chat/
+   cd genai-os/multi-chat/
    ```
 
 2. **安裝依賴套件:**
@@ -82,6 +86,7 @@
      cd executable/sh
      ./production_update.sh
      cd ../kernel
+     cd ../kernel
      pip install -r requirement.txt
      ```
 
@@ -91,11 +96,14 @@
      cd executable/bat
      ./production_update.bat
      cd ../kernel
+     cd ../kernel
      pip install -r requirement.txt
      ```
 
 3. **設定 PHP 和 PHP-FPM:**
    - 確保已安裝並正確設定了 PHP。
+   - 設定您的 Web 伺服器（Nginx 或 Apache），將 `multi-chat/public` 設置為網站根目錄。
+   - 範例設置文件: `multi-chat/nginx_config_example`, `multi-chat/php.ini`
    - 設定您的 Web 伺服器（Nginx 或 Apache），將 `multi-chat/public` 設置為網站根目錄。
    - 範例設置文件: `multi-chat/nginx_config_example`, `multi-chat/php.ini`
    - 推薦設置:
@@ -106,12 +114,15 @@
    - 確保已安裝並執行 Redis 伺服器。
    - 可以從 `.env` 中設定相關資訊。
    - 在 `multi-chat/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
+   - 在 `multi-chat/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
 
 5. **執行應用程式:**
    - 啟動您的 Web 伺服器和 PHP-FPM。
    - 執行Agent `kernel/main.py`。建議在執行之前將該Agent資料夾複製到另一個位置。
+   - 執行Agent `kernel/main.py`。建議在執行之前將該Agent資料夾複製到另一個位置。
 
 6. **連線到應用程式:**
+   - 首先您需要創建一個管理員帳號，前往 `multi-chat/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 首先您需要創建一個管理員帳號，前往 `multi-chat/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
    - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
@@ -161,6 +172,11 @@
 
 ## 致謝
 在此感謝國科會TAIDE計畫、台灣人工智慧學校對本計畫初期開發時的協助。
+<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/public/images/logo_NUK.jpg" height="100px"></a>
+<a href="https://taide.tw/"><img src="./multi-chat/public/images/logo_taide.jpg" height="100px"></a>
+<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/public/images/logo_NSTCpng.jpg" height="100px"></a>
+<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/public/images/logo_NARlabs.jpg" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/public/images/logo_AIA.png" height="100px"></a>
 <a href="https://www.nuk.edu.tw/"><img src="./multi-chat/public/images/logo_NUK.jpg" height="100px"></a>
 <a href="https://taide.tw/"><img src="./multi-chat/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/public/images/logo_NSTCpng.jpg" height="100px"></a>
