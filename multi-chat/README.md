@@ -57,11 +57,11 @@ exit
 # After installing, you need to relogin
 node -v # Should show you v18.xx.xx version installed
 # Time for the github project
-git clone git@github.com:taifu9920/LLM_Project.git
-sudo mv LLM_Project /var/www/html/
+git clone https://github.com/kuwaai/genai-os.git
+sudo cp -r genai-os/multi-chat /var/www/html/
 cd /var/www/html
 sudo chown ubuntu:ubuntu -R LLMProject 
-cd /var/www/html/LLM_Project/web/
+cd /var/www/html/multi-chat
 cp .env.debug .env
 # Now you should edit the .env file before proceed
 cd executables/sh
@@ -72,10 +72,10 @@ cd /var/www/html
 sudo chown www-data:www-data -R LLMProject 
 # It should setup most of things, proceed if no errors
 # Please make sure the path correct for you before execute
-sudo cp /var/www/html/LLM_Project/web/www.conf /etc/php/8.1/fpm/pool.d/
+sudo cp /var/www/html/multi-chat/www.conf /etc/php/8.1/fpm/pool.d/
 cd /etc/nginx/sites-enabled
-sudo cp /var/www/html/LLM_Project/web/nginx_config ../sites-available/LLM_Project
-sudo ln -s ../sites-available/LLM_Project .
+sudo cp /var/www/html/multi-chat/nginx_config ../sites-available/multi-chat
+sudo ln -s ../sites-available/multi-chat .
 # Get a ssl cert (optional)
 sudo apt install python3-certbot-nginx -y
 sudo certbot
@@ -100,7 +100,7 @@ Also it's recommanded to modify this variable in php.ini
 So when the model took too long, it won't shows 504 gateway timeout
 
 ### How it works
-![arch](web/demo/arch.png?raw=true "Architecture to complete jobs")
+![arch](demo/arch.png?raw=true "Architecture to complete jobs")
 
 # API Usage Guide
 
