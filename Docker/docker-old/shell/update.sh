@@ -1,4 +1,4 @@
 cd ..
-sudo chown -R ubuntu:ubuntu web/LLM_Project
-cd ./web/LLM_Project
+sudo chown -R ubuntu:ubuntu web/multi-chat
+cd ./web/multi-chat
 git pull
