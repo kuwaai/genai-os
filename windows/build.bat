@@ -70,6 +70,8 @@ copy /Y python39._pth "%python_folder%\python39._pth"
 REM Download required pip packages
 pushd "%python_folder%"
 .\python.exe -m pip install -r ..\..\kernel\requirements.txt
+.\python.exe -m pip install -r ..\..\executor\requirements1.txt
+.\python.exe -m pip install -r ..\..\executor\requirements2.txt
 popd
 
 REM Check if .env file exists

@@ -34,6 +34,22 @@ curl -s -o nul http://127.0.0.1:9000
 if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
+REM Load Model settings
+IF EXIST env.bat (
+    call env.bat
+	REM Start models
+	pushd ..\executor
+	set PYTHONPATH=%PYTHONPATH%;%~dp0..\executor
+	if defined GEMINI_KEY (
+		REM Call model.py with gemini_key argument
+		start /b "" "%~dp0%python_folder%\python.exe" geminipro.py --api_key %GEMINI_KEY%
+	) else (
+		echo GEMINI_KEY is not set. Skipping geminipro.py execution.
+	)
+	popd
+) ELSE (
+    echo env.bat doesn't exist, skipped.
+)
 REM Start web
 start http://127.0.0.1
 
