@@ -70,8 +70,8 @@
 或者你可以參考以下步驟來將整套系統安裝在主機上，在繼續之前，請確保您已經安裝了上述所有依賴套件。
 1. **複製專案:**
    ```sh
-   git clone https://github.com/kuwaai/gai-os.git
-   cd gai-os/multi-chat/web/
+   git clone https://github.com/kuwaai/genai-os.git
+   cd genai-os/multi-chat/web/
    ```
 
 2. **安裝依賴套件:**
@@ -123,7 +123,7 @@
 
 ## 下載
 
-您可以[下載](https://github.com/kuwaai/gai-os/releases)最新版本的Kuwa GenAI OS，支持Windows和Linux。
+您可以[下載](https://github.com/kuwaai/genai-os/releases)最新版本的Kuwa GenAI OS，支持Windows和Linux。
 
 ## 社區
 
