@@ -1,7 +1,5 @@
-exported_data.json
-converted_data.jsonl
+multi-chat/node_modules/.bin/carbon
 *.sqlite
-.env
 */.phpunit.cache
 */node_modules
 */public/build

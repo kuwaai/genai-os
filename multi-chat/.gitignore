@@ -1,3 +1,7 @@
+exported_data.json
+converted_data.jsonl
+*.sqlite
+.env
 */.phpunit.cache
 */node_modules
 */public/build
