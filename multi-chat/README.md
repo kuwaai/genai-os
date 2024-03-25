@@ -57,11 +57,11 @@ exit
 # After installing, you need to relogin
 node -v # Should show you v18.xx.xx version installed
 # Time for the github project
-git clone git@github.com:taifu9920/LLM_Project.git
-sudo mv LLM_Project /var/www/html/
+git clone https://github.com/kuwaai/genai-os.git
+sudo cp -r genai-os/multi-chat /var/www/html/
 cd /var/www/html
 sudo chown ubuntu:ubuntu -R LLMProject 
-cd /var/www/html/LLM_Project/web/
+cd /var/www/html/multi-chat
 cp .env.debug .env
 # Now you should edit the .env file before proceed
 cd executables/sh
@@ -72,10 +72,10 @@ cd /var/www/html
 sudo chown www-data:www-data -R LLMProject 
 # It should setup most of things, proceed if no errors
 # Please make sure the path correct for you before execute
-sudo cp /var/www/html/LLM_Project/web/www.conf /etc/php/8.1/fpm/pool.d/
+sudo cp /var/www/html/multi-chat/www.conf /etc/php/8.1/fpm/pool.d/
 cd /etc/nginx/sites-enabled
-sudo cp /var/www/html/LLM_Project/web/nginx_config ../sites-available/LLM_Project
-sudo ln -s ../sites-available/LLM_Project .
+sudo cp /var/www/html/multi-chat/nginx_config ../sites-available/multi-chat
+sudo ln -s ../sites-available/multi-chat .
 # Get a ssl cert (optional)
 sudo apt install python3-certbot-nginx -y
 sudo certbot
@@ -100,4 +100,105 @@ Also it's recommanded to modify this variable in php.ini
 So when the model took too long, it won't shows 504 gateway timeout
 
 ### How it works
-![arch](web/demo/arch.png?raw=true "Architecture to complete jobs")
+![arch](demo/arch.png?raw=true "Architecture to complete jobs")
+
+# API Usage Guide
+
+Welcome to the API usage guide for our service! This guide will help you understand how to interact with our API using various programming languages. Our API allows you to send chat messages and receive model-generated responses, supporting multiple rounds of chatting.
+
+## API Endpoint
+
+The base URL for our API endpoint is:
+```
+http://127.0.0.1/v1.0/chat/completions
+```
+
+## Authentication
+
+To access our API, you need to include an `Authorization` header in your requests. You should provide an authentication token in the following format:
+```
+Bearer YOUR_AUTH_TOKEN
+```
+
+Please note that you must have the necessary permissions to use this API, including the "read_api_token" permission to read your authentication token. If you don't have this permission, please contact your administrator or the API provider to ensure you have the required access.
+
+To retrieve your authentication token, you can visit your profile page on our platform, where you'll find the token associated with your account.
+
+Replace `YOUR_AUTH_TOKEN` with your unique authentication token. This token is used to authenticate your requests.
+
+## Sending Messages
+
+### Single Round Chatting
+
+For single round chatting, you can send a single message using the `messages` field. Here's an example:
+
+### Using `curl` (Linux)
+
+You can use the `curl` command line tool to make POST requests to our API. Here's an example of how to send a single message using `curl`:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d '{
+    "messages": [
+        { "isbot": false, "msg": "請自我介紹" }
+    ],
+    "model": "gemini-pro"
+}' http://127.0.0.1/v1.0/chat/completions
+```
+
+### Using `curl` (Windows)
+
+For Windows you need to escape these characters, here's how to do it:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": false, \"msg\": \"請自我介紹\" }],\"model\": \"gemini-pro\"}" http://127.0.0.1/v1.0/chat/completions
+```
+
+### Using JavaScript (Ajax)
+
+You can also use JavaScript and the `fetch` API to send a single message to our API.
+```javascript
+// Define the request payload as an object.
+const requestData = {
+    messages: [
+        { isbot: false, msg: "請自我介紹" }
+    ],
+    model: "gemini-pro"
+};
+
+// Define the API endpoint and authentication headers.
+const apiUrl = 'http://127.0.0.1/v1.0/chat/completions';
+const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_AUTH_TOKEN'
+};
+
+// Perform the AJAX request using the fetch API.
+fetch(apiUrl, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(requestData)
+})
+.then(response => {
+    if (!response.body) {
+        throw new Error('ReadableStream not supported');
+    }
+
+    // Create a reader for the response stream.
+    const reader = response.body.getReader();
+
+    // Function to read the stream and concatenate chunks.
+    function readStream(reader, buffer = "") {
+        return reader.read().then(({ done, value }) => {
+            if (done) {
+                // Handle the last chunk and end the stream.
+                handleStreamData(buffer);
+                return;
+            }
+
+            // Convert the chunk to a string.
+            const chunk = new TextDecoder().decode(value);
+
+            // Split the chunk into lines.
+            const lines = (buffer + chunk).split("data:");
+
+            // Process each line.

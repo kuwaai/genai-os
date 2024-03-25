@@ -15,8 +15,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ../../web:/var/www/html/TAIDE
-      - ../../LLMs/agent:/agent
+      - multi-chat:/var/www/html/TAIDE
+      - kernel:/agent
     networks:
       - backend
     depends_on:
