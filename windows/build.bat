@@ -20,7 +20,7 @@ call download_extract.bat %url_Redis% %redis_folder% . redis.zip
 
 REM Copy php.ini if not exists
 if not exist "%php_folder%\php.ini" (
-    copy ..\multi-chat\web\php.ini "%php_folder%\php.ini"
+    copy ..\multi-chat\php.ini "%php_folder%\php.ini"
 ) else (
     echo PHP.ini already exists, skipping copy and pasting.
 )
@@ -69,33 +69,33 @@ copy /Y python39._pth "%python_folder%\python39._pth"
 
 REM Download required pip packages
 pushd "%python_folder%"
-.\python.exe -m pip install -r ..\..\multi-chat\LLMs\agent\requirements.txt
+.\python.exe -m pip install -r ..\..\kernel\requirements.txt
 popd
 
 REM Check if .env file exists
-if not exist "..\multi-chat\web\.env" (
+if not exist "..\multi-chat\.env" (
     REM Kuwa Chat
     echo Preparing Kuwa Chat
-    copy ..\multi-chat\web\.env.dev ..\multi-chat\web\.env
+    copy ..\multi-chat\.env.dev ..\multi-chat\.env
 ) else (
     echo .env file already exists, skipping copy.
 )
 
 REM Production update
-pushd "..\multi-chat\web"
-call ..\..\windows\%php_folder%\php.exe ..\..\windows\composer.phar update
-call ..\..\windows\%php_folder%\php.exe artisan key:generate --force
-call ..\..\windows\%php_folder%\php.exe artisan migrate --force
+pushd "..\multi-chat"
+call ..\windows\%php_folder%\php.exe ..\windows\composer.phar update
+call ..\windows\%php_folder%\php.exe artisan key:generate --force
+call ..\windows\%php_folder%\php.exe artisan migrate --force
 call rmdir public\storage
-call ..\..\windows\%php_folder%\php.exe artisan storage:link
-call ..\..\windows\%node_folder%\node.exe ..\..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js install
-call ..\..\windows\%php_folder%\php.exe ..\..\windows\composer.phar dump-autoload --optimize
-call ..\..\windows\%php_folder%\php.exe artisan route:cache
-call ..\..\windows\%php_folder%\php.exe artisan view:cache
-call ..\..\windows\%php_folder%\php.exe artisan optimize
-call ..\..\windows\%node_folder%\node.exe ..\..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js run build
-call ..\..\windows\%php_folder%\php.exe artisan config:cache
-call ..\..\windows\%php_folder%\php.exe artisan config:clear
+call ..\windows\%php_folder%\php.exe artisan storage:link
+call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js install
+call ..\windows\%php_folder%\php.exe ..\windows\composer.phar dump-autoload --optimize
+call ..\windows\%php_folder%\php.exe artisan route:cache
+call ..\windows\%php_folder%\php.exe artisan view:cache
+call ..\windows\%php_folder%\php.exe artisan optimize
+call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js run build
+call ..\windows\%php_folder%\php.exe artisan config:cache
+call ..\windows\%php_folder%\php.exe artisan config:clear
 popd
 
 REM Download and extract Nginx if not exists
@@ -109,6 +109,6 @@ REM Remove folder nginx_folder/html
 echo Removing folder %nginx_folder%/html...
 rd /s /q "%nginx_folder%\html"
 
-REM Make shortcut from nginx_folder/html to ../web/public
-echo Creating shortcut from %nginx_folder%/html to ../web/public...
-mklink /j "%nginx_folder%\html" "..\multi-chat\web\public"
+REM Make shortcut from nginx_folder/html to ../public
+echo Creating shortcut from %nginx_folder%/html to ../public...
+mklink /j "%nginx_folder%\html" "..\multi-chat\public"
