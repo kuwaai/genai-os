@@ -5,3 +5,4 @@ python*/
 RunHiddenConsole*/
 Redis*/
 composer.phar
+env.bat
