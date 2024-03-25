@@ -35,16 +35,22 @@ if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
 REM Load Model settings
+call env.bat
 IF EXIST env.bat (
-    call env.bat
 	REM Start models
+	pushd "..\multi-chat"
+	call ..\windows\%php_folder%\php.exe artisan model:prune --force
+	popd
 	pushd ..\executor
 	set PYTHONPATH=%PYTHONPATH%;%~dp0..\executor
-	if defined GEMINI_KEY (
+	if defined gemini_key (
 		REM Call model.py with gemini_key argument
-		start /b "" "%~dp0%python_folder%\python.exe" geminipro.py --api_key %GEMINI_KEY%
+		start /b "" "%~dp0%python_folder%\python.exe" geminipro.py --api_key %gemini_key%
+		pushd "..\multi-chat"
+		call ..\windows\%php_folder%\php.exe artisan model:config "gemini-pro" "Gemini Pro"
+		popd
 	) else (
-		echo GEMINI_KEY is not set. Skipping geminipro.py execution.
+		echo gemini_key is not set. Skipping geminipro.py execution.
 	)
 	popd
 ) ELSE (
@@ -62,18 +68,10 @@ popd
 pushd "%nginx_folder%"
 echo "Nginx started!"
 start /b .\nginx.exe
+popd
 
 REM Trap any key press to stop Nginx
 echo Press any key to stop Nginx...
 pause > nul
-.\nginx.exe -s quit
-echo Nginx stopped
-popd
-REM Stop PHP-FPM gracefully
-echo "Stopping PHP-FPM..."
-echo PHP-FPM stopped
-taskkill /F /IM "nginx.exe"
-taskkill /F /IM "php-cgi.exe"
-taskkill /F /IM "php.exe"
-taskkill /F /IM "python.exe"
-taskkill /F /IM "redis-server.exe"
+
+call stop.bat
