@@ -1,6 +1,7 @@
 import socket, os
 from base import *
 
+<<<<<<< HEAD:multi-chat/LLMs/llms/dummy.py
 # -- Configs --
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://localhost:9000/"
@@ -18,6 +19,11 @@ if app.port == None:
 path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 # -- Config ends --
+=======
+if not app.LLM_name:
+    app.LLM_name = "debug"
+
+>>>>>>> 0cbbb60a4f1bce269c45504f8d6008ef1cb1e4d1:LLMs/llms/dummy.py
 global proc
 proc = None
 

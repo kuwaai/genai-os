@@ -1,6 +1,7 @@
 import socket, os, openai
 from base import *
 
+<<<<<<< HEAD:multi-chat/LLMs/llms/chatgpt.py
 # -- Configs --
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 app.agent_endpoint = "http://127.0.0.1:9000/"
@@ -19,6 +20,10 @@ path = "/"
 app.reg_endpoint = f"http://{public_ip}:{app.port}{path}"
 limit = 1024*2
 # -- Config ends --
+=======
+if not app.LLM_name:
+    app.LLM_name = "chatgpt"
+>>>>>>> 0cbbb60a4f1bce269c45504f8d6008ef1cb1e4d1:LLMs/llms/chatgpt.py
 
 global proc
 proc = False
