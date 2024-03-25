@@ -32,27 +32,24 @@
   <a href="#license">License</a>
 </p>
 
+## Key Features
+
+* Multi-lingual turnkey solution for GenAI development and deployment on Linux and Windows
+
+* Concurrent multi-chat, quoting, full prompt-list import/export/share and more for users
+
+* Flexible orchestration of prompts x RAGs x bots x models x hardware/GPUs
+
+* Heterogeneous supports from virtual hosts, laptops, PCs, edge servers to cloud
+
+* Open source, allowing developers to contribute and customize the system according to their needs
+
 ![screenshot](./multi-chat/web/public/images/demo.gif)
 
 ## Architecture
 > **WARNING**: This draft is preliminary and subject to further changes.
 
 [![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
-
-## Key Features
-* Multi-lingual Support: Kuwa GenAI OS provides a turnkey solution for GenAI development and deployment in multiple languages.
-
-* Advanced Chat Features: Users can enjoy concurrent multi-chat, quoting, full prompt-list import/export/share, and more.
-
-* Flexible Prompt Orchestration: Kuwa GenAI OS allows flexible orchestration of prompts, RAGs, bots, models, and hardware/GPUs.
-
-* Hardware Support: Supports heterogeneous hardware from virtual hosts, laptops, PCs, servers to the cloud.
-
-* Dark/Light Mode: Offers both dark and light mode for user preference.
-
-* Cross-Platform Compatibility: Kuwa GenAI OS is now compatible with Windows, and Linux, making it accessible across different platforms.
-
-* Open-Source: Kuwa GenAI OS is an open-source project, allowing developers to contribute and customize the system to their needs.
 
 ## Dependencies
 
@@ -69,11 +66,14 @@ To run this application, ensure you have the following dependencies installed on
 Please follow these steps to set up and run the project on both Windows and Linux:
 
 ## Installation Guide
-Before continue, Please make sure you have installed all the dependency programs above.
+
+We have a [portable version for Windows](./windows/README.md), only tested with Windows 10 x64. If you'd like to try it out easily, it's a good choice!
+
+Otherwise, you can install the system using the following guide after ensuring that you have installed all the dependency programs listed above.
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/kuwaai/gai-os.git
-   cd gai-os/multi-chat/web/
+   git clone https://github.com/kuwaai/genai-os.git
+   cd genai-os/multi-chat/web/
    ```
 
 2. **Install dependencies:**
@@ -118,11 +118,14 @@ Before continue, Please make sure you have installed all the dependency programs
    - Open your web browser and go to the application's URL.
    - Login with your admin account and start using Kuwa GenAI OS
 
-This should get your project up and running.
+7. **Setting up Models:**
+    - By default, there are no models installed. Please read [this README](./multi-chat/LLMs/llms/README.md) to set up some models.
+    - After setting up, the models will not appear on the website. Administrators must set the corresponding access_code on the website to access the model.
+    - Please note that the Agent must be started before setting up the model (you can check if `127.0.0.1:9000` is accessible to confirm).
 
 ## Download
 
-You can [download](https://github.com/kuwaai/gai-os/releases) the latest release of Kuwa GenAI OS for Windows and Linux.
+You can [download](https://github.com/kuwaai/genai-os/releases) the latest release of Kuwa GenAI OS for Windows and Linux.
 
 ## Community
 
@@ -144,7 +147,7 @@ You can [download](https://github.com/kuwaai/gai-os/releases) the latest release
 
 We're a small team of two, passionate about our project. If you're interested in what we've built, we'd love your contributions to help make our open-source project even better and more robust. Please don't hesitate to reach out if you're willing to lend a hand!
 
-## Credits
+## Package and Programs
 
 This software uses the following packages and programs:
 
@@ -164,7 +167,7 @@ Many thanks to Taiwan NSTC TAIDE project and AI Academy for their early supports
 <a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
 <a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.png" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.jpg" height="100px"></a>
 
 ## License
 [MIT](./LICENSE)

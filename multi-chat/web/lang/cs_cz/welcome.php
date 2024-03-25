@@ -19,4 +19,8 @@ return [
     'button.return_home' => 'Zpět na úvodní stránku',
     'under_maintenance.label' => 'Probíhá údržba webu,<br>zkuste to prosím později!',
     'under_maintenance.header' => 'Služba pozastavena',
+    "opensource" => "Open Source",
+    'concurrent_multichat' => 'Současný multi-chat',
+    'onedgecloud' => 'Windows a Linux na Edge a Cloud',
+    'totalsolution' => 'Kompletní řešení pro aplikace GenAI',
 ];

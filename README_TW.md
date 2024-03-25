@@ -9,7 +9,7 @@
   <br>
 </h1>
 
-<h4 align="center">一個開放、免費、安全、注重隱私的生成式AI作業系統。</h4>
+<h4 align="center">一個自由、開放、安全、注重隱私的生成式AI作業系統。</h4>
 <p align="center">
   <a href="http://makeapullrequest.com">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
@@ -31,27 +31,24 @@
   <a href="#授權條款">授權條款</a>
 </p>
 
+## 關鍵功能
+
+* 提供多語言GenAI開發與部署的整體解決方案，支援Windows及Linux
+
+* 提供群聊、引用、完整 Prompt 列表的匯入/匯出/分享等友善使用功能
+
+* 可靈活組合 Prompt x RAGs x Bot x 模型 x 硬體/GPUs以滿足應用所需
+
+* 支援從虛擬主機、筆記型電腦、個人電腦、地端伺服器到公私雲端的各種環境
+
+* 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
+
 ![screenshot](./multi-chat/web/public/images/demo.gif)
 
 ## 架構
 > **警告**: 本草案為初步版本，可能會有進一步的更改。
 
 [![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
-
-## 關鍵功能
-* 多語言支援: Kuwa GenAI OS 提供了多語言的 GenAI 開發和部署一站式解決方案。
-
-* 多模型聊天功能: 使用者可以享受同時多聊、引用、完整提示列表的導入/導出/共享等功能。
-
-* 靈活的提示詞編排: Kuwa GenAI OS 允許靈活編排提示詞、RAG、機器人、模型和硬體/GPU。
-
-* 硬體支援: 支援虛擬主機、筆記型電腦、個人電腦、伺服器和雲端等。
-
-* 深色/淺色模式: 提供深色和淺色模式供使用者選擇。
-
-* 跨平台相容性: Kuwa GenAI OS 現在和 Windows 和 Linux 相容，可在不同平台上使用。
-
-* 開源: Kuwa GenAI OS 是一個開源項目，允許開發人員貢獻並根據自己的需求定製系統。
 
 ## 依賴套件
 
@@ -68,11 +65,13 @@
 請按照以下步驟在 Windows 和 Linux 上設置和執行：
 
 ## 安裝指南
-在繼續之前，請確保您已經安裝了上述所有依賴套件。
+我們有提供一個[Windows可攜式版本](./windows/README_TW.md)，但只用Windows 10 x64環境測試過，如果你想嘗鮮試著快速跑起來玩玩，可以試試看！
+
+或者你可以參考以下步驟來將整套系統安裝在主機上，在繼續之前，請確保您已經安裝了上述所有依賴套件。
 1. **複製專案:**
    ```sh
-   git clone https://github.com/kuwaai/gai-os.git
-   cd gai-os/multi-chat/web/
+   git clone https://github.com/kuwaai/genai-os.git
+   cd genai-os/multi-chat/web/
    ```
 
 2. **安裝依賴套件:**
@@ -117,9 +116,14 @@
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
    - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
 
+7. **架設模型:**
+  - 預設是沒有模型的，請閱讀[這份README](./multi-chat/LLMs/llms/README_TW.md)來架設一些模型。
+  - 架設完畢後，模型不會屏空出現在網站上，管理員必須在網站上設定對應的access_code才能存取該模型。
+  - 請注意架設模型前Agent必須先啟動(你可以檢查`127.0.0.1:9000`是否可以連線來確定)
+
 ## 下載
 
-您可以[下載](https://github.com/kuwaai/gai-os/releases)最新版本的Kuwa GenAI OS，支持Windows和Linux。
+您可以[下載](https://github.com/kuwaai/genai-os/releases)最新版本的Kuwa GenAI OS，支持Windows和Linux。
 
 ## 社區
 
@@ -141,7 +145,7 @@
 
 我們團隊目前只有兩個人，如果您對我們合力開發的這個專案感興趣，可以一起協助我們開發，幫助我們把這個開源專案做的更好，如果您願意協助，請不要猶豫，隨時與我們聯繫！
 
-## 貢獻者
+## 套件與程式
 
 該專案用到了以下套件和程式：
 

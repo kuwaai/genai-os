@@ -19,4 +19,8 @@ return [
     'button.return_home' => 'Zurück zur Startseite',
     'under_maintenance.label' => 'Wir führen Wartungsarbeiten an der Website durch,<br>Bitte kommen Sie später wieder!',
     'under_maintenance.header' => 'Dienst vorübergehend eingestellt',
+    'opensource' => 'Open Source',
+    'concurrent_multichat' => 'Gleichzeitiger Multichat',
+    'onedgecloud' => 'Windows & Linux auf Edge & Cloud',
+    'totalsolution' => 'Gesamtlösung für GenAI-Anwendungen',
 ];
