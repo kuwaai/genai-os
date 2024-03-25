@@ -36,15 +36,14 @@ if %errorlevel% neq 0 (
 )
 REM Load Model settings
 call env.bat
+set PYTHONPATH=%PYTHONPATH%;%~dp0..\executor
 IF EXIST env.bat (
 	REM Start models
 	pushd "..\multi-chat"
 	call ..\windows\%php_folder%\php.exe artisan model:prune --force
 	popd
 	pushd ..\executor
-	set PYTHONPATH=%PYTHONPATH%;%~dp0..\executor
 	if defined gemini_key (
-		REM Call model.py with gemini_key argument
 		start /b "" "%~dp0%python_folder%\python.exe" geminipro.py --api_key %gemini_key%
 		pushd "..\multi-chat"
 		call ..\windows\%php_folder%\php.exe artisan model:config "gemini-pro" "Gemini Pro"
@@ -52,10 +51,28 @@ IF EXIST env.bat (
 	) else (
 		echo gemini_key is not set. Skipping geminipro.py execution.
 	)
+	if defined gguf_path (
+		start /b "" "%~dp0%python_folder%\python.exe" llamacpp.py --model_path %gguf_path%
+		pushd "..\multi-chat"
+		call ..\windows\%php_folder%\php.exe artisan model:config "gguf" "LLaMA.cpp Model"
+		popd
+	) else (
+		echo gguf_path is not set. Skipping llamacpp.py execution.
+	)
 	popd
 ) ELSE (
     echo env.bat doesn't exist, skipped.
 )
+pushd ..\executor
+if defined chatgpt_key (
+	start /b "" "%~dp0%python_folder%\python.exe" chatgpt.py --api_key %chatgpt_key%
+) else (
+	start /b "" "%~dp0%python_folder%\python.exe" chatgpt.py
+)
+pushd "..\multi-chat"
+call ..\windows\%php_folder%\php.exe artisan model:config "chatgpt" "ChatGPT"
+popd
+popd
 REM Start web
 start http://127.0.0.1
 
