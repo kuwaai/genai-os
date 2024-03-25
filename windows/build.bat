@@ -18,9 +18,6 @@ call download_extract.bat %url_Python% %python_folder% %python_folder% python.zi
 REM Download and extract Redis if not exists
 call download_extract.bat %url_Redis% %redis_folder% . redis.zip
 
-REM Download and extract CMake if not exists
-call download_extract.bat %url_CMake% %cmake_folder% . cmake.zip
-
 REM Copy php.ini if not exists
 if not exist "%php_folder%\php.ini" (
     copy ..\multi-chat\php.ini "%php_folder%\php.ini"
@@ -69,13 +66,14 @@ if not exist "%python_folder%\Scripts\pip.exe" (
 REM Overwrite the python39._pth file
 echo Overwrite the python39._pth file.
 copy /Y python39._pth "%python_folder%\python39._pth"
-set "CMAKE_C_COMPILER=%~dp0%cmake_folder%"
-set "CMAKE_CXX_COMPILER=%~dp0%cmake_folder%"
+
+set "PATH=%~dp0%python_folder%\Scripts;%PATH%"
 REM Download required pip packages
 pushd "%python_folder%"
-.\python.exe -m pip install --global-option="--make-spec=mingw" -r ..\..\kernel\requirements.txt
-.\python.exe -m pip install --global-option="--make-spec=mingw" -r ..\..\executor\requirements1.txt
-.\python.exe -m pip install --global-option="--make-spec=mingw" -r ..\..\executor\requirements2.txt
+.\python.exe -m pip install -r ..\..\kernel\requirements.txt
+.\python.exe -m pip install -r ..\..\executor\requirements1.txt
+.\python.exe -m pip install -r ..\..\executor\requirements2.txt
+.\python.exe -m pip install https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.56/llama_cpp_python-0.2.56-cp39-cp39-win_amd64.whl
 popd
 
 REM Check if .env file exists

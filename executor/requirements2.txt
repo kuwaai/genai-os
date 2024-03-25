@@ -1,2 +1,1 @@
 google-generativeai
-llama-cpp-python
