@@ -77,7 +77,7 @@ class LLMWorker:
         
         @self.app.route("/abort", methods=["GET"])
         def abort():
-            if self.abort:
+            if hasattr(self, 'abort') and callable(self.abort):
                 return Response(self.abort(), mimetype='text/plain')
             return "No abort method configured"
 
