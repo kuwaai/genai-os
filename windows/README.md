@@ -4,19 +4,13 @@ We provide a portable version for Windows x64, which uses SQLite as the database
 
 ### Prerequisites
 - Make sure you have [VC_redist.exe](https://learn.microsoft.com/zh-tw/cpp/windows/latest-supported-vc-redist?view=msvc-170) installed.
-Here's a revised version of the installation guide with the commands integrated:
 
 ### Installation Steps
 
 1. **Clone the Repository and Navigate to the Windows Folder:**
    ```bat
-<<<<<<< HEAD
-   git clone https://github.com/kuwaai/gai-os.git
-   cd gai-os/windows
-=======
    git clone https://github.com/kuwaai/genai-os.git
    cd genai-os/windows
->>>>>>> 0cbbb60a4f1bce269c45504f8d6008ef1cb1e4d1
    ```
 
 2. **Download Dependencies and Configure Packages:**

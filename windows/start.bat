@@ -17,14 +17,14 @@ set numWorkers=10
 REM Redis workers
 for /l %%i in (1,1,%numWorkers%) do (
 	echo Started a model worker
-    start /b %php_folder%\php.exe ..\multi-chat\web\artisan queue:work --verbose --timeout=600
+    start /b %php_folder%\php.exe ..\multi-chat\artisan queue:work --verbose --timeout=600
 )
 
 REM Agent
-pushd "..\multi-chat\LLMs\agent"
+pushd "..\kernel"
 del records.pickle
-set PYTHONPATH=%PYTHONPATH%;%~dp0..\multi-chat\LLMs\agent\src
-start /b "" "%~dp0%python_folder%\python.exe" "%~dp0..\multi-chat\LLMs\agent\main.py"
+set PYTHONPATH=%PYTHONPATH%;%~dp0..\kernel\src
+start /b "" "%~dp0%python_folder%\python.exe" "%~dp0..\kernel\main.py"
 popd
 
 REM Wait for Agent online
