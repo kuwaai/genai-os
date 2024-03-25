@@ -2,8 +2,7 @@
 
 <h1 align="center">
   <br>
-  <a href="https://dev.kuwaai.org/">
-  <img src="./multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
+  <a href="https://kuwaai.org/zh-Hant/">
   <img src="./multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
@@ -75,7 +74,6 @@
    ```sh
    git clone https://github.com/kuwaai/genai-os.git
    cd genai-os/multi-chat/
-   cd genai-os/multi-chat/
    ```
 
 2. **安裝依賴套件:**
@@ -86,7 +84,6 @@
      cd executable/sh
      ./production_update.sh
      cd ../kernel
-     cd ../kernel
      pip install -r requirement.txt
      ```
 
@@ -95,7 +92,6 @@
      copy .env.dev .env
      cd executable/bat
      ./production_update.bat
-     cd ../kernel
      cd ../kernel
      pip install -r requirement.txt
      ```
@@ -176,12 +172,7 @@
 <a href="https://taide.tw/"><img src="./multi-chat/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./multi-chat/public/images/logo_NSTCpng.jpg" height="100px"></a>
 <a href="https://www.narlabs.org.tw/"><img src="./multi-chat/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://aiacademy.tw/"><img src="./multi-chat/public/images/logo_AIA.png" height="100px"></a>
-<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/public/images/logo_NUK.jpg" height="100px"></a>
-<a href="https://taide.tw/"><img src="./multi-chat/public/images/logo_taide.jpg" height="100px"></a>
-<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/public/images/logo_NSTCpng.jpg" height="100px"></a>
-<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://aiacademy.tw/"><img src="./multi-chat/public/images/logo_AIA.png" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/public/images/logo_AIA.jpg" height="100px"></a>
 
 ## 授權條款
 [MIT](./LICENSE)

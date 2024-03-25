@@ -2,7 +2,7 @@
 
 <h1 align="center">
   <br>
-  <a href="https://dev.kuwaai.org/">
+  <a href="https://kuwaai.org/">
   <img src="./multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
@@ -119,7 +119,7 @@ Otherwise, you can install the system using the following guide after ensuring t
    - Login with your admin account and start using Kuwa GenAI OS
 
 7. **Setting up Models:**
-    - By default, there are no models installed. Please read [this README](./multi-chat/LLMs/llms/README.md) to set up some models.
+    - By default, there are no models installed. Please read [this README](./executor/README.md) to set up some models.
     - After setting up, the models will not appear on the website. Administrators must set the corresponding access_code on the website to access the model.
     - Please note that the Agent must be started before setting up the model (you can check if `127.0.0.1:9000` is accessible to confirm).
 
