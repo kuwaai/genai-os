@@ -109,6 +109,6 @@ REM Remove folder nginx_folder/html
 echo Removing folder %nginx_folder%/html...
 rd /s /q "%nginx_folder%\html"
 
-REM Make shortcut from nginx_folder/html to ../web/public
-echo Creating shortcut from %nginx_folder%/html to ../web/public...
-mklink /j "%nginx_folder%\html" "..\multi-chat\web\public"
+REM Make shortcut from nginx_folder/html to ../public
+echo Creating shortcut from %nginx_folder%/html to ../public...
+mklink /j "%nginx_folder%\html" "..\multi-chat\public"

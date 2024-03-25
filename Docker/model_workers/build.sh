@@ -1,7 +1,7 @@
 #!/bin/bash
 
-pushd ../../model_workers/worker_framework/
+pushd worker_framework/
 bash ./build.sh
 popd
-pushd ../../model_workers/contextual_chinese_convert/
+pushd contextual_chinese_convert/
 bash ./build.sh
