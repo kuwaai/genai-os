@@ -81,6 +81,9 @@ if not exist "..\multi-chat\.env" (
     echo .env file already exists, skipping copy.
 )
 
+
+set "PATH=%~dp0%node_folder%;%PATH%"
+
 REM Production update
 pushd "..\multi-chat"
 call ..\windows\%php_folder%\php.exe ..\windows\composer.phar update
