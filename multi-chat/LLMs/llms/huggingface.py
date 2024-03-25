@@ -1,5 +1,6 @@
 import socket, os
 from base import *
+<<<<<<< HEAD:multi-chat/LLMs/llms/huggingface.py
 
 # -- Configs --
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -24,9 +25,17 @@ usr_token = None
 tc_model = None
 # -- Config ends --
 
+=======
+>>>>>>> 0cbbb60a4f1bce269c45504f8d6008ef1cb1e4d1:LLMs/llms/TAIDE LLaMA2 e.1.1.0.py
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList
 from intel_extension_for_transformers.transformers import AutoModelForCausalLM
 from threading import Thread
+
+if not app.LLM_name:
+    raise Exception("You need to configure an Access_code!")
+if not app.model_path:
+    raise Exception("You need to configure a model path!")
+    
 class CustomStoppingCriteria(StoppingCriteria):
     def __init__(self):
         pass
@@ -34,7 +43,8 @@ class CustomStoppingCriteria(StoppingCriteria):
     def __call__(self, input_ids, score, **kwargs) -> bool:
         global proc
         return not proc
-model = AutoModelForCausalLM.from_pretrained(model_loc,device_map="auto", torch_dtype=torch.float16)
+
+model = AutoModelForCausalLM.from_pretrained(model_loc, device_map="auto", torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained(model_loc)
 prompts = " USER: {0} ASSISTANT: {1}"
 stopwords = ["USER:", "</s>"]
