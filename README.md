@@ -2,8 +2,8 @@
 
 <h1 align="center">
   <br>
-  <a href="https://dev.kuwaai.org/">
-  <img src="./multi-chat/web/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
+  <a href="https://kuwaai.org/">
+  <img src="./multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
   <br>
@@ -44,12 +44,12 @@
 
 * Open source, allowing developers to contribute and customize the system according to their needs
 
-![screenshot](./multi-chat/web/public/images/demo.gif)
+![screenshot](./multi-chat/public/images/demo.gif)
 
 ## Architecture
 > **WARNING**: This draft is preliminary and subject to further changes.
 
-[![screenshot](./multi-chat/web/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
+[![screenshot](./multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## Dependencies
 
@@ -73,7 +73,7 @@ Otherwise, you can install the system using the following guide after ensuring t
 1. **Clone the repository:**
    ```sh
    git clone https://github.com/kuwaai/genai-os.git
-   cd genai-os/multi-chat/web/
+   cd genai-os/multi-chat/
    ```
 
 2. **Install dependencies:**
@@ -83,7 +83,7 @@ Otherwise, you can install the system using the following guide after ensuring t
      cp .env.dev .env
      cd executable/sh
      ./production_update.sh
-     cd LLMs/agent
+     cd ../kernel
      pip install -r requirement.txt
      ```
 
@@ -92,14 +92,14 @@ Otherwise, you can install the system using the following guide after ensuring t
      copy .env.dev .env
      cd executable/bat
      ./production_update.bat
-     cd LLMs/agent
+     cd ../kernel
      pip install -r requirement.txt
      ```
 
 3. **Configure PHP and PHP-FPM:**
    - Make sure PHP is installed and configured correctly.
-   - Configure your web server (Nginx or Apache) to serve the project's files. Set `multi-chat/web/public` as the html root.
-   - Example setting file: `multi-chat/web/nginx_config_example`, `multi-chat/web/php.ini`
+   - Configure your web server (Nginx or Apache) to serve the project's files. Set `multi-chat/public` as the html root.
+   - Example setting file: `multi-chat/nginx_config_example`, `multi-chat/php.ini`
    - Recommended settings:
      - Set PHP max upload filesize to at least 10MB for RAG.
      - Set timeout of reading to at least 120 seconds or more for long-running models.
@@ -107,19 +107,19 @@ Otherwise, you can install the system using the following guide after ensuring t
 4. **Configure Redis:**
    - Ensure Redis Server is installed and running.
    - Configure it in `.env` or use default settings.
-   - Start Redis worker by running `php artisan queue:work --timeout=0` under `multi-chat/web/` to process requests to the agent, It's recommanded to have at least 5 workers running at the same time.
+   - Start Redis worker by running `php artisan queue:work --timeout=0` under `multi-chat/` to process requests to the agent, It's recommanded to have at least 5 workers running at the same time.
 
 5. **Run the application:**
    - Start your web server and PHP-FPM.
-   - Run the agent in `multi-chat/LLMs/agent/main.py` with your Python installation. It's recommended to copy the agent folder to another location before execution.
+   - Run the agent in `kernel/main.py` with your Python installation. It's recommended to copy the agent folder to another location before execution.
 
 6. **Access the application:**
-   - First you need to seed a account, go `multi-chat/web/` and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
+   - First you need to seed a account, go `multi-chat/` and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
    - Open your web browser and go to the application's URL.
    - Login with your admin account and start using Kuwa GenAI OS
 
 7. **Setting up Models:**
-    - By default, there are no models installed. Please read [this README](./multi-chat/LLMs/llms/README.md) to set up some models.
+    - By default, there are no models installed. Please read [this README](./executor/README.md) to set up some models.
     - After setting up, the models will not appear on the website. Administrators must set the corresponding access_code on the website to access the model.
     - Please note that the Agent must be started before setting up the model (you can check if `127.0.0.1:9000` is accessible to confirm).
 
@@ -163,11 +163,11 @@ This software uses the following packages and programs:
 
 ## Acknowledgements
 Many thanks to Taiwan NSTC TAIDE project and AI Academy for their early supports to this project.
-<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/web/public/images/logo_NUK.jpg" height="100px"></a>
-<a href="https://taide.tw/"><img src="./multi-chat/web/public/images/logo_taide.jpg" height="100px"></a>
-<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/web/public/images/logo_NSTCpng.jpg" height="100px"></a>
-<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/web/public/images/logo_NARlabs.jpg" height="100px"></a>
-<a href="https://aiacademy.tw/"><img src="./multi-chat/web/public/images/logo_AIA.jpg" height="100px"></a>
+<a href="https://www.nuk.edu.tw/"><img src="./multi-chat/public/images/logo_NUK.jpg" height="100px"></a>
+<a href="https://taide.tw/"><img src="./multi-chat/public/images/logo_taide.jpg" height="100px"></a>
+<a href="https://www.nstc.gov.tw/"><img src="./multi-chat/public/images/logo_NSTCpng.jpg" height="100px"></a>
+<a href="https://www.narlabs.org.tw/"><img src="./multi-chat/public/images/logo_NARlabs.jpg" height="100px"></a>
+<a href="https://aiacademy.tw/"><img src="./multi-chat/public/images/logo_AIA.jpg" height="100px"></a>
 
 ## License
 [MIT](./LICENSE)

@@ -4,7 +4,6 @@ We provide a portable version for Windows x64, which uses SQLite as the database
 
 ### Prerequisites
 - Make sure you have [VC_redist.exe](https://learn.microsoft.com/zh-tw/cpp/windows/latest-supported-vc-redist?view=msvc-170) installed.
-Here's a revised version of the installation guide with the commands integrated:
 
 ### Installation Steps
 
