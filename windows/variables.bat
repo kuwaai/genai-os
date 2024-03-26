@@ -34,3 +34,9 @@ set "url_Redis=https://github.com/redis-windows/redis-windows/releases/download/
 for %%I in ("%url_Redis%") do set "filename_Redis=%%~nxI"
 set "redis_folder=%filename_Redis:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_Redis%") do set "version_Redis=%%v"
+
+REM Variables for CMake 3.29.0
+set "url_CMake=https://github.com/Kitware/CMake/releases/download/v3.29.0/cmake-3.29.0-windows-x86_64.zip"
+for %%I in ("%url_CMake%") do set "filename_CMake=%%~nxI"
+set "cmake_folder=%filename_CMake:~0,-4%"
+for /f "tokens=2 delims=-" %%v in ("%filename_CMake%") do set "version_CMake=%%v"
