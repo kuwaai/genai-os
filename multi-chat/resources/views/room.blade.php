@@ -3,7 +3,13 @@
         $result = App\Models\Bots::Join('llms', function ($join) {
             $join->on('llms.id', '=', 'bots.model_id');
         })
-            ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'))
+            ->select(
+                'llms.*',
+                'bots.*',
+                DB::raw('COALESCE(bots.description, llms.description) as description'),
+                DB::raw('COALESCE(bots.config, llms.config) as config'),
+                DB::raw('COALESCE(bots.image, llms.image) as image'),
+            )
             ->orderby('llms.order')
             ->orderby('bots.created_at')
             ->get();
@@ -40,7 +46,7 @@
                     DB::raw(
                         (config('database.default') == 'sqlite'
                             ? 'GROUP_CONCAT(chats.llm_id ORDER BY chats.llm_id DESC SEPARATOR ",")'
-                            : 'array_agg(chats.bot_id ORDER BY chats.bot_id DESC)') . ' as identifier'
+                            : 'array_agg(chats.bot_id ORDER BY chats.bot_id DESC)') . ' as identifier',
                     ),
                     DB::raw('count(chats.id) as counts'),
                 )
@@ -49,13 +55,24 @@
                 ->groupBy('identifier');
             try {
                 if (!session('llms')) {
-                    $identifier = collect(Illuminate\Support\Arr::flatten($DC->toarray(), 1))->where('id', '=', request()->route('room_id'))->first()['identifier'];
+                    $identifier = collect(Illuminate\Support\Arr::flatten($DC->toarray(), 1))
+                        ->where('id', '=', request()->route('room_id'))
+                        ->first()['identifier'];
                     $DC = $DC[$identifier];
-                    $llms = App\Models\Bots::whereIn('bots.id', array_map('intval', explode(',', trim($identifier, '{}'))))
+                    $llms = App\Models\Bots::whereIn(
+                        'bots.id',
+                        array_map('intval', explode(',', trim($identifier, '{}'))),
+                    )
                         ->join('llms', function ($join) {
                             $join->on('llms.id', '=', 'bots.model_id');
                         })
-                        ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'))
+                        ->select(
+                            'llms.*',
+                            'bots.*',
+                            DB::raw('COALESCE(bots.description, llms.description) as description'),
+                            DB::raw('COALESCE(bots.config, llms.config) as config'),
+                            DB::raw('COALESCE(bots.image, llms.image) as image'),
+                        )
                         ->orderby('bots.id')
                         ->get();
                 } else {
@@ -63,7 +80,13 @@
                         ->Join('llms', function ($join) {
                             $join->on('llms.id', '=', 'bots.model_id');
                         })
-                        ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'))
+                        ->select(
+                            'llms.*',
+                            'bots.*',
+                            DB::raw('COALESCE(bots.description, llms.description) as description'),
+                            DB::raw('COALESCE(bots.config, llms.config) as config'),
+                            DB::raw('COALESCE(bots.image, llms.image) as image'),
+                        )
                         ->orderby('bots.id')
                         ->get();
                     $DC = $DC['{' . implode(',', array_reverse($llms->pluck('id')->toArray())) . '}'];
@@ -73,7 +96,13 @@
                     ->Join('llms', function ($join) {
                         $join->on('llms.id', '=', 'bots.model_id');
                     })
-                    ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'))
+                    ->select(
+                        'llms.*',
+                        'bots.*',
+                        DB::raw('COALESCE(bots.description, llms.description) as description'),
+                        DB::raw('COALESCE(bots.config, llms.config) as config'),
+                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                    )
                     ->orderby('bots.id')
                     ->get();
                 $DC = null;
@@ -110,7 +139,7 @@
                                     <button data-modal-target="create-model-modal"
                                         data-modal-toggle="create-model-modal"
                                         class="flex rounded-{{ request()->user()->hasPerm('Room_update_import_chat') ? 'l-' : '' }}lg border border-black dark:border-white border-1 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
-                                        class="flex rounded-{{ request()->user()->hasPerm('Room_update_import_chat') ? 'l-' : '' }}lg border border-black dark:border-white border-1 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+
                                         <p class="flex-1 text-center text-gray-700 dark:text-white">
                                             {{ __('room.button.create_room') }}
                                         </p>
@@ -118,8 +147,6 @@
                                 @endif
                                 @if (request()->user()->hasPerm('Room_update_import_chat'))
                                     <button data-modal-target="importModal" data-modal-toggle="importModal"
-                                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 {{ request()->user()->hasPerm('Room_update_new_chat') ? 'rounded-r-lg ' : 'rounded-lg w-full' }} flex items-center justify-center">
-                                        {{ request()->user()->hasPerm('Room_update_new_chat') ? '' : '匯入對話　' }}
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 {{ request()->user()->hasPerm('Room_update_new_chat') ? 'rounded-r-lg ' : 'rounded-lg w-full' }} flex items-center justify-center">
                                         {{ request()->user()->hasPerm('Room_update_new_chat') ? '' : '匯入對話　' }}
                                         <i class="fas fa-file-import"></i>
@@ -164,7 +191,21 @@
                                     })
                                     ->where('isbot', true)
                                     ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
-                                    ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.bot_id as bot_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'), 'feedback.nice', 'feedback.detail', 'feedback.flags');
+                                    ->select(
+                                        'histories.chained as chained',
+                                        'chats.id as chat_id',
+                                        'histories.id as id',
+                                        'chats.bot_id as bot_id',
+                                        'histories.created_at as created_at',
+                                        'histories.msg as msg',
+                                        'histories.isbot as isbot',
+                                        DB::raw('COALESCE(bots.description, llms.description) as description'),
+                                        DB::raw('COALESCE(bots.config, llms.config) as config'),
+                                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                                        'feedback.nice',
+                                        'feedback.detail',
+                                        'feedback.flags',
+                                    );
 
                                 $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
                                     ->leftjoin('bots', 'bots.id', '=', 'chats.bot_id')
@@ -173,7 +214,21 @@
                                     })
                                     ->where('isbot', false)
                                     ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
-                                    ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.bot_id as bot_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'), DB::raw('NULL as nice'), DB::raw('NULL as detail'), DB::raw('NULL as flags'));
+                                    ->select(
+                                        'histories.chained as chained',
+                                        'chats.id as chat_id',
+                                        'histories.id as id',
+                                        'chats.bot_id as bot_id',
+                                        'histories.created_at as created_at',
+                                        'histories.msg as msg',
+                                        'histories.isbot as isbot',
+                                        DB::raw('COALESCE(bots.description, llms.description) as description'),
+                                        DB::raw('COALESCE(bots.config, llms.config) as config'),
+                                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                                        DB::raw('NULL as nice'),
+                                        DB::raw('NULL as detail'),
+                                        DB::raw('NULL as flags'),
+                                    );
 
                                 $mergedChats = $botChats
                                     ->union($nonBotChats)
@@ -215,23 +270,7 @@
                                             shuffle($bufferedBotMessages);
                                             // If there are buffered bot messages, push them into the output collection
                                             $output = $output->merge($bufferedBotMessages);
-                            @php
-                                $output = collect();
-                                $bufferedBotMessages = [];
-                                foreach ($mergedChats as $history) {
-                                    if ($history->isbot) {
-                                        // If the current element is a bot message, buffer it
-                                        $bufferedBotMessages[] = $history;
-                                    } else {
-                                        // If the current element is not a bot message, check if there are buffered bot messages
-                                        if (!empty($bufferedBotMessages)) {
-                                            shuffle($bufferedBotMessages);
-                                            // If there are buffered bot messages, push them into the output collection
-                                            $output = $output->merge($bufferedBotMessages);
 
-                                            // Reset the buffered bot messages array
-                                            $bufferedBotMessages = [];
-                                        }
                                             // Reset the buffered bot messages array
                                             $bufferedBotMessages = [];
                                         }
@@ -244,28 +283,7 @@
                                     shuffle($bufferedBotMessages);
                                     // If there are buffered bot messages, push them into the output collection
                                     $output = $output->merge($bufferedBotMessages);
-                                        // Push the current non-bot message into the output collection
-                                        $output->push($history);
-                                    }
-                                }
-                                if (!empty($bufferedBotMessages)) {
-                                    shuffle($bufferedBotMessages);
-                                    // If there are buffered bot messages, push them into the output collection
-                                    $output = $output->merge($bufferedBotMessages);
 
-                                    // Reset the buffered bot messages array
-                                    $bufferedBotMessages = [];
-                                }
-                                $mergedChats = $output;
-                            @endphp
-                            @foreach ($mergedChats as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers"
-                                    :anonymous="true" />
-                            @endforeach
-                        @else
-                            @foreach ($mergedChats as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
-                            @endforeach
                                     // Reset the buffered bot messages array
                                     $bufferedBotMessages = [];
                                 }
@@ -289,8 +307,6 @@
                     </div>
                 </div>
                 @if (
-                    (request()->user()->hasPerm('Room_update_new_chat') && session('llms')) ||
-                        (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
                     (request()->user()->hasPerm('Room_update_new_chat') && session('llms')) ||
                         (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
                     <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
