@@ -63,7 +63,9 @@
         $DC = App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
             ->where('chats.user_id', Auth::user()->id)
             ->orderby('counts', 'desc')
-            ->select('chatrooms.*', DB::raw('array_agg(chats.llm_id ORDER BY chats.llm_id DESC) as identifier'), DB::raw('count(chats.id) as counts'))
+            ->select('chatrooms.*', DB::raw((config('database.default') == 'sqlite'
+                            ? 'GROUP_CONCAT(chats.llm_id ORDER BY chats.llm_id DESC SEPARATOR ",")'
+                            : 'array_agg(chats.llm_id ORDER BY chats.llm_id DESC)') . ' as identifier'), DB::raw('count(chats.id) as counts'))
             ->groupBy('chatrooms.id')
             ->get()
             ->groupBy('identifier');

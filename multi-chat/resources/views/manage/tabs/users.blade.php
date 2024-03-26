@@ -494,7 +494,7 @@
         $('#edit_user_form input[name=group]').val($users[id][2] == -1 ? "" : $groupnames[$users[id][2]])
         $('#edit_user_form input[name=email]').val($users[id][1])
         $('#edit_user_form input[name=detail]').val($users[id][3])
-        $('#edit_user_form input[name=require_change_password]').attr("checked", $users[id][4])
+        $('#edit_user_form input[name=require_change_password]').attr("checked", $users[id][4] != 0)
         $('#edit_user_form input[name=edit_created_at]').val(new Date($users[id][5]).toISOString().slice(0, 19))
         $('#edit_user_form input[name=edit_updated_at]').val(new Date($users[id][6]).toISOString().slice(0, 19))
         $('#user_id').text('ID:' + id)
