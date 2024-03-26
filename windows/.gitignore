@@ -1,7 +1,9 @@
 nginx*/
 node*/
 php*/
+cmake*/
 python*/
 RunHiddenConsole*/
 Redis*/
 composer.phar
+env.bat

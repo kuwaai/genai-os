@@ -30,7 +30,7 @@ We provide a portable version for Windows x64, which uses SQLite as the database
 5. **Create Admin Account (If you haven't):**
    - Run `seed.bat` and follow the prompts to create an admin account (provide a name, email, and password). You can use this account to log in.
 
-6. **Configure Model and Start Using Kuwa GenAI OS:**
-   - Set up your model configurations and start using Kuwa GenAI OS.
+6. **Configure Model:**
+   - Copy `env.bat.dev` and paste it as `env.bat`. Open the `env.bat` file and set up your API key or GGUF file path. Then, restart `start.bat` to easily host some models on your Kuwa GenAI OS.
 
 Feel free to reach out if you encounter any issues during the installation process.
