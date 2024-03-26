@@ -67,9 +67,13 @@ REM Overwrite the python39._pth file
 echo Overwrite the python39._pth file.
 copy /Y python39._pth "%python_folder%\python39._pth"
 
+set "PATH=%~dp0%python_folder%\Scripts;%PATH%"
 REM Download required pip packages
 pushd "%python_folder%"
 .\python.exe -m pip install -r ..\..\kernel\requirements.txt
+.\python.exe -m pip install -r ..\..\executor\requirements1.txt
+.\python.exe -m pip install -r ..\..\executor\requirements2.txt
+.\python.exe -m pip install https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.56/llama_cpp_python-0.2.56-cp39-cp39-win_amd64.whl
 popd
 
 REM Check if .env file exists
@@ -81,6 +85,9 @@ if not exist "..\multi-chat\.env" (
     echo .env file already exists, skipping copy.
 )
 
+
+set "PATH=%~dp0%node_folder%;%PATH%"
+
 REM Production update
 pushd "..\multi-chat"
 call ..\windows\%php_folder%\php.exe ..\windows\composer.phar update
@@ -88,12 +95,12 @@ call ..\windows\%php_folder%\php.exe artisan key:generate --force
 call ..\windows\%php_folder%\php.exe artisan migrate --force
 call rmdir public\storage
 call ..\windows\%php_folder%\php.exe artisan storage:link
-call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js install
+call ..\windows\%node_folder%\npm.cmd install
 call ..\windows\%php_folder%\php.exe ..\windows\composer.phar dump-autoload --optimize
 call ..\windows\%php_folder%\php.exe artisan route:cache
 call ..\windows\%php_folder%\php.exe artisan view:cache
 call ..\windows\%php_folder%\php.exe artisan optimize
-call ..\windows\%node_folder%\node.exe ..\windows\%node_folder%\node_modules\npm\bin\npm-cli.js run build
+call ..\windows\%node_folder%\npm.cmd run build
 call ..\windows\%php_folder%\php.exe artisan config:cache
 call ..\windows\%php_folder%\php.exe artisan config:clear
 popd
