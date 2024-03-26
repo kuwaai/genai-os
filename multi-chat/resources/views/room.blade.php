@@ -35,7 +35,15 @@
             $DC = App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
                 ->where('chats.user_id', Auth::user()->id)
                 ->orderby('counts', 'desc')
-                ->select('chatrooms.*', DB::raw('array_agg(chats.bot_id ORDER BY chats.bot_id DESC) as identifier'), DB::raw('count(chats.id) as counts'))
+                ->select(
+                    'chatrooms.*',
+                    DB::raw(
+                        (config('database.default') == 'sqlite'
+                            ? 'GROUP_CONCAT(chats.llm_id ORDER BY chats.llm_id DESC SEPARATOR ",")'
+                            : 'array_agg(chats.bot_id ORDER BY chats.bot_id DESC)') . ' as identifier'
+                    ),
+                    DB::raw('count(chats.id) as counts'),
+                )
                 ->groupBy('chatrooms.id')
                 ->get()
                 ->groupBy('identifier');
@@ -102,6 +110,7 @@
                                     <button data-modal-target="create-model-modal"
                                         data-modal-toggle="create-model-modal"
                                         class="flex rounded-{{ request()->user()->hasPerm('Room_update_import_chat') ? 'l-' : '' }}lg border border-black dark:border-white border-1 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+                                        class="flex rounded-{{ request()->user()->hasPerm('Room_update_import_chat') ? 'l-' : '' }}lg border border-black dark:border-white border-1 w-full menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
                                         <p class="flex-1 text-center text-gray-700 dark:text-white">
                                             {{ __('room.button.create_room') }}
                                         </p>
@@ -109,6 +118,8 @@
                                 @endif
                                 @if (request()->user()->hasPerm('Room_update_import_chat'))
                                     <button data-modal-target="importModal" data-modal-toggle="importModal"
+                                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 {{ request()->user()->hasPerm('Room_update_new_chat') ? 'rounded-r-lg ' : 'rounded-lg w-full' }} flex items-center justify-center">
+                                        {{ request()->user()->hasPerm('Room_update_new_chat') ? '' : '匯入對話　' }}
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 {{ request()->user()->hasPerm('Room_update_new_chat') ? 'rounded-r-lg ' : 'rounded-lg w-full' }} flex items-center justify-center">
                                         {{ request()->user()->hasPerm('Room_update_new_chat') ? '' : '匯入對話　' }}
                                         <i class="fas fa-file-import"></i>
@@ -135,7 +146,11 @@
                     <div>
                         @if (!session('llms'))
                             @php
-                                $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+                                $tasks = \Illuminate\Support\Facades\Redis::lrange(
+                                    'usertask_' . Auth::user()->id,
+                                    0,
+                                    -1,
+                                );
 
                                 $roomId = request()->route('room_id');
 
@@ -200,7 +215,23 @@
                                             shuffle($bufferedBotMessages);
                                             // If there are buffered bot messages, push them into the output collection
                                             $output = $output->merge($bufferedBotMessages);
+                            @php
+                                $output = collect();
+                                $bufferedBotMessages = [];
+                                foreach ($mergedChats as $history) {
+                                    if ($history->isbot) {
+                                        // If the current element is a bot message, buffer it
+                                        $bufferedBotMessages[] = $history;
+                                    } else {
+                                        // If the current element is not a bot message, check if there are buffered bot messages
+                                        if (!empty($bufferedBotMessages)) {
+                                            shuffle($bufferedBotMessages);
+                                            // If there are buffered bot messages, push them into the output collection
+                                            $output = $output->merge($bufferedBotMessages);
 
+                                            // Reset the buffered bot messages array
+                                            $bufferedBotMessages = [];
+                                        }
                                             // Reset the buffered bot messages array
                                             $bufferedBotMessages = [];
                                         }
@@ -213,7 +244,28 @@
                                     shuffle($bufferedBotMessages);
                                     // If there are buffered bot messages, push them into the output collection
                                     $output = $output->merge($bufferedBotMessages);
+                                        // Push the current non-bot message into the output collection
+                                        $output->push($history);
+                                    }
+                                }
+                                if (!empty($bufferedBotMessages)) {
+                                    shuffle($bufferedBotMessages);
+                                    // If there are buffered bot messages, push them into the output collection
+                                    $output = $output->merge($bufferedBotMessages);
 
+                                    // Reset the buffered bot messages array
+                                    $bufferedBotMessages = [];
+                                }
+                                $mergedChats = $output;
+                            @endphp
+                            @foreach ($mergedChats as $history)
+                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers"
+                                    :anonymous="true" />
+                            @endforeach
+                        @else
+                            @foreach ($mergedChats as $history)
+                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
+                            @endforeach
                                     // Reset the buffered bot messages array
                                     $bufferedBotMessages = [];
                                 }
@@ -237,6 +289,8 @@
                     </div>
                 </div>
                 @if (
+                    (request()->user()->hasPerm('Room_update_new_chat') && session('llms')) ||
+                        (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
                     (request()->user()->hasPerm('Room_update_new_chat') && session('llms')) ||
                         (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
                     <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
