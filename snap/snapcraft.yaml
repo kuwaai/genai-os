@@ -1,6 +1,6 @@
 name: kuwa-os
 base: core22 # Since the core22 doesn't support the local plugin
-version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.1.0' # just for humans, typically '1.2+git' or '1.3.2'
 summary: An open, free, secure, and privacy-focused Generative-AI Operating System.
 description: |
   Kuwa OS is an open, free, secure, and privacy-focused Generative-AI Operating
@@ -70,6 +70,19 @@ package-repositories:
  - type: apt
    ppa: ondrej/php
 
+# slots:
+#   multi-chat:
+#     interface: content
+#     content: storage
+#     write: 
+#       - $SNAP/var/www/html/multi-chat
+
+# plugs:
+#   multi-chat:
+#     interface: content
+#     content: storage
+#     target: $SNAP/var/www/html/multi-chat
+
 parts:
   # Manually install Node.js
   # This part will not included in the snap.
@@ -91,28 +104,156 @@ parts:
       curl -s https://getcomposer.org/installer | php
       mv composer.phar /usr/local/bin/composer
       echo Version of Composer: $(composer --version)
+  
+  # # Build a portable PHP from source
+  # # Reference: nextcloud-snap
+  # php:
+  #   plugin: autotools
+  #   source: https://www.php.net/distributions/php-8.1.27.tar.gz
+  #   source-type: tar
+  #   source-checksum: sha256/9aa5d7a29389d799885d90740932697006d5d0f55d1def67678e0c14f6ab7b2d
+  #   build-packages:
+  #     - pkg-config
+  #     - build-essential
+  #     - autoconf
+  #     - bison
+  #     - re2c
+  #     - libxml2-dev
+  #     - libcurl4-openssl-dev
+  #     - libpng-dev
+  #     - libjpeg8-dev
+  #     - libbz2-dev
+  #     - libmcrypt-dev
+  #     - libldap2-dev
+  #     - libfreetype6-dev
+  #     - libgmp-dev
+  #     - libzip-dev
+  #     - libargon2-0-dev
+  #     - libsodium-dev
 
+  #     # This is no longer bundled with PHP as of v7.4
+  #     - libonig-dev
+  #   stage-packages:
+  #     - libasn1-8-heimdal
+  #     - libcurl4
+  #     - libfreetype6
+  #     - libgssapi3-heimdal
+  #     - libhcrypto4-heimdal
+  #     - libheimbase1-heimdal
+  #     - libheimntlm0-heimdal
+  #     - libhx509-5-heimdal
+  #     - libicu70
+  #     - libjpeg8
+  #     - libkrb5-26-heimdal
+  #     - libldap-2.5-0
+  #     - libnghttp2-14
+  #     - libpng16-16
+  #     - libpsl5
+  #     - libroken18-heimdal
+  #     - librtmp1
+  #     - libsasl2-2
+  #     - libwind0-heimdal
+  #     - libxml2
+  #     - libzip4
+  #     - libargon2-0
+  #     - libonig5
+  #     - libsodium23
+  #     - libssl-dev
+  #   override-build: |
+  #     ./configure --enable-fpm --disable-cgi --disable-phar --disable-phpdbg --disable-rpath\
+  #       --enable-ctype --enable-mbstring --with-zip --with-zlib --with-bz2 --enable-gd --with-curl \
+  #       --with-openssl --with-sodium --enable-exif --enable-intl --enable-pcntl --with-jpeg \
+  #       --with-freetype --enable-bcmath --enable-sysvsem --with-gmp --with-password-argon2 \
+  #       --without-sqlite3 --without-pdo-sqlite --with-pdo-pgsql --with-pgsql `# Use PGSQL as database`\
+  #       --with-libdir=lib/${SNAPCRAFT_ARCH_TRIPLET} --with-ldap `# LDAP support`\
+  #       --prefix=${CRAFT_PART_INSTALL}
+  #     make -j${SNAP}
+  #     make install 
+    
+  #   stage: ['*']
+  php:
+    plugin: nil
+    source: snap/local/php
+    
+    override-build: |
+      # Custom configuration and scripts
+      mkdir -p ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/pool.d
+      mkdir -p ${CRAFT_PART_INSTALL}/etc/php/8.1/cli
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/bin
+      install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/ php.ini
+      install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/cli/ php.ini
+      install -v -T php-fpm-pool.conf ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/pool.d/www.conf 
+      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ php-wrapper
+    
+    stage: ['*']
+    stage-packages: [
+      php8.1, php8.1-cli, php8.1-fpm,
+      php8.1-curl, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-ldap,
+      php8.1-pgsql, php8.1-pdo-pgsql, php8.1-redis
+    ]
+    # stage:
+    #   - -etc/php/8.1/fpm/pool.d/www.conf
+
+    override-prime: |
+      craftctl default
+
+      mkdir -p ${CRAFT_PRIME}/etc/php/8.1/mods-available
+      find ${CRAFT_STAGE}/usr/share/ -iwholename "*php*.ini" -exec cp {} ${CRAFT_PRIME}/etc/php/8.1/mods-available \;
+      
+      mkdir -p ${CRAFT_PRIME}/etc/php/8.1/cli/conf.d/
+      cd ${CRAFT_PRIME}/etc/php/8.1/cli/conf.d/
+      ln -f -s ../../mods-available/*.ini .
+      
+      mkdir -p ${CRAFT_PRIME}/etc/php/8.1/fpm/conf.d/
+      cd ${CRAFT_PRIME}/etc/php/8.1/fpm/conf.d/
+      ln -f -s ../../mods-available/*.ini .
+    # prime:
+    #   - '*'
+    #   - 'etc/php/8.1/mods-available'
+  
+  nginx:
+    plugin: nil
+    source: snap/local/nginx
+    stage-packages: [nginx]
+    override-build: |
+      mkdir -p ${CRAFT_PART_INSTALL}/etc/nginx/sites-available
+      mkdir -p ${CRAFT_PART_INSTALL}/etc/nginx/sites-enabled
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/bin
+      install -v -T nginx_config ${CRAFT_PART_INSTALL}/etc/nginx/sites-available/multi-chat
+      install -v -T nginx_config ${CRAFT_PART_INSTALL}/etc/nginx/sites-enabled/multi-chat
+    stage: ['*']
+  
+  postgresql:
+    plugin: nil
+    stage-packages: [postgresql, postgresql-contrib]
+
+  redis:
+    plugin: nil
+    stage-packages: [redis]
+  
   multi-chat:
-    source: multi-chat/web
+    source: multi-chat
     plugin: nil
     after: [nodejs, composer]
     build-packages: [
       php8.1, php8.1-cli,
       php8.1-curl, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-ldap,
-      php8.1-pgsql, php8.1-redis
+      php8.1-pgsql, php8.1-pdo-pgsql, php8.1-redis
     ] 
     override-build: |
       set -xeu
       
       update-alternatives --set php /usr/bin/php8.1
       sed -E -i 's/^;(extension=ldap)/\1/' /etc/php/8.1/cli/php.ini
-      mv .env.dev .env 2>/dev/null; true
+      mv .env.dev .env 2>/dev/null || true
       
       # Optimize Laravel
       composer update
       php artisan key:generate --force
-      rm -rf ./public/storage
-      php artisan storage:link
+      pushd public &&
+        rm -f storage &&
+        ln -s ../storage storage &&
+        popd # Reconstruct the symbolic link
       composer dump-autoload --optimize
       php artisan config:cache
       php artisan route:cache
@@ -127,25 +268,21 @@ parts:
       mkdir -p ${CRAFT_PART_INSTALL}/site/
       cp -rf * ${CRAFT_PART_INSTALL}/site/
       chown -R www-data:www-data ${CRAFT_PART_INSTALL}/site/
-      install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/ php.ini
-      install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/pool.d/ www.conf
-      install -v -T snap/nginx_config ${CRAFT_PART_INSTALL}/etc/nginx/sites-available/multi-chat
-      install -v -T snap/nginx_config ${CRAFT_PART_INSTALL}/etc/nginx/sites-enabled/multi-chat
-      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ snap/run-redis-workers
-      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ snap/init-web
-    
-    stage-packages: [
-      nginx, postgresql, postgresql-contrib, redis, 
-      php8.1, php8.1-fpm,
-      php8.1-curl, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-ldap,
-      php8.1-pgsql, php8.1-redis
-    ]
     
     organize:
-      'site' : var/www/html/multi-chat
+      'site' : usr/share/multi-chat/site
+
     stage:
-      - '*'
-    prime:
       - -README*
-      - -var/www/html/multi-chat/demo
-      - -var/www/html/multi-chat/executables
+      - -usr/share/multi-chat/site/demo
+      - -usr/share/multi-chat/site/executables
+
+  multi-chat-script:
+    source: snap/local/multi-chat
+    after: [multi-chat]
+    plugin: nil
+    override-build: |
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/bin
+      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ run-redis-workers
+      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ init-web
+    stage: ['*']

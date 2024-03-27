@@ -1,0 +1,25 @@
+#!/bin/sh -xeu
+
+pwd
+printenv
+
+# Create the data directory of the multi-chat
+mkdir -p ${SNAP_DATA}/multi-chat
+chmod -R 750 ${SNAP_DATA}/multi-chat
+
+# Setup data directory (RW) of multi-chat.
+# ${SNAP_DATA}/multi-chat/storage
+cd ${SNAP}/usr/share/multi-chat/site/
+cp -r ./storage ${SNAP_DATA}/multi-chat
+find ./ -mindepth 1 -maxdepth 1 -not -path "./storage" -not -path "./public" \
+   -exec ln -sf $(realpath {}) ${SNAP_DATA}/multi-chat/ \;
+
+# Setup data directory (RW) of multi-chat.
+# ${SNAP_DATA}/multi-chat/public/storage -> ../storage/app/public
+cd ${SNAP}/usr/share/multi-chat/site/public
+mkdir -p ${SNAP_DATA}/multi-chat/public
+find ./ -mindepth 1 -maxdepth 1 -not -path "./storage"\
+    -exec ln -sf $(realpath {}) ${SNAP_DATA}/multi-chat/public/ \;
+cd ${SNAP_DATA}/multi-chat/public/
+ln -sf ../storage/app/public storage
+# mount -o rw --bind $SNAP_DATA/storage $SNAP/usr/share/multi-chat/site/storage
