@@ -1,19 +1,9 @@
 #!/bin/bash
 set -xeu
 
-pwd
-printenv
+cd ${SNAP_DAT}/multi-chat
 
-# setup data directory
-mkdir -p $SNAP_DATA/storage
-chmod -R 750 $SNAP_DATA/storage
-cp -rf $SNAP/var/www/html/multi-chat/storage $SNAP_DATA/
-mount -o rw --bind $SNAP_DATA/storage $SNAP/var/www/html/multi-chat/storage
-
-cd $SNAP/var/www/html/multi-chat
-php -m
-
-php artisan migrate --force
-php artisan db:seed --class=AdminSeeder --force
+php-snap artisan migrate --force
+php-snap artisan db:seed --class=AdminSeeder --force
 
 $SNAP/etc/init.d/nginx restart

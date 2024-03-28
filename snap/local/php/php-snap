@@ -2,4 +2,5 @@
 
 LD_LIBRARY_PATH=${SNAP}/usr/lib/php/20210902/:${LD_LIBRARY_PATH} \
 PHP_INI_SCAN_DIR=${SNAP}/etc/php/8.1/cli/conf.d \
+OPENSSL_CONF=${SNAP}/usr/lib/ssl/openssl.cnf \
 php8.1 -c ${SNAP}/etc/php/8.1/cli/php.ini $@

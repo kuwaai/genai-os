@@ -22,4 +22,6 @@ find ./ -mindepth 1 -maxdepth 1 -not -path "./storage"\
     -exec ln -sf $(realpath {}) ${SNAP_DATA}/multi-chat/public/ \;
 cd ${SNAP_DATA}/multi-chat/public/
 ln -sf ../storage/app/public storage
+
+# Solution2: need additional privilege
 # mount -o rw --bind $SNAP_DATA/storage $SNAP/usr/share/multi-chat/site/storage

@@ -183,33 +183,56 @@ parts:
       install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/ php.ini
       install -v -t ${CRAFT_PART_INSTALL}/etc/php/8.1/cli/ php.ini
       install -v -T php-fpm-pool.conf ${CRAFT_PART_INSTALL}/etc/php/8.1/fpm/pool.d/www.conf 
-      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ php-wrapper
+      install -v -m 755 -t ${CRAFT_PART_INSTALL}/usr/bin/ php-snap
     
     stage: ['*']
     stage-packages: [
       php8.1, php8.1-cli, php8.1-fpm,
-      php8.1-curl, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-ldap,
-      php8.1-pgsql, php8.1-pdo-pgsql, php8.1-redis
+      php8.1-curl, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-bz2,
+      php8.1-ldap, php8.1-pgsql, php8.1-pdo-pgsql, php8.1-redis, php8.1-igbinary
     ]
-    # stage:
-    #   - -etc/php/8.1/fpm/pool.d/www.conf
 
     override-prime: |
       craftctl default
+      
+      function enable_all_module() {
+        local install_path=$1
+        mkdir -p ${install_path}
+        pushd ${install_path} || return
+        
+        # Create symbolic link of all modules.
+        rm -f *.ini
+        ln -f -s ../../mods-available/*.ini .
+        
+        # Prepend the priority to the extension configuration files.
+        for conf_file in *.ini; do
+          # Get the priority value from the file
+          priority=""
+          : "${priority:=$(grep -oP '(?<=priority=)\d+' ${conf_file})}"
+          : "${priority:=20}" # Default priority is 20
+          
+          # Rename the file with the prefix of priority
+          mv ${conf_file} "${priority}-${conf_file}"
+        done
+        popd || retuen
+      }
 
+      # Copy the installed modules.
+      # In the dpkg, this is done by the postinst script of each module.
+      # However, in the snapcraft, the aforementioned script won't be executed.
+      # Thus, we have to manually copy it.
       mkdir -p ${CRAFT_PRIME}/etc/php/8.1/mods-available
-      find ${CRAFT_STAGE}/usr/share/ -iwholename "*php*.ini" -exec cp {} ${CRAFT_PRIME}/etc/php/8.1/mods-available \;
+      find ${CRAFT_STAGE}/usr/share/ -iwholename "*php*.ini" \
+        -not -path "*/php.ini" \
+        -exec cp {} ${CRAFT_PRIME}/etc/php/8.1/mods-available \;
+
+      # Fix the dependency issue of redis module.
+      # The redis module should be loaded after the igbinary module.
+      echo "; priority=30" >> ${CRAFT_PRIME}/etc/php/8.1/mods-available/redis.ini
       
-      mkdir -p ${CRAFT_PRIME}/etc/php/8.1/cli/conf.d/
-      cd ${CRAFT_PRIME}/etc/php/8.1/cli/conf.d/
-      ln -f -s ../../mods-available/*.ini .
-      
-      mkdir -p ${CRAFT_PRIME}/etc/php/8.1/fpm/conf.d/
-      cd ${CRAFT_PRIME}/etc/php/8.1/fpm/conf.d/
-      ln -f -s ../../mods-available/*.ini .
-    # prime:
-    #   - '*'
-    #   - 'etc/php/8.1/mods-available'
+      # Create enable all modules for both PHP-CLI and PHP-FPM
+      enable_all_module ${CRAFT_PRIME}/etc/php/8.1/cli/conf.d/
+      enable_all_module ${CRAFT_PRIME}/etc/php/8.1/fpm/conf.d/
   
   nginx:
     plugin: nil
