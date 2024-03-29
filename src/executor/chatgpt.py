@@ -1,11 +1,14 @@
 import argparse
 import os
 import sys
+import logging
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import openai
-from base import *
+from base import LLMWorker
 
-class GeminiWorker(LLMWorker):
+logger = logging.getLogger(__name__)
+
+class ChatGptWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
@@ -44,7 +47,7 @@ class GeminiWorker(LLMWorker):
                                 if ("This model's maximum context length is" in i.choices[0].delta.content):
                                     limit = 1000*16 - len(str(msg))
                                     break
-                                print(end=i.choices[0].delta.content)
+                                logger.debug(end=i.choices[0].delta.content)
                                 yield i.choices[0].delta.content
                             if not self.proc: break
                     if limit > 1000*3+512:
@@ -55,14 +58,14 @@ class GeminiWorker(LLMWorker):
                             if i.choices[0].delta.content:
                                 yield i.choices[0].delta.content
                             if not self.proc: break
-                    print(limit)
+                    logger.debug(limit)
                     openai.api_key = None
                 else:
                     yield "[請在網站的使用者設定中，將您的OpenAI API Token填入，才能使用該模型]" if len(msg) > 0 else "[沒有輸入任何訊息]"
             else:
                 yield "[請在網站的使用者設定中，將您的OpenAI API Token填入，才能使用該模型]" if msg else "[沒有輸入任何訊息]"
         except Exception as e:
-            print(e)
+            logger.exceptions("Error occurs when calling OpenAI API")
             if str(e).startswith("Incorrect API key provided:"):
                 yield "[無效的OpenAI API Token，請檢查該OpenAI API Token是否正確]"
             else:
@@ -70,15 +73,15 @@ class GeminiWorker(LLMWorker):
         finally:
             self.proc = False
             self.Ready = True
-            print("finished")
+            logger.debug("finished")
 
     def abort(self):
         if self.proc:
             self.proc = False
-            print("aborted")
+            logger.debug("aborted")
             return "Aborted"
         return "No process to abort"
 
 if __name__ == "__main__":
-    worker = GeminiWorker()
+    worker = ChatGptWorker()
     worker.run()

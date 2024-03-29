@@ -6,9 +6,11 @@ import signal
 import argparse
 import os
 import socket
+import logging
 from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
 
+logger = logging.getLogger(__name__)
 class LLMWorker:
     def __init__(self):
         self.app = Flask(__name__)
@@ -29,9 +31,16 @@ class LLMWorker:
         parser.add_argument('--prompt_path', default='', help='Prompt path')
         parser.add_argument('--gpu_config', default=None, help='GPU config')
         parser.add_argument('--agent_endpoint', default='http://127.0.0.1:9000/', help='Agent endpoint')
+        parser.add_argument("--log", help="the log level. (INFO, DEBUG, ...)", type=str, default="INFO")
         return parser
 
     def _setup(self):
+        # Setup logger
+        numeric_level = getattr(logging, self.args.log.upper(), None)
+        if not isinstance(numeric_level, int):
+            raise ValueError(f'Invalid log level: {args.log}')
+        logging.basicConfig(level=numeric_level)
+        
         self.app.register_blueprint(ServerSentEventsBlueprint('sse', __name__), url_prefix=self.args.worker_path)
         self.Ready = True
 
@@ -67,9 +76,9 @@ class LLMWorker:
                 resp = Response(self.llm_compute(data), mimetype='text/event-stream')
                 resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
                 if data: return resp
-                print("Request received, but no data is here!")
+                logger.info("Request received, but no data is here!")
                 self.Ready = True
-            return Response(status=404)
+            return Response(status=429)
         
         @self.app.route('/health')
         def health_check():
@@ -89,7 +98,7 @@ class LLMWorker:
         signal.signal(signal.SIGTERM, self._handle_sigterm)
 
     def _handle_sigterm(self, signum, frame):
-        print("Received SIGTERM, exiting...")
+        logger.info("Received SIGTERM, exiting...")
         self._shut_down()
         sys.exit(0)
 
@@ -98,21 +107,21 @@ class LLMWorker:
             try:
                 response = requests.post(self.agent_endpoint + f"{self.version_code}/worker/unregister", data={"name":self.LLM_name,"endpoint":self.reg_endpoint})
                 if response.text == "Failed":
-                    print("Warning, Failed to unregister from agent")
+                    logger.warning("Failed to unregister from agent")
             except requests.exceptions.ConnectionError as e:
-                print("Warning, Failed to unregister from agent")
+                logger.warning("Failed to unregister from agent")
 
     def _start_server(self):
         self.registered = True
         response = requests.post(self.agent_endpoint + f"{self.version_code}/worker/register", data={"name":self.LLM_name,"endpoint":self.reg_endpoint})
         if response.text == "Failed":
-            print("Warning, The server failed to register to agent")
+            logger.warning("The server failed to register to agent")
             self.registered = False
             if not self.ignore_agent:
-                print("The program will exit now.")
+                logger.info("The program will exit now.")
                 sys.exit(0)
         else:
-            print("Registered")
+            logger.info(f"Registered with access code \"{self.args.access_code}\"")
         self.app.run(port=self.port, host="0.0.0.0", threaded=True)
         self._shut_down()
 

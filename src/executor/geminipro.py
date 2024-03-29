@@ -1,9 +1,12 @@
 import argparse
 import os
 import sys
+import logging
 import google.generativeai as genai
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from base import *
+from base import LLMWorker
+
+logger = logging.getLogger(__name__)
 
 class GeminiWorker(LLMWorker):
     def __init__(self):
@@ -36,22 +39,22 @@ class GeminiWorker(LLMWorker):
             for i in chat.send_message(quiz, stream=True,safety_settings={'HARASSMENT':'block_none','HARM_CATEGORY_DANGEROUS_CONTENT':'block_none','HARM_CATEGORY_HATE_SPEECH':'block_none',"HARM_CATEGORY_SEXUALLY_EXPLICIT":"block_none"}):
                 for o in i.text:
                     yield o
-                    print(end=o)
+                    logger.debug(end=o)
                     time.sleep(0.01)
                     if not self.proc: break
                 if not self.proc: break
         except Exception as e:
-            print(e)
+            logger.exception("Error occurs when calling Gemini-Pro API.")
             yield str(e)
         finally:
             self.proc = False
             self.Ready = True
-            print("finished")
+            logger.debug("finished")
 
     def abort(self):
         if self.proc:
             self.proc = False
-            print("aborted")
+            logger.debug("aborted")
             return "Aborted"
         return "No process to abort"
 

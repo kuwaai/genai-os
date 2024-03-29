@@ -1,5 +1,7 @@
 import socket, os, time
-from base import *
+from base import LLMWorker
+
+logger = logging.getLogger(__name__)
 
 if not app.LLM_name:
     app.LLM_name = "debug"
@@ -10,9 +12,9 @@ def llm_compute(data):
             yield i
             time.sleep(0.02)
     except Exception as e:
-        print(e)
+        logger.exception()
     finally:
         app.Ready[0] = True
-        print("finished")
+        logger.info("finished")
 app.llm_compute = llm_compute
 start()

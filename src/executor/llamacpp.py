@@ -3,9 +3,11 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from llama_cpp import Llama
-from base import *
+from base import LLMWorker
 
-class GeminiWorker(LLMWorker):
+logger = logging.getLogger(__name__)
+
+class LlamaCppWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
@@ -41,18 +43,18 @@ class GeminiWorker(LLMWorker):
                 )
                 
                 for i in output:
-                    print(end=i["choices"][0]["text"],flush=True)
+                    logger.debug(end=i["choices"][0]["text"],flush=True)
                     yield i["choices"][0]["text"]
             else:
                 yield "[Sorry, The input message is too long!]"
 
         except Exception as e:
-            print(e)
+            logger.error("Error occurs while processing request.")
             raise e
         finally:
             self.Ready = True
-            print("finished")
+            logger.debug("finished")
 
 if __name__ == "__main__":
-    worker = GeminiWorker()
+    worker = LlamaCppWorker()
     worker.run()

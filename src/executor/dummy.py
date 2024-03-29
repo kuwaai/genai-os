@@ -1,5 +1,8 @@
 import socket, os
-from base import *
+import logging
+from base import LLMWorker
+
+logger = logging.getLogger(__name__)
 
 if not app.LLM_name:
     app.LLM_name = "debug"
@@ -25,16 +28,16 @@ def llm_compute(data):
             time.sleep(0.1)
             if not proc: break
     except Exception as e:
-        print(e)
+        logger.error("Error occurs while processing request.")
     finally:
         proc = False
         app.Ready[0] = True
-        print("finished")
+        logger.debug("finished")
 def abort():
     global proc
     if proc:
         proc = False
-        print("aborted")
+        logger.debug("aborted")
         return "Aborted"
     return "No process to abort"
 # model part ends
