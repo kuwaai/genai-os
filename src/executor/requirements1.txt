@@ -5,3 +5,6 @@ pathspec
 flask
 flask-sse
 retry
+click
+requests
+APScheduler

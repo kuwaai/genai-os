@@ -7,3 +7,5 @@ RunHiddenConsole*/
 Redis*/
 composer.phar
 env.bat
+packages
+*.zip
