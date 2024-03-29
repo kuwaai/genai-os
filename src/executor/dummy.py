@@ -1,20 +1,13 @@
-import socket, os
+import os
+import sys
+import asyncio
 import logging
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from base import LLMWorker
 
 logger = logging.getLogger(__name__)
 
-if not app.LLM_name:
-    app.LLM_name = "debug"
-
-global proc
-proc = None
-
-def llm_compute(data): 
-    global proc
-    try:
-        proc = True
-        for i in """你好我是個語言模型很高興認識你...之類的xD
+lorem = """你好我是個語言模型很高興認識你...之類的xD
 <<<WARNING>>>
 這是一個測試警告
 這是二個測試警告
@@ -23,24 +16,44 @@ def llm_compute(data):
 <<<WARNING>>>
 警告2，嗨
 <<</WARNING>>>
-輸出文字模擬結束""":
-            yield i
-            time.sleep(0.1)
-            if not proc: break
-    except Exception as e:
-        logger.error("Error occurs while processing request.")
-    finally:
-        proc = False
-        app.Ready[0] = True
-        logger.debug("finished")
-def abort():
-    global proc
-    if proc:
-        proc = False
-        logger.debug("aborted")
+輸出文字模擬結束"""
+
+class DummyWorker(LLMWorker):
+    def __init__(self):
+        super().__init__()
+
+    def _create_parser(self):
+        parser = super()._create_parser()
+        parser.add_argument('--delay', type=int, default=0.02, help='Inter-token delay')
+        return parser
+
+    def _setup(self):
+        super()._setup()
+
+        if not self.LLM_name:
+            self.LLM_name = "dummy"
+
+        self.stop = False
+
+    async def llm_compute(self, data):
+        try:
+            self.stop = False
+            for i in lorem: 
+                yield i
+                if self.stop:
+                    self.stop = False
+                    break
+                await asyncio.sleep(self.args.delay)
+        except Exception as e:
+            logger.exception("Error occurs during generation.")
+            yield str(e)
+        finally:
+            logger.debug("finished")
+
+    async def abort(self):
+        self.stop = True
         return "Aborted"
-    return "No process to abort"
-# model part ends
-app.llm_compute = llm_compute
-app.abort = abort
-start()
+
+if __name__ == "__main__":
+    worker = DummyWorker()
+    worker.run()
