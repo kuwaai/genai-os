@@ -4,3 +4,4 @@ pyproject-metadata
 pathspec
 flask
 flask-sse
+retry

@@ -7,6 +7,9 @@ import argparse
 import os
 import socket
 import logging
+import atexit
+from urllib.parse import urljoin
+from retry import retry
 from flask import Flask, request, Response
 from flask_sse import ServerSentEventsBlueprint
 
@@ -39,7 +42,11 @@ class LLMWorker:
         numeric_level = getattr(logging, self.args.log.upper(), None)
         if not isinstance(numeric_level, int):
             raise ValueError(f'Invalid log level: {args.log}')
-        logging.basicConfig(level=numeric_level)
+        logging.basicConfig(
+            level=numeric_level,
+            format='%(asctime)s [%(levelname)s]\t%(name)s - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
         
         self.app.register_blueprint(ServerSentEventsBlueprint('sse', __name__), url_prefix=self.args.worker_path)
         self.Ready = True
@@ -91,37 +98,46 @@ class LLMWorker:
             return "No abort method configured"
 
     def run(self):
-        self._register_signals()
+        atexit.register(self._shut_down)
         self._start_server()
 
-    def _register_signals(self):
-        signal.signal(signal.SIGTERM, self._handle_sigterm)
-
-    def _handle_sigterm(self, signum, frame):
-        logger.info("Received SIGTERM, exiting...")
-        self._shut_down()
-        sys.exit(0)
-
     def _shut_down(self):
-        if hasattr(self, 'registered') and self.registered:
-            try:
-                response = requests.post(self.agent_endpoint + f"{self.version_code}/worker/unregister", data={"name":self.LLM_name,"endpoint":self.reg_endpoint})
-                if response.text == "Failed":
-                    logger.warning("Failed to unregister from agent")
-            except requests.exceptions.ConnectionError as e:
-                logger.warning("Failed to unregister from agent")
+        if not hasattr(self, 'registered') or not self.registered:
+            return
+        try:
+            response = requests.post(self.agent_endpoint + f"{self.version_code}/worker/unregister", data={"name":self.LLM_name,"endpoint":self.reg_endpoint})
+            if not response.ok or response.text == "Failed":
+                raise RuntimeWarning()
+            else:
+                logger.info("Unregistered from agent.")
+                self.registered = False
+        except requests.exceptions.ConnectionError as e:
+            logger.warning("Failed to unregister from agent")
 
+    @retry(tries=5, delay=1, backoff=2, jitter=(0, 1), logger=logger)
+    def _try_register(self):
+        resp = requests.post(
+            url=urljoin(self.agent_endpoint, f"{self.version_code}/worker/register"),
+            data={"name": self.LLM_name, "endpoint": self.reg_endpoint}
+        )
+        if not resp.ok or resp.text == "Failed":
+            raise RuntimeWarning("The server failed to register to agent.")
+    
     def _start_server(self):
-        self.registered = True
-        response = requests.post(self.agent_endpoint + f"{self.version_code}/worker/register", data={"name":self.LLM_name,"endpoint":self.reg_endpoint})
-        if response.text == "Failed":
-            logger.warning("The server failed to register to agent")
-            self.registered = False
-            if not self.ignore_agent:
-                logger.info("The program will exit now.")
-                sys.exit(0)
-        else:
-            logger.info(f"Registered with access code \"{self.args.access_code}\"")
+        self.registered = False
+        if not self.ignore_agent:
+            try:
+                self._try_register()
+                logger.info(f"Registered with the name \"{self.LLM_name}\"")
+                self.registered = True
+
+            except Exception as e:
+                logger.exception("Failed to register to agent.")
+
+                if not self.ignore_agent:
+                    logger.info("The program will exit now.")
+                    sys.exit(0)
+        
         self.app.run(port=self.port, host="0.0.0.0", threaded=True)
         self._shut_down()
 
