@@ -13,6 +13,11 @@ class LlamaCppWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
+    def _create_parser(self):
+        parser = super()._create_parser()
+        parser.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
+        return parser
+
     def _setup(self):
         super()._setup()
 
@@ -22,7 +27,7 @@ class LlamaCppWorker(LLMWorker):
         if not self.LLM_name:
             self.LLM_name = "gguf"
 
-        self.model = Llama(model_path=self.model_path)
+        self.model = Llama(model_path=self.model_path, n_gpu_layers=self.args.ngl)
         self.proc = False
 
     async def llm_compute(self, data):
