@@ -23,7 +23,7 @@ class LlamaCppWorker(LLMWorker):
         self.model = Llama(model_path=self.model_path)
         self.proc = False
 
-    def llm_compute(self, data):
+    async def llm_compute(self, data):
         try:
             s = time.time()
             history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
@@ -43,7 +43,7 @@ class LlamaCppWorker(LLMWorker):
                 )
                 
                 for i in output:
-                    logger.debug(end=i["choices"][0]["text"],flush=True)
+                    if self.debug: print(end=i["choices"][0]["text"], flush=True)
                     yield i["choices"][0]["text"]
             else:
                 yield "[Sorry, The input message is too long!]"
@@ -52,7 +52,6 @@ class LlamaCppWorker(LLMWorker):
             logger.error("Error occurs while processing request.")
             raise e
         finally:
-            self.Ready = True
             logger.debug("finished")
 
 if __name__ == "__main__":

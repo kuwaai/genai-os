@@ -25,7 +25,7 @@ class ChatGptWorker(LLMWorker):
 
         self.proc = False
 
-    def llm_compute(self, data):
+    async def llm_compute(self, data):
         try:
             chatgpt_apitoken = data.get("chatgpt_apitoken")
             if not chatgpt_apitoken: chatgpt_apitoken = self.args.api_key
@@ -39,15 +39,20 @@ class ChatGptWorker(LLMWorker):
                     limit = 1000*3+512 - len(str(msg))
                     if limit < 256: limit = 1000*16 - len(str(msg))
                     if limit <= 1000*3+512:
-                        for i in openai.chat.completions.create(model="gpt-3.5-turbo",
+                        client = openai.AsyncOpenAI(api_key=chatgpt_apitoken)
+                        response = await client.chat.completions.create(
+                            model="gpt-3.5-turbo",
                             max_tokens=limit,
                             temperature=0.5,
-                            messages=msg, stream=True):
+                            messages=msg,
+                            stream=True
+                        )
+                        async for i in response:
                             if i.choices[0].delta.content:
                                 if ("This model's maximum context length is" in i.choices[0].delta.content):
                                     limit = 1000*16 - len(str(msg))
                                     break
-                                logger.debug(end=i.choices[0].delta.content)
+                                if self.debug: print(end=i.choices[0].delta.content, flush=True)
                                 yield i.choices[0].delta.content
                             if not self.proc: break
                     if limit > 1000*3+512:
@@ -65,17 +70,16 @@ class ChatGptWorker(LLMWorker):
             else:
                 yield "[請在網站的使用者設定中，將您的OpenAI API Token填入，才能使用該模型]" if msg else "[沒有輸入任何訊息]"
         except Exception as e:
-            logger.exceptions("Error occurs when calling OpenAI API")
+            logger.exception("Error occurs when calling OpenAI API")
             if str(e).startswith("Incorrect API key provided:"):
                 yield "[無效的OpenAI API Token，請檢查該OpenAI API Token是否正確]"
             else:
                 yield str(e)
         finally:
             self.proc = False
-            self.Ready = True
             logger.debug("finished")
 
-    def abort(self):
+    async def abort(self):
         if self.proc:
             self.proc = False
             logger.debug("aborted")

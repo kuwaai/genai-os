@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import asyncio
 import logging
 import google.generativeai as genai
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -29,18 +30,19 @@ class GeminiWorker(LLMWorker):
         self.model = genai.GenerativeModel('gemini-pro')
         self.proc = False
 
-    def llm_compute(self, data):
+    async def llm_compute(self, data):
         try:
             msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in eval(data.get("input").replace("true","True").replace("false","False"))]
             quiz = msg[-1]
             msg = msg[:-1]
             chat = self.model.start_chat(history=msg)
             self.proc = True
-            for i in chat.send_message(quiz, stream=True,safety_settings={'HARASSMENT':'block_none','HARM_CATEGORY_DANGEROUS_CONTENT':'block_none','HARM_CATEGORY_HATE_SPEECH':'block_none',"HARM_CATEGORY_SEXUALLY_EXPLICIT":"block_none"}):
+            response = await chat.send_message_async(quiz, stream=True,safety_settings={'HARASSMENT':'block_none','HARM_CATEGORY_DANGEROUS_CONTENT':'block_none','HARM_CATEGORY_HATE_SPEECH':'block_none',"HARM_CATEGORY_SEXUALLY_EXPLICIT":"block_none"})
+            async for i in response:
                 for o in i.text:
                     yield o
-                    logger.debug(end=o)
-                    time.sleep(0.01)
+                    if self.debug: print(end=o, flush=True)
+                    await asyncio.sleep(0.01)
                     if not self.proc: break
                 if not self.proc: break
         except Exception as e:
@@ -48,10 +50,9 @@ class GeminiWorker(LLMWorker):
             yield str(e)
         finally:
             self.proc = False
-            self.Ready = True
             logger.debug("finished")
 
-    def abort(self):
+    async def abort(self):
         if self.proc:
             self.proc = False
             logger.debug("aborted")
