@@ -2,9 +2,10 @@ scikit-build
 scikit-build-core
 pyproject-metadata
 pathspec
-flask
-flask-sse
+fastapi
+uvicorn
 retry
+python-multipart
 click
 requests
 APScheduler

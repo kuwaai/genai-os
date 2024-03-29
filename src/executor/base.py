@@ -1,22 +1,23 @@
-import time
-import re
 import requests
 import sys
-import signal
 import argparse
 import os
 import socket
 import logging
 import atexit
+import asyncio
 from urllib.parse import urljoin
+
+import uvicorn
 from retry import retry
-from flask import Flask, request, Response
-from flask_sse import ServerSentEventsBlueprint
+from fastapi import FastAPI, Response, Request
+from fastapi.responses import JSONResponse, StreamingResponse
 
 logger = logging.getLogger(__name__)
+
 class LLMWorker:
     def __init__(self):
-        self.app = Flask(__name__)
+        self.app = FastAPI()
         self.parser = self._create_parser()
         self.args = self.parser.parse_args()
         self._setup()
@@ -28,28 +29,27 @@ class LLMWorker:
         parser.add_argument('--ignore_agent', action='store_true', help='Ignore agent')
         parser.add_argument('--public_ip', default=None, help='This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent')
         parser.add_argument('--port', type=int, default=None, help='The port to use, by choosing None, it\'ll assign an unused port')
-        parser.add_argument('--worker_path', default='/', help='The path this model worker is going to use')
+        parser.add_argument('--worker_path', default='/chat', help='The path this model worker is going to use')
         parser.add_argument('--limit', type=int, default=1024*3, help='Limit')
         parser.add_argument('--model_path', default=None, help='Model path')
         parser.add_argument('--prompt_path', default='', help='Prompt path')
         parser.add_argument('--gpu_config', default=None, help='GPU config')
         parser.add_argument('--agent_endpoint', default='http://127.0.0.1:9000/', help='Agent endpoint')
-        parser.add_argument("--log", help="the log level. (INFO, DEBUG, ...)", type=str, default="INFO")
+        parser.add_argument("--log", type=str, default="INFO", help="The log level. (INFO, DEBUG, ...)")
         return parser
 
     def _setup(self):
         # Setup logger
         numeric_level = getattr(logging, self.args.log.upper(), None)
         if not isinstance(numeric_level, int):
-            raise ValueError(f'Invalid log level: {args.log}')
+            raise ValueError(f'Invalid log level: {self.args.log}')
         logging.basicConfig(
             level=numeric_level,
             format='%(asctime)s [%(levelname)s]\t%(name)s - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         
-        self.app.register_blueprint(ServerSentEventsBlueprint('sse', __name__), url_prefix=self.args.worker_path)
-        self.Ready = True
+        self.ready = True
 
         if self.args.gpu_config:
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.gpu_config
@@ -61,6 +61,7 @@ class LLMWorker:
         self.ignore_agent = self.args.ignore_agent
         self.limit = self.args.limit
         self.public_ip = self.args.public_ip
+        self.debug = (self.args.log.upper() == "DEBUG")
 
         if self.public_ip == None:
             self.public_ip = socket.gethostbyname(socket.gethostname())
@@ -70,32 +71,35 @@ class LLMWorker:
             with socket.socket() as s:
                 self.port = s.bind(('', 0)) or s.getsockname()[1]
 
-        self.reg_endpoint = f"http://{self.public_ip}:{self.port}{self.args.worker_path}"
+        self.reg_endpoint = urljoin(f"http://{self.public_ip}:{self.port}/", self.args.worker_path)
 
         self._register_routes()
 
     def _register_routes(self):
-        @self.app.route("/", methods=["POST"])
-        def api():
-            if self.Ready:
-                self.Ready = False
-                data = request.form
-                resp = Response(self.llm_compute(data), mimetype='text/event-stream')
-                resp.headers['Content-Type'] = 'text/event-stream; charset=utf-8'
-                if data: return resp
-                logger.info("Request received, but no data is here!")
-                self.Ready = True
-            return Response(status=429)
+        @self.app.post(self.args.worker_path)
+        async def api(request: Request):
+            if not self.ready:
+                return JSONResponse({"msg": "Processing another request."}, status_code=429)
+            data = await request.form()
+            if not data:
+                logger.debug("Received empty request!")
+                return JSONResponse({"msg": "Received empty request!"}, status_code=400)
+            resp = StreamingResponse(
+                self._llm_compute(data),
+                media_type='text/event-stream',
+                headers = {'Content-Type': 'text/event-stream; charset=utf-8'}
+            )
+            return resp
         
-        @self.app.route('/health')
-        def health_check():
-            return Response(status=204)
+        @self.app.get("/health")
+        async def health_check():
+            return Response(status_code=204)
         
-        @self.app.route("/abort", methods=["GET"])
-        def abort():
+        @self.app.get(f"{self.args.worker_path}/abort")
+        async def abort():
             if hasattr(self, 'abort') and callable(self.abort):
-                return Response(self.abort(), mimetype='text/plain')
-            return "No abort method configured"
+                return JSONResponse({"msg": await self.abort()})
+            return JSONResponse({"msg": "No abort method configured"}, status_code=404)
 
     def run(self):
         atexit.register(self._shut_down)
@@ -137,9 +141,24 @@ class LLMWorker:
                 if not self.ignore_agent:
                     logger.info("The program will exit now.")
                     sys.exit(0)
-        
-        self.app.run(port=self.port, host="0.0.0.0", threaded=True)
-        self._shut_down()
+        uvicorn.run(self.app, host='0.0.0.0', port=self.port)
+    
+    async def _llm_compute(self, data):
+        self.ready = False
+        try:
+            async for chunk in self.llm_compute(data):
+                yield chunk
+
+                # Yield control to the event loop.
+                # So that other coroutine, like aborting, can run.
+                await asyncio.sleep(0)
+        except Exception as e:
+            logger.exception("Error occurs during generation.")
+        finally:
+            self.ready = True
+
+    async def llm_compute(self, data):
+        raise NotImplementedError("Worker should implement the \"llm_compute\" method.")
 
 if __name__ == "__main__":
     worker = LLMWorker()

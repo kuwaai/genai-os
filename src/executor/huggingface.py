@@ -2,10 +2,14 @@ import argparse
 import os
 import sys
 import torch
+import logging
+import time
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from base import *
+from base import LLMWorker
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 from threading import Thread
+
+logger = logging.getLogger(__name__)
 
 class CustomStoppingCriteria(StoppingCriteria):
     def __init__(self):
@@ -32,7 +36,7 @@ class HuggingfaceWorker(LLMWorker):
         self.CSC = CustomStoppingCriteria()
         self.CSC.proc = False
 
-    def llm_compute(self, data):
+    async def llm_compute(self, data):
         prompts = "<s>[INST] {0} [/INST]{1}"
         stopwords = ["</s>","<s>"]
         bufferLength = max([len(k) for k in stopwords]) if stopwords else -1
@@ -62,7 +66,7 @@ class HuggingfaceWorker(LLMWorker):
                 thread.start()
                 self.CSC.proc = thread
                 buffer = ""
-                if bufferLength: print("buffering with", bufferLength, "length")
+                if bufferLength: logger.debug(f"buffering with {bufferLength} length")
                 for i in streamer:
                     torch.cuda.empty_cache()
                     if bufferLength != -1:
@@ -70,18 +74,18 @@ class HuggingfaceWorker(LLMWorker):
                         for o in stopwords:
                             if o in buffer: 
                                 self.CSC.proc = None
-                                print(o,"founded!")
+                                logger.debug(f"{o} founded!")
                                 buffer = buffer.split(o)[0]
                                 break
                         while len(buffer) > bufferLength:
-                            print(end=buffer[0],flush=True)
+                            if self.debug: print(end=buffer[0], flush=True)
                             yield buffer[0]
                             buffer = buffer[1:]
                         if not self.CSC.proc:
-                            print(end=buffer,flush=True)
+                            if self.debug: print(end=buffer, flush=True)
                             yield buffer # clear buffer
                     else:
-                        print(end=i.replace("</s>",""),flush=True)
+                        if self.debug: print(end=i.replace("</s>",""),flush=True)
                         yield i.replace("</s>","")
                     if not self.CSC.proc: break
                 thread.join()
@@ -89,20 +93,20 @@ class HuggingfaceWorker(LLMWorker):
             else:
                 yield "[Sorry, The input message is too long!]"
         except Exception as e:
-            print(e)
+            logger.exception("Error occurs during generation.")
             yield "[Oops, Cuda out of memory! Please try toggle off chained state, or remove some texts.]"
         finally:
             torch.cuda.empty_cache()
             self.Ready = True
-            print("finished")
+            logger.debug("finished")
             
-    def abort(self):
+    async def abort(self):
         if self.CSC.proc:
             tmp = self.CSC.proc
             self.CSC.proc = None
-            print("aborting...")
+            logger.debug("aborting...")
             tmp.join()
-            print("aborted")
+            logger.debug("aborted")
             torch.cuda.empty_cache()
             return "Aborted"
         return "No process to abort"
