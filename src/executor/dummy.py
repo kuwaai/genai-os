@@ -3,8 +3,8 @@ import sys
 import asyncio
 import logging
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from base import LLMWorker
+
+from framework import LLMWorker
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,7 @@ class DummyWorker(LLMWorker):
 
     async def abort(self):
         self.stop = True
+        logger.debug("aborted")
         return "Aborted"
 
 if __name__ == "__main__":

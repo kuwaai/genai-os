@@ -1,13 +1,13 @@
-import argparse
 import os
 import sys
 import torch
 import logging
 import time
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from base import LLMWorker
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 from threading import Thread
+
+from framework import LLMWorker
 
 logger = logging.getLogger(__name__)
 

@@ -3,15 +3,20 @@ import sys
 import argparse
 import os
 import socket
+import time
 import logging
 import atexit
 import asyncio
 from urllib.parse import urljoin
 
 import uvicorn
+import prometheus_client
 from retry import retry
 from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+
+from .metrics import WorkerMetrics
+from .logger import WorkerLogger
 
 logger = logging.getLogger(__name__)
 
@@ -40,14 +45,8 @@ class LLMWorker:
 
     def _setup(self):
         # Setup logger
-        numeric_level = getattr(logging, self.args.log.upper(), None)
-        if not isinstance(numeric_level, int):
-            raise ValueError(f'Invalid log level: {self.args.log}')
-        logging.basicConfig(
-            level=numeric_level,
-            format='%(asctime)s [%(levelname)s]\t%(name)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
+        self.logging_config = WorkerLogger(level=self.args.log.upper())
+        logging.config.dictConfig(self.logging_config.get_config())
         
         self.ready = True
 
@@ -72,6 +71,10 @@ class LLMWorker:
                 self.port = s.bind(('', 0)) or s.getsockname()[1]
 
         self.reg_endpoint = urljoin(f"http://{self.public_ip}:{self.port}/", self.args.worker_path)
+
+        # Metrics
+        self.metrics = WorkerMetrics(self.LLM_name)
+        self.metrics.state.state('idle')
 
         self._register_routes()
 
@@ -100,6 +103,13 @@ class LLMWorker:
             if hasattr(self, 'abort') and callable(self.abort):
                 return JSONResponse({"msg": await self.abort()})
             return JSONResponse({"msg": "No abort method configured"}, status_code=404)
+
+        @self.app.get("/metrics")
+        async def get_metrics():
+            return Response(
+                content=prometheus_client.generate_latest(),
+                media_type="text/plain"
+            )
 
     def run(self):
         atexit.register(self._shut_down)
@@ -141,20 +151,51 @@ class LLMWorker:
                 if not self.ignore_agent:
                     logger.info("The program will exit now.")
                     sys.exit(0)
-        uvicorn.run(self.app, host='0.0.0.0', port=self.port)
+        uvicorn.run(
+            self.app, host='0.0.0.0', port=self.port,
+            log_config=self.logging_config.get_config()
+        )
+
+    def _update_statistics(self, duration_sec: float, total_output_length: int):
+        """
+        Update the internal statistical metrics.
+        """
+
+        throughput = total_output_length/duration_sec
+        self.metrics.process_time_seconds.observe(duration_sec)
+        self.metrics.output_length_charters.observe(total_output_length)
+        self.metrics.output_throughput_charters_per_second.observe(throughput)
     
     async def _llm_compute(self, data):
+        """
+        The middle layer between the actual worker logic and API server logic.
+        Interception of the request-response can be done in this layer.
+        """
+
         self.ready = False
+        self.metrics.state.state('busy')
         try:
+            start_time = time.time()
+            total_output_length = 0
+            
             async for chunk in self.llm_compute(data):
+                total_output_length += len(chunk)
                 yield chunk
 
                 # Yield control to the event loop.
                 # So that other coroutine, like aborting, can run.
                 await asyncio.sleep(0)
+
+            duration_sec = time.time() - start_time
+            self._update_statistics(duration_sec, total_output_length)
+
         except Exception as e:
             logger.exception("Error occurs during generation.")
+            self.metrics.failed.inc()
+            yield 'Error occurred. Please consult support.'
+
         finally:
+            self.metrics.state.state('idle')
             self.ready = True
 
     async def llm_compute(self, data):

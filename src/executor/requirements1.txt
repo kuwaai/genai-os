@@ -9,3 +9,4 @@ python-multipart
 click
 requests
 APScheduler
+prometheus-client

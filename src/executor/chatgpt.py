@@ -1,10 +1,10 @@
-import argparse
 import os
 import sys
 import logging
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import openai
-from base import LLMWorker
+
+from framework import LLMWorker
 
 logger = logging.getLogger(__name__)
 
