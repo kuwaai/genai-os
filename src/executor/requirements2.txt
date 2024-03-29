@@ -1,2 +1,6 @@
 google-generativeai
 openai
+torch
+transformers
+accelerate
+sentencepiece

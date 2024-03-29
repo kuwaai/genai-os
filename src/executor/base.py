@@ -5,6 +5,7 @@ import os
 import socket
 import logging
 import atexit
+import asyncio
 from urllib.parse import urljoin
 
 import uvicorn
@@ -147,6 +148,10 @@ class LLMWorker:
         try:
             async for chunk in self.llm_compute(data):
                 yield chunk
+
+                # Yield control to the event loop.
+                # So that other coroutine, like aborting, can run.
+                await asyncio.sleep(0)
         except Exception as e:
             logger.exception("Error occurs during generation.")
         finally:
