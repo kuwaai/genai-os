@@ -40,3 +40,19 @@ set "url_CMake=https://github.com/Kitware/CMake/releases/download/v3.29.0/cmake-
 for %%I in ("%url_CMake%") do set "filename_CMake=%%~nxI"
 set "cmake_folder=%filename_CMake:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_CMake%") do set "version_CMake=%%v"
+
+REM Prepare migration file
+if not exist "src\migrations.txt" (
+    type nul > "src\migrations.txt"
+)
+
+REM Prepare packages folder
+mkdir packages 2>nul
+REM Run migration
+for %%i in ("src\migration\*.bat") do (
+    findstr /i /c:"%%~nxi" "src\migrations.txt" >nul || (
+        echo Running %%~nxi
+        call "%%i"
+        echo %%~nxi>>"src\migrations.txt"
+    )
+)

@@ -6,3 +6,6 @@ fastapi
 uvicorn
 retry
 python-multipart
+click
+requests
+APScheduler

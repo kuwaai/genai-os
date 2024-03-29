@@ -1,7 +1,7 @@
 @echo off
 
 REM Include variables from separate file
-call variables.bat
+call src\variables.bat
 
 REM Production update
 pushd "..\multi-chat"

@@ -1,8 +1,8 @@
 @echo off
 
 REM Include variables from separate file
-call variables.bat
-pushd "%nginx_folder%"
+call src\variables.bat
+pushd "packages\%nginx_folder%"
 .\nginx.exe -s quit
 echo Nginx stopped
 popd
