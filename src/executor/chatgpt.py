@@ -52,7 +52,7 @@ class ChatGptWorker(LLMWorker):
                                 if ("This model's maximum context length is" in i.choices[0].delta.content):
                                     limit = 1000*16 - len(str(msg))
                                     break
-                                if self.debug: print(end=i.choices[0].delta.content, flush=True)
+                                if self.in_debug(): print(end=i.choices[0].delta.content, flush=True)
                                 yield i.choices[0].delta.content
                             if not self.proc: break
                     if limit > 1000*3+512:

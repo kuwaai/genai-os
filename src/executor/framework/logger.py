@@ -22,7 +22,7 @@ class InternalEndpointFilter(logging.Filter):
         result = all([full_path != x for x in internal_endpoints])
         return result
 
-class WorkerLogger:
+class WorkerLoggerFactory:
     template = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -75,6 +75,7 @@ class WorkerLogger:
     }
 
     def __init__(self, level="INFO"):
+        level = level.upper()
         self.conf = self.template.copy()
         self.conf["root"]["level"] = level
         for logger in self.conf["loggers"].keys():

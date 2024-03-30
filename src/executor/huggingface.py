@@ -78,14 +78,14 @@ class HuggingfaceWorker(LLMWorker):
                                 buffer = buffer.split(o)[0]
                                 break
                         while len(buffer) > bufferLength:
-                            if self.debug: print(end=buffer[0], flush=True)
+                            if self.in_debug(): print(end=buffer[0], flush=True)
                             yield buffer[0]
                             buffer = buffer[1:]
                         if not self.CSC.proc:
-                            if self.debug: print(end=buffer, flush=True)
+                            if self.in_debug(): print(end=buffer, flush=True)
                             yield buffer # clear buffer
                     else:
-                        if self.debug: print(end=i.replace("</s>",""),flush=True)
+                        if self.in_debug(): print(end=i.replace("</s>",""),flush=True)
                         yield i.replace("</s>","")
                     if not self.CSC.proc: break
                 thread.join()

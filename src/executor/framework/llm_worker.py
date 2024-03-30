@@ -8,6 +8,7 @@ import logging
 import atexit
 import asyncio
 from urllib.parse import urljoin
+from typing import Optional
 
 import uvicorn
 import prometheus_client
@@ -16,11 +17,34 @@ from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from .metrics import WorkerMetrics
-from .logger import WorkerLogger
+from .logger import WorkerLoggerFactory
 
 logger = logging.getLogger(__name__)
 
+def find_free_port():
+    port = None
+    with socket.socket() as s:
+        port = s.bind(('', 0)) or s.getsockname()[1]
+    return port
+
 class LLMWorker:
+    executor_iface_version: str = "v1.0"
+    agent_url: str = "http://127.0.0.1:9000/"
+    ignore_agent: bool = False
+    https: bool = False
+    host: Optional[str] = None
+    port: Optional[int] = None
+    worker_path: str = "/chat"
+    LLM_name: Optional[str] = None
+
+    model_path: Optional[str] = None
+    prompt_path: Optional[str] = None
+    limit: int = 1024*3
+    ready: bool = False
+
+    log_level: str = "INFO"
+    metrics: Optional[WorkerMetrics] = None
+
     def __init__(self):
         self.app = FastAPI()
         self.parser = self._create_parser()
@@ -29,48 +53,45 @@ class LLMWorker:
 
     def _create_parser(self):
         parser = argparse.ArgumentParser(description='LLM model worker, Please make sure your agent is working before use.')
-        parser.add_argument('--access_code', default=None, help='Access code')
-        parser.add_argument('--version', default='v1.0', help='Version')
+        parser.add_argument('--access_code', default=self.LLM_name, help='Access code')
+        parser.add_argument('--version', default=self.executor_iface_version, help='Version of the executor interface')
         parser.add_argument('--ignore_agent', action='store_true', help='Ignore agent')
-        parser.add_argument('--public_ip', default=None, help='This is the IP that will be stored in Agent, Make sure the IP address here are accessible by Agent')
+        parser.add_argument('--https', action='store_true', help='Register the worker endpoint with https scheme')
+        parser.add_argument('--host', default=None, help='The hostname or IP address that will be stored in Agent, Make sure the location are accessible by Agent')
         parser.add_argument('--port', type=int, default=None, help='The port to use, by choosing None, it\'ll assign an unused port')
-        parser.add_argument('--worker_path', default='/chat', help='The path this model worker is going to use')
-        parser.add_argument('--limit', type=int, default=1024*3, help='Limit')
-        parser.add_argument('--model_path', default=None, help='Model path')
-        parser.add_argument('--prompt_path', default='', help='Prompt path')
+        parser.add_argument('--worker_path', default=self.worker_path, help='The path this model worker is going to use')
+        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the context window')
+        parser.add_argument('--model_path', default=self.model_path, help='Model path')
+        parser.add_argument('--prompt_path', default=self.prompt_path, help='Prompt path')
         parser.add_argument('--gpu_config', default=None, help='GPU config')
-        parser.add_argument('--agent_endpoint', default='http://127.0.0.1:9000/', help='Agent endpoint')
-        parser.add_argument("--log", type=str, default="INFO", help="The log level. (INFO, DEBUG, ...)")
+        parser.add_argument('--agent_url', default=self.agent_url, help='Agent endpoint')
+        parser.add_argument("--log", type=str, default=self.log_level, help="The log level. (INFO, DEBUG, ...)")
         return parser
 
     def _setup(self):
         # Setup logger
-        self.logging_config = WorkerLogger(level=self.args.log.upper())
-        logging.config.dictConfig(self.logging_config.get_config())
+        self.log_level = self.args.log.upper()
+        logging.config.dictConfig(WorkerLoggerFactory(level=self.log_level).get_config())
         
-        self.ready = True
-
         if self.args.gpu_config:
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.gpu_config
 
-        self.agent_endpoint = self.args.agent_endpoint
-        self.LLM_name = self.args.access_code
-        self.model_path = self.args.model_path
-        self.version_code = self.args.version
+        # Registration information
+        self.executor_iface_version = self.args.version
+        self.agent_url = self.args.agent_url
         self.ignore_agent = self.args.ignore_agent
+        self.LLM_name = self.args.access_code
+
+        # Common configurations of worker application
+        self.model_path = self.args.model_path
+        self.prompt_path = self.args.prompt_path
         self.limit = self.args.limit
-        self.public_ip = self.args.public_ip
-        self.debug = (self.args.log.upper() == "DEBUG")
 
-        if self.public_ip == None:
-            self.public_ip = socket.gethostbyname(socket.gethostname())
-
-        self.port = self.args.port
-        if self.port == None:
-            with socket.socket() as s:
-                self.port = s.bind(('', 0)) or s.getsockname()[1]
-
-        self.reg_endpoint = urljoin(f"http://{self.public_ip}:{self.port}/", self.args.worker_path)
+        # Serving URL
+        self.host = self.args.host or socket.gethostbyname(socket.gethostname())
+        self.port = self.args.port or find_free_port()
+        self.https = self.args.https
+        self.worker_path = self.args.worker_path
 
         # Metrics
         self.metrics = WorkerMetrics(self.LLM_name)
@@ -79,7 +100,7 @@ class LLMWorker:
         self._register_routes()
 
     def _register_routes(self):
-        @self.app.post(self.args.worker_path)
+        @self.app.post(self.worker_path)
         async def api(request: Request):
             if not self.ready:
                 return JSONResponse({"msg": "Processing another request."}, status_code=429)
@@ -98,7 +119,7 @@ class LLMWorker:
         async def health_check():
             return Response(status_code=204)
         
-        @self.app.get(f"{self.args.worker_path}/abort")
+        @self.app.get(urljoin(f"{self.worker_path}/", "./abort"))
         async def abort():
             if hasattr(self, 'abort') and callable(self.abort):
                 return JSONResponse({"msg": await self.abort()})
@@ -114,12 +135,22 @@ class LLMWorker:
     def run(self):
         atexit.register(self._shut_down)
         self._start_server()
+    
+    def get_reg_endpoint(self) -> str:
+        scheme = 'https' if self.args.https else 'http'
+        return urljoin(f"{scheme}://{self.host}:{self.port}/", self.worker_path)
+
+    def in_debug(self) -> bool:
+        return (self.log_level.upper() == "DEBUG")
 
     def _shut_down(self):
         if not hasattr(self, 'registered') or not self.registered:
             return
         try:
-            response = requests.post(self.agent_endpoint + f"{self.version_code}/worker/unregister", data={"name":self.LLM_name,"endpoint":self.reg_endpoint})
+            response = requests.post(
+                urljoin(self.agent_url, f"{self.executor_iface_version}/worker/unregister"),
+                data={"name": self.LLM_name,"endpoint": self.get_reg_endpoint()}
+            )
             if not response.ok or response.text == "Failed":
                 raise RuntimeWarning()
             else:
@@ -131,8 +162,8 @@ class LLMWorker:
     @retry(tries=5, delay=1, backoff=2, jitter=(0, 1), logger=logger)
     def _try_register(self):
         resp = requests.post(
-            url=urljoin(self.agent_endpoint, f"{self.version_code}/worker/register"),
-            data={"name": self.LLM_name, "endpoint": self.reg_endpoint}
+            url=urljoin(self.agent_url, f"{self.executor_iface_version}/worker/register"),
+            data={"name": self.LLM_name, "endpoint": self.get_reg_endpoint()}
         )
         if not resp.ok or resp.text == "Failed":
             raise RuntimeWarning("The server failed to register to agent.")
@@ -151,9 +182,10 @@ class LLMWorker:
                 if not self.ignore_agent:
                     logger.info("The program will exit now.")
                     sys.exit(0)
+        self.ready = True
         uvicorn.run(
-            self.app, host='0.0.0.0', port=self.port,
-            log_config=self.logging_config.get_config()
+            self.app, host=self.host, port=self.port,
+            log_config=WorkerLoggerFactory(level=self.log_level).get_config()
         )
 
     def _update_statistics(self, duration_sec: float, total_output_length: int):

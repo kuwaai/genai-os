@@ -41,7 +41,7 @@ class GeminiWorker(LLMWorker):
             async for i in response:
                 for o in i.text:
                     yield o
-                    if self.debug: print(end=o, flush=True)
+                    if self.in_debug(): print(end=o, flush=True)
                     await asyncio.sleep(0.01)
                     if not self.proc: break
                 if not self.proc: break

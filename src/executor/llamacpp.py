@@ -50,7 +50,7 @@ class LlamaCppWorker(LLMWorker):
                 )
                 
                 for i in output:
-                    if self.debug: print(end=i["choices"][0]["text"], flush=True)
+                    if self.in_debug(): print(end=i["choices"][0]["text"], flush=True)
                     yield i["choices"][0]["text"]
             else:
                 yield "[Sorry, The input message is too long!]"
