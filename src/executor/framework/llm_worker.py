@@ -37,9 +37,6 @@ class LLMWorker:
     worker_path: str = "/chat"
     LLM_name: Optional[str] = None
 
-    model_path: Optional[str] = None
-    prompt_path: Optional[str] = None
-    limit: int = 1024*3
     ready: bool = False
 
     log_level: str = "INFO"
@@ -58,14 +55,10 @@ class LLMWorker:
         parser.add_argument('--ignore_agent', action='store_true', help='Ignore agent')
         parser.add_argument('--https', action='store_true', help='Register the worker endpoint with https scheme')
         parser.add_argument('--host', default=None, help='The hostname or IP address that will be stored in Agent, Make sure the location are accessible by Agent')
-        parser.add_argument('--port', type=int, default=None, help='The port to use, by choosing None, it\'ll assign an unused port')
+        parser.add_argument('--port', type=int, default=None, help='The port to serve. By choosing None, it\'ll assign an unused port')
         parser.add_argument('--worker_path', default=self.worker_path, help='The path this model worker is going to use')
-        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the context window')
-        parser.add_argument('--model_path', default=self.model_path, help='Model path')
-        parser.add_argument('--prompt_path', default=self.prompt_path, help='Prompt path')
-        parser.add_argument('--gpu_config', default=None, help='GPU config')
-        parser.add_argument('--agent_url', default=self.agent_url, help='Agent endpoint')
-        parser.add_argument("--log", type=str, default=self.log_level, help="The log level. (INFO, DEBUG, ...)")
+        parser.add_argument('--agent_url', default=self.agent_url, help='Base URL of Agent\'s executor management API')
+        parser.add_argument("--log", type=str.upper, default=self.log_level, help="The logging level.", choices=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
         return parser
 
     def _setup(self):
@@ -73,19 +66,11 @@ class LLMWorker:
         self.log_level = self.args.log.upper()
         logging.config.dictConfig(WorkerLoggerFactory(level=self.log_level).get_config())
         
-        if self.args.gpu_config:
-            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.gpu_config
-
         # Registration information
         self.executor_iface_version = self.args.version
         self.agent_url = self.args.agent_url
         self.ignore_agent = self.args.ignore_agent
         self.LLM_name = self.args.access_code
-
-        # Common configurations of worker application
-        self.model_path = self.args.model_path
-        self.prompt_path = self.args.prompt_path
-        self.limit = self.args.limit
 
         # Serving URL
         self.host = self.args.host or socket.gethostbyname(socket.gethostname())

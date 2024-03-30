@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import time
+from typing import Optional
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from llama_cpp import Llama
 
@@ -10,17 +11,28 @@ from framework import LLMWorker
 logger = logging.getLogger(__name__)
 
 class LlamaCppWorker(LLMWorker):
+
+    model_path: Optional[str] = None
+    limit: int = 1024*3
+    
     def __init__(self):
         super().__init__()
 
     def _create_parser(self):
         parser = super()._create_parser()
+        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the context window')
+        parser.add_argument('--model_path', default=self.model_path, help='Model path')
+        parser.add_argument('--gpu_config', default=None, help='GPU config')
         parser.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
         return parser
 
     def _setup(self):
         super()._setup()
 
+        if self.args.gpu_config:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.gpu_config
+
+        self.model_path = self.args.model_path
         if not self.model_path:
             raise Exception("You need to configure a .gguf model path!")
 

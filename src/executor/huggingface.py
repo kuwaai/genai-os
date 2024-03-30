@@ -3,9 +3,10 @@ import sys
 import torch
 import logging
 import time
+from typing import Optional
+from threading import Thread
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
-from threading import Thread
 
 from framework import LLMWorker
 
@@ -19,12 +20,27 @@ class CustomStoppingCriteria(StoppingCriteria):
         return not self.proc
 
 class HuggingfaceWorker(LLMWorker):
+
+    model_path: Optional[str] = None
+    limit: int = 1024*3
+    
     def __init__(self):
         super().__init__()
+    
+    def _create_parser(self):
+        parser = super()._create_parser()
+        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the context window')
+        parser.add_argument('--model_path', default=self.model_path, help='Model path')
+        parser.add_argument('--gpu_config', default=None, help='GPU config')
+        return parser
 
     def _setup(self):
         super()._setup()
 
+        if self.args.gpu_config:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.gpu_config
+
+        self.model_path = self.args.model_path
         if not self.model_path:
             raise Exception("You need to configure a local or huggingface model path!")
 
