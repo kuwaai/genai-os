@@ -44,12 +44,10 @@
 * 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
 
 ![screenshot](./multi-chat/public/images/demo.gif)
-![screenshot](./multi-chat/public/images/demo.gif)
 
 ## 架構
 > **警告**: 本草案為初步版本，可能會有進一步的更改。
 
-[![screenshot](./multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 [![screenshot](./multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
 ## 依賴套件
@@ -100,8 +98,6 @@
    - 確保已安裝並正確設定了 PHP。
    - 設定您的 Web 伺服器（Nginx 或 Apache），將 `multi-chat/public` 設置為網站根目錄。
    - 範例設置文件: `multi-chat/nginx_config_example`, `multi-chat/php.ini`
-   - 設定您的 Web 伺服器（Nginx 或 Apache），將 `multi-chat/public` 設置為網站根目錄。
-   - 範例設置文件: `multi-chat/nginx_config_example`, `multi-chat/php.ini`
    - 推薦設置:
      - 為了RAG應用，PHP 最大上傳文件大小設置為至少 10MB。
      - 避免一些較慢的RAG或攏長的模型輸出，將Timeout設置為至少 120 秒或更長時間。
@@ -110,15 +106,12 @@
    - 確保已安裝並執行 Redis 伺服器。
    - 可以從 `.env` 中設定相關資訊。
    - 在 `multi-chat/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
-   - 在 `multi-chat/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
 
 5. **執行應用程式:**
    - 啟動您的 Web 伺服器和 PHP-FPM。
    - 執行Agent `kernel/main.py`。建議在執行之前將該Agent資料夾複製到另一個位置。
-   - 執行Agent `kernel/main.py`。建議在執行之前將該Agent資料夾複製到另一個位置。
 
 6. **連線到應用程式:**
-   - 首先您需要創建一個管理員帳號，前往 `multi-chat/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 首先您需要創建一個管理員帳號，前往 `multi-chat/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
    - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
    - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
