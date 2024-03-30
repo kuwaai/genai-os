@@ -40,7 +40,7 @@ class WorkerLoggerFactory:
         },
         'filters': {
             'internal_endpoint_filter': {
-                '()': 'framework.logger.InternalEndpointFilter'
+                '()': 'kuwa.executor.logger.InternalEndpointFilter'
             }
         },
         'handlers': {

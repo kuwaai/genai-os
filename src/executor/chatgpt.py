@@ -4,7 +4,7 @@ import logging
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import openai
 
-from framework import LLMWorker
+from kuwa.executor import LLMWorker
 
 logger = logging.getLogger(__name__)
 

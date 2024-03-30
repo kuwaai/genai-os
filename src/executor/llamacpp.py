@@ -6,7 +6,7 @@ from typing import Optional
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from llama_cpp import Llama
 
-from framework import LLMWorker
+from kuwa.executor import LLMWorker
 
 logger = logging.getLogger(__name__)
 
