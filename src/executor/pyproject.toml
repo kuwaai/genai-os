@@ -5,6 +5,14 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/kuwa"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"debug.py" = "kuwa/executor/example/debug.py"
+"dummy.py" = "kuwa/executor/example/dummy.py"
+"geminipro.py" = "kuwa/executor/example/geminipro.py"
+"chatgpt.py" = "kuwa/executor/example/chatgpt.py"
+"huggingface.py" = "kuwa/executor/example/huggingface.py"
+"llamacpp.py" = "kuwa/executor/example/llamacpp.py"
+
 [project]
 name = "kuwa-executor"
 version = "0.1.0"
@@ -32,5 +40,5 @@ dependencies=[
 "Homepage" = "https://kuwaai.org/os/Intro"
 "Bug Tracker" = "https://github.com/kuwaai/genai-os/issues"
 
-# [project.scripts]
-# worker-server = "worker_framework.main:main"
+[project.scripts]
+kuwa-executor = "kuwa.executor.cli:main"

@@ -15,11 +15,13 @@ class ChatGptWorker(LLMWorker):
     def _create_parser(self):
         parser = super()._create_parser()
         parser.add_argument('--api_key', default=None, help='ChatGPT key from OpenAI')
+        parser.add_argument('--model', default="gpt-3.5-turbo", help='Model name. See https://platform.openai.com/docs/models/overview')
         return parser
 
     def _setup(self):
         super()._setup()
 
+        self.model_name = self.args.model
         if not self.LLM_name:
             self.LLM_name = "chatgpt"
 
@@ -41,7 +43,7 @@ class ChatGptWorker(LLMWorker):
                     if limit <= 1000*3+512:
                         client = openai.AsyncOpenAI(api_key=chatgpt_apitoken)
                         response = await client.chat.completions.create(
-                            model="gpt-3.5-turbo",
+                            model=self.model_name,
                             max_tokens=limit,
                             temperature=0.5,
                             messages=msg,
