@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import time
+import json
 from typing import Optional
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from llama_cpp import Llama
@@ -45,7 +46,7 @@ class LlamaCppWorker(LLMWorker):
     async def llm_compute(self, data):
         try:
             s = time.time()
-            history = [i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]
+            history = [i['msg'] for i in json.loads(data.get("input"))]
             while len("".join(history)) > self.limit:
                 del history[0]
                 if history: del history[0]

@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import openai
 
@@ -31,7 +32,7 @@ class ChatGptWorker(LLMWorker):
         try:
             chatgpt_apitoken = data.get("chatgpt_apitoken")
             if not chatgpt_apitoken: chatgpt_apitoken = self.args.api_key
-            msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in eval(data.get("input").replace("true","True").replace("false","False"))]
+            msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
             
             if msg and chatgpt_apitoken:
                 chatgpt_apitoken = chatgpt_apitoken.strip()

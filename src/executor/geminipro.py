@@ -2,6 +2,7 @@ import os
 import sys
 import asyncio
 import logging
+import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import google.generativeai as genai
 
@@ -32,7 +33,7 @@ class GeminiWorker(LLMWorker):
 
     async def llm_compute(self, data):
         try:
-            msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in eval(data.get("input").replace("true","True").replace("false","False"))]
+            msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
             quiz = msg[-1]
             msg = msg[:-1]
             chat = self.model.start_chat(history=msg)

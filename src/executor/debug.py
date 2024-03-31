@@ -2,6 +2,7 @@ import os
 import sys
 import asyncio
 import logging
+import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from kuwa.executor import LLMWorker
@@ -32,7 +33,7 @@ class DebugWorker(LLMWorker):
     async def llm_compute(self, data):
         try:
             self.stop = False
-            for i in "".join([i['msg'] for i in eval(data.get("input").replace("true","True").replace("false","False"))]).strip():
+            for i in "".join([i['msg'] for i in json.loads(data.get("input"))]).strip():
                 yield i
                 if self.stop:
                     self.stop = False
