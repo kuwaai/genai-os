@@ -40,7 +40,7 @@ class LlamaCppWorker(LLMWorker):
             self.LLM_name = "gguf"
 
         self.model = Llama(model_path=self.model_path, n_gpu_layers=self.args.ngl)
-        self.proc = False
+        self.serving_generator = None
 
     async def llm_compute(self, data):
         try:
@@ -53,15 +53,16 @@ class LlamaCppWorker(LLMWorker):
                 history.append("")
                 history = ["<s>[INST] {0} [/INST]{1}".format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
                 history = "".join(history)
-                output = self.model.create_completion(
+                output_generator = self.model.create_completion(
                     history,
                     max_tokens=4096,
                     stop=["</s>"],
                     echo=False,
                     stream=True
                 )
+                self.serving_generator = output_generator
                 
-                for i in output:
+                for i in output_generator:
                     if self.in_debug(): print(end=i["choices"][0]["text"], flush=True)
                     yield i["choices"][0]["text"]
             else:
@@ -72,6 +73,14 @@ class LlamaCppWorker(LLMWorker):
             raise e
         finally:
             logger.debug("finished")
+    
+    async def abort(self):
+        if not self.serving_generator:
+            return "There's not running generation request to abort."
+        self.serving_generator.close()
+        self.serving_generator = None
+        logger.debug("aborted")
+        return "Aborted"
 
 if __name__ == "__main__":
     worker = LlamaCppWorker()
