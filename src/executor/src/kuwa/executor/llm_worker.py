@@ -177,11 +177,11 @@ class LLMWorker:
         """
         Update the internal statistical metrics.
         """
-
-        throughput = total_output_length/duration_sec
-        self.metrics.process_time_seconds.observe(duration_sec)
-        self.metrics.output_length_charters.observe(total_output_length)
-        self.metrics.output_throughput_charters_per_second.observe(throughput)
+        if duration_sec > 0:
+            throughput = total_output_length/duration_sec
+            self.metrics.process_time_seconds.observe(duration_sec)
+            self.metrics.output_length_charters.observe(total_output_length)
+            self.metrics.output_throughput_charters_per_second.observe(throughput)
     
     async def _llm_compute(self, data):
         """
