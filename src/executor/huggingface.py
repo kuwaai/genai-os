@@ -38,15 +38,15 @@ class HuggingfaceWorker(LLMWorker):
     
     def _create_parser(self):
         parser = super()._create_parser()
-        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
         parser.add_argument('--model_path', default=self.model_path, help='Model path. It can be the path to local model or the model name on HuggingFace Hub')
+        parser.add_argument('--gpu_config', default=None, help='GPU config')
         parser.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
+        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
         parser.add_argument('--context_window', default=self.context_window, help='The context window of the model')
         parser.add_argument('--override_chat_template', default=None,
             help='Override the default chat template provided by the model. Reference: https://huggingface.co/docs/transformers/main/en/chat_templating')
         parser.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
         
-        parser.add_argument('--gpu_config', default=None, help='GPU config')
         return parser
 
     def _setup(self):
@@ -94,7 +94,7 @@ class HuggingfaceWorker(LLMWorker):
         Ensure the history begin with "user."
         """
         first_user_idx = 0
-        while history[first_user_idx]["role"] != "user":
+        while history[first_user_idx]["role"] != "user" and first_user_idx+1 < len(history)-1:
             first_user_idx += 1
         history = history[first_user_idx:]
         return history
