@@ -42,17 +42,17 @@ set "cmake_folder=%filename_CMake:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_CMake%") do set "version_CMake=%%v"
 
 REM Prepare migration file
-if not exist "src\migrations.txt" (
-    type nul > "src\migrations.txt"
+if not exist "src\conf\migrations.txt" (
+    type nul > "src\conf\migrations.txt"
 )
 
 REM Prepare packages folder
 mkdir packages 2>nul
 REM Run migration
-for %%i in ("src\migration\*.bat") do (
-    findstr /i /c:"%%~nxi" "src\migrations.txt" >nul || (
+for %%i in ("src\conf\migration\*.bat") do (
+    findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (
         echo Running %%~nxi
         call "%%i"
-        echo %%~nxi>>"src\migrations.txt"
+        echo %%~nxi>>"src\conf\migrations.txt"
     )
 )

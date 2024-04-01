@@ -10,7 +10,7 @@ use DB;
 
 class ModelPrune extends Command
 {
-    protected $signature = 'model:prune {--force : Automatically confirm deletion}';
+    protected $signature = 'model:prune {--force : Automatically confirm deletion} {--exclude=* : Exclude specific access codes}';
     protected $description = 'Quickly cleanup all models';
     public function __construct()
     {
@@ -18,7 +18,7 @@ class ModelPrune extends Command
     }
     public function handle()
     {
-        $models = LLMs::get(); // Get all models
+        $models = LLMs::whereNotIn('access_code', $this->option('exclude'))->get();
 
         if ($models->isEmpty()) {
             $this->info('No models found for deletion.');

@@ -87,6 +87,7 @@ pushd "packages\%python_folder%"
 .\python.exe -m pip install -r ..\..\..\src\executor\requirements1.txt
 .\python.exe -m pip install -r ..\..\..\src\executor\requirements2.txt
 .\python.exe -m pip install https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.56/llama_cpp_python-0.2.56-cp39-cp39-win_amd64.whl
+.\python.exe -m pip install ..\..\..\src\executor\
 popd
 
 REM Check if .env file exists

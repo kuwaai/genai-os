@@ -10,3 +10,5 @@ click
 requests
 APScheduler
 prometheus-client
+hatchling
+tiktoken
