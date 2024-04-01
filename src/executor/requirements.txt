@@ -5,6 +5,7 @@ google-generativeai
 
 # GPT
 openai
+tiktoken
 
 # llama.cpp
 llama-cpp-python

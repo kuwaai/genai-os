@@ -85,7 +85,7 @@ class HuggingfaceWorker(LLMWorker):
         if self.system_prompt:
             history.insert(0, {"role": "system", "content": self.system_prompt})
         prompt = self.tokenizer.apply_chat_template(
-            history, tokenize=False, add_generation_prompt=True
+            history, tokenize=True, add_generation_prompt=True, return_tensors='pt'
         )
         return prompt
 
@@ -99,7 +99,6 @@ class HuggingfaceWorker(LLMWorker):
         history = history[first_user_idx:]
         return history
 
-
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
         history = [
@@ -112,10 +111,10 @@ class HuggingfaceWorker(LLMWorker):
         history = self.rectify_history(history)
 
         # Trim the history to fit into the context window
-        prompt = ""
+        prompt_embedding = []
         while True:
-            prompt = self.synthesis_prompt(history)
-            if len(prompt) <= self.limit: break
+            prompt_embedding = self.synthesis_prompt(history)
+            if prompt_embedding.shape[1] <= self.limit: break
 
             history = self.rectify_history(history[1:])
             if len(history) == 0:
@@ -123,11 +122,11 @@ class HuggingfaceWorker(LLMWorker):
                 yield "[Sorry, The input message is too long!]"
                 return
 
-        logging.debug(prompt)
-        encoding = self.tokenizer(prompt, return_tensors='pt', add_special_tokens=False).to(self.model.device)
+        logging.debug(self.tokenizer.decode(prompt_embedding[0]))
+        prompt_embedding = prompt_embedding.to(self.model.device)
         streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, timeout=2)
         thread = Thread(target=self.model.generate, kwargs=dict(
-            input_ids=encoding['input_ids'],
+            input_ids=prompt_embedding,
             streamer=streamer,
             generation_config=GenerationConfig(
                 max_new_tokens=self.context_window,
