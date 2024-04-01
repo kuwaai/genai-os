@@ -16,7 +16,7 @@ WORKERS = [
         "class": "dummy.DummyWorker"
     },
     {
-        "name": "gemini",
+        "name": "geminipro",
         "description": "[Cloud model] Google Gemini-Pro. Need API key.",
         "class": "geminipro.GeminiWorker"
     },
