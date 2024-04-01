@@ -86,7 +86,7 @@ class LlamaCppWorker(LLMWorker):
         self.system_prompt = self.args.system_prompt
         self.context_window = self.args.context_window
         self.temperature = self.args.temperature
-        self.model = Llama(model_path=self.model_path, n_gpu_layers=self.args.ngl)
+        self.model = Llama(model_path=self.model_path, n_gpu_layers=self.args.ngl, n_ctx=self.context_window)
 
         # Get EOS and BOS token.
         # Reference: https://github.com/abetlen/llama-cpp-python/blob/aa9f1ae011fbc22893750209af500fee3167f21c/llama_cpp/llama.py#L403
@@ -168,7 +168,6 @@ class LlamaCppWorker(LLMWorker):
             output_generator = self.model.create_completion(
                 prompt,
                 max_tokens=None,
-                stop=self.stop_words,
                 temperature=self.temperature,
                 echo=False,
                 stream=True
@@ -176,6 +175,7 @@ class LlamaCppWorker(LLMWorker):
             self.serving_generator = output_generator
             
             for i in output_generator:
+                logging.debug(i)
                 chunk = i["choices"][0]["text"]
                 if self.in_debug(): print(end=chunk, flush=True)
                 yield chunk
