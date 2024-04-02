@@ -4,3 +4,5 @@ for %%i in (composer.phar nginx-1.24.0 node-v20.11.1-win-x64 php-8.1.27-Win32-vs
         move %%i packages
     )
 )
+
+exit /b 0
