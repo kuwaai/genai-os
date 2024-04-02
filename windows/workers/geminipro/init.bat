@@ -4,29 +4,40 @@ setlocal EnableDelayedExpansion
 REM Extract the folder name from the input
 for %%e in ("%~dp0.") do set "current_folder=%%~nxe"
 
-REM Define the options
-set "options=1-chatgpt 2-geminipro 3-gguf 4-huggingface"
+REM Define an array to store the model types and their names
+set "names[1]=ChatGPT"
+set "names[2]=Gemini Pro"
+set "names[3]=GGUF Model"
+set "names[4]=HuggingFace Model"
+set "names[5]=Custom Module"
 
 REM Define an array to store the model types and their names
 set "models[1]=chatgpt"
 set "models[2]=geminipro"
 set "models[3]=gguf"
 set "models[4]=huggingface"
+set "models[5]=custom"
 
 REM Check if the current folder matches any option
 for %%a in (1 2 3 4) do (
-    for /f "tokens=1,* delims=-" %%b in ("!options!") do (
-        if "!models[%%a]!"=="!current_folder!" (
-            set "model_type=!models[%%a]!"
-            goto skip_selection
-        )
-    )
+	if "!models[%%a]!"=="!current_folder!" (
+		echo Using predefined...
+		echo model_type=!models[%%a]!
+		echo model_name=!names[%%a]!
+		echo access_code=!models[%%a]!
+		
+		set "model_type=!models[%%a]!"
+		set "model_name=!names[%%a]!"
+		set "access_code=!models[%%a]!"
+		goto skip_selection
+	)
 )
 
 REM Display the options
 echo Select an option:
-for %%o in (%options%) do (
-    for /f "tokens=1,* delims=-" %%a in ("%%o") do echo %%a - !models[%%a]!
+
+for %%a in (1 2 3 4 5) do (
+	echo %%a - !names[%%a]!
 )
 
 REM Ask for user input
@@ -40,8 +51,6 @@ if not defined models[%option%] (
 REM Set the model type based on the selected option
 set "model_type=!models[%option%]!"
 
-:skip_selection
-
 REM Ask for model name
 :input_model_name
 set /p "model_name=Enter the model name: "
@@ -49,6 +58,16 @@ if "!model_name!"=="" (
     echo Model name cannot be blank. Please try again.
     goto input_model_name
 )
+
+REM Ask for access code (must-fill field)
+:input_access_code
+set /p "access_code=Enter the access code: "
+if "!access_code!"=="" (
+    echo Access code cannot be blank. Please try again.
+    goto input_access_code
+)
+
+:skip_selection
 
 REM Ask for API key if the model type is geminipro or ChatGPT
 if "!model_type!"=="geminipro" (
@@ -64,6 +83,7 @@ if "!model_type!"=="geminipro" (
 )
 
 :continue
+
 REM Ask for model path if the model type is GGUF or Hugging Face
 if "!model_type!"=="gguf" (
     :input_model_path
@@ -85,6 +105,7 @@ REM Save to env.bat
 echo set "model_type=!model_type!" > env.bat
 echo set "model_name=!model_name!" >> env.bat
 if defined api_key echo set "api_key=!api_key!" >> env.bat
+echo set "access_code=!access_code!" >> env.bat
 if defined model_path echo set "model_path=!model_path!" >> env.bat
 
 echo Configuration saved to env.bat

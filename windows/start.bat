@@ -45,8 +45,6 @@ for /D %%d in ("workers\*") do (
     if exist "%%d\env.bat" (
         rem Execute the env.bat file
         call %%d\env.bat
-        set "input=%%d"
-        for /f "tokens=2 delims=\" %%e in ("!input!") do set "current_folder=%%e"
 
         rem Perform different actions based on the model type
         rem Use if statements to handle different model types
@@ -61,23 +59,23 @@ for /D %%d in ("workers\*") do (
         rem Perform extra action if needed
         if "!do_extra_action!"=="1" (
             if defined api_key (
-                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!current_folder!" "--api_key" "!api_key!"
+                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--api_key" "!api_key!"
             ) else (
-                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!current_folder!"
+                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!"
             )
         ) else (
-            start /b "" "kuwa-executor" "!model_type!" "--access_code" "!current_folder!" "--model_path" "!model_path!"
+            start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--model_path" "!model_path!"
         )
 
         pushd ..\src\multi-chat\
-        call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!current_folder!" "!model_name!"
+        call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!"
         popd
 
         rem Collect existing access code
         if "!exclude_access_codes!"=="" (
-            set "exclude_access_codes=--exclude=!current_folder!"
+            set "exclude_access_codes=--exclude=!access_code!"
         ) else (
-            set "exclude_access_codes=!exclude_access_codes! --exclude=!current_folder!"
+            set "exclude_access_codes=!exclude_access_codes! --exclude=!access_code!"
         )
     )
 )
