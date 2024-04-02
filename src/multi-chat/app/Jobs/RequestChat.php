@@ -9,6 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use App\Events\RequestStatus;
 use App\Models\Histories;
@@ -18,7 +19,7 @@ use Carbon\Carbon;
 class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $access_code, $msgtime, $history_id, $user_id, $chatgpt_apitoken, $channel;
+    private $input, $access_code, $msgtime, $history_id, $user_id, $channel, $openai_token, $google_token;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
     public static $agent_version = 'v1.0';
@@ -27,21 +28,19 @@ class RequestChat implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($input, $access_code, $user_id, $history_id, $chatgpt_apitoken, $channel = null)
+    public function __construct($input, $access_code, $user_id, $history_id, $channel = null)
     {
         $this->input = json_encode(json_decode($input), JSON_UNESCAPED_UNICODE);
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
         $this->access_code = $access_code;
         $this->user_id = $user_id;
         $this->history_id = $history_id;
-        if ($chatgpt_apitoken == null) {
-            $chatgpt_apitoken = '';
-        }
         if ($channel == null) {
             $channel = '';
         }
         $this->channel = $channel;
-        $this->chatgpt_apitoken = $chatgpt_apitoken;
+        $this->openai_token = User::find($user_id)->openai_token;
+        $this->google_token = User::find($user_id)->google_token;
     }
 
     /**
@@ -49,6 +48,7 @@ class RequestChat implements ShouldQueue
      */
     public function handle(): void
     {
+        $warningMessages = [];
         if ($this->channel == '') {
             $this->channel .= $this->history_id;
         }
@@ -138,7 +138,6 @@ class RequestChat implements ShouldQueue
                             $taide_flag = false;
                         }
                     }
-
                     $response = $client->post($agent_location . '/' . self::$agent_version . '/chat/completions', [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                         'form_params' => [
@@ -146,7 +145,8 @@ class RequestChat implements ShouldQueue
                             'name' => $this->access_code,
                             'user_id' => $this->user_id,
                             'history_id' => $this->history_id * ($this->channel == $this->history_id ? 1 : -1),
-                            'chatgpt_apitoken' => $this->chatgpt_apitoken,
+                            'openai_token' => $this->openai_token,
+                            'google_token' => $this->google_token,
                         ],
                         'stream' => true,
                     ]);
@@ -156,7 +156,6 @@ class RequestChat implements ShouldQueue
                     $cache = false;
                     $cached = '';
                     $tmp = '';
-                    $warningMessages = [];
                     while (!$stream->eof()) {
                         $chunk = $stream->read(1);
                         $buffer .= $chunk;

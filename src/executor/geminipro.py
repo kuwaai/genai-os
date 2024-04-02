@@ -27,16 +27,12 @@ class GeminiWorker(LLMWorker):
 
     def _setup(self):
         super()._setup()
-        if not self.args.api_key:
-            raise Exception("You need Gemini API key from Google Cloud Console to host Gemini Pro model! Please add by --api_key <your_key>")
-
+        
         self.model_name = self.args.model
         self.limit = self.args.limit
         if not self.LLM_name:
             self.LLM_name = "gemini-pro"
 
-        genai.configure(api_key=self.args.api_key)
-        self.model = genai.GenerativeModel(self.model_name)
         self.proc = False
 
     async def count_token(self, messages: list):
@@ -56,7 +52,15 @@ class GeminiWorker(LLMWorker):
     
     async def llm_compute(self, data):
         try:
+            google_token = data.get("google_token") or self.args.api_key
             msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
+
+            if not google_token or len(google_token) == 0:
+                yield "[請在網站的使用者設定中，將您的Google API Token填入，才能使用該模型]"
+                return
+
+            genai.configure(api_key=google_token)
+            self.model = genai.GenerativeModel(self.model_name)
 
             # Trim the history to fit into the context window
             while await self.count_token(msg) > self.limit:

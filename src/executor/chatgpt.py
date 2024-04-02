@@ -78,14 +78,14 @@ class ChatGptWorker(LLMWorker):
 
     async def llm_compute(self, data):
         try:
-            chatgpt_apitoken = data.get("chatgpt_apitoken") or self.args.api_key
+            openai_token = data.get("openai_token") or self.args.api_key
             msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
             
             if not msg or len(msg) == 0:
                 yield "[沒有輸入任何訊息]"
                 return
             
-            if not chatgpt_apitoken or len(chatgpt_apitoken) == 0:
+            if not openai_token or len(openai_token) == 0:
                 yield "[請在網站的使用者設定中，將您的OpenAI API Token填入，才能使用該模型]"
                 return
 
@@ -97,9 +97,9 @@ class ChatGptWorker(LLMWorker):
                     yield "[Sorry, The input message is too long!]"
                     return
 
-            chatgpt_apitoken = chatgpt_apitoken.strip()
-            openai.api_key = chatgpt_apitoken
-            client = openai.AsyncOpenAI(api_key=chatgpt_apitoken)
+            openai_token = openai_token.strip()
+            openai.api_key = openai_token
+            client = openai.AsyncOpenAI(api_key=openai_token)
             self.proc = True
             response = await client.chat.completions.create(
                 model=self.model_name,
