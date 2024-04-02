@@ -80,14 +80,14 @@ if not exist "packages\%python_folder%\Scripts\pip.exe" (
 )
 
 
-set "PATH=%~dp0packages\%python_folder%\Scripts;%PATH%"
+set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 REM Download required pip packages
-pushd "packages\%python_folder%"
-.\python.exe -m pip install -r ..\..\..\src\kernel\requirements.txt
-.\python.exe -m pip install -r ..\..\..\src\executor\requirements1.txt
-.\python.exe -m pip install https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.56/llama_cpp_python-0.2.56-cp39-cp39-win_amd64.whl
-.\python.exe -m pip install -r ..\..\..\src\executor\requirements.txt
-.\python.exe -m pip install ..\..\..\src\executor\
+pushd "..\src\kernel"
+python.exe -m pip install -r requirements.txt
+popd
+pushd "..\src\executor"
+python.exe -m pip install https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.56/llama_cpp_python-0.2.56-cp39-cp39-win_amd64.whl
+python.exe -m pip install -r requirements.txt
 popd
 
 REM Check if .env file exists
