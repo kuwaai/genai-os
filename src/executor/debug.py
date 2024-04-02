@@ -19,7 +19,7 @@ class DebugWorker(LLMWorker):
         Remember to invoke "_create_parser" of the parent class.
         """
         parser = super()._create_parser()
-        parser.add_argument('--delay', type=int, default=0.02, help='Inter-token delay')
+        parser.add_argument('--delay', type=float, default=0.02, help='Inter-token delay')
         return parser
 
     def _setup(self):
