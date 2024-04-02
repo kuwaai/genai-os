@@ -3,5 +3,4 @@ requests
 flask
 flask_sse
 APScheduler
-hatchling
 #llm-safety-guard>=0.2.0
