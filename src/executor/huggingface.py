@@ -39,7 +39,7 @@ class HuggingfaceWorker(LLMWorker):
     def _create_parser(self):
         parser = super()._create_parser()
         parser.add_argument('--model_path', default=self.model_path, help='Model path. It can be the path to local model or the model name on HuggingFace Hub')
-        parser.add_argument('--gpu_config', default=None, help='GPU config')
+        parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
         parser.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
         parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
         parser.add_argument('--context_window', default=self.context_window, help='The context window of the model')
@@ -52,8 +52,8 @@ class HuggingfaceWorker(LLMWorker):
     def _setup(self):
         super()._setup()
 
-        if self.args.gpu_config:
-            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.gpu_config
+        if self.args.visible_gpu:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.model_path = self.args.model_path
         if not self.model_path:

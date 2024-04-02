@@ -56,7 +56,7 @@ class LlamaCppWorker(LLMWorker):
     def _create_parser(self):
         parser = super()._create_parser()
         parser.add_argument('--model_path', default=self.model_path, help='Model path')
-        parser.add_argument('--gpu_config', default=None, help='GPU config')
+        parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
         parser.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
 
         parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the context window')
@@ -72,8 +72,8 @@ class LlamaCppWorker(LLMWorker):
     def _setup(self):
         super()._setup()
 
-        if self.args.gpu_config:
-            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.gpu_config
+        if self.args.visible_gpu:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.model_path = self.args.model_path
         if not self.model_path:
@@ -168,6 +168,7 @@ class LlamaCppWorker(LLMWorker):
             output_generator = self.model.create_completion(
                 prompt,
                 max_tokens=None,
+                stop=self.stop_words,
                 temperature=self.temperature,
                 echo=False,
                 stream=True
@@ -175,7 +176,6 @@ class LlamaCppWorker(LLMWorker):
             self.serving_generator = output_generator
             
             for i in output_generator:
-                logging.debug(i)
                 chunk = i["choices"][0]["text"]
                 if self.in_debug(): print(end=chunk, flush=True)
                 yield chunk
