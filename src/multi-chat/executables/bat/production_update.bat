@@ -3,7 +3,7 @@ call composer update
 call php artisan key:generate --force
 call php artisan db:seed --class=InitSeeder --force
 call php artisan migrate --force
-call del public\storage
+rmdir /Q /S public\storage
 call php artisan storage:link
 call npm install
 call composer dump-autoload --optimize

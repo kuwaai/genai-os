@@ -40,7 +40,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         session()->put('locale', $lang);
         return back();
     })->name('lang');
-    
+
     Route::get('/IPNotAllowed', function () {
         return view('errors.IPNotAllowed');
     })->name('errors.ipnotallowed');
@@ -76,7 +76,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         # User routes, required email verified
         Route::middleware('auth', 'verified')->group(function () {
             Route::get('/change_password', function () {
-                if (request()->user()->require_change_password){
+                if (request()->user()->require_change_password) {
                     return view('profile.change_password');
                 }
                 return redirect(route('chat.home'));
@@ -109,9 +109,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::middleware(AdminMiddleware::class . ':Profile_update_api_token')
                             ->patch('/api', [ProfileController::class, 'renew'])
                             ->name('profile.api.renew');
-                        Route::middleware(AdminMiddleware::class . ':Profile_update_openai_token')
-                            ->patch('/chatgpt/api', [ProfileController::class, 'chatgpt_update'])
+                        Route::middleware(AdminMiddleware::class . ':Profile_update_external_api_token')
+                            ->patch('/chatgpt/api', [ProfileController::class, 'openai_update'])
                             ->name('profile.chatgpt.api.update');
+                        Route::middleware(AdminMiddleware::class . ':Profile_update_external_api_token')
+                            ->patch('/google/api', [ProfileController::class, 'google_update'])
+                            ->name('profile.google.api.update');
 
                         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
                         Route::middleware(AdminMiddleware::class . ':Profile_delete_account')

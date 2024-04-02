@@ -32,7 +32,7 @@ return [
     'label.api_manage' => 'APIキーを管理してください。他の人に知らせないでください！',
     'label.taide_api' => 'TAIDE APIキー',
     'label.openai_api' => 'OpenAI APIキー',
-    'label.stay_secure' => 'OpenAI APIキーの使用量に注意してください！',
+    'label.stay_secure' => '外部APIトークンの使用量に注意してください！',
 
     //Delete Account
     'header.delete_account' => 'アカウントの削除',

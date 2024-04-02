@@ -32,7 +32,7 @@ return [
     'label.api_manage' => 'Verwalten Sie Ihre API-Schlüssel, geben Sie sie nicht weiter!',
     'label.taide_api' => 'TAIDE-Schlüssel',
     'label.openai_api' => 'OpenAI-Schlüssel',
-    'label.stay_secure' => 'Achten Sie darauf, wie Sie Ihren OpenAI-Schlüssel verwenden!',
+    'label.stay_secure' => 'Bitte achten Sie darauf, wie Sie Ihren externen Schlüssel verwenden!',
 
     //Delete Account
     'header.delete_account' => 'Konto löschen',

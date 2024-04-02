@@ -32,7 +32,7 @@ return [
     'label.api_manage' => 'Gérez vos clés API, ne les divulgez à personne !',
     'label.taide_api' => 'Clé TAIDE',
     'label.openai_api' => 'Clé OpenAI',
-    'label.stay_secure' => 'Veuillez surveiller attentivement votre utilisation de la clé OpenAI !',
+    'label.stay_secure' => 'Veuillez surveiller attentivement votre utilisation de clés API externes !',
 
     //Delete Account
     'header.delete_account' => 'Supprimer le compte',

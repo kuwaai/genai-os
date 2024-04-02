@@ -32,7 +32,7 @@ return [
      'label.api_manage' => '管理您的API金钥，切勿让别人知道！ ',
      'label.taide_api' => 'TAIDE 金钥',
      'label.openai_api' => 'OpenAI 金钥',
-     'label.stay_secure' => '请多留意您的OpenAI金钥用量！ ',
+     'label.stay_secure' => '请多留意您的外部金钥用量！ ',
 
      //Delete Account
      'header.delete_account' => '删除帐号',

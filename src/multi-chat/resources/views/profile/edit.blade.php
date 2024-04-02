@@ -16,7 +16,7 @@
             </div>
             @endif
 
-            @if (Auth::user()->hasPerm('Profile_read_api_token') || Auth::user()->hasPerm('Profile_update_openai_token') || Auth::user()->hasPerm('Profile_update_api_token'))
+            @if (Auth::user()->hasPerm('Profile_read_api_token') || Auth::user()->hasPerm('Profile_update_external_api_token') || Auth::user()->hasPerm('Profile_update_api_token'))
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="max-w-xl">
                     @include('profile.partials.update-api-token-form')

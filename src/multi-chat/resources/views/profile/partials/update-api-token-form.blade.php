@@ -15,10 +15,7 @@
 
             <div>
                 <x-input-label for="taide_api" :value="__('profile.label.taide_api')" />
-                <x-text-input type="text" id="taide_api" class="mt-1 block w-full" :value="$user
-                    ->tokens()
-                    ->where('name', 'API_Token')
-                    ->first()->token" readonly />
+                <x-text-input type="text" id="taide_api" class="mt-1 block w-full" :value="$user->tokens()->where('name', 'API_Token')->first()->token" readonly />
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
@@ -35,8 +32,31 @@
         </form>
     @endif
 
+    @if (Auth::user()->hasPerm('Profile_update_external_api_token'))
+        <form method="post" action="{{ route('profile.google.api.update') }}" class="mt-6 space-y-6"
+            autocomplete="off">
+            @csrf
+            @method('patch')
 
-    @if (Auth::user()->hasPerm('Profile_update_openai_token'))
+            <div>
+                <x-input-label for="google_token" :value="__('profile.label.google_api')" />
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    {{ __('profile.label.stay_secure') }}
+                </p>
+                <x-text-input type="password" id="google_token" name="google_token" class="mt-1 block w-full"
+                    placeholder="{{ $user->google_token ? '************************' : '' }}" />
+                <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            </div>
+
+            <div class="flex items-center gap-4">
+                <x-primary-button>{{ __('profile.button.update') }}</x-primary-button>
+
+                @if (session('status') === 'google-token-updated')
+                    <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                @endif
+            </div>
+        </form>
         <form method="post" action="{{ route('profile.chatgpt.api.update') }}" class="mt-6 space-y-6"
             autocomplete="off">
             @csrf

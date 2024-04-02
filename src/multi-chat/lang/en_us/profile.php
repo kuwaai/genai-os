@@ -32,6 +32,7 @@ return [
     'label.api_manage' => 'Manage your API Tokens, Please keep it secret!',
     'label.taide_api' => 'TAIDE Chat API Token',
     'label.openai_api' => 'OpenAI API Token',
+    'label.google_api' => 'Google API Token',
     'label.stay_secure' => 'Please aware that each message might cause the usage up to 2000 tokens',
 
     //Delete Account

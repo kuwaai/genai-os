@@ -32,7 +32,7 @@ return [
     'label.api_manage' => 'Spravujte své API klíče, nikomu je neposkytujte!',
     'label.taide_api' => 'TAIDE API klíč',
     'label.openai_api' => 'OpenAI API klíč',
-    'label.stay_secure' => 'Dbejte na bezpečnost svého OpenAI klíče!',
+    'label.stay_secure' => 'Buďte opatrní s vaším externím klíčem!',
 
     //Delete Account
     'header.delete_account' => 'Smazat účet',

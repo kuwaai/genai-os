@@ -213,13 +213,22 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit');
     }
 
-    public function chatgpt_update(Request $request)
+    public function openai_update(Request $request)
     {
         $request
             ->user()
             ->fill(['openai_token' => $request->input('openai_token')])
             ->save();
         return Redirect::route('profile.edit')->with('status', 'chatgpt-token-updated');
+    }
+
+    public function google_update(Request $request)
+    {
+        $request
+            ->user()
+            ->fill(['google_token' => $request->input('google_token')])
+            ->save();
+        return Redirect::route('profile.edit')->with('status', 'google-token-updated');
     }
 
     /**

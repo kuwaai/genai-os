@@ -135,7 +135,7 @@ return [
     'perm.Profile_update_name' => '修改使用者名稱',
     'perm.Profile_update_email' => '修改電子郵件地址',
     'perm.Profile_update_password' => '修改密碼',
-    'perm.Profile_update_openai_token' => '修改OpenAI金鑰',
+    'perm.Profile_update_external_api_token' => '修改外部API金鑰',
     'perm.Profile_read_api_token' => '讀取網站API金鑰',
     'perm.Profile_delete_account' => '刪除帳號',
 
@@ -144,7 +144,7 @@ return [
     'perm.Profile_update_name.describe' => '更新自己帳號名稱的權限',
     'perm.Profile_update_email.describe' => '更新自己電子郵件信箱的權限',
     'perm.Profile_update_password.describe' => '更新自己密碼的權限',
-    'perm.Profile_update_openai_token.describe' => '更新存放在網站上的OpenAI金鑰的權限',
+    'perm.Profile_update_external_api_token.describe' => '更新存放在網站上的外部API金鑰的權限',
     'perm.Profile_read_api_token.describe' => '閱讀網站API金鑰的權限',
     'perm.Profile_delete_account.describe' => '刪除自己帳號的權限',
     'perm.Profile_update_api_token.describe' => '更新網站API金鑰的權限',

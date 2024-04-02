@@ -134,7 +134,7 @@ return [
     'perm.Profile_update_name' => 'Update Username',
     'perm.Profile_update_email' => 'Update Email',
     'perm.Profile_update_password' => 'Update Password',
-    'perm.Profile_update_openai_token' => 'Update OpenAI Token',
+    'perm.Profile_update_external_api_token' => 'Update External API Token',
     'perm.Profile_read_api_token' => 'Read Web API Token',
     'perm.Profile_delete_account' => 'Delete Account',
 
@@ -143,7 +143,7 @@ return [
     'perm.Profile_update_name.describe' => 'Permission to update name',
     'perm.Profile_update_email.describe' => 'Permission to update email',
     'perm.Profile_update_password.describe' => 'Permission to update password',
-    'perm.Profile_update_openai_token.describe' => 'Permission to update OpenAI Token',
+    'perm.Profile_update_external_api_token.describe' => 'Permission to update External API Token',
     'perm.Profile_read_api_token.describe' => 'Permission to read TAIDE Chat API token',
     'perm.Profile_delete_account.describe' => 'Permission to delete their account',
     'perm.Profile_update_api_token.describe' => 'Permission to update TAIDE Chat API token',
