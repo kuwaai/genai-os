@@ -5,11 +5,13 @@ import time
 import json
 from typing import Optional
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from llama_cpp import Llama
 import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
 
 from kuwa.executor import LLMWorker
+from kuwa.executor.util import expose_function_parameter, read_config
 
 logger = logging.getLogger(__name__)
 
@@ -48,25 +50,36 @@ class LlamaCppWorker(LLMWorker):
     context_window: int = 4096
     stop_words: list = []
     system_prompt: str = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
-    temperature: float = 0.5
+    generation_config: dict = {
+        "max_tokens": None
+    }
     
     def __init__(self):
         super().__init__()
 
     def _create_parser(self):
         parser = super()._create_parser()
-        parser.add_argument('--model_path', default=self.model_path, help='Model path')
-        parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
-        parser.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
+        model_group = parser.add_argument_group('Model Options')
+        model_group.add_argument('--model_path', default=self.model_path, help='Model path')
+        model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
+        model_group.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
 
-        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the context window')
-        parser.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
-        parser.add_argument('--context_window', default=self.context_window, help='The context window of the model')
-        parser.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
-        parser.add_argument('--override_chat_template', default=None,
-            help='Override the default chat template provided by the model. Reference: https://huggingface.co/docs/transformers/main/en/chat_templating')
+        model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the input tokens')
+        model_group.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
+        model_group.add_argument('--context_window', default=self.context_window, help='The context window of the model')
+        model_group.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
+        model_group.add_argument('--override_chat_template', default=None,
+            help='Override the default chat template provided by the model. See https://huggingface.co/docs/transformers/main/en/chat_templating')
 
-        parser.add_argument('-t', '--temperature', type=float, default=self.temperature, help=' The temperature to use for sampling. Setting it to a negative value enables greedy decoding.')
+        # Generation Options
+        gen_group = parser.add_argument_group('Generation Options', 'Generation options for llama.cpp. See https://llama-cpp-python.readthedocs.io/en/latest/api-reference/#llama_cpp.Llama.create_completion')
+        gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
+        self.generation_config = expose_function_parameter(
+            function=Llama.create_completion,
+            parser=gen_group,
+            defaults=self.generation_config
+        )
+
         return parser
 
     def _setup(self):
@@ -85,7 +98,6 @@ class LlamaCppWorker(LLMWorker):
         self.limit = self.args.limit
         self.system_prompt = self.args.system_prompt
         self.context_window = self.args.context_window
-        self.temperature = self.args.temperature
         self.model = Llama(model_path=self.model_path, n_gpu_layers=self.args.ngl, n_ctx=self.context_window)
 
         # Get EOS and BOS token.
@@ -107,7 +119,21 @@ class LlamaCppWorker(LLMWorker):
                 ).to_chat_handler()
         self.model.chat_handler = chat_handler
         
-        logger.debug(f"Chat handler:{self.model.chat_handler}")
+        # Setup generation config
+        default_gconf = self.generation_config.copy()
+        file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
+        arg_gconf = {k: getattr(self.args, k) for k in default_gconf.keys()}
+        gconf = {
+            k: {"arg": arg_gconf.get(k), "file": file_gconf.get(k), "default": default_gconf.get(k)}
+            for k in default_gconf.keys()
+        }
+        self.generation_config = {
+            k: v["arg"] if v["arg"] is not None else
+              (v["file"] if v["file"] is not None else v["default"])
+            for k, v in gconf.items()
+        }
+
+        logger.debug(f"Generation config: {json.dumps(self.generation_config, indent=2)}")
         logger.debug(f"Stop words: {self.stop_words}")
 
         self.serving_generator = None
@@ -167,11 +193,10 @@ class LlamaCppWorker(LLMWorker):
             
             output_generator = self.model.create_completion(
                 prompt,
-                max_tokens=None,
                 stop=self.stop_words,
-                temperature=self.temperature,
                 echo=False,
-                stream=True
+                stream=True,
+                **self.generation_config
             )
             self.serving_generator = output_generator
             
