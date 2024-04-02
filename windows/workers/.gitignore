@@ -1,1 +1,5 @@
 */env.bat
+*/*.gguf
+*/*.safetensors
+*/*.model
+*/*.bin
