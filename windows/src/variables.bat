@@ -42,7 +42,7 @@ set "cmake_folder=%filename_CMake:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_CMake%") do set "version_CMake=%%v"
 
 REM Prepare migration file
-mkdir src/conf 2>nul
+mkdir src\conf 2>nul
 if not exist "src\conf\migrations.txt" (
     type nul > "src\conf\migrations.txt"
 )
