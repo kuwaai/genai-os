@@ -52,6 +52,8 @@ for /D %%d in ("workers\*") do (
             set "do_extra_action=1"
         ) else if "!model_type!"=="geminipro" (
             set "do_extra_action=1"
+        ) else if "!model_type!"=="custom" (
+            set "do_extra_action=2"
         ) else (
             set "do_extra_action=0"
         )
@@ -63,6 +65,8 @@ for /D %%d in ("workers\*") do (
             ) else (
                 start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!"
             )
+        ) else if "!do_extra_action!"=="2" (
+            start /b "" "%~dp0%python_folder%\python.exe" !worker_path! "--access_code" "!access_code!"
         ) else (
             start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--model_path" "!model_path!"
         )
