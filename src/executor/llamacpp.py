@@ -168,6 +168,7 @@ class LlamaCppWorker(LLMWorker):
             output_generator = self.model.create_completion(
                 prompt,
                 max_tokens=None,
+                stop=self.stop_words,
                 temperature=self.temperature,
                 echo=False,
                 stream=True
@@ -175,7 +176,6 @@ class LlamaCppWorker(LLMWorker):
             self.serving_generator = output_generator
             
             for i in output_generator:
-                logging.debug(i)
                 chunk = i["choices"][0]["text"]
                 if self.in_debug(): print(end=chunk, flush=True)
                 yield chunk
