@@ -48,11 +48,17 @@ if not exist "src\conf\migrations.txt" (
 
 REM Prepare packages folder
 mkdir packages 2>nul
+
 REM Run migration
-for %%i in ("src\conf\migration\*.bat") do (
+for %%i in ("src\migration\*.bat") do (
     findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (
         echo Running %%~nxi
         call "%%i"
-        echo %%~nxi>>"src\conf\migrations.txt"
+        if errorlevel 1 (
+            echo %%~nxi did not execute successfully.
+        ) else (
+            echo %%~nxi executed successfully.
+            echo %%~nxi>>"src\conf\migrations.txt"
+        )
     )
 )
