@@ -23,7 +23,7 @@ class ImportChat implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     private $ids, $access_code, $user_id;
     public $tries = 1; # Believe if it fails, it always failed
-    public $timeout = 600; # Shouldn't takes longer than 10 mins
+    public $timeout = 6000; # Shouldn't takes longer than 100 mins
     public $agent_version = 'v1.0';
     /**
      * Create a new job instance.
@@ -78,7 +78,7 @@ class ImportChat implements ShouldQueue
                     ->limit(1);
             }
             $input = $input->get()->toJson();
-            RequestChat::dispatch($input, $access_code, $this->user_id, $id, User::find($this->user_id)->openai_token);
+            RequestChat::dispatch($input, $access_code, $this->user_id, $id);
         }
     }
 }
