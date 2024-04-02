@@ -1,7 +1,0 @@
-google-generativeai
-openai
-torch
-transformers
-accelerate
-sentencepiece
-llama-cpp-python
