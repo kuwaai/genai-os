@@ -29,8 +29,8 @@ def find_free_port():
 
 class LLMWorker:
     executor_iface_version: str = "v1.0"
-    agent_url: str = "http://127.0.0.1:9000/"
-    ignore_agent: bool = False
+    kernel_url: str = "http://127.0.0.1:9000/"
+    ignore_kernel: bool = False
     https: bool = False
     host: Optional[str] = None
     port: Optional[int] = None
@@ -50,18 +50,18 @@ class LLMWorker:
 
     def _create_parser(self):
         parser = argparse.ArgumentParser(
-            description='LLM model worker, Please make sure your agent is working before use.',
+            description='LLM model worker, Please make sure your kernel is working before use.',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         group = parser.add_argument_group('General Options')
         group.add_argument('--access_code', default=self.LLM_name, help='Access code')
         group.add_argument('--version', default=self.executor_iface_version, help='Version of the executor interface')
-        group.add_argument('--ignore_agent', action='store_true', help='Ignore agent')
+        group.add_argument('--ignore_kernel', action='store_true', help='Ignore kernel')
         group.add_argument('--https', action='store_true', help='Register the worker endpoint with https scheme')
-        group.add_argument('--host', default=None, help='The hostname or IP address that will be stored in Agent, Make sure the location are accessible by Agent')
+        group.add_argument('--host', default=None, help='The hostname or IP address that will be stored in Kernel, Make sure the location are accessible by Kernel')
         group.add_argument('--port', type=int, default=None, help='The port to serve. By choosing None, it\'ll assign an unused port')
         group.add_argument('--worker_path', default=self.worker_path, help='The path this model worker is going to use')
-        group.add_argument('--agent_url', default=self.agent_url, help='Base URL of Agent\'s executor management API')
+        group.add_argument('--kernel_url', default=self.kernel_url, help='Base URL of Kernel\'s executor management API')
         group.add_argument("--log", type=str.upper, default=self.log_level, help="The logging level.", choices=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
         return parser
 
@@ -72,8 +72,8 @@ class LLMWorker:
         
         # Registration information
         self.executor_iface_version = self.args.version
-        self.agent_url = self.args.agent_url
-        self.ignore_agent = self.args.ignore_agent
+        self.kernel_url = self.args.kernel_url
+        self.ignore_kernel = self.args.ignore_kernel
         self.LLM_name = self.args.access_code
 
         # Serving URL
@@ -137,38 +137,38 @@ class LLMWorker:
             return
         try:
             response = requests.post(
-                urljoin(self.agent_url, f"{self.executor_iface_version}/worker/unregister"),
+                urljoin(self.kernel_url, f"{self.executor_iface_version}/worker/unregister"),
                 data={"name": self.LLM_name,"endpoint": self.get_reg_endpoint()}
             )
             if not response.ok or response.text == "Failed":
                 raise RuntimeWarning()
             else:
-                logger.info("Unregistered from agent.")
+                logger.info("Unregistered from kernel.")
                 self.registered = False
         except requests.exceptions.ConnectionError as e:
-            logger.warning("Failed to unregister from agent")
+            logger.warning("Failed to unregister from kernel")
 
     @retry(tries=5, delay=1, backoff=2, jitter=(0, 1), logger=logger)
     def _try_register(self):
         resp = requests.post(
-            url=urljoin(self.agent_url, f"{self.executor_iface_version}/worker/register"),
+            url=urljoin(self.kernel_url, f"{self.executor_iface_version}/worker/register"),
             data={"name": self.LLM_name, "endpoint": self.get_reg_endpoint()}
         )
         if not resp.ok or resp.text == "Failed":
-            raise RuntimeWarning("The server failed to register to agent.")
+            raise RuntimeWarning("The server failed to register to kernel.")
     
     def _start_server(self):
         self.registered = False
-        if not self.ignore_agent:
+        if not self.ignore_kernel:
             try:
                 self._try_register()
                 logger.info(f"Registered with the name \"{self.LLM_name}\"")
                 self.registered = True
 
             except Exception as e:
-                logger.exception("Failed to register to agent.")
+                logger.exception("Failed to register to kernel.")
 
-                if not self.ignore_agent:
+                if not self.ignore_kernel:
                     logger.info("The program will exit now.")
                     sys.exit(0)
         self.ready = True

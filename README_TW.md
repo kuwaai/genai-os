@@ -1,4 +1,4 @@
-[English Readme.md](./README.md)
+[English README.md](./README.md)
 
 <h1 align="center">
   <br>
@@ -9,7 +9,8 @@
   <br>
 </h1>
 
-<h4 align="center">一個自由、開放、安全、注重隱私的生成式AI作業系統。</h4>
+<h4 align="center">一個自由、開放、安全且注重隱私的生成式人工智慧服務系統。</h4>
+
 <p align="center">
   <a href="http://makeapullrequest.com">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
@@ -97,19 +98,19 @@
 3. **設定 PHP 和 PHP-FPM:**
    - 確保已安裝並正確設定了 PHP。
    - 設定您的 Web 伺服器（Nginx 或 Apache），將 `src/multi-chat/public` 設置為網站根目錄。
-   - 範例設置文件: `src/multi-chat/nginx_config_example`, `src/multi-chat/php.ini`
+   - 範例設置文件: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
    - 推薦設置:
      - 為了RAG應用，PHP 最大上傳文件大小設置為至少 10MB。
      - 避免一些較慢的RAG或攏長的模型輸出，將Timeout設置為至少 120 秒或更長時間。
 
 4. **設定 Redis:**
    - 確保已安裝並執行 Redis 伺服器。
-   - 可以從 `.env` 中設定相關資訊。
+   - 可以從 `.env` 中調整相關設定。
    - 在 `src/multi-chat/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
 
 5. **執行應用程式:**
    - 啟動您的 Web 伺服器和 PHP-FPM。
-   - 執行Agent `src/kernel/main.py`。建議在執行之前將該Agent資料夾複製到另一個位置。
+   - 執行Kernel `src/kernel/main.py`。建議在執行之前將該Kernel資料夾複製到另一個位置。
 
 6. **連線到應用程式:**
    - 首先您需要建立一個管理員帳號，前往 `src/multi-chat/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
@@ -119,7 +120,7 @@
 7. **架設模型:**
     - 預設是沒有模型的，請閱讀[這份README](./src/executor/README_TW.md)來架設一些模型。
     - 架設完畢後，模型不會屏空出現在網站上，管理員必須在網站上設定對應的access_code才能存取該模型。
-    - 請注意架設模型前Agent必須先啟動(你可以檢查`127.0.0.1:9000`是否可以連線來確定)
+    - 請注意架設模型前Kernel必須先啟動(你可以檢查`127.0.0.1:9000`是否可以連線來確定)
 
 ## 下載
 
