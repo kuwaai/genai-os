@@ -1,7 +1,3 @@
-@echo off
-
-REM Include variables from separate file
-call src\variables.bat
 pushd "packages\%nginx_folder%"
 .\nginx.exe -s quit
 popd

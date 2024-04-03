@@ -1,2 +1,0 @@
-20240330_move_folder_to_packages.bat
-20240402_seed_admin.bat
