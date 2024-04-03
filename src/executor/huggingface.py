@@ -164,9 +164,8 @@ class HuggingfaceWorker(LLMWorker):
         except Exception as e:
             logger.exception("Error occurs during generation.")
             yield "[Oops, Cuda out of memory! Please try toggle off chained state, or remove some texts.]"
-
         finally:
-            thread.join()
+            self.CSC.proc = None
             torch.cuda.empty_cache()
             logger.debug("finished")
             
