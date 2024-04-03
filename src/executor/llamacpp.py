@@ -1,8 +1,10 @@
+import re
 import os
 import sys
 import logging
 import time
 import json
+import pprint
 from typing import Optional
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -11,7 +13,7 @@ import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
 
 from kuwa.executor import LLMWorker
-from kuwa.executor.util import expose_function_parameter, read_config
+from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +45,20 @@ class ReflectiveLlama(Llama):
                 "total_tokens": 0
             }
         }
+
+class LlamaCppDescParser(DescriptionParser):
+    """
+    Extract parameter description from Llama.create_completion.
+    Ref: https://github.com/abetlen/llama-cpp-python/blob/f96de6d92087243f6430449c7a082f8a9071185a/llama_cpp/llama.py#L1423
+    """
+    def __call__(self, doc:str, name:str) -> str:
+        match = re.search(rf"{name}:\s+(.*)\n", doc)
+        if match:
+            description = match.group(1)
+        else:
+            description = None
+        return description
+
 class LlamaCppWorker(LLMWorker):
 
     model_path: Optional[str] = None
@@ -77,7 +93,8 @@ class LlamaCppWorker(LLMWorker):
         self.generation_config = expose_function_parameter(
             function=Llama.create_completion,
             parser=gen_group,
-            defaults=self.generation_config
+            defaults=self.generation_config,
+            desc_parser=LlamaCppDescParser()
         )
 
         return parser
@@ -120,20 +137,16 @@ class LlamaCppWorker(LLMWorker):
         self.model.chat_handler = chat_handler
         
         # Setup generation config
-        default_gconf = self.generation_config.copy()
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
-        arg_gconf = {k: getattr(self.args, k) for k in default_gconf.keys()}
-        gconf = {
-            k: {"arg": arg_gconf.get(k), "file": file_gconf.get(k), "default": default_gconf.get(k)}
-            for k in default_gconf.keys()
+        arg_gconf = {
+            k: getattr(self.args, k)
+            for k, v in self.generation_config.items()
+            if f"--{k}" in sys.argv
         }
-        self.generation_config = {
-            k: v["arg"] if v["arg"] is not None else
-              (v["file"] if v["file"] is not None else v["default"])
-            for k, v in gconf.items()
-        }
+        self.generation_config = merge_config(base=self.generation_config, top=file_gconf)
+        self.generation_config = merge_config(base=self.generation_config, top=arg_gconf)
 
-        logger.debug(f"Generation config: {json.dumps(self.generation_config, indent=2)}")
+        logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
         logger.debug(f"Stop words: {self.stop_words}")
 
         self.serving_generator = None

@@ -1,28 +1,57 @@
+import re
 import os
 import sys
 import asyncio
 import logging
 import json
+import pprint
+from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import google.generativeai as genai
 
 from kuwa.executor import LLMWorker
+from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
 
+class GeminiDescParser(DescriptionParser):
+    """
+    Extract parameter description from google.generativeai.GenerationConfig.
+    Ref: https://github.com/google/generative-ai-python/blob/3704fa8b1859c2ac8135cdd36df73429a7b27acc/google/generativeai/types/generation_types.py#L70
+    """
+    def __call__(self, doc:str, name:str) -> str:
+        doc = dedent(doc[doc.find("Attributes:")+len("Attributes:"):]) + "\nEOF"
+        match = re.search(rf"{name}[^:]*:([\s\S]+?)\n[^\s\n]", doc, re.MULTILINE)
+        if match:
+            description = match.group(1).replace('\n', '')
+        else:
+            description = None
+        return description
 class GeminiWorker(LLMWorker):
 
     model_name: str = "gemini-1.0-pro"
     limit: int = 30720
+    generation_config: dict = {}
 
     def __init__(self):
         super().__init__()
 
     def _create_parser(self):
         parser = super()._create_parser()
-        parser.add_argument('--api_key', default=None, help='Gemini API key from Google Cloud Console')
-        parser.add_argument('--model', default=self.model_name, help='Model name. See https://ai.google.dev/models/gemini')
-        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
+        model_group = parser.add_argument_group('Model Options')
+        model_group.add_argument('--api_key', default=None, help='Gemini API key from Google Cloud Console')
+        model_group.add_argument('--model', default=self.model_name, help='Model name. See https://ai.google.dev/models/gemini')
+        model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
+
+        gen_group = parser.add_argument_group('Generation Options', 'Generation options for Google AI API. See https://ai.google.dev/api/python/google/generativeai/GenerationConfig')
+        gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
+        self.generation_config = expose_function_parameter(
+            function=genai.GenerationConfig,
+            parser=gen_group,
+            defaults=self.generation_config,
+            desc_parser=GeminiDescParser()
+        )
+
         return parser
 
     def _setup(self):
@@ -32,6 +61,18 @@ class GeminiWorker(LLMWorker):
         self.limit = self.args.limit
         if not self.LLM_name:
             self.LLM_name = "gemini-pro"
+
+        # Setup generation config
+        file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
+        arg_gconf = {
+            k: getattr(self.args, k)
+            for k, v in self.generation_config.items()
+            if f"--{k}" in sys.argv
+        }
+        self.generation_config = merge_config(base=self.generation_config, top=file_gconf)
+        self.generation_config = merge_config(base=self.generation_config, top=arg_gconf)
+
+        logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
 
         self.proc = False
 
@@ -83,10 +124,15 @@ class GeminiWorker(LLMWorker):
                     "HARM_CATEGORY_DANGEROUS_CONTENT": "block_none",
                     "HARM_CATEGORY_HATE_SPEECH": "block_none",
                     "HARM_CATEGORY_SEXUALLY_EXPLICIT": "block_none"
-                }
+                },
+                generation_config=genai.GenerationConfig(**self.generation_config)
             )
-            async for i in response:
-                chunk = i.text
+            async for resp in response:
+
+                # Continue when there's no text is avalilable in the response
+                if len(resp.candidates) == 0 or not resp.candidates[0].content.parts: continue
+                
+                chunk = resp.text
                 yield chunk
                 if self.in_debug(): print(end=chunk, flush=True)
                 if not self.proc: break

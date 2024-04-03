@@ -12,6 +12,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 
 from kuwa.executor import LLMWorker
+from kuwa.executor.util import expose_function_parameter, read_config
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +27,13 @@ class HuggingfaceWorker(LLMWorker):
 
     model_path: Optional[str] = None
     limit: int = 1024*3
-    context_window: int = 4096
     stop_words: list = []
     system_prompt: str = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
+    generation_config: dict = {
+        "max_new_tokens": 4096,
+        "do_sample": False,
+        "repetition_penalty": 1.0
+    }
 
     # Internal variable
     buffer_length: int = 1 # The length of the sliding window buffer
@@ -38,14 +43,18 @@ class HuggingfaceWorker(LLMWorker):
     
     def _create_parser(self):
         parser = super()._create_parser()
-        parser.add_argument('--model_path', default=self.model_path, help='Model path. It can be the path to local model or the model name on HuggingFace Hub')
-        parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
-        parser.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
-        parser.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
-        parser.add_argument('--context_window', default=self.context_window, help='The context window of the model')
-        parser.add_argument('--override_chat_template', default=None,
+        model_group = parser.add_argument_group('Model Options')
+        model_group.add_argument('--model_path', default=self.model_path, help='Model path. It can be the path to local model or the model name on HuggingFace Hub')
+        model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
+        model_group.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
+        model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
+        model_group.add_argument('--override_chat_template', default=None,
             help='Override the default chat template provided by the model. Reference: https://huggingface.co/docs/transformers/main/en/chat_templating')
-        parser.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
+        model_group.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
+        
+        # Generation Options
+        gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
+        gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
         
         return parser
 
@@ -65,13 +74,19 @@ class HuggingfaceWorker(LLMWorker):
         self.model = AutoModelForCausalLM.from_pretrained(self.model_path,device_map="auto", torch_dtype=torch.float16)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         self.system_prompt = self.args.system_prompt
-        self.context_window = self.args.context_window
         self.stop_words = list(set([self.tokenizer.eos_token, self.tokenizer.bos_token] + self.args.stop))
         self.buffer_length = max([len(k) for k in self.stop_words] or [1])
         self.tokenizer.chat_template = self.args.override_chat_template or \
                                        self.tokenizer.chat_template or \
                                        self.tokenizer.default_chat_template
         self.CSC = CustomStoppingCriteria()
+
+        # Setup generation config
+        self.generation_config["pad_token_id"] = self.tokenizer.eos_token_id
+        default_gconf = GenerationConfig().to_dict()
+        file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
+        self.generation_config = merge_config(base=default_gconf, top=self.generation_config)
+        self.generation_config = merge_config(base=self.generation_config, top=file_gconf)
 
         logger.debug(f"Stop words: {self.stop_words}")
         logger.debug(f"Buffer length: {self.buffer_length}")
@@ -129,10 +144,7 @@ class HuggingfaceWorker(LLMWorker):
             input_ids=prompt_embedding,
             streamer=streamer,
             generation_config=GenerationConfig(
-                max_new_tokens=self.context_window,
-                pad_token_id=self.tokenizer.eos_token_id,
-                do_sample=False,
-                repetition_penalty = 1.0
+                **self.generation_config
             ),
             stopping_criteria=StoppingCriteriaList([self.CSC])
         ), daemon=True)
