@@ -1,6 +1,23 @@
 @props(['result'])
+@php
+    $DCs = App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
+        ->where('chats.user_id', Auth::user()->id)
+        ->select('chatrooms.*', DB::raw('count(chats.id) as counts'))
+        ->groupBy('chatrooms.id');
 
-@foreach (App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')->where('chats.user_id', Auth::user()->id)->orderby('counts', 'desc')->select('chatrooms.*', DB::raw( (config('database.default') == 'sqlite' ? 'GROUP_CONCAT(chats.llm_id, ",")' : 'array_agg(chats.llm_id ORDER BY chats.llm_id)') . ' as identifier'), DB::raw('count(chats.id) as counts'))->groupBy('chatrooms.id')->get()->groupBy('identifier') as $DC)
+    // Fetch the ordered identifiers based on `llm_id` for both MySQL and SQLite
+    $DCs->selectSub(function ($query) {
+        $query
+            ->from('chats')
+            ->selectRaw('group_concat(llm_id) as identifier')
+            ->whereColumn('roomID', 'chatrooms.id')
+            ->orderByDesc('llm_id');
+    }, 'identifier');
+
+    // Get the final result and group by the ordered identifiers
+    $DCs = $DCs->get()->groupBy('identifier');
+@endphp
+@foreach ($DCs as $DC)
     @if (array_diff(explode(',', trim($DC->first()->identifier, '{}')), $result->pluck('model_id')->toArray()) == [])
         <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
             @if (request()->user()->hasPerm('Room_update_new_chat'))
