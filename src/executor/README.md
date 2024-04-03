@@ -1,40 +1,42 @@
-### Model Deployment Tutorial
+## Model Serving Tutorial
 
-This guide will help you set up your model deployment after you've launched a kernel. By default, the kernel will be hosted at `127.0.0.1:9000`. If you have already launched the kernel, you can start deploying your own model on it. You can check the current status of your kernel by visiting
-http://127.0.0.1:9000/v1.0/worker/debug.
+This guide will help you setup your model serving after your Kernel is started. By default, the kernel should be served at `127.0.0.1:9000`. If you've already started your Kernel, you should be ready to host your own model on your kernel.
+
+You can check the current serving status of the Kernel by connecting to
+http://127.0.0.1:9000/v1.0/worker/debug
+
+### Basic Usage
 
 **1. Install Required Packages**
-
-Make sure you have the required packages installed by running:
-
+ 
+Make sure you've installed the required packages by running:
 ```sh
 pip install -r requirements.txt
 ```
-
-We have packaged the executor as a package, so you can directly use the command `kuwa-executor` to start the executor after installation. You can read more detailed parameters by running the command:
+The executor is packaged so that after installation you can directly use the `kuwa-executor` command to start up your executor. You can get more detailed parameters with:
 ```sh
 > kuwa-executor --list
 
-Available model workers:
+Available model executors:
 
-debug      : [Tool] Debugging worker. It will reflect the last input.
-dummy      : [Tool] Dummy worker. It will reply fixed message regardless of the user prompt.
+debug      : [Tool] Debugging executor. It will reflect the last input.
+dummy      : [Tool] Dummy executor. It will reply fixed message regardless of the user prompt.
 geminipro  : [Cloud model] Google Gemini-Pro. Need API key.
 chatgpt    : [Cloud model] OpenAI ChatGPT. Need API key.
 huggingface: [On-premises model] Download and run Huggingface model locally.
 llamacpp   : [On-premises model] Run the GGUF model locally.
 
-Use "kuwa-executor [worker] --help" to get more information.
+Use "kuwa-executor [executor] --help" to get more information.
 ```
-You can get more detailed help for specific worker types, for example:
+You can get more detailed instructions for a specific executor type as well:
 ```sh
 > kuwa-executor debug --help
 
 usage: kuwa-executor debug [-h] [--access_code ACCESS_CODE] [--version VERSION] [--ignore_kernel] [--https]
-                           [--host HOST] [--port PORT] [--worker_path WORKER_PATH] [--kernel_url KERNEL_URL]
+                           [--host HOST] [--port PORT] [--executor_path EXECUTOR_PATH] [--kernel_url KERNEL_URL]
                            [--log {NOTSET,DEBUG,INFO,WARNING,ERROR,CRITICAL}] [--delay DELAY]
 
-LLM model worker, Please make sure your kernel is working before use.
+LLM model executor, Please make sure your kernel is working before use.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -45,12 +47,12 @@ General Options:
                         Access code (default: None)
   --version VERSION     Version of the executor interface (default: v1.0)
   --ignore_kernel       Ignore kernel (default: False)
-  --https               Register the worker endpoint with https scheme (default: False)
+  --https               Register the executor endpoint with https scheme (default: False)
   --host HOST           The hostname or IP address that will be stored in Kernel, Make sure the location are
                         accessible by Kernel (default: None)
   --port PORT           The port to serve. By choosing None, it'll assign an unused port (default: None)
-  --worker_path WORKER_PATH
-                        The path this model worker is going to use (default: /chat)
+  --executor_path EXECUTOR_PATH
+                        The path this model executor is going to use (default: /chat)
   --kernel_url KERNEL_URL
                         Base URL of Kernel's executor management API (default: http://127.0.0.1:9000/)
   --log {NOTSET,DEBUG,INFO,WARNING,ERROR,CRITICAL}
@@ -59,29 +61,68 @@ General Options:
 
 **2. Prepare Your Model**
 
-To deploy a model if your model is in `.gguf` format, use:
+If your model is in `.gguf` format:
 ```sh
 kuwa-executor llamacpp --model_path <PATH_TO_YOUR_GGUF> --visible_gpu <CUDA_VISIBLE_DEVICES>
 ```
-For models that can be loaded by transformers (`.safetensors`, `.bin`, `.model`, etc.) or models hosted on Huggingface:
+For models loadable by transformers (`.safetensors`, `.bin`, `.model`, etc.) or hosted by Huggingface:
 ```sh
-kuwa-executor huggingface --model_path <PATH_TO_MODEL_FOLDER/PATH_TO_HUGGINGFACE> --visible_gpu <CUDA_VISIBLE_DEVICES>
+kuwa-executor huggingface --model_path <PATH_TO_MODEL_FOLDER/HUGGINGFACE_MODEL_NAME> --visible_gpu <CUDA_VISIBLE_DEVICES>
 ```
 
-**3. Connecting Cloud Models**
+**3. Connect to Cloud Model**
 
-You can also connect to cloud models like Gemini Pro or ChatGPT using API keys.
+You can use API Keys to connect to cloud models such as Gemini Pro or ChatGPT.
 
-- Start the worker with commands below, `api_key` is a global default key, so you can omit it.
-
+- Start the executor with the following commands. The `api_key` is optional and will default to the global value.
 
   ```sh
   kuwa-executor geminipro --api_key <YOUR_API_KEY>
   kuwa-executor chatgpt --api_key <YOUR_API_KEY> --model <gpt-3.5-turbo/gpt-4/gpt-4-32k/...>
   ```
 
-- By default, both of them will use `gemini-pro` and `chatgpt` as the `access_code` when deploying the model. If you want to adjust the `access_code` of the deployment, you can use: `--access_code <your desired access code>`.
+- By default, these will set up the executor with `gemini-pro` and `chatgpt` as the `access_code` respectively. If you'd like to adjust the `access_code` the executor is setup with, you can use `--access_code <your_desired_access_code>`.
 
-**4. Advanced Usage**
+### Advanced Usage
 
-You can inherit the `kuwa.LLMWorker` class to customize your own worker, but this is not ready to be demonstrated here, stay tuned...
+#### Detailed Generation Args
+
+In addition to the debug executor, other executors allow you to specify detailed generation args, either through config file or command line arguments. On-premises models also allow you to specify a system prompt and prompt template. For details, use `kuwa-executor [executor] --help`.
+
+#### Custom Executors
+
+Kuwa Executor can be viewed as a function or server that provides a specific functionality. The interface is defined in `kuwa.executor.LLMExecutor`, which is a function that takes in the user's chat history and outputs text. You can extend this class to define your own custom executor.
+
+The simplest implementation of `LLMExecutor` can be seen in `debug.py` and `dummy.py`. Here is an explanation of each API:
+- `__init__`: Initialize the service. Make sure to call `super().__init__()` to complete the initialization.
+- `extend_arguments`: Optionally add command-line arguments. Use the `argparse` built-in library for parsing arguments.
+- `setup`: Initialize anything you need. The command line arguments have been parsed at this stage and can be accessed via the `self.args` variable.
+- `llm_compute`: The main method for handling requests. Please use an asynchronous iterator to implement this method.
+- `abort`: Called when the request is aborted by the user. It is expected to interrupt the current request in progress.
+
+#### Connecting to other Inference Environments
+
+Kuwa Executor can be easily connected to other inference environments, making it easy to integrate with existing open-source software.
+
+Currently, any OpenAI API compatible inference server can be used with the ChatGPT Executor.
+
+Here's an example using [vLLM](https://github.com/vllm-project/vllm), a high-throughput inference engine.
+
+**1. Start vLLM Server** (Shown using the Google Gemma 7B Instruct model as an example)
+```sh
+docker run --runtime nvidia --gpus all \
+    -v ~/.cache/huggingface:/root/.cache/huggingface \
+    --env "HUGGING_FACE_HUB_TOKEN=<secret>" \
+    -p 8000:8000 \
+    --ipc=host \
+    vllm/vllm-openai:latest \
+    --model google/gemma-7b-it --dtype half
+```
+
+**2. Start Kuwa ChatGPT Executor**
+```sh
+kuwa-executor chatgpt --access_code vllm --log debug \
+    --base_url "http://localhost:8000/v1" `# Change the API base URL to vLLM` \
+    --api_key dummy `# Dummy API Key` \
+    --model "google/gemma-7b-it" `# Specify Gemma 7B model`
+```
