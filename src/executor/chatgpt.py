@@ -1,12 +1,18 @@
+import re
 import os
 import sys
 import logging
 import json
+import typing
+import pprint
+from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import openai
 import tiktoken
+from openai.resources.chat.completions import AsyncCompletions
 
 from kuwa.executor import LLMWorker
+from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
 
@@ -18,27 +24,60 @@ CONTEXT_WINDOW = {
     ("gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-4-1106-preview", "gpt-4-vision-preview", "gpt-4-1106-vision-preview"): 128000,
 }
 
+class ChatGptDescParser(DescriptionParser):
+    """
+    Extract parameter description from openai.resources.chat.completions.AsyncCompletions.create.
+    Ref: https://github.com/openai/openai-python/blob/f0bdef04611a24ed150d19c4d180aacab3052704/src/openai/resources/chat/completions.py#L97
+    """
+    def __call__(self, doc:str, name:str) -> str:
+        """
+        [TODO]
+        Currently, this parser is not functioning properly because the "create"
+        function is decorated with the @typing.overload decorator, which causes
+        the docstring to be None.
+        """
+        if not doc: return None
+        doc = dedent(doc[doc.find("Args:")+len("Args:"):])
+        match = re.search(rf"{name}:([\s\S]+?)\n[^\s\n]", doc, re.MULTILINE)
+        if match:
+            description = match.group(1).replace('\n', '')
+        else:
+            description = None
+        return description
+
 class ChatGptWorker(LLMWorker):
 
     model_name: str = "gpt-3.5-turbo"
-    temperature: float = 0.5
     context_window: int = 0
+    generation_config: dict = {
+        "temperature": 0.5
+    }
 
     def __init__(self):
         super().__init__()
 
     def _create_parser(self):
         parser = super()._create_parser()
-        parser.add_argument('--api_key', default=None, help='ChatGPT key from OpenAI')
-        parser.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
-        parser.add_argument('--temperature', default=self.temperature, help='What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.')
+        model_group = parser.add_argument_group('Model Options')
+        model_group.add_argument('--api_key', default=None, help='ChatGPT key from OpenAI')
+        model_group.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
+        # model_group.add_argument('--temperature', default=self.temperature, help='What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.')
+
+        gen_group = parser.add_argument_group('Generation Options', 'Generation options for OpenAI API. See https://github.com/openai/openai-python/blob/main/src/openai/types/chat/completion_create_params.py')
+        gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
+        self.generation_config = expose_function_parameter(
+            function=AsyncCompletions.create,
+            parser=gen_group,
+            defaults=self.generation_config,
+            desc_parser=ChatGptDescParser()
+        )
+
         return parser
 
     def _setup(self):
         super()._setup()
 
         self.model_name = self.args.model
-        self.temperature = self.args.temperature
         if not self.LLM_name:
             self.LLM_name = "chatgpt"
         
@@ -48,6 +87,18 @@ class ChatGptWorker(LLMWorker):
             self.context_window = min(CONTEXT_WINDOW.values())
         else:
             self.context_window = context_window[0]
+
+        # Setup generation config
+        file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
+        arg_gconf = {
+            k: getattr(self.args, k)
+            for k, v in self.generation_config.items()
+            if f"--{k}" in sys.argv
+        }
+        self.generation_config = merge_config(base=self.generation_config, top=file_gconf)
+        self.generation_config = merge_config(base=self.generation_config, top=arg_gconf)
+
+        logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
 
         self.proc = False
 
@@ -101,11 +152,12 @@ class ChatGptWorker(LLMWorker):
             openai.api_key = openai_token
             client = openai.AsyncOpenAI(api_key=openai_token)
             self.proc = True
+            logger.debug(type(client.chat.completions))
             response = await client.chat.completions.create(
                 model=self.model_name,
-                temperature=self.temperature,
                 messages=msg,
-                stream=True
+                stream=True,
+                **self.generation_config
             )
             async for i in response:
                 chunk = i.choices[0].delta.content
