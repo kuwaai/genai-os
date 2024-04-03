@@ -33,7 +33,7 @@ class GeminiWorker(LLMWorker):
                 history = ["<s>[INST] {0} [/INST]{1}".format(history[i], ("{0}" if i+1 == len(history) - 1 else " {0} </s>").format(history[i + 1])) for i in range(0, len(history), 2)]
                 history = "".join(history)
                 output = self.model.create_completion(
-                    history,
+                    history.encode('UTF-8', 'ignore').decode("utf-8"),
                     max_tokens=4096,
                     stop=["</s>"],
                     echo=False,
