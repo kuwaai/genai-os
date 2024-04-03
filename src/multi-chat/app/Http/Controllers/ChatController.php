@@ -491,7 +491,7 @@ class ChatController extends Controller
                 return Redirect::route('chat.chat', $chat->id);
             }
         }
-        return back();
+        return Redirect::route('chat.new', $request->input('llm_id'));
     }
 
     public function main(Request $request)
@@ -530,7 +530,7 @@ class ChatController extends Controller
                 }
             }
         }
-        return back();
+        return response()->noContent();
     }
 
     public function create(ChatRequest $request): RedirectResponse
@@ -557,7 +557,7 @@ class ChatController extends Controller
                 if (strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc-qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'doc_qa') === 0 || strpos(LLMs::find($request->input('llm_id'))->access_code, 'web_qa') === 0) {
                     # Validate first message is exactly URL
                     if (!filter_var($input, FILTER_VALIDATE_URL)) {
-                        return back();
+                        return Redirect::route('chat.new', $request->input('llm_id'));
                     }
                 }
                 $chat = new Chats();
@@ -621,7 +621,7 @@ class ChatController extends Controller
         } else {
             Log::channel('analyze')->info('User ' . Auth::user()->id . ' with ' . implode(',', Redis::lrange('usertask_' . Auth::user()->id, 0, -1)));
         }
-        return back();
+        return Redirect::route('chat.new', $request->input('llm_id'));
     }
 
     public function request(Request $request): RedirectResponse
@@ -685,7 +685,7 @@ class ChatController extends Controller
                 return Redirect::route('chat.chat', $chatId);
             }
         }
-        return back();
+        return Redirect::route('chat.chat', $request->input('chat_id'));
     }
 
     public function delete(Request $request): RedirectResponse
