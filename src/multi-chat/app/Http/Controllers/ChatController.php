@@ -726,7 +726,11 @@ class ChatController extends Controller
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-
+        set_exception_handler(function ($exception) {
+            if ($exception->getMessage() != "Connection closed"){
+                Log::error('Uncaught SSE Exception: ' . $exception->getMessage());
+            }
+        });
         $response->setCallback(function () use ($response, $request) {
             $channel = $request->input('channel');
             if ($channel != null && strpos($channel, 'aielection_') === 0) {
@@ -764,7 +768,6 @@ class ChatController extends Controller
                         echo "event: close\n\n";
                         ob_flush();
                         flush();
-                        $client->disconnect();
                     }
 
                     $client = Redis::connection();
