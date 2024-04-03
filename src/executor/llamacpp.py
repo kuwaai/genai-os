@@ -73,8 +73,7 @@ class LlamaCppWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
-    def _create_parser(self):
-        parser = super()._create_parser()
+    def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
         model_group.add_argument('--model_path', default=self.model_path, help='Model path')
         model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
@@ -97,11 +96,7 @@ class LlamaCppWorker(LLMWorker):
             desc_parser=LlamaCppDescParser()
         )
 
-        return parser
-
-    def _setup(self):
-        super()._setup()
-
+    def setup(self):
         if self.args.visible_gpu:
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 

@@ -77,7 +77,10 @@ def expose_function_parameter(
     defaults = {} if defaults is None else defaults.copy()
     docstring = inspect.getdoc(function)
     for p in params:
-        defaults[p["name"]] = p["default"]
+        if p["name"] in defaults:
+            p["default"] = defaults[p["name"]]
+        else:
+            defaults[p["name"]] = p["default"]
         if not parser: continue
 
         desc = "-"

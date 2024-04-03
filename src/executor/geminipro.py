@@ -36,8 +36,7 @@ class GeminiWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
-    def _create_parser(self):
-        parser = super()._create_parser()
+    def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
         model_group.add_argument('--api_key', default=None, help='Gemini API key from Google Cloud Console')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://ai.google.dev/models/gemini')
@@ -52,11 +51,7 @@ class GeminiWorker(LLMWorker):
             desc_parser=GeminiDescParser()
         )
 
-        return parser
-
-    def _setup(self):
-        super()._setup()
-        
+    def setup(self):
         self.model_name = self.args.model
         self.limit = self.args.limit
         if not self.LLM_name:

@@ -45,8 +45,10 @@ class LLMWorker:
     def __init__(self):
         self.app = FastAPI()
         self.parser = self._create_parser()
+        self.extend_arguments(parser=self.parser)
         self.args = self.parser.parse_args()
         self._setup()
+        self.setup()
 
     def _create_parser(self):
         parser = argparse.ArgumentParser(
@@ -63,7 +65,14 @@ class LLMWorker:
         group.add_argument('--worker_path', default=self.worker_path, help='The path this model worker is going to use')
         group.add_argument('--kernel_url', default=self.kernel_url, help='Base URL of Kernel\'s executor management API')
         group.add_argument("--log", type=str.upper, default=self.log_level, help="The logging level.", choices=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+
         return parser
+    
+    def extend_arguments(self, parser: argparse.ArgumentParser):
+        """
+        Append command-line arguments.
+        """
+        pass
 
     def _setup(self):
         # Setup logger
@@ -87,6 +96,12 @@ class LLMWorker:
         self.metrics.state.state('idle')
 
         self._register_routes()
+
+    def setup(self):
+        """
+        User defined setup procedure
+        """
+        pass
 
     def _register_routes(self):
         @self.app.post(self.worker_path)

@@ -13,18 +13,13 @@ class DebugWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
-    def _create_parser(self):
+    def extend_arguments(self, parser):
         """
         Override this method to add custom command-line arguments.
-        Remember to invoke "_create_parser" of the parent class.
         """
-        parser = super()._create_parser()
         parser.add_argument('--delay', type=float, default=0.02, help='Inter-token delay')
-        return parser
 
-    def _setup(self):
-        super()._setup()
-
+    def setup(self):
         if not self.LLM_name:
             self.LLM_name = "debug"
 

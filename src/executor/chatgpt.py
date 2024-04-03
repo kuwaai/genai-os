@@ -48,6 +48,7 @@ class ChatGptDescParser(DescriptionParser):
 class ChatGptWorker(LLMWorker):
 
     model_name: str = "gpt-3.5-turbo"
+    openai_base_url: str = "https://api.openai.com/v1"
     context_window: int = 0
     generation_config: dict = {
         "temperature": 0.5
@@ -56,12 +57,11 @@ class ChatGptWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
-    def _create_parser(self):
-        parser = super()._create_parser()
+    def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
-        model_group.add_argument('--api_key', default=None, help='ChatGPT key from OpenAI')
+        model_group.add_argument('--api_key', default=None, help='The API key to access the service')
+        model_group.add_argument('--base_url', default=self.openai_base_url, help='Alter the base URL to use third-party service.')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
-        # model_group.add_argument('--temperature', default=self.temperature, help='What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.')
 
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for OpenAI API. See https://github.com/openai/openai-python/blob/main/src/openai/types/chat/completion_create_params.py')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
@@ -72,12 +72,9 @@ class ChatGptWorker(LLMWorker):
             desc_parser=ChatGptDescParser()
         )
 
-        return parser
-
-    def _setup(self):
-        super()._setup()
-
+    def setup(self):
         self.model_name = self.args.model
+        self.openai_base_url = self.args.base_url
         if not self.LLM_name:
             self.LLM_name = "chatgpt"
         
@@ -150,7 +147,11 @@ class ChatGptWorker(LLMWorker):
 
             openai_token = openai_token.strip()
             openai.api_key = openai_token
-            client = openai.AsyncOpenAI(api_key=openai_token)
+            openai.base_url = self.openai_base_url
+            client = openai.AsyncOpenAI(
+                api_key=openai_token,
+                base_url=self.openai_base_url
+            )
             self.proc = True
             logger.debug(type(client.chat.completions))
             response = await client.chat.completions.create(

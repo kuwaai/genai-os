@@ -23,14 +23,10 @@ class DummyWorker(LLMWorker):
     def __init__(self):
         super().__init__()
 
-    def _create_parser(self):
-        parser = super()._create_parser()
+    def extend_arguments(self, parser):
         parser.add_argument('--delay', type=int, default=0.02, help='Inter-token delay')
-        return parser
 
-    def _setup(self):
-        super()._setup()
-
+    def setup(self):
         if not self.LLM_name:
             self.LLM_name = "dummy"
 

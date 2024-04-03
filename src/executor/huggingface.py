@@ -5,6 +5,7 @@ import logging
 import time
 import re
 import json
+import pprint
 from inspect import cleandoc
 from typing import Optional
 from threading import Thread
@@ -12,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 
 from kuwa.executor import LLMWorker
-from kuwa.executor.util import expose_function_parameter, read_config
+from kuwa.executor.util import expose_function_parameter, read_config, merge_config
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +42,7 @@ class HuggingfaceWorker(LLMWorker):
     def __init__(self):
         super().__init__()
     
-    def _create_parser(self):
-        parser = super()._create_parser()
+    def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
         model_group.add_argument('--model_path', default=self.model_path, help='Model path. It can be the path to local model or the model name on HuggingFace Hub')
         model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
@@ -55,12 +55,8 @@ class HuggingfaceWorker(LLMWorker):
         # Generation Options
         gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
-        
-        return parser
 
-    def _setup(self):
-        super()._setup()
-
+    def setup(self):
         if self.args.visible_gpu:
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
@@ -91,6 +87,7 @@ class HuggingfaceWorker(LLMWorker):
         logger.debug(f"Stop words: {self.stop_words}")
         logger.debug(f"Buffer length: {self.buffer_length}")
         logger.debug(f"Chat template: {self.tokenizer.chat_template}")
+        logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
 
     def synthesis_prompt(self, history: list):
         """
