@@ -8,3 +8,4 @@ Redis*/
 composer.phar
 packages
 *.zip
+src/conf/migrations.txt

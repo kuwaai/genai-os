@@ -306,13 +306,13 @@ class RoomController extends Controller
 
             foreach ($llms as $i) {
                 if (!in_array($i, $result)) {
-                    return back();
+                    return Redirect::route('room.home');
                 }
             }
             # model permission auth done
             foreach ($selectedLLMs as $id) {
                 if (!in_array($id, $llms)) {
-                    return back();
+                    return Redirect::route('room.home');
                 }
             }
             $input = $request->input('input');
@@ -369,7 +369,7 @@ class RoomController extends Controller
 
             foreach ($llms as $i) {
                 if (!in_array($i, $result)) {
-                    return back();
+                    return Redirect::route('room.home');
                 }
             }
 
@@ -445,12 +445,12 @@ class RoomController extends Controller
 
                 foreach ($chats->pluck('llm_id')->toarray() as $i) {
                     if (!in_array($i, $result)) {
-                        return back();
+                        return Redirect::route('room.home');
                     }
                 }
                 foreach ($selectedLLMs as $id) {
                     if (!in_array($id, $chats->pluck('llm_id')->toarray())) {
-                        return back();
+                        return Redirect::route('room.home');
                     }
                 }
                 #Model permission checked

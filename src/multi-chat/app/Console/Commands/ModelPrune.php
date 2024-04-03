@@ -39,7 +39,7 @@ class ModelPrune extends Command
             DB::beginTransaction(); // Start a database transaction
 
             foreach ($models as $model) {
-                Storage::delete($model->image);
+                if ($model->image) Storage::delete($model->image);
                 Permissions::where('name', '=', 'model_' . $model->id)->delete();
                 $model->delete();
             }

@@ -41,19 +41,21 @@
         @php
             $DC = App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
                 ->where('chats.user_id', Auth::user()->id)
-                ->orderby('counts', 'desc')
-                ->select(
-                    'chatrooms.*',
-                    DB::raw(
-                        (config('database.default') == 'sqlite'
-                            ? 'GROUP_CONCAT(chats.llm_id ORDER BY chats.llm_id DESC SEPARATOR ",")'
-                            : 'array_agg(chats.llm_id ORDER BY chats.llm_id DESC)') . ' as identifier'
-                    ),
-                    DB::raw('count(chats.id) as counts'),
-                )
-                ->groupBy('chatrooms.id')
-                ->get()
-                ->groupBy('identifier');
+                ->select('chatrooms.*', DB::raw('count(chats.id) as counts'))
+                ->groupBy('chatrooms.id');
+
+            // Fetch the ordered identifiers based on `llm_id` for both MySQL and SQLite
+            $DC->selectSub(function ($query) {
+                $query
+                    ->from('chats')
+                    ->selectRaw('group_concat(llm_id) as identifier')
+                    ->whereColumn('roomID', 'chatrooms.id')
+                    ->orderByDesc('llm_id');
+            }, 'identifier');
+
+            // Get the final result and group by the ordered identifiers
+            $DC = $DC->get()->groupBy('identifier');
+
             try {
                 if (!session('llms')) {
                     $identifier = collect(Illuminate\Support\Arr::flatten($DC->toarray(), 1))
@@ -64,8 +66,12 @@
                         ->orderby('id')
                         ->get();
                 } else {
-                    $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();
-                    $DC = $DC['{' . implode(',', array_reverse($llms->pluck('id')->toArray())) . '}'];
+                    $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id', 'desc')->get();
+                    $ids = array_reverse($llms->pluck('id')->toArray());
+                    $DC =
+                        $DC[
+                            config('database.default') == 'sqlite' ? implode(',', $ids) : '{' . implode(',', $ids) . '}'
+                        ];
                 }
             } catch (Exception $e) {
                 $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();

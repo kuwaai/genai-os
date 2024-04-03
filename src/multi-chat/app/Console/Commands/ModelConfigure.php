@@ -6,11 +6,13 @@ use Illuminate\Console\Command;
 use App\Models\LLMs;
 use App\Models\Permissions;
 use App\Models\GroupPermissions;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use DB;
 
 class ModelConfigure extends Command
 {
-    protected $signature = 'model:config {access_code} {name}';
+    protected $signature = 'model:config {access_code} {name} {image=null}';
     protected $description = 'Quickly configure a model for everyone';
     public function __construct()
     {
@@ -29,11 +31,20 @@ class ModelConfigure extends Command
                 $this->error('The name already exists! Aborted.');
             } else {
                 DB::beginTransaction(); // Start a database transaction
+                $path = null;
+                if ($this->argument('image')) {
+                    $imagePath = $this->argument('image');
+                    $fileContents = file_get_contents($imagePath);
+                    $imageName = Str::random(40) . '.' . pathinfo($imagePath, PATHINFO_EXTENSION);
+                    $path = 'public/images/' . $imageName;
+                    Storage::put($path, $fileContents);
+                }
+                
                 $model = new LLMs();
-                $model->fill(['name' => $name, 'access_code' => $accessCode]);
+                $model->fill(['name' => $name, 'access_code' => $accessCode, "image"=>$path]);
                 $model->save();
                 $perm = new Permissions();
-                $perm->fill(['name' => 'model_' . $model->id, 'describe' => 'Permission for model id ' . $model->id]);
+                $perm->fill(['name' => 'model_' . $model->id]);
                 $perm->save();
                 $currentTimestamp = now();
 

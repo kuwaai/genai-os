@@ -72,7 +72,11 @@ for /D %%d in ("workers\*") do (
         )
 
         pushd ..\src\multi-chat\
-        call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!"
+        if "!image_path!"=="" (
+			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!"
+		) else (
+			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!" "!image_path!"
+		)
         popd
 
         rem Collect existing access code
@@ -104,16 +108,25 @@ echo "Nginx started!"
 start /b .\nginx.exe
 popd
 
-REM Loop to wait for "stop" command
+REM Loop to wait for commands
 :loop
-set /p userInput=Type "stop" to stop the server:
-set userInput=%userInput:~0,4%
+set userInput=
+set /p userInput=Enter a command (stop, seed, hf login): 
+
 if /I "%userInput%"=="stop" (
     echo Stopping Nginx...
     call stop.bat
+) else if /I "%userInput%"=="seed" (
+    echo Running seed command...
+    call src\migration\20240402_seed_admin.bat
+    goto loop
+) else if /I "%userInput%"=="hf login" (
+    echo Running huggingface login command...
+    call src\migration\20240403_login_huggingface.bat
+    goto loop
 ) else (
     goto loop
 )
 
-call stop.bat
+call src\stop.bat
 endlocal
