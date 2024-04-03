@@ -31,7 +31,7 @@ class LLMController extends Controller
     public function delete(Request $request): RedirectResponse
     {
         $model = LLMs::findOrFail($request->input("id")); 
-        Storage::delete($model->image);
+        if ($model->image) Storage::delete($model->image);
         $model->delete();
         Permissions::where("name","=","model_" . $request->input("id"))->delete();
         return Redirect::route('dashboard.home');
