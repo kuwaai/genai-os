@@ -22,73 +22,11 @@
 * [WIP] ODT chat history export
 * [WIP] System stress measure
 
-
-### Basic Software Requirements
-* PostgreSQL 14
-* Nodejs 18
-* PHP & PHP-FPM 8.1
-* Redis Server
-* Vite (Use `npm install -g vite`)
-
-### The whole commands to setup the web and database directly
-```sh
-# Update all packages
-sudo apt update
-sudo apt upgrade -y
-# These are required packages
-sudo apt install nginx php php-fpm redis nodejs npm postgresql postgresql-contrib zip unzip php-zip
- -y
-#Install hamachi if you need (optional)
-wget https://www.vpn.net/installers/logmein-hamachi_2.1.0.203-1_amd64.deb
-sudo dpkg -i logmein-hamachi_2.1.0.203-1_amd64.deb
-rm logmein-hamachi_2.1.0.203-1_amd64.deb
-sudo hamachi login
-# Create database (modify the command’s red parts as your require)
-sudo -u postgres psql
-create database llm_project;
-create user llmprojectroot with encrypted password 'LLMProject';
-grant all privileges on database llm_project to llmprojectroot;
-quit
-# Installing ‘n’ package require sudo account
-sudo su
-npm install n -g
-n stable
-exit
-# After installing, you need to relogin
-node -v # Should show you v18.xx.xx version installed
-# Time for the github project
-git clone https://github.com/kuwaai/genai-os.git
-sudo cp -r genai-os/multi-chat /var/www/html/
-cd /var/www/html
-sudo chown ubuntu:ubuntu -R LLMProject 
-cd /var/www/html/multi-chat
-cp .env.debug .env
-# Now you should edit the .env file before proceed
-cd executables/sh
-sudo chmod +x *.sh
-./production_update.sh
-# This step give the file owner back to www-data, so nginx can works
-cd /var/www/html
-sudo chown www-data:www-data -R LLMProject 
-# It should setup most of things, proceed if no errors
-# Please make sure the path correct for you before execute
-sudo cp /var/www/html/multi-chat/www.conf /etc/php/8.1/fpm/pool.d/
-cd /etc/nginx/sites-enabled
-sudo cp /var/www/html/multi-chat/nginx_config ../sites-available/multi-chat
-sudo ln -s ../sites-available/multi-chat .
-# Get a ssl cert (optional)
-sudo apt install python3-certbot-nginx -y
-sudo certbot
-# Fill the information and done
-# Now the web should be ready
-```
-
 ### How to update
 1. Stash all your changes by using `git stash`
 2. Pull the newest version of files by using `git pull`
 3. Go under the folder `cd executables/sh`
 4. Run the script `./production_update.sh`
-(Some updates will required to do migration update, So confirm the migrate is recommanded)
 
 ### For production
 Nginx is recommanded, Since that is the only tested one,
@@ -202,3 +140,112 @@ fetch(apiUrl, {
             const lines = (buffer + chunk).split("data:");
 
             // Process each line.
+            lines.forEach(line => {
+                if (line.trim() !== "") {
+                    // Handle the current line (remove any leading/trailing whitespace).
+                    handleStreamData(line.trim());
+                }
+            });
+
+            // Continue reading the next chunk.
+            return readStream(reader, lines[lines.length - 1]);
+        });
+    }
+
+    // Start reading the stream.
+    return readStream(reader);
+})
+.catch(error => {
+    // Handle errors.
+    console.error('Error:', error);
+});
+
+// Function to handle each data point in the stream.
+function handleStreamData(line) {
+    if (line === "event: end") {
+        // Handle the end of the stream.
+        console.log("Stream ended");
+        return;
+    }
+
+    try {
+        const data = JSON.parse(line)["choices"][0]["delta"]["content"];
+        console.log(data); 
+    } catch (error) {
+    }
+}
+```
+
+### Using Python
+
+Here's an example of how to send a single message using Python and the `requests` library:
+
+```python
+import requests, json
+
+# Define the API endpoint and authentication headers.
+api_url = 'http://127.0.0.1/v1.0/chat/completions'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_AUTH_TOKEN'
+}
+
+# Define the request payload as a dictionary for single round chatting.
+request_data = {
+    "messages": [
+        { "isbot": False, "msg": "請自我介紹" }
+    ],
+    "model": "gemini-pro"
+}
+
+# Perform the HTTP request using the requests library.
+with requests.post(api_url, headers=headers, json=request_data, stream=True,timeout=60) as response:
+    for line in response.iter_lines(decode_unicode=True):
+        if line:
+            if line == "event: end":
+                break
+            elif line.startswith("data: "):
+                try:
+                    tmp = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
+                    print(end=tmp[-1], flush=True)
+                except Exception as e:
+                    print(e)
+```
+
+### Multiple Rounds Chatting
+
+For multiple rounds of chatting, you can extend the `messages` field with the conversation history. The conversation history includes both user and bot messages, allowing for more interactive conversations. Here's an example:
+
+```json
+"messages": [
+    { "isbot": false, "msg": "你好" },
+    { "isbot": true, "msg": "你好，我是一個機器人" },
+    { "isbot": false, "msg": "嗨" }
+]
+```
+
+You can continue to add user and bot messages to this `messages` array to maintain a dynamic conversation with the model.
+
+## Handling Responses
+
+Once you make a successful request to our API, you will receive a JSON response like this.
+
+```json
+{
+    "choices": [
+        {
+            "delta": {
+                "content": "你好，我是由Google開發的大型語言模型，又稱「對話式AI」，或稱「聊天機器人」。我透過文字進行互動，接受過大量資料的訓練，具備學習和理解的能力，能夠回答各種問題、撰寫不同的內容。\n我目前仍然在發展階段，但已經能夠執行多種語言任務，包括以下項目：\n\n* 翻譯語言\n* 回答問題\n* 撰寫故事、詩歌等不同類型的文本\n* 理解和生成程式碼\n* 玩遊戲\n* 提供書寫建議等等\n\n我的目標是成為一個功能強大的工具，幫助人們完成各種任務，並提供有用的資訊。隨著我繼續學習和成長，我希望能越來越好，為人們提供更好的服務。\n\n如果今天想請我幫忙的話，您可以提出您的要求。我將盡力提供您需要且有用的資訊",
+                "role": null
+            }
+        }
+    ],
+    "created": 1705602791,
+    "id": "chatcmpl-xxxxx",
+    "model": "gemini-pro",
+    "object": "chat.completion",
+    "usage": []
+}
+```
+
+You can then handle the response data as needed in your application.
