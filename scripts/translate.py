@@ -32,7 +32,7 @@ def translate(input_filename, target_filename=None, lang="en", quite=False):
     }[lang]
 
     input_content = ''
-    with open(input_filename) as f:
+    with open(input_filename,encoding="utf-8") as f:
         input_content = f.read()
     prompt += "\n" + input_content
 
@@ -43,7 +43,7 @@ def translate(input_filename, target_filename=None, lang="en", quite=False):
     
     if not target_filename: exit(0)
 
-    with open(target_filename, 'a') as f:
+    with open(target_filename, 'a',encoding="utf-8") as f:
         f.write(output_content)
 
 if __name__ == '__main__':

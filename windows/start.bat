@@ -22,7 +22,7 @@ for /l %%i in (1,1,%numWorkers%) do (
     start /b packages\%php_folder%\php.exe ..\src\multi-chat\artisan queue:work --verbose --timeout=6000
 )
 
-REM Agent
+REM Kernel
 pushd "..\src\kernel"
 del records.pickle
 set PYTHONPATH=%PYTHONPATH%;%~dp0..\src\kernel\src
@@ -30,7 +30,7 @@ set "PATH=%~dp0packages\%python_folder%\Scripts;%PATH%"
 start /b "" "%~dp0packages\%python_folder%\python.exe" "%~dp0..\src\kernel\main.py"
 popd
 
-REM Wait for Agent online
+REM Wait for Kernel online
 :CHECK_URL
 timeout /t 1 >nul
 curl -s -o nul http://127.0.0.1:9000
