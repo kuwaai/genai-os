@@ -49,16 +49,20 @@ class LLMWorker:
         self._setup()
 
     def _create_parser(self):
-        parser = argparse.ArgumentParser(description='LLM model worker, Please make sure your agent is working before use.')
-        parser.add_argument('--access_code', default=self.LLM_name, help='Access code')
-        parser.add_argument('--version', default=self.executor_iface_version, help='Version of the executor interface')
-        parser.add_argument('--ignore_agent', action='store_true', help='Ignore agent')
-        parser.add_argument('--https', action='store_true', help='Register the worker endpoint with https scheme')
-        parser.add_argument('--host', default=None, help='The hostname or IP address that will be stored in Agent, Make sure the location are accessible by Agent')
-        parser.add_argument('--port', type=int, default=None, help='The port to serve. By choosing None, it\'ll assign an unused port')
-        parser.add_argument('--worker_path', default=self.worker_path, help='The path this model worker is going to use')
-        parser.add_argument('--agent_url', default=self.agent_url, help='Base URL of Agent\'s executor management API')
-        parser.add_argument("--log", type=str.upper, default=self.log_level, help="The logging level.", choices=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+        parser = argparse.ArgumentParser(
+            description='LLM model worker, Please make sure your agent is working before use.',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
+        group = parser.add_argument_group('General Options')
+        group.add_argument('--access_code', default=self.LLM_name, help='Access code')
+        group.add_argument('--version', default=self.executor_iface_version, help='Version of the executor interface')
+        group.add_argument('--ignore_agent', action='store_true', help='Ignore agent')
+        group.add_argument('--https', action='store_true', help='Register the worker endpoint with https scheme')
+        group.add_argument('--host', default=None, help='The hostname or IP address that will be stored in Agent, Make sure the location are accessible by Agent')
+        group.add_argument('--port', type=int, default=None, help='The port to serve. By choosing None, it\'ll assign an unused port')
+        group.add_argument('--worker_path', default=self.worker_path, help='The path this model worker is going to use')
+        group.add_argument('--agent_url', default=self.agent_url, help='Base URL of Agent\'s executor management API')
+        group.add_argument("--log", type=str.upper, default=self.log_level, help="The logging level.", choices=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
         return parser
 
     def _setup(self):
