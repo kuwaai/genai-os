@@ -12,7 +12,7 @@ from threading import Thread
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 
-from kuwa.executor import LLMWorker
+from kuwa.executor import LLMExecutor
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class CustomStoppingCriteria(StoppingCriteria):
     def __call__(self, input_ids, score, **kwargs) -> bool:
         return not self.proc
 
-class HuggingfaceWorker(LLMWorker):
+class HuggingfaceExecutor(LLMExecutor):
 
     model_path: Optional[str] = None
     limit: int = 1024*3
@@ -45,7 +45,7 @@ class HuggingfaceWorker(LLMWorker):
     def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
         model_group.add_argument('--model_path', default=self.model_path, help='Model path. It can be the path to local model or the model name on HuggingFace Hub')
-        model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
+        model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
         model_group.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
         model_group.add_argument('--override_chat_template', default=None,
@@ -190,5 +190,5 @@ class HuggingfaceWorker(LLMWorker):
         return "Aborted"
 
 if __name__ == "__main__":
-    worker = HuggingfaceWorker()
-    worker.run()
+    executor = HuggingfaceExecutor()
+    executor.run()

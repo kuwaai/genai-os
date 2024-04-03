@@ -4,7 +4,7 @@ import asyncio
 import logging
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from kuwa.executor import LLMWorker
+from kuwa.executor import LLMExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ lorem = """你好我是個語言模型很高興認識你...之類的xD
 <<</WARNING>>>
 輸出文字模擬結束"""
 
-class DummyWorker(LLMWorker):
+class DummyExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
 
@@ -53,5 +53,5 @@ class DummyWorker(LLMWorker):
         return "Aborted"
 
 if __name__ == "__main__":
-    worker = DummyWorker()
-    worker.run()
+    executor = DummyExecutor()
+    executor.run()

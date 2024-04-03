@@ -33,10 +33,10 @@ def completions_backend(inputs:list, llm_name:str, dest:List, openai_token:Optio
     through a decorator.
     Arguments:
         inputs: The prompt from the user.
-        llm_name: The unique name of the model workers to be called.
+        llm_name: The unique name of the model executors to be called.
         dest: The reference of the internal scheduling state. Note that the
         state should be reset after processing.
-        openai_token: Specialized parameter for the ChatGPT model worker.
+        openai_token: Specialized parameter for the ChatGPT model executor.
     Return:
         A generator object should be returned representing the streaming content.
         When encounter an error, we return an empty string here to be compatible

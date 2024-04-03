@@ -22,7 +22,7 @@ class InternalEndpointFilter(logging.Filter):
         result = all([full_path != x for x in internal_endpoints])
         return result
 
-class WorkerLoggerFactory:
+class ExecutorLoggerFactory:
     template = {
         'version': 1,
         'disable_existing_loggers': False,

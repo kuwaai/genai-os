@@ -25,7 +25,7 @@ if __name__ == '__main__':
     from flask import Flask
     from flask_sse import ServerSentEventsBlueprint
     from apscheduler.schedulers.background import BackgroundScheduler
-    from routes.worker import worker
+    from routes.executor import executor
     from routes.chat import chat
     
     # Load savefile
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     app.config["REDIS_URL"] = "redis://localhost:6379/0"
     sse = ServerSentEventsBlueprint('sse', __name__)
     app.register_blueprint(sse, url_prefix='/')
-    app.register_blueprint(worker, url_prefix=f'/{version}/worker')
+    app.register_blueprint(executor, url_prefix=f'/{version}/worker')
     app.register_blueprint(chat, url_prefix=f'/{version}/chat')
     log(0,"Route list:\n","\n".join([str(i) for i in app.url_map.iter_rules()]), "\n")
     log(0,"Server started")

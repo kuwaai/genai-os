@@ -9,7 +9,7 @@ from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import google.generativeai as genai
 
-from kuwa.executor import LLMWorker
+from kuwa.executor import LLMExecutor
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class GeminiDescParser(DescriptionParser):
         else:
             description = None
         return description
-class GeminiWorker(LLMWorker):
+class GeminiExecutor(LLMExecutor):
 
     model_name: str = "gemini-1.0-pro"
     limit: int = 30720
@@ -146,5 +146,5 @@ class GeminiWorker(LLMWorker):
         return "No process to abort"
 
 if __name__ == "__main__":
-    worker = GeminiWorker()
-    worker.run()
+    executor = GeminiExecutor()
+    executor.run()

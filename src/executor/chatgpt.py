@@ -11,7 +11,7 @@ import openai
 import tiktoken
 from openai.resources.chat.completions import AsyncCompletions
 
-from kuwa.executor import LLMWorker
+from kuwa.executor import LLMExecutor
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class ChatGptDescParser(DescriptionParser):
             description = None
         return description
 
-class ChatGptWorker(LLMWorker):
+class ChatGptExecutor(LLMExecutor):
 
     model_name: str = "gpt-3.5-turbo"
     openai_base_url: str = "https://api.openai.com/v1"
@@ -187,5 +187,5 @@ class ChatGptWorker(LLMWorker):
         return "No process to abort"
 
 if __name__ == "__main__":
-    worker = ChatGptWorker()
-    worker.run()
+    executor = ChatGptExecutor()
+    executor.run()

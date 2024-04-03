@@ -12,7 +12,7 @@ from llama_cpp import Llama
 import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
 
-from kuwa.executor import LLMWorker
+from kuwa.executor import LLMExecutor
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class LlamaCppDescParser(DescriptionParser):
             description = None
         return description
 
-class LlamaCppWorker(LLMWorker):
+class LlamaCppExecutor(LLMExecutor):
 
     model_path: Optional[str] = None
     limit: int = 1024*3
@@ -76,7 +76,7 @@ class LlamaCppWorker(LLMWorker):
     def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
         model_group.add_argument('--model_path', default=self.model_path, help='Model path')
-        model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this worker can use. Separate by comma.')
+        model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
         model_group.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
 
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the input tokens')
@@ -228,5 +228,5 @@ class LlamaCppWorker(LLMWorker):
         return "Aborted"
 
 if __name__ == "__main__":
-    worker = LlamaCppWorker()
-    worker.run()
+    executor = LlamaCppExecutor()
+    executor.run()

@@ -1,6 +1,6 @@
 import prometheus_client
 
-class WorkerMetrics:
+class ExecutorMetrics:
     metrics_template = {
         "state": {
             "type": "Enum",
@@ -35,10 +35,10 @@ class WorkerMetrics:
         }
     }
 
-    def __init__(self, worker_name=None):
-        self.name_space = 'worker'
+    def __init__(self, executor_name=None):
+        self.name_space = 'executor'
         self.subsystem = 'framework'
-        self.worker_name = worker_name
+        self.executor_name = executor_name
         
         for name, spec in self.metrics_template.items():
             assert 'type' in spec
@@ -48,8 +48,8 @@ class WorkerMetrics:
                     namespace = self.name_space,
                     subsystem = self.subsystem,
                     name = name,
-                    labelnames = ('worker_name', ),
+                    labelnames = ('executor_name', ),
                     documentation = description,
                     **spec
-                ).labels(self.worker_name)
+                ).labels(self.executor_name)
             setattr(self, name, metric)

@@ -20,7 +20,7 @@ authors = [
   { name="Drift", email="taifu9920923@gmail.com" },
   { name="Yung-Hsiang Hu", email="iftnt1999@gmail.com" },
 ]
-description = "A framework to serve the Kuwa Executors, including LLM model worker."
+description = "A framework to serve the Kuwa Executors, including LLM model executor."
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [

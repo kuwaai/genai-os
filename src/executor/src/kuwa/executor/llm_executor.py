@@ -16,8 +16,8 @@ from retry import retry
 from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from .metrics import WorkerMetrics
-from .logger import WorkerLoggerFactory
+from .metrics import ExecutorMetrics
+from .logger import ExecutorLoggerFactory
 
 logger = logging.getLogger(__name__)
 
@@ -27,20 +27,20 @@ def find_free_port():
         port = s.bind(('', 0)) or s.getsockname()[1]
     return port
 
-class LLMWorker:
+class LLMExecutor:
     executor_iface_version: str = "v1.0"
     kernel_url: str = "http://127.0.0.1:9000/"
     ignore_kernel: bool = False
     https: bool = False
     host: Optional[str] = None
     port: Optional[int] = None
-    worker_path: str = "/chat"
+    executor_path: str = "/chat"
     LLM_name: Optional[str] = None
 
     ready: bool = False
 
     log_level: str = "INFO"
-    metrics: Optional[WorkerMetrics] = None
+    metrics: Optional[ExecutorMetrics] = None
 
     def __init__(self):
         self.app = FastAPI()
@@ -52,17 +52,17 @@ class LLMWorker:
 
     def _create_parser(self):
         parser = argparse.ArgumentParser(
-            description='LLM model worker, Please make sure your kernel is working before use.',
+            description='LLM model executor, Please make sure your kernel is working before use.',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         group = parser.add_argument_group('General Options')
         group.add_argument('--access_code', default=self.LLM_name, help='Access code')
         group.add_argument('--version', default=self.executor_iface_version, help='Version of the executor interface')
         group.add_argument('--ignore_kernel', action='store_true', help='Ignore kernel')
-        group.add_argument('--https', action='store_true', help='Register the worker endpoint with https scheme')
+        group.add_argument('--https', action='store_true', help='Register the executor endpoint with https scheme')
         group.add_argument('--host', default=None, help='The hostname or IP address that will be stored in Kernel, Make sure the location are accessible by Kernel')
         group.add_argument('--port', type=int, default=None, help='The port to serve. By choosing None, it\'ll assign an unused port')
-        group.add_argument('--worker_path', default=self.worker_path, help='The path this model worker is going to use')
+        group.add_argument('--executor_path', default=self.executor_path, help='The path this model executor is going to use')
         group.add_argument('--kernel_url', default=self.kernel_url, help='Base URL of Kernel\'s executor management API')
         group.add_argument("--log", type=str.upper, default=self.log_level, help="The logging level.", choices=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
 
@@ -77,7 +77,7 @@ class LLMWorker:
     def _setup(self):
         # Setup logger
         self.log_level = self.args.log.upper()
-        logging.config.dictConfig(WorkerLoggerFactory(level=self.log_level).get_config())
+        logging.config.dictConfig(ExecutorLoggerFactory(level=self.log_level).get_config())
         
         # Registration information
         self.executor_iface_version = self.args.version
@@ -89,10 +89,10 @@ class LLMWorker:
         self.host = self.args.host or socket.gethostbyname(socket.gethostname())
         self.port = self.args.port or find_free_port()
         self.https = self.args.https
-        self.worker_path = self.args.worker_path
+        self.executor_path = self.args.executor_path
 
         # Metrics
-        self.metrics = WorkerMetrics(self.LLM_name)
+        self.metrics = ExecutorMetrics(self.LLM_name)
         self.metrics.state.state('idle')
 
         self._register_routes()
@@ -104,7 +104,7 @@ class LLMWorker:
         pass
 
     def _register_routes(self):
-        @self.app.post(self.worker_path)
+        @self.app.post(self.executor_path)
         async def api(request: Request):
             if not self.ready:
                 return JSONResponse({"msg": "Processing another request."}, status_code=429)
@@ -123,7 +123,7 @@ class LLMWorker:
         async def health_check():
             return Response(status_code=204)
         
-        @self.app.get(urljoin(f"{self.worker_path}/", "./abort"))
+        @self.app.get(urljoin(f"{self.executor_path}/", "./abort"))
         async def abort():
             if hasattr(self, 'abort') and callable(self.abort):
                 return JSONResponse({"msg": await self.abort()})
@@ -142,7 +142,7 @@ class LLMWorker:
     
     def get_reg_endpoint(self) -> str:
         scheme = 'https' if self.args.https else 'http'
-        return urljoin(f"{scheme}://{self.host}:{self.port}/", self.worker_path)
+        return urljoin(f"{scheme}://{self.host}:{self.port}/", self.executor_path)
 
     def in_debug(self) -> bool:
         return (self.log_level.upper() == "DEBUG")
@@ -189,7 +189,7 @@ class LLMWorker:
         self.ready = True
         uvicorn.run(
             self.app, host=self.host, port=self.port,
-            log_config=WorkerLoggerFactory(level=self.log_level).get_config()
+            log_config=ExecutorLoggerFactory(level=self.log_level).get_config()
         )
 
     def _update_statistics(self, duration_sec: float, total_output_length: int):
@@ -204,7 +204,7 @@ class LLMWorker:
     
     async def _llm_compute(self, data):
         """
-        The middle layer between the actual worker logic and API server logic.
+        The middle layer between the actual executor logic and API server logic.
         Interception of the request-response can be done in this layer.
         """
 
@@ -235,8 +235,8 @@ class LLMWorker:
             self.ready = True
 
     async def llm_compute(self, data):
-        raise NotImplementedError("Worker should implement the \"llm_compute\" method.")
+        raise NotImplementedError("Executor should implement the \"llm_compute\" method.")
 
 if __name__ == "__main__":
-    worker = LLMWorker()
-    worker.run()
+    executor = LLMExecutor()
+    executor.run()

@@ -5,11 +5,11 @@ import logging
 import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from kuwa.executor import LLMWorker
+from kuwa.executor import LLMExecutor
 
 logger = logging.getLogger(__name__)
 
-class DebugWorker(LLMWorker):
+class DebugExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
 
@@ -46,5 +46,5 @@ class DebugWorker(LLMWorker):
         return "Aborted"
 
 if __name__ == "__main__":
-    worker = DebugWorker()
-    worker.run()
+    executor = DebugExecutor()
+    executor.run()

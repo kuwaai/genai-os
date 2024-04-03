@@ -1,9 +1,9 @@
 from flask import Blueprint, request, json, redirect, url_for
 from src.variable import *
 from src.functions import *
-worker = Blueprint('worker', __name__)
+executor = Blueprint('executor', __name__)
 
-@worker.route("/schedule", methods=["POST"])
+@executor.route("/schedule", methods=["POST"])
 def status():
     # This will check if any LLM that is READY, then return "READY", if every is busy, return "BUSY"
     # Parameters: name, history_id, user_id
@@ -22,7 +22,7 @@ def status():
     log(0, f"No READY machine for {llm_name}, returning BUSY code")
     return "BUSY"
    
-@worker.route("/register", methods=["POST"])
+@executor.route("/register", methods=["POST"])
 def register():
     # For Online LLM register themself
     # Parameters: name, endpoint
@@ -33,7 +33,7 @@ def register():
     log(0,f"A new {llm_name} is registered at {endpoint}")
     return "Success"
 
-@worker.route("/unregister", methods=["POST"])
+@executor.route("/unregister", methods=["POST"])
 def unregister():
     # For Offline LLM to unregister themself
     # Parameters: name, endpoint
@@ -49,12 +49,12 @@ def unregister():
     log(0,f"{llm_name} , {endpoint} failed to unregister")
     return "Failed"
     
-@worker.route("/debug", methods=["GET", "POST"])
+@executor.route("/debug", methods=["GET", "POST"])
 def debug():
     # This route is for debugging
     if request.method == 'POST':
         loadRecords(json.loads(request.form.get('data')), True)
-        return redirect(url_for('worker.debug'))
+        return redirect(url_for('executor.debug'))
     return """
 <form method="POST">
     <textarea name="data" rows="4" cols="50">{0}</textarea><br>
