@@ -121,5 +121,7 @@ if [ "$1" = force-update ]
 then
     update
 else
+    # php artisan model:config "gemini-pro" "Gemini-Pro"
+    php artisan queue:work --verbose --timeout=6000 &
     exec "$@"
 fi
