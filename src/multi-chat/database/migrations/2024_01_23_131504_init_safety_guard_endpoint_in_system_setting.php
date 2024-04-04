@@ -5,19 +5,18 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\SystemSetting;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-		$setting = new SystemSetting();
-		$setting->fill([
-			'key' => 'safety_guard_location',
-			'value' => '',
-		]);
-		$setting->save();
+        $setting = new SystemSetting();
+        $setting->fill([
+            'key' => 'safety_guard_location',
+            'value' => '',
+        ]);
+        $setting->save();
     }
 
     /**
@@ -25,6 +24,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-		
     }
 };

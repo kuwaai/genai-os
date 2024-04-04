@@ -11,8 +11,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        DB::beginTransaction(); // Start a database transaction
         try {
-            DB::beginTransaction(); // Start a database transaction
             // Append more detailed permissions for profile
             // Append more detailed permissions for chats
             $currentTimestamp = now();
