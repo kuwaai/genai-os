@@ -11,9 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('chats', function (Blueprint $table) {
-			$table->foreignId('dcID')->nullable()->references('id')->on('duelchat')->onDelete('cascade')->onUpdate('cascade');
-        });
+        try{
+            Schema::table('chats', function (Blueprint $table) {
+                $table->foreignId('dcID')->nullable()->references('id')->on('duelchat')->onDelete('cascade')->onUpdate('cascade');
+            });
+        } catch (Exception $e){
+            try{
+                Schema::table('chats', function (Blueprint $table) {
+                    $table->foreignId('"dcID"')->nullable()->references('id')->on('duelchat')->onDelete('cascade')->onUpdate('cascade');
+                });
+            }catch (Exception $e){
+                Schema::table('chats', function (Blueprint $table) {
+                    $table->foreignId("'dcID'")->nullable()->references('id')->on('duelchat')->onDelete('cascade')->onUpdate('cascade');
+                });
+            }
+        }
+        
     }
 
     /**
