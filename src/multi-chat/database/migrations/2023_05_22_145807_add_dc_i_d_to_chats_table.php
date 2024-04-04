@@ -15,18 +15,17 @@ return new class extends Migration
             Schema::table('chats', function (Blueprint $table) {
                 $table->foreignId('dcID')->nullable()->references('id')->on('duelchat')->onDelete('cascade')->onUpdate('cascade');
             });
-        } catch (Exception $e){
+        } catch (\Throwable $e){
             try{
                 Schema::table('chats', function (Blueprint $table) {
                     $table->foreignId('"dcID"')->nullable()->references('id')->on('duelchat')->onDelete('cascade')->onUpdate('cascade');
                 });
-            }catch (Exception $e){
+            }catch (\Throwable $e){
                 Schema::table('chats', function (Blueprint $table) {
                     $table->foreignId("'dcID'")->nullable()->references('id')->on('duelchat')->onDelete('cascade')->onUpdate('cascade');
                 });
             }
         }
-        
     }
 
     /**
@@ -34,8 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('chats', function (Blueprint $table) {
-            //
-        });
+        
     }
 };

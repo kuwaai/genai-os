@@ -9,23 +9,23 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        DB::transaction(function () {
-            Schema::rename('duelchat', 'chatrooms');
+        try{
+            Schema::table('chats', function (Blueprint $table) {
+                $table->renameColumn('dcID', 'roomID');
+            });
+        } catch (\Throwable $e){
             try{
                 Schema::table('chats', function (Blueprint $table) {
-                    $table->renameColumn('dcID', 'roomID');
+                    $table->renameColumn('"dcID"', '"roomID"');
                 });
-            } catch (Exception $e){
-                try{
-                    Schema::table('chats', function (Blueprint $table) {
-                        $table->renameColumn('"dcID"', '"roomID"');
-                    });
-                }catch (Exception $e){
-                    Schema::table('chats', function (Blueprint $table) {
-                        $table->renameColumn("'dcID'", "'roomID'");
-                    });
-                }
+            }catch (\Throwable $e){
+                Schema::table('chats', function (Blueprint $table) {
+                    $table->renameColumn("'dcID'", "'roomID'");
+                });
             }
+        }
+        DB::transaction(function () {
+            Schema::rename('duelchat', 'chatrooms');
             DB::table('permissions')
                 ->where('name', 'like', '%Duel%')
                 ->update([
