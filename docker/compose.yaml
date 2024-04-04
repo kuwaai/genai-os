@@ -1,0 +1,123 @@
+version: '3.8'
+name: kuwa
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: docker/web/Dockerfile
+    image: kuwa-multi-chat-web
+    restart: unless-stopped
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
+    volumes: ["multi-chat-storage:/app/storage:ro"]
+    ports: ["80:80", "443:443"]
+    depends_on: ["multi-chat"]
+    networks: ["frontend"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl", "-f", "http://localhost/"]
+      timeout: 10s
+  
+  multi-chat:
+    build:
+      context: ../
+      dockerfile: docker/multi-chat/Dockerfile
+    image: kuwa-multi-chat
+    restart: unless-stopped
+    init: true
+    depends_on:
+      - redis
+      # - db
+    environment:
+      # DB_USERNAME: ${DB_USERNAME}
+      # DB_PASSWORD_FILE: /run/secrets/db-password
+      # DB_DATABASE: ${DB_DATABASE}
+      APP_URL: ${PUBLIC_BASE_URL}
+      ADMIN_NAME: ${ADMIN_NAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD_FILE: /run/secrets/admin-password
+    secrets:
+      - db-password
+      - admin-password
+    volumes: ["multi-chat-storage:/app/storage:rw"]
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm-healthcheck"]
+      timeout: 10s
+    networks: ["frontend", "backend"]
+
+  # kernel:
+  #   build:
+  #     context: ../
+  #     dockerfile: docker/kernel/Dockerfile
+  #   image: kuwa-kernel
+  #   restart: unless-stopped
+  #   networks: ["backend"]
+  
+  # executor:
+  #   build:
+  #     context: ../
+  #     dockerfile: docker/executor/Dockerfile
+  #   image: kuwa-executor
+  #   restart: unless-stopped
+  #   networks: ["backend"]
+
+  redis:
+    image: redis:6.0.20
+    container_name: redis
+    restart: always
+    networks:
+      - backend
+
+  # [TODO] migration issue
+  # db:
+  #   image: postgres:15
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: ${DB_USERNAME}
+  #     POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+  #     POSTGRES_DB: ${DB_DATABASE}
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #   secrets:
+  #     - db-password
+  #   networks:
+  #     - backend
+
+  # [TODO] migration issue
+  # db:
+  #   image: mysql
+  #   restart: unless-stopped
+  #   environment:
+  #     MYSQL_RANDOM_ROOT_PASSWORD: yes
+  #     MYSQL_USER: ${DB_USERNAME}
+  #     MYSQL_PASSWORD_FILE: /run/secrets/db-password
+  #     MYSQL_DATABASE: ${DB_DATABASE}
+  #   volumes:
+  #     - db-data:/var/lib/mysql
+  #   secrets:
+  #     - db-password
+  #   networks:
+  #     - backend
+  
+  # db-ui:
+  #   image: adminer
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - 8080:8080
+  #   networks:
+  #     - backend
+
+volumes:
+  multi-chat-storage: {}
+  db-data: {}
+
+secrets:
+  db-password:
+    file: .db-password
+  admin-password:
+    file: .admin-password
+
+networks:
+  frontend: {}
+  backend: {}
