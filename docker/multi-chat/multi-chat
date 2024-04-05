@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -n|--num-worker)
+      NUM_WORKER=$2
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      echo "Usage: $0 [-n|--num-worker] [--help]"
+      echo "Options:"
+      echo "  -n, --num-worker: Number of workers"
+      echo "  -h, --help: Print this usage information"
+      exit 0
+      ;;
+    *)
+      echo "Invalid argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
+exec_redis_workers() {
+    for i in $(seq $1); do
+        php artisan queue:work --verbose --timeout=6000 &
+    done
+}
+
+NUM_WORKER=${NUM_WORKER:-1}
+echo "Number of redis workers: $NUM_WORKER"
+exec_redis_workers ${NUM_WORKER}
+exec php-fpm

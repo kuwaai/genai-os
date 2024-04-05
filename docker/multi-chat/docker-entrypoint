@@ -1,5 +1,5 @@
 #!/bin/sh
-set -xeu
+set -e
 
 # Ensure the storage directory have the proper structure
 construct_storage() {
@@ -81,12 +81,12 @@ seed_admin() {
 
 # Store the Kernel API information
 seed_kernel() {
-    php artisan web:config --kernel_endpoint ${KUWA_KERNEL_URL}
+    php artisan web:config --kernel_endpoint ${KUWA_KERNEL_URL} || return 0
 }
 
 # Add the default model config
 seed_model_config() {
-    # php artisan model:config "gemini-pro" "Gemini-Pro"
+    php artisan model:config ${MODEL_ACCESS_CODE} ${MODEL_NAME} || return 0
     return
 }
 
@@ -103,17 +103,16 @@ should_update() {
 }
 
 # Update the cache and database
-update() {
+upgrade() {
     optimize_laravel
     migrate_database
-    echo ${KUWA_MULTI_CHAT_VERSION} > ${VERSION_FILE}
-}
 
-exec_redis_workers() {
-    n_worker=10
-    for i in $(seq $n_worker); do
-        php artisan queue:work --verbose --timeout=6000 &
-    done
+    echo ${KUWA_MULTI_CHAT_VERSION} > ${VERSION_FILE}
+    echo "Successfully upgraded Kuwa Multi-Chat and it's database to version ${KUWA_MULTI_CHAT_VERSION}"
+    
+    echo "Try to seeding the database."
+    seed_kernel
+    seed_admin
 }
 
 #=========================================
@@ -125,15 +124,12 @@ load_api_key
 
 if should_update $@
 then
-    update
-    seed_kernel
+    upgrade
 fi
-seed_admin
 
-if [ "$1" = force-update ]
+if [ "$1" = force-upgrade ]
 then
-    update
+    upgrade
 else
-    exec_redis_workers
     exec "$@"
 fi
