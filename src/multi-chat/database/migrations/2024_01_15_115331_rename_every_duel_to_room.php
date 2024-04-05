@@ -9,21 +9,24 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        try{
+        DB::beginTransaction();
+
+        try {
             Schema::table('chats', function (Blueprint $table) {
                 $table->renameColumn('dcID', 'roomID');
             });
-        } catch (\Throwable $e){
-            try{
-                Schema::table('chats', function (Blueprint $table) {
-                    $table->renameColumn('"dcID"', '"roomID"');
-                });
-            }catch (\Throwable $e){
-                Schema::table('chats', function (Blueprint $table) {
-                    $table->renameColumn("'dcID'", "'roomID'");
-                });
-            }
+
+            DB::commit();
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+
+            Schema::table('chats', function (Blueprint $table) {
+                $table->renameColumn('`dcID`', '`roomID`');
+            });
+
+            DB::commit();
         }
+
         DB::transaction(function () {
             Schema::rename('duelchat', 'chatrooms');
             DB::table('permissions')
