@@ -62,16 +62,16 @@ COPY --from=build /app /app
 COPY docker/multi-chat/app.env /app/.env
 
 # Copy the enrtypoint scripts
-COPY docker/multi-chat/docker-entrypoint /usr/local/bin/
+COPY docker/multi-chat/docker-entrypoint docker/multi-chat/multi-chat /usr/local/bin/
 WORKDIR /usr/local/bin
-RUN chmod +x docker-entrypoint
+RUN chmod +x docker-entrypoint multi-chat
 
 # Setup the entry point
-ENV KUWA_MULTI_CHAT_VERSION="0.1.0"
-ENV KUWA_KERNEL_URL="http://kernel:9000/"
+ENV KUWA_MULTI_CHAT_VERSION="0.1.0-docker2"
+ENV KUWA_KERNEL_URL="http://kernel:9000"
 ENV ADMIN_NAME="Kuwa Admin"
 ENV ADMIN_EMAIL="admin@localhost"
 ENV ADMIN_PASSWORD=""
 WORKDIR /app
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["php-fpm"]
+CMD ["multi-chat", "--num-worker", "10"]
