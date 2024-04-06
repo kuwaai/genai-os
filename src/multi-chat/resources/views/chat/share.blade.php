@@ -48,7 +48,7 @@
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', DB::raw('CAST(llms.id AS TEXT)'), '=', 'tmp.model_id')
+            ->join('llms', DB::raw('CAST(llms.id AS '. (Config::get('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'tmp.model_id')
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
