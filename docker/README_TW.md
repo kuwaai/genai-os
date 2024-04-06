@@ -1,17 +1,18 @@
-# Docker Installation Guide
+# Docker 版安裝教學
 
-## Software Version
- - Minimum Docker Engine version: 18.06.0+
- - Docker Engine tested version:
-   - 25.0.3 (git commit: f417435)
-   - 25.0.4 (git commit: 061aa95)
+## 軟體版本
+- Docker Engine 最小版本: 18.06.0+
+- Docker Engine 測試過的版本:
+  - 25.0.3 (git commit: f417435)
+  - 25.0.4 (git commit: 061aa95)
 
-## Environment Setup
-All commands will be tested on Ubuntu 22.04 LTS. If you're using a different Linux distro, please consult the relevant documentation. If you want to use GPU for model inference, please install CUDA and NVIDIA Container Toolkit.
+## 環境安裝
+以下指令皆在 Ubuntu 22.04 LTS 測試，若您使用不同 Linux 發行版，請自行參考相關文件。  
+若您有使用 GPU 進行模型推論的需求，請安裝 CUDA 與 NVIDIA Container Toolkit。
 
-### 1. (Optional) Install the CUDA driver
+### 1. (非必要) 安裝 CUDA 驅動程式
 
-Documentation: [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/)
+參考文件: [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/)
 
 ```sh
 # Install the header of current running kernel
@@ -37,9 +38,9 @@ cat /proc/driver/nvidia/version
 # GCC version:  gcc version 11.4.0 (Ubuntu 11.4.0-1ubuntu1~22.04)
 ```
 
-### 2. Install Docker and Docker Compose
+### 2. 安裝 Docker 與 Docker Compose
 
-Documentation: [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+參考文件: [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 ```sh
 # Add official GPG key
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -66,9 +67,9 @@ Unattended-Upgrade::Origins-Pattern {
 EOT
 ```
 
-### 3. (Optional) Install NVIDIA Container Toolkit
+### 3. (非必要) 安裝 NVIDIA Container Toolkit
 
-Documentation: [Installing the NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+參考文件: [Installing the NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 ```sh
 # Setup GPG key
@@ -91,29 +92,30 @@ sudo docker pull nvidia/cuda:12.2.0-base-ubuntu22.04
 sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 ```
 
-## Basic Setup
+## 基礎安裝
 
-### 1. Edit the Config Files
+### 1. 更改設定檔
 
-Duplicate `.admin-password.sample`, `.db-password.sample`, and `.env.sample` and remove the `.sample` suffix.
-- `.admin-password`: Default admin password. It's recommended to change it from the default.
-- `.db-password`: Password for the system database. It's recommended to set a random and long string.
-- `.env`: Other system environment variables. The minimal values are as follows:
+複製`.admin-password.sample`, `.db-password.sample`, `.env.sample` 並把 `.sample` 副檔名去掉  
+檔案說明如下:
+- `.admin-password`: 預設管理者密碼，建議不要維持預設值
+- `.db-password`: 系統自帶資料庫密碼，建議設定成足夠長度的隨機字串
+- `.env`: 其餘系統環境變數，最小設定值如下
     ```sh
-    DOMAIN_NAME=localhost # The domain name of the website. If you want to expose the service to public, please change it to your actual public domain name
-    PUBLIC_BASE_URL="http://${DOMAIN_NAME}/" # The base URL of the website
+    DOMAIN_NAME=localhost # 網站域名，若要公開提供服務，請設定成你的公開域名
+    PUBLIC_BASE_URL="http://${DOMAIN_NAME}/" # 網站基礎 URL
 
-    ADMIN_NAME="Kuwa Admin" # The default admin name of the website
-    ADMIN_EMAIL="admin@${DOMAIN_NAME}" # The default admin email address of the website. It can be a non-existing email address.
+    ADMIN_NAME="Kuwa Admin" # 網站預設管理者名稱
+    ADMIN_EMAIL="admin@${DOMAIN_NAME}" # 網站預設管理者登入電子郵件，可為不存在的電子郵件
     ```
 
-### 2. Start the System
+### 2. 啟動系統
 
 > [!WARNING]
-> Please use Docker Compose V2 or above.
-> The `docker-compose` package in Ubuntu APT is Docker Compose V1, which is no longer supported. Please follow the previous guide to install the new version of Docker Compose.
+> 請使用 Docker Compose V2 以上的版本
+> Ubuntu APT 中的 `docker-compose` 套件為 Docker Compose V1，無法使用，請參考前面章節安裝新版 Docker Compose
 
-Start the system with Docker Compose:
+使用 Docker Compose 啟動系統
 ```sh
 docker compose -f compose.yaml up
 ```

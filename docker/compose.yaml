@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.7'
 name: kuwa
 services:
   web:
@@ -60,6 +60,28 @@ services:
     command: [ "kuwa-executor", "geminipro", "--kernel_url", "http://kernel:9000/" ]
     restart: unless-stopped
     networks: ["backend"]
+
+  # huggingface:
+  #   build:
+  #     context: ../
+  #     dockerfile: docker/executor/Dockerfile
+  #   image: kuwa-executor
+  #   command: [
+  #     "kuwa-executor", "huggingface",
+  #     "--kernel_url", "http://kernel:9000/"
+  #     "--model_path", "google/gemma-7b-it"
+  #     ]
+  #   environment:
+  #     - HUGGING_FACE_HUB_TOKEN: <YOUR_TOKEN_HERE>
+  #   restart: unless-stopped
+  #   deploy:
+  #       resources:
+  #         reservations:
+  #           devices:
+  #           - driver: nvidia
+  #             device_ids: ['0', '1']
+  #             capabilities: [gpu]
+  #   networks: ["backend"]
 
   redis:
     image: redis:6.0.20
