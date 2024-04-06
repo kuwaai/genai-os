@@ -12,16 +12,16 @@
                 ->from('chats')
                 ->selectRaw("group_concat(llm_id, ',') as identifier")
                 ->whereColumn('roomID', 'chatrooms.id')
-                ->orderByDesc('llm_id');
+                ->orderBy('llm_id');
         } elseif (config('database.default') == 'mysql') {
             $query
                 ->from('chats')
-                ->selectRaw('group_concat(llm_id order by llm_id desc separator \',\') as identifier')
+                ->selectRaw('group_concat(llm_id order by llm_id separator \',\') as identifier')
                 ->whereColumn('roomID', 'chatrooms.id');
         } elseif (config('database.default') == 'pgsql') {
             $query
                 ->from('chats')
-                ->selectRaw('string_agg(llm_id::text, \',\' order by llm_id desc) as identifier')
+                ->selectRaw('string_agg(llm_id::text, \',\' order by llm_id) as identifier')
                 ->whereColumn('roomID', 'chatrooms.id');
         }
     }, 'identifier');
