@@ -68,10 +68,13 @@ RUN chmod +x docker-entrypoint multi-chat
 
 # Setup the entry point
 ENV KUWA_MULTI_CHAT_VERSION="0.1.0-docker2"
+
 ENV KUWA_KERNEL_URL="http://kernel:9000"
-ENV ADMIN_NAME="Kuwa Admin"
-ENV ADMIN_EMAIL="admin@localhost"
-ENV ADMIN_PASSWORD=""
+ENV CHAT_ADMIN_NAME="Kuwa Admin"
+ENV CHAT_ADMIN_EMAIL="admin@localhost"
+ENV CHAT_ADMIN_PASSWORD=""
+ENV CHAT_ADMIN_PASSWORD_FILE=""
+
 WORKDIR /app
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["multi-chat", "--num-worker", "10"]

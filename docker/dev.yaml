@@ -1,0 +1,4 @@
+services:
+  multi-chat:
+      CHAT_ENV: development
+      CHAT_DEBUG: true

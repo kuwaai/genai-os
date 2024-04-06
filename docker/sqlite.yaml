@@ -1,0 +1,5 @@
+services:
+  multi-chat:
+    environment:
+      CHAT_DB_CONNECTION: sqlite
+      CHAT_DB_DATABASE: /app/storage/database.sqlite

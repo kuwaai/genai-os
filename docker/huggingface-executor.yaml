@@ -1,70 +1,14 @@
-version: '3.7'
-name: kuwa
 services:
-  web:
+  gemini-executor:
     build:
       context: ../
-      dockerfile: docker/web/Dockerfile
-    image: kuwa-multi-chat-web
-    restart: unless-stopped
-    environment:
-      DOMAIN_NAME: ${DOMAIN_NAME}
-    volumes: ["multi-chat-storage:/app/storage:ro"]
-    ports: ["80:80", "443:443"]
-    depends_on: ["multi-chat"]
-    networks: ["frontend"]
-    healthcheck:
-      test: ["CMD-SHELL", "curl", "-f", "http://localhost/"]
-      timeout: 10s
-  
-  multi-chat:
-    build:
-      context: ../
-      dockerfile: docker/multi-chat/Dockerfile
-    image: kuwa-multi-chat
-    restart: unless-stopped
-    init: true
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
     depends_on:
-      - redis
-    environment:
-      CHAT_ENV: production
-      CHAT_DEBUG: false
-      CHAT_BASE_URL: ${PUBLIC_BASE_URL}
-
-      CHAT_ADMIN_NAME: ${CHAT_ADMIN_NAME}
-      CHAT_ADMIN_EMAIL: ${CHAT_ADMIN_EMAIL}
-      CHAT_ADMIN_PASSWORD_FILE: /run/secrets/admin-password
-    secrets:
-      - admin-password
-    volumes: ["multi-chat-storage:/app/storage:rw"]
-    healthcheck:
-      test: ["CMD-SHELL", "php-fpm-healthcheck"]
-      timeout: 10s
-    networks: ["frontend", "backend"]
-
-  kernel:
-    build:
-      context: ../
-      dockerfile: docker/kernel/Dockerfile
-    image: kuwa-kernel
+      - kernel
+    command: [ "kuwa-executor", "geminipro", "--kernel_url", "http://kernel:9000/" ]
     restart: unless-stopped
     networks: ["backend"]
-
-  redis:
-    image: redis:6.0.20
-    container_name: redis
-    restart: always
-    networks:
-      - backend
-  
-  # gemini:
-  #   build:
-  #     context: ../
-  #     dockerfile: docker/executor/Dockerfile
-  #   image: kuwa-executor
-  #   command: [ "kuwa-executor", "geminipro", "--kernel_url", "http://kernel:9000/" ]
-  #   restart: unless-stopped
-  #   networks: ["backend"]
 
   # huggingface:
   #   build:
@@ -87,6 +31,13 @@ services:
   #             device_ids: ['0', '1']
   #             capabilities: [gpu]
   #   networks: ["backend"]
+
+  redis:
+    image: redis:6.0.20
+    container_name: redis
+    restart: always
+    networks:
+      - backend
 
   # [TODO] migration issue
   # db:
@@ -131,8 +82,11 @@ services:
 
 volumes:
   multi-chat-storage: {}
+  db-data: {}
 
 secrets:
+  db-password:
+    file: .db-password
   admin-password:
     file: .admin-password
 

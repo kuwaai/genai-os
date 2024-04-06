@@ -1,0 +1,11 @@
+services:
+  gemini-executor:
+    build:
+      context: ../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    depends_on:
+      - kernel
+    command: [ "kuwa-executor", "geminipro", "--kernel_url", "http://kernel:9000/" ]
+    restart: unless-stopped
+    networks: ["backend"]

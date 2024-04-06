@@ -14,9 +14,9 @@ construct_storage() {
 
 # Load secrets
 load_db_password(){
-    if [ -f ${DB_PASSWORD_FILE:-} ]
+    if [ -f ${CHAT_DB_PASSWORD_FILE:-} ]
     then
-        export DB_PASSWORD=$(cat ${DB_PASSWORD_FILE})
+        export CHAT_DB_PASSWORD=$(cat ${CHAT_DB_PASSWORD_FILE})
     fi
 }
 
@@ -65,18 +65,18 @@ migrate_database() {
 
 # Add the Admin account if there is corresponding variables
 seed_admin() {
-    if [ -f ${ADMIN_PASSWORD_FILE:-} ]
+    if [ -f ${CHAT_ADMIN_PASSWORD_FILE:-} ]
     then
-        export ADMIN_PASSWORD=$(cat ${ADMIN_PASSWORD_FILE})
+        export CHAT_ADMIN_PASSWORD=$(cat ${CHAT_ADMIN_PASSWORD_FILE})
     fi
-    if [ -z "${ADMIN_NAME:-}" ] || [ -z "${ADMIN_EMAIL:-}" ] || [ -z "${ADMIN_PASSWORD:-}" ]
+    if [ -z "${CHAT_ADMIN_NAME:-}" ] || [ -z "${CHAT_ADMIN_EMAIL:-}" ] || [ -z "${CAHT_ADMIN_PASSWORD:-}" ]
     then
         return
     fi
 
-    printf "${ADMIN_NAME}\n${ADMIN_EMAIL}\n${ADMIN_PASSWORD}" \
+    printf "${CHAT_ADMIN_NAME}\n${CHAT_ADMIN_EMAIL}\n${CHAT_ADMIN_PASSWORD}" \
       | php artisan db:seed --class=AdminSeeder --force || return 0
-    echo "Admin \"${ADMIN_NAME}\" had been added"
+    echo "Admin \"${CHAT_ADMIN_NAME}\" had been added"
 }
 
 # Store the Kernel API information

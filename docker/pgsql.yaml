@@ -1,0 +1,44 @@
+services:
+  multi-chat:
+    depends_on:
+      - db
+    environment:
+      CHAT_DB_CONNECTION: pgsql
+      CHAT_DB_HOST: db
+      CHAT_DB_PORT: 5432
+      CHAT_DB_USERNAME: ${CHAT_DB_USERNAME}
+      CHAT_DB_PASSWORD_FILE: /run/secrets/db-password
+      CHAT_DB_DATABASE: ${CHAT_DB_DATABASE}
+    secrets:
+      - db-password
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${CHAT_DB_USERNAME}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+      POSTGRES_DB: ${CHAT_DB_DATABASE}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    secrets:
+      - db-password
+    networks:
+      - backend
+
+  # db-ui:
+  #   image: adminer
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - 8080:8080
+  #   networks:
+  #     - backend
+
+volumes:
+  db-data: {}
+
+secrets:
+  db-password:
+    file: .db-password
