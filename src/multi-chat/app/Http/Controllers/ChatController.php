@@ -187,7 +187,7 @@ class ChatController extends Controller
                         ->where('name', 'like', 'model_%')
                         ->get();
                 }, 'tmp')
-                    ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS SIGNED)'))
+                    ->join('llms', DB::raw('CAST(llms.id AS TEXT)'), '=', 'tmp.model_id')
                     ->select('llms.id')
                     ->where('llms.enabled', true)
                     ->get()
@@ -383,7 +383,7 @@ class ChatController extends Controller
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS SIGNED)'))
+            ->join('llms', DB::raw('CAST(llms.id AS TEXT)'), '=', 'tmp.model_id')
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
@@ -405,7 +405,7 @@ class ChatController extends Controller
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS SIGNED)'))
+            ->join('llms', DB::raw('CAST(llms.id AS TEXT)'), '=', 'tmp.model_id')
             ->select('llms.id')
             ->where('llms.enabled', true)
             ->get()
@@ -440,7 +440,7 @@ class ChatController extends Controller
                     ->where('name', 'like', 'model_%')
                     ->get();
             }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS SIGNED)'))
+                ->join('llms', DB::raw('CAST(llms.id AS TEXT)'), '=', 'tmp.model_id')
                 ->select('llms.id')
                 ->where('llms.enabled', true)
                 ->get()
@@ -545,7 +545,7 @@ class ChatController extends Controller
                     ->where('name', 'like', 'model_%')
                     ->get();
             }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS SIGNED)'))
+                ->join('llms', DB::raw('CAST(llms.id AS TEXT)'), '=', 'tmp.model_id')
                 ->select('llms.id')
                 ->where('llms.enabled', true)
                 ->get()
@@ -636,7 +636,7 @@ class ChatController extends Controller
                     ->where('name', 'like', 'model_%')
                     ->get();
             }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS SIGNED)'))
+                ->join('llms', DB::raw('CAST(llms.id AS TEXT)'), '=', 'tmp.model_id')
                 ->select('llms.id')
                 ->where('llms.enabled', true)
                 ->get()
