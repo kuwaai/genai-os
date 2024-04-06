@@ -81,9 +81,7 @@
                     $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id', 'desc')->get();
                     $ids = array_reverse($llms->pluck('id')->toArray());
                     $DC =
-                        $DC[
-                            config('database.default') == 'sqlite' ? implode(',', $ids) : '{' . implode(',', $ids) . '}'
-                        ];
+                        $DC[implode(',', $ids)];
                 }
             } catch (Exception $e) {
                 $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();
