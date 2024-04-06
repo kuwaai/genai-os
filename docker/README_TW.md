@@ -112,7 +112,7 @@ sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 ### 2. 啟動系統
 
 > [!WARNING]
-> 請使用 Docker Compose V2 以上的版本
+> 請使用 Docker Compose V2 以上的版本。
 > Ubuntu APT 中的 `docker-compose` 套件為 Docker Compose V1，無法使用，請參考前面章節安裝新版 Docker Compose
 
 使用 Docker Compose 啟動系統
