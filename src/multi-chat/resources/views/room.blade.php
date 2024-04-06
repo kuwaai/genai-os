@@ -9,7 +9,7 @@
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
@@ -45,13 +45,37 @@
                 ->groupBy('chatrooms.id');
 
             // Fetch the ordered identifiers based on `llm_id` for both MySQL and SQLite
-            $DC->selectSub(function ($query) {
-                $query
-                    ->from('chats')
-                    ->selectRaw('group_concat(llm_id) as identifier')
-                    ->whereColumn('roomID', 'chatrooms.id')
-                    ->orderByDesc('llm_id');
-            }, 'identifier');
+            $DC = $DC->selectSub(function ($query) {
+                if (
+                    DB::connection()
+                        ->getPdo()
+                        ->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'sqlite'
+                ) {
+                    $query
+                        ->from('chats')
+                        ->selectRaw('group_concat(llm_id) as identifier')
+                        ->whereColumn('roomID', 'chatrooms.id')
+                        ->groupBy('roomID')
+                        ->orderByDesc('llm_id');
+                } elseif (
+                    DB::connection()
+                        ->getPdo()
+                        ->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql'
+                ) {
+                    $query
+                        ->from('chats')
+                        ->selectRaw('json_group_array(llm_id) as identifier')
+                        ->whereColumn('roomID', 'chatrooms.id')
+                        ->orderByDesc('llm_id');
+                } else {
+                    // Assume MySQL
+                    $query
+                        ->from('chats')
+                        ->selectRaw('group_concat(llm_id) as identifier')
+                        ->whereColumn('roomID', 'chatrooms.id')
+                        ->orderByDesc('llm_id');
+                }
+            }, 'identifier')->groupBy('chatrooms.id');
 
             // Get the final result and group by the ordered identifiers
             $DC = $DC->get()->groupBy('identifier');

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{App\Models\ChatRoom::findOrFail(request()->route("room_id"))->name}}</title>
+    <title>{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}</title>
 
     <!-- Fonts -->
     <link href="{{ asset('css/fontBunny.css') }}" rel="stylesheet" />
@@ -26,8 +26,9 @@
         @media print {
             .new-page {
                 page-break-after: auto;
+
                 p {
-                    color:black;
+                    color: black;
                 }
             }
 
@@ -54,7 +55,7 @@
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
@@ -66,13 +67,37 @@
             ->groupBy('chatrooms.id');
 
         // Fetch the ordered identifiers based on `llm_id` for both MySQL and SQLite
-        $DC->selectSub(function ($query) {
-            $query
-                ->from('chats')
-                ->selectRaw('group_concat(llm_id) as identifier')
-                ->whereColumn('roomID', 'chatrooms.id')
-                ->orderByDesc('llm_id');
-        }, 'identifier');
+        $DC = $DC->selectSub(function ($query) {
+            if (
+                DB::connection()
+                    ->getPdo()
+                    ->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'sqlite'
+            ) {
+                $query
+                    ->from('chats')
+                    ->selectRaw('group_concat(llm_id) as identifier')
+                    ->whereColumn('roomID', 'chatrooms.id')
+                    ->groupBy('roomID')
+                    ->orderByDesc('llm_id');
+            } elseif (
+                DB::connection()
+                    ->getPdo()
+                    ->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql'
+            ) {
+                $query
+                    ->from('chats')
+                    ->selectRaw('json_group_array(llm_id) as identifier')
+                    ->whereColumn('roomID', 'chatrooms.id')
+                    ->orderByDesc('llm_id');
+            } else {
+                // Assume MySQL
+                $query
+                    ->from('chats')
+                    ->selectRaw('group_concat(llm_id) as identifier')
+                    ->whereColumn('roomID', 'chatrooms.id')
+                    ->orderByDesc('llm_id');
+            }
+        }, 'identifier')->groupBy('chatrooms.id');
 
         // Get the final result and group by the ordered identifiers
         $DC = $DC->get()->groupBy('identifier');
@@ -86,21 +111,16 @@
                     ->orderby('id')
                     ->get();
             } else {
-                $llms = App\Models\LLMs::whereIn('id', session('llms'))
-                    ->orderby('id')
-                    ->get();
+                $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();
                 $DC = $DC['{' . implode(',', array_reverse($llms->pluck('id')->toArray())) . '}'];
             }
         } catch (Exception $e) {
-            $llms = App\Models\LLMs::whereIn('id', session('llms'))
-                ->orderby('id')
-                ->get();
+            $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();
             $DC = null;
         }
     @endphp
     <div class="flex h-full">
-        <div id="histories"
-            class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl">
+        <div id="histories" class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl">
             <x-room.header :llms="$llms" :readonly="true" />
             <div id="chatroom" class="flex-1 p-4 flex flex-col-reverse scrollbar bg-gray-200 dark:bg-gray-600">
                 <div>
@@ -116,13 +136,39 @@
                             ->join('llms', 'llms.id', '=', 'chats.llm_id')
                             ->where('isbot', true)
                             ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
-                            ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', 'feedback.nice', 'feedback.detail', 'feedback.flags');
+                            ->select(
+                                'histories.chained as chained',
+                                'chats.id as chat_id',
+                                'histories.id as id',
+                                'chats.llm_id as llm_id',
+                                'histories.created_at as created_at',
+                                'histories.msg as msg',
+                                'histories.isbot as isbot',
+                                'llms.image as image',
+                                'llms.name as name',
+                                'feedback.nice',
+                                'feedback.detail',
+                                'feedback.flags',
+                            );
 
                         $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
                             ->leftjoin('llms', 'llms.id', '=', 'chats.llm_id')
                             ->where('isbot', false)
                             ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
-                            ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.llm_id as llm_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', 'llms.image as image', 'llms.name as name', DB::raw('NULL as nice'), DB::raw('NULL as detail'), DB::raw('NULL as flags'));
+                            ->select(
+                                'histories.chained as chained',
+                                'chats.id as chat_id',
+                                'histories.id as id',
+                                'chats.llm_id as llm_id',
+                                'histories.created_at as created_at',
+                                'histories.msg as msg',
+                                'histories.isbot as isbot',
+                                'llms.image as image',
+                                'llms.name as name',
+                                DB::raw('NULL as nice'),
+                                DB::raw('NULL as detail'),
+                                DB::raw('NULL as flags'),
+                            );
 
                         $mergedChats = $botChats
                             ->union($nonBotChats)
@@ -190,7 +236,7 @@
                     @foreach ($mergedChats as $history)
                         <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" :readonly="true" />
                     @endforeach
-                @endenv
+                    @endenv
                 </div>
             </div>
         </div>
