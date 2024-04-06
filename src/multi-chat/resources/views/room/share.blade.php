@@ -55,7 +55,7 @@
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS SIGNED)'))
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
