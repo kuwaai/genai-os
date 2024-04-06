@@ -14,12 +14,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        DB::beginTransaction(); // Start a database transaction
         try {
             // Append more detailed permissions for profile
             $currentTimestamp = now();
             $PermissionsToAdd = [];
-
+    
             $permissions = [
                 // Profile tab
                 'tab_Profile' => 'Permission for tab Profile',
@@ -31,7 +30,7 @@ return new class extends Migration {
                 'Profile_delete_account' => 'Permission to delete their account',
                 'Profile_update_api_token' => 'Permission to update TAIDE Chat API token',
             ];
-
+    
             foreach ($permissions as $name => $describe) {
                 $PermissionsToAdd[] = [
                     'name' => $name,
@@ -40,27 +39,23 @@ return new class extends Migration {
                     'updated_at' => $currentTimestamp,
                 ];
             }
-
+    
             // Insert all permissions into db
             Permissions::insert($PermissionsToAdd);
-
+    
             // Check if there are users for demo
             $demoUsersCount = User::where('forDemo', true)->count();
             // Check if there are admin users
             $adminUsersCount = User::where('isAdmin', true)->count();
-
+    
             // Create groups only if there are corresponding users
             if ($demoUsersCount > 0) {
-                $demoGroup = new Groups();
-                $demoGroup->fill(['name' => 'Demos', 'describe' => 'The old forDemo users are all migrated into this group']);
-                $demoGroup->save();
+                $demoGroup = Groups::create(['name' => 'Demos', 'describe' => 'The old forDemo users are all migrated into this group']);
                 User::where('forDemo', true)->update(['group_id' => $demoGroup->id]);
             }
-
+    
             if ($adminUsersCount > 0) {
-                $adminGroup = new Groups();
-                $adminGroup->fill(['name' => 'Admins', 'describe' => 'The old isAdmin users are all migrated into this group']);
-                $adminGroup->save();
+                $adminGroup = Groups::create(['name' => 'Admins', 'describe' => 'The old isAdmin users are all migrated into this group']);
                 // Migrate permissions for admin group
                 $perm_records = [];
                 foreach (Permissions::get() as $perm) {
@@ -75,18 +70,16 @@ return new class extends Migration {
                 // Assign users to their respective groups
                 User::where('isAdmin', true)->update(['group_id' => $adminGroup->id]);
             }
-
+    
             // Remove old columns
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn(['isAdmin', 'forDemo']);
             });
-
-            DB::commit();
         } catch (\Exception $e) {
-            DB::rollBack(); // Rollback the transaction in case of an exception
-            throw $e; // Re-throw the exception to halt the migration
+            // Handle exception
         }
     }
+    
 
     /**
      * Reverse the migrations.
