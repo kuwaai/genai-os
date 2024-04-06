@@ -34,15 +34,15 @@
 
 ## Key Features
 
-- Provides a complete solution for developing and deploying GenAI in multiple languages, supporting Windows and Linux
+* Multi-lingual turnkey solution for GenAI development and deployment on Linux and Windows
 
-- Provides user-friendly functions such as group chat, citations, importing/exporting/sharing complete Prompt lists
+* Concurrent multi-chat, quoting, full prompt-list import/export/share and more for users
 
-- Flexibly combine Prompt x RAGs x Bot x Model x Hardware/GPUs to meet application needs
+* Flexible orchestration of prompts x RAGs x bots x models x hardware/GPUs
 
-- Supports a variety of environments, from virtual hosts, notebooks, PCs, local servers to public and private clouds
+* Heterogeneous supports from virtual hosts, laptops, PCs, edge servers to cloud
 
-- Open source, enabling developers to contribute and build their own customized systems based on their own needs
+* Open source, allowing developers to contribute and customize the system according to their needs
 
 ![screenshot](./src/multi-chat/public/images/demo.gif)
 
