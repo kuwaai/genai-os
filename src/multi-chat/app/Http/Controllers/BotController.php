@@ -40,7 +40,7 @@ class BotController extends Controller
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
@@ -62,7 +62,7 @@ class BotController extends Controller
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
             ->select('llms.id')
             ->where('llms.enabled', true)
             ->get()
@@ -95,7 +95,7 @@ class BotController extends Controller
                     ->where('name', 'like', 'model_%')
                     ->get();
             }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
+                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
                 ->select('llms.id')
                 ->where('llms.enabled', true)
                 ->get()
@@ -194,7 +194,7 @@ class BotController extends Controller
                     ->where('name', 'like', 'model_%')
                     ->get();
             }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
+                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
                 ->select('llms.id')
                 ->where('llms.enabled', true)
                 ->get()
@@ -285,7 +285,7 @@ class BotController extends Controller
                     ->where('name', 'like', 'model_%')
                     ->get();
             }, 'tmp')
-                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS INTEGER)'))
+                ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
                 ->select('llms.id')
                 ->where('llms.enabled', true)
                 ->get()
