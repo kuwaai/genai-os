@@ -26,7 +26,7 @@ REM Kernel
 pushd "..\src\kernel"
 del records.pickle
 set PYTHONPATH=%PYTHONPATH%;%~dp0..\src\kernel\src
-set "PATH=%~dp0packages\%python_folder%\Scripts;%PATH%"
+set "PATH=%~dp0packages\%python_folder%\Scripts;%~dp0packages\%python_folder%\;%PATH%"
 start /b "" "%~dp0packages\%python_folder%\python.exe" "%~dp0..\src\kernel\main.py"
 popd
 

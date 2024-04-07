@@ -138,14 +138,43 @@ set /p "image_path=Enter the image path: (press Enter to leave blank)"
 
 :skip_image_path
 	
+del env.bat
 REM Save to env.bat
-echo set "model_type=!model_type!" > env.bat
-echo set "model_name=!model_name!" >> env.bat
-if defined api_key echo set "api_key=!api_key!" >> env.bat
-echo set "access_code=!access_code!" >> env.bat
-if defined model_path echo set "model_path=!model_path!" >> env.bat
-if defined worker_path echo set "worker_path=!worker_path!" >> env.bat
-if defined image_path echo set "image_path=!image_path!" >> env.bat
+if defined model_type (
+	echo set "model_type=!model_type!" >> env.bat
+) else (
+	echo set /U model_type >> env.bat
+)
+if defined model_name (
+	echo set "model_name=!model_name!" >> env.bat
+) else (
+	echo set /U model_name >> env.bat
+)
+if defined api_key (
+	echo set "api_key=!api_key!" >> env.bat
+) else (
+	echo set /U api_key >> env.bat
+)
+if defined access_code (
+	echo set "access_code=!access_code!" >> env.bat
+) else (
+	echo set /U access_code >> env.bat
+)
+if defined model_path (
+	echo set "model_path=!model_path!" >> env.bat
+) else (
+	echo set /U model_path >> env.bat
+)
+if defined worker_path (
+	echo set "worker_path=!worker_path!" >> env.bat
+) else (
+	echo set /U worker_path >> env.bat
+)
+if defined image_path (
+	echo set "image_path=!image_path!" >> env.bat
+) else (
+	echo set /U image_path >> env.bat
+)
 
 echo Configuration saved to env.bat
 pause
