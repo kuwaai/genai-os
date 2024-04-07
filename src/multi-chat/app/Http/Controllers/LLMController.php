@@ -18,7 +18,7 @@ class LLMController extends Controller
         $model = LLMs::findOrFail($request->input("id"));
         $validated = $request->validated();
         if ($file = $request->file('image')) {
-            Storage::delete($model->image);
+            if ($model->image) Storage::delete($model->image);
             $validated['image'] = $file->store('public/images');
         }
         if (is_null($validated['order']))  unset($validated['order']);

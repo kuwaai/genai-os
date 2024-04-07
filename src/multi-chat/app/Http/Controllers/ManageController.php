@@ -195,7 +195,7 @@ class ManageController extends Controller
         $model = LLMs::findOrFail($request->input('id'));
         $validated = $request->validated();
         if ($file = $request->file('image')) {
-            Storage::delete($model->image);
+            if ($model->image) Storage::delete($model->image);
             $validated['image'] = $file->store('public/images');
         }
         if (is_null($validated['order'])) {
@@ -212,7 +212,7 @@ class ManageController extends Controller
     public function llm_delete(Request $request): RedirectResponse
     {
         $model = LLMs::findOrFail($request->input('id'));
-        Storage::delete($model->image);
+        if ($model->image) Storage::delete($model->image);
         $model->delete();
         Permissions::where('name', '=', 'model_' . $request->input('id'))->delete();
         return Redirect::route('manage.home')->with('last_tab', 'llms')->with('last_llm_id', $request->input('id'));
