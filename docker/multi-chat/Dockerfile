@@ -38,6 +38,10 @@ RUN rm -rf node_modules storage &&\
 #============================================
 FROM php:8.1-fpm
 
+# Align the UID and PID with Nginx
+RUN usermod -u 101 www-data &&\
+    groupmod -g 101 www-data
+
 # Configure PHP
 COPY docker/multi-chat/php-override.ini ${PHP_INI_DIR}/conf.d/00-override.ini
 RUN mv "$PHP_INI_DIR/php.ini-production" "${PHP_INI_DIR}/php.ini"
