@@ -121,3 +121,26 @@ sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 ```sh
 docker compose -f compose.yaml -f pgsql.yaml -f gemini.yaml up --build
 ```
+
+## 進階使用
+
+### 1. 啟動除錯模式
+Docker 版本預設不會在 Multi-Chat 網頁前端顯示任何錯誤訊息，若您遇到錯誤可以使用以下指令開啟除錯模式。
+```sh
+docker compose -f compose.yaml -f dev.yaml -f <其他 yaml 檔案...> up --build
+```
+
+### 2. 執行多個 Executor
+每種 Executor 的設定都已寫在對應的 YAML 檔案中 (gemini.yaml, chatgpt.yaml, huggingface.yaml)，請參考這些設定檔按照您的需求擴充。  
+您可能需要參考 [Executor 說明文件](../src/executor/README_TW.md)。  
+完成設定檔後可使用以下指令啟動整個系統
+```sh
+docker compose -f compose.yaml -f pgsql.yaml -f <Executor1設定檔> -f <Executor2設定檔...> up --build
+```
+
+### 3. 強制更新
+若您資料庫不小心遺失或毀損，可透過強置
+請先確定系統正在運作中，再使用以下指令強制更新資料庫  
+```sh
+docker exec -it kuwa-multi-chat-1 docker-entrypoint force-upgrade
+```

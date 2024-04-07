@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -xeu
 
 # Ensure the storage directory have the proper structure
 construct_storage() {
@@ -79,18 +79,16 @@ seed_admin() {
 
     printf "${ADMIN_NAME}\n${ADMIN_EMAIL}\n${ADMIN_PASSWORD}" \
       | php artisan db:seed --class=AdminSeeder --force || return 0
-    echo "Admin \"${ADMIN_NAME}\" had been added"
+    printf "Admin \"${ADMIN_NAME}\" had been added\n"
 }
 
 # Store the Kernel API information
 seed_kernel() {
+    if [ -z "${KUWA_KERNEL_URL:-}" ]
+    then
+        return
+    fi
     php artisan web:config --kernel_endpoint ${KUWA_KERNEL_URL} || return 0
-}
-
-# Add the default model config
-seed_model_config() {
-    php artisan model:config ${MODEL_ACCESS_CODE} ${MODEL_NAME} || return 0
-    return
 }
 
 # Check whether should update 
@@ -111,7 +109,7 @@ upgrade() {
     migrate_database
 
     echo ${KUWA_MULTI_CHAT_VERSION} > ${VERSION_FILE}
-    echo "Successfully upgraded Kuwa Multi-Chat and it's database to version ${KUWA_MULTI_CHAT_VERSION}"
+    printf "Successfully upgraded Kuwa Multi-Chat and it's database to version ${KUWA_MULTI_CHAT_VERSION}\n"
     
     echo "Try to seeding the database."
     seed_kernel

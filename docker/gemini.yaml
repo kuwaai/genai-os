@@ -4,8 +4,13 @@ services:
       context: ../
       dockerfile: docker/executor/Dockerfile
     image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: geminipro
+      EXECUTOR_ACCESS_CODE: gemini-pro
+      EXECUTOR_NAME: Gemini Pro
     depends_on:
       - kernel
-    command: [ "kuwa-executor", "geminipro", "--kernel_url", "http://kernel:9000/" ]
+      - multi-chat
+    command: []
     restart: unless-stopped
     networks: ["backend"]

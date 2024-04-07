@@ -62,8 +62,9 @@ RUN apt-get install -y netcat-openbsd wget &&\
 
 COPY --from=build /app /app
 COPY docker/multi-chat/app.env /app/.env
+COPY docker/multi-chat/add-executor.php /app/add-executor.php
 
-# Copy the enrtypoint scripts
+# Copy the scripts
 COPY docker/multi-chat/docker-entrypoint docker/multi-chat/multi-chat /usr/local/bin/
 WORKDIR /usr/local/bin
 RUN chmod +x docker-entrypoint multi-chat

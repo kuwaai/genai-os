@@ -1,4 +1,5 @@
 services:
   multi-chat:
-      CHAT_ENV: development
-      CHAT_DEBUG: true
+    environment:
+      APP_ENV: development
+      APP_DEBUG: true

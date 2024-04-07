@@ -16,6 +16,7 @@ services:
     image: mysql
     restart: unless-stopped
     container_name: mysql
+    hostname: db
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: yes
       MYSQL_USER: ${DB_USERNAME}
