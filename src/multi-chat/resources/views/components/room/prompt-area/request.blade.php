@@ -30,7 +30,7 @@
                                     </div>
                                 @else
                                     <img
-                                        src="{{ strpos($llm->image, 'data:image/png;base64') === 0 ? $llm->image : asset(Storage::url($llm->image)) }}">
+                                        src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/images/kuwa.png' }}">
                                     @endenv
                                 </div>
                             </span>

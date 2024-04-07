@@ -23,7 +23,7 @@
                     <script>
                         $llms[{{ $LLM->id }}] = {!! json_encode(
                             [
-                                strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)),
+                                $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png',
                                 $LLM->name,
                                 $LLM->link,
                                 $LLM->order,
@@ -41,7 +41,7 @@
                         <div class="flex flex-1">
                             <div class="flex m-auto w-[48px] h-[48px] justify-center items-center"><img width="48px"
                                     height="48px" class="rounded-full border-2 border border-white bg-black"
-                                    src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}" />
+                                    src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' }}" />
                             </div>
                             <div class="flex flex-1 flex-col  h-[48px]">
                                 <span
@@ -59,7 +59,7 @@
                     <script>
                         $llms[{{ $LLM->id }}] = {!! json_encode(
                             [
-                                strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)),
+                                $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' ,
                                 $LLM->name,
                                 $LLM->link,
                                 $LLM->order,
@@ -77,7 +77,7 @@
                         <div class="flex flex-1">
                             <div class="flex m-auto w-[48px] h-[48px] justify-center items-center"><img width="48px"
                                     height="48px" class="rounded-full border-2 border border-white bg-black"
-                                    src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}" />
+                                    src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' }}" />
                             </div>
                             <div class="flex flex-1 flex-col  h-[48px]">
                                 <span
@@ -109,8 +109,7 @@
                                 </span>
                                 <img id="image"
                                     class="rounded-full border border-gray-400 dark:border-gray-900 m-auto bg-black"
-                                    width="50px" height="50px" class="m-auto"
-                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg==" />
+                                    width="50px" height="50px" class="m-auto" src="/images/kuwa.png" />
                             </label>
                         </div>
                     </div>
@@ -167,8 +166,7 @@
                     </label>
                     <input name="link"
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="link" placeholder="{{ __('manage.placeholder.link') }}"
-                        value="">
+                        id="link" placeholder="{{ __('manage.placeholder.link') }}" value="">
                 </div>
             </div>
             <div class="flex flex-wrap -mx-3 mb-2">
@@ -298,9 +296,7 @@
 
     function CreateRow() {
         $("#edit_llm form").attr("action", "{{ route('manage.llms.create') }}");
-        $("#update_LLM_by_ID img").attr("src",
-            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg=="
-        )
+        $("#update_LLM_by_ID img").attr("src", "/images/kuwa.png")
         $("#update_LLM_by_ID input:eq(1)").prop("disabled", true)
         $("#update_LLM_by_ID input[name='name']").val("")
         $("#update_LLM_by_ID input[name='link']").val("")

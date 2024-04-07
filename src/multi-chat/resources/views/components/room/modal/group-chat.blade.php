@@ -43,7 +43,7 @@
                                     <div
                                         class="flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
                                         <img
-                                            src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
+                                            src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' }}">
                                     </div>
                                     <div class="pl-2 overflow-hidden">
                                         {{-- blade-formatter-disable --}}

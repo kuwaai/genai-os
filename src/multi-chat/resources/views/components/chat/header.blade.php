@@ -62,7 +62,7 @@
         @endif
 
         <img class="h-full w-full" data-tooltip-target="llm_{{ $LLM->id }}_chat" data-tooltip-placement="top"
-            src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}">
+            src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' }}">
     </div>
     @if (!$readonly && $llmId)
         <p class="flex-1 flex flex-wrap items-center mr-3 overflow-y-auto overflow-x-hidden scrollbar">
