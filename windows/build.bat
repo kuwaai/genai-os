@@ -2,6 +2,7 @@
 
 REM Initialize everything
 call src\variables.bat
+set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 
 REM Download and extract RunHiddenConsole if not exists
 call src\download_extract.bat %url_RunHiddenConsole% packages\%RunHiddenConsole_folder% packages\%RunHiddenConsole_folder% RunHiddenConsole.zip
@@ -79,8 +80,6 @@ if not exist "packages\%python_folder%\Scripts\pip.exe" (
     echo pip already installed, skipping installing.
 )
 
-
-set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 REM Download required pip packages
 pip install -r .\src\requirements.txt
 pushd "..\src\kernel"
