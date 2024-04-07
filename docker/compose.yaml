@@ -31,6 +31,10 @@ services:
       APP_DEBUG: false
       APP_URL: ${PUBLIC_BASE_URL}
 
+      # Use sqlite as the default database
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /app/storage/database.sqlite
+
       ADMIN_NAME: ${ADMIN_NAME}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD_FILE: /run/secrets/admin-password

@@ -1,6 +1,7 @@
 FROM nginx:stable-alpine
 
 RUN apk --no-cache add curl
+RUN mkdir -p /var/log/php-fpm
 
 WORKDIR /app
 RUN rm -rf /etc/nginx/templates

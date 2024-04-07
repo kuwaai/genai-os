@@ -21,6 +21,8 @@ server {
     error_page 404 /index.php;
  
     location ~ \.php$ {
+        access_log /dev/stdout main;
+        access_log /var/log/php-fpm/php-access.log main;
         fastcgi_pass multi-chat:9000;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;
