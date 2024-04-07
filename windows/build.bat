@@ -18,9 +18,9 @@ IF EXIST packages\%python_folder% (
 ) ELSE (
     REM Download and extract Python if not exists
     call src\download_extract.bat %url_Python% packages\%python_folder% packages\%python_folder% python.zip
-    REM Overwrite the python39._pth file
-    echo Overwrite the python39._pth file.
-    copy /Y src\python39._pth "packages\%python_folder%\python39._pth"
+    REM Overwrite the python310._pth file
+    echo Overwrite the python310._pth file.
+    copy /Y src\python310._pth "packages\%python_folder%\python310._pth"
 )
 
 REM Download and extract Redis if not exists

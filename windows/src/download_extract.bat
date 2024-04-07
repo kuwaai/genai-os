@@ -10,8 +10,16 @@ set "archive_name=%4"
 if not exist "%check_location%" (
     echo Downloading %url%...
     curl -L -o %archive_name% %url%
-    echo Extracting %archive_name%...
-    powershell Expand-Archive -Path %archive_name% -DestinationPath "%folder_name%"
+    
+    :: Check if the file is a tar.xz archive
+    if "%archive_name:~-7%"==".tar.xz" (
+        echo Extracting %archive_name%...
+        tar -xf %archive_name% -C "%folder_name%"
+    ) else (
+        echo Extracting %archive_name%...
+        powershell Expand-Archive -Path %archive_name% -DestinationPath "%folder_name%"
+    )
+    
     echo Cleaning up...
     del %archive_name%
 ) else (
