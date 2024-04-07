@@ -12,7 +12,7 @@ use DB;
 
 class ModelConfigure extends Command
 {
-    protected $signature = 'model:config {access_code} {name} {image=null}';
+    protected $signature = 'model:config {access_code} {name} {--image=}';
     protected $description = 'Quickly configure a model for everyone';
     public function __construct()
     {
@@ -32,8 +32,8 @@ class ModelConfigure extends Command
             } else {
                 DB::beginTransaction(); // Start a database transaction
                 $path = null;
-                if ($this->argument('image')) {
-                    $imagePath = $this->argument('image');
+                if ($this->option('image')) {
+                    $imagePath = $this->option('image');
                     $fileContents = file_get_contents($imagePath);
                     $imageName = Str::random(40) . '.' . pathinfo($imagePath, PATHINFO_EXTENSION);
                     $path = 'public/images/' . $imageName;

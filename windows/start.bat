@@ -75,7 +75,7 @@ for /D %%d in ("workers\*") do (
         if "!image_path!"=="" (
 			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!"
 		) else (
-			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!" "!image_path!"
+			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!" --image "!image_path!"
 		)
         popd
 

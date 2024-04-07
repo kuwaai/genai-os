@@ -1,7 +1,7 @@
 REM This help user quickly setup their own account
 
 set python_exe=packages\%python_folder%\python.exe
-set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
+set "PATH=%~dp0..\..\packages\%python_folder%;%~dp0..\..\packages\%python_folder%\Scripts;%PATH%"
 
 if exist "%python_exe%" (
     huggingface-cli login
