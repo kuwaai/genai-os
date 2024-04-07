@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # Ensure the storage directory have the proper structure
@@ -14,9 +14,9 @@ construct_storage() {
 
 # Load secrets
 load_db_password(){
-    if [ -f ${CHAT_DB_PASSWORD_FILE:-} ]
+    if [ -f ${DB_PASSWORD_FILE:-} ]
     then
-        export CHAT_DB_PASSWORD=$(cat ${CHAT_DB_PASSWORD_FILE})
+        export DB_PASSWORD=$(cat ${DB_PASSWORD_FILE})
     fi
 }
 
@@ -54,29 +54,32 @@ optimize_laravel() {
 
 # Forcely migrate the database
 migrate_database() {
-    # until nc -z -v -w30 ${DB_HOST:-db} ${DB_PORT:-3306}
-    # do
-    #     echo "Waiting for database connection..."
-    #     # wait for 5 seconds before check again
-    #     sleep 5
-    # done
+    if [ -z "${DB_HOST:-}" ] && [ -z "${DB_PORT:-}" ]
+    then
+        until nc -z -v -w30 ${DB_HOST} ${DB_PORT}
+        do
+            echo "Waiting for database connection..."
+            # wait for 5 seconds before check again
+            sleep 5
+        done
+    fi
     php artisan migrate --force
 }
 
 # Add the Admin account if there is corresponding variables
 seed_admin() {
-    if [ -f ${CHAT_ADMIN_PASSWORD_FILE:-} ]
+    if [ -f ${ADMIN_PASSWORD_FILE:-} ]
     then
-        export CHAT_ADMIN_PASSWORD=$(cat ${CHAT_ADMIN_PASSWORD_FILE})
+        ADMIN_PASSWORD=$(cat ${ADMIN_PASSWORD_FILE})
     fi
-    if [ -z "${CHAT_ADMIN_NAME:-}" ] || [ -z "${CHAT_ADMIN_EMAIL:-}" ] || [ -z "${CAHT_ADMIN_PASSWORD:-}" ]
+    if [ -z "${ADMIN_NAME:-}" ] || [ -z "${ADMIN_EMAIL:-}" ] || [ -z "${ADMIN_PASSWORD:-}" ]
     then
         return
     fi
 
-    printf "${CHAT_ADMIN_NAME}\n${CHAT_ADMIN_EMAIL}\n${CHAT_ADMIN_PASSWORD}" \
+    printf "${ADMIN_NAME}\n${ADMIN_EMAIL}\n${ADMIN_PASSWORD}" \
       | php artisan db:seed --class=AdminSeeder --force || return 0
-    echo "Admin \"${CHAT_ADMIN_NAME}\" had been added"
+    echo "Admin \"${ADMIN_NAME}\" had been added"
 }
 
 # Store the Kernel API information

@@ -1,17 +1,15 @@
 FROM php:8.1-cli as build
 
-# Install nodejs
+# Install nodejs and composer
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - &&\
     apt-get install -y nodejs &&\
     echo Version of Node.js: $(node -v) &&\
     echo Version of NPM: $(npm -v)
-
-# Install composer
 RUN curl -s https://getcomposer.org/installer | php &&\
     mv composer.phar /usr/local/bin/composer &&\
     echo Version of Composer: $(composer --version)
 
-# Install dependency of PHP extension
+# Install dependency of PHP extension for building
 RUN apt-get install -y libldap-dev libzip-dev &&\
     docker-php-ext-install ldap zip
 
@@ -70,10 +68,24 @@ RUN chmod +x docker-entrypoint multi-chat
 ENV KUWA_MULTI_CHAT_VERSION="0.1.0-docker2"
 
 ENV KUWA_KERNEL_URL="http://kernel:9000"
-ENV CHAT_ADMIN_NAME="Kuwa Admin"
-ENV CHAT_ADMIN_EMAIL="admin@localhost"
-ENV CHAT_ADMIN_PASSWORD=""
-ENV CHAT_ADMIN_PASSWORD_FILE=""
+ENV APP_URL="http://localhost/"
+ENV APP_ENV="production"
+ENV APP_DEBUG="false"
+
+ENV DB_CONNECTION="pgsql"
+ENV DB_HOST="db"
+ENV DB_PORT="5432"
+
+ENV LOGIN_WITH_EMAIL="true"
+ENV INFORMATION_URL="https://kuwaai.org/"
+ENV ALLOWED_IPS="0.0.0.0/0"
+ENV DEFAULT_LOCALE="en_us"
+ENV FALLBACK_LOCALE="en_us"
+
+ENV ADMIN_NAME="Kuwa Admin"
+ENV ADMIN_EMAIL="admin@localhost"
+ENV ADMIN_PASSWORD=""
+ENV ADMIN_PASSWORD_FILE=""
 
 WORKDIR /app
 ENTRYPOINT ["docker-entrypoint"]

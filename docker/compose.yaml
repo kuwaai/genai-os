@@ -27,13 +27,13 @@ services:
     depends_on:
       - redis
     environment:
-      CHAT_ENV: production
-      CHAT_DEBUG: false
-      CHAT_BASE_URL: ${PUBLIC_BASE_URL}
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: ${PUBLIC_BASE_URL}
 
-      CHAT_ADMIN_NAME: ${CHAT_ADMIN_NAME}
-      CHAT_ADMIN_EMAIL: ${CHAT_ADMIN_EMAIL}
-      CHAT_ADMIN_PASSWORD_FILE: /run/secrets/admin-password
+      ADMIN_NAME: ${ADMIN_NAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD_FILE: /run/secrets/admin-password
     secrets:
       - admin-password
     volumes: ["multi-chat-storage:/app/storage:rw"]
@@ -56,78 +56,6 @@ services:
     restart: always
     networks:
       - backend
-  
-  # gemini:
-  #   build:
-  #     context: ../
-  #     dockerfile: docker/executor/Dockerfile
-  #   image: kuwa-executor
-  #   command: [ "kuwa-executor", "geminipro", "--kernel_url", "http://kernel:9000/" ]
-  #   restart: unless-stopped
-  #   networks: ["backend"]
-
-  # huggingface:
-  #   build:
-  #     context: ../
-  #     dockerfile: docker/executor/Dockerfile
-  #   image: kuwa-executor
-  #   command: [
-  #     "kuwa-executor", "huggingface",
-  #     "--kernel_url", "http://kernel:9000/"
-  #     "--model_path", "google/gemma-7b-it"
-  #     ]
-  #   environment:
-  #     - HUGGING_FACE_HUB_TOKEN: <YOUR_TOKEN_HERE>
-  #   restart: unless-stopped
-  #   deploy:
-  #       resources:
-  #         reservations:
-  #           devices:
-  #           - driver: nvidia
-  #             device_ids: ['0', '1']
-  #             capabilities: [gpu]
-  #   networks: ["backend"]
-
-  # [TODO] migration issue
-  # db:
-  #   image: postgres:15
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_USER: ${DB_USERNAME}
-  #     POSTGRES_PASSWORD_FILE: /run/secrets/db-password
-  #     POSTGRES_DB: ${DB_DATABASE}
-  #   volumes:
-  #     - db-data:/var/lib/postgresql/data
-  #   secrets:
-  #     - db-password
-  #   networks:
-  #     - backend
-
-  # [TODO] migration issue
-  # db:
-  #   image: mysql
-  #   restart: unless-stopped
-  #   environment:
-  #     MYSQL_RANDOM_ROOT_PASSWORD: yes
-  #     MYSQL_USER: ${DB_USERNAME}
-  #     MYSQL_PASSWORD_FILE: /run/secrets/db-password
-  #     MYSQL_DATABASE: ${DB_DATABASE}
-  #   volumes:
-  #     - db-data:/var/lib/mysql
-  #   secrets:
-  #     - db-password
-  #   networks:
-  #     - backend
-  
-  # db-ui:
-  #   image: adminer
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - db
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - backend
 
 volumes:
   multi-chat-storage: {}

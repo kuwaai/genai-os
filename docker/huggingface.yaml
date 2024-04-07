@@ -1,0 +1,25 @@
+services:
+  hf-executor:
+    build:
+      context: ../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    depends_on:
+      - kernel
+    command: [
+      "kuwa-executor", "huggingface",
+      "--kernel_url", "http://kernel:9000/",
+      "--model_path", "google/gemma-7b-it",
+      "--access_code", "gemma-7b-it"
+      ]
+    environment:
+      - HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+    restart: unless-stopped
+    deploy:
+        resources:
+          reservations:
+            devices:
+            - driver: nvidia
+              device_ids: ['0', '1']
+              capabilities: [gpu]
+    networks: ["backend"]
