@@ -8,16 +8,17 @@ from kuwa.executor import LLMExecutor
 
 logger = logging.getLogger(__name__)
 
-lorem = """你好我是個語言模型很高興認識你...之類的xD
+lorem = """Hello, I am a language model nice to meet you...etc. xD
 <<<WARNING>>>
-這是一個測試警告
-這是二個測試警告
+This is a test warning
+This is the second test warning
 <<</WARNING>>>
-中途可以輸出警告
+Warning can be outputted in the middle
 <<<WARNING>>>
-警告2，嗨
+Warning 2, hi
 <<</WARNING>>>
-輸出文字模擬結束"""
+End of simulated text output
+"""
 
 class DummyExecutor(LLMExecutor):
     def __init__(self):

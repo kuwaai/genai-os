@@ -92,7 +92,7 @@ class GeminiExecutor(LLMExecutor):
             msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
 
             if not google_token or len(google_token) == 0:
-                yield "[請在網站的使用者設定中，將您的Google API Token填入，才能使用該模型]"
+                yield "[Please enter your Google API Token in the user settings of the website in order to use this model.]"
                 return
 
             genai.configure(api_key=google_token)

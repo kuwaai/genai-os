@@ -130,11 +130,11 @@ class ChatGptExecutor(LLMExecutor):
             msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
             
             if not msg or len(msg) == 0:
-                yield "[沒有輸入任何訊息]"
+                yield "[No input message entered]"
                 return
             
             if not openai_token or len(openai_token) == 0:
-                yield "[請在網站的使用者設定中，將您的OpenAI API Token填入，才能使用該模型]"
+                yield "[Please enter your OpenAI API Token in the user settings on the website in order to use the model.]"
                 return
 
             # Trim the history to fit into the context window
@@ -172,7 +172,7 @@ class ChatGptExecutor(LLMExecutor):
         except Exception as e:
             logger.exception("Error occurs when calling OpenAI API")
             if str(e).startswith("Incorrect API key provided:"):
-                yield "[無效的OpenAI API Token，請檢查該OpenAI API Token是否正確]"
+                yield "[Invalid OpenAI API Token, please check if the OpenAI API Token is correct.]"
             else:
                 yield str(e)
         finally:
