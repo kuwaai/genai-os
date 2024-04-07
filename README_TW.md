@@ -66,7 +66,7 @@
 請按照以下步驟在 Windows 和 Linux 上設置和執行：
 
 ## 安裝指南
-我們有提供一個[Windows可攜式版本](./windows/README_TW.md)，但只用Windows 10 x64環境測試過，如果你想嘗鮮試著快速跑起來玩玩，可以試試看！
+如果你想嘗鮮試著快速跑起來玩玩，我們有提供[Windows可攜式版本](./windows/README_TW.md)與[Docker版本](./docker/README_TW.md)，分別在Windows 10 x64 與 Ubuntu 22.04LTS 環境測試過，可以試試看！
 
 或者你可以參考以下步驟來將整套系統安裝在主機上，在繼續之前，請確保您已經安裝了上述所有依賴套件。
 1. **複製專案:**

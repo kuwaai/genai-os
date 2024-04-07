@@ -66,7 +66,7 @@ To run this application, please make sure the following packages are installed o
 For Windows and Linux, please follow the steps below to set up and run:
 
 ## Installation Guide
-We have a [Portable version for Windows](./windows/README.md) for your convenience. It has only been tested on Windows 10 x64 environment. If you want to try it out quickly, you can have a try!
+If you want to try running fast to see, we provide a [Portable Windows version](./windows/README.md) and a [Docker version](./docker/README.md), which have been tested in Windows 10 x64 and Ubuntu 22.04LTS environments. You can try them out!
 
 Alternatively, you can refer to the following steps to install the entire system on your host. Before proceeding, please make sure you have installed all the dependencies listed above.
 1. **Clone the project:**

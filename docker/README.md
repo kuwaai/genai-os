@@ -1,13 +1,14 @@
 # Installation for Docker
 
 ## Software versions
-- Docker Compose V2+
-- Docker Engine 18.06.0+
-- Docker Engine tested version:
+- Docker Compose V2 or later, tested versions
+  - 2.24.6
+  - 2.24.7
+- Docker Engine 18.06.0 or later, tested versions
   - 25.0.3 (git commit: f417435)
   - 25.0.4 (git commit: 061aa95)
 
-## Environment installation
+## Environment Installation
 The following instructions have been tested on Ubuntu 22.04 LTS, if you are using a different Linux distribution, please refer to the relevant documentation.  
 If you need to use GPU for model inference, please install CUDA and NVIDIA Container Toolkit.
 

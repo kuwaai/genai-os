@@ -1,9 +1,10 @@
 # Docker 版安裝教學
 
 ## 軟體版本
-- Docker Compose V2+
-- Docker Engine 18.06.0+
-- Docker Engine 測試過的版本:
+- Docker Compose V2 以上，測試過的版本
+  - 2.24.6
+  - 2.24.7
+- Docker Engine 18.06.0 以上，測試過的版本
   - 25.0.3 (git commit: f417435)
   - 25.0.4 (git commit: 061aa95)
 
