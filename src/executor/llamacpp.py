@@ -66,6 +66,7 @@ class LlamaCppExecutor(LLMExecutor):
     context_window: int = 4096
     stop_words: list = []
     system_prompt: str = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
+    no_system_prompt: bool = False
     generation_config: dict = {
         "max_tokens": None
     }
@@ -80,7 +81,8 @@ class LlamaCppExecutor(LLMExecutor):
         model_group.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
 
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the input tokens')
-        model_group.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
+        model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
+        model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
         model_group.add_argument('--context_window', default=self.context_window, help='The context window of the model')
         model_group.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
         model_group.add_argument('--override_chat_template', default=None,
@@ -109,6 +111,7 @@ class LlamaCppExecutor(LLMExecutor):
 
         self.limit = self.args.limit
         self.system_prompt = self.args.system_prompt
+        self.no_system_prompt = self.args.no_system_prompt
         self.context_window = self.args.context_window
         self.model = Llama(model_path=self.model_path, n_gpu_layers=self.args.ngl, n_ctx=self.context_window)
 
@@ -151,7 +154,7 @@ class LlamaCppExecutor(LLMExecutor):
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if self.system_prompt:
+        if not self.no_system_prompt:
             history.insert(0, {"role": "system", "content": self.system_prompt})
 
         prompt = self.model.chat_handler(

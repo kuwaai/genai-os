@@ -30,6 +30,8 @@ class HuggingfaceExecutor(LLMExecutor):
     limit: int = 1024*3
     stop_words: list = []
     system_prompt: str = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
+    no_system_prompt: bool = False
+    timeout: float = 10.0
     generation_config: dict = {
         "max_new_tokens": 4096,
         "do_sample": False,
@@ -46,11 +48,13 @@ class HuggingfaceExecutor(LLMExecutor):
         model_group = parser.add_argument_group('Model Options')
         model_group.add_argument('--model_path', default=self.model_path, help='Model path. It can be the path to local model or the model name on HuggingFace Hub')
         model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
-        model_group.add_argument('--system_prompt', default=self.system_prompt, help='System prompt. Disable it by setting it to an empty string if the model doesn\'t support')
+        model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
+        model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
         model_group.add_argument('--override_chat_template', default=None,
             help='Override the default chat template provided by the model. Reference: https://huggingface.co/docs/transformers/main/en/chat_templating')
         model_group.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
+        model_group.add_argument('--timeout', type=float, default=self.timeout, help='The generation timeout in seconds.')
         
         # Generation Options
         gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
@@ -70,6 +74,8 @@ class HuggingfaceExecutor(LLMExecutor):
         self.model = AutoModelForCausalLM.from_pretrained(self.model_path,device_map="auto", torch_dtype=torch.float16)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         self.system_prompt = self.args.system_prompt
+        self.no_system_prompt = self.args.no_system_prompt
+        self.timeout = self.args.timeout
         self.stop_words = list(set([self.tokenizer.eos_token, self.tokenizer.bos_token] + self.args.stop))
         self.buffer_length = max([len(k) for k in self.stop_words] or [1])
         self.tokenizer.chat_template = self.args.override_chat_template or \
@@ -94,7 +100,7 @@ class HuggingfaceExecutor(LLMExecutor):
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if self.system_prompt:
+        if not self.no_system_prompt:
             history.insert(0, {"role": "system", "content": self.system_prompt})
         prompt = self.tokenizer.apply_chat_template(
             history, tokenize=True, add_generation_prompt=True, return_tensors='pt'
@@ -136,7 +142,7 @@ class HuggingfaceExecutor(LLMExecutor):
 
         logging.debug(self.tokenizer.decode(prompt_embedding[0]))
         prompt_embedding = prompt_embedding.to(self.model.device)
-        streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, timeout=2)
+        streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, timeout=self.timeout)
         thread = Thread(target=self.model.generate, kwargs=dict(
             input_ids=prompt_embedding,
             streamer=streamer,
