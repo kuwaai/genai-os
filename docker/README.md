@@ -1,17 +1,19 @@
-# Docker Installation Guide
+# Installation for Docker
 
-## Software Version
- - Minimum Docker Engine version: 18.06.0+
- - Docker Engine tested version:
-   - 25.0.3 (git commit: f417435)
-   - 25.0.4 (git commit: 061aa95)
+## Software versions
+- Docker Compose V2+
+- Docker Engine 18.06.0+
+- Docker Engine tested version:
+  - 25.0.3 (git commit: f417435)
+  - 25.0.4 (git commit: 061aa95)
 
-## Environment Setup
-All commands will be tested on Ubuntu 22.04 LTS. If you're using a different Linux distro, please consult the relevant documentation. If you want to use GPU for model inference, please install CUDA and NVIDIA Container Toolkit.
+## Environment installation
+The following instructions have been tested on Ubuntu 22.04 LTS, if you are using a different Linux distribution, please refer to the relevant documentation.  
+If you need to use GPU for model inference, please install CUDA and NVIDIA Container Toolkit.
 
-### 1. (Optional) Install the CUDA driver
+### 1. (Optional) Install CUDA Driver
 
-Documentation: [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/)
+Refer to the documentation: [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/)
 
 ```sh
 # Install the header of current running kernel
@@ -39,7 +41,7 @@ cat /proc/driver/nvidia/version
 
 ### 2. Install Docker and Docker Compose
 
-Documentation: [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+Refer to the documentation: [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 ```sh
 # Add official GPG key
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -68,7 +70,7 @@ EOT
 
 ### 3. (Optional) Install NVIDIA Container Toolkit
 
-Documentation: [Installing the NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+Refer to the documentation: [Installing the NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 ```sh
 # Setup GPG key
@@ -91,29 +93,30 @@ sudo docker pull nvidia/cuda:12.2.0-base-ubuntu22.04
 sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 ```
 
-## Basic Setup
+## Basic installation
 
-### 1. Edit the Config Files
+### 1. Change configuration files
 
-Duplicate `.admin-password.sample`, `.db-password.sample`, and `.env.sample` and remove the `.sample` suffix.
-- `.admin-password`: Default admin password. It's recommended to change it from the default.
-- `.db-password`: Password for the system database. It's recommended to set a random and long string.
-- `.env`: Other system environment variables. The minimal values are as follows:
+Copy `.admin-password.sample`, `.db-password.sample`, `.env.sample` and remove the `.sample` suffix.  
+The files are as follows:
+- `.admin-password`: Default administrator password, it is recommended not to keep the default value
+- `.db-password`: System built-in database password, it is recommended to set it to a random string of sufficient length
+- `.env`: Other system environment variables, the minimum set value is as follows
     ```sh
-    DOMAIN_NAME=localhost # The domain name of the website. If you want to expose the service to public, please change it to your actual public domain name
-    PUBLIC_BASE_URL="http://${DOMAIN_NAME}/" # The base URL of the website
+    DOMAIN_NAME=localhost # Website domain name, if you want to make the service public, please set it to your public domain name
+    PUBLIC_BASE_URL="http://${DOMAIN_NAME}/" # Website base URL
 
-    ADMIN_NAME="Kuwa Admin" # The default admin name of the website
-    ADMIN_EMAIL="admin@${DOMAIN_NAME}" # The default admin email address of the website. It can be a non-existing email address.
+    ADMIN_NAME="Kuwa Admin" # Website default administrator name
+    ADMIN_EMAIL="admin@${DOMAIN_NAME}" # Website default administrator login email, which can be an invalid email
     ```
 
-### 2. Start the System
+### 2. Start the system
 
 > [!WARNING]
 > Please use Docker Compose V2 or above.
-> The `docker-compose` package in Ubuntu APT is Docker Compose V1, which is no longer supported. Please follow the previous guide to install the new version of Docker Compose.
+> The `docker-compose` package in Ubuntu APT is Docker Compose V1, which cannot be used. Please refer to the previous section to install the new version of Docker Compose
 
-Start the system with Docker Compose:
+Start the basic Kuwa GenAI OS system, PostgreSQL and Gemini-Pro Executor using Docker Compose
 ```sh
-docker compose -f compose.yaml up
+docker compose -f compose.yaml -f pgsql.yaml -f gemini.yaml up --build
 ```

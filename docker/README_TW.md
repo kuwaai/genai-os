@@ -1,7 +1,8 @@
 # Docker 版安裝教學
 
 ## 軟體版本
-- Docker Engine 最小版本: 18.06.0+
+- Docker Compose V2+
+- Docker Engine 18.06.0+
 - Docker Engine 測試過的版本:
   - 25.0.3 (git commit: f417435)
   - 25.0.4 (git commit: 061aa95)
@@ -115,7 +116,7 @@ sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 > 請使用 Docker Compose V2 以上的版本。
 > Ubuntu APT 中的 `docker-compose` 套件為 Docker Compose V1，無法使用，請參考前面章節安裝新版 Docker Compose
 
-使用 Docker Compose 啟動系統
+使用 Docker Compose 啟動基礎 Kuwa GenAI OS 系統、PostgreSQL、Gemini-Pro Executor
 ```sh
-docker compose -f compose.yaml up
+docker compose -f compose.yaml -f pgsql.yaml -f gemini.yaml up --build
 ```
