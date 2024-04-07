@@ -9,7 +9,7 @@
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'tmp.model_id')
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')

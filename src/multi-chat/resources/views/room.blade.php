@@ -9,7 +9,7 @@
                 ->where('name', 'like', 'model_%')
                 ->get();
         }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'tmp.model_id')
             ->select('tmp.*', 'llms.*')
             ->where('llms.enabled', true)
             ->orderby('llms.order')
@@ -44,13 +44,25 @@
                 ->select('chatrooms.*', DB::raw('count(chats.id) as counts'))
                 ->groupBy('chatrooms.id');
 
-            // Fetch the ordered identifiers based on `llm_id` for both MySQL and SQLite
-            $DC->selectSub(function ($query) {
-                $query
-                    ->from('chats')
-                    ->selectRaw('group_concat(llm_id) as identifier')
-                    ->whereColumn('roomID', 'chatrooms.id')
-                    ->orderByDesc('llm_id');
+            // Fetch the ordered identifiers based on `llm_id` for each database
+            $DC = $DC->selectSub(function ($query) {
+                if (config('database.default') == 'sqlite') {
+                    $query
+                        ->from('chats')
+                        ->selectRaw("group_concat(llm_id, ',') as identifier")
+                        ->whereColumn('roomID', 'chatrooms.id')
+                        ->orderBy('llm_id');
+                } elseif (config('database.default') == 'mysql') {
+                    $query
+                        ->from('chats')
+                        ->selectRaw('group_concat(llm_id separator \',\') as identifier')
+                        ->whereColumn('roomID', 'chatrooms.id');
+                } elseif (config('database.default') == 'pgsql') {
+                    $query
+                        ->from('chats')
+                        ->selectRaw('string_agg(llm_id::text, \',\') as identifier')
+                        ->whereColumn('roomID', 'chatrooms.id');
+                }
             }, 'identifier');
 
             // Get the final result and group by the ordered identifiers
@@ -68,10 +80,7 @@
                 } else {
                     $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id', 'desc')->get();
                     $ids = array_reverse($llms->pluck('id')->toArray());
-                    $DC =
-                        $DC[
-                            config('database.default') == 'sqlite' ? implode(',', $ids) : '{' . implode(',', $ids) . '}'
-                        ];
+                    $DC = $DC[implode(',', $ids)];
                 }
             } catch (Exception $e) {
                 $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();

@@ -17,24 +17,39 @@ return new class extends Migration {
             });
 
             DB::commit();
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
 
-            Schema::table('chats', function (Blueprint $table) {
-                $table->renameColumn('`dcID`', '`roomID`');
-            });
+            try {
+                Schema::table('chats', function (Blueprint $table) {
+                    $table->renameColumn('`dcID`', '`roomID`');
+                });
+                DB::commit();
+            } catch (\Throwable $e) {
+                DB::rollBack();
+            }
+        }
+        DB::beginTransaction();
+
+        try {
+            Schema::rename('duelchat', 'chatrooms');
 
             DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
         }
-
-        DB::transaction(function () {
-            Schema::rename('duelchat', 'chatrooms');
+        
+        DB::beginTransaction();
+        try {
             DB::table('permissions')
-                ->where('name', 'like', '%Duel%')
-                ->update([
-                    'name' => DB::raw("REPLACE(name, 'Duel', 'Room')"),
-                ]);
-        });
+            ->where('name', 'like', '%Duel%')
+            ->update([
+                'name' => DB::raw("REPLACE(name, 'Duel', 'Room')"),
+            ]);
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+        }
     }
 
     /**
