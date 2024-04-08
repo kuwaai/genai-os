@@ -1,5 +1,5 @@
 <script>
-    var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    var isMac = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     var histories = {}
 
 

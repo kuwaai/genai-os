@@ -1,7 +1,7 @@
 <script>
     if ($("#chat_input")) {
         $("#chat_input").prop("readonly", true)
-        $("#chat_input").val("訊息處理中...請稍後...")
+        $("#chat_input").val("{{__('chat.hint.processing')}}")
         $("#submit_msg").hide()
         if ($("#abort_btn")) $("#abort_btn").hide()
         $chattable = false
@@ -36,7 +36,7 @@
                 $chattable = false
                 $("#submit_msg").hide()
                 if (!isMac) {
-                    $("#chat_input").val("訊息處理中...請稍後...")
+                    $("#chat_input").val("{{__('chat.hint.processing')}}")
                 }
                 $("#chat_input").prop("readonly", true)
             } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
@@ -55,7 +55,7 @@
                 $chattable = false
                 $("#submit_msg").hide()
                 if (!isMac) {
-                    $("#chat_input").val("訊息處理中...請稍後...")
+                    $("#chat_input").val("{{__('chat.hint.processing')}}")
                 }
                 $("#chat_input").prop("readonly", true)
             } else {

@@ -97,8 +97,8 @@ class RequestChat implements ShouldQueue
                 $currentTimeInSeconds = Carbon::now()->timestamp;
                 $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
 
-                if ($ExecutionTime < 2) {
-                    sleep(2 - $ExecutionTime);
+                if ($ExecutionTime < 5) {
+                    sleep(5 - $ExecutionTime);
                 }
                 Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
 
@@ -275,22 +275,23 @@ class RequestChat implements ShouldQueue
                     } catch (Exception $e) {
                     }
 
-                    Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
-
                     $end = microtime(true);
                     $elapsed = $end - $start;
                     Log::channel('analyze')->Info('Out:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . $elapsed . '|' . strlen(trim($tmp)) . '|' . Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->diffInSeconds(Carbon::now()) . '|' . $tmp);
 
                     if ($this->channel == $this->history_id) {
-                        Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
-                        Redis::publish($this->channel, 'Ended Ended');
                         $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
                         $currentTimeInSeconds = Carbon::now()->timestamp;
                         $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
-
-                        if ($ExecutionTime < 2) {
-                            sleep(2 - $ExecutionTime);
+                        while ($ExecutionTime < 2) {
+                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
+                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
+                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
+                            Redis::publish($this->channel, 'Ended Ended');
+                            $currentTimeInSeconds = Carbon::now()->timestamp;
+                            $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
                         }
+                        Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
                         Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                         Redis::publish($this->channel, 'Ended Ended');
                     }
@@ -312,8 +313,8 @@ class RequestChat implements ShouldQueue
             $currentTimeInSeconds = Carbon::now()->timestamp;
             $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
 
-            if ($ExecutionTime < 2) {
-                sleep(2 - $ExecutionTime);
+            if ($ExecutionTime < 5) {
+                sleep(5 - $ExecutionTime);
             }
 
             Redis::publish($this->channel, 'New ' . json_encode(['msg' => '[Sorry, something is broken, please try again later!]']));

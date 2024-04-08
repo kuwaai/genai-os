@@ -208,7 +208,7 @@
                                 dynamicInputs.append(newInput);
                             }
                         });
-                        var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                        var isMac = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
                         if (!isMac) {
                             $(document).on('keydown', '.dynamic-input', function(event) {
                                 const textarea = $(this)[0]; // Get the actual DOM element

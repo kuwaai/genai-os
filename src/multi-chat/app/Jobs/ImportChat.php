@@ -81,4 +81,10 @@ class ImportChat implements ShouldQueue
             RequestChat::dispatch($input, $access_code, $this->user_id, $id);
         }
     }
+    public function failed(\Throwable $exception)
+    {
+        Log::channel('analyze')->Info('Failed import job');
+
+        Redis::ltrim('usertask_' . $this->user_id, 1, 0);
+    }
 }
