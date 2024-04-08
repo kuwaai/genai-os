@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-    'Version' => "0.1.0.1",
+    'Version' => "0.1.0",
     'API_Key' => env('API_Key', null),
     'MAIL_MAILER' => env('MAIL_MAILER', null),
     'MAIL_HOST' => env('MAIL_HOST', null),
