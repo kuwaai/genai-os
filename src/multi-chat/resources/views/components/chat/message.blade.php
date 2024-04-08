@@ -3,7 +3,7 @@
 @php
     try {
         $img = App\Models\LLMs::findOrFail(App\Models\Chats::findOrFail($history->chat_id)->llm_id)->image;
-        $botimgurl = $img ? asset(Storage::url($img)) : '/images/kuwa.png';
+        $botimgurl = $img ? asset(Storage::url($img)) : '/' . config('app.LLM_DEFAULT_IMG');
     } catch (\Throwable $e) {
         $botimgurl = '';
     }

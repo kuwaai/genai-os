@@ -87,7 +87,7 @@
                                 Storage::url(
                                     App\Models\LLMs::findOrFail(
                                         App\Models\Chats::findOrFail(request()->route('chat_id'))->llm_id,
-                                    )->image ?? '../images/kuwa.png',
+                                    )->image ?? '../' . config('app.LLM_DEFAULT_IMG'),
                                 ),
                             );
                         @endphp

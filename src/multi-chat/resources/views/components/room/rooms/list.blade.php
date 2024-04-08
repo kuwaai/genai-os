@@ -11,7 +11,7 @@
                         class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
                         <div class="h-full w-full"><img data-tooltip-target="llm_{{ $llm->id }}"
                                 data-tooltip-placement="top" class="h-full w-full"
-                                src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/images/kuwa.png' }}">
+                                src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                         </div>
                         <div id="llm_{{ $llm->id }}" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
@@ -66,7 +66,7 @@
                         class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
                         <div class="h-full w-full"><img data-tooltip-target="llm_{{ $chat->llm_id }}"
                                 data-tooltip-placement="top" class="h-full w-full"
-                                src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/images/kuwa.png' }}">
+                                src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                         </div>
                         <div id="llm_{{ $chat->llm_id }}" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">

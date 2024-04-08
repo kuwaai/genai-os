@@ -23,7 +23,7 @@
                     <script>
                         $llms[{{ $LLM->id }}] = {!! json_encode(
                             [
-                                $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png',
+                                $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG'),
                                 $LLM->name,
                                 $LLM->link,
                                 $LLM->order,
@@ -41,7 +41,7 @@
                         <div class="flex flex-1">
                             <div class="flex m-auto w-[48px] h-[48px] justify-center items-center"><img width="48px"
                                     height="48px" class="rounded-full border-2 border border-white bg-black"
-                                    src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' }}" />
+                                    src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}" />
                             </div>
                             <div class="flex flex-1 flex-col  h-[48px]">
                                 <span
@@ -59,7 +59,7 @@
                     <script>
                         $llms[{{ $LLM->id }}] = {!! json_encode(
                             [
-                                $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' ,
+                                $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') ,
                                 $LLM->name,
                                 $LLM->link,
                                 $LLM->order,
@@ -77,7 +77,7 @@
                         <div class="flex flex-1">
                             <div class="flex m-auto w-[48px] h-[48px] justify-center items-center"><img width="48px"
                                     height="48px" class="rounded-full border-2 border border-white bg-black"
-                                    src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' }}" />
+                                    src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}" />
                             </div>
                             <div class="flex flex-1 flex-col  h-[48px]">
                                 <span
@@ -109,7 +109,7 @@
                                 </span>
                                 <img id="image"
                                     class="rounded-full border border-gray-400 dark:border-gray-900 m-auto bg-black"
-                                    width="50px" height="50px" class="m-auto" src="/images/kuwa.png" />
+                                    width="50px" height="50px" class="m-auto" src="/{{config('app.LLM_DEFAULT_IMG')}}" />
                             </label>
                         </div>
                     </div>
@@ -296,7 +296,7 @@
 
     function CreateRow() {
         $("#edit_llm form").attr("action", "{{ route('manage.llms.create') }}");
-        $("#update_LLM_by_ID img").attr("src", "/images/kuwa.png")
+        $("#update_LLM_by_ID img").attr("src", "/{{config('app.LLM_DEFAULT_IMG')}}")
         $("#update_LLM_by_ID input:eq(1)").prop("disabled", true)
         $("#update_LLM_by_ID input[name='name']").val("")
         $("#update_LLM_by_ID input[name='link']").val("")

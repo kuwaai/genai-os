@@ -14,6 +14,7 @@ return [
     'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS', null),
     'MAIL_FROM_NAME' => env('MAIL_FROM_NAME', null),
     'Email_Required' => env('Email_Required', true),
+    'LLM_DEFAULT_IMG' => env('LLM_DEFAULT_IMG','images/kuwa.png'),
     'LANGUAGES' => json_decode(env('LANGUAGES'), true) ?: [
         'en_us' => 'English',
         'zh_tw' => '中文 (台灣)',
