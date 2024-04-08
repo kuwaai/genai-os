@@ -267,6 +267,7 @@ class RoomController extends Controller
                                 if ($history->content == '') {
                                     $ids[] = $record->id;
                                     Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                    Redis::expire('usertask_' . $request->user()->id, 1200);
                                 }
                             } else {
                                 $user_msg = $history->content;
@@ -334,6 +335,7 @@ class RoomController extends Controller
                     $history->save();
                     RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                    Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
             }
         }
@@ -490,6 +492,7 @@ class RoomController extends Controller
                         $history->save();
                         RequestChat::dispatch($tmp, LLMs::findOrFail($chat->llm_id)->access_code, Auth::user()->id, $history->id);
                         Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                        Redis::expire('usertask_' . Auth::user()->id, 1200);
                     }
                 }
             }
