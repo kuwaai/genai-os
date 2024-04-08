@@ -304,7 +304,7 @@ class ProfileController extends Controller
                             $response->setCallback(function () use ($request, $history, $tmp, $llm, $user) {
                                 $client = new Client(['timeout' => 300]);
                                 Redis::rpush('api_' . $user->tokenable_id, $history->id);
-                                Redis::expire('usertask_' . Auth::user()->id, 1200);
+                                Redis::expire('usertask_' . $user->tokenable_id, 1200);
                                 RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, 'api_' . $history->id);
 
                                 $req = $client->get(route('api.stream'), [

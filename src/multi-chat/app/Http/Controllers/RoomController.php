@@ -267,7 +267,7 @@ class RoomController extends Controller
                                 if ($history->content == '') {
                                     $ids[] = $record->id;
                                     Redis::rpush('usertask_' . $request->user()->id, $record->id);
-                                    Redis::expire('usertask_' . Auth::user()->id, 1200);
+                                    Redis::expire('usertask_' . $request->user()->id, 1200);
                                 }
                             } else {
                                 $user_msg = $history->content;
