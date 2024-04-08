@@ -49,7 +49,6 @@
                             </div>
                             <input name="llm[]" value="{{ $chat->bot_id }}" style="display:none;">
                         </div>
-                    @endforeach
                 </button>
             </form>
         @else

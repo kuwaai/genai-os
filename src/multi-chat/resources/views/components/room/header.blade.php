@@ -69,24 +69,19 @@
                     <div
                         class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                         <img data-tooltip-target="llm_{{ $chat->id }}_toggle" data-tooltip-placement="top"
-                            class="h-full w-full" <<<<<<<
-                            HEAD:multi-chat/resources/views/components/room/header.blade.php
-                            src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}">
-                        <div id="llm_{{ $chat->id }}_toggle"
-                            role="tooltip"=======src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/images/kuwa.png' }}">
-                            <div id="llm_{{ $chat->llm_id }}_toggle" role="tooltip">>>>>>>
-                                origin/main:src/multi-chat/resources/views/components/room/header.blade.php
-                                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
-                                {{ $chat->name }}
-                                <div class="tooltip-arrow" data-popper-arrow></div>
-                            </div>
-                            <div id="llm_{{ $chat->id }}_chat" role="tooltip"
-                                access_code="{{ $chat->access_code }}"
-                                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                                {{ $chat->name }}
-                                <div class="tooltip-arrow" data-popper-arrow></div>
-                            </div>
+                            class="h-full w-full"
+                            src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/images/kuwa.png' }}">
+                        <div id="llm_{{ $chat->id }}_toggle" role="tooltip"
+                            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
+                            {{ $chat->name }}
+                            <div class="tooltip-arrow" data-popper-arrow></div>
                         </div>
+                        <div id="llm_{{ $chat->id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
+                            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                            {{ $chat->name }}
+                            <div class="tooltip-arrow" data-popper-arrow></div>
+                        </div>
+                    </div>
                 @endforeach
                 <div id="react_copy" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
