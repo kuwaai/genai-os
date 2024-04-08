@@ -91,89 +91,82 @@ For Windows you need to escape these characters, here's how to do it:
 curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": false, \"msg\": \"請自我介紹\" }],\"model\": \"gemini-pro\"}" http://127.0.0.1/v1.0/chat/completions
 ```
 
-### Using JavaScript (Ajax)
+### Using JavaScript
 
-You can also use JavaScript and the `fetch` API to send a single message to our API.
+You can also use JavaScript and the `fetch` API to send message to our API.
 ```javascript
-// Define the request payload as an object.
+// Define the data to be sent in the request
 const requestData = {
     messages: [
-        { isbot: false, msg: "請自我介紹" }
+        { isbot: false, msg: "請自我介紹" } // Requesting a self-introduction
     ],
-    model: "gemini-pro"
+    model: "gemini-pro" // Using the Gemini Pro model
 };
 
-// Define the API endpoint and authentication headers.
-const apiUrl = 'http://127.0.0.1/v1.0/chat/completions';
+// API endpoint for the request
+const apiUrl = 'http://localhost/v1.0/chat/completions';
+
+// Headers for the request, including authorization
 const headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_AUTH_TOKEN'
 };
 
-// Perform the AJAX request using the fetch API.
+// Initialize an empty output variable
+var output = ""
+
+// Make a POST request to the API
 fetch(apiUrl, {
     method: 'POST',
     headers: headers,
-    body: JSON.stringify(requestData)
+    body: JSON.stringify(requestData) // Send the requestData as JSON
 })
 .then(response => {
     if (!response.body) {
         throw new Error('ReadableStream not supported');
     }
 
-    // Create a reader for the response stream.
+    // Get a ReadableStream from the response
     const reader = response.body.getReader();
 
-    // Function to read the stream and concatenate chunks.
-    function readStream(reader, buffer = "") {
+    let buffer = "";
+    function readStream() {
         return reader.read().then(({ done, value }) => {
             if (done) {
-                // Handle the last chunk and end the stream.
-                handleStreamData(buffer);
+                console.log("Stream ended");
                 return;
             }
 
-            // Convert the chunk to a string.
             const chunk = new TextDecoder().decode(value);
 
-            // Split the chunk into lines.
-            const lines = (buffer + chunk).split("data:");
+            buffer += chunk;
 
-            // Process each line.
-            lines.forEach(line => {
-                if (line.trim() !== "") {
-                    // Handle the current line (remove any leading/trailing whitespace).
-                    handleStreamData(line.trim());
+            // Process the buffer in chunks until it contains complete JSON objects
+            while (buffer.includes("}\n")) {
+                const endIndex = buffer.indexOf("}\n") + 2;
+                const jsonStr = buffer.substring(6, endIndex);
+                buffer = buffer.substring(endIndex);
+
+                try {
+                    // Parse the JSON and extract the content
+                    const data = JSON.parse(jsonStr)["choices"][0]["delta"]["content"];
+                    output += data;
+                    console.clear(); // Clear the console
+                    console.log(output); // Output the result to the console
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
                 }
-            });
+            }
 
-            // Continue reading the next chunk.
-            return readStream(reader, lines[lines.length - 1]);
+            return readStream();
         });
     }
 
-    // Start reading the stream.
-    return readStream(reader);
+    return readStream();
 })
 .catch(error => {
-    // Handle errors.
     console.error('Error:', error);
 });
-
-// Function to handle each data point in the stream.
-function handleStreamData(line) {
-    if (line === "event: end") {
-        // Handle the end of the stream.
-        console.log("Stream ended");
-        return;
-    }
-
-    try {
-        const data = JSON.parse(line)["choices"][0]["delta"]["content"];
-        console.log(data); 
-    } catch (error) {
-    }
-}
 ```
 
 ### Using Python
@@ -228,14 +221,14 @@ You can continue to add user and bot messages to this `messages` array to mainta
 
 ## Handling Responses
 
-Once you make a successful request to our API, you will receive a JSON response like this.
+Once you make a successful request to our API, you will receive multiple streaming JSON response like this.
 
 ```json
 {
     "choices": [
         {
             "delta": {
-                "content": "你好，我是由Google開發的大型語言模型，又稱「對話式AI」，或稱「聊天機器人」。我透過文字進行互動，接受過大量資料的訓練，具備學習和理解的能力，能夠回答各種問題、撰寫不同的內容。\n我目前仍然在發展階段，但已經能夠執行多種語言任務，包括以下項目：\n\n* 翻譯語言\n* 回答問題\n* 撰寫故事、詩歌等不同類型的文本\n* 理解和生成程式碼\n* 玩遊戲\n* 提供書寫建議等等\n\n我的目標是成為一個功能強大的工具，幫助人們完成各種任務，並提供有用的資訊。隨著我繼續學習和成長，我希望能越來越好，為人們提供更好的服務。\n\n如果今天想請我幫忙的話，您可以提出您的要求。我將盡力提供您需要且有用的資訊",
+                "content": "你",
                 "role": null
             }
         }
@@ -246,6 +239,52 @@ Once you make a successful request to our API, you will receive a JSON response 
     "object": "chat.completion",
     "usage": []
 }
+{
+    "choices": [
+        {
+            "delta": {
+                "content": "好",
+                "role": null
+            }
+        }
+    ],
+    "created": 1705602791,
+    "id": "chatcmpl-xxxxx",
+    "model": "gemini-pro",
+    "object": "chat.completion",
+    "usage": []
+}
+{
+    "choices": [
+        {
+            "delta": {
+                "content": "，",
+                "role": null
+            }
+        }
+    ],
+    "created": 1705602791,
+    "id": "chatcmpl-xxxxx",
+    "model": "gemini-pro",
+    "object": "chat.completion",
+    "usage": []
+}
+{
+    "choices": [
+        {
+            "delta": {
+                "content": "我",
+                "role": null
+            }
+        }
+    ],
+    "created": 1705602791,
+    "id": "chatcmpl-xxxxx",
+    "model": "gemini-pro",
+    "object": "chat.completion",
+    "usage": []
+}
+...
 ```
 
 You can then handle the response data as needed in your application.

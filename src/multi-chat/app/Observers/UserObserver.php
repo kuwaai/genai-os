@@ -19,7 +19,7 @@ class UserObserver
         ];
 
         // Remove unwanted attributes
-        $attributesToIgnore = ['updated_at', 'openai_token', 'password', 'id', 'created_at'];
+        $attributesToIgnore = ['updated_at', 'openai_token', 'password', 'id', 'created_at', 'google_token'];
         $attributes = array_diff_key($user->getAttributes(), array_flip($attributesToIgnore));
 
         if (!empty($attributes)) {
@@ -49,15 +49,18 @@ class UserObserver
 
         $modifiedValues = [];
         $passwordChanged = false;
-        $openaiTokenChanged = false;
+        $ExternalTokenChanged = false;
 
         foreach ($changes as $attribute => $change) {
             if ($attribute === 'password') {
                 $passwordChanged = true;
                 continue; // Skip logging the actual password change
             } elseif ($attribute === 'openai_token') {
-                $openaiTokenChanged = true;
+                $ExternalTokenChanged = true;
                 continue; // Skip logging the actual openai_token change
+            } elseif ($attribute === 'google_token') {
+                $ExternalTokenChanged = true;
+                continue; // Skip logging the actual google_token change
             }
 
             // Check if the attribute exists in original values before accessing it
@@ -73,8 +76,8 @@ class UserObserver
 
         if ($passwordChanged) {
             $logData['message'] = 'Password has been changed';
-        } elseif ($openaiTokenChanged) {
-            $logData['message'] = 'OpenAI token has been changed';
+        } elseif ($ExternalTokenChanged) {
+            $logData['message'] = 'External token has been changed';
         } elseif (!empty($modifiedValues)) {
             $logData['modified_values'] = $modifiedValues;
         }
