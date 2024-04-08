@@ -139,7 +139,7 @@ class RoomController extends Controller
                     }
 
                     if ($access_codes) {
-                        $bot_ids = $bot_ids->merge(LLMs::whereIn('access_code', $access_codes)->join("bots","bots.model_id","=","llms.id")->where("visibility","=",0)->select('bots.id', 'access_code')->get())->unique('id');
+                        $bot_ids = $bot_ids->merge(LLMs::whereIn('access_code', $access_codes)->join('bots', 'bots.model_id', '=', 'llms.id')->where('visibility', '=', 0)->select('bots.id', 'access_code')->get())->unique('id');
                     }
 
                     $access_codes = [];
@@ -249,7 +249,7 @@ class RoomController extends Controller
                         $ids = [];
                         $deltaTime = count($historys);
                         $t = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime . ' second'));
-                        $chatIds = Chats::join("bots","bots.id","=","chats.bot_id")->join('llms', 'bots.model_id', '=', 'llms.id')->whereIn('chats.id', $chatIds)->select('chats.id', 'llms.access_code')->get();
+                        $chatIds = Chats::join('bots', 'bots.id', '=', 'chats.bot_id')->join('llms', 'bots.model_id', '=', 'llms.id')->whereIn('chats.id', $chatIds)->select('chats.id', 'llms.access_code')->get();
                         foreach ($historys as $history) {
                             $history->isbot = $history->role == 'user' ? false : true;
                             if ($history->isbot) {
@@ -266,6 +266,7 @@ class RoomController extends Controller
                                 if ($history->content == '') {
                                     $ids[] = $record->id;
                                     Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                    Redis::expire('usertask_' . $request->user()->id, 1200);
                                 }
                             } else {
                                 $user_msg = $history->content;
@@ -396,6 +397,7 @@ class RoomController extends Controller
                     $history->save();
                     RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                    Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
             }
         }
@@ -485,7 +487,7 @@ class RoomController extends Controller
                     $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false, 'created_at' => $start, 'updated_at' => $start]);
                     $history->save();
                     $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
-                    if ((strpos($access_code, 'doc-qa') === 0 || strpos($access_code, 'doc_qa') === 0 || strpos($access_code, 'web_qa') === 0) && !$chained) {
+                    if (in_array(LLMs::find($chat->bot_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
                         $tmp = json_encode([
                             [
                                 'msg' => Histories::where('chat_id', '=', $chat->id)
@@ -514,6 +516,7 @@ class RoomController extends Controller
                     $history->save();
                     RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                    Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
             }
         }

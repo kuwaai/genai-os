@@ -294,6 +294,8 @@ class RequestChat implements ShouldQueue
                         Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
                         Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                         Redis::publish($this->channel, 'Ended Ended');
+                    }else{
+                        Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
                     }
                 }
             }
