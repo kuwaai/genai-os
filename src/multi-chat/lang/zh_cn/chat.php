@@ -70,4 +70,5 @@ return [
      'hint.success' => '成功',
      'hint.failed' => '失败',
      "hint.copied"=> "已复制",
+     'hint.processing' => '讯息处理中...请稍后...',
 ];

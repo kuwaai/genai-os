@@ -70,4 +70,5 @@ return [
     'hint.success' => '성공',
     'hint.failed' => '실패',
     "hint.copied"=> "복사됨",
+    'hint.processing' => '처리 중입니다... 잠시만 기다려주세요'
 ];

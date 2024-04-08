@@ -70,4 +70,5 @@ return [
     'hint.success' => 'Success',
     'hint.failed' => 'Failed',
     "hint.copied"=> "Copied",
+    'hint.processing' => 'Processing... Please wait',
 ];

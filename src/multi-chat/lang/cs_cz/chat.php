@@ -70,4 +70,5 @@ return [
     'hint.success' => 'Úspěch',
     'hint.failed' => 'Selhání',
     "hint.copied"=> "Zkopírováno",
+    'hint.processing' => 'Zpracování... Prosím, čekejte',
 ];

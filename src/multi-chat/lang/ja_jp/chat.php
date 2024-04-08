@@ -70,4 +70,5 @@ return [
     'hint.success' => '成功',
     'hint.failed' => '失敗',
     "hint.copied" => "コピー済み",
+    'hint.processing' => '処理中...お待ちください',
 ];

@@ -70,4 +70,5 @@ return [
     'hint.success' => 'Erfolg',
     'hint.failed' => 'Fehlgeschlagen',
     'hint.copied' => 'Kopiert',
+    'hint.processing' => 'Verarbeitung... Bitte warten Sie',
 ];

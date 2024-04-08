@@ -70,4 +70,5 @@ return [
     'hint.success' => 'Succès',
     'hint.failed' => 'Échec',
     "hint.copied"=> "Copié",
+    'hint.processing' => 'Traitement en cours... Veuillez patienter',
 ];
