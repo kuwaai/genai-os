@@ -142,6 +142,7 @@ class BotController extends Controller
                 $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
                 $history->save();
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                Redis::expire('usertask_' . Auth::user()->id, 1200);
                 RequestChat::dispatch(json_encode([['msg' => $msg, 'isbot' => false]]), LLMs::find($llm_id)->access_code, Auth::user()->id, $history->id);
                 return Redirect::route('play.bots.chat', $chat->id);
             }
@@ -264,6 +265,7 @@ class BotController extends Controller
                 $history->save();
                 $llm = LLMs::findOrFail($llm_id);
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                Redis::expire('usertask_' . Auth::user()->id, 1200);
                 RequestChat::dispatch($tmp, $llm->access_code, Auth::user()->id, $history->id);
                 return Redirect::route('play.bots.chat', $chat->id);
             }
@@ -330,6 +332,7 @@ class BotController extends Controller
                 $history->save();
                 $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                Redis::expire('usertask_' . Auth::user()->id, 1200);
                 RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id);
                 return Redirect::route('play.bots.chat', $chatId);
             }

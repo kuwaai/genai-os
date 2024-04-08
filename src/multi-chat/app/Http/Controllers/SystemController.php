@@ -88,18 +88,28 @@ class SystemController extends Controller
             User::query()->update(['term_accepted' => false]);
         }
 
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'settings')
-            ->with('last_action', 'update')
-            ->with('status', $result);
+        return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'update')->with('status', $result);
     }
 
     public function ResetRedis(Request $request)
     {
-        Redis::flushAll();
-        return Redirect::route('manage.home')
-            ->with('last_tab', 'settings')
-            ->with('last_action', 'resetRedis')
-            ->with('status', 'success');
+        foreach (Redis::keys("usertask_*") as $key){
+            $user_id = explode("usertask_", $key, 2);
+            if (count($user_id) > 1) {
+                Redis::del("usertask_" . $user_id[1]);
+            } else {
+                Redis::del("usertask_" . $user_id);
+            }
+        }
+        foreach (Redis::keys("api_*") as $key){
+            $user_id = explode("api_", $key, 2);
+            if (count($user_id) > 1) {
+                Redis::del("api_" . $user_id[1]);
+            } else {
+                Redis::del("api_" . $user_id);
+            }
+        }
+        
+        return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
     }
 }

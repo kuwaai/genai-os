@@ -120,6 +120,7 @@ class ChatController extends Controller
         $response->setCallback(function () use ($history, $tmp, $access_code) {
             $client = new Client(['timeout' => 300]);
             Redis::rpush('api_' . Auth::user()->id, $history->id);
+            Redis::expire('api_' . Auth::user()->id, 1200);
             RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, 'api_' . $history->id);
 
             $req = $client->get(route('api.stream'), [
@@ -355,6 +356,7 @@ class ChatController extends Controller
                                     if ($history->content == '') {
                                         $ids[] = $record->id;
                                         Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                        Redis::expire('usertask_' . Auth::user()->id, 1200);
                                     }
                                 } else {
                                     $user_msg = $history->content;
@@ -487,6 +489,7 @@ class ChatController extends Controller
                 $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'))]);
                 $history->save();
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                Redis::expire('usertask_' . Auth::user()->id, 1200);
                 RequestChat::dispatch(json_encode([['msg' => $msg, 'isbot' => false]]), LLMs::find($llm_id)->access_code, Auth::user()->id, $history->id);
                 return Redirect::route('chat.chat', $chat->id);
             }
@@ -615,6 +618,7 @@ class ChatController extends Controller
                 $history->save();
                 $llm = LLMs::findOrFail($llm_id);
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                Redis::expire('usertask_' . Auth::user()->id, 1200);
                 RequestChat::dispatch($tmp, $llm->access_code, Auth::user()->id, $history->id);
                 return Redirect::route('chat.chat', $chat->id);
             }
@@ -681,6 +685,7 @@ class ChatController extends Controller
                 $history->save();
                 $access_code = LLMs::findOrFail(Chats::findOrFail($chatId)->llm_id)->access_code;
                 Redis::rpush('usertask_' . Auth::user()->id, $history->id);
+                Redis::expire('usertask_' . Auth::user()->id, 1200);
                 RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id);
                 return Redirect::route('chat.chat', $chatId);
             }
