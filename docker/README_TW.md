@@ -131,11 +131,11 @@ docker compose -f compose.yaml -f dev.yaml -f <其他 yaml 檔案...> up --build
 ```
 
 ### 2. 執行多個 Executor
-每種 Executor 的設定都已寫在對應的 YAML 檔案中 (gemini.yaml, chatgpt.yaml, huggingface.yaml)，請參考這些設定檔按照您的需求擴充。  
+每種 Executor 的設定都已寫在對應的 YAML 檔案中 (gemini.yaml, chatgpt.yaml, huggingface.yaml, llamacpp.yaml)，請參考這些設定檔按照您的需求擴充。  
 您可能需要參考 [Executor 說明文件](../src/executor/README_TW.md)。  
 完成設定檔後可使用以下指令啟動整個系統
 ```sh
-docker compose -f compose.yaml -f pgsql.yaml -f <Executor1設定檔> -f <Executor2設定檔...> up --build
+docker compose -f compose.yaml -f pgsql.yaml -f <executor1設定檔> -f <executor2設定檔...> up --build
 ```
 
 ### 3. 強制更新

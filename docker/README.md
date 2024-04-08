@@ -121,3 +121,26 @@ Start the basic Kuwa GenAI OS system, PostgreSQL and Gemini-Pro Executor using D
 ```sh
 docker compose -f compose.yaml -f pgsql.yaml -f gemini.yaml up --build
 ```
+
+## Advanced Usage
+
+### 1. Launch Debug Mode
+The docker version will not display any error message on the Multi-Chat web frontend by default. If you encounter an error, you can use the following command to enable the debug mode.
+```sh
+docker compose -f compose.yaml -f dev.yaml -f <other yaml files...> up --build
+```
+
+### 2. Run Multiple Executors
+The settings for each Executor are already written in the corresponding YAML files (gemini.yaml, chatgpt.yaml, huggingface.yaml, llamacpp.yaml), please refer to these configuration files and extend them according to your needs.  
+You may need to refer to the [Executor documentation](../src/executor/README.md).  
+Once the configuration files are complete, you can use the following command to start the entire system
+```sh
+docker compose -f compose.yaml -f pgsql.yaml -f <executor1 configuration file> -f <executor2 configuration file...> up --build
+```
+
+### 3. Force Upgrade
+If your database is accidentally lost or damaged, you can force upgrade it  
+Please make sure the system is running, then use the following command to force upgrade the database  
+```sh
+docker exec -it kuwa-multi-chat-1 docker-entrypoint force-upgrade
+```
