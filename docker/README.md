@@ -1,4 +1,4 @@
-# Installation for Docker
+# Install Kuwa GenAI OS on Docker
 
 ## Software versions
 - Docker Compose V2 or later, tested versions
@@ -10,7 +10,7 @@
 
 ## Environment Installation
 The following instructions have been tested on Ubuntu 22.04 LTS, if you are using a different Linux distribution, please refer to the relevant documentation.  
-If you need to use GPU for model inference, please install CUDA and NVIDIA Container Toolkit.
+If you need to use NVIDIA GPU for model inference, please install CUDA and NVIDIA Container Toolkit.
 
 ### 1. (Optional) Install CUDA Driver
 
@@ -139,7 +139,7 @@ docker compose -f compose.yaml -f pgsql.yaml -f <executor1 configuration file> -
 ```
 
 ### 3. Force Upgrade
-If your database is accidentally lost or damaged, you can force upgrade it  
+If your database is accidentally lost or corrupted, you can reset the database by forcibly updating it  
 Please make sure the system is running, then use the following command to force upgrade the database  
 ```sh
 docker exec -it kuwa-multi-chat-1 docker-entrypoint force-upgrade
