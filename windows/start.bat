@@ -1,13 +1,15 @@
 @echo off
+setlocal enabledelayedexpansion
 
 REM Include variables from separate file
-call variables.bat
+call src\variables.bat
 
 REM Start Kuwa workers
 
 REM Redis Server
 
-pushd %redis_folder%
+pushd packages\%redis_folder%
+del dump.rdb
 start /b "" "redis-server.exe" redis.conf
 popd
 
@@ -17,78 +19,114 @@ set numWorkers=10
 REM Redis workers
 for /l %%i in (1,1,%numWorkers%) do (
 	echo Started a model worker
-    start /b %php_folder%\php.exe ..\multi-chat\artisan queue:work --verbose --timeout=600
+    start /b packages\%php_folder%\php.exe ..\src\multi-chat\artisan queue:work --verbose --timeout=6000
 )
 
-REM Agent
-pushd "..\kernel"
+REM Kernel
+pushd "..\src\kernel"
 del records.pickle
-set PYTHONPATH=%PYTHONPATH%;%~dp0..\kernel\src
-start /b "" "%~dp0%python_folder%\python.exe" "%~dp0..\kernel\main.py"
+set PYTHONPATH=%PYTHONPATH%;%~dp0..\src\kernel\src
+set "PATH=%~dp0packages\%python_folder%\Scripts;%~dp0packages\%python_folder%\;%PATH%"
+start /b "" "%~dp0packages\%python_folder%\python.exe" "%~dp0..\src\kernel\main.py"
 popd
 
-REM Wait for Agent online
+REM Wait for Kernel online
 :CHECK_URL
 timeout /t 1 >nul
 curl -s -o nul http://127.0.0.1:9000
 if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
-REM Load Model settings
-call env.bat
-set PYTHONPATH=%PYTHONPATH%;%~dp0..\executor
-IF EXIST env.bat (
-	REM Start models
-	pushd "..\multi-chat"
-	call ..\windows\%php_folder%\php.exe artisan model:prune --force
-	popd
-	pushd ..\executor
-	if defined gemini_key (
-		start /b "" "%~dp0%python_folder%\python.exe" geminipro.py --api_key %gemini_key%
-		pushd "..\multi-chat"
-		call ..\windows\%php_folder%\php.exe artisan model:config "gemini-pro" "Gemini Pro"
-		popd
-	) else (
-		echo gemini_key is not set. Skipping geminipro.py execution.
-	)
-	if defined gguf_path (
-		start /b "" "%~dp0%python_folder%\python.exe" llamacpp.py --model_path %gguf_path%
-		pushd "..\multi-chat"
-		call ..\windows\%php_folder%\php.exe artisan model:config "gguf" "LLaMA.cpp Model"
-		popd
-	) else (
-		echo gguf_path is not set. Skipping llamacpp.py execution.
-	)
-	popd
-) ELSE (
-    echo env.bat doesn't exist, skipped.
+
+REM Prepare workers and collect existing access codes
+set "exclude_access_codes="
+for /D %%d in ("workers\*") do (
+    rem Check if the env.bat file exists in the current loop folder
+    if exist "%%d\env.bat" (
+        rem Execute the env.bat file
+        call %%d\env.bat
+
+        rem Perform different actions based on the model type
+        rem Use if statements to handle different model types
+        if "!model_type!"=="chatgpt" (
+            set "do_extra_action=1"
+        ) else if "!model_type!"=="geminipro" (
+            set "do_extra_action=1"
+        ) else if "!model_type!"=="custom" (
+            set "do_extra_action=2"
+        ) else (
+            set "do_extra_action=0"
+        )
+
+        rem Perform extra action if needed
+        if "!do_extra_action!"=="1" (
+            if defined api_key (
+                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--api_key" "!api_key!"
+            ) else (
+                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!"
+            )
+        ) else if "!do_extra_action!"=="2" (
+            start /b "" "%~dp0%python_folder%\python.exe" !worker_path! "--access_code" "!access_code!"
+        ) else (
+            start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--model_path" "!model_path!"
+        )
+
+        pushd ..\src\multi-chat\
+        if "!image_path!"=="" (
+			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!"
+		) else (
+			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!" --image "!image_path!"
+		)
+        popd
+
+        rem Collect existing access code
+        if "!exclude_access_codes!"=="" (
+            set "exclude_access_codes=--exclude=!access_code!"
+        ) else (
+            set "exclude_access_codes=!exclude_access_codes! --exclude=!access_code!"
+        )
+    )
 )
-pushd ..\executor
-if defined chatgpt_key (
-	start /b "" "%~dp0%python_folder%\python.exe" chatgpt.py --api_key %chatgpt_key%
-) else (
-	start /b "" "%~dp0%python_folder%\python.exe" chatgpt.py
+REM Prune unused access codes
+if not "!exclude_access_codes!"=="" (
+	pushd ..\src\multi-chat\
+	call ..\..\windows\packages\!php_folder!\php.exe artisan model:prune --force !exclude_access_codes!
+	popd
 )
-pushd "..\multi-chat"
-call ..\windows\%php_folder%\php.exe artisan model:config "chatgpt" "ChatGPT"
-popd
-popd
+
 REM Start web
 start http://127.0.0.1
 
 REM Start Nginx and PHP-FPM
-pushd %php_folder%
+pushd packages\%php_folder%
 set PHP_FCGI_MAX_REQUESTS=0
 set PHP_FCGI_CHILDREN=20
 start /b RunHiddenConsole.exe php-cgi.exe -b 127.0.0.1:9123
 popd
-pushd "%nginx_folder%"
+pushd "packages\%nginx_folder%"
 echo "Nginx started!"
 start /b .\nginx.exe
 popd
 
-REM Trap any key press to stop Nginx
-echo Press any key to stop Nginx...
-pause > nul
+REM Loop to wait for commands
+:loop
+set userInput=
+set /p userInput=Enter a command (stop, seed, hf login): 
 
-call stop.bat
+if /I "%userInput%"=="stop" (
+    echo Stopping Nginx...
+    call stop.bat
+) else if /I "%userInput%"=="seed" (
+    echo Running seed command...
+    call src\migration\20240402_seed_admin.bat
+    goto loop
+) else if /I "%userInput%"=="hf login" (
+    echo Running huggingface login command...
+    call src\migration\20240403_login_huggingface.bat
+    goto loop
+) else (
+    goto loop
+)
+
+call src\stop.bat
+endlocal
