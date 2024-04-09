@@ -36,7 +36,10 @@
                 @csrf
                 <button
                     class="flex px-2 scrollbar rounded-t-lg w-full hover:bg-gray-300 dark:hover:bg-gray-700 scrollbar-3 overflow-x-auto py-3 border-b border-black dark:border-white">
-                        <div
+                    @foreach (App\Models\Chats::join('bots', 'bots.id', '=', 'bot_id')->Join('llms', function ($join) {
+                        $join->on('llms.id', '=', 'bots.model_id');
+                    })->where('user_id', Auth::user()->id)->where('roomID', $DC->first()->id)->orderby('bot_id')->get() as $chat)    
+                    <div
                             class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
                             <div class="h-full w-full"><img data-tooltip-target="llm_{{ $chat->bot_id }}"
                                     data-tooltip-placement="top" class="h-full w-full"
@@ -49,6 +52,7 @@
                             </div>
                             <input name="llm[]" value="{{ $chat->bot_id }}" style="display:none;">
                         </div>
+                        @endforeach
                 </button>
             </form>
         @else
