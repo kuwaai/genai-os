@@ -6,4 +6,6 @@ python*/
 RunHiddenConsole*/
 Redis*/
 composer.phar
-env.bat
+packages
+*.zip
+src/conf/migrations.txt

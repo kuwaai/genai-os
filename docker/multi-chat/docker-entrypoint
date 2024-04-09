@@ -1,0 +1,136 @@
+#!/bin/bash
+set -xeu
+
+# Ensure the storage directory have the proper structure
+construct_storage() {
+    mkdir -p storage/framework/sessions
+    mkdir -p storage/framework/views
+    mkdir -p storage/framework/cache
+    mkdir -p storage/app/public
+    mkdir -p storage/app/secret
+    touch storage/database.sqlite
+    chown -R www-data:www-data storage
+}
+
+# Load secrets
+load_db_password(){
+    if [ -f ${DB_PASSWORD_FILE:-} ]
+    then
+        export DB_PASSWORD=$(cat ${DB_PASSWORD_FILE})
+    fi
+}
+
+# Load or generate the APP_KEY
+load_app_key() {
+    APP_KEY_FILE="/app/storage/app/secret/APP_KEY"
+    if [ ! -f ${APP_KEY_FILE} ]
+    then
+        php artisan key:generate --show > ${APP_KEY_FILE}
+    fi
+    export APP_KEY=$(cat ${APP_KEY_FILE})
+}
+
+# Load or generate the API_Key
+# This function generates a random string with 32 digits that compatible with the
+# InitSeeder.php
+load_api_key() {
+    API_KEY_FILE="/app/storage/app/secret/API_KEY"
+    DIGITS=32
+    if [ ! -f ${API_KEY_FILE} ]
+    then
+        php -r "echo bin2hex(random_bytes(intdiv(${DIGITS}, 2)));" > ${API_KEY_FILE}
+    fi
+    export API_Key=$(cat ${API_KEY_FILE})
+}
+
+# Optimize the laravel if the storage is empty
+optimize_laravel() {
+    php artisan config:clear
+    php artisan config:cache
+    php artisan route:cache
+    php artisan view:cache
+    php artisan optimize
+}
+
+# Forcely migrate the database
+migrate_database() {
+    if [ -z "${DB_HOST:-}" ] && [ -z "${DB_PORT:-}" ]
+    then
+        until nc -z -v -w30 ${DB_HOST} ${DB_PORT}
+        do
+            echo "Waiting for database connection..."
+            # wait for 5 seconds before check again
+            sleep 5
+        done
+    fi
+    php artisan migrate --force
+}
+
+# Add the Admin account if there is corresponding variables
+seed_admin() {
+    if [ -f ${ADMIN_PASSWORD_FILE:-} ]
+    then
+        ADMIN_PASSWORD=$(cat ${ADMIN_PASSWORD_FILE})
+    fi
+    if [ -z "${ADMIN_NAME:-}" ] || [ -z "${ADMIN_EMAIL:-}" ] || [ -z "${ADMIN_PASSWORD:-}" ]
+    then
+        return
+    fi
+
+    printf "${ADMIN_NAME}\n${ADMIN_EMAIL}\n${ADMIN_PASSWORD}" \
+      | php artisan db:seed --class=AdminSeeder --force || return 0
+    printf "Admin \"${ADMIN_NAME}\" had been added\n"
+}
+
+# Store the Kernel API information
+seed_kernel() {
+    if [ -z "${KUWA_KERNEL_URL:-}" ]
+    then
+        return
+    fi
+    php artisan web:config --kernel_endpoint ${KUWA_KERNEL_URL} || return 0
+}
+
+# Check whether should update 
+VERSION_FILE="/app/storage/app/VERSION"
+should_update() {
+    if [ ! -f ${VERSION_FILE} ]
+    then
+        return 0
+    else
+        dpkg --compare-versions $(cat ${VERSION_FILE}) "lt" "${KUWA_MULTI_CHAT_VERSION}"
+        return
+    fi
+}
+
+# Update the cache and database
+upgrade() {
+    optimize_laravel
+    migrate_database
+
+    echo ${KUWA_MULTI_CHAT_VERSION} > ${VERSION_FILE}
+    printf "Successfully upgraded Kuwa Multi-Chat and it's database to version ${KUWA_MULTI_CHAT_VERSION}\n"
+    
+    echo "Try to seeding the database."
+    seed_kernel
+    seed_admin
+}
+
+#=========================================
+
+construct_storage
+load_db_password
+load_app_key
+load_api_key
+
+if should_update $@
+then
+    upgrade
+fi
+
+if [ "$1" = force-upgrade ]
+then
+    upgrade
+else
+    exec "$@"
+fi

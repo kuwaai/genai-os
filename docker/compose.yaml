@@ -1,0 +1,73 @@
+version: '3.7'
+name: kuwa
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: docker/web/Dockerfile
+    image: kuwa-multi-chat-web
+    restart: unless-stopped
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
+    volumes: ["multi-chat-storage:/app/storage:ro"]
+    ports: ["80:80", "443:443"]
+    depends_on: ["multi-chat"]
+    networks: ["frontend"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl", "-f", "http://localhost/"]
+      timeout: 10s
+  
+  multi-chat:
+    build:
+      context: ../
+      dockerfile: docker/multi-chat/Dockerfile
+    image: kuwa-multi-chat
+    restart: unless-stopped
+    init: true
+    depends_on:
+      - redis
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: ${PUBLIC_BASE_URL}
+
+      # Use sqlite as the default database
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /app/storage/database.sqlite
+
+      ADMIN_NAME: ${ADMIN_NAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD_FILE: /run/secrets/admin-password
+    secrets:
+      - admin-password
+    volumes: ["multi-chat-storage:/app/storage:rw"]
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm-healthcheck"]
+      timeout: 10s
+    networks: ["frontend", "backend"]
+
+  kernel:
+    build:
+      context: ../
+      dockerfile: docker/kernel/Dockerfile
+    image: kuwa-kernel
+    restart: unless-stopped
+    networks: ["backend"]
+
+  redis:
+    image: redis:6.0.20
+    container_name: redis
+    restart: always
+    networks:
+      - backend
+
+volumes:
+  multi-chat-storage: {}
+
+secrets:
+  admin-password:
+    file: .admin-password
+
+networks:
+  frontend: {}
+  backend: {}
