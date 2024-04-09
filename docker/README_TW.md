@@ -10,7 +10,7 @@
 
 ## 環境安裝
 以下指令皆在 Ubuntu 22.04 LTS 測試，若您使用不同 Linux 發行版，請自行參考相關文件。  
-若您有使用 GPU 進行模型推論的需求，請安裝 CUDA 與 NVIDIA Container Toolkit。
+若您有使用 NVIDIA GPU 進行模型推論的需求，請安裝 CUDA 與 NVIDIA Container Toolkit。
 
 ### 1. (非必要) 安裝 CUDA 驅動程式
 
@@ -139,8 +139,8 @@ docker compose -f compose.yaml -f pgsql.yaml -f <executor1設定檔> -f <executo
 ```
 
 ### 3. 強制更新
-若您資料庫不小心遺失或毀損，可透過強置
-請先確定系統正在運作中，再使用以下指令強制更新資料庫  
+若您資料庫不小心遺失或毀損，可透過強置更新重置資料庫。  
+請先確定系統正在運作中，再使用以下指令強制更新資料庫。  
 ```sh
 docker exec -it kuwa-multi-chat-1 docker-entrypoint force-upgrade
 ```
