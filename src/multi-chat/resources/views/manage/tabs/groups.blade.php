@@ -204,8 +204,11 @@
                     <div
                         class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                         @foreach (DB::table(function ($query) {
-        $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
-    }, 'p')->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'p.model_id')->where('enabled', '=', true)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
+        $query->select(DB::raw('substring(name, 7) as model_id, id'))
+        ->from('permissions')->where('name', 'like', 'model_%');
+    }, 'p')
+    ->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'p.model_id')->where('enabled', '=', true)
+    ->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
                             <div
                                 class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                                 <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
