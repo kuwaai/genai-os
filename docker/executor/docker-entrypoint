@@ -1,0 +1,19 @@
+#!/bin/sh
+set -xeu
+
+add_executor(){
+    if [ -z "${EXECUTOR_NAME:-}" ] || [ -z "${EXECUTOR_ACCESS_CODE:-}" ]
+    then
+        return
+    fi
+    multi-chat-client add-executor "${EXECUTOR_ACCESS_CODE}" "${EXECUTOR_NAME}" || return 0
+}
+
+if [ "${ADD_EXECUTOR_TO_MULTI_CHAT}" = true ]
+then
+    add_executor
+fi
+exec kuwa-executor ${EXECUTOR_TYPE} \
+    --kernel_url ${KERNEL_URL} \
+    --access_code ${EXECUTOR_ACCESS_CODE} \
+    $@ 2>&1

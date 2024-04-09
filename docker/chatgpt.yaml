@@ -1,0 +1,15 @@
+services:
+  chatgpt-executor:
+    build:
+      context: ../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: chatgpt
+      EXECUTOR_ACCESS_CODE: chatgpt
+      EXECUTOR_NAME: ChatGPT
+    depends_on:
+      - kernel
+    command: ["--temperature", "0.2"]
+    restart: unless-stopped
+    networks: ["backend"]
