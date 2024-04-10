@@ -13,7 +13,7 @@ del dump.rdb
 start /b "" "redis-server.exe" redis.conf
 popd
 
-REM Define number of workers
+REM Define number of Redis workers
 set numWorkers=10
 
 REM Redis workers
@@ -38,21 +38,21 @@ if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
 
-REM Prepare workers and collect existing access codes
+REM Prepare executors and collect existing access codes
 set "exclude_access_codes="
-for /D %%d in ("workers\*") do (
+for /D %%d in ("executors\*") do (
     rem Check if the env.bat file exists in the current loop folder
     if exist "%%d\env.bat" (
         rem Execute the env.bat file
         call %%d\env.bat
 
-        rem Perform different actions based on the model type
-        rem Use if statements to handle different model types
-        if "!model_type!"=="chatgpt" (
+        rem Perform different actions based on the executor type
+        rem Use if statements to handle different executor types
+        if "!EXECUTOR_TYPE!"=="chatgpt" (
             set "do_extra_action=1"
-        ) else if "!model_type!"=="geminipro" (
+        ) else if "!EXECUTOR_TYPE!"=="geminipro" (
             set "do_extra_action=1"
-        ) else if "!model_type!"=="custom" (
+        ) else if "!EXECUTOR_TYPE!"=="custom" (
             set "do_extra_action=2"
         ) else (
             set "do_extra_action=0"
@@ -61,29 +61,29 @@ for /D %%d in ("workers\*") do (
         rem Perform extra action if needed
         if "!do_extra_action!"=="1" (
             if defined api_key (
-                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--api_key" "!api_key!"
+                start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!" "--api_key" "!api_key!"
             ) else (
-                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!"
+                start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!"
             )
         ) else if "!do_extra_action!"=="2" (
-            start /b "" "%~dp0%python_folder%\python.exe" !worker_path! "--access_code" "!access_code!"
+            start /b "" "%~dp0%python_folder%\python.exe" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
         ) else (
-            start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--model_path" "!model_path!"
+            start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!" "--model_path" "!model_path!"
         )
 
         pushd ..\src\multi-chat\
         if "!image_path!"=="" (
-			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!"
+			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!"
 		) else (
-			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!" --image "!image_path!"
+			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!" --image "!image_path!"
 		)
         popd
 
         rem Collect existing access code
         if "!exclude_access_codes!"=="" (
-            set "exclude_access_codes=--exclude=!access_code!"
+            set "exclude_access_codes=--exclude=!EXECUTOR_ACCESS_CODE!"
         ) else (
-            set "exclude_access_codes=!exclude_access_codes! --exclude=!access_code!"
+            set "exclude_access_codes=!exclude_access_codes! --exclude=!EXECUTOR_ACCESS_CODE!"
         )
     )
 )

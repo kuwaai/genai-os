@@ -22,13 +22,13 @@ REM Check if the current folder matches any option
 for %%a in (1 2 3 4) do (
 	if "!models[%%a]!"=="!current_folder!" (
 		echo Using predefined...
-		echo model_type=!models[%%a]!
-		echo model_name=!names[%%a]!
-		echo access_code=!models[%%a]!
+		echo EXECUTOR_TYPE=!models[%%a]!
+		echo EXECUTOR_NAME=!names[%%a]!
+		echo EXECUTOR_ACCESS_CODE=!models[%%a]!
 		
-		set "model_type=!models[%%a]!"
-		set "model_name=!names[%%a]!"
-		set "access_code=!models[%%a]!"
+		set "EXECUTOR_TYPE=!models[%%a]!"
+		set "EXECUTOR_NAME=!names[%%a]!"
+		set "EXECUTOR_ACCESS_CODE=!models[%%a]!"
 		goto skip_selection
 	)
 )
@@ -49,7 +49,7 @@ if not defined models[%option%] (
 )
 
 REM Set the model type based on the selected option
-set "model_type=!models[%option%]!"
+set "EXECUTOR_TYPE=!models[%option%]!"
 
 if "!option!" == "5" (
     REM Ask for worker path (must-fill field)
@@ -62,30 +62,30 @@ if "!option!" == "5" (
 )
 
 REM Ask for model name
-:input_model_name
-set /p "model_name=Enter the model name: "
-if "!model_name!"=="" (
+:input_EXECUTOR_NAME
+set /p "EXECUTOR_NAME=Enter the model name: "
+if "!EXECUTOR_NAME!"=="" (
     echo Model name cannot be blank. Please try again.
-    goto input_model_name
+    goto input_EXECUTOR_NAME
 )
 
 REM Ask for access code (must-fill field)
-:input_access_code
-set /p "access_code=Enter the access code: "
-if "!access_code!"=="" (
+:input_EXECUTOR_ACCESS_CODE
+set /p "EXECUTOR_ACCESS_CODE=Enter the access code: "
+if "!EXECUTOR_ACCESS_CODE!"=="" (
     echo Access code cannot be blank. Please try again.
-    goto input_access_code
+    goto input_EXECUTOR_ACCESS_CODE
 )
 
 :skip_selection
 
 REM Ask for API key if the model type is geminipro or ChatGPT
-if "!model_type!"=="geminipro" (
+if "!EXECUTOR_TYPE!"=="geminipro" (
     set "api_key="
     :input_api_key
     set /p "api_key=Enter the API key (press Enter to leave blank): "
     if "!api_key!"=="" goto continue
-) else if "!model_type!"=="chatgpt" (
+) else if "!EXECUTOR_TYPE!"=="chatgpt" (
     set "api_key="
     :input_api_key
     set /p "api_key=Enter the API key (press Enter to leave blank): "
@@ -95,7 +95,7 @@ if "!model_type!"=="geminipro" (
 :continue
 
 REM Ask for model path if the model type is llamacpp or Hugging Face
-if "!model_type!"=="llamacpp" (
+if "!EXECUTOR_TYPE!"=="llamacpp" (
 	for /r %%i in (*.gguf) do (
 		echo "using founded .gguf file"
 		echo model_path=%%~fi
@@ -109,7 +109,7 @@ if "!model_type!"=="llamacpp" (
         echo Model path cannot be blank. Please try again.
         goto input_model_path
     )
-) else if "!model_type!"=="huggingface" (
+) else if "!EXECUTOR_TYPE!"=="huggingface" (
 	for /r %%i in (*.model *.bin *.safetensor) do (
 		echo "model folder detected, using current folder path"
 		echo model_path=%%~dpi
@@ -140,25 +140,25 @@ set /p "image_path=Enter the image path: (press Enter to leave blank)"
 	
 del env.bat
 REM Save to env.bat
-if defined model_type (
-	echo set "model_type=!model_type!" >> env.bat
+if defined EXECUTOR_TYPE (
+	echo set "EXECUTOR_TYPE=!EXECUTOR_TYPE!" >> env.bat
 ) else (
-	echo set /U model_type >> env.bat
+	echo set /U EXECUTOR_TYPE >> env.bat
 )
-if defined model_name (
-	echo set "model_name=!model_name!" >> env.bat
+if defined EXECUTOR_NAME (
+	echo set "EXECUTOR_NAME=!EXECUTOR_NAME!" >> env.bat
 ) else (
-	echo set /U model_name >> env.bat
+	echo set /U EXECUTOR_NAME >> env.bat
 )
 if defined api_key (
 	echo set "api_key=!api_key!" >> env.bat
 ) else (
 	echo set /U api_key >> env.bat
 )
-if defined access_code (
-	echo set "access_code=!access_code!" >> env.bat
+if defined EXECUTOR_ACCESS_CODE (
+	echo set "EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!" >> env.bat
 ) else (
-	echo set /U access_code >> env.bat
+	echo set /U EXECUTOR_ACCESS_CODE >> env.bat
 )
 if defined model_path (
 	echo set "model_path=!model_path!" >> env.bat
