@@ -12,10 +12,16 @@ set "node_folder=%filename_NodeJS:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_NodeJS%") do set "version_NodeJS=%%v"
 
 REM Variables for PHP
-set "url_PHP=https://windows.php.net/downloads/releases/php-8.1.27-Win32-vs16-x64.zip"
+set "url_PHP=https://windows.php.net/downloads/releases/php-8.1.28-Win32-vs16-x64.zip"
 for %%I in ("%url_PHP%") do set "filename_PHP=%%~nxI"
 set "php_folder=%filename_PHP:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_PHP%") do set "version_PHP=%%v"
+
+REM Variables for PHP archive
+set "url_PHP_Archive=https://windows.php.net/downloads/releases/archives/php-8.1.28-Win32-vs16-x64.zip"
+for %%I in ("%url_PHP%") do set "filename_PHP_Archive=%%~nxI"
+set "php_folder_Archive=%filename_PHP_Archive:~0,-4%"
+for /f "tokens=2 delims=-" %%v in ("%filename_PHP_Archive%") do set "version_PHP_Archive=%%v"
 
 REM Variables for Nginx
 set "url_Nginx=https://nginx.org/download/nginx-1.24.0.zip"

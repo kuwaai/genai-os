@@ -13,6 +13,9 @@ call src\download_extract.bat %url_NodeJS% packages\%node_folder% packages\. nod
 REM Download and extract PHP if not exists
 call src\download_extract.bat %url_PHP% packages\%php_folder% packages\%php_folder% php.zip
 
+REM Download and extract PHP if not exists
+call src\download_extract.bat %url_PHP_Archive% packages\%php_folder_Archive% packages\%php_folder_Archive% php.zip
+
 IF EXIST packages\%python_folder% (
     echo Python folder already exists.
 ) ELSE (
