@@ -37,7 +37,6 @@ curl -s -o nul http://127.0.0.1:9000
 if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
-
 REM Prepare executors and collect existing access codes
 set "exclude_access_codes="
 for /D %%d in ("executors\*") do (
@@ -57,7 +56,6 @@ for /D %%d in ("executors\*") do (
         ) else (
             set "do_extra_action=0"
         )
-
         rem Perform extra action if needed
         if "!do_extra_action!"=="1" (
             if defined api_key (
@@ -66,7 +64,7 @@ for /D %%d in ("executors\*") do (
                 start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!"
             )
         ) else if "!do_extra_action!"=="2" (
-            start /b "" "%~dp0%python_folder%\python.exe" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
+            start /b "" "%~dp0packages\%python_folder%\python.exe" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
         ) else (
             start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!" "--model_path" "!model_path!"
         )
