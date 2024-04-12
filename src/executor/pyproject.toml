@@ -22,12 +22,13 @@ authors = [
 ]
 description = "A framework to serve the Kuwa Executors, including LLM model executor."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
 dependencies=[
+  'pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4',
   'fastapi~=0.110.0',
   'prometheus_client~=0.20.0',
   'python-multipart~=0.0.9',
