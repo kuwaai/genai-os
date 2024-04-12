@@ -128,53 +128,54 @@ if "!EXECUTOR_TYPE!"=="llamacpp" (
 
 for /r %%i in (*.jpg *.jpeg *.png *.gif *.webp *.bmp *.ico *.svg *.tiff *.tif *.jp2 *.jxr *.wdp *.hdp) do (
     echo "Image detected, using founded image."
-    echo image_path=%%~fi
-    set "image_path=%%~fi"
-    goto skip_image_path
+    for %%F in ("%%~pi.") do (
+		for %%G in ("%%~pi\..") do (
+			for %%H in ("%%~pi\..\..") do (
+				echo image_path=..\..\%%~nxH\%%~nxG\%%~nxF\%%~nxi
+				set "image_path=..\..\%%~nxH\%%~nxG\%%~nxF\%%~nxi"
+				goto skip_image_path
+			)
+		)
+	)
 )
 
 :input_image_path
 set /p "image_path=Enter the image path: (press Enter to leave blank)"
 
 :skip_image_path
-	
-del env.bat
-REM Save to env.bat
-if defined EXECUTOR_TYPE (
-	echo set "EXECUTOR_TYPE=!EXECUTOR_TYPE!" >> env.bat
-) else (
-	echo set /U EXECUTOR_TYPE >> env.bat
-)
-if defined EXECUTOR_NAME (
-	echo set "EXECUTOR_NAME=!EXECUTOR_NAME!" >> env.bat
-) else (
-	echo set /U EXECUTOR_NAME >> env.bat
-)
-if defined api_key (
-	echo set "api_key=!api_key!" >> env.bat
-) else (
-	echo set /U api_key >> env.bat
-)
-if defined EXECUTOR_ACCESS_CODE (
-	echo set "EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!" >> env.bat
-) else (
-	echo set /U EXECUTOR_ACCESS_CODE >> env.bat
-)
-if defined model_path (
-	echo set "model_path=!model_path!" >> env.bat
-) else (
-	echo set /U model_path >> env.bat
-)
-if defined worker_path (
-	echo set "worker_path=!worker_path!" >> env.bat
-) else (
-	echo set /U worker_path >> env.bat
-)
-if defined image_path (
-	echo set "image_path=!image_path!" >> env.bat
-) else (
-	echo set /U image_path >> env.bat
-)
 
-echo Configuration saved to env.bat
+:input_command_path
+set /p "command=Enter the command parameters: (press Enter to leave blank if you don't need or don't know what this is.)"
+
+:skip_command_path
+	
+del run.bat
+
+REM Save configuration to run.bat
+echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!> run.bat
+
+REM model:config
+echo pushd ..\..\..\src\multi-chat>>run.bat
+set command=php artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!"
+IF DEFINED image_path (
+    set command=%command% --image "!image_path!"
+)
+echo %command%>> run.bat
+echo popd>>run.bat
+
+REM kuwa-executor
+IF NOT "!EXECUTOR_TYPE!"=="custom" (
+	set command=start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!"
+	IF DEFINED api_key (
+		set command=%command% "--api_key" "!api_key!"
+	)
+	IF DEFINED model_path (
+		set command=%command% "--model_path" "!model_path!"
+	)
+) else (
+	start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
+)
+echo %command%>> run.bat
+
+echo Configuration saved to run.bat
 pause

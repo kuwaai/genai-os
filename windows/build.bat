@@ -101,24 +101,23 @@ if not exist "..\src\multi-chat\.env" (
     echo .env file already exists, skipping copy.
 )
 
-
 set "PATH=%~dp0packages\%node_folder%;%PATH%"
 
 REM Production update
 pushd "..\src\multi-chat"
-call ..\..\windows\packages\%php_folder%\php.exe ..\..\windows\packages\composer.phar update
-call ..\..\windows\packages\%php_folder%\php.exe artisan key:generate --force
-call ..\..\windows\packages\%php_folder%\php.exe artisan migrate --force
+call php ..\..\windows\packages\composer.phar update
+call php artisan key:generate --force
+call php artisan migrate --force
 rmdir /Q /S public\storage
-call ..\..\windows\packages\%php_folder%\php.exe artisan storage:link
-call ..\..\windows\packages\%node_folder%\npm.cmd install
-call ..\..\windows\packages\%php_folder%\php.exe ..\..\windows\packages\composer.phar dump-autoload --optimize
-call ..\..\windows\packages\%php_folder%\php.exe artisan route:cache
-call ..\..\windows\packages\%php_folder%\php.exe artisan view:cache
-call ..\..\windows\packages\%php_folder%\php.exe artisan optimize
-call ..\..\windows\packages\%node_folder%\npm.cmd run build
-call ..\..\windows\packages\%php_folder%\php.exe artisan config:cache
-call ..\..\windows\packages\%php_folder%\php.exe artisan config:clear
+call php artisan storage:link
+call npm.cmd install
+call php ..\..\windows\packages\composer.phar dump-autoload --optimize
+call php artisan route:cache
+call php artisan view:cache
+call php artisan optimize
+call npm.cmd run build
+call php artisan config:cache
+call php artisan config:clear
 popd
 
 REM Remove folder nginx_folder/html

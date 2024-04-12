@@ -56,6 +56,8 @@ if not exist "src\conf\migrations.txt" (
 REM Prepare packages folder
 mkdir packages 2>nul
 
+REM init env
+set "PATH=%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%PATH%"
 REM Run migration
 for %%i in ("src\migration\*.bat") do (
     findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (

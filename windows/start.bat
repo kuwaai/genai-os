@@ -4,10 +4,7 @@ setlocal enabledelayedexpansion
 REM Include variables from separate file
 call src\variables.bat
 
-REM Start Kuwa workers
-
 REM Redis Server
-
 pushd packages\%redis_folder%
 del dump.rdb
 start /b "" "redis-server.exe" redis.conf
@@ -25,8 +22,6 @@ for /l %%i in (1,1,%numWorkers%) do (
 REM Kernel
 pushd "..\src\kernel"
 del records.pickle
-set PYTHONPATH=%PYTHONPATH%;%~dp0..\src\kernel\src
-set "PATH=%~dp0packages\%python_folder%\Scripts;%~dp0packages\%python_folder%\;%PATH%"
 start /b "" "%~dp0packages\%python_folder%\python.exe" "%~dp0..\src\kernel\main.py"
 popd
 
@@ -37,44 +32,15 @@ curl -s -o nul http://127.0.0.1:9000
 if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
+
 REM Prepare executors and collect existing access codes
 set "exclude_access_codes="
 for /D %%d in ("executors\*") do (
-    rem Check if the env.bat file exists in the current loop folder
-    if exist "%%d\env.bat" (
-        rem Execute the env.bat file
-        call %%d\env.bat
-
-        rem Perform different actions based on the executor type
-        rem Use if statements to handle different executor types
-        if "!EXECUTOR_TYPE!"=="chatgpt" (
-            set "do_extra_action=1"
-        ) else if "!EXECUTOR_TYPE!"=="geminipro" (
-            set "do_extra_action=1"
-        ) else if "!EXECUTOR_TYPE!"=="custom" (
-            set "do_extra_action=2"
-        ) else (
-            set "do_extra_action=0"
-        )
-        rem Perform extra action if needed
-        if "!do_extra_action!"=="1" (
-            if defined api_key (
-                start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!" "--api_key" "!api_key!"
-            ) else (
-                start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!"
-            )
-        ) else if "!do_extra_action!"=="2" (
-            start /b "" "%~dp0packages\%python_folder%\python.exe" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
-        ) else (
-            start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!" "--model_path" "!model_path!"
-        )
-
-        pushd ..\src\multi-chat\
-        if "!image_path!"=="" (
-			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!"
-		) else (
-			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!" --image "!image_path!"
-		)
+    rem Check if the run.bat file exists in the current loop folder
+    if exist "%%d\run.bat" (
+        rem Execute the run.bat file
+        pushd %%d
+        call run.bat
         popd
 
         rem Collect existing access code
@@ -112,8 +78,8 @@ set userInput=
 set /p userInput=Enter a command (stop, seed, hf login): 
 
 if /I "%userInput%"=="stop" (
-    echo Stopping Nginx...
-    call stop.bat
+    echo Stopping everything...
+	call src\stop.bat
 ) else if /I "%userInput%"=="seed" (
     echo Running seed command...
     call src\migration\20240402_seed_admin.bat
@@ -126,5 +92,4 @@ if /I "%userInput%"=="stop" (
     goto loop
 )
 
-call src\stop.bat
 endlocal
