@@ -37,11 +37,14 @@ REM Prepare executors and collect existing access codes
 set "exclude_access_codes="
 for /D %%d in ("executors\*") do (
     rem Check if the run.bat file exists in the current loop folder
-    if exist "%%d\run.bat" (
+    pushd %%d
+    if exist "init.bat" if not exist "run.bat" (
+        call init.bat quick
+    )
+
+    if exist "run.bat" (
         rem Execute the run.bat file
-        pushd %%d
         call run.bat
-        popd
 
         rem Collect existing access code
         if "!exclude_access_codes!"=="" (
@@ -49,7 +52,8 @@ for /D %%d in ("executors\*") do (
         ) else (
             set "exclude_access_codes=!exclude_access_codes! --exclude=!EXECUTOR_ACCESS_CODE!"
         )
-    )
+    ) 
+    popd
 )
 REM Prune unused access codes
 if not "!exclude_access_codes!"=="" (

@@ -18,6 +18,19 @@ set "models[3]=llamacpp"
 set "models[4]=huggingface"
 set "models[5]=custom"
 
+REM TAIDE init
+if "taide"=="!current_folder!" (
+	echo Init TAIDE
+	echo EXECUTOR_TYPE=llamacpp
+	echo EXECUTOR_NAME=TAIDE
+	echo EXECUTOR_ACCESS_CODE=taide
+	
+	set "EXECUTOR_TYPE=llamacpp"
+	set "EXECUTOR_NAME=TAIDE"
+	set "EXECUTOR_ACCESS_CODE=taide"
+	goto skip_selection
+)
+
 REM Check if the current folder matches any option
 for %%a in (1 2 3 4) do (
 	if "!models[%%a]!"=="!current_folder!" (
@@ -31,6 +44,11 @@ for %%a in (1 2 3 4) do (
 		set "EXECUTOR_ACCESS_CODE=!models[%%a]!"
 		goto skip_selection
 	)
+)
+
+REM not quick
+if "%1" == "quick" (
+	exit /b 0
 )
 
 REM Display the options
@@ -78,7 +96,9 @@ if "!EXECUTOR_ACCESS_CODE!"=="" (
 )
 
 :skip_selection
-
+if "%1" == "quick" (
+	goto continue
+)
 REM Ask for API key if the model type is geminipro or ChatGPT
 if "!EXECUTOR_TYPE!"=="geminipro" (
     set "api_key="
@@ -98,9 +118,13 @@ REM Ask for model path if the model type is llamacpp or Hugging Face
 if "!EXECUTOR_TYPE!"=="llamacpp" (
 	for /r %%i in (*.gguf) do (
 		echo "using founded .gguf file"
-		echo model_path=%%~fi
-		set "model_path=%%~fi"
+		echo model_path=%%~nxi
+		set "model_path=%%~nxi"
 		goto skip_model_path
+	)
+	
+	if "%1" == "quick" (
+		exit /b 0
 	)
 
     :input_model_path
@@ -116,6 +140,11 @@ if "!EXECUTOR_TYPE!"=="llamacpp" (
 		set "model_path=%%~dpi"
 		goto skip_model_path
 	)
+
+	if "%1" == "quick" (
+		exit /b 0
+	)
+
     :input_model_path
     set /p "model_path=Enter the model path: "
     if "!model_path!"=="" (
@@ -139,15 +168,21 @@ for /r %%i in (*.jpg *.jpeg *.png *.gif *.webp *.bmp *.ico *.svg *.tiff *.tif *.
 	)
 )
 
+if "%1" == "quick" (
+	goto skip_image_path
+)
 :input_image_path
 set /p "image_path=Enter the image path: (press Enter to leave blank)"
 
 :skip_image_path
 
-:input_command_path
-set /p "command=Enter the command parameters: (press Enter to leave blank if you don't need or don't know what this is.)"
+if "%1" == "quick" (
+	goto skip_arguments_path
+)
+:input_arguments_path
+set /p "arguments=Arguments to use: (press Enter to leave blank if you don't need or don't know what this is.)"
 
-:skip_command_path
+:skip_arguments_path
 	
 del run.bat
 
@@ -158,24 +193,31 @@ REM model:config
 echo pushd ..\..\..\src\multi-chat>>run.bat
 set command=php artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!"
 IF DEFINED image_path (
-    set command=%command% --image "!image_path!"
+    set command=!command! --image "!image_path!"
 )
-echo %command%>> run.bat
+echo !command!>> run.bat
 echo popd>>run.bat
 
 REM kuwa-executor
 IF NOT "!EXECUTOR_TYPE!"=="custom" (
 	set command=start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!"
 	IF DEFINED api_key (
-		set command=%command% "--api_key" "!api_key!"
+		set command=!command! "--api_key" "!api_key!"
 	)
 	IF DEFINED model_path (
-		set command=%command% "--model_path" "!model_path!"
+		set command=!command! "--model_path" "!model_path!"
+	)
+	IF DEFINED arguments (
+		set command=!command! !arguments!
 	)
 ) else (
-	start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
+	set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
 )
-echo %command%>> run.bat
+echo !command!>> run.bat
 
 echo Configuration saved to run.bat
+
+if "%1" == "quick" (
+	exit /b 0
+)
 pause

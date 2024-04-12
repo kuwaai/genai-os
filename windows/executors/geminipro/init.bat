@@ -1,1 +1,1 @@
-call ..\init.bat
+call ..\init.bat %1
