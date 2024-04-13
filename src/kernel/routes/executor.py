@@ -68,4 +68,4 @@ def debug():
 
 @executor.route("/list", methods=["GET"])
 def list_executor():
-    return jsonify(data.keys())
+    return jsonify(list(data.keys()))
