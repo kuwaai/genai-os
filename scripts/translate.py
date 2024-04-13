@@ -20,8 +20,7 @@ def invoke_model(prompt, model="gemini-pro", base_url="https://chatdev.gai.tw"):
         if not resp.ok:
             raise RuntimeError(f'Request failed with status {response.status_code}')
         for line in resp.iter_lines(decode_unicode=True):
-            if not line:
-                continue
+            if line == "event: close": break
             elif line.startswith("data: "):
                 chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
                 yield chunk

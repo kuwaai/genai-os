@@ -8,7 +8,18 @@
 - 確保您已安裝 [VC_redist.exe](https://learn.microsoft.com/zh-tw/cpp/windows/latest-supported-vc-redist?view=msvc-170)。
 - 如要在GPU上載入模型，請先安裝好[CUDA](https://developer.nvidia.com/cuda-toolkit)。
 
-### 安裝步驟
+### 快速安裝
+- 預設會啟用Gemini Pro與ChatGPT兩個模型，如需連帶執行gguf模型可提前先丟至executors\llamacpp路徑下。
+- 過程會創建管理者權限帳號，如需重新創建，請參照[常見問題](#常見問題)第一項。
+```bat
+git clone https://github.com/kuwaai/genai-os.git
+cd genai-os/windows
+"build & start.bat"
+```
+- 關閉系統請輸入`stop`指令，直接關閉視窗可能會無法順利釋放記憶體，不小心關閉視窗請參照[常見問題](#常見問題)第三項。
+- 後續啟動可直接跑`start.bat`，如有更新、移動專案路徑，請重跑`build.bat`或`build & start.bat`。
+
+### 詳細安裝步驟
 
 1. **從Release下載，或用git bash執行以下指令複製專案並切換至專案內的 windows 資料夾：**
    ```bat
@@ -37,13 +48,13 @@
    - **因此請在執行`start.bat`時養成習慣輸入`stop`的方式來關閉該程式。**
 
 6. **設定模型：**
-   - 剛啟動該程式的狀態下是沒有任何模型的，因此需要設定workers，但這部分由於篇幅龐大，請參考[該處](./workers/README_TW.md)的教學指南。
+   - 剛啟動該程式的狀態下預設有ChatGPT、Gemini Pro，兩種模型皆為串接API，因此需要申請對應的API Key，如果您想啟動自己的模型，或串接其他的API，則需要設定executors，但這部分由於篇幅龐大，請參考[該處](./executors/README_TW.md)的教學指南。
 
 ## 常見問題
 
 1. **Q: 沒有被要求創建管理者帳號、管理者帳號創建失敗、輸入錯誤...**
    
-   A: 請打開`windows\tool.bat`，然後輸入`seed`並Enter，就會打開管理員帳號創建的介面了，創建完成之後輸入`quit`即可關閉。
+   A: 請打開`tool.bat`，然後輸入`seed`並Enter，就會打開管理員帳號創建的介面了，創建完成之後輸入`quit`即可關閉。
 
 2. **Q: 我將整個專案移動位置後，執行start.bat卻一堆錯誤，網頁也404/500無法進入。**
 
@@ -51,6 +62,6 @@
 
 3. **Q: 不小心將整個start.bat的程式給直接按下紅色叉叉關閉了，背景程式沒有被關閉導致記憶體資源依舊被占用，我該怎麼辦？**
 
-   A: 礙於.bat檔無法在您戳紅色叉叉的時候把所有程式都一同關閉，你可以打開`windows\tool.bat`，並輸入`stop`來將所有相關程式都終止。
+   A: 礙於.bat檔無法在您戳紅色叉叉的時候把所有程式都一同關閉，你可以打開`tool.bat`，並輸入`stop`來將所有相關程式都終止。
 
 在安裝過程中遇到任何問題，請隨時聯絡我們。

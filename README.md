@@ -56,8 +56,8 @@
 To run this application, please make sure the following packages are installed on your system:
 
 - Node.js v20.11.1 & npm
-- PHP 8.1.27 & php-fpm & Composer
-- Python 3.9.5 & pip
+- PHP 8.1 & php-fpm & Composer
+- Python 3.10 & pip
 - Nginx or Apache
 - Redis 6.0.20
 - CUDA
@@ -84,6 +84,7 @@ Alternatively, you can refer to the following steps to install the entire system
      ./production_update.sh
      cd ../kernel
      pip install -r requirement.txt
+     sudo chown -R $(whoami):www-data /var/www/html
      ```
 
    - For Windows:
