@@ -20,10 +20,12 @@ def invoke_model(prompt, model="gemini-pro", base_url="https://chatdev.gai.tw"):
         if not resp.ok:
             raise RuntimeError(f'Request failed with status {response.status_code}')
         for line in resp.iter_lines(decode_unicode=True):
-            if not line or line == "event: end": break
+            if not line:
+                continue
             elif line.startswith("data: "):
                 chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
                 yield chunk
+
 
 def translate(input_filename, target_filename=None, lang="en", quite=False):
     prompt = {
@@ -35,7 +37,7 @@ def translate(input_filename, target_filename=None, lang="en", quite=False):
     with open(input_filename,encoding="utf-8") as f:
         input_content = f.read()
     prompt += "\n" + input_content
-
+    
     output_content = ''
     for chunk in invoke_model(prompt):
         output_content += chunk
