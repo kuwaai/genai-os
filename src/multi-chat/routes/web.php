@@ -7,7 +7,6 @@ use App\Http\Controllers\SystemController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\PlayController;
 use App\Http\Controllers\ManageController;
-use App\Http\Controllers\BotController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LanguageMiddleware;
