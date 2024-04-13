@@ -96,7 +96,11 @@ class DocQaExecutor(LLMExecutor):
                 if url == None : raise NoUrlException(i18n.t('docqa.no_url_exception'))
             
                 chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
-            async for reply in self.docqa.process(urls=[url], chat_history=chat_history, auth_token=auth_token):
+            self.proc = True
+            response_generator = self.docqa.process(urls=[url], chat_history=chat_history, auth_token=auth_token)
+            async for reply in response_generator:
+                if not self.proc:
+                    await response_generator.aclose()
                 yield reply
 
         except NoUrlException as e:
@@ -106,6 +110,13 @@ class DocQaExecutor(LLMExecutor):
             await asyncio.sleep(2) # To prevent SSE error of web page.
             logger.exception('Unexpected error')
             yield i18n.t("docqa.default_exception_msg")
+    
+    async def abort(self):
+        if self.proc:
+            self.proc = False
+            logger.debug("aborted")
+            return "Aborted"
+        return "No process to abort"
 
 if __name__ == "__main__":
     executor = DocQaExecutor()

@@ -1,4 +1,4 @@
-Web QA
+Doc QA
 ---
 A Retrieval-Augmented Generation Executor.
 
