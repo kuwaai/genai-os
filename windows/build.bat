@@ -127,7 +127,7 @@ pip install -r requirements.txt
 popd
 pushd "..\src\executor"
 pip install -r requirements.txt
-pushd "webqa"
+pushd "docqa"
 pip install -r requirements.txt
 popd
 popd
