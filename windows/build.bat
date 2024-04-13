@@ -1,5 +1,5 @@
 @echo off
-
+cd "%~dp0"
 REM Initialize everything
 call src\variables.bat
 set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
@@ -83,15 +83,6 @@ if not exist "packages\%python_folder%\Scripts\pip.exe" (
     echo pip already installed, skipping installing.
 )
 
-REM Download required pip packages
-pip install -r .\src\requirements.txt
-pushd "..\src\kernel"
-pip install -r requirements.txt
-popd
-pushd "..\src\executor"
-pip install -r requirements.txt
-popd
-
 REM Check if .env file exists
 if not exist "..\src\multi-chat\.env" (
     REM Kuwa Chat
@@ -127,3 +118,15 @@ rmdir /Q /S "packages\%nginx_folder%\html"
 REM Make shortcut from nginx_folder/html to ../public
 echo Creating shortcut from %nginx_folder%/html to ../public...
 mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
+
+REM Download required pip packages
+pip install -r .\src\requirements.txt --use-pep517
+pushd "..\src\kernel"
+pip install -r requirements.txt 
+popd
+pushd "..\src\executor"
+pip install -r requirements.txt
+pushd "webqa"
+pip install -r requirements.txt
+popd
+popd

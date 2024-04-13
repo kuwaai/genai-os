@@ -1,4 +1,5 @@
 @echo off
+cd "%~dp0"
 setlocal enabledelayedexpansion
 
 REM Include variables from separate file
