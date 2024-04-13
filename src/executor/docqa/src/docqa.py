@@ -113,7 +113,7 @@ class DocQa:
         document_store = await self.construct_document_store(docs)
     except HTTPError as e:
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield i18n.t('error_fetching_document').format(str(e))
+      yield i18n.t('docqa.error_fetching_document').format(str(e))
       return
     
     task = ''
