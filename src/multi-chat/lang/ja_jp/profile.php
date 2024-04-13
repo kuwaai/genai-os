@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API管理',
     'label.api_manage' => 'APIキーを管理してください。他の人に知らせないでください！',
-    'label.taide_api' => 'TAIDE APIキー',
+    'label.taide_api' => 'Kuwa APIキー',
     'label.openai_api' => 'OpenAI APIキー',
     'label.stay_secure' => '外部APIトークンの使用量に注意してください！',
 

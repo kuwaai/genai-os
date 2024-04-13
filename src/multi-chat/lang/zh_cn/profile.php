@@ -30,7 +30,7 @@ return [
      //API
      'header.api_manage' => 'API管理',
      'label.api_manage' => '管理您的API金钥，切勿让别人知道！ ',
-     'label.taide_api' => 'TAIDE 金钥',
+     'label.taide_api' => 'Kuwa 金钥',
      'label.openai_api' => 'OpenAI 金钥',
      'label.stay_secure' => '请多留意您的外部金钥用量！ ',
 
