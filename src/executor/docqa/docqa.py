@@ -3,6 +3,7 @@
 
 import os
 import re
+import sys
 import logging
 import asyncio
 import functools
@@ -10,6 +11,7 @@ import itertools
 import requests
 import json
 import i18n
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
 from kuwa.executor import LLMExecutor
@@ -24,7 +26,7 @@ class NoUrlException(Exception):
     def __init__(self, msg):
         self.msg = msg
     def __str__(self):
-        return msg
+        return self.msg
 
 class DocQaExecutor(LLMExecutor):
     def __init__(self):

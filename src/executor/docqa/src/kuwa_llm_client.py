@@ -21,7 +21,7 @@ class KuwaLlmClient:
         url = urljoin(self.base_url, "/v1.0/chat/completions")
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {auth_token if auth_token is not None else self.auth_token}",
+            "Authorization": f"Bearer {self.auth_token if self.auth_token is not None else auth_token}",
         }
         request_body = {
             "messages": messages,

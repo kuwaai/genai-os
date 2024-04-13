@@ -4,7 +4,7 @@ call src\variables.bat
 set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 :loop
 set userInput=
-set /p userInput=Enter a command (quit, seed, hf login, prune, stop): 
+set /p userInput=Enter a command (quit, seed, hf login, prune, stop, cmd): 
 
 if /I "%userInput%"=="quit" (
 	echo Quit.
@@ -19,6 +19,10 @@ if /I "%userInput%"=="quit" (
 ) else if /I "%userInput%"=="stop" (
     echo Stopping everything
     call src\stop.bat
+    goto loop
+) else if /I "%userInput%"=="cmd" (
+    echo Opening cmd
+    call cmd
     goto loop
 ) else if /I "%userInput%"=="prune" (
     echo Running prune command...
