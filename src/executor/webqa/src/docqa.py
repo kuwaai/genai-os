@@ -20,7 +20,7 @@ import asyncio
 import copy
 import time
 
-class WebQa:
+class DocQa:
 
   def __init__(
     self,
@@ -58,7 +58,7 @@ class WebQa:
     modified_chat_history = chat_history[:-1] + [{"isbot": False, "msg": llm_input}]
     if modified_chat_history[0]["msg"] is None:
       if len(modified_chat_history) != 2: # Multi-round
-        modified_chat_history[0]["msg"] = i18n.t("webqa.summary_prompt")
+        modified_chat_history[0]["msg"] = i18n.t("docqa.summary_prompt")
       else: # Single-round
         modified_chat_history = modified_chat_history[1:]
     modified_chat_history = [
@@ -118,11 +118,11 @@ class WebQa:
     
     task = ''
     if final_user_input == None:
-      question = i18n.t("webqa.summary_question") 
+      question = i18n.t("docqa.summary_question") 
       llm_question = None
       task = 'summary'
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield i18n.t("webqa.summary_prefix")+'\n'
+      yield i18n.t("docqa.summary_prefix")+'\n'
     else:
       question = final_user_input
       llm_question = question

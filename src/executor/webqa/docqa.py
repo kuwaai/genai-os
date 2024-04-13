@@ -14,7 +14,7 @@ import i18n
 from typing import Generator
 from kuwa.executor import LLMExecutor
 
-from src.webqa import WebQa
+from src.docqa import DocQa
 from src.kuwa_llm_client import KuwaLlmClient
 from src.document_store import DocumentStore
 
@@ -26,7 +26,7 @@ class NoUrlException(Exception):
     def __str__(self):
         return msg
 
-class WebQaExecutor(LLMExecutor):
+class DocQaExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
 
@@ -59,7 +59,7 @@ class WebQaExecutor(LLMExecutor):
             chunk_size = self.args.chunk_size,
             chunk_overlap = self.args.chunk_overlap
         )
-        self.webqa = WebQa(
+        self.docqa = DocQa(
             document_store = self.document_store,
             vector_db = self.pre_built_db,
             llm = self.llm,
@@ -93,10 +93,10 @@ class WebQaExecutor(LLMExecutor):
         try:
             if self.pre_built_db == None:
                 url, chat_history = self.extract_last_url(chat_history)
-                if url == None : raise NoUrlException(i18n.t('webqa.no_url_exception'))
+                if url == None : raise NoUrlException(i18n.t('docqa.no_url_exception'))
             
                 chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
-            async for reply in self.webqa.process(urls=[url], chat_history=chat_history, auth_token=auth_token):
+            async for reply in self.docqa.process(urls=[url], chat_history=chat_history, auth_token=auth_token):
                 yield reply
 
         except NoUrlException as e:
@@ -105,8 +105,8 @@ class WebQaExecutor(LLMExecutor):
         except Exception as e:
             await asyncio.sleep(2) # To prevent SSE error of web page.
             logger.exception('Unexpected error')
-            yield i18n.t("webqa.default_exception_msg")
+            yield i18n.t("docqa.default_exception_msg")
 
 if __name__ == "__main__":
-    executor = WebQaExecutor()
+    executor = DocQaExecutor()
     executor.run()
