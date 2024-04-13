@@ -9,6 +9,7 @@ import functools
 import itertools
 import requests
 import json
+import i18n
 
 from typing import Generator
 from kuwa.executor import LLMExecutor
@@ -20,14 +21,17 @@ from src.document_store import DocumentStore
 logger = logging.getLogger(__name__)
 
 class NoUrlException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
     def __str__(self):
-        return "找不到URL。"
+        return msg
 
 class WebQaExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
 
     def extend_arguments(self, parser):
+        parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
         parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
         parser.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
         parser.add_argument('--limit', default=30720, type=int, help='The limit of the LLM\'s context window')
@@ -38,6 +42,9 @@ class WebQaExecutor(LLMExecutor):
         parser.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
 
     def setup(self):
+        i18n.load_path.append(f'lang/{self.args.lang}/')
+        i18n.config.set("error_on_missing_translation", True)
+        i18n.config.set("locale", self.args.lang)
 
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
@@ -53,6 +60,7 @@ class WebQaExecutor(LLMExecutor):
         self.webqa = WebQa(
             document_store = self.document_store,
             llm = self.llm,
+            lang = self.args.lang
         )
         self.proc = False
 
@@ -81,7 +89,7 @@ class WebQaExecutor(LLMExecutor):
 
         try:
             url, chat_history = self.extract_last_url(chat_history)
-            if url == None : raise NoUrlException
+            if url == None : raise NoUrlException(i18n.t('webqa.no_url_exception'))
             
             chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
             async for reply in self.webqa.process(urls=[url], chat_history=chat_history, auth_token=auth_token):
@@ -93,7 +101,7 @@ class WebQaExecutor(LLMExecutor):
         except Exception as e:
             await asyncio.sleep(2) # To prevent SSE error of web page.
             logger.exception('Unexpected error')
-            yield '發生錯誤，請再試一次或是聯絡管理員。'
+            yield i18n.t("webqa.default_exception_msg")
 
 if __name__ == "__main__":
     executor = WebQaExecutor()

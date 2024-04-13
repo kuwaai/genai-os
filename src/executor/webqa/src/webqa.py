@@ -5,6 +5,7 @@ from typing import Generator, Iterable
 from pathlib import Path
 from urllib.error import HTTPError
 from langchain.docstore.document import Document
+import i18n
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from .document_store import DocumentStore
@@ -26,10 +27,12 @@ class WebQa:
     document_store:DocumentStore = DocumentStore,
     vector_db:str = None,
     llm:KuwaLlmClient = KuwaLlmClient(),
+    lang:str="en",
     with_ref = True
     ):
     self.logger = logging.getLogger(__name__)
     self.llm = llm
+    self.lang = lang
     self.with_ref = with_ref
     if vector_db != None:
       self.pre_build_db = True
@@ -40,7 +43,7 @@ class WebQa:
   
   def generate_llm_input(self, task, question, related_docs):
     
-    template_path = 'src/prompt_template/' + f'llm_input_{task}.mustache'
+    template_path = f'lang/{self.lang}/prompt_template/llm_input_{task}.mustache'
     llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
@@ -55,7 +58,7 @@ class WebQa:
     modified_chat_history = chat_history[:-1] + [{"isbot": False, "msg": llm_input}]
     if modified_chat_history[0]["msg"] is None:
       if len(modified_chat_history) != 2: # Multi-round
-        modified_chat_history[0]["msg"] = '請提供這篇文章的摘要'
+        modified_chat_history[0]["msg"] = i18n.t("webqa.summary_prompt")
       else: # Single-round
         modified_chat_history = modified_chat_history[1:]
     modified_chat_history = [
@@ -110,16 +113,16 @@ class WebQa:
         document_store = await self.construct_document_store(docs)
     except HTTPError as e:
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield f'獲取文件時發生錯誤 {str(e)}，請確認所提供文件存在且可被公開存取。'
+      yield i18n.t('error_fetching_document').format(str(e))
       return
     
     task = ''
     if final_user_input == None:
-      question = '時間、地點、目的、結論、摘要'
+      question = i18n.t("webqa.summary_question") 
       llm_question = None
       task = 'summary'
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield '以下是這篇文章的摘要：\n'
+      yield i18n.t("webqa.summary_prefix")+'\n'
     else:
       question = final_user_input
       llm_question = question
