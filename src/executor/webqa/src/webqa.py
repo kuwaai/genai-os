@@ -5,6 +5,7 @@ from typing import Generator, Iterable
 from pathlib import Path
 from urllib.error import HTTPError
 from langchain.docstore.document import Document
+import i18n
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from .document_store import DocumentStore
@@ -26,10 +27,12 @@ class WebQa:
     document_store:DocumentStore = DocumentStore,
     vector_db:str = None,
     llm:KuwaLlmClient = KuwaLlmClient(),
+    lang:str="en",
     with_ref = True
     ):
     self.logger = logging.getLogger(__name__)
     self.llm = llm
+    self.lang = lang
     self.with_ref = with_ref
     if vector_db != None:
       self.pre_build_db = True
@@ -40,7 +43,7 @@ class WebQa:
   
   def generate_llm_input(self, task, question, related_docs):
     
-    template_path = 'prompt_template/' + f'llm_input_{task}.mustache'
+    template_path = f'lang/{self.lang}/prompt_template/llm_input_{task}.mustache'
     llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
@@ -50,16 +53,16 @@ class WebQa:
 
     return llm_input
 
-  def replace_chat_history(self, chat_history, task, question, related_docs):
+  def replace_chat_history(self, chat_history:[dict], task:str, question:str, related_docs:[str]):
     llm_input = self.generate_llm_input(task, question, related_docs)
-    modified_chat_history = chat_history[:-1] + [ChatRecord(llm_input, Role.USER)]
-    if modified_chat_history[0].msg is None:
+    modified_chat_history = chat_history[:-1] + [{"isbot": False, "msg": llm_input}]
+    if modified_chat_history[0]["msg"] is None:
       if len(modified_chat_history) != 2: # Multi-round
-        modified_chat_history[0].msg = '請提供這篇文章的摘要'
+        modified_chat_history[0]["msg"] = i18n.t("webqa.summary_prompt")
       else: # Single-round
         modified_chat_history = modified_chat_history[1:]
     modified_chat_history = [
-      ChatRecord('[Empty message]', r.role) if r.msg == '' else r
+      {"msg": "[Empty message]", "isbot": r["isbot"]} if r["msg"] == '' else r
       for r in modified_chat_history
     ]
 
@@ -97,7 +100,7 @@ class WebQa:
     await document_store.from_documents(docs)
     return document_store
 
-  async def process(self, urls: Iterable, chat_history: [dict]) -> Generator[str, None, None]:
+  async def process(self, urls: Iterable, chat_history: [dict], auth_token=None) -> Generator[str, None, None]:
 
     final_user_input = self.get_final_user_input(chat_history)
 
@@ -110,16 +113,16 @@ class WebQa:
         document_store = await self.construct_document_store(docs)
     except HTTPError as e:
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield f'獲取文件時發生錯誤 {str(e)}，請確認所提供文件存在且可被公開存取。'
+      yield i18n.t('error_fetching_document').format(str(e))
       return
     
     task = ''
     if final_user_input == None:
-      question = '時間、地點、目的、結論、摘要'
+      question = i18n.t("webqa.summary_question") 
       llm_question = None
       task = 'summary'
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield '以下是這篇文章的摘要：\n'
+      yield i18n.t("webqa.summary_prefix")+'\n'
     else:
       question = final_user_input
       llm_question = question
@@ -145,17 +148,26 @@ class WebQa:
     # Generate
     llm_input = self.generate_llm_input(task, llm_question, related_docs)
     self.logger.info('LLM input: {}'.format(llm_input))
-    result = await self.llm.complete(modified_chat_history)
+    # result = ''
+    generator = self.llm.chat_complete(
+      auth_token=auth_token,
+      messages=modified_chat_history
+    )
+    async for chunk in generator:
+      yield chunk
 
     # Egress filter
-    is_english = self.is_english(result)
-    self.logger.info(f'Is English: {is_english}')
-    if task == 'summary' and is_english:
-      result = await self.llm.complete([
-        ChatRecord(
-          role=Role.USER,
-          msg=self.generate_llm_input('translate', result, [])
-          ),
-      ])
+    # is_english = self.is_english(result)
+    # self.logger.info(f'Is English: {is_english}')
+    # if task == 'summary' and is_english:
+    #   result = await self.llm.chat_complete(
+    #     auth_token=auth_token,
+    #     messages=[
+    #       {
+    #         "isbot": False,
+    #         "msg": self.generate_llm_input('translate', result, [])
+    #       },
+    #     ]
+    #   )
 
-    yield result
+    # yield result

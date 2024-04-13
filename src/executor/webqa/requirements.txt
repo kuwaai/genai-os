@@ -10,3 +10,4 @@ chevron
 trafilatura
 requests
 selenium
+python-i18n[YAML]
