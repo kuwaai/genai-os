@@ -32,6 +32,7 @@ class WebQaExecutor(LLMExecutor):
 
     def extend_arguments(self, parser):
         parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
+        parser.add_argument('--database', default=None, type=str, help='The path the the pre-built database.')
         parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
         parser.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
         parser.add_argument('--limit', default=30720, type=int, help='The limit of the LLM\'s context window')
@@ -46,6 +47,7 @@ class WebQaExecutor(LLMExecutor):
         i18n.config.set("error_on_missing_translation", True)
         i18n.config.set("locale", self.args.lang)
 
+        self.pre_built_db = self.args.database
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
             model=self.args.model,
@@ -59,6 +61,7 @@ class WebQaExecutor(LLMExecutor):
         )
         self.webqa = WebQa(
             document_store = self.document_store,
+            vector_db = self.pre_built_db,
             llm = self.llm,
             lang = self.args.lang
         )
@@ -84,14 +87,15 @@ class WebQaExecutor(LLMExecutor):
 
     async def llm_compute(self, data):
         chat_history = json.loads(data.get("input"))
-        auth_token = data.get("kuwa_token") or self.args.api_key
+        auth_token = data.get("user_token") or self.args.api_key
         url = None
 
         try:
-            url, chat_history = self.extract_last_url(chat_history)
-            if url == None : raise NoUrlException(i18n.t('webqa.no_url_exception'))
+            if self.pre_built_db == None:
+                url, chat_history = self.extract_last_url(chat_history)
+                if url == None : raise NoUrlException(i18n.t('webqa.no_url_exception'))
             
-            chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
+                chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
             async for reply in self.webqa.process(urls=[url], chat_history=chat_history, auth_token=auth_token):
                 yield reply
 

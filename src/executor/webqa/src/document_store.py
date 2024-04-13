@@ -113,7 +113,7 @@ class DocumentStore:
     embedding_model_name = config['embedding_name']
     store = cls(embedding_model=embedding_model_name)
     store.load_embedding_model()
-    store.vector_store = FAISS.load_local(path, store.embeddings)
+    store.vector_store = FAISS.load_local(path, store.embeddings, allow_dangerous_deserialization=True)
     store.init_retriever()
     logger.info('Document store loaded.')
     return store
