@@ -14,6 +14,7 @@ import i18n
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
+from urllib.parse import urljoin
 from kuwa.executor import LLMExecutor
 
 from src.docqa import DocQa
@@ -31,6 +32,31 @@ class NoUrlException(Exception):
 class DocQaExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
+        
+    def _try_register(self):
+        super()._try_register()
+        if self.alt_access_code:
+            resp = requests.post(
+                url=urljoin(self.kernel_url, f"{self.executor_iface_version}/worker/register"),
+                data={"name": self.alt_access_code, "endpoint": self.get_reg_endpoint()}
+            )
+            if not resp.ok or resp.text == "Failed":
+                raise RuntimeWarning("The server failed to register to kernel.")
+
+    def _shut_down(self):
+        super()._shut_down()
+        if self.alt_access_code:
+            try:
+                response = requests.post(
+                    urljoin(self.kernel_url, f"{self.executor_iface_version}/worker/unregister"),
+                    data={"name": self.alt_access_code,"endpoint": self.get_reg_endpoint()}
+                )
+                if not response.ok or response.text == "Failed":
+                    raise RuntimeWarning()
+                else:
+                    logger.info("Unregistered from kernel.")
+            except requests.exceptions.ConnectionError as e:
+                logger.warning("Failed to unregister from kernel")
 
     def extend_arguments(self, parser):
         parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
@@ -43,6 +69,7 @@ class DocQaExecutor(LLMExecutor):
         parser.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
         parser.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
         parser.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
+        parser.add_argument('--alt_access_code', default=None, type=str, help='The alternate access code.')
 
     def setup(self):
         i18n.load_path.append(f'lang/{self.args.lang}/')
@@ -68,6 +95,7 @@ class DocQaExecutor(LLMExecutor):
             llm = self.llm,
             lang = self.args.lang
         )
+        self.alt_access_code = self.args.alt_access_code
         self.proc = False
 
     def extract_last_url(self, chat_history: list):

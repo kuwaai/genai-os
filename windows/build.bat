@@ -98,6 +98,7 @@ REM Production update
 pushd "..\src\multi-chat"
 call php ..\..\windows\packages\composer.phar update
 call php artisan key:generate --force
+call php artisan db:seed --class=InitSeeder --force
 call php artisan migrate --force
 rmdir /Q /S public\storage
 call php artisan storage:link

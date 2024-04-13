@@ -1,6 +1,19 @@
 @echo off
 setlocal EnableDelayedExpansion
-echo Now in: %cd%
+echo Now in: "%cd%"
+
+REM Remove variables
+set EXECUTOR_TYPE=
+set EXECUTOR_NAME=
+set EXECUTOR_ACCESS_CODE=
+set api_key=
+set model_path=
+set worker_path=
+set arguments=
+set command=
+set image_path=
+set target_access_code=
+
 REM Extract the folder name from the input
 for %%e in ("%cd%.") do set "current_folder=%%~nxe"
 
@@ -28,6 +41,54 @@ if "taide"=="!current_folder!" (
 	set "EXECUTOR_TYPE=llamacpp"
 	set "EXECUTOR_NAME=TAIDE"
 	set "EXECUTOR_ACCESS_CODE=taide"
+	goto skip_selection
+) else if "docQA & webQA"=="!current_folder!" (
+	echo Init docQA and webQA
+	echo EXECUTOR_TYPE=custom
+	echo "EXECUTOR_NAME=docQA & webQA"
+	echo "EXECUTOR_ACCESS_CODE=docQA & webQA"
+	
+	set "EXECUTOR_TYPE=custom"
+	set "EXECUTOR_NAME=docQA & webQA"
+	if "%1" == "quick" (
+		goto continue
+	)
+	goto input_EXECUTOR_ACCESS_CODE
+) else if "dbQA" == "!current_folder!" (
+	echo Init dbQA
+	echo EXECUTOR_TYPE=custom
+	echo EXECUTOR_NAME=dbQA
+	echo EXECUTOR_ACCESS_CODE=dbqa
+	
+	set "EXECUTOR_TYPE=custom"
+	set "EXECUTOR_NAME=dbQA"
+	set "EXECUTOR_ACCESS_CODE=dbqa"
+	set "worker_path=docqa.py"
+	for /d %%i in (*) do (
+		echo "Folder detected, using founded folder."
+		for %%F in ("%%~pi.") do (
+			for %%G in ("%%~pi\..") do (
+				for %%H in ("%%~pi\..\..") do (
+					echo db_path=..\..\..\%%~nxH\%%~nxG\%%~nxF\%%~nxi
+					set "db_path=../../../%%~nxH/%%~nxG/%%~nxF/%%~nxi"
+					goto skip_db_path
+				)
+			)
+		)
+	)
+
+	REM not quick
+	if "%1" == "quick" (
+		exit /b 0
+	)
+
+	:input_db_path
+	set /p "db_path=Enter the database path:"
+	if "!db_path!"=="" (
+		echo Database path cannot be blank. Please try again.
+		goto input_db_path
+	)
+	:skip_db_path
 	goto skip_selection
 )
 
@@ -87,6 +148,9 @@ if "!EXECUTOR_NAME!"=="" (
     goto input_EXECUTOR_NAME
 )
 
+if "%1" == "quick" (
+	exit /b 0
+)
 REM Ask for access code (must-fill field)
 :input_EXECUTOR_ACCESS_CODE
 set /p "EXECUTOR_ACCESS_CODE=Enter the access code: "
@@ -183,38 +247,82 @@ if "%1" == "quick" (
 set /p "arguments=Arguments to use: (press Enter to leave blank if you don't need or don't know what this is.)"
 
 :skip_arguments_path
-	
+
 del run.bat
 
-REM Save configuration to run.bat
-echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!> run.bat
-
-REM model:config
-echo pushd ..\..\..\src\multi-chat>>run.bat
-set command=php artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!"
-IF DEFINED image_path (
-    set command=!command! --image "!image_path!"
-)
-echo !command!>> run.bat
-echo popd>>run.bat
-
-REM kuwa-executor
-IF NOT "!EXECUTOR_TYPE!"=="custom" (
-	set command=start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!"
-	IF DEFINED api_key (
-		set command=!command! "--api_key" "!api_key!"
+if "!EXECUTOR_NAME!" == "docQA & webQA" (
+	if not "!EXECUTOR_ACCESS_CODE!" == "docQA & webQA" (
+		set target_access_code=!EXECUTOR_ACCESS_CODE!
 	)
-	IF DEFINED model_path (
-		set command=!command! "--model_path" "!model_path!"
+	REM Save configuration to run.bat
+	echo set EXECUTOR_ACCESS_CODE=doc_qa --exclude=web_qa> run.bat
+
+	REM webQA
+	echo pushd ..\..\..\src\multi-chat>>run.bat
+	set command=php artisan model:config "web_qa" "Web QA"
+	IF DEFINED image_path (
+		set command=!command! --image "..\..\windows\executors\docQA & webQA\webQA.png"
+	)
+	echo !command!>> run.bat
+
+	REM docQA
+	set command=php artisan model:config "doc_qa" "Document QA"
+	IF DEFINED image_path (
+		set command=!command! --image "..\..\windows\executors\docQA & webQA\docQA.png"
+	)
+	echo !command!>> run.bat
+	echo popd>> run.bat
+
+	REM webQA & docQA
+	echo pushd ..\..\..\src\executor\docqa>>run.bat
+	set command=start /b "" "python" "docqa.py" "--access_code" "web_qa" "--alt_access_code" "doc_qa"
+	if DEFINED target_access_code (
+		set command=!command! --model !target_access_code!
 	)
 	IF DEFINED arguments (
 		set command=!command! !arguments!
 	)
+	echo !command!>> run.bat
+	echo popd>> run.bat
 ) else (
-	set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
-)
-echo !command!>> run.bat
+	REM Save configuration to run.bat
+	echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!> run.bat
 
+	REM model:config
+	echo pushd ..\..\..\src\multi-chat>>run.bat
+	set command=php artisan model:config "!EXECUTOR_ACCESS_CODE!" "!EXECUTOR_NAME!"
+	IF DEFINED image_path (
+		set command=!command! --image "!image_path!"
+	)
+	echo !command!>> run.bat
+	echo popd>>run.bat
+
+	REM kuwa-executor
+	IF NOT "!EXECUTOR_TYPE!"=="custom" (
+		set command=start /b "" "kuwa-executor" "!EXECUTOR_TYPE!" "--access_code" "!EXECUTOR_ACCESS_CODE!"
+		IF DEFINED api_key (
+			set command=!command! "--api_key" "!api_key!"
+		)
+		IF DEFINED model_path (
+			set command=!command! "--model_path" "!model_path!"
+		)
+	) else (
+		set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
+	)
+	if DEFINED db_path (
+		set command=!command! --database !db_path!
+	)
+	IF DEFINED arguments (
+		set command=!command! !arguments!
+	)
+	if "dbQA" == "!current_folder!" (
+		echo pushd ..\..\..\src\executor\docqa\>> run.bat
+		echo !command!>> run.bat
+		echo popd>> run.bat
+	) else (
+		echo !command!>> run.bat
+	)
+)
 echo Configuration saved to run.bat
 
 if "%1" == "quick" (
