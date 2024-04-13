@@ -1,4 +1,4 @@
-from flask import Blueprint, request, json, redirect, url_for
+from flask import Blueprint, request, json, redirect, url_for, jsonify
 from src.variable import *
 from src.functions import *
 executor = Blueprint('executor', __name__)
@@ -65,3 +65,7 @@ def debug():
     document.querySelector("textarea").style.height = (document.querySelector("textarea").scrollHeight) + 'px';
 </script>
 """.format(str(dumps(data, indent=2)))
+
+@executor.route("/list", methods=["GET"])
+def list_executor():
+    return jsonify(list(data.keys()))
