@@ -40,7 +40,7 @@ class WebQa:
   
   def generate_llm_input(self, task, question, related_docs):
     
-    template_path = 'prompt_template/' + f'llm_input_{task}.mustache'
+    template_path = 'src/prompt_template/' + f'llm_input_{task}.mustache'
     llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
@@ -50,16 +50,16 @@ class WebQa:
 
     return llm_input
 
-  def replace_chat_history(self, chat_history, task, question, related_docs):
+  def replace_chat_history(self, chat_history:[dict], task:str, question:str, related_docs:[str]):
     llm_input = self.generate_llm_input(task, question, related_docs)
-    modified_chat_history = chat_history[:-1] + [ChatRecord(llm_input, Role.USER)]
-    if modified_chat_history[0].msg is None:
+    modified_chat_history = chat_history[:-1] + [{"isbot": False, "msg": llm_input}]
+    if modified_chat_history[0]["msg"] is None:
       if len(modified_chat_history) != 2: # Multi-round
-        modified_chat_history[0].msg = '請提供這篇文章的摘要'
+        modified_chat_history[0]["msg"] = '請提供這篇文章的摘要'
       else: # Single-round
         modified_chat_history = modified_chat_history[1:]
     modified_chat_history = [
-      ChatRecord('[Empty message]', r.role) if r.msg == '' else r
+      {"msg": "[Empty message]", "isbot": r["isbot"]} if r["msg"] == '' else r
       for r in modified_chat_history
     ]
 
@@ -97,7 +97,7 @@ class WebQa:
     await document_store.from_documents(docs)
     return document_store
 
-  async def process(self, urls: Iterable, chat_history: [dict]) -> Generator[str, None, None]:
+  async def process(self, urls: Iterable, chat_history: [dict], auth_token=None) -> Generator[str, None, None]:
 
     final_user_input = self.get_final_user_input(chat_history)
 
@@ -145,17 +145,26 @@ class WebQa:
     # Generate
     llm_input = self.generate_llm_input(task, llm_question, related_docs)
     self.logger.info('LLM input: {}'.format(llm_input))
-    result = await self.llm.complete(modified_chat_history)
+    # result = ''
+    generator = self.llm.chat_complete(
+      auth_token=auth_token,
+      messages=modified_chat_history
+    )
+    async for chunk in generator:
+      yield chunk
 
     # Egress filter
-    is_english = self.is_english(result)
-    self.logger.info(f'Is English: {is_english}')
-    if task == 'summary' and is_english:
-      result = await self.llm.complete([
-        ChatRecord(
-          role=Role.USER,
-          msg=self.generate_llm_input('translate', result, [])
-          ),
-      ])
+    # is_english = self.is_english(result)
+    # self.logger.info(f'Is English: {is_english}')
+    # if task == 'summary' and is_english:
+    #   result = await self.llm.chat_complete(
+    #     auth_token=auth_token,
+    #     messages=[
+    #       {
+    #         "isbot": False,
+    #         "msg": self.generate_llm_input('translate', result, [])
+    #       },
+    #     ]
+    #   )
 
-    yield result
+    # yield result
