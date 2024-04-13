@@ -4,8 +4,8 @@ import functools
 import json
 from pathlib import Path
 from langchain.docstore.document import Document
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.retrievers.bm25 import BM25Retriever
 from langchain.schema.vectorstore import VectorStoreRetriever
 from langchain.retrievers.ensemble import EnsembleRetriever
@@ -18,7 +18,14 @@ class DocumentStore:
 
   config_filename = 'config.json'
 
-  def __init__(self, embedding_model = 'infgrad/stella-base-zh', mmr_k = 6, mmr_fetch_k = 12):
+  def __init__(
+    self,
+    embedding_model = 'thenlper/gte-base-zh',
+    mmr_k = 6,
+    mmr_fetch_k = 12,
+    chunk_size = 512,
+    chunk_overlap = 128
+    ):
     """
     Initialize the document store.
     embedding_model: The sentence-transformers pre-trained model

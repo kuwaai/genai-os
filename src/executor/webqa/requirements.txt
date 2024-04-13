@@ -1,8 +1,6 @@
 langchain
+langchain-community
 accelerate
-torch
-transformers
-protobuf
 sentence-transformers
 textract
 bs4
@@ -10,7 +8,5 @@ bs4
 faiss-cpu
 chevron
 trafilatura
-jsonlines
-requests-oauthlib
 requests
 selenium

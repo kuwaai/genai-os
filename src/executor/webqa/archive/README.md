@@ -1,6 +1,6 @@
-Document QA (DocQA)
+Web QA
 ---
-Retrieve-Augmented Generation Worker.
+A Retrieval-Augmented Generation Executor.
 
 ## Production Deployment
 

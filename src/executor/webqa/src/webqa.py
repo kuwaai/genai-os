@@ -1,7 +1,6 @@
 #!/bin/python3
 # -#- coding: UTF-8 -*-
 
-from worker_framework.datatype import ChatRecord, Role
 from typing import Generator, Iterable
 from pathlib import Path
 from urllib.error import HTTPError
@@ -9,30 +8,35 @@ from langchain.docstore.document import Document
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from .document_store import DocumentStore
-from .taide_llm import TaideLlmFactory
+from .kuwa_llm_client import KuwaLlmClient
 
 import re
 import gc
 import os
-import torch
 import logging
 import chevron
 import asyncio
 import copy
-import jsonlines
 import time
 
-class DocumentQa:
+class WebQa:
 
-  log_path = os.environ.get('llm_log_path','/var/log/doc_qa/qa.jsonl')
-
-  def __init__(self, document_store:str = None, with_ref = True):
+  def __init__(
+    self,
+    document_store:DocumentStore = DocumentStore,
+    vector_db:str = None,
+    llm:KuwaLlmClient = KuwaLlmClient(),
+    with_ref = True
+    ):
     self.logger = logging.getLogger(__name__)
-    self.llm = TaideLlmFactory.get_taide_llm(model_location=os.environ.get('MODEL_LOCATION','remote-nchc'))
+    self.llm = llm
     self.with_ref = with_ref
-    self.document_store:DocumentStore = None
-    if document_store != None:
-      self.document_store = DocumentStore.load(document_store)
+    if vector_db != None:
+      self.pre_build_db = True
+      self.document_store = DocumentStore.load(vector_db)
+    else:
+      self.pre_build_db = False
+      self.document_store:DocumentStore = document_store
   
   def generate_llm_input(self, task, question, related_docs):
     
@@ -68,9 +72,9 @@ class DocumentQa:
 
     return english_rate >= threshold
 
-  def get_final_user_input(self, chat_history: [ChatRecord]) -> str:
-    final_user_record = next(filter(lambda x: x.role == Role.USER, reversed(chat_history)))
-    return final_user_record.msg
+  def get_final_user_input(self, chat_history: [dict]) -> str:
+    final_user_record = next(filter(lambda x: x['isbot'] == False, reversed(chat_history)))
+    return final_user_record['msg']
 
   async def fetch_documents(self, url:str):
     # Fetching documents
@@ -89,18 +93,18 @@ class DocumentQa:
     return docs
     
   async def construct_document_store(self, docs: [Document]):
-    document_store = DocumentStore()
+    document_store = self.document_store
     await document_store.from_documents(docs)
     return document_store
 
-  async def process(self, urls: Iterable, chat_history: [ChatRecord]) -> Generator[str, None, None]:
+  async def process(self, urls: Iterable, chat_history: [dict]) -> Generator[str, None, None]:
 
     final_user_input = self.get_final_user_input(chat_history)
 
     document_store = self.document_store
     docs = None
     try:
-      if document_store == None:
+      if not self.pre_build_db:
         docs = await asyncio.gather(*[self.fetch_documents(url) for url in urls])
         docs = [doc for sub_docs in docs for doc in sub_docs]
         document_store = await self.construct_document_store(docs)
@@ -137,7 +141,6 @@ class DocumentQa:
     # Free the unused VRAM
     del document_store
     gc.collect()
-    torch.cuda.empty_cache()
 
     # Generate
     llm_input = self.generate_llm_input(task, llm_question, related_docs)
@@ -154,15 +157,5 @@ class DocumentQa:
           msg=self.generate_llm_input('translate', result, [])
           ),
       ])
-
-    # Log the QA history
-    with jsonlines.open(self.log_path, mode='a', flush=True) as log:
-      log.write({
-        'time': time.time(),
-        'url': urls,
-        'question': question,
-        'related_docs': [doc.page_content for doc in related_docs],
-        'response': result
-      })
 
     yield result
