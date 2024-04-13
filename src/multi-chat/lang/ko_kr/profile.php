@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API 관리',
     'label.api_manage' => 'API 키를 관리하고 다른 사람에게 공개하지 마십시오!',
-    'label.taide_api' => 'TAIDE 키',
+    'label.taide_api' => 'Kuwa 키',
     'label.openai_api' => 'OpenAI 키',
     'label.stay_secure' => '외부 API 토큰 사용량에 주의하세요!',
 
