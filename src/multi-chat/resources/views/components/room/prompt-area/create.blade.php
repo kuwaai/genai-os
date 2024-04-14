@@ -23,7 +23,7 @@
                                 <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
                                 @else
                                 <img
-                                    src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/images/kuwa.png' }}">
+                                    src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                                 @endenv
                             </div>
                         </span>

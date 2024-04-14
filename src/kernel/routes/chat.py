@@ -10,7 +10,7 @@ chat = Blueprint('chat', __name__)
 def completions():
     # Forward SSE stream to the READY state LLM API, If no exist then return empty message
     # Parameters: name, input, history_id, user_id
-    llm_name, inputs, history_id, openai_token, google_token, user_id = request.form.get("name"), request.form.get("input"), request.form.get("history_id"), request.form.get("openai_token"), request.form.get("google_token"), request.form.get("user_id")
+    llm_name, inputs, history_id, openai_token, google_token, user_id, user_token = request.form.get("name"), request.form.get("input"), request.form.get("history_id"), request.form.get("openai_token"), request.form.get("google_token"), request.form.get("user_id"), request.form.get("user_token")
     if data.get(llm_name):
         dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == history_id and i[3] == user_id]
         if len(dest) > 0:
@@ -20,13 +20,14 @@ def completions():
                 llm_name=llm_name,
                 dest=dest,
                 openai_token=openai_token,
-                google_token=google_token
+                google_token=google_token,
+                user_token=user_token
             )
             return result
     return ""
 
 @safety_middleware
-def completions_backend(inputs:list, llm_name:str, dest:List, openai_token:Optional[str], google_token:Optional[str]):
+def completions_backend(inputs:list, llm_name:str, dest:List, openai_token:Optional[str], google_token:Optional[str], user_token:Optional[str]):
     """
     The backend portion of the completions endpoint. It forwards the user
     request to the backend.  This separation enables middleware can be installed
@@ -44,7 +45,7 @@ def completions_backend(inputs:list, llm_name:str, dest:List, openai_token:Optio
     """
 
     try:
-        response = requests.post(dest[0], data={"input": inputs, "openai_token":openai_token, "google_token":google_token}, stream=True, timeout=60)
+        response = requests.post(dest[0], data={"input": inputs, "openai_token":openai_token, "google_token":google_token, "user_token":user_token}, stream=True, timeout=120)
         def event_stream(dest, response):
             dest[1] = "BUSY"
             try:

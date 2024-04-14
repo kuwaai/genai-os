@@ -19,7 +19,7 @@ use Carbon\Carbon;
 class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $access_code, $msgtime, $history_id, $user_id, $channel, $openai_token, $google_token;
+    private $input, $access_code, $msgtime, $history_id, $user_id, $channel, $openai_token, $google_token, $user_token;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
     public static $agent_version = 'v1.0';
@@ -39,8 +39,14 @@ class RequestChat implements ShouldQueue
             $channel = '';
         }
         $this->channel = $channel;
-        $this->openai_token = User::find($user_id)->openai_token;
-        $this->google_token = User::find($user_id)->google_token;
+        $user = User::find($user_id);
+        $this->openai_token = $user->openai_token;
+        $this->google_token = $user->google_token;
+        if ($user->tokens()->where('name', 'API_Token')->count() != 1) {
+            $user->tokens()->where('name', 'API_Token')->delete();
+            $user->createToken('API_Token', ['access_api']);
+        }
+        $this->user_token = $user->tokens()->where('name', 'API_Token')->first()->token;
     }
 
     /**
@@ -147,6 +153,7 @@ class RequestChat implements ShouldQueue
                             'history_id' => $this->history_id * ($this->channel == $this->history_id ? 1 : -1),
                             'openai_token' => $this->openai_token,
                             'google_token' => $this->google_token,
+                            'user_token' => $this->user_token,
                         ],
                         'stream' => true,
                     ]);
