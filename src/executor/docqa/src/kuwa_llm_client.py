@@ -33,7 +33,7 @@ class KuwaLlmClient:
         llm.append(None)
         return llm[0]
 
-    async def chat_complete(self, auth_token:str=None, messages:list=[], timeout=60):
+    async def chat_complete(self, auth_token:str=None, messages:list=[], timeout=120):
 
         url = urljoin(self.base_url, "/v1.0/chat/completions")
         headers = {

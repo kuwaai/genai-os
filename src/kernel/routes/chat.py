@@ -45,7 +45,7 @@ def completions_backend(inputs:list, llm_name:str, dest:List, openai_token:Optio
     """
 
     try:
-        response = requests.post(dest[0], data={"input": inputs, "openai_token":openai_token, "google_token":google_token, "user_token":user_token}, stream=True, timeout=60)
+        response = requests.post(dest[0], data={"input": inputs, "openai_token":openai_token, "google_token":google_token, "user_token":user_token}, stream=True, timeout=120)
         def event_stream(dest, response):
             dest[1] = "BUSY"
             try:
