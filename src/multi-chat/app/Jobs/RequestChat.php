@@ -39,9 +39,14 @@ class RequestChat implements ShouldQueue
             $channel = '';
         }
         $this->channel = $channel;
-        $this->openai_token = User::find($user_id)->openai_token;
-        $this->google_token = User::find($user_id)->google_token;
-        $this->user_token = User::find($user_id)->tokens()->where('name', 'API_Token')->first()->token;
+        $user = User::find($user_id);
+        $this->openai_token = $user->openai_token;
+        $this->google_token = $user->google_token;
+        if ($user->tokens()->where('name', 'API_Token')->count() != 1) {
+            $user->tokens()->where('name', 'API_Token')->delete();
+            $user->createToken('API_Token', ['access_api']);
+        }
+        $this->user_token = $user->tokens()->where('name', 'API_Token')->first()->token;
     }
 
     /**
