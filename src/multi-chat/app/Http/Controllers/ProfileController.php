@@ -304,7 +304,8 @@ class ProfileController extends Controller
                             $response->setCallback(function () use ($request, $history, $tmp, $llm, $user) {
                                 $client = new Client(['timeout' => 300]);
                                 Redis::rpush('api_' . $user->tokenable_id, $history->id);
-                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $user->openai_token, 'api_' . $history->id);
+                                Redis::expire('usertask_' . $user->tokenable_id, 1200);
+                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, 'api_' . $history->id);
 
                                 $req = $client->get(route('api.stream'), [
                                     'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
@@ -341,13 +342,13 @@ class ProfileController extends Controller
                                             $jsonData = (object) json_decode(trim(substr($line, 5)));
                                             if ($jsonData !== null) {
                                                 $resp['choices'][0]['delta']['content'] = $jsonData->msg;
-                                                echo 'data: ' . json_encode($resp) . "\n";
+                                                echo 'data: ' . json_encode($resp) . "\n\n";
                                                 ob_flush();
                                                 flush();
                                             }
                                         } elseif (substr($line, 0, 6) === 'event:') {
                                             if (trim(substr($line, 5)) == 'end') {
-                                                echo "event: end\n\n";
+                                                echo "event: close\n\n";
                                                 ob_flush();
                                                 flush();
                                                 $client->disconnect();
