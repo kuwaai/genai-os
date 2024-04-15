@@ -89,7 +89,8 @@ async def file_extractor(content: str, url: str, content_type: str) -> str:
     
     # Correct the suffix
     guessed_suffixes = mimetypes.guess_all_extensions(content_type.split(';', 1)[0])
-    file_path = file_path.with_suffix('').with_suffix(guessed_suffixes[0])
+    if len(guessed_suffixes) > 0:
+        file_path = file_path.with_suffix('').with_suffix(guessed_suffixes[0])
     
     # Make directory and write the file
     # Note that in most of OS, file operation is synchronous.
