@@ -41,11 +41,11 @@ for %%I in ("%url_Redis%") do set "filename_Redis=%%~nxI"
 set "redis_folder=%filename_Redis:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_Redis%") do set "version_Redis=%%v"
 
-REM Variables for CMake 3.29.0
-set "url_CMake=https://github.com/Kitware/CMake/releases/download/v3.29.0/cmake-3.29.0-windows-x86_64.zip"
-for %%I in ("%url_CMake%") do set "filename_CMake=%%~nxI"
-set "cmake_folder=%filename_CMake:~0,-4%"
-for /f "tokens=2 delims=-" %%v in ("%filename_CMake%") do set "version_CMake=%%v"
+REM Variables for XpdfReader
+set "url_XpdfReader=https://web.archive.org/web/20240303193546/https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip"
+for %%I in ("%url_XpdfReader%") do set "filename_XpdfReader=%%~nxI"
+set "xpdfreader_folder=%filename_XpdfReader:~0,-4%"
+for /f "tokens=2 delims=-" %%v in ("%filename_XpdfReader%") do set "version_XpdfReader=%%v"
 
 REM Prepare migration file
 mkdir src\conf 2>nul
@@ -57,7 +57,7 @@ REM Prepare packages folder
 mkdir packages 2>nul
 
 REM init env
-set "PATH=%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%PATH%"
+set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%PATH%"
 REM Run migration
 for %%i in ("src\migration\*.bat") do (
     findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (

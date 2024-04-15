@@ -16,6 +16,9 @@ call src\download_extract.bat %url_PHP% packages\%php_folder% packages\%php_fold
 REM Download and extract PHP if not exists
 call src\download_extract.bat %url_PHP_Archive% packages\%php_folder_Archive% packages\%php_folder_Archive% php.zip
 
+REM Download and extract xpdfreader if not exists
+call src\download_extract.bat %url_XpdfReader% packages\%xpdfreader_folder% packages\. xpdfreader.zip
+
 IF EXIST packages\%python_folder% (
     echo Python folder already exists.
 ) ELSE (
