@@ -2,7 +2,7 @@
     @php
         $result = App\Models\Bots::Join('llms', function ($join) {
             $join->on('llms.id', '=', 'bots.model_id');
-        })
+        })->where("llms.enabled",'=',true)
             ->select(
                 'llms.*',
                 'bots.*',
@@ -43,23 +43,23 @@
                 ->select('chatrooms.*', DB::raw('count(chats.id) as counts'))
                 ->groupBy('chatrooms.id');
 
-            // Fetch the ordered identifiers based on `llm_id` for each database
+            // Fetch the ordered identifiers based on `bot_id` for each database
             $DC = $DC->selectSub(function ($query) {
                 if (config('database.default') == 'sqlite') {
                     $query
                         ->from('chats')
                         ->selectRaw("group_concat(bot_id, ',') as identifier")
                         ->whereColumn('roomID', 'chatrooms.id')
-                        ->orderBy('bot_id');
+                        ->orderByRaw('bot_id');
                 } elseif (config('database.default') == 'mysql') {
                     $query
                         ->from('chats')
-                        ->selectRaw('group_concat(bot_id separator \',\') as identifier')
+                        ->selectRaw('group_concat(bot_id separator \',\' order by bot_id) as identifier')
                         ->whereColumn('roomID', 'chatrooms.id');
                 } elseif (config('database.default') == 'pgsql') {
                     $query
                         ->from('chats')
-                        ->selectRaw('string_agg(bot_id::text, \',\') as identifier')
+                        ->selectRaw('string_agg(bot_id::text, \',\' order by bot_id) as identifier')
                         ->whereColumn('roomID', 'chatrooms.id');
                 }
             }, 'identifier');
@@ -75,7 +75,7 @@
                     $DC = $DC[$identifier];
                     $llms = App\Models\Bots::whereIn(
                         'bots.id',
-                        array_map('intval', explode(',', trim($identifier, '{}'))),
+                        array_map('intval', explode(',', $identifier)),
                     )
                         ->join('llms', function ($join) {
                             $join->on('llms.id', '=', 'bots.model_id');
@@ -103,7 +103,7 @@
                         )
                         ->orderby('bots.id')
                         ->get();
-                    $DC = $DC[implode(',', array_reverse($llms->pluck('id')->toArray()))];
+                    $DC = $DC[implode(',', $llms->pluck('id')->toArray())];
                 }
             } catch (Exception $e) {
                 $llms = App\Models\Bots::whereIn('bots.id', session('llms'))

@@ -1,0 +1,196 @@
+#!/bin/python3
+# -#- coding: UTF-8 -*-
+
+import os
+import re
+import sys
+import logging
+import asyncio
+import functools
+import itertools
+import requests
+import json
+import i18n
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from typing import Generator
+from kuwa.executor import LLMExecutor
+
+from src.docqa import DocQa
+from src.kuwa_llm_client import KuwaLlmClient
+from src.document_store import DocumentStore
+
+logger = logging.getLogger(__name__)
+
+class NoUrlException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
+
+class SearchQaExecutor(LLMExecutor):
+    def __init__(self):
+        super().__init__()
+
+    def extend_arguments(self, parser):
+        parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
+        parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
+        parser.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
+        parser.add_argument('--limit', default=3072, type=int, help='The limit of the LLM\'s context window')
+        parser.add_argument('--model', default=None, help='The model name (access code) on Kuwa multi-chat WebUI')
+        parser.add_argument('--mmr_k', default=6, type=int, help='Number of chunk to retrieve after Maximum Marginal Relevance (MMR).')
+        parser.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
+        parser.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
+        parser.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
+        parser.add_argument('--google_api_key', default=None, help='The API key of Google API.')
+        parser.add_argument('--google_cse_id', default=None, help='The ID of Google Custom Search Engine.')
+        parser.add_argument('--restricted_sites', default='', help='A list of restricted sites. Septate by ";".')
+        parser.add_argument('--blocked_sites', default='', help='A list of blocked sites. Septate by ";".')
+
+    def setup(self):
+        i18n.load_path.append(f'lang/{self.args.lang}/')
+        i18n.config.set("error_on_missing_translation", True)
+        i18n.config.set("locale", self.args.lang)
+
+        self.llm = KuwaLlmClient(
+            base_url = self.args.api_base_url,
+            kernel_base_url = self.kernel_url,
+            model=self.args.model,
+            auth_token=self.args.api_key
+        )
+        self.document_store = DocumentStore(
+            mmr_k = self.args.mmr_k,
+            mmr_fetch_k = self.args.mmr_fetch_k,
+            chunk_size = self.args.chunk_size,
+            chunk_overlap = self.args.chunk_overlap
+        )
+        self.docqa = DocQa(
+            document_store = self.document_store,
+            llm = self.llm,
+            lang = self.args.lang
+        )
+
+        self.google_api_key = self.args.google_api_key
+        self.searching_engine_id = self.args.google_cse_id
+        self.restricted_sites = self.args.restricted_sites
+        self.blocked_sites = self.args.blocked_sites
+
+        self.proc = False
+
+    async def is_url_reachable(self, url:str, timeout=5) -> bool:
+        loop = asyncio.get_running_loop()
+        resp = None
+        try:
+            resp = await loop.run_in_executor(
+                None,
+                functools.partial(
+                requests.get,
+                url,
+                timeout=timeout,
+                verify=False
+                )
+            )
+        except Exception as e:
+            logger.exception(e)
+        finally:
+            return resp != None and resp.ok
+
+    async def search_url(self, chat_history: [dict], num_url = 3) -> ([dict[str, str]],[str]):
+        """
+        Get first URL from the search result.
+        """
+
+        process_site_list = lambda x: list(filter(None, x.split(';')))
+        restricted_sites = process_site_list(self.restricted_sites)
+        blocked_sites = process_site_list(self.blocked_sites)
+        latest_user_record = next(filter(lambda x: not x["isbot"], reversed(chat_history)))
+        latest_user_msg = latest_user_record["msg"]
+
+        query = latest_user_msg
+        query += ''.join([f' site:{s.strip()}' for s in restricted_sites])
+        query += ''.join([f' -site:{s.strip()}' for s in blocked_sites])
+        
+        logger.debug(f'Restricted sites: {restricted_sites}')
+        logger.debug(f'Blocked sites: {blocked_sites}')
+        logger.debug(f'Query: {query}')
+
+        endpoint = 'https://customsearch.googleapis.com/customsearch/v1'
+        params = {
+            'key': self.google_api_key,
+            'cx': self.searching_engine_id,
+            'q': query
+        }
+
+        urls = []
+
+        try:
+
+            loop = asyncio.get_running_loop()
+            resp = await loop.run_in_executor(
+                None,
+                functools.partial(
+                requests.get,
+                endpoint,
+                params = params
+                )
+            )
+            
+            logger.debug(f'Search response ({resp.status_code}):\n{resp.content}')
+
+            if not resp.ok or 'error' in resp.json(): raise ValueError()
+            resp  = resp.json()
+            
+            urls = [item['link'] for item in resp['items']]
+            titles = [item['title'] for item in resp['items']]
+            urls_reachable = await asyncio.gather(*[self.is_url_reachable(url) for url in urls])
+            logger.debug(list(zip(urls, urls_reachable)))
+            urls = list(zip(urls, titles))
+            urls = list(itertools.compress(urls, urls_reachable))
+            urls = urls[:min(len(urls), num_url)]
+        
+        except Exception as e:
+            logger.exception('Error while getting URLs for Google searching API')
+        
+        finally:
+            return urls, [latest_user_record]
+
+    async def llm_compute(self, data):
+        chat_history = json.loads(data.get("input"))
+        auth_token = data.get("user_token") or self.args.api_key
+
+        try:
+        
+            urls, chat_history = await self.search_url(chat_history)
+
+            if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
+        
+            self.proc = True
+            response_generator = self.docqa.process(urls=[u for u,t in urls], chat_history=chat_history, auth_token=auth_token)
+            async for reply in response_generator:
+                if not self.proc:
+                    await response_generator.aclose()
+                yield reply
+        
+            yield f"\n\n{i18n.t('searchqa.reference')}\n"
+            for i, (url, title) in enumerate(urls):
+                yield f'{i+1}. [{title.strip()}]({url})\n'
+        
+        except NoUrlException as e:
+            await asyncio.sleep(2) # To prevent SSE error of web page.
+            yield 
+
+        except Exception as e:
+            await asyncio.sleep(2) # To prevent SSE error of web page.
+            logger.exception('Unexpected error')
+            yield i18n.t("searchqa.default_exception_msg")
+
+    async def abort(self):
+        if self.proc:
+            self.proc = False
+            logger.debug("aborted")
+            return "Aborted"
+        return "No process to abort"
+
+if __name__ == "__main__":
+    executor = SearchQaExecutor()
+    executor.run()

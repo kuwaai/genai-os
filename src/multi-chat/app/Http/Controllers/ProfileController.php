@@ -273,7 +273,7 @@ class ProfileController extends Controller
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
         if ($result->exists()) {
             $user = $result->first();
-            if (User::find($user->id)->hasPerm('Chat_read_access_to_api')) {
+            if (User::find($user->id)->hasPerm('Chat_read_access_to_api') || config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
                 if (isset($jsonData['messages']) && isset($jsonData['model'])) {
                     $llm = LLMs::where('access_code', '=', $jsonData['model']);
 
@@ -347,7 +347,7 @@ class ProfileController extends Controller
                                                 flush();
                                             }
                                         } elseif (substr($line, 0, 6) === 'event:') {
-                                            if (trim(substr($line, 5)) == 'end') {
+                                            if (trim(substr($line, 5)) == 'close') {
                                                 echo "event: close\n\n";
                                                 ob_flush();
                                                 flush();
@@ -406,7 +406,7 @@ class ProfileController extends Controller
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
         if ($result->exists()) {
             $user = $result->first();
-            if (User::find($user->id)->hasPerm('Chat_read_access_to_api')) {
+            if (User::find($user->id)->hasPerm('Chat_read_access_to_api') || config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
                 $list = \Illuminate\Support\Facades\Redis::lrange('api_' . $user->tokenable_id, 0, -1);
                 $integers = array_map(function ($element) {
                     return is_string($element) ? -((int) $element) : null;
@@ -464,7 +464,7 @@ class ProfileController extends Controller
                         $client->subscribe('api_' . $request->input('history_id'), function ($message, $raw_history_id) use ($client) {
                             [$type, $msg] = explode(' ', $message, 2);
                             if ($type == 'Ended') {
-                                echo 'event: end\n\n';
+                                echo 'event: close\n\n';
                                 ob_flush();
                                 flush();
                                 $client->disconnect();

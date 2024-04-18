@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API verwalten',
     'label.api_manage' => 'Verwalten Sie Ihre API-Schlüssel, geben Sie sie nicht weiter!',
-    'label.taide_api' => 'TAIDE-Schlüssel',
+    'label.taide_api' => 'Kuwa-Schlüssel',
     'label.openai_api' => 'OpenAI-Schlüssel',
     'label.stay_secure' => 'Bitte achten Sie darauf, wie Sie Ihren externen Schlüssel verwenden!',
 

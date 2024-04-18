@@ -1,19 +1,17 @@
 @echo off
+cd "%~dp0"
 setlocal enabledelayedexpansion
 
 REM Include variables from separate file
 call src\variables.bat
 
-REM Start Kuwa workers
-
 REM Redis Server
-
 pushd packages\%redis_folder%
 del dump.rdb
 start /b "" "redis-server.exe" redis.conf
 popd
 
-REM Define number of workers
+REM Define number of Redis workers
 set numWorkers=10
 
 REM Redis workers
@@ -25,8 +23,6 @@ for /l %%i in (1,1,%numWorkers%) do (
 REM Kernel
 pushd "..\src\kernel"
 del records.pickle
-set PYTHONPATH=%PYTHONPATH%;%~dp0..\src\kernel\src
-set "PATH=%~dp0packages\%python_folder%\Scripts;%~dp0packages\%python_folder%\;%PATH%"
 start /b "" "%~dp0packages\%python_folder%\python.exe" "%~dp0..\src\kernel\main.py"
 popd
 
@@ -38,54 +34,27 @@ if %errorlevel% neq 0 (
     goto :CHECK_URL
 )
 
-REM Prepare workers and collect existing access codes
+REM Prepare executors and collect existing access codes
 set "exclude_access_codes="
-for /D %%d in ("workers\*") do (
-    rem Check if the env.bat file exists in the current loop folder
-    if exist "%%d\env.bat" (
-        rem Execute the env.bat file
-        call %%d\env.bat
+for /D %%d in ("executors\*") do (
+    rem Check if the run.bat file exists in the current loop folder
+    pushd %%d
+    if exist "init.bat" if not exist "run.bat" (
+        call init.bat quick
+    )
 
-        rem Perform different actions based on the model type
-        rem Use if statements to handle different model types
-        if "!model_type!"=="chatgpt" (
-            set "do_extra_action=1"
-        ) else if "!model_type!"=="geminipro" (
-            set "do_extra_action=1"
-        ) else if "!model_type!"=="custom" (
-            set "do_extra_action=2"
-        ) else (
-            set "do_extra_action=0"
-        )
-
-        rem Perform extra action if needed
-        if "!do_extra_action!"=="1" (
-            if defined api_key (
-                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--api_key" "!api_key!"
-            ) else (
-                start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!"
-            )
-        ) else if "!do_extra_action!"=="2" (
-            start /b "" "%~dp0%python_folder%\python.exe" !worker_path! "--access_code" "!access_code!"
-        ) else (
-            start /b "" "kuwa-executor" "!model_type!" "--access_code" "!access_code!" "--model_path" "!model_path!"
-        )
-
-        pushd ..\src\multi-chat\
-        if "!image_path!"=="" (
-			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!"
-		) else (
-			call ..\..\windows\packages\!php_folder!\php.exe artisan model:config "!access_code!" "!model_name!" --image "!image_path!"
-		)
-        popd
+    if exist "run.bat" (
+        rem Execute the run.bat file
+        call run.bat
 
         rem Collect existing access code
         if "!exclude_access_codes!"=="" (
-            set "exclude_access_codes=--exclude=!access_code!"
+            set "exclude_access_codes=--exclude=!EXECUTOR_ACCESS_CODE!"
         ) else (
-            set "exclude_access_codes=!exclude_access_codes! --exclude=!access_code!"
+            set "exclude_access_codes=!exclude_access_codes! --exclude=!EXECUTOR_ACCESS_CODE!"
         )
-    )
+    ) 
+    popd
 )
 REM Prune unused access codes
 if not "!exclude_access_codes!"=="" (
@@ -114,8 +83,8 @@ set userInput=
 set /p userInput=Enter a command (stop, seed, hf login): 
 
 if /I "%userInput%"=="stop" (
-    echo Stopping Nginx...
-    call stop.bat
+    echo Stopping everything...
+	call src\stop.bat
 ) else if /I "%userInput%"=="seed" (
     echo Running seed command...
     call src\migration\20240402_seed_admin.bat
@@ -128,5 +97,4 @@ if /I "%userInput%"=="stop" (
     goto loop
 )
 
-call src\stop.bat
 endlocal

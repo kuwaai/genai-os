@@ -14,7 +14,7 @@
                 class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                 <img data-tooltip-target="llm_{{ $chat->id }}_toggle" data-tooltip-placement="top"
                     class="h-full w-full"
-                    src="{{ strpos($chat->image, 'data:image/png;base64') === 0 ? $chat->image : asset(Storage::url($chat->image)) }}">
+                    src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                 <div id="llm_{{ $chat->id }}_toggle" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                     {{ $chat->name }}
@@ -51,7 +51,7 @@
                         class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                         <img data-tooltip-target="llm_{{ $llm->id }}_toggle" data-tooltip-placement="top"
                             class="h-full w-full"
-                            src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/images/kuwa.png' }}">
+                            src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                         <div id="llm_{{ $llm->id }}_toggle" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                             {{ $llm->name }}
@@ -70,7 +70,7 @@
                         class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                         <img data-tooltip-target="llm_{{ $chat->id }}_toggle" data-tooltip-placement="top"
                             class="h-full w-full"
-                            src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/images/kuwa.png' }}">
+                            src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                         <div id="llm_{{ $chat->id }}_toggle" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
                             {{ $chat->name }}

@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'Gérer les API',
     'label.api_manage' => 'Gérez vos clés API, ne les divulgez à personne !',
-    'label.taide_api' => 'Clé TAIDE',
+    'label.taide_api' => 'Clé Kuwa',
     'label.openai_api' => 'Clé OpenAI',
     'label.stay_secure' => 'Veuillez surveiller attentivement votre utilisation de clés API externes !',
 

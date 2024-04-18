@@ -1,7 +1,7 @@
 @props(['history', 'tasks' => null, 'refers' => null, 'readonly' => false, 'anonymous' => false])
 
 @php
-    $botimgurl = $history->image ? asset(Storage::url($history->image)) : '/images/kuwa.png';
+    $botimgurl = $history->image ? asset(Storage::url($history->image)) : '/'. config('app.LLM_DEFAULT_IMG');
     $message = trim(str_replace(["\r\n"], "\n", $history->msg));
     $visable = true;
     if (!$history->isbot && $refers) {
