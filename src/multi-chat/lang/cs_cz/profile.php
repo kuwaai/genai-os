@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'Správa API',
     'label.api_manage' => 'Spravujte své API klíče, nikomu je neposkytujte!',
-    'label.taide_api' => 'TAIDE API klíč',
+    'label.taide_api' => 'Kuwa API klíč',
     'label.openai_api' => 'OpenAI API klíč',
     'label.stay_secure' => 'Buďte opatrní s vaším externím klíčem!',
 

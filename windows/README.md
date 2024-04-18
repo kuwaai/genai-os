@@ -1,56 +1,67 @@
-## Windows Portable Installation Guide
+## Portable Installation Guide for Windows
 
-We provide a portable version for Windows x64, which uses SQLite as the default database. The required packages will take up about 1.5 GB of space after decompression. Please pay attention to the network traffic consumed.
+We provide a portable version for Windows x64, which uses SQLite as the database by default. The required packages will take up about 1.5GB after decompression. Please pay attention to your network traffic.
 
 Please follow the steps below to build:
 
 ### Prerequisites
-- Make sure you have installed [VC_redist.exe](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170).
+- Make sure you have installed [VC_redist.exe](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170)
 - If you want to load models on GPU, please install [CUDA](https://developer.nvidia.com/cuda-toolkit) first.
 
-### Installation Steps
+### Quick Installation
+- Gemini Pro and ChatGPT are enabled by default. If you need to run the gguf model, please drop it in the path: executors\llamacpp.
+- The process will create an admin account. If you need to recreate it, please refer to the first item in [FAQs](#faq).
+```bat
+git clone https://github.com/kuwaai/genai-os.git
+cd genai-os/windows
+"build & start.bat"
+```
+- Enter the `stop` command to close the system. Directly closing the window may not release the memory smoothly. If you accidentally close the window, please refer to the third item in [FAQs](#faq).
+- You can directly run `start.bat` for subsequent startup. If there is an update or the project path is moved, please rerun `build.bat` or `build & start.bat`.
 
-1. **Download from the Release or clone the project and switch to the windows directory in the project using git bash with the following commands：**
+### Detailed Installation Steps
+
+1. **Download from Release, or execute the following command in git bash to clone the project and switch to the windows folder in the project:**
    ```bat
    git clone https://github.com/kuwaai/genai-os.git
    cd genai-os/windows
    ```
 
-2. **Download dependencies and do a quick setup：**
+2. **Download the related packages and set up quickly:**
    ```bat
    .\build.bat
    ```
 
-3. **Start the application：**
-   - Run `start.bat` to start the application. Note: If you have any of the following services running (nginx、php、php-cgi、python、redis-server), this executable file will terminate them when it is closed. Also make sure ports 80, 9000, and 6379 are not in use.
+3. **Start the application:**
+   - Run `start.bat` to start the application. Note: If you have any of the following services running (nginx, php, php-cgi, python, redis-server), this executable will terminate them when closed. Please also make sure that ports 80, 9000, and 6379 are not being used.
    ```bat
    .\start.bat
    ```
-   - You should be prompted to create an administrator account (enter a username, email, and password). If you are not prompted, or if you enter an incorrect entry or the creation fails, please refer to [here](#FAQ).
+   - At this point, you should be asked to create an administrator account (you will need to enter a name, email address, and password). If it does not pop up or you enter it incorrectly or fail to create it, please see [here](#faq).
 
-4. **Check the application status：**
-   - If successful, your browser will automatically open to `127.0.0.1`. If you see the web interface, the installation should be OK.
+4. **Check the application status:**
+   - If successful, your browser will automatically open to `127.0.0.1`. If you see the web interface, the installation should be successful.
 
-5. **How to close the program：**
-   - Please try not to force close the .bat file (including closing it directly with the red X). Currently, the .bat file cannot automatically close all open programs and release resources in these cases.
+5. **How to close the program:**
+   - Please try not to force close the .bat file (including using the red cross to close it directly). Currently, due to the .bat file, it cannot automatically close all open programs to release resources in these situations.
 
-   - **Therefore, please get used to closing the program by entering `stop` when executing `start.bat`.**
+   - **Therefore, please develop the habit of entering `stop` when executing `start.bat` to close the program.**
 
-6. **Set up models：**
-   - The program does not have any models when it is first started, so you will need to set up workers. However, this is a lengthy process, so please refer to the tutorial guide [here](./workers/README.md).
+6. **Set up models:**
+   - By default, ChatGPT and Gemini Pro are preset when the program is just started. Both models are connected to the API, so you need to apply for the corresponding API Key. If you want to start your own model or connect to other APIs, you need to set up executors. However, since this part is extensive, please refer to the tutorial guide [here](./executors/README.md).
 
 ## FAQ
 
-1. **Q: I was not prompted to create an administrator account, the administrator account creation failed, or I entered an error...**
+1. **Q: I was not asked to create an administrator account, the administrator account creation failed, or I entered it incorrectly...**
    
-   A: Please open `windows\tool.bat`, enter `seed`, and press Enter. This will open the administrator account creation interface. Enter `quit` to close after creation is complete.
+   A: Please open `tool.bat`, then enter `seed` and Enter to open the administrator account creation interface. Enter `quit` to close after creation.
 
-2. **Q: I moved the entire project after a successful `start.bat` execution, and the website now returns a 404/500 error.**
+2. **Q: After moving the entire project, I got a bunch of errors when executing start.bat, and the webpage was 404/500 and could not be accessed.**
 
-   A: Because some parts of the project must use absolute paths, if the path to the project directory has changed (change the parent folder name or move the entire project), you will need to rerun `build.bat` to update the absolute paths and redo `init.bat` in the workers directory to avoid errors.
+   A: Since some parts of the project must use absolute paths, if the path to the project directory has changed (change the name of the parent folder or move the entire project), you need to rerun `build.bat` to update the absolute path, and so does the model in the workers folder. It is recommended to rerun `init.bat` to avoid errors.
 
-3. **Q: I accidentally closed the entire `start.bat` program with the red X, and the background programs did not close, causing memory resources to be occupied. What should I do?**
+3. **Q: I accidentally closed the entire start.bat program by directly clicking the red cross, the background program was not closed, and the memory resources are still occupied. What should I do?**
 
-   A: Because the .bat file cannot close all programs when you click the red X, you can open `windows\tool.bat` and enter `stop` to terminate all related programs.
+   A: Due to the .bat file, it cannot close all programs when you click the red cross. You can open `tool.bat` and enter `stop` to terminate all related programs.
 
-If you encounter any problems during the installation process, please contact us at any time.
+Please feel free to contact us if you encounter any problems during the installation.

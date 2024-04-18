@@ -1,0 +1,20 @@
+services:
+  docqa-executor:
+    build:
+      context: ../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
+      EXECUTOR_ACCESS_CODE: doc-qa;web-qa
+      EXECUTOR_NAME: DocQA;WebQA
+    depends_on:
+      - kernel
+      - multi-chat
+    command: [
+      "--api_base_url", "http://web/",
+      "--access_code", "doc-qa",
+      "--alt_access_code", "web-qa"
+      ]
+    restart: unless-stopped
+    networks: ["backend", "frontend"]

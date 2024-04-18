@@ -41,7 +41,7 @@
                                     <div
                                         class="flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
                                         <img
-                                            src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/images/kuwa.png' }}">
+                                            src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                                     </div>
                                     <div class="pl-2 overflow-hidden">
                                         {{-- blade-formatter-disable --}}
