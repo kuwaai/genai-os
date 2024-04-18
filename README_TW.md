@@ -56,8 +56,8 @@
 為了執行此應用，請確保您的系統上安裝了以下套件：
 
 - Node.js v20.11.1 & npm
-- PHP 8.1.27 & php-fpm & Composer
-- Python 3.9.5 & pip
+- PHP 8.1 & php-fpm & Composer
+- Python 3.10 & pip
 - Nginx 或 Apache
 - Redis 6.0.20
 - CUDA
@@ -84,6 +84,7 @@
      ./production_update.sh
      cd ../kernel
      pip install -r requirement.txt
+     sudo chown -R $(whoami):www-data /var/www/html
      ```
 
    - 對於 Windows:

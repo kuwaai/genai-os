@@ -1,5 +1,5 @@
 @echo off
-
+cd "%~dp0"
 REM Initialize everything
 call src\variables.bat
 set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
@@ -12,6 +12,12 @@ call src\download_extract.bat %url_NodeJS% packages\%node_folder% packages\. nod
 
 REM Download and extract PHP if not exists
 call src\download_extract.bat %url_PHP% packages\%php_folder% packages\%php_folder% php.zip
+
+REM Download and extract PHP if not exists
+call src\download_extract.bat %url_PHP_Archive% packages\%php_folder_Archive% packages\%php_folder_Archive% php.zip
+
+REM Download and extract xpdfreader if not exists
+call src\download_extract.bat %url_XpdfReader% packages\%xpdfreader_folder% packages\. xpdfreader.zip
 
 IF EXIST packages\%python_folder% (
     echo Python folder already exists.
@@ -80,15 +86,6 @@ if not exist "packages\%python_folder%\Scripts\pip.exe" (
     echo pip already installed, skipping installing.
 )
 
-REM Download required pip packages
-pip install -r .\src\requirements.txt
-pushd "..\src\kernel"
-pip install -r requirements.txt
-popd
-pushd "..\src\executor"
-pip install -r requirements.txt
-popd
-
 REM Check if .env file exists
 if not exist "..\src\multi-chat\.env" (
     REM Kuwa Chat
@@ -98,24 +95,24 @@ if not exist "..\src\multi-chat\.env" (
     echo .env file already exists, skipping copy.
 )
 
-
 set "PATH=%~dp0packages\%node_folder%;%PATH%"
 
 REM Production update
 pushd "..\src\multi-chat"
-call ..\..\windows\packages\%php_folder%\php.exe ..\..\windows\packages\composer.phar update
-call ..\..\windows\packages\%php_folder%\php.exe artisan key:generate --force
-call ..\..\windows\packages\%php_folder%\php.exe artisan migrate --force
+call php ..\..\windows\packages\composer.phar update
+call php artisan key:generate --force
+call php artisan db:seed --class=InitSeeder --force
+call php artisan migrate --force
 rmdir /Q /S public\storage
-call ..\..\windows\packages\%php_folder%\php.exe artisan storage:link
-call ..\..\windows\packages\%node_folder%\npm.cmd install
-call ..\..\windows\packages\%php_folder%\php.exe ..\..\windows\packages\composer.phar dump-autoload --optimize
-call ..\..\windows\packages\%php_folder%\php.exe artisan route:cache
-call ..\..\windows\packages\%php_folder%\php.exe artisan view:cache
-call ..\..\windows\packages\%php_folder%\php.exe artisan optimize
-call ..\..\windows\packages\%node_folder%\npm.cmd run build
-call ..\..\windows\packages\%php_folder%\php.exe artisan config:cache
-call ..\..\windows\packages\%php_folder%\php.exe artisan config:clear
+call php artisan storage:link
+call npm.cmd install
+call php ..\..\windows\packages\composer.phar dump-autoload --optimize
+call php artisan route:cache
+call php artisan view:cache
+call php artisan optimize
+call npm.cmd run build
+call php artisan config:cache
+call php artisan config:clear
 popd
 
 REM Remove folder nginx_folder/html
@@ -125,3 +122,15 @@ rmdir /Q /S "packages\%nginx_folder%\html"
 REM Make shortcut from nginx_folder/html to ../public
 echo Creating shortcut from %nginx_folder%/html to ../public...
 mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
+
+REM Download required pip packages
+pip install -r .\src\requirements.txt
+pushd "..\src\kernel"
+pip install -r requirements.txt 
+popd
+pushd "..\src\executor"
+pip install -r requirements.txt
+pushd "docqa"
+pip install -r requirements.txt
+popd
+popd

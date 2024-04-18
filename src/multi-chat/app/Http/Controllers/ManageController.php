@@ -250,6 +250,23 @@ class ManageController extends Controller
         $perm = new Permissions();
         $perm->fill(['name' => 'model_' . $model->id]);
         $perm->save();
+        
+        $groups = GroupPermissions::pluck('group_id')->toArray();
+        $targetPermID = Permissions::where("name", "=", "tab_Manage")->first()->id;
+        $currentTimestamp = now();
+        foreach ($groups as $group) {
+            GroupPermissions::where('group_id', $group)
+                ->where('perm_id', '=', $perm->id)
+                ->delete();
+            if (GroupPermissions::where('group_id', $group)->where('perm_id', '=', $targetPermID)->exists()){
+                GroupPermissions::insert([
+                    'group_id' => $group,
+                    'perm_id' => $perm->id,
+                    'created_at' => $currentTimestamp,
+                    'updated_at' => $currentTimestamp,
+                ]);
+            }
+        }
         return Redirect::route('manage.home')
             ->with('last_tab', 'llms')
             ->with('last_llm_id', $model->id);

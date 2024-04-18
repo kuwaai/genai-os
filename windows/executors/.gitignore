@@ -1,0 +1,6 @@
+*/env.bat
+*/run.bat
+*/*.gguf
+*/*.safetensors
+*/*.model
+*/*.bin

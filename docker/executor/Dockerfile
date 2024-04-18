@@ -10,6 +10,8 @@ COPY src/executor/requirements.txt ./
 RUN sed -i '/\.[/]*/d' ./requirements.txt &&\
     sed -i '/torch.*/d' ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+COPY src/executor/docqa/requirements.txt ./docqa/requirements.txt
+RUN pip install --no-cache-dir -r ./docqa/requirements.txt
 
 # Install the executor framework
 COPY src/executor/. .

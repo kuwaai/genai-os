@@ -48,18 +48,22 @@ class ModelConfigure extends Command
                 $perm->save();
                 $currentTimestamp = now();
 
+                $targetPermID = Permissions::where("name", "=", "tab_Manage")->first()->id;
+
                 $groups = GroupPermissions::pluck('group_id')->toArray();
 
                 foreach ($groups as $group) {
                     GroupPermissions::where('group_id', $group)
                         ->where('perm_id', '=', $perm->id)
                         ->delete();
-                    GroupPermissions::insert([
-                        'group_id' => $group,
-                        'perm_id' => $perm->id,
-                        'created_at' => $currentTimestamp,
-                        'updated_at' => $currentTimestamp,
-                    ]);
+                    if (GroupPermissions::where('group_id', $group)->where('perm_id', '=', $targetPermID)->exists()){
+                        GroupPermissions::insert([
+                            'group_id' => $group,
+                            'perm_id' => $perm->id,
+                            'created_at' => $currentTimestamp,
+                            'updated_at' => $currentTimestamp,
+                        ]);
+                    }
                 }
                 DB::commit();
                 $this->info('Model ' . $name . ' with access_code ' . $accessCode . ' configured successfully!');

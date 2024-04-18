@@ -195,7 +195,7 @@ request_data = {
 with requests.post(api_url, headers=headers, json=request_data, stream=True,timeout=60) as response:
     for line in response.iter_lines(decode_unicode=True):
         if line:
-            if line == "event: end":
+            if line == "event: close":
                 break
             elif line.startswith("data: "):
                 try:
