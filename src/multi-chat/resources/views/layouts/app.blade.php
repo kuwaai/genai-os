@@ -229,9 +229,9 @@ xmlns="http://www.w3.org/2000/svg">
         @endif
 
 
-        @if (!Auth::user()->term_accepted)
+        @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '' && !Auth::user()->term_accepted)
             $modal2.show();
-        @elseif (!Auth::user()->announced)
+        @elseif (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' && !Auth::user()->announced)
             $modal1.show();
         @endif
 
