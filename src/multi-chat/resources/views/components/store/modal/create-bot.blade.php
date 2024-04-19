@@ -34,7 +34,7 @@
                                 <label for="llm_name">
                                     <img id="llm_img" class="rounded-full m-auto bg-black" width="50px"
                                         height="50px"
-                                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg==">
+                                        src="/{{config('app.LLM_DEFAULT_IMG')}}">
                                 </label>
                             </div>
                         </div>
@@ -46,13 +46,13 @@
                                 選取模型
                             </label>
                             <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
-                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg==")'
+                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src"))'
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="基底模型">
                             <datalist id="llm-list">
                                 @foreach ($result as $LLM)
                                     <option
-                                        src="{{ strpos($LLM->image, 'data:image/png;base64') === 0 ? $LLM->image : asset(Storage::url($LLM->image)) }}"
+                                        src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/'. config('app.LLM_DEFAULT_IMG') }}"
                                         value="{{ $LLM->name }}"></option>
                                 @endforeach
                             </datalist>

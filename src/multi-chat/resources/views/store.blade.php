@@ -30,10 +30,10 @@
             <div class="my-8">
                 <x-logo />
             </div>
-            <div class="mb-2 mx-auto w-[150px] h-[50px] border border-green-500  border-1 rounded-lg"
+            <div class="mb-2 mx-auto w-[150px] h-[50px]"
                 data-modal-target="create-bot-modal" data-modal-toggle="create-bot-modal">
                 <button
-                    class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+                    class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-200 transition duration-300 rounded-lg overflow-hidden">
                     <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
                 </button>
             </div>
