@@ -80,7 +80,7 @@
    - 對於 Linux:
      ```sh
      cp .env.dev .env
-     cd executable/sh
+     cd executables/sh
      ./production_update.sh
      cd ../kernel
      pip install -r requirement.txt
