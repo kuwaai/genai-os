@@ -62,6 +62,7 @@ class ChatGptExecutor(LLMExecutor):
         model_group.add_argument('--api_key', default=None, help='The API key to access the service')
         model_group.add_argument('--base_url', default=self.openai_base_url, help='Alter the base URL to use third-party service.')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
+        model_group.add_argument('--context_window', default=None, help='Override the context window.')
 
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for OpenAI API. See https://github.com/openai/openai-python/blob/main/src/openai/types/chat/completion_create_params.py')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
@@ -78,12 +79,14 @@ class ChatGptExecutor(LLMExecutor):
         if not self.LLM_name:
             self.LLM_name = "chatgpt"
         
-        context_window = [v for k, v in CONTEXT_WINDOW.items() if self.model_name in k]
+        context_window = [self.args.context_window] if self.args.context_window is not None else \
+                         [v for k, v in CONTEXT_WINDOW.items() if self.model_name in k]
         if len(context_window) == 0:
             logging.warning(f"The context window length of model {self.model_name} not found. Set to minimal value.")
             self.context_window = min(CONTEXT_WINDOW.values())
         else:
             self.context_window = context_window[0]
+        logger.debug(f"Context window: {self.context_window}")
 
         # Setup generation config
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
