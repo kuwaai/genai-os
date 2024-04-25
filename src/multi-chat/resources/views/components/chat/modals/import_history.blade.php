@@ -1,7 +1,7 @@
 @props(['llms'])
 
 <!-- resources/views/components/ImportModal.blade.php -->
-<div id="importModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+<div id="importModal" tabindex="-1" aria-hidden="true"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-2xl max-h-full">
         <!-- Modal content -->
@@ -31,9 +31,10 @@
                 <form method="post" action="{{ route('room.import') }}">
                     @csrf
                     @if ($llms)
-                    @foreach ($llms as $llm)
-                        <input id="importTo_{{ $llm->id }}" name="llm_ids[]" value="{{ $llm->id }}" hidden>
-                    @endforeach
+                        @foreach ($llms as $llm)
+                            <input id="importTo_{{ $llm->id }}" name="llm_ids[]" value="{{ $llm->id }}"
+                                hidden>
+                        @endforeach
                     @endif
                     @if (request()->route('room_id'))
                         <input name="room_id" value="{{ request()->route('room_id') }}" hidden>

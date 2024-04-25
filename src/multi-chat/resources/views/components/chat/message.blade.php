@@ -1,13 +1,13 @@
 @props(['history', 'tasks' => null, 'refers' => null, 'readonly' => false, 'anonymous' => false])
 
 @php
-    $botimgurl = $history->image ? asset(Storage::url($history->image)) : '/'. config('app.LLM_DEFAULT_IMG');
+    $botimgurl = $history->image ? asset(Storage::url($history->image)) : '/' . config('app.LLM_DEFAULT_IMG');
     $message = trim(str_replace(["\r\n"], "\n", $history->msg));
     $visable = true;
     if (!$history->isbot && $refers) {
         foreach ($refers->where('id', '<', $history->id) as $refer) {
             $referMsg = trim(str_replace(["\r\n"], "\n", $refer->msg));
-                $referMsg = '"""' . $referMsg . '"""';
+            $referMsg = '"""' . $referMsg . '"""';
 
             if ($refer->id !== $history->id) {
                 if ($message === $referMsg) {
@@ -30,13 +30,17 @@
             @if ($anonymous)
                 <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
             @else
-                <img data-tooltip-target="llm_{{ $history->bot_id }}_chat" data-tooltip-placement="top"
-                    src="{{ $botimgurl }}" class="h-full w-full">
+                <div id="{{ $history->id }}_llm_{{ $history->bot_id }}_msg" role="tooltip"
+                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                    {{ $history->name }}
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+                <img data-tooltip-target="{{ $history->id }}_llm_{{ $history->bot_id }}_msg"
+                    data-tooltip-placement="top" src="{{ $botimgurl }}" class="h-full w-full">
             @endif
         </div>
         <div class="overflow-hidden">
-            <div tabindex="0" hidefocus="true"
-                class="transition-colors p-3 bg-gray-300 rounded-r-lg rounded-bl-lg"
+            <div tabindex="0" hidefocus="true" class="transition-colors p-3 bg-gray-300 rounded-r-lg rounded-bl-lg"
                 @if (!$anonymous && $history->isbot) onfocus="toggleHighlight(this, true)" onblur="toggleHighlight(this, false)" @endif>
                 {{-- blade-formatter-disable --}}
                 <div class="text-sm space-y-3 break-words{{ $history->chained ? ' chain-msg' : '' }}{{ $history->isbot ? ' bot-msg' : '' }}" id="task_{{ $history->id }}">{{ $history->msg == "* ...thinking... *" ? "<pending holder>" : $history->msg }}</div>
@@ -53,8 +57,13 @@
                 @if ($anonymous)
                     <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
                 @else
-                    <img data-tooltip-target="llm_{{ $history->bot_id }}_chat" data-tooltip-placement="top"
-                        src="{{ $botimgurl }}" class="h-full w-full">
+                    <div id="{{ $history->id }}_llm_{{ $history->bot_id }}_msg" role="tooltip"
+                        class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                        {{ $history->name }}
+                        <div class="tooltip-arrow" data-popper-arrow></div>
+                    </div>
+                    <img data-tooltip-target="{{ $history->id }}_llm_{{ $history->bot_id }}_msg"
+                        data-tooltip-placement="top" src="{{ $botimgurl }}" class="h-full w-full">
                 @endif
             </div>
         @endif

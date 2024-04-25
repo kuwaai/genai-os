@@ -79,37 +79,9 @@
 
 <x-room.prompt-area.chat-script :llms="$llms" />
 <script>
-    function chain_toggle() {
-        $.get("{{ route('room.chain') }}", {
-            switch: $('#chained').prop('disabled')
-        }, function() {
-            $('#chained').prop('disabled', !$('#chained').prop('disabled'));
-            $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
-            $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('chat.button.unchain') }}' :
-                '{{ __('chat.button.chained') }}')
-        })
-    }
 
     function abortGenerate() {
         $.get("{{ route('room.abort', request()->route('room_id')) }}");
         return false;
-    }
-
-    function uploadcheck() {
-        if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
-            1024) {
-            $("#attachment").show();
-            $("#attachment button").text($("#upload")[0].files[0].name)
-        } else if ($("#upload")[0].files.length > 0) {
-            $("#error_alert >span").text("{{ __('File Too Large') }}")
-            $("#error_alert").fadeIn();
-            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            $("#upload").val("");
-            $("#attachment").hide();
-            setTimeout(function() {
-                $("#error_alert").fadeOut();
-                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            }, 3000);
-        }
     }
 </script>

@@ -1,6 +1,6 @@
 @props(['name'])
 
-<div id="exportModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+<div id="exportModal" tabindex="-1" aria-hidden="true"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-2xl max-h-full">
         <!-- Modal content -->
@@ -36,7 +36,7 @@
                         id="link"
                         value="{{ request()->routeIs('chat.*') ? route('chat.share', request()->route('chat_id')) : route('room.share', request()->route('room_id')) }}"
                         autocomplete="off" readonly>
-                    <a href="{{ request()->routeIs('chat.*') ? route('chat.share', request()->route('chat_id')) : route('room.share', request()->route('room_id')) }}"
+                    <a data-modal-hide="exportModal" href="{{ request()->routeIs('chat.*') ? route('chat.share', request()->route('chat_id')) : route('room.share', request()->route('room_id')) }}"
                         target="_blank"
                         class="px-4 flex justify-center items-center rounded-r-lg bg-green-500 hover:bg-green-600 text-white">
                         <i class="fas fa-external-link-alt"></i>

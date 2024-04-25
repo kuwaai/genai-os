@@ -178,8 +178,7 @@
                 @foreach (['Feedback', 'Translate', 'Quote', "Other"] as $label)
                     @php $id = strtolower($label); @endphp
                     <div class="flex items-center">
-                        <input checked id="{{ $id }}" name="react_btn[]" value="{{ $id }}"
-                            type="checkbox"
+                        <input id="{{ $id }}" name="react_btn[]" value="{{ $id }}" type="checkbox"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         <label for="{{ $id }}"
                             class="ml-2 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -319,7 +318,7 @@
         $("#update_LLM_by_ID input[name='id']").val("")
         $("#update_LLM_by_ID input[name='description']").val("")
         $("#update_LLM_by_ID input[name='system_prompt']").val("")
-        $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", false);
+        $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", true);
         $("#edit_llm h3:eq(0)").text("{{ __('manage.header.create_model') }}")
         $("#edit_llm h3:eq(1)").text("{{ __('manage.modal.create_model.header') }}")
         $("#edit_llm_btns > button").removeClass("bg-gray-600")
