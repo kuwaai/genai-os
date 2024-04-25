@@ -19,8 +19,8 @@
     <link href="{{ asset('css/dracula.css') }}" rel="stylesheet" />
 
     <!-- Scripts -->
-    <script src="{{ asset('js/flowbite.min.js') }}"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
@@ -29,10 +29,10 @@
 
 <body class="font-sans antialiased h-full">
     @if (Auth::user()->term_accepted)
-    <div data-modal-target="tos_modal"></div>
+        <div data-modal-target="tos_modal"></div>
     @endif
     @if (Auth::user()->announced)
-    <div data-modal-target="system_announcement_modal"></div>
+        <div data-modal-target="system_announcement_modal"></div>
     @endif
     @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
         <div id="system_announcement_modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
@@ -112,7 +112,6 @@
             {{ $slot }}
         </main>
     </div>
-    <script src="{{ asset('js/flowbite.min.js') }}"></script>
     <script>
         function markdown(node) {
             $(node).html(marked.parse(DOMPurify.sanitize(node[0], {
@@ -238,6 +237,35 @@ xmlns="http://www.w3.org/2000/svg">
 
         markdown($("#system_announcement_modal .content"))
         markdown($("#tos_modal .content"))
+
+        function chain_toggle() {
+            $.get("{{ route('room.chain') }}", {
+                switch: $('#chained').prop('disabled')
+            }, function() {
+                $('#chained').prop('disabled', !$('#chained').prop('disabled'));
+                $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
+                $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('chat.button.unchain') }}' :
+                    '{{ __('chat.button.chained') }}')
+            })
+        }
+
+        function uploadcheck() {
+            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
+                1024) {
+                $("#attachment").show();
+                $("#attachment button").text($("#upload")[0].files[0].name)
+            } else if ($("#upload")[0].files.length > 0) {
+                $("#error_alert >span").text("{{ __('File Too Large') }}")
+                $("#error_alert").fadeIn();
+                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+                $("#upload").val("");
+                $("#attachment").hide();
+                setTimeout(function() {
+                    $("#error_alert").fadeOut();
+                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+                }, 3000);
+            }
+        }
     </script>
 </body>
 

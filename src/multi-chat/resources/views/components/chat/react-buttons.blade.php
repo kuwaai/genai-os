@@ -2,9 +2,14 @@
 
 <div class="flex space-x-1{{ $showOnFinished ? ' show-on-finished' : '' }}"
     style="{{ $showOnFinished ? 'display:none;' : '' }}">
+    <div id="{{ $history->id }}_react_copy" role="tooltip"
+        class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+        {{ __('chat.react_btn.copy') }}
+        <div class="tooltip-arrow" data-popper-arrow></div>
+    </div>
     <button
         class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg {{ $history->isbot ? '' : 'text-white' }}"
-        data-tooltip-target="react_copy" data-tooltip-placement="top"
+        data-tooltip-target="{{ $history->id }}_react_copy" data-tooltip-placement="top"
         onclick="copytext(this, histories[{{ $history->id }}])">
         <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"
             stroke-linejoin="round" class="icon-sm" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
@@ -22,7 +27,12 @@
     @if ($history->isbot)
         @if (in_array('quote', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_react_message'))
-            <button data-tooltip-target="react_quote" data-tooltip-placement="top"
+                <div id="{{ $history->id }}_react_quote" role="tooltip"
+                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                    {{ __('chat.react_btn.quote') }}
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+            <button data-tooltip-target="{{ $history->id }}_react_quote" data-tooltip-placement="top"
                 onclick="quote({{ $history->bot_id }}, {{ $history->id }}, this)"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" height="8" width="8" viewBox="0 0 512 512">
@@ -38,7 +48,12 @@
         @endif
         @if (in_array('feedback', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_feedback'))
-            <button data-tooltip-target="react_like" data-tooltip-placement="top"
+                <div id="{{ $history->id }}_react_like" role="tooltip"
+                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                    {{ __('chat.react_btn.like') }}
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+            <button data-tooltip-target="{{ $history->id }}_react_like" data-tooltip-placement="top"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
                 @if (request()->user()->hasPerm('Room_update_detail_feedback')) data-modal-target="feedback" data-modal-toggle="feedback" @endif
                 onclick="feedback({{ $history->id }},1,this,{!! htmlspecialchars(
@@ -52,7 +67,12 @@
                     </path>
                 </svg>
             </button>
-            <button data-tooltip-target="react_dislike" data-tooltip-placement="top"
+            <div id="{{ $history->id }}_react_dislike" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                {{ __('chat.react_btn.dislike') }}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+            <button data-tooltip-target="{{ $history->id }}_react_dislike" data-tooltip-placement="top"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg {{ $history->nice === false ? 'text-red-600' : 'text-black' }}"
                 data-modal-target="feedback" data-modal-toggle="feedback"
                 onclick="feedback({{ $history->id }},2,this,{!! htmlspecialchars(
@@ -69,7 +89,12 @@
         @endif
         @if (in_array('translate', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_react_message'))
-            <button data-tooltip-target="react_translate" data-tooltip-placement="top"
+                <div id="{{ $history->id }}_react_translate" role="tooltip"
+                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                    {{ __('chat.react_btn.translate') }}
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+            <button data-tooltip-target="{{ $history->id }}_react_translate" data-tooltip-placement="top"
                 onclick="translates(this, {{ $history->id }}, null)"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg translates">
                 <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
@@ -102,7 +127,12 @@
         @endif
         @if (in_array('other', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_react_message'))
-            <button data-tooltip-target="react_safetyGuard" data-tooltip-placement="top"
+                <div id="{{ $history->id }}_react_safetyGuard" role="tooltip"
+                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                    {{ __('chat.react_btn.safety_guard') }}
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+            <button data-tooltip-target="{{ $history->id }}_react_safetyGuard" data-tooltip-placement="top"
                 onclick="translates(this, {{ $history->id }}, 'safety-guard')"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg translates">
                 <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512">
