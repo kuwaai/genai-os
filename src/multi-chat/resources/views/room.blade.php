@@ -25,10 +25,10 @@
     @if (request()->user()->hasPerm('Room_delete_chatroom'))
         <x-room.modal.delete_confirm />
     @endif
+    @if (request()->user()->hasPerm('Room_update_new_chat'))
+        <x-room.modal.group-chat :result="$result" />
+    @endif
     @if (!(request()->route('room_id') || session('llms')))
-        @if (request()->user()->hasPerm('Room_update_new_chat'))
-            <x-room.modal.group-chat :result="$result" />
-        @endif
         <x-room.rooms.drawer :result="$result" />
     @else
         @if (request()->route('room_id'))
