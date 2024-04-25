@@ -55,6 +55,9 @@ class HuggingfaceExecutor(LLMExecutor):
             help='Override the default chat template provided by the model. Reference: https://huggingface.co/docs/transformers/main/en/chat_templating')
         model_group.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
         model_group.add_argument('--timeout', type=float, default=self.timeout, help='The generation timeout in seconds.')
+        model_group.add_argument('--load_8bits', action="store_true", default=False, help='Load the model in 8bit.')
+        model_group.add_argument('--trust_remote_code', action="store_true", default=False, help='Trust the remote code when loading model.')
+        model_group.add_argument('--tokenizer', type=str, default=None, help='Override the tokenizer.')
         
         # Generation Options
         gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
@@ -65,14 +68,31 @@ class HuggingfaceExecutor(LLMExecutor):
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.model_path = self.args.model_path
+        self.tokenizer_name = self.args.tokenizer if self.args.tokenizer is not None else self.model_path
         if not self.model_path:
             raise Exception("You need to configure a local or huggingface model path!")
 
         if not self.LLM_name:
             self.LLM_name = "huggingface"
                 
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_path,device_map="auto", torch_dtype=torch.float16)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+        self.load_8bits = self.args.load_8bits
+        self.trust_remote_code = self.args.trust_remote_code
+        model_dtype = {}
+        if self.load_8bits:
+            model_dtype["load_in_8bit"] = True
+        else:
+            model_dtype["torch_dtype"] = torch.float16 
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.model_path,
+            device_map="auto",
+            trust_remote_code=self.trust_remote_code,
+            **model_dtype
+        )
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name,
+            trust_remote_code=self.trust_remote_code,
+        )
         self.system_prompt = self.args.system_prompt
         self.no_system_prompt = self.args.no_system_prompt
         self.timeout = self.args.timeout
