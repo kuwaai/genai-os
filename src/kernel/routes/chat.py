@@ -2,7 +2,6 @@ import requests
 from typing import List, Optional
 from flask import Blueprint, request, Response
 from src.variable import *
-from src.functions import *
 from src.safety_middleware import safety_middleware
 chat = Blueprint('chat', __name__)
 
