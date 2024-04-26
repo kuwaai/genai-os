@@ -24,7 +24,7 @@
         @endforeach
     @else
         <button
-            class="block sm:hidden text-center text-white bg-gray-300 hover:bg-gray-400 dark:bg-gray-800 dark:hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-5 dark:text-white hover:dark:text-gray-300 focus:outline-none dark:focus:ring-blue-800"
+            class="block sm:hidden text-center text-black hover:text-black dark:text-white hover:text-gray-300 hover:bg-gray-400 dark:bg-gray-800 dark:hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-5 focus:outline-none dark:focus:ring-blue-800"
             type="button" data-drawer-target="chatlist_drawer" data-drawer-show="chatlist_drawer"
             aria-controls="chatlist_drawer">
             <i class="fas fa-bars"></i>
@@ -75,7 +75,7 @@
         <nav x-data="{ open: false }">
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
-                    <button class="p-3 text-white hover:text-gray-300"><svg width="24" height="24"
+                    <button class="p-3 text-black hover:text-black dark:text-white hover:text-gray-300"><svg width="24" height="24"
                             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md">
                             <path fill-rule="evenodd" clip-rule="evenodd"
                                 d="M3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12ZM10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12ZM17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12Z"

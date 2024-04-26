@@ -91,7 +91,7 @@
                         </a>
 
                         <button data-dropdown-toggle="chat_dropdown_{{ $dc->id }}"
-                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-3 text-white hover:text-gray-300"><svg
+                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-3 text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" class="icon-md">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -99,7 +99,7 @@
                                     fill="currentColor"></path>
                             </svg></button>
                         <div id="{{$extra}}chat_dropdown_{{ $dc->id }}"
-                            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                            class="z-10 hidden bg-gray-200 border border-1 dark:border-white border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                 aria-labelledby="dropdownDefaultButton">
                                 <li>

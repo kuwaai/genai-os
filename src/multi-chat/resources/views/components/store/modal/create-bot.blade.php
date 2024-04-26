@@ -46,7 +46,7 @@
                                 選取模型
                             </label>
                             <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
-                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src"))'
+                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{config("app.LLM_DEFAULT_IMG")}}")'
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="基底模型">
                             <datalist id="llm-list">
