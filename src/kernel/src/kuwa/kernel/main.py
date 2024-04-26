@@ -17,9 +17,13 @@ from .routes.chat import chat
 
 logger = logging.getLogger(__name__)
 
+KUWA_KERNEL_API_VERSION="v1.0"
+
 def main():
     parser = argparse.ArgumentParser(prog='Kuwa Kernel', description='Kuwa Kernel')
     parser.add_argument('--log_level', type=str, default="INFO", help="Log level")
+    parser.add_argument('--port', type=int, default=9000, help="The port to serve")
+    parser.add_argument('--host', type=str, default="0.0.0.0", help="The host IP address to serve")
     args = parser.parse_args()
     logging.config.dictConfig(KernelLoggerFactory(level=args.log_level).get_config())
     
@@ -43,11 +47,11 @@ def main():
     app.config["REDIS_URL"] = "redis://localhost:6379/0"
     sse = ServerSentEventsBlueprint('sse', __name__)
     app.register_blueprint(sse, url_prefix='/')
-    app.register_blueprint(executor, url_prefix=f'/{version}/worker')
-    app.register_blueprint(chat, url_prefix=f'/{version}/chat')
+    app.register_blueprint(executor, url_prefix=f'/{KUWA_KERNEL_API_VERSION}/worker')
+    app.register_blueprint(chat, url_prefix=f'/{KUWA_KERNEL_API_VERSION}/chat')
     logger.info("Route list:\n{}\n".format('\n'.join([str(i) for i in app.url_map.iter_rules()])))
     logger.info("Server started")
-    app.run(port=port, host=ip, threaded=True)
+    app.run(port=args.port, host=args.host, threaded=True)
     #Stopped, saving to file
     save_variable_to_file(record_file, data)
 
