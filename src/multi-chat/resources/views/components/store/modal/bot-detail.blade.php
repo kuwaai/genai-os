@@ -79,6 +79,16 @@
                                 placeholder="{{ __('store.bot.description.label') }}">
                         </div>
                     </div>
+                    <!--<div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        <button type="button"
+                            class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                            {{ __('manage.button.save') }}
+                        </button>
+                        <button type="button" id="delete_button"
+                            class="bg-red-500 hover:bg-red-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                            {{ __('manage.button.delete') }}
+                        </button>
+                    </div>-->
                 </ul>
             </div>
         </div>
@@ -89,7 +99,7 @@
         $("#detail-modal h3").text(data.name);
         $("#detail-modal input[name=llm_name]").val(data.llm_name)
         $("#detail-modal input[name=bot-name]").val(data.name)
-        $("#detail-modal img").attr("src",data.image)
+        $("#detail-modal img").attr("src", data.image)
         $("#detail-modal input[name=bot-describe]").val(data.description)
     }
 </script>

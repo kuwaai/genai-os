@@ -143,7 +143,7 @@
                                     class="flex justify-center transition items-center px-4 cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded-l-lg duration-300">←</a>
                                 @if (request()->user()->hasPerm('Room_update_new_chat'))
                                     <button data-modal-target="create-model-modal" data-modal-toggle="create-model-modal"
-                                        class="flex w-full border-x border-1 border-white menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+                                        class="flex w-full border-x border-1 border-black dark:border-white menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
 
                                         <p class="flex-1 text-center text-gray-700 dark:text-white">
                                             {{ __('room.button.create_room') }}
@@ -172,7 +172,7 @@
                                 @if (request()->user()->hasPerm('Room_update_new_chat'))
                                     <button data-modal-target="create-model-modal"
                                         data-modal-toggle="create-model-modal"
-                                        class="flex w-full border-r border-1 border-white menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
+                                        class="flex w-full border-r border-1 border-black dark:border-white menu-btn flex items-center justify-center h-12 dark:hover:bg-gray-700 hover:bg-gray-200 transition duration-300">
 
                                         <p class="flex-1 text-center text-gray-700 dark:text-white">
                                             {{ __('room.button.create_room') }}
@@ -197,7 +197,7 @@
             <div id="histories_hint"
                 class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
                 <button
-                    class="absolute sm:hidden text-center text-white hover:bg-gray-300 dark:hover:bg-gray-700 focus:ring-4 focus:ring-blue-300 font-medium text-sm px-5 py-5 dark:text-white hover:dark:text-gray-300 focus:outline-none dark:focus:ring-blue-800"
+                    class="absolute sm:hidden text-center text-black hover:text-black dark:text-white hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 focus:ring-4 focus:ring-blue-300 font-medium text-sm px-5 py-5 focus:outline-none dark:focus:ring-blue-800"
                     type="button" data-drawer-target="chatlist_drawer" data-drawer-show="chatlist_drawer"
                     aria-controls="chatlist_drawer">
                     <i class="fas fa-bars"></i>
@@ -207,15 +207,15 @@
                     class="mx-4 mb-4 grid grid-cols-4 sm:grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
                     @foreach ($result as $bot)
                         <form method="post"
-                            class="border border-1 border-black dark:border-white text-black dark:text-white rounded-lg p-2 bg-gray-500 hover:bg-gray-600 transition"
+                            class="border border-1 border-black dark:border-white text-black dark:text-white rounded-lg p-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-500 dark:hover:bg-gray-600 transition"
                             action="{{ route('room.new') }}">
                             @csrf
-                            <button class="h-full w-full">
+                            <button class="h-full w-full flex flex-col items-center justify-start">
                                 <img id="llm_img" class="rounded-full mx-auto bg-black" width="50px" height="50px"
                                     src="{{ $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                                <p class="mb-auto text-sm line-clamp-4">{{ $bot->name }}</p>
+                                <p class="text-sm line-clamp-4">{{ $bot->name }}</p>
                                 @if ($bot->description)
-                                    <p class="text-gray-300 line-clamp-4 max-w-full text-xs">
+                                    <p class="text-gray-500 dark:text-gray-300 line-clamp-4 max-w-full text-xs">
                                         {{ $bot->description }}</p>
                                 @endif
                                 <input name="llm[]" value="{{ $bot->id }}" style="display:none;">
@@ -372,7 +372,7 @@
                                 src="{{ $llms[0]->image ? asset(Storage::url($llms[0]->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                             <p class="text-center text-sm line-clamp-4 py-1">{{ $llms[0]->name }}</p>
                             @if ($llms[0]->description)
-                                <p class="text-gray-300 line-clamp-4 max-w-full text-xs text-center py-1">
+                                <p class="text-gray-500 dark:text-gray-300 line-clamp-4 max-w-full text-xs text-center py-1">
                                     {{ $llms[0]->description }}</p>
                             @endif
                         </div>
