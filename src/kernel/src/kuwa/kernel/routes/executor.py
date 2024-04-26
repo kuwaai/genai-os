@@ -1,8 +1,8 @@
 import logging
 import json
 from flask import Blueprint, request, json, redirect, url_for, jsonify
-from src.variable import *
-from src.functions import save_variable_to_file, endpoint_formatter, get_base_url, load_records
+from ..variable import *
+from ..functions import save_variable_to_file, endpoint_formatter, get_base_url, load_records
 executor = Blueprint('executor', __name__)
 
 logger = logging.getLogger(__name__)

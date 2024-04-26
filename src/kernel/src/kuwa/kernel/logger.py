@@ -67,12 +67,12 @@ class KernelLoggerFactory:
                 'datefmt': '%Y-%m-%d %H:%M:%S'
             },
             'default_file': {
-                '()': 'src.logger.DefaultFileFormatter',
+                '()': 'kuwa.kernel.logger.DefaultFileFormatter',
                 'format': '%(asctime)s [%(name)-13s] %(levelprefix)-4s %(message)s',
                 'datefmt': '%Y-%m-%d %H:%M:%S'
             },
             'access_file': {
-                '()': 'src.logger.AccessFileFormatter',
+                '()': 'kuwa.kernel.logger.AccessFileFormatter',
                 'format': '%(asctime)s [%(name)-13s] %(levelprefix)-4s %(client_addr)s - "%(request_line)s" %(status_code)s',
                 'datefmt': '%Y-%m-%d %H:%M:%S'
             }
@@ -80,7 +80,7 @@ class KernelLoggerFactory:
         },
         'filters': {
             'internal_endpoint_filter': {
-                '()': 'src.logger.InternalEndpointFilter'
+                '()': 'kuwa.kernel.logger.InternalEndpointFilter'
             }
         },
         'handlers': {

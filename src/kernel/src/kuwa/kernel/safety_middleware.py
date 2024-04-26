@@ -4,8 +4,6 @@ import json
 import requests
 from typing import List
 
-# from .functions import log
-
 logger = logging.getLogger(__name__)
 
 def safety_middleware(func, n_max_buffer=50, streaming=True):

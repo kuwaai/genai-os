@@ -2,22 +2,9 @@ import os, logging, re, gzip, pickle, requests
 from urllib.parse import urlparse
 from flask import make_response
 from json import dumps
-from src.variable import *
+from .variable import *
 
 logger = logging.getLogger(__name__)
-
-
-# def init_folder(path):
-#     if not os.path.exists(path):
-#         os.mkdir(path)
-
-# def log(state, *args, **kwargs):
-#     log_level = ["INFO", "WARNING", "CRITIAL"]
-#     message = ' '.join(map(str, args))
-#     msg = f"[{datetime.now().strftime('%Y-%m-%d %H-%M-%S.%f')}][{log_level[state]}] {message}"
-#     print(msg)
-#     with open(log_file_path, "a") as file:
-#         file.write(msg + "\n")
 
 def save_variable_to_file(filename, data):
     with gzip.open(filename, 'wb') as file:
@@ -30,7 +17,6 @@ def load_variable_from_file(filename):
 
 def endpoint_formatter(endpoint):
     return endpoint[:-1] if endpoint.endswith("/") else endpoint
-        
         
 def get_base_url(url):
     parsed_url = urlparse(url)
