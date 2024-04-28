@@ -1,57 +1,40 @@
-DataBase Question Answering (DBQA)
-===
-DBQA is an application that leverages Retrieval-Augmented Generation (RAG) to provide answers to questions that are related to local documents.  
-It supports a wide array of document formats, such as txt, html, word, pdf, epub, and more.
-## Dependency Installation
-### For Ubuntu
+# Kuwa RAG Toolchain
+RAG related toolkit, which can currently build vector databases based on local documents (pdf, doc, docx, html).
 
+## Installation
+### Ubuntu
 ```bash
 apt-get install python-dev-is-python3 libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext
 pip install -r requirements.txt
 ```
 
-### For Archlinux
-
-```bash
-pacman -S python libxml2 libxslt antiword unrtf poppler pstotext
-pip install -r requirements.txt
-```
-
 ## Usage
-
-> Note: The local TAIDE model is expected located at `/var/models/llama2-7b-chat-b5.0.0`
-
-1. Construct the vector database from local documents
-    ```bash
-    python construct_vector_db.py /path/to/documents /path/to/output/directory
+1. Assuming your files are in `/path/to/docs`, you can build a vector database using the following command, which will be stored in `/path/to/database`
     ```
-2. Ask question about your documents
-    ```bash
-    python dbqa.py /path/to/database/directory "Your question"
+    python construct_vector_db.py /path/to/docs /path/to/database
     ```
 
-## Development
+    The constructed vector database should have the following files
+    ```
+    /path/to/database
+    ├── config.json
+    ├── index.faiss
+    └── index.pkl
+    ```
+2. The constructed vector database can be used for question answering using the executor of DBQA. Please refer to the [documentation of DBQA](../executor/docqa/README.md) to start DBQA
+    > [!NOTE]
+    > The `--access_code` parameter can be changed to any string, as long as it is consistent with the one recorded in the WebUI.
 
-### Architecture
+    ```sh
+    cd ../executor/docqa
+    python ./docqa.py --access_code dbqa --api_base_url http://localhost/ [--model <MODEL_NAME>] --database /path/to/database
+    ```
+3. Login to the WebUI of Kuwa and add a model configuration for DBQA, then you can start question answering over the constructed vector database
+
+## Internal Flow
+
 ```mermaid
 flowchart LR
-
-subgraph "Retrival-Augmented Generation (RAG)"
-    direction LR
-    *A(Start) --> AA[/Query/]
-    AB[(Vector DB)]
-    AC[/Prompt template/]
-    AA ---> AD[Retriever]
-    AB ---> AD
-    AA ---> AE[Reranker]
-    AD -- Documents --> AE
-    AC --> AF[Formater]
-    AA ---> AF
-    AE -- Related documents --> AF
-    AF -- Prompt --> AG["Generator (LLM)"]
-    AG --> AH[/Answer/]
-end
-
 
 subgraph Database Construction
     direction LR
@@ -63,10 +46,3 @@ subgraph Database Construction
     BC -- Chunks --> BE 
 end
 ```
-
-### Class Documentation
-- `ChatTuple`: Grouped chat record for rendering prompt
-- `DocumentStore`: Encapsulation of the vector database and the embedding model
-- `TaideChatModel`: LangChain-compatible ChatModel for TAIDE
-- `TextractLoader`: Universal file text extractor
-- `ParallelSplitter`: Splitter with multiprocessing
