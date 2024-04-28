@@ -21,7 +21,7 @@ pip install -r requirements.txt
     ├── index.faiss
     └── index.pkl
     ```
-2. The constructed vector database can be used for question answering using the executor of DBQA. Please refer to the [documentation of DBQA](../executor/docqa/README.md) to start DBQA
+2. The constructed vector database can be used for question answering using the executor of DBQA. Please refer to the [documentation of DBQA](../executor/docqa/README.md#dbqa) to start DBQA
 > [!NOTE]
 > The `--access_code` parameter can be changed to any string, as long as it is consistent with the one recorded in the WebUI.
 
