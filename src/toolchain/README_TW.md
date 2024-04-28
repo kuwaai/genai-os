@@ -22,8 +22,8 @@ pip install -r requirements.txt
     └── index.pkl
     ```
 2. 建立完的向量資料庫可以使用 DBQA 的 Executor 進行問答。請參考 [DBQA 的文件](../executor/docqa/README.md)啟動 DBQA
-    > [!NOTE]
-    > `--access_code` 參數可隨意變更，與 WebUI 中紀錄的一致即可。
+> [!NOTE]
+> `--access_code` 參數可隨意變更，與 WebUI 中紀錄的一致即可。
 
     ```sh
     cd ../executor/docqa
