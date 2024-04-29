@@ -6,6 +6,7 @@ import time
 import re
 import json
 import pprint
+import argparse
 from inspect import cleandoc
 from typing import Optional
 from threading import Thread
@@ -23,6 +24,28 @@ class CustomStoppingCriteria(StoppingCriteria):
 
     def __call__(self, input_ids, score, **kwargs) -> bool:
         return not self.proc
+
+class KwargsParser(argparse.Action):
+    """Parser action class to parse kwargs of form key=value"""
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, dict())
+        for val in values:
+            if '=' not in val:
+                raise ValueError(
+                    (
+                        'Argument parsing error, kwargs are expected in'
+                        ' the form of key=value.'
+                    )
+                )
+            kwarg_k, kwarg_v = val.split('=')
+            try:
+                converted_v = int(kwarg_v)
+            except ValueError:
+                try:
+                    converted_v = float(kwarg_v)
+                except ValueError:
+                    converted_v = kwarg_v
+            getattr(namespace, self.dest)[kwarg_k] = converted_v
 
 class HuggingfaceExecutor(LLMExecutor):
 
@@ -55,24 +78,45 @@ class HuggingfaceExecutor(LLMExecutor):
             help='Override the default chat template provided by the model. Reference: https://huggingface.co/docs/transformers/main/en/chat_templating')
         model_group.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
         model_group.add_argument('--timeout', type=float, default=self.timeout, help='The generation timeout in seconds.')
+        model_group.add_argument('--load_8bits', action="store_true", default=False, help='Load the model in 8bit.')
+        model_group.add_argument('--trust_remote_code', action="store_true", default=False, help='Trust the remote code when loading model.')
+        model_group.add_argument('--tokenizer', type=str, default=None, help='Override the tokenizer.')
         
         # Generation Options
         gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
+        gen_group.add_argument('--generation_kwargs', type=str, nargs='*', action=KwargsParser, help='Additional kwargs passed to the HF generate function.')
 
     def setup(self):
         if self.args.visible_gpu:
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.model_path = self.args.model_path
+        self.tokenizer_name = self.args.tokenizer if self.args.tokenizer is not None else self.model_path
         if not self.model_path:
             raise Exception("You need to configure a local or huggingface model path!")
 
         if not self.LLM_name:
             self.LLM_name = "huggingface"
                 
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_path,device_map="auto", torch_dtype=torch.float16)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+        self.load_8bits = self.args.load_8bits
+        self.trust_remote_code = self.args.trust_remote_code
+        model_dtype = {}
+        if self.load_8bits:
+            model_dtype["load_in_8bit"] = True
+        else:
+            model_dtype["torch_dtype"] = torch.float16 
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.model_path,
+            device_map="auto",
+            trust_remote_code=self.trust_remote_code,
+            **model_dtype
+        )
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name,
+            trust_remote_code=self.trust_remote_code,
+        )
         self.system_prompt = self.args.system_prompt
         self.no_system_prompt = self.args.no_system_prompt
         self.timeout = self.args.timeout
@@ -89,6 +133,7 @@ class HuggingfaceExecutor(LLMExecutor):
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
         self.generation_config = merge_config(base=default_gconf, top=self.generation_config)
         self.generation_config = merge_config(base=self.generation_config, top=file_gconf)
+        self.generation_config = merge_config(base=self.generation_config, top=self.args.generation_kwargs)
 
         logger.debug(f"Stop words: {self.stop_words}")
         logger.debug(f"Buffer length: {self.buffer_length}")
