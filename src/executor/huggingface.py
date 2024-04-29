@@ -6,6 +6,7 @@ import time
 import re
 import json
 import pprint
+import argparse
 from inspect import cleandoc
 from typing import Optional
 from threading import Thread
@@ -23,6 +24,28 @@ class CustomStoppingCriteria(StoppingCriteria):
 
     def __call__(self, input_ids, score, **kwargs) -> bool:
         return not self.proc
+
+class KwargsParser(argparse.Action):
+    """Parser action class to parse kwargs of form key=value"""
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, dict())
+        for val in values:
+            if '=' not in val:
+                raise ValueError(
+                    (
+                        'Argument parsing error, kwargs are expected in'
+                        ' the form of key=value.'
+                    )
+                )
+            kwarg_k, kwarg_v = val.split('=')
+            try:
+                converted_v = int(kwarg_v)
+            except ValueError:
+                try:
+                    converted_v = float(kwarg_v)
+                except ValueError:
+                    converted_v = kwarg_v
+            getattr(namespace, self.dest)[kwarg_k] = converted_v
 
 class HuggingfaceExecutor(LLMExecutor):
 
@@ -62,6 +85,7 @@ class HuggingfaceExecutor(LLMExecutor):
         # Generation Options
         gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
+        gen_group.add_argument('--generation_kwargs', type=str, nargs='*', action=KwargsParser, help='Additional kwargs passed to the HF generate function.')
 
     def setup(self):
         if self.args.visible_gpu:
@@ -109,6 +133,7 @@ class HuggingfaceExecutor(LLMExecutor):
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
         self.generation_config = merge_config(base=default_gconf, top=self.generation_config)
         self.generation_config = merge_config(base=self.generation_config, top=file_gconf)
+        self.generation_config = merge_config(base=self.generation_config, top=self.args.generation_kwargs)
 
         logger.debug(f"Stop words: {self.stop_words}")
         logger.debug(f"Buffer length: {self.buffer_length}")
