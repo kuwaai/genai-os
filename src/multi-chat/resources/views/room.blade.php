@@ -202,7 +202,7 @@
                     aria-controls="chatlist_drawer">
                     <i class="fas fa-bars"></i>
                 </button>
-                <p class="text-black dark:text-white mx-auto my-5">請選擇一個您想使用的模型：</p>
+                <p class="text-black dark:text-white mx-auto my-5">{{__("room.model.hint")}}</p>
                 <div
                     class="mx-4 mb-4 grid grid-cols-4 sm:grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
                     @foreach ($result as $bot)

@@ -28,7 +28,7 @@
                         {{ __('room.label.share_link') }}
                     </label>
                     <p id="copiedAlert" class="text-sm text-gray-600 dark:text-green-400" style="display: none;">
-                        {{ __('hint.copied') }}</p>
+                        {{ __('chat.hint.copied') }}</p>
                 </div>
                 <div class="flex">
                     <input name="link" onclick="copyShare($(this), $('#copiedAlert'))"

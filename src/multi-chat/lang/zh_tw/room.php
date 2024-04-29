@@ -11,4 +11,5 @@ return [
     'button.edit_chatname' => '編輯聊天室名稱',
     'button.share_link' => '分享連結',
     'label.share_link' => '分享連結 (目前只有自己可存取)',
+    'model.hint' => '請選擇一個您想使用的模型：',
 ];
