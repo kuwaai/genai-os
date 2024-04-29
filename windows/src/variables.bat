@@ -42,7 +42,7 @@ set "redis_folder=%filename_Redis:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_Redis%") do set "version_Redis=%%v"
 
 REM Variables for XpdfReader
-set "url_XpdfReader=https://web.archive.org/web/20240303193546/https://dl.xpdfreader.com/xpdf-tools-win-4.05.zip"
+set "url_XpdfReader=https://dl.kuwaai.org/packages/xpdf/xpdf-tools-win-4.05.zip"
 for %%I in ("%url_XpdfReader%") do set "filename_XpdfReader=%%~nxI"
 set "xpdfreader_folder=%filename_XpdfReader:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_XpdfReader%") do set "version_XpdfReader=%%v"
