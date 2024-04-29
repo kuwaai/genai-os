@@ -90,7 +90,7 @@
                                 {{ $dc->name }}</p>
                         </a>
 
-                        <button data-dropdown-toggle="chat_dropdown_{{ $dc->id }}"
+                        <button data-dropdown-toggle="{{$extra}}chat_dropdown_{{ $dc->id }}"
                             class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-3 text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" class="icon-md">

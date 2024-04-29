@@ -79,6 +79,16 @@
                                 placeholder="{{ __('store.bot.description.label') }}">
                         </div>
                     </div>
+                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        <div class="w-full">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                for="modelfile">Modelfile</label>
+                            <div class="flex items-center">
+                                <textarea readonly id="modelfile" name="modelfile" type="text" rows="1" max-rows="10" placeholder="modelfile"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
                     <!--<div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <button type="button"
                             class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -101,5 +111,7 @@
         $("#detail-modal input[name=bot-name]").val(data.name)
         $("#detail-modal img").attr("src", data.image)
         $("#detail-modal input[name=bot-describe]").val(data.description)
+        if (data.config)$("#detail-modal textarea[name=modelfile]").val(modelfile_to_string(JSON.parse(data.config)))
+        adjustTextareaRows($("#detail-modal textarea[name=modelfile]")[0])
     }
 </script>

@@ -8,4 +8,5 @@ return [
     "modal.label"=>"Prosím vyberte modely, které chcete použít současně",
     "button.create"=>"Vytvořit",
     "hint.must_select_at_least_2_llms"=>"Musíte vybrat alespoň dva modely!",
+    'model.hint' => 'Vyberte prosím model, který chcete použít:',
 ];

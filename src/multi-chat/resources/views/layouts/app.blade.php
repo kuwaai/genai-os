@@ -266,6 +266,120 @@ xmlns="http://www.w3.org/2000/svg">
                 }, 3000);
             }
         }
+
+        function adjustTextareaRows(obj) {
+            obj = $(obj)
+            if (obj.length) {
+                const textarea = obj;
+                const maxRows = parseInt(textarea.attr('max-rows')) || 5;
+                const lineHeight = parseInt(textarea.css('line-height'));
+
+                textarea.attr('rows', 1);
+                const contentHeight = textarea[0].scrollHeight;
+                const rowsToDisplay = Math.floor(contentHeight / lineHeight);
+
+                textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+            }
+        }
+
+        function modelfile_parse(data) {
+            const commands = [];
+            let currentCommand = {
+                Name: '',
+                Args: ''
+            };
+
+            let systemCommandProcessed = false; // Flag to track if a system command has been processed
+
+            // Split the input data into lines
+            const lines = data.split('\n');
+
+            // Iterate over each line
+            lines.forEach(line => {
+                // Trim whitespace from the beginning and end of the line
+                line = line.trim();
+
+                // If the line is empty, skip it
+                if (!line) return;
+
+                // Check if the line starts with a command keyword
+                if (line.toUpperCase().startsWith('FROM') ||
+                    line.toUpperCase().startsWith('ADAPTER') ||
+                    line.toUpperCase().startsWith('LICENSE') ||
+                    line.toUpperCase().startsWith('TEMPLATE') ||
+                    line.toUpperCase().startsWith('SYSTEM') ||
+                    line.toUpperCase().startsWith('PARAMETER') ||
+                    line.toUpperCase().startsWith('MESSAGE')) {
+                    // If a command is already being accumulated, push it to the commands array
+                    if (currentCommand.Name !== '' && currentCommand.Args.trim() !== '') {
+                        commands.push(currentCommand);
+                    }
+                    // Start a new command
+                    currentCommand = {
+                        Name: '',
+                        Args: ''
+                    };
+
+                    // Split the line into command type and arguments
+                    let [commandType, commandArgs] = line.split(/\s+(.+)/);
+                    if (!commandArgs) commandArgs = '';
+
+                    // Set the current command's name and arguments
+                    currentCommand.Name = commandType.toLowerCase();
+                    currentCommand.Args = commandArgs.trim();
+
+                    // If the command is a system command and it has already been processed, skip it
+                    if (currentCommand.Name === 'system' && systemCommandProcessed) {
+                        currentCommand = {
+                            Name: '',
+                            Args: ''
+                        };
+                    } else if (currentCommand.Name === 'system') {
+                        systemCommandProcessed = true; // Set the flag to true if a system command is processed
+                    }
+                } else {
+                    // If the line does not start with a command keyword, append it to the current command's arguments
+                    currentCommand.Args += '\n' + line;
+                }
+            });
+
+            // Push the last command to the commands array if it has non-empty arguments
+            if (currentCommand.Name !== '' && currentCommand.Args.trim() !== '') {
+                commands.push(currentCommand);
+            }
+
+            // Remove triple-quotes at the start or end of arguments
+            commands.forEach(command => {
+                if (command.Args.startsWith('"""')) {
+                    command.Args = command.Args.slice(3);
+                }
+                if (command.Args.endsWith('"""')) {
+                    command.Args = command.Args.slice(0, -3);
+                }
+            });
+
+            return commands;
+        }
+
+        function modelfile_update(node) {
+            let data = modelfile_parse(node.val());
+            for (let obj of data) {
+                if (obj.Name === 'system') {
+                    $("#bot-system_prompt").val(obj.Args)
+                }
+            }
+            node.val(modelfile_to_string(data));
+        }
+
+        function modelfile_to_string(array) {
+            return array.map(item => {
+                let args = item.Args;
+                if (args.includes('\n')) {
+                    args = '"""' + args + '"""';
+                }
+                return `${item.Name.toUpperCase()} ${args}`;
+            }).join('\n');
+        }
     </script>
 </body>
 

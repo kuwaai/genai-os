@@ -374,7 +374,7 @@ xmlns="http://www.w3.org/2000/svg">
         $(node).children("svg").eq(0).hide();
         $(node).children("svg").eq(1).show();
         if ($(node).children("span")) {
-            $(node).children("span").text("{{ __('hint.copied') }}")
+            $(node).children("span").text("{{ __('chat.hint.copied') }}")
         }
         setTimeout(function() {
             $(node).children("svg").eq(0).show();
@@ -383,21 +383,6 @@ xmlns="http://www.w3.org/2000/svg">
                 $(node).children("span").text("{{ __('Copy') }}")
             }
         }, 3000);
-    }
-
-    function adjustTextareaRows(obj) {
-        obj = $(obj)
-        if (obj.length) {
-            const textarea = obj;
-            const maxRows = parseInt(textarea.attr('max-rows')) || 5;
-            const lineHeight = parseInt(textarea.css('line-height'));
-
-            textarea.attr('rows', 1);
-            const contentHeight = textarea[0].scrollHeight;
-            const rowsToDisplay = Math.floor(contentHeight / lineHeight);
-
-            textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
-        }
     }
 
     function compileVerilog($this) {

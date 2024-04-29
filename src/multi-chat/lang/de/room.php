@@ -8,4 +8,5 @@ return [
     'modal.label' => 'Bitte wählen Sie die Modelle aus, die Sie gleichzeitig verwenden möchten',
     'button.create' => 'Erstellen',
     'hint.must_select_at_least_2_llms' => 'Sie müssen mindestens zwei Modelle auswählen!',
+    'model.hint' => 'Bitte wählen Sie ein Modell aus, das Sie verwenden möchten:',
 ];

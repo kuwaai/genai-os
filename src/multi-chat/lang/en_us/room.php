@@ -13,4 +13,5 @@ return [
     'button.edit_chatname' => 'Edit Chat Name',
     'button.share_link' => 'Share link',
     'label.share_link' => 'Share link (For now, Only you can access)',
+    'model.hint' => 'Please select a model you\'d like to use:',
 ];

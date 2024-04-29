@@ -8,4 +8,5 @@ return [
     "modal.label"=>"Veuillez sélectionner les modèles que vous souhaitez utiliser simultanément",
     "button.create"=>"Créer",
     "hint.must_select_at_least_2_llms"=>"Vous devez sélectionner au moins deux modèles !",
+    'model.hint' => 'Veuillez choisir un modèle que vous souhaitez utiliser :',
 ];

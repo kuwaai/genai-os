@@ -33,8 +33,7 @@
                             <div class="w-full px-3 flex flex-col items-center">
                                 <label for="llm_name">
                                     <img id="llm_img" class="rounded-full m-auto bg-black" width="50px"
-                                        height="50px"
-                                        src="/{{config('app.LLM_DEFAULT_IMG')}}">
+                                        height="50px" src="/{{ config('app.LLM_DEFAULT_IMG') }}">
                                 </label>
                             </div>
                         </div>
@@ -46,13 +45,13 @@
                                 選取模型
                             </label>
                             <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
-                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{config("app.LLM_DEFAULT_IMG")}}")'
+                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="基底模型">
                             <datalist id="llm-list">
                                 @foreach ($result as $LLM)
                                     <option
-                                        src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/'. config('app.LLM_DEFAULT_IMG') }}"
+                                        src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
                                         value="{{ $LLM->name }}"></option>
                                 @endforeach
                             </datalist>
@@ -76,22 +75,40 @@
                                 placeholder="{{ __('store.bot.description.label') }}">
                         </div>
                     </div>
-                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap"
+                        id="sys_prompt">
                         <div class="w-full">
-                            <label for="bot-system_prompt"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.system_prompt') }}</label>
-                        <input type="text" id="bot-system_prompt" name="bot-system_prompt" autocomplete="off"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="{{ __('store.bot.system_prompt.label') }}">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                for="bot-system_prompt">{{ __('store.bot.system_prompt') }}</label>
+                            <div class="flex items-center">
+                                <textarea id="bot-system_prompt" type="text"
+                                    oninput="$('#modelfile').val(modelfile_to_string((modelfile_parse($('#modelfile').val()).some(obj => obj.Name === 'system') ? modelfile_parse($('#modelfile').val()) : [...modelfile_parse($('#modelfile').val()), { Name: 'system', Args: 'uwu' }])
+                                    .map(obj => obj.Name === 'system' ? { ...obj, Args: $(this).val() } : obj))); adjustTextareaRows(this)"
+                                    rows="1" max-rows="4" placeholder="{{ __('store.bot.system_prompt.label') }}"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap"
+                        id="welcome_prompt">
                         <div class="w-full">
                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                                 for="welcome-message">{{ __('store.bot.welcome_message') }}</label>
                             <div class="flex items-center">
-                                <textarea id="welcome-message" name="welcome-message" type="text" oninput="adjustTextareaRows(this)" rows="0"
-                                    max-rows="5" placeholder="{{ __('store.bot.welcome_message.label') }}"
+                                <textarea id="welcome-message" type="text" oninput="adjustTextareaRows(this)" rows="1"
+                                    max-rows="4" placeholder="{{ __('store.bot.welcome_message.label') }}"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        <div class="w-full">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+                                onclick="$('#modelfile').toggle();$('#welcome_prompt').toggle(); $('#sys_prompt').toggle()"
+                                for="modelfile">Modelfile</label>
+                            <div class="flex items-center">
+                                <textarea id="modelfile" name="modelfile" type="text" oninput="adjustTextareaRows(this)"
+                                    onblur="modelfile_update($(this));" rows="1" style="display:none;" max-rows="10" placeholder="modelfile"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
                         </div>
@@ -101,7 +118,8 @@
                     <div class="border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                         <button type="submit"
                             class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-500 hover:bg-gray-400 transition duration-300">
-                            <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('store.bot.button.create') }}
+                            <p class="flex-1 text-center text-gray-700 dark:text-white">
+                                {{ __('store.bot.button.create') }}
                             </p>
                         </button>
                     </div>
@@ -120,7 +138,8 @@
         }
         if (!$("#create_room input[name='llm_name']").val()) $("#create_error").text(
             {{ __('store.hint.must_select_base_model') }})
-        else if (!$("#create_room input[name='bot-name']").val()) $("#create_error").text("{{ __('You must name your bot') }}")
+        else if (!$("#create_room input[name='bot-name']").val()) $("#create_error").text(
+            "{{ __('You must name your bot') }}")
         $("#create_error").show().delay(3000).fadeOut();
         return false;
     }
