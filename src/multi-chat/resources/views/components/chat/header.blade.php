@@ -123,7 +123,7 @@
 
                             $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
                                 var historyId = $(element).prop("id").replace("history_", "");
-                                var msgText = histories[historyId].replace("\n", "\\n").replace("\t", "\\t");
+                                var msgText = histories[historyId].replaceAll("\n", "\\n").replaceAll("\t", "\\t");
                                 var isBot = $(element).children("div").children("div").children("div").hasClass("bot-msg");
                                 var chained = $(element).children("div").children("div").children("div").hasClass("chain-msg");
 
