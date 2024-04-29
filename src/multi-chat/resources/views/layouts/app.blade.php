@@ -299,9 +299,6 @@ xmlns="http://www.w3.org/2000/svg">
                 // Trim whitespace from the beginning and end of the line
                 line = line.trim();
 
-                // If the line is empty, skip it
-                if (!line) return;
-
                 // Check if the line starts with a command keyword
                 if (line.toUpperCase().startsWith('FROM') ||
                     line.toUpperCase().startsWith('ADAPTER') ||
