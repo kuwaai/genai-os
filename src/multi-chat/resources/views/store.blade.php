@@ -46,7 +46,7 @@
             @if ($bots->where('owner_id', '=', Auth::user()->id)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('Your Bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" />
+                    <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" :readonly="'false'" />
                 </div>
             @endif
             @if ($bots->where('visibility', '=', 1)->count() > 0)

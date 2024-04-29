@@ -190,6 +190,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/', [BotController::class, 'home'])->name('store.home');
                 Route::post('/create', [BotController::class, 'create'])->name('store.create');
                 Route::patch('/update', [BotController::class, 'update'])->name('store.update');
+                Route::delete('/delete', [BotController::class, 'delete'])->name('store.delete');
             })
             ->name('store');
         #---Manage
