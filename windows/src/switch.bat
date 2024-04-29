@@ -1,5 +1,5 @@
 @echo off
-
+cd "%~dp0"
 setlocal enabledelayedexpansion
 rem Initialize the CUDA version variable
 set "version=cpu"
