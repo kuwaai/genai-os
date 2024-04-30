@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\LLMs;
+use App\Models\Bots;
 use App\Models\Permissions;
 use App\Models\GroupPermissions;
 use Illuminate\Support\Facades\Storage;
@@ -12,8 +13,8 @@ use DB;
 
 class ModelConfigure extends Command
 {
-    protected $signature = 'model:config {access_code} {name} {--image=}';
-    protected $description = 'Quickly configure a model for everyone';
+    protected $signature = 'model:config {access_code} {name} {--image=} {--do_not_create_bot}';
+    protected $description = 'Quickly configure a model for admins';
     public function __construct()
     {
         parent::__construct();
@@ -39,16 +40,16 @@ class ModelConfigure extends Command
                     $path = 'public/images/' . $imageName;
                     Storage::put($path, $fileContents);
                 }
-                
+
                 $model = new LLMs();
-                $model->fill(['name' => $name, 'access_code' => $accessCode, "image"=>$path]);
+                $model->fill(['name' => $name, 'access_code' => $accessCode, 'image' => $path]);
                 $model->save();
                 $perm = new Permissions();
                 $perm->fill(['name' => 'model_' . $model->id]);
                 $perm->save();
                 $currentTimestamp = now();
 
-                $targetPermID = Permissions::where("name", "=", "tab_Manage")->first()->id;
+                $targetPermID = Permissions::where('name', '=', 'tab_Manage')->first()->id;
 
                 $groups = GroupPermissions::pluck('group_id')->toArray();
 
@@ -56,7 +57,7 @@ class ModelConfigure extends Command
                     GroupPermissions::where('group_id', $group)
                         ->where('perm_id', '=', $perm->id)
                         ->delete();
-                    if (GroupPermissions::where('group_id', $group)->where('perm_id', '=', $targetPermID)->exists()){
+                    if (GroupPermissions::where('group_id', $group)->where('perm_id', '=', $targetPermID)->exists()) {
                         GroupPermissions::insert([
                             'group_id' => $group,
                             'perm_id' => $perm->id,
@@ -64,6 +65,12 @@ class ModelConfigure extends Command
                             'updated_at' => $currentTimestamp,
                         ]);
                     }
+                }
+
+                if (!$this->option('do_not_create_bot')) {
+                    $bot = new Bots();
+                    $bot->fill(['name' => $model->name, 'type' => 'prompt', 'visibility' => 0, 'model_id' => $model->id]);
+                    $bot->save();
                 }
                 DB::commit();
                 $this->info('Model ' . $name . ' with access_code ' . $accessCode . ' configured successfully!');
