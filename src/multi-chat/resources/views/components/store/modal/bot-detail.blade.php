@@ -1,4 +1,4 @@
-<div id="detail-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+<div id="detail-modal" tabindex="-1" aria-hidden="true"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-2xl max-h-full">
         <!-- Modal content -->
@@ -45,8 +45,7 @@
                     <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                         <div class="flex flex-wrap -mx-3">
                             <div class="w-full px-3 flex flex-col items-center">
-                                <img class="rounded-full m-auto bg-black" width="50px" height="50px"
-                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGlwJ/lXeUPwAAAABJRU5ErkJggg==">
+                                <img class="rounded-full m-auto bg-black" width="50px" height="50px">
                             </div>
                         </div>
                     </div>
@@ -56,7 +55,7 @@
                                 for="llm_name">
                                 選取模型
                             </label>
-                            <input readonly type="text" name="llm_name" autocomplete="off"
+                            <input type="text" name="llm_name" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="基底模型">
                         </div>
@@ -65,7 +64,7 @@
                         <div class="w-full">
                             <label for="bot-name"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.name') }}</label>
-                            <input readonly type="text" name="bot-name" autocomplete="off"
+                            <input type="text" name="bot-name" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="{{ __('store.bot.name.label') }}">
                         </div>
@@ -74,7 +73,7 @@
                         <div class="w-full">
                             <label for="bot-describe"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.description') }}</label>
-                            <input readonly type="text" name="bot-describe" autocomplete="off"
+                            <input type="text" name="bot-describe" autocomplete="off"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="{{ __('store.bot.description.label') }}">
                         </div>
@@ -104,7 +103,7 @@
                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                                 for="modelfile">Modelfile</label>
                             <div class="flex items-center">
-                                <textarea readonly id="modelfile" name="modelfile" type="text" rows="1" max-rows="10"
+                                <textarea id="modelfile" name="modelfile" type="text" rows="1" max-rows="10"
                                     placeholder="modelfile"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
@@ -167,6 +166,7 @@
 </div>
 <script>
     function detail_update(data, readonly) {
+        console.log(readonly)
         $("#save_bot").hide()
         $("#delete_bot").hide()
         if (!readonly) {
