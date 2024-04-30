@@ -4,7 +4,7 @@ import json
 import requests
 from typing import List
 
-from .functions import log
+logger = logging.getLogger(__name__)
 
 def safety_middleware(func, n_max_buffer=50, streaming=True):
     bypass = True
@@ -12,8 +12,7 @@ def safety_middleware(func, n_max_buffer=50, streaming=True):
         from llm_safety_guard import LlmSafetyGuard
         bypass = False
     except ImportError:
-        logging.exception('Bypassing')
-        log(0, 'Bypassing safety middleware due to the package "llm-safety-guard" is not installed.')
+        logger.warning('Bypassing safety middleware due to the package "llm-safety-guard" is not installed.')
 
     def wrap(*args, **kwargs):
         nonlocal func

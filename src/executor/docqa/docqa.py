@@ -65,6 +65,7 @@ class DocQaExecutor(LLMExecutor):
         parser.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
         parser.add_argument('--limit', default=3072, type=int, help='The limit of the LLM\'s context window')
         parser.add_argument('--model', default=None, help='The model name (access code) on Kuwa multi-chat WebUI')
+        parser.add_argument('--embedding_model', default="thenlper/gte-base-zh", help='The HuggingFace name of the embedding model.')
         parser.add_argument('--mmr_k', default=6, type=int, help='Number of chunk to retrieve after Maximum Marginal Relevance (MMR).')
         parser.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
         parser.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
@@ -84,6 +85,7 @@ class DocQaExecutor(LLMExecutor):
             auth_token=self.args.api_key
         )
         self.document_store = DocumentStore(
+            embedding_model = self.args.embedding_model,
             mmr_k = self.args.mmr_k,
             mmr_fetch_k = self.args.mmr_fetch_k,
             chunk_size = self.args.chunk_size,

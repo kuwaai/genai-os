@@ -1,7 +1,11 @@
+import logging
+import json
 from flask import Blueprint, request, json, redirect, url_for, jsonify
-from src.variable import *
-from src.functions import *
+from ..variable import *
+from ..functions import save_variable_to_file, endpoint_formatter, get_base_url, load_records
 executor = Blueprint('executor', __name__)
+
+logger = logging.getLogger(__name__)
 
 @executor.route("/schedule", methods=["POST"])
 def status():
@@ -14,12 +18,12 @@ def status():
                 if i[1] == "READY" and i[2] == -1 and i[3] == -1:
                     i[2] = history_id
                     i[3] = user_id
-                    log(0, f"Scheduled {llm_name},{i[0]} for {history_id},{user_id}")
+                    logger.info(f"Scheduled {llm_name},{i[0]} for {history_id},{user_id}")
                     return "READY"
         else:
-            log(0, f"No machine for {llm_name} has founded, returning NOMACHINE code")
+            logger.warning(f"No machine for {llm_name} has founded, returning NOMACHINE code")
             return "NOMACHINE"
-    log(0, f"No READY machine for {llm_name}, returning BUSY code")
+    logger.warning(f"No READY machine for {llm_name}, returning BUSY code")
     return "BUSY"
    
 @executor.route("/register", methods=["POST"])
@@ -30,7 +34,7 @@ def register():
     if endpoint == None or llm_name == None or endpoint_formatter(endpoint) in [j[0] for j in data.get(llm_name, [])]: return "Failed"
     data.setdefault(llm_name, []).append([endpoint_formatter(endpoint), "READY", -1, -1])
     save_variable_to_file(record_file, data)
-    log(0,f"A new {llm_name} is registered at {endpoint}")
+    logger.info(f"A new {llm_name} is registered at {endpoint}")
     return "Success"
 
 @executor.route("/unregister", methods=["POST"])
@@ -44,16 +48,16 @@ def unregister():
         if data[llm_name] == []: del data[llm_name]
         if data.get(llm_name) == None or old != len(data[llm_name]):
             save_variable_to_file(record_file, data)
-            log(0,f"{llm_name} , {endpoint} just unregistered from agent")
+            logger.info(f"{llm_name} , {endpoint} just unregistered from agent")
             return "Success"
-    log(0,f"{llm_name} , {endpoint} failed to unregister")
+    logger.warning(f"{llm_name} , {endpoint} failed to unregister")
     return "Failed"
     
 @executor.route("/debug", methods=["GET", "POST"])
 def debug():
     # This route is for debugging
     if request.method == 'POST':
-        loadRecords(json.loads(request.form.get('data')), True)
+        load_records(json.loads(request.form.get('data')), True)
         return redirect(url_for('executor.debug'))
     return """
 <form method="POST">
@@ -64,7 +68,7 @@ def debug():
     document.querySelector("textarea").style.height = 'auto';
     document.querySelector("textarea").style.height = (document.querySelector("textarea").scrollHeight) + 'px';
 </script>
-""".format(str(dumps(data, indent=2)))
+""".format(str(json.dumps(data, indent=2)))
 
 @executor.route("/list", methods=["GET"])
 def list_executor():
