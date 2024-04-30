@@ -66,14 +66,21 @@ class LoginRequest extends FormRequest
                 ]);
             }
         } else {
-            $credentials = [
-                'mail' => $this->email,
-                'password' => $this->password,
-                'fallback' => [
+            if (env('LDAP_CONNECTION', '') != '') {
+                $credentials = [
+                    'mail' => $this->email,
+                    'password' => $this->password,
+                    'fallback' => [
+                        'email' => $this->email,
+                        'password' => $this->password,
+                    ],
+                ];
+            } else {
+                $credentials = [
                     'email' => $this->email,
                     'password' => $this->password,
-                ],
-            ];
+                ];
+            }
 
             try {
                 if (!Auth::attempt($credentials, $this->filled('remember'))) {

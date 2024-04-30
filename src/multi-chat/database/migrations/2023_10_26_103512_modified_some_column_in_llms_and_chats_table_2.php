@@ -10,9 +10,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('chats', 'channel')) {
-            Schema::table('chats', function (Blueprint $table) {
-                $table->integer('channel')->default(0);
+        if (Schema::hasColumn('llms', 'limit_per_day')) {
+            Schema::table('llms', function (Blueprint $table) {
+                $table->dropColumn('limit_per_day');
             });
         }
     }

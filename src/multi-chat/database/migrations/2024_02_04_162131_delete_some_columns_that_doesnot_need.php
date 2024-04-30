@@ -14,13 +14,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chats', function (Blueprint $table) {
-            $table->dropColumn('name');
+            if (Schema::hasColumn('chats', 'name')) {
+                $table->dropColumn('name');
+            }
         });
-        Schema::table('llms', function (Blueprint $table) {
-            $table->dropColumn('link');
-            $table->dropColumn('healthy');
-            $table->dropColumn('version');
-        });
+        
     }
 
     /**

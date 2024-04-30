@@ -23,7 +23,7 @@ for /l %%i in (1,1,%numWorkers%) do (
 REM Kernel
 pushd "..\src\kernel"
 del records.pickle
-start /b "" "%~dp0packages\%python_folder%\python.exe" "%~dp0..\src\kernel\main.py"
+start /b "" "kuwa-kernel"
 popd
 
 REM Wait for Kernel online
