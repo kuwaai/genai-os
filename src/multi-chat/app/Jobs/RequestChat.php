@@ -28,7 +28,7 @@ class RequestChat implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($input, $access_code, $user_id, $history_id, $channel = null)
+    public function __construct($input, $access_code, $user_id, $history_id, $channel = null, $modelfile = null)
     {
         $this->input = json_encode(json_decode($input), JSON_UNESCAPED_UNICODE);
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
@@ -39,6 +39,7 @@ class RequestChat implements ShouldQueue
             $channel = '';
         }
         $this->channel = $channel;
+        $this->modelfile = $modelfile;
         $user = User::find($user_id);
         $this->openai_token = $user->openai_token;
         $this->google_token = $user->google_token;

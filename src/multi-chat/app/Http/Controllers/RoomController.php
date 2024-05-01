@@ -395,7 +395,7 @@ class RoomController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $dct, 'updated_at' => $dct]);
                     $history->save();
-                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id);
+                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, null, Bots::findOrFail($chat->bot_id)->config['modelfile'] ?? []);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                     Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
@@ -487,7 +487,7 @@ class RoomController extends Controller
                     $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false, 'created_at' => $start, 'updated_at' => $start]);
                     $history->save();
                     $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
-                    if (in_array(LLMs::find($chat->bot_id)->access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
+                    if (in_array($access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
                         $tmp = json_encode([
                             [
                                 'msg' => Histories::where('chat_id', '=', $chat->id)
@@ -514,7 +514,7 @@ class RoomController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chained' => $chained, 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $deltaStart, 'updated_at' => $deltaStart]);
                     $history->save();
-                    RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id);
+                    RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, null,Bots::findOrFail($chat->bot_id)->config['modelfile'] ?? []);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                     Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }

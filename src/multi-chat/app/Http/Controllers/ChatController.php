@@ -45,11 +45,11 @@ class ChatController extends Controller
         $access_code = $request->input('model');
         $msg = $record->msg;
         if ($access_code == null && strpos(Groups::find($request->user()->group_id)->describe, '!verilog_translate!') === 0){
-            $access_code = LLMs::find($chat->bot_id)->access_code;
+            $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
             $msg = "請將程式碼轉成verilog。\n" . $msg;
         }
         else if ($access_code == null) {
-            $access_code = LLMs::find($chat->bot_id)->access_code;
+            $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
             $msg = "以下提供內容，請幫我翻譯成中文。\n" . $msg;
         }
 
