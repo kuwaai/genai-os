@@ -375,7 +375,7 @@ xmlns="http://www.w3.org/2000/svg">
         $(node).children("svg").eq(0).hide();
         $(node).children("svg").eq(1).show();
         if ($(node).children("span")) {
-            $(node).children("span").text("{{ __('hint.copied') }}")
+            $(node).children("span").text("{{ __('chat.hint.copied') }}")
         }
         setTimeout(function() {
             $(node).children("svg").eq(0).show();
