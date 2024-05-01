@@ -85,7 +85,7 @@ class HuggingfaceExecutor(LLMExecutor):
         # Generation Options
         gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
-        gen_group.add_argument('--generation_kwargs', type=str, nargs='*', action=KwargsParser, help='Additional kwargs passed to the HF generate function.')
+        gen_group.add_argument('--generation_kwargs', default={}, type=str, nargs='*', action=KwargsParser, help='Additional kwargs passed to the HF generate function.')
 
     def setup(self):
         if self.args.visible_gpu:
