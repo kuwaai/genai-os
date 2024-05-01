@@ -1,5 +1,5 @@
 @echo off
-
+cd "%~dp0"
 setlocal enabledelayedexpansion
 rem Initialize the CUDA version variable
 set "version=cpu"
@@ -19,7 +19,7 @@ if "%set_version%"=="" (
 			set "cuda_version=%%v"
 		)
 		rem Parse the version number
-		for /f "tokens=1,2,3 delims=." %%a in ("%cuda_version%") do (
+		for /f "tokens=1,2,3 delims=." %%a in ("!cuda_version!") do (
 			set "major=%%a"
 			set "minor=%%b"
 			set "patch=%%c"
