@@ -15,7 +15,7 @@
                 <img data-tooltip-target="llm_{{ $chat->id }}_chat" data-tooltip-placement="top"
                     class="h-full w-full"
                     src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                <div id="llm_{{ $chat->id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
+                <div id="llm_{{ $chat->id }}_chat" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                     {{ $chat->name }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
@@ -61,7 +61,7 @@
                         <img data-tooltip-target="llm_{{ $chat->id }}_chat" data-tooltip-placement="top"
                             class="h-full w-full"
                             src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                        <div id="llm_{{ $chat->id }}_chat" role="tooltip" access_code="{{ $chat->access_code }}"
+                        <div id="llm_{{ $chat->id }}_chat" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                             {{ $chat->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
@@ -194,6 +194,7 @@
                     var model = $("#" + $.escapeSelector($(element).children("div").children("img").data(
                             "tooltip-target")))
                         .attr("access_code");
+                        console.log($(element).children("div").children("img"))
                     if (model == undefined) model = "";
                     row = `assistant	${model}	${msgText}	${chained}\n`;
                 } else {

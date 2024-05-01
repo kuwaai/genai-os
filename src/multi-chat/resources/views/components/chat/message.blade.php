@@ -30,7 +30,7 @@
             @if ($anonymous)
                 <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
             @else
-                <div id="{{ $history->id }}_llm_{{ $history->bot_id }}_msg" role="tooltip"
+                <div id="{{ $history->id }}_llm_{{ $history->bot_id }}_msg" role="tooltip" access_code="{{ $history->access_code }}"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                     {{ $history->name }}
                     <div class="tooltip-arrow" data-popper-arrow></div>
@@ -57,7 +57,7 @@
                 @if ($anonymous)
                     <div class="h-full w-full bg-black flex justify-center items-center text-white">?</div>
                 @else
-                    <div id="{{ $history->id }}_llm_{{ $history->bot_id }}_msg" role="tooltip"
+                    <div id="{{ $history->id }}_llm_{{ $history->bot_id }}_msg" role="tooltip" access_code="{{ $history->access_code }}"
                         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
                         {{ $history->name }}
                         <div class="tooltip-arrow" data-popper-arrow></div>

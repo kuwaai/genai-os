@@ -266,6 +266,7 @@
                                     'feedback.nice',
                                     'feedback.detail',
                                     'feedback.flags',
+                                    'access_code'
                                 );
 
                             $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
@@ -290,6 +291,7 @@
                                     DB::raw('NULL as nice'),
                                     DB::raw('NULL as detail'),
                                     DB::raw('NULL as flags'),
+                                    'access_code'
                                 );
 
                             $mergedChats = $botChats
