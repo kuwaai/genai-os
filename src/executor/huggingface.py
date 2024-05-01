@@ -140,12 +140,14 @@ class HuggingfaceExecutor(LLMExecutor):
         logger.debug(f"Chat template: {self.tokenizer.chat_template}")
         logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
 
-    def synthesis_prompt(self, history: list):
+    def synthesis_prompt(self, history: list, system_prompt: str):
         """
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if not self.no_system_prompt:
+        if system_prompt:
+            history.insert(0, {"role": "system", "content": system_prompt})
+        elif not self.no_system_prompt:
             history.insert(0, {"role": "system", "content": self.system_prompt})
         prompt = self.tokenizer.apply_chat_template(
             history, tokenize=True, add_generation_prompt=True, return_tensors='pt'
@@ -172,11 +174,13 @@ class HuggingfaceExecutor(LLMExecutor):
             for record in history
         ]
         history = self.rectify_history(history)
+        modelfile = data.get("modelfile")
+        if modelfile: modelfile = json.loads(modelfile)
 
         # Trim the history to fit into the context window
         prompt_embedding = []
         while True:
-            prompt_embedding = self.synthesis_prompt(history)
+            prompt_embedding = self.synthesis_prompt(history, "".join([i["Args"] for i in modelfile if i['Name'] == 'system']) if modelfile else "")
             if prompt_embedding.shape[1] <= self.limit: break
 
             history = self.rectify_history(history[1:])
