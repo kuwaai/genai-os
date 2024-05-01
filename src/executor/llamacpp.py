@@ -149,14 +149,15 @@ class LlamaCppExecutor(LLMExecutor):
 
         self.serving_generator = None
 
-    def synthesis_prompt(self, history: list):
+    def synthesis_prompt(self, history: list, system_prompt: str):
         """
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if not self.no_system_prompt:
+        if system_prompt:
+            history.insert(0, {"role": "system", "content": system_prompt})
+        elif not self.no_system_prompt:
             history.insert(0, {"role": "system", "content": self.system_prompt})
-
         prompt = self.model.chat_handler(
             llama = ReflectiveLlama(),
             messages = history
@@ -183,12 +184,13 @@ class LlamaCppExecutor(LLMExecutor):
             for record in history
         ]
         history = self.rectify_history(history)
-
+        modelfile = data.get("modelfile")
+        if modelfile: modelfile = json.loads(modelfile)
         try:
             # Trim the history to fit into the context window
             prompt = ""
             while True:
-                prompt = self.synthesis_prompt(history)
+                prompt = self.synthesis_prompt(history, "".join([i["Args"] for i in modelfile if i['Name'] == 'system']) if modelfile else "")
                 prompt_length = len(self.model.tokenize(
                     text=prompt.encode('UTF-8', 'ignore'),
                     add_bos=False, special=False

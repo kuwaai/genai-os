@@ -395,7 +395,7 @@ class RoomController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $dct, 'updated_at' => $dct]);
                     $history->save();
-                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, null, Bots::findOrFail($chat->bot_id)->config['modelfile'] ?? []);
+                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, null, json_decode(Bots::find($llm)->config ?? '')->modelfile ?? null);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                     Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
@@ -514,7 +514,7 @@ class RoomController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chained' => $chained, 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $deltaStart, 'updated_at' => $deltaStart]);
                     $history->save();
-                    RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, null,Bots::findOrFail($chat->bot_id)->config['modelfile'] ?? []);
+                    RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, null, Bots::findOrFail($chat->bot_id)->config['modelfile'] ?? []);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                     Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
