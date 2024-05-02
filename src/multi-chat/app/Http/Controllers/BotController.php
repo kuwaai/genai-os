@@ -29,8 +29,8 @@ class BotController extends Controller
     {
         $commands = [];
         $currentCommand = [
-            'Name' => '',
-            'Args' => '',
+            'name' => '',
+            'args' => '',
         ];
 
         $systemCommandProcessed = false; // Flag to track if a system command has been processed
@@ -51,51 +51,51 @@ class BotController extends Controller
             // Check if the line starts with a command keyword
             if (strtoupper(substr($line, 0, 4)) === 'FROM' || strtoupper(substr($line, 0, 7)) === 'ADAPTER' || strtoupper(substr($line, 0, 7)) === 'LICENSE' || strtoupper(substr($line, 0, 8)) === 'TEMPLATE' || strtoupper(substr($line, 0, 6)) === 'SYSTEM' || strtoupper(substr($line, 0, 9)) === 'PARAMETER' || strtoupper(substr($line, 0, 7)) === 'MESSAGE') {
                 // If a command is already being accumulated, push it to the commands array
-                if ($currentCommand['Name'] !== '' && trim($currentCommand['Args']) !== '') {
+                if ($currentCommand['name'] !== '' && trim($currentCommand['args']) !== '') {
                     $commands[] = $currentCommand;
                 }
                 // Start a new command
                 $currentCommand = [
-                    'Name' => '',
-                    'Args' => '',
+                    'name' => '',
+                    'args' => '',
                 ];
 
                 // Split the line into command type and arguments
                 $commandParts = preg_split('/\s+(.+)/', $line, -1, PREG_SPLIT_DELIM_CAPTURE);
                 $commandType = $commandParts[0];
-                $commandArgs = isset($commandParts[1]) ? $commandParts[1] : '';
+                $commandargs = isset($commandParts[1]) ? $commandParts[1] : '';
 
                 // Set the current command's name and arguments
-                $currentCommand['Name'] = strtolower($commandType);
-                $currentCommand['Args'] = trim($commandArgs);
+                $currentCommand['name'] = strtolower($commandType);
+                $currentCommand['args'] = trim($commandargs);
 
                 // If the command is a system command and it has already been processed, skip it
-                if ($currentCommand['Name'] === 'system' && $systemCommandProcessed) {
+                if ($currentCommand['name'] === 'system' && $systemCommandProcessed) {
                     $currentCommand = [
-                        'Name' => '',
-                        'Args' => '',
+                        'name' => '',
+                        'args' => '',
                     ];
-                } elseif ($currentCommand['Name'] === 'system') {
+                } elseif ($currentCommand['name'] === 'system') {
                     $systemCommandProcessed = true; // Set the flag to true if a system command is processed
                 }
             } else {
                 // If the line does not start with a command keyword, append it to the current command's arguments
-                $currentCommand['Args'] .= "\n" . $line;
+                $currentCommand['args'] .= "\n" . $line;
             }
         }
 
         // Push the last command to the commands array if it has non-empty arguments
-        if ($currentCommand['Name'] !== '' && trim($currentCommand['Args']) !== '') {
+        if ($currentCommand['name'] !== '' && trim($currentCommand['args']) !== '') {
             $commands[] = $currentCommand;
         }
 
         // Remove triple-quotes at the start or end of arguments
         foreach ($commands as &$command) {
-            if (strpos($command['Args'], '"""') === 0) {
-                $command['Args'] = substr($command['Args'], 3);
+            if (strpos($command['args'], '"""') === 0) {
+                $command['args'] = substr($command['args'], 3);
             }
-            if (strrpos($command['Args'], '"""') === strlen($command['Args']) - 3) {
-                $command['Args'] = substr($command['Args'], 0, -3);
+            if (strrpos($command['args'], '"""') === strlen($command['args']) - 3) {
+                $command['args'] = substr($command['args'], 0, -3);
             }
         }
 
