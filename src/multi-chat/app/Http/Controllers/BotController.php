@@ -127,12 +127,34 @@ class BotController extends Controller
     }
     public function update(Request $request)
     {
+        $bot = Bots::findOrFail($request->input('id'));
+        $model_id = LLMs::where('name', '=', $request->input('llm_name'))->first()->id;
+
+        $config = [];
+        if ($request->input('modelfile')) {
+            $config['modelfile'] = $this->modelfile_parse($request->input('modelfile'));
+        }
+        if ($request->input('react_btn')) {
+            $config['react_btn'] = $request->input('react_btn');
+        }
+        $config = json_encode($config);
+        if ($request->input('bot-name')) {
+            $bot->name = $request->input('bot-name');
+        }
+        if ($request->input('bot-describe')) {
+            $bot->description = $request->input('bot-describe');
+        }
+        $bot->model_id = $model_id;
+        $bot->config = $config;
+        $bot->save();
         return redirect()->route('store.home');
     }
     public function delete(Request $request): RedirectResponse
     {
-        $bot = Bots::findOrFail($request->input("id")); 
-        if ($bot->image) Storage::delete($bot->image);
+        $bot = Bots::findOrFail($request->input('id'));
+        if ($bot->image) {
+            Storage::delete($bot->image);
+        }
         $bot->delete();
         return Redirect::route('store.home');
     }
