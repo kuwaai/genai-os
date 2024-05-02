@@ -102,8 +102,8 @@
                                 for="bot-system_prompt">{{ __('store.bot.system_prompt') }}</label>
                             <div class="flex items-center">
                                 <textarea id="bot-system_prompt" type="text"
-                                    oninput="$('#modelfile').val(modelfile_to_string((modelfile_parse($('#modelfile').val()).some(obj => obj.Name === 'system') ? modelfile_parse($('#modelfile').val()) : [...modelfile_parse($('#modelfile').val()), { Name: 'system', Args: 'uwu' }])
-                                    .map(obj => obj.Name === 'system' ? { ...obj, Args: $(this).val() } : obj))); adjustTextareaRows(this)"
+                                    oninput="$('#modelfile').val(modelfile_to_string((modelfile_parse($('#modelfile').val()).some(obj => obj.name === 'system') ? modelfile_parse($('#modelfile').val()) : [...modelfile_parse($('#modelfile').val()), { name: 'system', args: 'uwu' }])
+                                    .map(obj => obj.name === 'system' ? { ...obj, args: $(this).val() } : obj))); adjustTextareaRows(this)"
                                     rows="1" max-rows="4" placeholder="{{ __('store.bot.system_prompt.label') }}"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
