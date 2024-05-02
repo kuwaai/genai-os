@@ -207,24 +207,26 @@ class HuggingfaceExecutor(LLMExecutor):
 
             buffer = ""
             for chunk in streamer:
-                torch.cuda.empty_cache()
                 buffer += chunk
                 for word in self.stop_words:
                     if word not in buffer: continue
-                    self.CSC.proc = None
                     logger.debug(f"{word} founded!")
                     buffer = buffer.split(word)[0]
+                    self.CSC.proc = None
                     break
-                if not self.CSC.proc:
-                    if self.in_debug(): print(end=buffer, flush=True)
-                    yield buffer # Flush buffer
-                    break
-                elif len(buffer) > self.buffer_length:
+
+                if not self.CSC.proc: break
+                
+                if len(buffer) > self.buffer_length:
                     output_length = len(buffer) - self.buffer_length
                     if self.in_debug(): print(end=buffer[:output_length], flush=True)
                     yield buffer[:output_length]
                     buffer = buffer[output_length:]
-                
+            
+            if len(buffer) > 0:
+                if self.in_debug(): print(end=buffer, flush=True)
+                yield buffer # Flush buffer
+
         except Exception as e:
             logger.exception("Error occurs during generation.")
             yield "[Oops, Cuda out of memory! Please try toggle off chained state, or remove some texts.]"
