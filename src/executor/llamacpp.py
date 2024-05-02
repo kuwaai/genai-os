@@ -190,7 +190,7 @@ class LlamaCppExecutor(LLMExecutor):
             # Trim the history to fit into the context window
             prompt = ""
             while True:
-                prompt = self.synthesis_prompt(history, "".join([i["Args"] for i in modelfile if i['Name'] == 'system']) if modelfile else "")
+                prompt = self.synthesis_prompt(history, "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else "")
                 prompt_length = len(self.model.tokenize(
                     text=prompt.encode('UTF-8', 'ignore'),
                     add_bos=False, special=False

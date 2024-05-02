@@ -180,7 +180,7 @@ class HuggingfaceExecutor(LLMExecutor):
         # Trim the history to fit into the context window
         prompt_embedding = []
         while True:
-            prompt_embedding = self.synthesis_prompt(history, "".join([i["Args"] for i in modelfile if i['Name'] == 'system']) if modelfile else "")
+            prompt_embedding = self.synthesis_prompt(history, "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else "")
             if prompt_embedding.shape[1] <= self.limit: break
 
             history = self.rectify_history(history[1:])

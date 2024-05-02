@@ -285,8 +285,8 @@ xmlns="http://www.w3.org/2000/svg">
         function modelfile_parse(data) {
             const commands = [];
             let currentCommand = {
-                Name: '',
-                Args: ''
+                name: '',
+                args: ''
             };
 
             let systemCommandProcessed = false; // Flag to track if a system command has been processed
@@ -308,13 +308,13 @@ xmlns="http://www.w3.org/2000/svg">
                     line.toUpperCase().startsWith('PARAMETER') ||
                     line.toUpperCase().startsWith('MESSAGE')) {
                     // If a command is already being accumulated, push it to the commands array
-                    if (currentCommand.Name !== '' && currentCommand.Args.trim() !== '') {
+                    if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
                         commands.push(currentCommand);
                     }
                     // Start a new command
                     currentCommand = {
-                        Name: '',
-                        Args: ''
+                        name: '',
+                        args: ''
                     };
 
                     // Split the line into command type and arguments
@@ -322,36 +322,36 @@ xmlns="http://www.w3.org/2000/svg">
                     if (!commandArgs) commandArgs = '';
 
                     // Set the current command's name and arguments
-                    currentCommand.Name = commandType.toLowerCase();
-                    currentCommand.Args = commandArgs.trim();
+                    currentCommand.name = commandType.toLowerCase();
+                    currentCommand.args = commandArgs.trim();
 
                     // If the command is a system command and it has already been processed, skip it
-                    if (currentCommand.Name === 'system' && systemCommandProcessed) {
+                    if (currentCommand.name === 'system' && systemCommandProcessed) {
                         currentCommand = {
-                            Name: '',
-                            Args: ''
+                            name: '',
+                            args: ''
                         };
-                    } else if (currentCommand.Name === 'system') {
+                    } else if (currentCommand.name === 'system') {
                         systemCommandProcessed = true; // Set the flag to true if a system command is processed
                     }
                 } else {
                     // If the line does not start with a command keyword, append it to the current command's arguments
-                    currentCommand.Args += '\n' + line;
+                    currentCommand.args += '\n' + line;
                 }
             });
 
             // Push the last command to the commands array if it has non-empty arguments
-            if (currentCommand.Name !== '' && currentCommand.Args.trim() !== '') {
+            if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
                 commands.push(currentCommand);
             }
 
             // Remove triple-quotes at the start or end of arguments
             commands.forEach(command => {
-                if (command.Args.startsWith('"""')) {
-                    command.Args = command.Args.slice(3);
+                if (command.args.startsWith('"""')) {
+                    command.args = command.args.slice(3);
                 }
-                if (command.Args.endsWith('"""')) {
-                    command.Args = command.Args.slice(0, -3);
+                if (command.args.endsWith('"""')) {
+                    command.args = command.args.slice(0, -3);
                 }
             });
 
@@ -361,8 +361,8 @@ xmlns="http://www.w3.org/2000/svg">
         function modelfile_update(node) {
             let data = modelfile_parse(node.val());
             for (let obj of data) {
-                if (obj.Name === 'system') {
-                    $("#bot-system_prompt").val(obj.Args)
+                if (obj.name === 'system') {
+                    $("#bot-system_prompt").val(obj.args)
                 }
             }
             node.val(modelfile_to_string(data));
@@ -370,11 +370,11 @@ xmlns="http://www.w3.org/2000/svg">
 
         function modelfile_to_string(array) {
             return array.map(item => {
-                let args = item.Args;
+                let args = item.args;
                 if (args.includes('\n')) {
                     args = '"""' + args + '"""';
                 }
-                return `${item.Name.toUpperCase()} ${args}`;
+                return `${item.name.toUpperCase()} ${args}`;
             }).join('\n');
         }
     </script>
