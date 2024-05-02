@@ -89,8 +89,12 @@ class GeminiExecutor(LLMExecutor):
     async def llm_compute(self, data):
         try:
             google_token = data.get("google_token") or self.args.api_key
+            
+            modelfile = data.get("modelfile")
+            if modelfile: modelfile = json.loads(modelfile)
+            modelfile = "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else ""
             msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
-
+            msg[0]["parts"][0]['text'] = modelfile + msg[0]["parts"][0]['text']
             if not google_token or len(google_token) == 0:
                 yield "[Please enter your Google API Token in the user settings of the website in order to use this model.]"
                 return
