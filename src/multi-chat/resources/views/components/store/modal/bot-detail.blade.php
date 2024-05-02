@@ -113,7 +113,7 @@
                     </div>
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                                 for="modelfile">Modelfile</label>
                             <div class="flex items-center">
                                 <textarea id="modelfile" name="modelfile" type="text" oninput="adjustTextareaRows(this)"
