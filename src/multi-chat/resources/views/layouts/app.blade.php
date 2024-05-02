@@ -370,11 +370,16 @@ xmlns="http://www.w3.org/2000/svg">
 
         function modelfile_to_string(array) {
             return array.map(item => {
-                let args = item.args;
-                if (args.includes('\n')) {
-                    args = '"""' + args + '"""';
+                if (item) {
+                    let args = item.args;
+                    if (args) {
+                        if (args.includes('\n')) {
+                            args = '"""' + args + '"""';
+                        }
+                        return `${item.name.toUpperCase()} ${args}`;
+                    }
                 }
-                return `${item.name.toUpperCase()} ${args}`;
+                return ""
             }).join('\n');
         }
     </script>
