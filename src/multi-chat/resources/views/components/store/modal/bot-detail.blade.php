@@ -253,7 +253,7 @@
             return true;
         }
         if (!$("#update_bot input[name='llm_name']").val()) $("#create_error").text(
-            {{ __('store.hint.must_select_base_model') }})
+            '{{ __('store.hint.must_select_base_model') }}')
         else if (!$("#update_bot input[name='bot-name']").val()) $("#create_error").text(
             "{{ __('You must name your bot') }}")
         $("#create_error").show().delay(3000).fadeOut();

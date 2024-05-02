@@ -4,7 +4,7 @@ return [
     'route' => 'Store',
     'button.create' => 'Create Bot',
     'label.offical_bots' => 'Offical Bots',
-    'hint.must_select_base_model' => 'You must select a base model',
+    'hint.%' => 'You must select a base model',
     'label.community_bots' => 'Community Bots',
     'bot.system_prompt' => 'Startup Prompt',
     'bot.welcome_message' => 'Welcome message',
