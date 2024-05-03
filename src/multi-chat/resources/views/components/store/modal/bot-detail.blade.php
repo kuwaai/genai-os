@@ -50,7 +50,7 @@
                     <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                         <div class="flex flex-wrap -mx-3">
                             <div class="w-full px-3 flex flex-col items-center">
-                                <img class="rounded-full m-auto bg-black" width="50px" height="50px">
+                                <img id="llm_img2" class="rounded-full m-auto bg-black" width="50px" height="50px">
                             </div>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
                                 選取模型
                             </label>
                             <input type="text" list="llm-list" name="llm_name" autocomplete="off"
-                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
+                                oninput='$("#llm_img2").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="基底模型">
                             
@@ -247,7 +247,7 @@
             return true;
         }
         if (!$("#update_bot input[name='llm_name']").val()) $("#create_error").text(
-            '{{ __('store.hint.must_select_base_model') }}')
+            "{{ __('store.hint.must_select_base_model') }}")
         else if (!$("#update_bot input[name='bot-name']").val()) $("#create_error").text(
             "{{ __('You must name your bot') }}")
         $("#create_error").show().delay(3000).fadeOut();
