@@ -1,4 +1,4 @@
-@props(['result'])
+
 <div id="detail-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-2xl max-h-full">
@@ -60,17 +60,11 @@
                                 for="llm_name">
                                 選取模型
                             </label>
-                            <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
+                            <input type="text" list="llm-list" name="llm_name" autocomplete="off"
                                 oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="基底模型">
-                            <datalist id="llm-list">
-                                @foreach ($result as $LLM)
-                                    <option
-                                        src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
-                                        value="{{ $LLM->name }}"></option>
-                                @endforeach
-                            </datalist>
+                            
                         </div>
                     </div>
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">

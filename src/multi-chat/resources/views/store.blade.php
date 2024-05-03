@@ -33,7 +33,7 @@
                     ->get();
             @endphp
             <x-store.modal.create-bot :result="$result" />
-            <x-store.modal.bot-detail :result="$result" />
+            <x-store.modal.bot-detail />
             <div class="my-8">
                 <x-logo />
             </div>
