@@ -10,6 +10,6 @@ if /I "%userInput%"=="n" (
      pause
 ) else (
      echo 正在下載模型...
-     curl -L -o "taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/ZoneTwelve/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1.Q4_K_M.gguf?download=true
+     curl -L -o "taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/nctu6/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1-Q4_K_M.gguf?download=true
      
 )
