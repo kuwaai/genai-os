@@ -134,7 +134,7 @@ xmlns="http://www.w3.org/2000/svg">
                     var match = DOMPurify.sanitize(this).replaceAll("&lt;","<").replaceAll("&gt;",">").match(pattern);
                     if (match) {
                         var refNumber = match[1];
-                        $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(1) div div")[
+                        $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(3) div div")[
                             0], {
                             ALLOWED_TAGS: [],
                             ALLOWED_ATTR: []
