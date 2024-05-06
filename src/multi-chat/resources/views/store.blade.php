@@ -22,6 +22,7 @@
                 $bots = App\Models\Bots::Join('llms', function ($join) {
                     $join->on('llms.id', '=', 'bots.model_id');
                 })
+            ->where('llms.enabled', '=', true)
                     ->select(
                         'llms.*',
                         'bots.*',
@@ -47,19 +48,19 @@
             @if ($bots->where('visibility', '=', 0)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.offical_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 0)" />
+                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 0)" :extra="'offical_bots-'" />
                 </div>
             @endif
             @if ($bots->where('owner_id', '=', Auth::user()->id)->count() > 0)
                 <div class="w-full p-4">
-                    <p class="mb-2">{{ __('Your Bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" />
+                    <p class="mb-2">{{ __('store.label.my_bots') }}</p>
+                    <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" :extra="'my_bots-'" />
                 </div>
             @endif
             @if ($bots->where('visibility', '=', 1)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.community_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 1)" />
+                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 1)" :extra="'community_bots-'" />
                 </div>
             @endif
         </div>

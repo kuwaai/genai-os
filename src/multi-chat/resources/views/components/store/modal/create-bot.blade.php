@@ -42,12 +42,12 @@
                         <div class="w-full">
                             <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                                 for="llm_name">
-                                選取模型
+                                {{ __('store.bot.base_model') }}
                             </label>
                             <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
                                 oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="基底模型">
+                                placeholder="{{ __('store.bot.base_model.label') }}">
                             <datalist id="llm-list">
                                 @foreach ($result as $LLM)
                                     <option
@@ -78,7 +78,7 @@
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
                             <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
-                                {{ __('React Buttons') }}
+                                {{ __('store.bot.react_buttons') }}
                             </p>
 
                             @foreach (['Feedback', 'Translate', 'Quote', 'Other'] as $label)
@@ -89,7 +89,7 @@
                                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                     <label for="{{ $id }}"
                                         class="ml-2 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                        {{ __('Allow ' . $label) }}
+                                        {{ __('store.bot.react.allow_' . strtolower($label)) }}
                                     </label>
                                 </div>
                             @endforeach
@@ -125,10 +125,10 @@
                         <div class="w-full">
                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
                                 onclick="$('#modelfile').toggle();$('#welcome_prompt').toggle(); $('#sys_prompt').toggle()"
-                                for="modelfile">Modelfile</label>
+                                for="modelfile">{{ __('store.bot.modelfile') }}</label>
                             <div class="flex items-center">
                                 <textarea id="modelfile" name="modelfile" type="text" oninput="adjustTextareaRows(this)"
-                                    onblur="modelfile_update($(this));" rows="1" style="display:none;" max-rows="10" placeholder="modelfile"
+                                    onblur="modelfile_update($(this));" rows="1" style="display:none;" max-rows="10" placeholder="{{ __('store.bot.modelfile.label') }}"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
                         </div>
