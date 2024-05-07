@@ -35,8 +35,8 @@ def load_records(var, keep_state = False):
                     if resp.status_code == 204:
                         data[i].append(k if keep_state else [endpoint_formatter(k[0]),"READY",-1,-1])
                     else:
-                        log(0,f"Healthy check failed in {i} at {k[0]}, removed")
+                        logger.info(f"Healthy check failed in {i} at {k[0]}, removed")
                 except requests.exceptions.ConnectionError as e:
-                    log(0,f"Healthy check failed in {i} at {k[0]}, removed")
+                    logger.info(f"Healthy check failed in {i} at {k[0]}, removed")
         if len(data[i]) == 0: del data[i]
     logger.info(f"Records loaded, Here's After\n{data}")
