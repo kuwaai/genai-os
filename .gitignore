@@ -2,6 +2,7 @@ ssl/
 screenlog.0
 __pycache__
 tmp/
+.venv
 
 # Transformers
 generation_config.json
