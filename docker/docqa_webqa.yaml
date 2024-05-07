@@ -16,5 +16,7 @@ services:
       "--access_code", "doc-qa",
       "--alt_access_code", "web-qa"
       ]
+    extra_hosts:
+      - "localhost:host-gateway"
     restart: unless-stopped
     networks: ["backend", "frontend"]
