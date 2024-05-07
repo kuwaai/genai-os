@@ -120,7 +120,7 @@ class HuggingfaceExecutor(LLMExecutor):
         self.system_prompt = self.args.system_prompt
         self.no_system_prompt = self.args.no_system_prompt
         self.timeout = self.args.timeout
-        self.stop_words = list(set([self.tokenizer.eos_token, self.tokenizer.bos_token] + self.args.stop))
+        self.stop_words = [i for i in set([self.tokenizer.eos_token, self.tokenizer.bos_token] + self.args.stop) if i != None]
         self.buffer_length = max([len(k) for k in self.stop_words] or [1])
         self.tokenizer.chat_template = self.args.override_chat_template or \
                                        self.tokenizer.chat_template or \

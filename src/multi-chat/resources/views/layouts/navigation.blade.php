@@ -25,13 +25,6 @@
                         </x-nav-link>
                     </div>
                 @endif
-                @if (Auth::user()->hasPerm('tab_Play'))
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
-                            {{ __('play.route') }}
-                        </x-nav-link>
-                    </div>
-                @endif
                 @if (Auth::user()->hasPerm('tab_Store'))
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('store.home')" :active="request()->routeIs('store.*')">
@@ -167,11 +160,6 @@
             @if (Auth::user()->hasPerm('tab_Room'))
                 <x-responsive-nav-link :href="route('room.home')" :active="request()->routeIs('room.*')">
                     {{ __('room.route') }}
-                </x-responsive-nav-link>
-            @endif
-            @if (Auth::user()->hasPerm('tab_Play'))
-                <x-responsive-nav-link :href="route('play.home')" :active="request()->routeIs('play.*')">
-                    {{ __('play.route') }}
                 </x-responsive-nav-link>
             @endif
             @if (Auth::user()->hasPerm('tab_Store'))

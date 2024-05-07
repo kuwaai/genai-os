@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\Feedback;
 use App\Models\APIHistories;
 use App\Models\Groups;
+use App\Models\Bots;
 use DB;
 use Session;
 
@@ -44,11 +45,10 @@ class ChatController extends Controller
 
         $access_code = $request->input('model');
         $msg = $record->msg;
-        if ($access_code == null && strpos(Groups::find($request->user()->group_id)->describe, '!verilog_translate!') === 0){
+        if ($access_code == null && strpos(Groups::find($request->user()->group_id)->describe, '!verilog_translate!') === 0) {
             $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
             $msg = "請將程式碼轉成verilog。\n" . $msg;
-        }
-        else if ($access_code == null) {
+        } elseif ($access_code == null) {
             $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
             $msg = "以下提供內容，請幫我翻譯成中文。\n" . $msg;
         }
@@ -155,7 +155,7 @@ class ChatController extends Controller
                     ->where('name', 'like', 'model_%')
                     ->get();
             }, 'tmp')
-                ->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'tmp.model_id')
+                ->join('llms', DB::raw('CAST(llms.id AS ' . (config('database.default') == 'mysql' ? 'CHAR' : 'TEXT') . ')'), '=', 'tmp.model_id')
                 ->select('llms.id')
                 ->where('llms.enabled', true)
                 ->get()
@@ -247,7 +247,7 @@ class ChatController extends Controller
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
         set_exception_handler(function ($exception) {
-            if ($exception->getMessage() != "Connection closed"){
+            if ($exception->getMessage() != 'Connection closed') {
                 Log::error('Uncaught SSE Exception: ' . $exception->getMessage());
             }
         });
@@ -342,7 +342,7 @@ class ChatController extends Controller
         if ($result && $response->successful()) {
             return $response;
         } else {
-            return response()->json(['error' => $result ? "Compile failed" : 'Backend compiler offline'], 200);
+            return response()->json(['error' => $result ? 'Compile failed' : 'Backend compiler offline'], 200);
         }
     }
 }

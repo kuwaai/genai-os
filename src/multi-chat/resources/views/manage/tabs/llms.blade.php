@@ -159,7 +159,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-wrap -mx-3 mb-2">
+            <!--<div class="flex flex-wrap -mx-3 mb-2">
                 <div class="w-full px-3">
                     <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
                         for="system_prompt">
@@ -169,7 +169,7 @@
                         class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         id="system_prompt" placeholder="{{ __('System Prompt for the model') }}">
                 </div>
-            </div>
+            </div>-->
             <div class="space-y-2">
                 <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
                     {{ __('React Buttons') }}

@@ -25,6 +25,153 @@
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>
+
+    <script>
+        function chain_toggle() {
+            $.get("{{ route('room.chain') }}", {
+                switch: $('#chained').prop('disabled')
+            }, function() {
+                $('#chained').prop('disabled', !$('#chained').prop('disabled'));
+                $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
+                $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('chat.button.unchain') }}' :
+                    '{{ __('chat.button.chained') }}')
+            })
+        }
+
+        function uploadcheck() {
+            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
+                1024) {
+                $("#attachment").show();
+                $("#attachment button").text($("#upload")[0].files[0].name)
+            } else if ($("#upload")[0].files.length > 0) {
+                $("#error_alert >span").text("{{ __('File Too Large') }}")
+                $("#error_alert").fadeIn();
+                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+                $("#upload").val("");
+                $("#attachment").hide();
+                setTimeout(function() {
+                    $("#error_alert").fadeOut();
+                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+                }, 3000);
+            }
+        }
+
+        function adjustTextareaRows(obj) {
+            obj = $(obj)
+            if (obj.length) {
+                const textarea = obj;
+                const maxRows = parseInt(textarea.attr('max-rows')) || 5;
+                const lineHeight = parseInt(textarea.css('line-height'));
+
+                textarea.attr('rows', 1);
+                const contentHeight = textarea[0].scrollHeight;
+                const rowsToDisplay = Math.floor(contentHeight / lineHeight);
+
+                textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
+            }
+        }
+
+        function modelfile_parse(data) {
+            const commands = [];
+            let currentCommand = {
+                name: '',
+                args: ''
+            };
+
+            let systemCommandProcessed = false; // Flag to track if a system command has been processed
+
+            // Split the input data into lines
+            const lines = data.split('\n');
+
+            // Iterate over each line
+            lines.forEach(line => {
+                // Trim whitespace from the beginning and end of the line
+                line = line.trim();
+
+                // Check if the line starts with a command keyword
+                if (line.toUpperCase().startsWith('FROM') ||
+                    line.toUpperCase().startsWith('ADAPTER') ||
+                    line.toUpperCase().startsWith('LICENSE') ||
+                    line.toUpperCase().startsWith('TEMPLATE') ||
+                    line.toUpperCase().startsWith('SYSTEM') ||
+                    line.toUpperCase().startsWith('PARAMETER') ||
+                    line.toUpperCase().startsWith('MESSAGE')) {
+                    // If a command is already being accumulated, push it to the commands array
+                    if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
+                        commands.push(currentCommand);
+                    }
+                    // Start a new command
+                    currentCommand = {
+                        name: '',
+                        args: ''
+                    };
+
+                    // Split the line into command type and arguments
+                    let [commandType, commandArgs] = line.split(/\s+(.+)/);
+                    if (!commandArgs) commandArgs = '';
+
+                    // Set the current command's name and arguments
+                    currentCommand.name = commandType.toLowerCase();
+                    currentCommand.args = commandArgs.trim();
+
+                    // If the command is a system command and it has already been processed, skip it
+                    if (currentCommand.name === 'system' && systemCommandProcessed) {
+                        currentCommand = {
+                            name: '',
+                            args: ''
+                        };
+                    } else if (currentCommand.name === 'system') {
+                        systemCommandProcessed = true; // Set the flag to true if a system command is processed
+                    }
+                } else {
+                    // If the line does not start with a command keyword, append it to the current command's arguments
+                    currentCommand.args += '\n' + line;
+                }
+            });
+
+            // Push the last command to the commands array if it has non-empty arguments
+            if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
+                commands.push(currentCommand);
+            }
+
+            // Remove triple-quotes at the start or end of arguments
+            commands.forEach(command => {
+                if (command.args.startsWith('"""')) {
+                    command.args = command.args.slice(3);
+                }
+                if (command.args.endsWith('"""')) {
+                    command.args = command.args.slice(0, -3);
+                }
+            });
+
+            return commands;
+        }
+
+        function modelfile_update(node) {
+            let data = modelfile_parse(node.val());
+            for (let obj of data) {
+                if (obj.name === 'system') {
+                    $("#bot-system_prompt").val(obj.args)
+                }
+            }
+            node.val(modelfile_to_string(data));
+        }
+
+        function modelfile_to_string(array) {
+            return array.map(item => {
+                if (item) {
+                    let args = item.args;
+                    if (args) {
+                        if (args.includes('\n')) {
+                            args = '"""' + args + '"""';
+                        }
+                        return `${item.name.toUpperCase()} ${args}`;
+                    }
+                }
+                return ""
+            }).join('\n');
+        }
+    </script>
 </head>
 
 <body class="font-sans antialiased h-full">
@@ -237,151 +384,6 @@ xmlns="http://www.w3.org/2000/svg">
 
         markdown($("#system_announcement_modal .content"))
         markdown($("#tos_modal .content"))
-
-        function chain_toggle() {
-            $.get("{{ route('room.chain') }}", {
-                switch: $('#chained').prop('disabled')
-            }, function() {
-                $('#chained').prop('disabled', !$('#chained').prop('disabled'));
-                $('#chain_btn').toggleClass('bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700');
-                $('#chain_btn').text($('#chained').prop('disabled') ? '{{ __('chat.button.unchain') }}' :
-                    '{{ __('chat.button.chained') }}')
-            })
-        }
-
-        function uploadcheck() {
-            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
-                1024) {
-                $("#attachment").show();
-                $("#attachment button").text($("#upload")[0].files[0].name)
-            } else if ($("#upload")[0].files.length > 0) {
-                $("#error_alert >span").text("{{ __('File Too Large') }}")
-                $("#error_alert").fadeIn();
-                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                $("#upload").val("");
-                $("#attachment").hide();
-                setTimeout(function() {
-                    $("#error_alert").fadeOut();
-                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                }, 3000);
-            }
-        }
-
-        function adjustTextareaRows(obj) {
-            obj = $(obj)
-            if (obj.length) {
-                const textarea = obj;
-                const maxRows = parseInt(textarea.attr('max-rows')) || 5;
-                const lineHeight = parseInt(textarea.css('line-height'));
-
-                textarea.attr('rows', 1);
-                const contentHeight = textarea[0].scrollHeight;
-                const rowsToDisplay = Math.floor(contentHeight / lineHeight);
-
-                textarea.attr('rows', Math.min(maxRows, rowsToDisplay));
-            }
-        }
-
-        function modelfile_parse(data) {
-            const commands = [];
-            let currentCommand = {
-                name: '',
-                args: ''
-            };
-
-            let systemCommandProcessed = false; // Flag to track if a system command has been processed
-
-            // Split the input data into lines
-            const lines = data.split('\n');
-
-            // Iterate over each line
-            lines.forEach(line => {
-                // Trim whitespace from the beginning and end of the line
-                line = line.trim();
-
-                // Check if the line starts with a command keyword
-                if (line.toUpperCase().startsWith('FROM') ||
-                    line.toUpperCase().startsWith('ADAPTER') ||
-                    line.toUpperCase().startsWith('LICENSE') ||
-                    line.toUpperCase().startsWith('TEMPLATE') ||
-                    line.toUpperCase().startsWith('SYSTEM') ||
-                    line.toUpperCase().startsWith('PARAMETER') ||
-                    line.toUpperCase().startsWith('MESSAGE')) {
-                    // If a command is already being accumulated, push it to the commands array
-                    if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
-                        commands.push(currentCommand);
-                    }
-                    // Start a new command
-                    currentCommand = {
-                        name: '',
-                        args: ''
-                    };
-
-                    // Split the line into command type and arguments
-                    let [commandType, commandArgs] = line.split(/\s+(.+)/);
-                    if (!commandArgs) commandArgs = '';
-
-                    // Set the current command's name and arguments
-                    currentCommand.name = commandType.toLowerCase();
-                    currentCommand.args = commandArgs.trim();
-
-                    // If the command is a system command and it has already been processed, skip it
-                    if (currentCommand.name === 'system' && systemCommandProcessed) {
-                        currentCommand = {
-                            name: '',
-                            args: ''
-                        };
-                    } else if (currentCommand.name === 'system') {
-                        systemCommandProcessed = true; // Set the flag to true if a system command is processed
-                    }
-                } else {
-                    // If the line does not start with a command keyword, append it to the current command's arguments
-                    currentCommand.args += '\n' + line;
-                }
-            });
-
-            // Push the last command to the commands array if it has non-empty arguments
-            if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
-                commands.push(currentCommand);
-            }
-
-            // Remove triple-quotes at the start or end of arguments
-            commands.forEach(command => {
-                if (command.args.startsWith('"""')) {
-                    command.args = command.args.slice(3);
-                }
-                if (command.args.endsWith('"""')) {
-                    command.args = command.args.slice(0, -3);
-                }
-            });
-
-            return commands;
-        }
-
-        function modelfile_update(node) {
-            let data = modelfile_parse(node.val());
-            for (let obj of data) {
-                if (obj.name === 'system') {
-                    $("#bot-system_prompt").val(obj.args)
-                }
-            }
-            node.val(modelfile_to_string(data));
-        }
-
-        function modelfile_to_string(array) {
-            return array.map(item => {
-                if (item) {
-                    let args = item.args;
-                    if (args) {
-                        if (args.includes('\n')) {
-                            args = '"""' + args + '"""';
-                        }
-                        return `${item.name.toUpperCase()} ${args}`;
-                    }
-                }
-                return ""
-            }).join('\n');
-        }
     </script>
 </body>
 

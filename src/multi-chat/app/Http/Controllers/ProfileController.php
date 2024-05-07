@@ -273,7 +273,7 @@ class ProfileController extends Controller
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
         if ($result->exists()) {
             $user = $result->first();
-            if (User::find($user->id)->hasPerm('Chat_read_access_to_api') || config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
+            if (User::find($user->id)->hasPerm('Chat_read_access_to_api') || (config('app.API_Key') != null && config('app.API_Key') == $request->input('key'))) {
                 if (isset($jsonData['messages']) && isset($jsonData['model'])) {
                     $llm = LLMs::where('access_code', '=', $jsonData['model']);
 
@@ -406,7 +406,7 @@ class ProfileController extends Controller
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
         if ($result->exists()) {
             $user = $result->first();
-            if (User::find($user->id)->hasPerm('Chat_read_access_to_api') || config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
+            if (User::find($user->id)->hasPerm('Chat_read_access_to_api') || (config('app.API_Key') != null && config('app.API_Key') == $request->input('key'))) {
                 $list = \Illuminate\Support\Facades\Redis::lrange('api_' . $user->tokenable_id, 0, -1);
                 $integers = array_map(function ($element) {
                     return is_string($element) ? -((int) $element) : null;

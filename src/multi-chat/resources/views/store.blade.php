@@ -22,7 +22,15 @@
                 $bots = App\Models\Bots::Join('llms', function ($join) {
                     $join->on('llms.id', '=', 'bots.model_id');
                 })
-                    ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'), "llms.name as llm_name")
+            ->where('llms.enabled', '=', true)
+                    ->select(
+                        'llms.*',
+                        'bots.*',
+                        DB::raw('COALESCE(bots.description, llms.description) as description'),
+                        DB::raw('COALESCE(bots.config, llms.config) as config'),
+                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                        'llms.name as llm_name',
+                    )
                     ->get();
             @endphp
             <x-store.modal.create-bot :result="$result" />
@@ -30,8 +38,8 @@
             <div class="my-8">
                 <x-logo />
             </div>
-            <div class="mb-2 mx-auto w-[150px] h-[50px]"
-                data-modal-target="create-bot-modal" data-modal-toggle="create-bot-modal">
+            <div class="mb-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
+                data-modal-toggle="create-bot-modal">
                 <button
                     class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-200 transition duration-300 rounded-lg overflow-hidden">
                     <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
@@ -40,19 +48,19 @@
             @if ($bots->where('visibility', '=', 0)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.offical_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 0)" />
+                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 0)" :extra="'offical_bots-'" />
                 </div>
             @endif
             @if ($bots->where('owner_id', '=', Auth::user()->id)->count() > 0)
                 <div class="w-full p-4">
-                    <p class="mb-2">{{ __('Your Bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" />
+                    <p class="mb-2">{{ __('store.label.my_bots') }}</p>
+                    <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" :extra="'my_bots-'" />
                 </div>
             @endif
             @if ($bots->where('visibility', '=', 1)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.community_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 1)" />
+                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 1)" :extra="'community_bots-'" />
                 </div>
             @endif
         </div>

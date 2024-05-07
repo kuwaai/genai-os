@@ -130,8 +130,11 @@ class ChatGptExecutor(LLMExecutor):
     async def llm_compute(self, data):
         try:
             openai_token = data.get("openai_token") or self.args.api_key
+            modelfile = data.get("modelfile")
+            if modelfile: modelfile = json.loads(modelfile)
+            modelfile = "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else ""
             msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
-            
+            msg[0]['content'] = modelfile + msg[0]['content']
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return
