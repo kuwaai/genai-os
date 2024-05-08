@@ -2,8 +2,10 @@
 
 import argparse
 import logging
+import sys
 from dotenv import load_dotenv, find_dotenv
 from langchain_community.document_loaders import DirectoryLoader
+sys.path.append(".")
 
 from lib.gpu_util import check_gpu
 from lib.textract_loader import TextractLoader

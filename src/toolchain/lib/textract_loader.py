@@ -14,10 +14,12 @@ class TextractLoader(TextLoader):
         file_path: Path to the file to load.
     """
 
-    def __init__(self, file_path: str,):
+    def __init__(self, file_path: str, encoding=None, autodetect_encoding: bool = False):
         self.file_path = file_path
+        self.encoding = encoding
+        self.autodetect_encoding = autodetect_encoding
 
-    def load(self) -> List[Document]:
+    def lazy_load(self) -> List[Document]:
         """Load from file path."""
         text = ""
         try:
