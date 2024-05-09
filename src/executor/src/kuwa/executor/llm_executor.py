@@ -258,7 +258,7 @@ class LLMExecutor:
                     else:
                         logging.debug(f"{role} doesn't existed!!")
             except Exception as e:
-                logger.exception(f"Error in modelfile {e}")
+                logger.exception(f"Error in modelfile `{command}` with error: `{e}`")
         return override_system_prompt, messages
 
 if __name__ == "__main__":
