@@ -166,12 +166,13 @@ class HuggingfaceExecutor(LLMExecutor):
 
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
-        history = [
-            {
-                "role": "assistant" if record["isbot"] else "user",
-                "content": record["msg"]
-            }
-            for record in history
+        # Parse and process modelfile
+        override_system_prompt, messages = self.parse_modelfile(data.get("modelfile", "[]"))
+        if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
+
+        messages, history = [
+            [{"role": "assistant" if record["isbot"] else "user", "content": record["msg"]} for record in data]
+            for data in (messages, history)
         ]
         history = self.rectify_history(history)
         modelfile = data.get("modelfile")
@@ -180,7 +181,7 @@ class HuggingfaceExecutor(LLMExecutor):
         # Trim the history to fit into the context window
         prompt_embedding = []
         while True:
-            prompt_embedding = self.synthesis_prompt(history, "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else "")
+            prompt_embedding = self.synthesis_prompt(messages + history, override_system_prompt)
             if prompt_embedding.shape[1] <= self.limit: break
 
             history = self.rectify_history(history[1:])
