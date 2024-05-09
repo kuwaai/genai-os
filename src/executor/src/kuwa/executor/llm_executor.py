@@ -244,18 +244,21 @@ class LLMExecutor:
         override_system_prompt = ""
         messages = []
         for command in modelfile:
-            if command["name"] == "system":
-                override_system_prompt += command["args"]
-            elif command["name"] == "message":
-                role, content = command["args"].split(' ', 1)
-                if role == "user":
-                    messages += [{"msg":content, "isbot":False}]
-                elif role == "assistant":
-                    messages += [{"msg":content, "isbot":True}]
-                elif role == "system":
-                    override_system_prompt += content
-                else:
-                    logging.debug(f"{role} doesn't existed!!")
+            try:
+                if command["name"] == "system":
+                    override_system_prompt += command["args"]
+                elif command["name"] == "message":
+                    role, content = command["args"].split(' ', 1)
+                    if role == "user":
+                        messages += [{"msg":content, "isbot":False}]
+                    elif role == "assistant":
+                        messages += [{"msg":content, "isbot":True}]
+                    elif role == "system":
+                        override_system_prompt += content
+                    else:
+                        logging.debug(f"{role} doesn't existed!!")
+            except Exception as e:
+                logger.exception(f"Error in modelfile {e}")
         return override_system_prompt, messages
 
 if __name__ == "__main__":
