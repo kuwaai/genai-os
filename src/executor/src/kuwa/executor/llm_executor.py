@@ -243,6 +243,7 @@ class LLMExecutor:
         if not modelfile: modelfile = []
         override_system_prompt = ""
         messages = []
+        template = ""
         for command in modelfile:
             try:
                 if command["name"] == "system":
@@ -257,9 +258,11 @@ class LLMExecutor:
                         override_system_prompt += content
                     else:
                         logging.debug(f"{role} doesn't existed!!")
+                elif command['name'] == "template":
+                    template = command['args']
             except Exception as e:
                 logger.exception(f"Error in modelfile `{command}` with error: `{e}`")
-        return override_system_prompt, messages
+        return override_system_prompt, messages, template
 
 if __name__ == "__main__":
     executor = LLMExecutor()

@@ -140,7 +140,7 @@ class HuggingfaceExecutor(LLMExecutor):
         logger.debug(f"Chat template: {self.tokenizer.chat_template}")
         logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
 
-    def synthesis_prompt(self, history: list, system_prompt: str):
+    def synthesis_prompt(self, history: list, system_prompt: str, chat_template: str):
         """
         Synthesis the prompt from chat history.
         """
@@ -149,9 +149,16 @@ class HuggingfaceExecutor(LLMExecutor):
             history.insert(0, {"role": "system", "content": system_prompt})
         elif not self.no_system_prompt:
             history.insert(0, {"role": "system", "content": self.system_prompt})
-        prompt = self.tokenizer.apply_chat_template(
-            history, tokenize=True, add_generation_prompt=True, return_tensors='pt'
-        )
+        backup = self.tokenizer.chat_template
+        if chat_template: self.tokenizer.chat_template = chat_template
+        try:
+            prompt = self.tokenizer.apply_chat_template(
+                history, tokenize=True, add_generation_prompt=True, return_tensors='pt'
+            )
+        except Exception as e:
+            logger.exception(f"Error in template `{self.tokenizer.chat_template}` with error: `{e}`")
+        finally:
+            self.tokenizer.chat_template = backup
         return prompt
 
     def rectify_history(self, history: list):
@@ -167,7 +174,7 @@ class HuggingfaceExecutor(LLMExecutor):
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
         # Parse and process modelfile
-        override_system_prompt, messages = self.parse_modelfile(data.get("modelfile", "[]"))
+        override_system_prompt, messages, chat_template = self.parse_modelfile(data.get("modelfile", "[]"))
         if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
 
         messages, history = [
@@ -181,7 +188,7 @@ class HuggingfaceExecutor(LLMExecutor):
         # Trim the history to fit into the context window
         prompt_embedding = []
         while True:
-            prompt_embedding = self.synthesis_prompt(messages + history, override_system_prompt)
+            prompt_embedding = self.synthesis_prompt(messages + history, override_system_prompt, chat_template)
             if prompt_embedding.shape[1] <= self.limit: break
 
             history = self.rectify_history(history[1:])
