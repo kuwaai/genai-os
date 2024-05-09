@@ -154,10 +154,7 @@ class LlamaCppExecutor(LLMExecutor):
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if system_prompt:
-            history.insert(0, {"role": "system", "content": system_prompt})
-        elif not self.no_system_prompt:
-            history.insert(0, {"role": "system", "content": self.system_prompt})
+        if system_prompt: history.insert(0, {"role": "system", "content": system_prompt})
         prompt = self.model.chat_handler(
             llama = ReflectiveLlama(),
             messages = history
@@ -176,12 +173,14 @@ class LlamaCppExecutor(LLMExecutor):
 
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
-        history = [
-            {
-                "role": "assistant" if record["isbot"] else "user",
-                "content": record["msg"]
-            }
-            for record in history
+
+        # Parse and process modelfile
+        override_system_prompt, messages = self.parse_modelfile(data.get("modelfile", "[]"))
+        if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
+
+        messages, history = [
+            [{"role": "assistant" if record["isbot"] else "user", "content": record["msg"]} for record in data]
+            for data in (messages, history)
         ]
         history = self.rectify_history(history)
         modelfile = data.get("modelfile")
@@ -190,7 +189,7 @@ class LlamaCppExecutor(LLMExecutor):
             # Trim the history to fit into the context window
             prompt = ""
             while True:
-                prompt = self.synthesis_prompt(history, "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else "")
+                prompt = self.synthesis_prompt(messages + history, override_system_prompt)
                 prompt_length = len(self.model.tokenize(
                     text=prompt.encode('UTF-8', 'ignore'),
                     add_bos=False, special=False

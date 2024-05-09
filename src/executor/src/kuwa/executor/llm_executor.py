@@ -7,6 +7,7 @@ import time
 import logging
 import atexit
 import asyncio
+import json
 from urllib.parse import urljoin
 from typing import Optional
 
@@ -236,6 +237,26 @@ class LLMExecutor:
 
     async def llm_compute(self, data):
         raise NotImplementedError("Executor should implement the \"llm_compute\" method.")
+        
+    def parse_modelfile(self, modelfile):
+        modelfile = json.loads(modelfile)
+        if not modelfile: modelfile = []
+        override_system_prompt = ""
+        messages = []
+        for command in modelfile:
+            if command["name"] == "system":
+                override_system_prompt += command["args"]
+            elif command["name"] == "message":
+                role, content = command["args"].split(' ', 1)
+                if role == "user":
+                    messages += [{"msg":content, "isbot":False}]
+                elif role == "assistant":
+                    messages += [{"msg":content, "isbot":True}]
+                elif role == "system":
+                    override_system_prompt += content
+                else:
+                    logging.debug(f"{role} doesn't existed!!")
+        return override_system_prompt, messages
 
 if __name__ == "__main__":
     executor = LLMExecutor()

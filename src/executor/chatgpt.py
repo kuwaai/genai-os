@@ -48,6 +48,8 @@ class ChatGptDescParser(DescriptionParser):
 class ChatGptExecutor(LLMExecutor):
 
     model_name: str = "gpt-3.5-turbo"
+    system_prompt: str = ""
+    no_system_prompt: bool = False
     openai_base_url: str = "https://api.openai.com/v1"
     context_window: int = 0
     generation_config: dict = {
@@ -63,6 +65,8 @@ class ChatGptExecutor(LLMExecutor):
         model_group.add_argument('--base_url', default=self.openai_base_url, help='Alter the base URL to use third-party service.')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
         model_group.add_argument('--context_window', default=None, help='Override the context window.')
+        model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
+        model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
 
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for OpenAI API. See https://github.com/openai/openai-python/blob/main/src/openai/types/chat/completion_create_params.py')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
@@ -130,11 +134,16 @@ class ChatGptExecutor(LLMExecutor):
     async def llm_compute(self, data):
         try:
             openai_token = data.get("openai_token") or self.args.api_key
-            modelfile = data.get("modelfile")
-            if modelfile: modelfile = json.loads(modelfile)
-            modelfile = "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else ""
-            msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
-            msg[0]['content'] = modelfile + msg[0]['content']
+            
+            # Parse and process modelfile
+            override_system_prompt, messages = self.parse_modelfile(data.get("modelfile", "[]"))
+            if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
+
+            # Apply parsed modelfile data to Inference
+            raw_inputs = messages + json.loads(data.get("input"))
+            msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in raw_inputs]
+            msg[0]['content'] = override_system_prompt + msg[0]['content']
+
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return

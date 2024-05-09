@@ -30,6 +30,8 @@ class GeminiDescParser(DescriptionParser):
 class GeminiExecutor(LLMExecutor):
 
     model_name: str = "gemini-1.0-pro"
+    system_prompt: str = ""
+    no_system_prompt: bool = False
     limit: int = 30720
     generation_config: dict = {}
 
@@ -41,7 +43,8 @@ class GeminiExecutor(LLMExecutor):
         model_group.add_argument('--api_key', default=None, help='Gemini API key from Google Cloud Console')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://ai.google.dev/models/gemini')
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
-
+        model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
+        model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for Google AI API. See https://ai.google.dev/api/python/google/generativeai/GenerationConfig')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
         self.generation_config = expose_function_parameter(
@@ -54,6 +57,8 @@ class GeminiExecutor(LLMExecutor):
     def setup(self):
         self.model_name = self.args.model
         self.limit = self.args.limit
+        self.system_prompt = self.args.system_prompt
+        self.no_system_prompt = self.args.no_system_prompt
         if not self.LLM_name:
             self.LLM_name = "gemini-pro"
 
@@ -85,16 +90,20 @@ class GeminiExecutor(LLMExecutor):
             first_user_idx += 1
         messages = messages[first_user_idx:]
         return messages
-    
+
     async def llm_compute(self, data):
         try:
             google_token = data.get("google_token") or self.args.api_key
+
+            # Parse and process modelfile
+            override_system_prompt, messages = self.parse_modelfile(data.get("modelfile", "[]"))
+            if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
+
+            # Apply parsed modelfile data to Inference
+            raw_inputs = messages + json.loads(data.get("input"))
+            msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in raw_inputs]
+            msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
             
-            modelfile = data.get("modelfile")
-            if modelfile: modelfile = json.loads(modelfile)
-            modelfile = "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else ""
-            msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
-            msg[0]["parts"][0]['text'] = modelfile + msg[0]["parts"][0]['text']
             if not google_token or len(google_token) == 0:
                 yield "[Please enter your Google API Token in the user settings of the website in order to use this model.]"
                 return
