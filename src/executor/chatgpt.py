@@ -50,6 +50,7 @@ class ChatGptExecutor(LLMExecutor):
     model_name: str = "gpt-3.5-turbo"
     openai_base_url: str = "https://api.openai.com/v1"
     context_window: int = 0
+    system_prompt: str = None
     generation_config: dict = {
         "temperature": 0.5
     }
@@ -63,6 +64,7 @@ class ChatGptExecutor(LLMExecutor):
         model_group.add_argument('--base_url', default=self.openai_base_url, help='Alter the base URL to use third-party service.')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
         model_group.add_argument('--context_window', default=None, help='Override the context window.')
+        model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
 
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for OpenAI API. See https://github.com/openai/openai-python/blob/main/src/openai/types/chat/completion_create_params.py')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
@@ -76,6 +78,7 @@ class ChatGptExecutor(LLMExecutor):
     def setup(self):
         self.model_name = self.args.model
         self.openai_base_url = self.args.base_url
+        self.system_prompt = self.args.system_prompt
         if not self.LLM_name:
             self.LLM_name = "chatgpt"
         
@@ -131,10 +134,14 @@ class ChatGptExecutor(LLMExecutor):
         try:
             openai_token = data.get("openai_token") or self.args.api_key
             modelfile = data.get("modelfile")
-            if modelfile: modelfile = json.loads(modelfile)
-            modelfile = "".join([i["args"] for i in modelfile if i['name'] == 'system']) if modelfile else ""
+            if modelfile is not None:
+                modelfile = json.loads(modelfile)
+                system_prompt = "".join([i["args"] for i in modelfile if i['name'] == 'system'])
+            else:
+                system_prompt = self.system_prompt
             msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in json.loads(data.get("input"))]
-            msg[0]['content'] = modelfile + msg[0]['content']
+            if system_prompt is not None:
+                msg = [{"content": system_prompt, "role": "system"}] + msg
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return
