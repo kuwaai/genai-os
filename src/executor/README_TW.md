@@ -126,3 +126,14 @@ kuwa-executor chatgpt --access_code vllm --log debug \
     --api_key dummy `# API Key 隨意`\
     --model "google/gemma-7b-it" `# 選擇 Gemma 7B 模型`
 ```
+
+#### 串接 TAIDE API
+
+國家高速網路與計算中心提供的 TAIDE API 也可以輕鬆透過我們的 ChatGPT executor 串接。
+```sh
+kuwa-executor chatgpt --access_code taide-api --log debug \
+    --base_url "https://td.nchc.org.tw/api/v1/" `#國網中心的 TAIDE API 路徑` \
+    --api_key "YOUR_API_KEY" `#輸入已申請的 API key` \
+    --model "TAIDE/a.2.0.0-SG" `#使用a.2.0.0模型` \
+    --system_prompt "你是一個來自台灣的AI助理，你的名字是TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。" `#TAIDE的預設system prompt`
+```
