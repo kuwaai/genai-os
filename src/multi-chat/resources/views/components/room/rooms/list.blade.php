@@ -71,7 +71,7 @@
                                     <li>
                                         <a href="#" data-modal-target="delete_chat_modal"
                                             data-modal-toggle="delete_chat_modal"
-                                            onclick="event.preventDefault();$('#deleteChat input[name=id]').val({{ $dc->id }});$('#deleteChat h3 span:eq(1)').text('{{ $dc->name }}');"
+                                            onclick="event.preventDefault();$('#deleteChat input[name=id]').val({{ $dc->id }});$('#deleteChat h3 span:eq(1)').text('<{{ $dc->name }}>');"
                                             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white !text-red-500 hover:!text-red-600">{{ __('chat.button.delete') }}</a>
                                     </li>
                                 @endif
@@ -154,7 +154,7 @@
                                     <li>
                                         <a href="#" data-modal-target="delete_chat_modal"
                                             data-modal-toggle="delete_chat_modal"
-                                            onclick="event.preventDefault();$('#deleteChat input[name=id]').val({{ $dc->id }});$('#deleteChat h3 span:eq(1)').text('{{ $dc->name }}');"
+                                            onclick="event.preventDefault();$('#deleteChat input[name=id]').val({{ $dc->id }});$('#deleteChat h3 span:eq(1)').text('<{{ $dc->name }}>');"
                                             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white !text-red-500 hover:!text-red-600">{{ __('chat.button.delete') }}</a>
                                     </li>
                                 @endif

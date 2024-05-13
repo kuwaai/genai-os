@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'route' => 'ストア',
+    'button.create' => 'Botを作成',
+    'label.offical_bots' => 'システムボット',
+    'hint.must_select_base_model' => '基本モデルを選択する必要があります',
+    'label.community_bots' => 'コミュニティボット',
+    'label.my_bots' => 'マイボット',
+    'bot.system_prompt' => 'システムプロンプト',
+    'bot.welcome_message' => 'ウェルカムメッセージ',
+    'bot.name' => 'アプリケーション名',
+    'bot.name.label' => '名前',
+    'bot.description' => 'アプリケーションの説明',
+    'bot.description.label' => '説明',
+    'bot.system_prompt.label' => 'システムプロンプトは、モデルの動作に影響します',
+    'bot.welcome_message.label' => 'ウェルカムメッセージは表示されるだけで、推論には入力されません',
+    'bot.button.create' => '作成',
+    'bot.react_buttons' => 'リアクションボタン',
+    'bot.react.allow_translate' => '翻訳ボタンを許可',
+    'bot.react.allow_feedback' => 'フィードバックボタンを許可',
+    'bot.react.allow_quote' => '引用ボタンを許可',
+    'bot.react.allow_other' => 'その他のボタンを許可',
+    'bot.modelfile.label' => 'このBotに適用されるモデル設定ファイル',
+    'bot.modelfile' => 'モデル設定ファイル',
+    'bot.base_model' => 'ベースモデルを選択',
+    'bot.base_model.label' => 'ベースモデル',
+];

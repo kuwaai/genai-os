@@ -12,9 +12,9 @@ return [
     |
     */
 
-    'failed' => 'Diese Anmeldeinformationen stimmen nicht mit unseren Aufzeichnungen überein.',
-    'password' => 'Das eingegebene Passwort ist falsch.',
-    'throttle' => 'Zu viele Anmeldeversuche. Bitte versuchen Sie es in :seconds Sekunden erneut.',
+    'failed' => 'Diese Anmeldedaten stimmen nicht mit unseren Aufzeichnungen überein.',
+    'password' => 'Das angegebene Passwort ist nicht korrekt.',
+    'throttle' => 'Zu viele Anmeldeversuche. Bitte versuche es in :seconds Sekunden erneut.',
 
     'label.invite_token' => 'Einladungscode',
     'label.invite_token.invite_token_optional' => 'Einladungscode (optional)',
@@ -22,6 +22,6 @@ return [
     'hint.user_created_success' => 'Benutzer erfolgreich erstellt',
 
     //Email verify
-    'email.thanks_for_signup' => 'Danke für Ihre Registrierung! Bevor wir beginnen können, müssen wir Ihre E-Mail-Adresse überprüfen. Bitte überprüfen Sie Ihr Postfach auf die von uns gesendete E-Mail. Sie enthält einen Bestätigungslink. Wenn Sie die E-Mail nicht erhalten haben, können wir sie erneut senden.',
-    'email.new_verify_link_send' => 'Ein neuer Bestätigungslink wurde an Ihre E-Mail-Adresse gesendet.',
+    'email.thanks_for_signup' => 'Danke für deine Registrierung! Bevor wir beginnen können, musst du deine E-Mail-Adresse verifizieren. Bitte überprüfe deine E-Mails auf eine Nachricht von uns. Folge dem darin enthaltenen Verifizierungslink. Solltest du keine E-Mail erhalten haben, können wir dir eine neue senden.',
+    'email.new_verify_link_send' => 'Ein neuer Verifizierungslink wurde an deine E-Mail-Adresse gesendet',
 ];

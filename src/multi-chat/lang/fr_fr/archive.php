@@ -2,6 +2,6 @@
 
 return [
     'route' => 'Archivé',
-    'hint.no_archived' => 'Aucune salle de discussion archivée trouvée',
-    'hint.introduce' => 'Ici, vous pouvez parcourir les salles de discussion de modèles de langage désactivés.<br> Ces modèles de langage ne seront pas nécessairement réactivés,<br> mais vous pouvez consulter leurs enregistrements ou les supprimer ici.',
+    'hint.no_archived' => 'Aucune salle de chat archivée trouvée',
+    'hint.introduce' => 'Parcourez ici les salles de chat du modèle linguistique qui ont été désactivées.<br>Ces modèles linguistiques peuvent ou non être réactivés à l’avenir.<br>Mais vous pouvez les parcourir ou les supprimer ici',
 ];

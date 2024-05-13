@@ -22,11 +22,10 @@
                         d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
                 <h3
-                    class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 overflow-hidden flex justify-center items-center">
-                    <span>{{ __('chat.modal.delete_chat.header') }}"</span>
+                    class="mb-5 text-lg font-normal text-gray-500 flex-col dark:text-gray-400 overflow-hidden flex justify-center items-center">
+                    <span>{{ __('chat.modal.delete_chat.header') }}</span>
                     <span class="truncate-text overflow-hidden overflow-ellipsis inline-block max-w-[200px] text-lg"
                         style="text-wrap:nowrap">{{ $room->name }}</span>
-                    <span>"?</span>
                 </h3>
 
                 @csrf

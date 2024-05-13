@@ -56,8 +56,8 @@
                 @endforeach
             @elseif(!$readonly)
                 @foreach ($llms as $chat)
-                    <div
-                        class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                    <div onclick="$('#prompt_area input[name=\'chatsTo[]\']').prop('disabled',true); $('#prompt_area .sends span').addClass('bg-red-500 hover:bg-red-600').removeClass('bg-green-500 hover:bg-green-600');$('span[data-tooltip-target=llm_{{ $chat->id }}_toggle]').removeClass('bg-red-500 hover:bg-red-600').addClass('bg-green-500 hover:bg-green-600');$('#chatsTo_{{ $chat->id }}').prop('disabled',false);$('#prompt_area').submit()"
+                        class="cursor-pointer mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                         <img data-tooltip-target="llm_{{ $chat->id }}_chat" data-tooltip-placement="top"
                             class="h-full w-full"
                             src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">

@@ -26,12 +26,7 @@ def invoke_model(prompt, model="gemini-pro", base_url="https://chatdev.gai.tw"):
                 yield chunk
 
 
-def translate(input_filename, target_filename=None, lang="en", quite=False):
-    prompt = {
-        "en": "Translate to English.",
-        "zh-tw": "翻譯成繁體中文。"
-    }[lang]
-
+def translate(input_filename, target_filename=None, prompt="Translate to English.", quite=False):
     input_content = ''
     with open(input_filename,encoding="utf-8") as f:
         input_content = f.read()

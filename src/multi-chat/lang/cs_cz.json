@@ -1,12 +1,12 @@
 {
-    "Please click the button below to verify your email address.": "Prosím, klikněte na tlačítko níže pro ověření vaší e-mailové adresy.",
-    "Hello!": "Ahoj!",
-    "If you did not create an account, no further action is required.": "Pokud jste si nevytvořili účet, není třeba dalších akcí.",
-    "If you did not request a password reset, no further action is required.": "Pokud jste nepožádali o obnovení hesla, není třeba dalších akcí.",
-    "This password reset link will expire in :count minutes.": "Tento odkaz pro obnovení hesla vyprší za :count minut.",
-    "You are receiving this email because we received a password reset request for your account.": "Tento e-mail obdržíte, protože jsme obdrželi žádost o obnovení hesla pro váš účet.",
-    "Regards": "S pozdravem",
-    "Reset Password": "Obnovit heslo",
-    "Reset Password Notification": "Upozornění na obnovení hesla",
-    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Pokud máte problémy s kliknutím na tlačítko \":actionText\", zkopírujte a vložte níže uvedenou URL\nadresu do vašeho webového prohlížeče:"
+    "Please click the button below to verify your email address." : "Klepnutím na tlačítko níže ověřte svoji e-mailovou adresu.",
+    "Hello!" : "Ahoj!",
+    "If you did not create an account, no further action is required." : "Pokud jste nevytvořili účet, není třeba dělat nic dalšího.",
+    "If you did not request a password reset, no further action is required.":"Pokud jste nepožádali o resetování hesla, není třeba dělat nic dalšího.",
+    "This password reset link will expire in :count minutes.":"Tato adresa pro obnovení hesla vyprší za :count minut.",
+    "You are receiving this email because we received a password reset request for your account.":"Tento e-mail obdržíte, protože jsme pro váš účet obdrželi žádost o resetování hesla.",
+    "Regards" : "S pozdravem",
+    "Reset Password":"Obnovit heslo",
+    "Reset Password Notification":"Oznámení o obnovení hesla",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:" : "Pokud nemůžete kliknout na tlačítko \":actionText\", zkopírujte a vložte níže uvedenou adresu URL do svého webového prohlížeče:"
 }

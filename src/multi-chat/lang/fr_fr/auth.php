@@ -12,16 +12,16 @@ return [
     |
     */
 
-    'failed' => 'Ces identifiants ne correspondent pas à nos enregistrements.',
+    'failed' => 'Ces informations de connexion ne correspondent pas à nos enregistrements.',
     'password' => 'Le mot de passe fourni est incorrect.',
-    'throttle' => 'Trop de tentatives de connexion. Veuillez essayer de nouveau dans :seconds secondes.',
+    'throttle' => 'Trop de tentatives de connexion. Veuillez essayer à nouveau dans :seconds secondes.',
 
     'label.invite_token' => 'Code d\'invitation',
-    'label.invite_token.invite_token_optional' => 'Code d\'invitation (facultatif)',
+    'label.invite_token.invite_token_optional' => 'Code d\'invitation (optionnel)',
 
     'hint.user_created_success' => 'Utilisateur créé avec succès',
 
     //Email verify
-    'email.thanks_for_signup' => 'Merci pour votre inscription ! Avant de commencer, nous avons besoin de vérifier votre adresse e-mail. Veuillez vérifier votre boîte de réception pour trouver un e-mail que nous vous avons envoyé, contenant un lien de vérification. Si vous n\'avez pas reçu l\'e-mail, nous pouvons vous en renvoyer un.',
-    'email.new_verify_link_send' => 'Un nouveau lien de vérification a été envoyé à votre adresse e-mail.',
+    'email.thanks_for_signup' => 'Merci de vous être inscrit ! Avant de commencer, nous avons besoin de vérifier votre adresse e-mail : veuillez consulter votre boîte de réception pour un e-mail contenant un lien de vérification. Si vous n\'avez pas reçu cet e-mail, nous pouvons vous en renvoyer un.',
+    'email.new_verify_link_send' => 'Un nouveau lien de vérification a été envoyé à votre adresse e-mail',
 ];

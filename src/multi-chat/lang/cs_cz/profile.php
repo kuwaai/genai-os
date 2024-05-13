@@ -5,37 +5,38 @@ return [
     'interface.header' => 'Osobní údaje',
     'button.save' => 'Uložit',
     'button.copy' => 'Kopírovat',
-    'button.renew' => 'Obnovit',
+    'button.renew' => 'Vygenerovat nový',
     'button.update' => 'Aktualizovat',
     'button.confirm' => 'Potvrdit',
-    'button.change_lang' => 'Změnit jazyk',
-    'hint.updated' => 'Aktualizace proběhla úspěšně',
+    "button.change_lang"=>"Změnit jazyk",
+    'hint.updated' => 'Úspěšně aktualizováno',
     'hint.saved' => 'Uloženo',
-    'hint.nochange' => 'Data zůstala stejná, žádná aktualizace',
-    'hint.alert' => 'Upozornění',
-    'hint.require_change_password' => 'Z důvodu bezpečnosti systému je nutné změnit heslo',
+    'hint.nochange'=>'Žádné změny, data zůstávají stejná',
+    'hint.alert'=>'Upozornění',
+    'hint.require_change_password'=>'Pro větší zabezpečení systému, musíte si změnit heslo',
 
-    //Personal Infos
-    'header.personal_info' => 'Zde můžete aktualizovat své jméno nebo email',
+    //Osobní údaje
+    'header.personal_info' => 'Zde si můžete aktualizovat své jméno nebo email',
     'label.name' => 'Uživatelské jméno',
-    'label.email' => 'Email',
+    'label.email' => 'E-mail',
 
-    //Password
-    'header.update_password' => 'Aktualizace hesla',
-    'label.update_password' => 'Ujistěte se, že používáte dostatečně bezpečné heslo',
+    //Heslo
+    'header.update_password' => 'Aktualizujte své heslo',
+    'label.update_password' => 'Zajistěte, aby bylo Vaše heslo dostatečně bezpečné',
     'label.current_password' => 'Současné heslo',
     'label.new_password' => 'Nové heslo',
-    'label.confirm_password' => 'Potvrďte nové heslo',
+    'label.confirm_password' => 'Prosím, zadejte nové heslo znovu',
 
     //API
     'header.api_manage' => 'Správa API',
-    'label.api_manage' => 'Spravujte své API klíče, nikomu je neposkytujte!',
-    'label.taide_api' => 'Kuwa API klíč',
+    'label.api_manage' => 'Spravujte své API klíče, nikdy je nesdílejte s nikým!',
+    'label.taide_api' => 'Kuwa klíč',
     'label.openai_api' => 'OpenAI API klíč',
-    'label.stay_secure' => 'Buďte opatrní s vaším externím klíčem!',
+    'label.google_api' => 'Google API klíč',
+    'label.stay_secure' => 'Vždy sledujte využití Vašich externích klíčů!',
 
-    //Delete Account
+    //Smazání účtu
     'header.delete_account' => 'Smazat účet',
-    'label.delete_account' => 'Po smazání účtu budou všechna související data odstraněna, jedná se o nevratný proces, prosím, buďte opatrní',
+    'label.delete_account' => 'Jakmile je Váš účet smazán, všechna související data budou nenávratně ztracena!',
     'button.delete_account' => 'Smazat účet',
 ];

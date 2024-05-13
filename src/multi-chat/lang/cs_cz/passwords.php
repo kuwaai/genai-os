@@ -4,19 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Password Reset Language Lines
+    | Přeložení řádků pro jazyk hesla
     |--------------------------------------------------------------------------
     |
-    | The following language lines are the default lines which match reasons
-    | that are given by the password broker for a password update attempt
-    | has failed, such as for an invalid token or invalid new password.
+    | Následující jazykové řádky jsou výchozí řádky, které se shodují s důvody
+    | uvedenými makléřem hesla pro pokus o aktualizaci hesla
+    | které selhalo, například pro neplatný token nebo neplatné nové heslo.
     |
     */
 
-    'reset' => 'Vaše heslo bylo obnoveno.',
-    'sent' => 'Odkaz na obnovení hesla byl odeslán na váš e-mail.',
-    'throttled' => 'Prosím, počkejte chvíli a zkuste to znovu.',
-    'token' => 'Tento token pro obnovení hesla je neplatný.',
-    'user' => 'Uživatel se zadanou e-mailovou adresou nebyl nalezen.',    
+    'reset' => 'Vaše heslo bylo resetováno.',
+    'sent' => 'Odeslali jsme odkaz pro resetování hesla na váš e-mail.',
+    'throttled' => 'Prosím, zkuste to znovu později.',
+    'token' => 'Tento token pro resetování hesla je neplatný.',
+    'user' => 'Nemůžeme najít uživatele s touto e-mailovou adresou.',
 
 ];

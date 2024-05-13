@@ -1,17 +1,15 @@
 <?php
 
 return [
-    'route' => 'Room',
-    'button.delete'=>'Delete',
-    'button.cancel'=>'Cancel',
+    'route' => 'Chat Rooms',
     'button.create_room' => 'Create Room',
-    'header.new_room' => 'New Chatroom',
+    'header.new_room' => 'New Room',
     'modal.create_room.header' => 'Create Chat Room',
-    'modal.label' => 'Select the LLMs you want to use at the same time.',
+    'modal.label' => 'Please select models that you would like to use together:',
     'button.create' => 'Create',
-    'hint.must_select_llms' => 'You must select at least 1 LLMs',
-    'button.edit_chatname' => 'Edit Chat Name',
-    'button.share_link' => 'Share link',
-    'label.share_link' => 'Share link (For now, Only you can access)',
-    'model.hint' => 'Please select a model you\'d like to use:',
+    'hint.must_select_llms' => 'You have to select at least one model!',
+    'button.edit_chatname' => 'Edit chatroom name',
+    'button.share_link' => 'Share Link',
+    'label.share_link' => 'Shareable Link (Can only be accessed by yourself for now)',
+    'model.hint' => 'Please select the model(s) which you would like to use:',
 ];
