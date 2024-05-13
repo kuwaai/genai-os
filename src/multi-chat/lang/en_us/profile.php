@@ -1,42 +1,42 @@
 <?php
 
 return [
-    'route' => 'Profile',
-    'interface.header' => 'Profile Information',
+    'route' => 'Setting',
+    'interface.header' => 'Personal Profile',
     'button.save' => 'Save',
     'button.copy' => 'Copy',
-    'button.renew' => 'Renew',
+    'button.renew' => 'Regenerate',
     'button.update' => 'Update',
     'button.confirm' => 'Confirm',
-    "button.change_lang"=>"Language",
-    'hint.updated' => 'Updated',
+    "button.change_lang"=>"Change Language",
+    'hint.updated' => 'Successfully updated',
     'hint.saved' => 'Saved',
-    'hint.nochange'=>'No changes are made.',
-    'hint.alert'=>'Alert',
-    'hint.require_change_password'=>'You must change your password due to system security requirements',
+    'hint.nochange'=>'No update, data is the same',
+    'hint.alert'=>'Warning',
+    'hint.require_change_password'=>'System security requires you to change password',
 
     //Personal Infos
-    'header.personal_info' => "Update your account\'s profile information and email address.",
-    'label.name' => 'Name',
+    'header.personal_info' => 'You can update your name or email below',
+    'label.name' => 'Username',
     'label.email' => 'Email',
 
     //Password
     'header.update_password' => 'Update Password',
-    'label.update_password' => 'Ensure your account is using a long, random password to stay secure.',
+    'label.update_password' => 'Make sure your password is strong',
     'label.current_password' => 'Current Password',
     'label.new_password' => 'New Password',
     'label.confirm_password' => 'Confirm Password',
 
     //API
-    'header.api_manage' => 'API Token Management',
-    'label.api_manage' => 'Manage your API Tokens, Please keep it secret!',
-    'label.taide_api' => 'Kuwa Chat API Token',
-    'label.openai_api' => 'OpenAI API Token',
-    'label.google_api' => 'Google API Token',
-    'label.stay_secure' => 'Please aware that each message might cause the usage up to 2000 tokens',
+    'header.api_manage' => 'API Management',
+    'label.api_manage' => 'Manage your API Key, don\'t let other people know about it!',
+    'label.taide_api' => 'Kuwa API Key',
+    'label.openai_api' => 'OpenAI API Key',
+    'label.google_api' => 'Google API Key',
+    'label.stay_secure' => 'Please be careful about your external API usage!',
 
     //Delete Account
     'header.delete_account' => 'Delete Account',
-    'label.delete_account' => 'Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.',
+    'label.delete_account' => 'Once deleted, all the data relative to your account will be removed.',
     'button.delete_account' => 'Delete Account',
 ];

@@ -31,7 +31,8 @@ return [
     'header.api_manage' => 'API管理',
     'label.api_manage' => '管理您的API金鑰，切勿讓別人知道！',
     'label.taide_api' => 'Kuwa 金鑰',
-    'label.openai_api' => 'OpenAI 金鑰',
+    'label.openai_api' => 'OpenAI API 金鑰',
+    'label.google_api' => 'Google API 金鑰',
     'label.stay_secure' => '請多留意您的外部金鑰用量！',
 
     //Delete Account

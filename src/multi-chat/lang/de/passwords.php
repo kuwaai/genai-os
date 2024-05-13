@@ -1,20 +1,22 @@
 <?php
 
 return [
+
     /*
     |--------------------------------------------------------------------------
-    | Password Reset Language Lines
+    | Kennwort-Zurücksetzungs-Sprachlinien
     |--------------------------------------------------------------------------
     |
-    | The following language lines are the default lines which match reasons
-    | that are given by the password broker for a password update attempt
-    | has failed, such as for an invalid token or invalid new password.
+    | Die folgenden Sprachzeilen sind die Standardzeilen, die mit Gründen übereinstimmen,
+    | die vom Kennwort-Broker für einen fehlgeschlagenen Versuch der Kennwortaktualisierung angegeben werden,
+    | wie z. B. für einen ungültigen Token oder ein ungültiges neues Kennwort.
     |
     */
 
-    'reset' => 'Ihr Passwort wurde zurückgesetzt.',
-    'sent' => 'Wir haben Ihnen einen Link zum Zurücksetzen Ihres Passworts per E-Mail gesendet.',
-    'throttled' => 'Bitte warten Sie einen Moment und versuchen Sie es dann erneut.',
-    'token' => 'Dieses Token zum Zurücksetzen des Passworts ist ungültig.',
-    'user' => 'Es wurde kein Benutzer mit dieser E-Mail-Adresse gefunden.',
+    'reset' => 'Ihr Kennwort wurde zurückgesetzt.',
+    'sent' => 'Wir haben einen Link zum Zurücksetzen des Kennworts an Ihre E-Mail-Adresse gesendet.',
+    'throttled' => 'Bitte versuchen Sie es erneut.',
+    'token' => 'Dieser Token zum Zurücksetzen des Kennworts ist ungültig.',
+    'user' => 'Es wurde kein Benutzer mit dieser E-Mail-Adresse gefunden.',    
+
 ];

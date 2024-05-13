@@ -1,12 +1,15 @@
 <?php
 
 return [
-    "route"=>"Skupinový chat",
-    "button.create_room"=>"Nový rozhovor",
-    "header.new_room"=>"Nový rozhovor",
-    "modal.create_room.header"=>"Vytvořit skupinový chat",
-    "modal.label"=>"Prosím vyberte modely, které chcete použít současně",
-    "button.create"=>"Vytvořit",
-    "hint.must_select_at_least_2_llms"=>"Musíte vybrat alespoň dva modely!",
-    'model.hint' => 'Vyberte prosím model, který chcete použít:',
+    'route' => 'Chatovací místnosti',
+    'button.create_room' => 'Nová chatovací místnost',
+    'header.new_room' => 'Nová chatovací místnost',
+    'modal.create_room.header' => 'Vytvořit novou chatovací místnost',
+    'modal.label' => 'Vyberte modely, které chcete používat dohromady',
+    'button.create' => 'Vytvořit',
+    'hint.must_select_llms' => 'Musíte vybrat alespoň jeden model!',
+    'button.edit_chatname' => 'Upravit název chatovací místnosti',
+    'button.share_link' => 'Sdílet odkaz',
+    'label.share_link' => 'Sdílet odkaz (v tuto chvíli má přístup pouze vlastník)',
+    'model.hint' => 'Vyberte model, který chcete používat:',
 ];
