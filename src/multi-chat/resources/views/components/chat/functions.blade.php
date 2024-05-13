@@ -177,9 +177,9 @@ xmlns="http://www.w3.org/2000/svg">
                             return true
                         }
                         return false
-                    } else if ($(this).find("img").attr("data-tooltip-target") == $(node).parent().parent()
+                    } else if ($(this).find("img").attr("data-tooltip-target").split('_')[2] == $(node).parent().parent()
                         .find(
-                            "div img").attr("data-tooltip-target")) {
+                            "div img").attr("data-tooltip-target").split('_')[2]) {
                         $trigger = true;
                         return true
                     }
