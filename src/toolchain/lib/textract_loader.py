@@ -14,7 +14,7 @@ class TextractLoader(TextLoader):
         file_path: Path to the file to load.
     """
 
-    def __init__(self, file_path: str, encoding=None, autodetect_encoding: bool = False):
+    def __init__(self, file_path: str, encoding="utf-8", autodetect_encoding: bool = False):
         self.file_path = file_path
         self.encoding = encoding
         self.autodetect_encoding = autodetect_encoding
@@ -23,7 +23,8 @@ class TextractLoader(TextLoader):
         """Load from file path."""
         text = ""
         try:
-            text = textract.process(self.file_path)
+            text = textract.process(self.file_path, encoding=self.encoding)
+            text = text.decode(self.encoding)
         except Exception as e:
             raise RuntimeError(f"Error loading {self.file_path}") from e
 

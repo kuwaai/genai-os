@@ -108,6 +108,7 @@ async def file_extractor(content: str, url: str, content_type: str) -> str:
             textract.process,
             str(file_path)
         )
+        text = text.decode("utf-8")
     except Exception as e:
         logger.exception('Failed to extract text.')
     

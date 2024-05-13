@@ -53,7 +53,7 @@ for /d %%i in (*) do (
         for %%G in ("%%~pi\..") do (
             for %%H in ("%%~pi\..\..") do (
                 echo db_path=..\..\..\%%~nxH\%%~nxG\%%~nxF\%%~nxi
-                set "db_path=../../../%%~nxH/%%~nxG/%%~nxF/%%~nxi"
+                set "db_path=..\..\..\%%~nxH\%%~nxG\%%~nxF\%%~nxi"
                 goto skip_db_path
             )
         )
@@ -87,7 +87,7 @@ set /p "arguments=Arguments to use: (press Enter to leave blank if you don't nee
 REM Save configuration to run.bat
 
 del run.bat
-echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!> run.bat
+echo set "EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!"> run.bat
 
 REM model:config
 echo pushd ..\..\..\src\multi-chat>>run.bat
@@ -101,7 +101,7 @@ echo popd>>run.bat
 REM kuwa-executor
 set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
 if DEFINED db_path (
-    set command=!command! --database !db_path!
+    set command=!command! "--database" "!db_path!"
 )
 if DEFINED arguments (
     set command=!command! !arguments!
