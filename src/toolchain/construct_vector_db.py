@@ -8,8 +8,7 @@ from langchain_community.document_loaders import DirectoryLoader
 sys.path.append(".")
 
 from lib.gpu_util import check_gpu
-from lib.textract_loader import TextractLoader
-from lib.trafilatura_loader import TrafilaturaLoader
+from lib.file_text_loader import FileTextLoader
 from lib.parallel_splitter import ParallelSplitter
 from lib.document_store import DocumentStore
 
@@ -18,7 +17,6 @@ logger = logging.getLogger(__name__)
 def construct_db(
     docs_path:str,
     output_path:str,
-    force_html:bool = False,
     chunk_size:int = 512,
     chunk_overlap:int = 128,
     embedding_model:str = 'thenlper/gte-base-zh'
@@ -29,7 +27,7 @@ def construct_db(
 
     loader = DirectoryLoader(docs_path,
                          recursive=True,
-                         loader_cls=TextractLoader if not force_html else TrafilaturaLoader,
+                         loader_cls=FileTextLoader,
                          use_multithreading=True,
                          show_progress=True)
     logger.info(f'Loading documents...')
@@ -54,7 +52,6 @@ if __name__ == '__main__':
     parser.add_argument("docs_path", help="the path to the directory of input documents.", type=str)
     parser.add_argument("output_path", help="the path where the final database will be stored.", type=str)
     parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
-    parser.add_argument("--force-html", help="Force parse the files as HTML.", action="store_true")
     parser.add_argument("--chunk-size", help="The chunk size to split the document.", type=int, default=512)
     parser.add_argument("--chunk-overlap", help="The chunk size to split the document.", type=int, default=128)
     parser.add_argument("--embedding-model", help="the embedding model to use", type=str, default="thenlper/gte-base-zh")
@@ -77,6 +74,5 @@ if __name__ == '__main__':
         output_path=args.output_path,
         chunk_size=args.chunk_size,
         chunk_overlap=args.chunk_overlap,
-        force_html=args.force_html,
         embedding_model=args.embedding_model
     )

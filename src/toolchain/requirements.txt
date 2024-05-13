@@ -12,3 +12,4 @@ python-dotenv
 jinja2
 simsimd
 trafilatura
+magika
