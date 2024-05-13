@@ -63,7 +63,10 @@ class FileTextLoader(TextLoader):
             config = trafilatura.settings.use_config()
             config.set("DEFAULT", "EXTRACTION_TIMEOUT", "0")
             
-            content = Path(self.file_path).read_text()
+            content = ""
+            with open(self.file_path, encoding=self.encoding, errors='ignore') as f:
+                content = f.read()
+            content = Path(self.file_path, encoding=self.encoding).read_text()
             text = trafilatura.extract(
                 content,
                 favor_precision=True,

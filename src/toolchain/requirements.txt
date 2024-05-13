@@ -10,6 +10,6 @@ faiss-cpu
 tqdm
 python-dotenv
 jinja2
-simsimd
+simsimd==3.7.7
 trafilatura
 magika
