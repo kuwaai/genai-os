@@ -61,7 +61,8 @@ return [
     'llm.describe_default' => '該語言模型當前可用！',
     'hint.human_feedback_only' => '此處用於模型回饋蒐集，只能匯入匯出。',
 
-    'label.send_to' => '傳送給:',
+    'label.multiple_send' => '多選傳送',
+    'label.direct_send' => '單選傳送',
     'modal.delete_chat.header' => '您確定要刪除聊天室 ',
     'hint.no_permission_to_upload_file' => '很抱歉，但您沒有上傳檔案的權限',
     'hint.no_llms' => '沒有可用的模型<br>請稍後再回來看看！',

@@ -52,10 +52,10 @@ class RoomController extends Controller
     {
         $room_id = $request->route('room_id');
         if ($room_id) {
-            $chat = ChatRoom::findOrFail($room_id);
-            if ($chat->user_id != Auth::user()->id) {
+            $chat = ChatRoom::find($room_id);
+            if ($chat == null || $chat->user_id != Auth::user()->id) {
                 return redirect()->route('room.home');
-            } elseif (true) {
+            } else {
                 #LLMs::findOrFail($chat->bot_id)->enabled == true) {
                 return view('room');
             }

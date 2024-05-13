@@ -18,9 +18,11 @@
             @if (count($llms) > 1)
                 <div
                     class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
-                    <p>{{ __('chat.label.send_to') }}</p>
+                    <div id="send_to_mode" class="cursor-pointer bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded-lg mr-2"
+                        onclick="$(this).next().find('>div').each((e,i)=>{$(i).toggle()}); $(this).text($(this).next().find('>div:eq(0)').attr('style') == '' ? '{{ __('chat.label.multiple_send') }}' : '{{ __('chat.label.direct_send') }}')">
+                        {{ __('chat.label.multiple_send') }}</div>
                     <div class="flex flex-1 items-center overflow-hidden">
-                        <div class="flex flex-1 mr-auto overflow-auto scrollbar scrollbar-3">
+                        <div class="flex flex-1 mr-auto overflow-auto scrollbar scrollbar-3 sends">
                             @foreach ($llms as $llm)
                                 <span
                                     @env('arena')  @else data-tooltip-target="llm_{{ $llm->id }}_toggle" data-tooltip-placement="top" @endenv
@@ -34,6 +36,36 @@
                                         <div class="h-full w-full bg-black flex justify-center items-center text-white">
                                             ?</div>
                                     @else
+                                        <div id="llm_{{ $llm->id }}_toggle" role="tooltip"
+                                            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
+                                            {{ $llm->name }}
+                                            <div class="tooltip-arrow" data-popper-arrow></div>
+                                        </div>
+                                        <img
+                                            src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                        @endenv
+                                    </div>
+                                </span>
+                            @endforeach
+                        </div>
+                        <div class="flex flex-1 mr-auto overflow-auto scrollbar scrollbar-3" style="display:none">
+                            @foreach ($llms as $llm)
+                                <span
+                                    @env('arena')  @else data-tooltip-target="llm_{{ $llm->id }}_direct_send" data-tooltip-placement="top" @endenv
+                                    onclick="$('#prompt_area input[name=\'chatsTo[]\']').prop('disabled',true); $('#prompt_area .sends span').addClass('bg-red-500 hover:bg-red-600').removeClass('bg-green-500 hover:bg-green-600');$('span[data-tooltip-target=llm_{{ $llm->id }}_toggle]').removeClass('bg-red-500 hover:bg-red-600').addClass('bg-green-500 hover:bg-green-600');$('#chatsTo_{{ $llm->id }}').prop('disabled',false);$('#prompt_area').submit()"
+                                    class="cursor-pointer flex py-1 px-2 mx-1 bg-blue-500 hover:bg-blue-600 rounded-full">
+                                    <div
+                                        class="inline h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black overflow-hidden">
+
+                                        @env('arena')
+                                        <div class="h-full w-full bg-black flex justify-center items-center text-white">
+                                            ?</div>
+                                    @else
+                                        <div id="llm_{{ $llm->id }}_direct_send" role="tooltip"
+                                            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-600">
+                                            {{ $llm->name }}
+                                            <div class="tooltip-arrow" data-popper-arrow></div>
+                                        </div>
                                         <img
                                             src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                                         @endenv

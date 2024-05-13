@@ -3,7 +3,7 @@
 <script>
     if ($("#chat_input")) {
         $("#chat_input").prop("readonly", true)
-        $("#chat_input").val("{{__('chat.hint.processing')}}")
+        $("#chat_input").val("{{ __('chat.hint.processing') }}")
         $("#submit_msg").hide()
         if ($("#upload_btn")) $("#upload_btn").hide()
         if ($("#abort_btn")) $("#abort_btn").hide()
@@ -27,7 +27,7 @@
                 $("#submit_msg").hide()
                 if ($("#upload_btn")) $("#upload_btn").hide()
                 if (!isMac) {
-                    $("#chat_input").val("{{__('chat.hint.processing')}}")
+                    $("#chat_input").val("{{ __('chat.hint.processing') }}")
                 }
                 $("#chat_input").prop("readonly", true)
             } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
@@ -56,7 +56,7 @@
                 $("#submit_msg").hide()
                 if ($("#upload_btn")) $("#upload_btn").hide()
                 if (!isMac) {
-                    $("#chat_input").val("{{__('chat.hint.processing')}}")
+                    $("#chat_input").val("{{ __('chat.hint.processing') }}")
                 }
                 $("#chat_input").prop("readonly", true)
             } else {
@@ -170,11 +170,11 @@ xmlns="http://www.w3.org/2000/svg">
     }
 
     @if (session('selLLMs'))
-        @foreach ($llms as $llm)
-            $(`#btn_{{ $llm->id }}_toggle`).click()
-        @endforeach
-        @foreach (session('selLLMs') as $id)
+        @foreach (array_diff($llms->pluck('id')->toarray(), session('selLLMs')) as $id)
             $(`#btn_{{ $id }}_toggle`).click()
         @endforeach
+        @if (count(session('selLLMs')) == 1)
+            $('#send_to_mode').click()
+        @endif
     @endif
 </script>

@@ -36,7 +36,8 @@
                     <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 <img data-tooltip-target="{{ $history->id }}_llm_{{ $history->bot_id }}_msg"
-                    data-tooltip-placement="top" src="{{ $botimgurl }}" class="h-full w-full">
+                    data-tooltip-placement="top" src="{{ $botimgurl }}" class="h-full w-full {{$readonly ? '' : 'cursor-pointer'}}"
+                    @if(!$readonly) onclick="$('#prompt_area input[name=\'chatsTo[]\']').prop('disabled',true); $('#prompt_area .sends span').addClass('bg-red-500 hover:bg-red-600').removeClass('bg-green-500 hover:bg-green-600');$('span[data-tooltip-target=llm_{{ $history->bot_id }}_toggle]').removeClass('bg-red-500 hover:bg-red-600').addClass('bg-green-500 hover:bg-green-600');$('#chatsTo_{{ $history->bot_id }}').prop('disabled',false);$('#prompt_area').submit()" @endif>
             @endif
         </div>
         <div class="overflow-hidden">
@@ -63,7 +64,8 @@
                         <div class="tooltip-arrow" data-popper-arrow></div>
                     </div>
                     <img data-tooltip-target="{{ $history->id }}_llm_{{ $history->bot_id }}_msg"
-                        data-tooltip-placement="top" src="{{ $botimgurl }}" class="h-full w-full">
+                        data-tooltip-placement="top" src="{{ $botimgurl }}" class="h-full w-full {{$readonly ? '' : 'cursor-pointer'}}"
+                        @if(!$readonly) onclick="$('#prompt_area input[name=\'chatsTo[]\']').prop('disabled',true); $('#prompt_area .sends span').addClass('bg-red-500 hover:bg-red-600').removeClass('bg-green-500 hover:bg-green-600');$('span[data-tooltip-target=llm_{{ $history->bot_id }}_toggle]').removeClass('bg-red-500 hover:bg-red-600').addClass('bg-green-500 hover:bg-green-600');$('#chatsTo_{{ $history->bot_id }}').prop('disabled',false);$('#prompt_area').submit()" @endif>
                 @endif
             </div>
         @endif
