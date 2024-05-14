@@ -19,11 +19,12 @@
             @if ($llms && count($llms) > 1)
                 <div
                     class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
-                    <div id="send_to_mode" class="cursor-pointer bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded-lg mr-2"
+                    <div id="send_to_mode"
+                        class="cursor-pointer bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded-lg mr-2"
                         onclick="$(this).next().find('>div').each((e,i)=>{$(i).toggle()}); $(this).text($(this).next().find('>div:eq(0)').attr('style') == '' ? '{{ __('chat.label.multiple_send') }}' : '{{ __('chat.label.direct_send') }}')">
                         {{ __('chat.label.multiple_send') }}</div>
                     <div class="flex flex-1 items-center overflow-hidden">
-                        <div class="flex mr-auto overflow-auto scrollbar scrollbar-3 min-w-[36px]">
+                        <div class="flex mr-auto overflow-auto scrollbar scrollbar-3 min-w-[36px] sends">
                             @foreach ($llms as $llm)
                                 <span
                                     @env('arena')  @else data-tooltip-target="llm_{{ $llm->id }}_toggle" data-tooltip-placement="top" @endenv
@@ -54,7 +55,7 @@
                             @foreach ($llms as $llm)
                                 <span
                                     @env('arena')  @else data-tooltip-target="llm_{{ $llm->id }}_direct_send" data-tooltip-placement="top" @endenv
-                                    onclick="$('#prompt_area input[name=\'chatsTo[]\']').prop('disabled',true);$('#chatsTo_{{ $llm->id }}').prop('disabled',false);$('#prompt_area').submit()"
+                                    onclick="$('#prompt_area input[name=\'chatsTo[]\']').prop('disabled',true); $('#prompt_area .sends span').addClass('bg-red-500 hover:bg-red-600').removeClass('bg-green-500 hover:bg-green-600');$('span[data-tooltip-target=llm_{{ $llm->id }}_toggle]').removeClass('bg-red-500 hover:bg-red-600').addClass('bg-green-500 hover:bg-green-600');$('#chatsTo_{{ $llm->id }}').prop('disabled',false);$('#prompt_area').submit()"
                                     class="cursor-pointer flex py-1 px-2 mx-1 bg-blue-500 hover:bg-blue-600 rounded-full">
                                     <div
                                         class="inline h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black overflow-hidden">

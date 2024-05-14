@@ -138,7 +138,7 @@ class ChatGptExecutor(LLMExecutor):
             openai_token = data.get("openai_token") or self.args.api_key
             
             # Parse and process modelfile
-            override_system_prompt, messages, template = self.parse_modelfile(data.get("modelfile", "[]"))
+            override_system_prompt, messages, _ = self.parse_modelfile(data.get("modelfile", "[]"))
             system_prompt = override_system_prompt or self.system_prompt
 
             # Apply parsed modelfile data to Inference

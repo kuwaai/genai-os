@@ -96,7 +96,7 @@ class GeminiExecutor(LLMExecutor):
             google_token = data.get("google_token") or self.args.api_key
 
             # Parse and process modelfile
-            override_system_prompt, messages = self.parse_modelfile(data.get("modelfile", "[]"))
+            override_system_prompt, messages, _ = self.parse_modelfile(data.get("modelfile", "[]"))
             if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
 
             # Apply parsed modelfile data to Inference
