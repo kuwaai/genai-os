@@ -11,7 +11,7 @@ return [
     "button.change_lang"=>"Changer de langue",
     'hint.updated' => 'Mis à jour avec succès',
     'hint.saved' => 'Enregistré',
-    'hint.nochange'=>'Les données sont identiques, aucune mise à jour n'est nécessaire',
+    'hint.nochange'=>'Les données sont identiques, aucune mise à jour n\'est nécessaire',
     'hint.alert'=>'Alerte',
     'hint.require_change_password'=>'Pour des raisons de sécurité, vous devez changer votre mot de passe',
 
