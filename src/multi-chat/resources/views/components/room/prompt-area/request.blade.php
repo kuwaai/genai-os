@@ -14,7 +14,7 @@
         <input name="room_id" value="{{ request()->route('room_id') }}" hidden>
         <input id="chained" {{ \Session::get('chained') ?? true ? '' : 'disabled' }} hidden>
         <input id="upload" type="file" name="file" style="display: none;" onchange="uploadcheck()">
-        <div class="flex flex-1 items-end justify-end {{ count($llms) > 1 ? 'flex-col' : '' }} overflow-hidden">
+        <div class="flex flex-1 items-end justify-end flex-col overflow-hidden">
             @if (count($llms) > 1)
                 <div
                     class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
