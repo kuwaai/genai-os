@@ -18,7 +18,8 @@
             @if (count($llms) > 1)
                 <div
                     class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
-                    <div id="send_to_mode" class="cursor-pointer text-black dark:text-white bg-gray-200 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 px-2 py-1 rounded-lg mr-2"
+                    <div id="send_to_mode"
+                        class="cursor-pointer text-black dark:text-white bg-gray-200 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 px-2 py-1 rounded-lg mr-2"
                         onclick="$(this).next().find('>div').each((e,i)=>{$(i).toggle()}); $(this).text($(this).next().find('>div:eq(0)').attr('style') == '' ? '{{ __('chat.label.multiple_send') }}' : '{{ __('chat.label.direct_send') }}')">
                         {{ __('chat.label.multiple_send') }}</div>
                     <div class="flex flex-1 items-center overflow-hidden">
