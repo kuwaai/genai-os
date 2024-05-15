@@ -12,4 +12,6 @@ return [
     'button.share_link' => '分享連結',
     'label.share_link' => '分享連結 (目前只有自己可存取)',
     'model.hint' => '請選擇一個您想使用的模型：',
+    'connecting.hint' => '- 連線中 -',
+    'connected.hint' => '連線成功'
 ];
