@@ -112,7 +112,7 @@ class DocQa:
     if not self.pre_build_db:
       if len(urls) == 1:
         try:
-          docs = self.fetch_documents(url[0])
+          docs = await self.fetch_documents(urls[0])
         except HTTPError as e:
           await asyncio.sleep(2) # To prevent SSE error of web page.
           yield i18n.t('docqa.error_fetching_document').format(str(e))
