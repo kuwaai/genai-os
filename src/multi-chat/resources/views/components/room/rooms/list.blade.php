@@ -21,6 +21,10 @@
                     </div>
                 </div>
             @endforeach
+
+            @if (count($llms) == 1)
+                <span class="text-center w-full line-clamp-1">{{ $llms[0]->name }}</span>
+            @endif
         </div>
         @if (request()->user()->hasPerm('Room_update_new_chat'))
             <div class="m-2 border border-green-400 border-1 rounded-lg h-12 overflow-hidden">

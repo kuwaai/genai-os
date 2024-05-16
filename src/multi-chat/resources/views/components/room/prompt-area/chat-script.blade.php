@@ -1,5 +1,12 @@
 @props(['llms'])
 
+<div id="connection_indicator" class="fixed center left-0 right-0 top-0 bottom-0 justify-center items-center flex inset-0 pointer-events-none">
+    <div class="flex flex-col">
+        <div class="flex justify-center items-center"><i class="fas fa-wifi text-white animate-pulse bg-green-500 rounded-full p-4"></i></div>
+        <span class="text-black dark:text-white animate-bounce pt-2">{{__('room.connecting.hint')}}</span>
+    </div>
+</div>
+
 <script>
     if ($("#chat_input")) {
         $("#chat_input").prop("readonly", true)
@@ -79,45 +86,74 @@
             }
         })
     }
-    task = new EventSource("{{ route('room.sse') }}", {
-        withCredentials: false
-    });
-    task.addEventListener('error', error => {
-        task.close();
-    });
-    task.addEventListener('message', event => {
-        if (event.data == "finished" && $("#submit_msg")) {
-            $chattable = true
-            $("#submit_msg").show()
-            if ($("#abort_btn")) $("#abort_btn").hide();
-            if ($("#upload_btn")) $("#upload_btn").show()
-            $("#chat_input").val("")
-            $("#chat_input").prop("readonly", false)
-            adjustTextareaRows($("#chat_input"))
-            $(".show-on-finished").attr("style", "")
-            hljs.configure({
-                languages: hljs.listLanguages()
-            }); //enable auto detect
-            $('#chatroom div.text-sm.space-y-3.break-words pre >div').remove()
-            $('#chatroom div.text-sm.space-y-3.break-words pre code.language-undefined').each(function() {
-                $(this).text($(this).text())
-                $(this)[0].dataset.highlighted = '';
-                $(this)[0].classList = ""
-                hljs.highlightElement($(this)[0]);
-            });
-            $('#chatroom div.text-sm.space-y-3.break-words pre').each(function() {
-                let languageClass = '';
-                $(this).children("code")[0].classList.forEach(cName => {
-                    if (cName.startsWith('language-')) {
-                        languageClass = cName.replace('language-', '');
-                        return;
-                    }
-                })
-                verilog = languageClass == "verilog" ?
-                    `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>` :
-                    ``
-                $(this).prepend(
-                    `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
+    let finsihed = false;
+
+    function connect() {
+        const task = new EventSource("{{ route('room.sse') }}", {
+            withCredentials: false
+        });
+        task.addEventListener('open', () => {
+            setTimeout(() => {
+                if (finsihed || task.readyState === EventSource.OPEN) {
+                    console.log('Connected')
+                    $('#connection_indicator span').text('{{__('room.connected.hint')}}')
+                    $('#connection_indicator').fadeOut();
+                }
+            }, 1);
+        });
+
+
+        task.addEventListener('error', error => {
+            console.error("Connection timeouted...");
+            $('#connection_indicator').fadeIn();
+            task.close();
+
+            setTimeout(() => {
+                if (!finsihed && task.readyState !== EventSource.OPEN) {
+                    console.log(`Retrying connection`);
+                    connect()
+                } else {
+                    $('#connection_indicator span').text('Connected!')
+                    $('#connection_indicator').fadeOut();
+                    console.log('Connected')
+                }
+            }, 1);
+        });
+
+        task.addEventListener('message', event => {
+            if (event.data == "finished" && $("#submit_msg")) {
+                finsihed = true;
+                $chattable = true
+                $("#submit_msg").show()
+                if ($("#abort_btn")) $("#abort_btn").hide();
+                if ($("#upload_btn")) $("#upload_btn").show()
+                $("#chat_input").val("")
+                $("#chat_input").prop("readonly", false)
+                adjustTextareaRows($("#chat_input"))
+                $(".show-on-finished").attr("style", "")
+                hljs.configure({
+                    languages: hljs.listLanguages()
+                }); //enable auto detect
+                $('#chatroom div.text-sm.space-y-3.break-words pre >div').remove()
+                $('#chatroom div.text-sm.space-y-3.break-words pre code.language-undefined').each(function() {
+                    $(this).text($(this).text())
+                    $(this)[0].dataset.highlighted = '';
+                    $(this)[0].classList = ""
+                    hljs.highlightElement($(this)[0]);
+                });
+                $('#chatroom div.text-sm.space-y-3.break-words pre').each(function() {
+                    let languageClass = '';
+                    $(this).children("code")[0].classList.forEach(cName => {
+                        if (cName.startsWith('language-')) {
+                            languageClass = cName.replace('language-', '');
+                            return;
+                        }
+                    })
+                    verilog = languageClass == "verilog" ?
+                        `<button onclick="compileVerilog(this)" class="flex items-center hover:bg-gray-900 px-2 py-2 "><span>{{ __('chat.button.verilog_compile_test') }}</span></button>` :
+                        ``
+                    $(this).prepend(
+                        `<div class="flex items-center text-gray-200 bg-gray-800 rounded-t-lg overflow-hidden">
 <span class="pl-4 py-2 mr-auto"><input class="bg-gray-900" list="language_list" oninput="switchLang(this)" value="${languageClass}"></span>
 ${verilog}
 <button onclick="copytext(this, $(this).parent().parent().children('code').text().trim())"
@@ -133,22 +169,28 @@ stroke-linejoin="round" class="icon-sm" style="display:none;" height="1em" width
 xmlns="http://www.w3.org/2000/svg">
 <polyline points="20 6 9 17 4 12"></polyline>
 </svg><span>{{ __('Copy') }}</span></button></div>`
-                )
-            })
-        } else {
-            data = JSON.parse(event.data)
-            number = parseInt(data["history_id"]);
-            $('#task_' + number).text(data["msg"]);
-            histories[number] = $("#history_" + number + " div.text-sm.space-y-3.break-words")
-                .text()
-            hljs.configure({
-                languages: []
-            }); // disable auto detect
-            chatroomFormatter($("#history_" + data["history_id"])[0]);
-            if ($("#abort_btn")) $("#abort_btn").show();
-            if ($("#upload_btn")) $("#upload_btn").hide()
-        }
-    });
+                    )
+                })
+                task.close();
+            } else {
+                data = JSON.parse(event.data)
+                number = parseInt(data["history_id"]);
+                $('#task_' + number).text(data["msg"]);
+                histories[number] = $("#history_" + number + " div.text-sm.space-y-3.break-words")
+                    .text()
+                hljs.configure({
+                    languages: []
+                }); // disable auto detect
+                chatroomFormatter($("#history_" + data["history_id"])[0]);
+                if ($("#abort_btn")) $("#abort_btn").show();
+                if ($("#upload_btn")) $("#upload_btn").hide()
+            }
+        });
+
+    }
+
+    // Initial connection
+    connect();
 
     if ($("#chat_input")) {
         $("#chat_input").focus();
