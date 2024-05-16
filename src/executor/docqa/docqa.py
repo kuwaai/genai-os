@@ -59,6 +59,7 @@ class DocQaExecutor(LLMExecutor):
                 logger.warning("Failed to unregister from kernel")
 
     def extend_arguments(self, parser):
+        parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
         parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
         parser.add_argument('--database', default=None, type=str, help='The path the the pre-built database.')
         parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
@@ -78,6 +79,9 @@ class DocQaExecutor(LLMExecutor):
         i18n.load_path.append(f'lang/{self.args.lang}/')
         i18n.config.set("error_on_missing_translation", True)
         i18n.config.set("locale", self.args.lang)
+        
+        if self.args.visible_gpu:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.pre_built_db = self.args.database
         self.llm = KuwaLlmClient(
@@ -102,6 +106,9 @@ class DocQaExecutor(LLMExecutor):
         )
         self.alt_access_code = self.args.alt_access_code
         self.proc = False
+        
+        if self.pre_built_db is None:
+            self.document_store.load_embedding_model()
 
     def extract_last_url(self, chat_history: list):
         """

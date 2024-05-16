@@ -33,6 +33,7 @@ class SearchQaExecutor(LLMExecutor):
         super().__init__()
 
     def extend_arguments(self, parser):
+        parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
         parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
         parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
         parser.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
@@ -55,6 +56,9 @@ class SearchQaExecutor(LLMExecutor):
         i18n.load_path.append(f'lang/{self.args.lang}/')
         i18n.config.set("error_on_missing_translation", True)
         i18n.config.set("locale", self.args.lang)
+
+        if self.args.visible_gpu:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
@@ -85,6 +89,8 @@ class SearchQaExecutor(LLMExecutor):
         self.with_ref = not self.args.hide_ref
 
         self.proc = False
+        
+        self.document_store.load_embedding_model()
 
     async def is_url_reachable(self, url:str, timeout=5) -> bool:
         loop = asyncio.get_running_loop()

@@ -49,6 +49,7 @@ class DocumentStore:
     # self.ensemble_retriever:EnsembleRetriever = None
   
   def load_embedding_model(self):
+    if not self.embeddings is None: return
     logger.info('Loading embedding model...')
     self.embeddings = HuggingFaceEmbeddings(model_name=self.embedding_model)
     logger.info('Embedding model loaded.')
