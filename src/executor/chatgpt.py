@@ -16,12 +16,13 @@ from kuwa.executor.util import expose_function_parameter, read_config, merge_con
 
 logger = logging.getLogger(__name__)
 
-# Updated 2024/04/01
+# Updated 2024/05/16
 CONTEXT_WINDOW = {
     ("gpt-3.5-turbo", "gpt-3.5-turbo-1106", "gpt-3.5-turbo-0125"): 16384,
+    ("gpt-3.5-turbo-instruct",): 4096,
     ("gpt-4", "gpt-4-0613"): 8192,
     ("gpt-4-32k", "gpt-4-32k-0613"): 32768,
-    ("gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-4-1106-preview", "gpt-4-vision-preview", "gpt-4-1106-vision-preview"): 128000,
+    ("gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-4-1106-preview", "gpt-4-vision-preview", "gpt-4-1106-vision-preview", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13"): 128000,
 }
 
 class ChatGptDescParser(DescriptionParser):
