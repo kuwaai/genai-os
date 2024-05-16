@@ -1,4 +1,4 @@
-@props(['llms' => null])
+@props(['llms' => null, 'tasks' => null])
 <form method="post" enctype="multipart/form-data" action="{{ route('room.create') }}" id="prompt_area">
     @csrf
     @if (session('llms'))
@@ -126,4 +126,4 @@
         }
     }
 </script>
-<x-room.prompt-area.chat-script :llms="$llms" />
+<x-room.prompt-area.chat-script :llms="$llms" :tasks="$tasks" />

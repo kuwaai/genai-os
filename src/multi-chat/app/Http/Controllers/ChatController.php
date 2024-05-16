@@ -240,7 +240,7 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
-        $request->input("listening");
+        $awaiting = $request->input('listening');
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
@@ -252,9 +252,13 @@ class ChatController extends Controller
                 Log::error('Uncaught SSE Exception: ' . $exception->getMessage());
             }
         });
-        $response->setCallback(function () use ($response, $request) {
+        $response->setCallback(function () use ($response, $request, $awaiting) {
             global $listening;
             $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+            if ($awaiting) {
+                $union = array_merge($listening, $awaiting);
+                $listening = array_unique($union);
+            }
             if (count($listening) > 0) {
                 foreach ($listening as $i) {
                     $history = Histories::find($i);
