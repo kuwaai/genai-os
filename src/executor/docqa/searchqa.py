@@ -46,7 +46,7 @@ class SearchQaExecutor(LLMExecutor):
         parser.add_argument('--google_api_key', default=None, help='The API key of Google API.')
         parser.add_argument('--google_cse_id', default=None, help='The ID of Google Custom Search Engine.')
         parser.add_argument('--restricted_sites', default='', help='A list of restricted sites. Septate by ";".')
-        parser.add_argument('--blocked_sites', default='', help='A list of blocked sites. Septate by ";".')
+        parser.add_argument('--blocked_sites', default='youtube.com;facebook.com;instagram.com;twitter.com;threads.net;play.google.com;apps.apple.com;www.messenger.com', help='A list of blocked sites. Septate by ";".')
         parser.add_argument('--num_url', default=3, type=int, help='Search results reference before RAG.')
         parser.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
                                             help='The user agent string when issuing the crawler.')
