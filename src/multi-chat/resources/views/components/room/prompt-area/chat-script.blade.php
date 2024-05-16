@@ -1,7 +1,7 @@
-@props(['llms'])
+@props(['llms', 'tasks'])
 
-<div id="connection_indicator" class="fixed center left-0 right-0 top-0 bottom-0 justify-center items-center flex inset-0 pointer-events-none">
-    <div class="flex flex-col">
+<div id="connection_indicator" class="fixed center left-0 right-0 top-0 bottom-0 justify-center items-end flex inset-0 pointer-events-none">
+    <div class="flex flex-col pb-20">
         <div class="flex justify-center items-center"><i class="fas fa-wifi text-white animate-pulse bg-green-500 rounded-full p-4"></i></div>
         <span class="text-black dark:text-white animate-bounce pt-2">{{__('room.connecting.hint')}}</span>
     </div>
@@ -89,7 +89,7 @@
     let finsihed = false;
 
     function connect() {
-        const task = new EventSource("{{ route('room.sse') }}", {
+        const task = new EventSource("{!! $tasks ? route('room.sse', ['listening'=>$tasks]) : route('room.sse') !!}", {
             withCredentials: false
         });
         task.addEventListener('open', () => {

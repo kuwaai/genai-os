@@ -293,14 +293,6 @@ class RequestChat implements ShouldQueue
                         $msgTimeInSeconds = Carbon::createFromFormat('Y-m-d H:i:s', $this->msgtime)->timestamp;
                         $currentTimeInSeconds = Carbon::now()->timestamp;
                         $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
-                        while ($ExecutionTime < 2) {
-                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
-                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
-                            Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
-                            Redis::publish($this->channel, 'Ended Ended');
-                            $currentTimeInSeconds = Carbon::now()->timestamp;
-                            $ExecutionTime = $currentTimeInSeconds - $msgTimeInSeconds;
-                        }
                         Redis::lrem(($this->channel == $this->history_id ? 'usertask_' : 'api_') . $this->user_id, 0, $this->history_id);
                         Redis::publish($this->channel, 'New ' . json_encode(['msg' => trim($tmp)]));
                         Redis::publish($this->channel, 'Ended Ended');

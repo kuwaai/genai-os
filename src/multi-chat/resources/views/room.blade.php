@@ -202,7 +202,7 @@
                     aria-controls="chatlist_drawer">
                     <i class="fas fa-bars"></i>
                 </button>
-                <p class="text-black dark:text-white mx-auto my-5">{{__("room.model.hint")}}</p>
+                <p class="text-black dark:text-white mx-auto my-5">{{ __('room.model.hint') }}</p>
                 <div
                     class="mx-4 mb-4 grid grid-cols-4 sm:grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
                     @foreach ($result as $bot)
@@ -266,7 +266,7 @@
                                     'feedback.nice',
                                     'feedback.detail',
                                     'feedback.flags',
-                                    'access_code'
+                                    'access_code',
                                 );
 
                             $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
@@ -291,7 +291,7 @@
                                     DB::raw('NULL as nice'),
                                     DB::raw('NULL as detail'),
                                     DB::raw('NULL as flags'),
-                                    'access_code'
+                                    'access_code',
                                 );
 
                             $mergedChats = $botChats
@@ -374,7 +374,8 @@
                                 src="{{ $llms[0]->image ? asset(Storage::url($llms[0]->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                             <p class="text-center text-sm line-clamp-4 py-1">{{ $llms[0]->name }}</p>
                             @if ($llms[0]->description)
-                                <p class="text-gray-500 dark:text-gray-300 line-clamp-4 max-w-full text-xs text-center py-1">
+                                <p
+                                    class="text-gray-500 dark:text-gray-300 line-clamp-4 max-w-full text-xs text-center py-1">
                                     {{ $llms[0]->description }}</p>
                             @endif
                         </div>
@@ -385,9 +386,9 @@
                         (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
                     <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
                         @if (request()->user()->hasPerm('Room_update_new_chat') && session('llms'))
-                            <x-room.prompt-area.create :llms="$llms" />
+                            <x-room.prompt-area.create :llms="$llms" :tasks="$tasks ?? null" />
                         @elseif (request()->user()->hasPerm('Room_update_send_message') && !session('llms'))
-                            <x-room.prompt-area.request :llms="$llms" />
+                            <x-room.prompt-area.request :llms="$llms" :tasks="$tasks ?? null" />
                         @endif
                     </div>
                 @endif

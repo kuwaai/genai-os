@@ -1,4 +1,4 @@
-@props(['llms'])
+@props(['llms', 'tasks'])
 
 <form method="post" action="{{ route('room.request') }}" id="prompt_area" enctype="multipart/form-data">
     @foreach ($llms as $llm)
@@ -109,7 +109,7 @@
         {{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? '' }}</p>
 </form>
 
-<x-room.prompt-area.chat-script :llms="$llms" />
+<x-room.prompt-area.chat-script :llms="$llms" :tasks="$tasks" />
 <script>
     function abortGenerate() {
         $.get("{{ route('room.abort', request()->route('room_id')) }}");
