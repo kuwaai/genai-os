@@ -8,7 +8,7 @@ call src\variables.bat
 REM Check for updates
 git fetch
 git status -uno | findstr "Your branch is behind"
-IF %ERRORLEVEL% NEQ 0 (
+IF %ERRORLEVEL% EQU 0 (
     echo Your branch is behind. You should pull the latest changes.
     
     REM Prompt the user for input with default 'Y'
