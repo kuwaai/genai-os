@@ -35,6 +35,11 @@ EXECUTORS = [
         "description": "[On-premises model] Run the GGUF model locally.",
         "class": "llamacpp.LlamaCppExecutor"
     },
+    {
+        "name": "ollama",
+        "description": "[On-premises model] Run a proxy that connected to the Ollama API server.",
+        "class": "ollama_proxy.OllamaExecutor"
+    },
 ]
 
 def import_class(name: str):

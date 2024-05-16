@@ -12,10 +12,11 @@ packages = ["src/kuwa"]
 "chatgpt.py" = "kuwa/executor/example/chatgpt.py"
 "huggingface.py" = "kuwa/executor/example/huggingface.py"
 "llamacpp.py" = "kuwa/executor/example/llamacpp.py"
+"ollama_proxy.py" = "kuwa/executor/example/ollama_proxy.py"
 
 [project]
 name = "kuwa-executor"
-version = "0.1.0"
+version = "0.3.0"
 authors = [
   { name="Drift", email="taifu9920923@gmail.com" },
   { name="Yung-Hsiang Hu", email="iftnt1999@gmail.com" },

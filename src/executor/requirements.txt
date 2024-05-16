@@ -15,3 +15,7 @@ torch
 transformers
 accelerate
 sentencepiece
+
+# ollama
+jinja2
+ollama

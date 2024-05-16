@@ -22,14 +22,16 @@ set "names[1]=ChatGPT"
 set "names[2]=Gemini Pro"
 set "names[3]=GGUF Model"
 set "names[4]=HuggingFace Model"
-set "names[5]=Custom Module"
+set "names[5]=Ollama"
+set "names[6]=Custom Module"
 
 REM Define an array to store the model types and their names
 set "models[1]=chatgpt"
 set "models[2]=geminipro"
 set "models[3]=llamacpp"
 set "models[4]=huggingface"
-set "models[5]=custom"
+set "models[5]=ollama"
+set "models[6]=custom"
 
 REM TAIDE init
 if "taide"=="!current_folder!" (
@@ -90,10 +92,42 @@ if "taide"=="!current_folder!" (
 	)
 	:skip_db_path
 	goto skip_selection
+) else if "SearchQA" == "!current_folder!" (
+	echo Init SearchQA
+	echo EXECUTOR_TYPE=custom
+	echo EXECUTOR_NAME=SearchQA
+	echo EXECUTOR_ACCESS_CODE=searchqa
+	
+	set "EXECUTOR_TYPE=custom"
+	set "EXECUTOR_NAME=SearchQA"
+	set "EXECUTOR_ACCESS_CODE=searchqa"
+	set "worker_path=searchqa.py"
+
+	REM not quick
+	if "%1" == "quick" (
+		exit /b 0
+	)
+
+	:input_google_api_key
+	set /p "google_api_key=Enter the Google API key:"
+	if "!google_api_key!"=="" (
+		echo Google API key cannot be blank. Please try again.
+		goto input_google_api_key
+	)
+
+	:input_google_cse_id_key
+	set /p "google_cse_id=Enter the Google Custom Search Engine ID:"
+	if "!google_cse_id!"=="" (
+		echo Google Custom Search Engine ID cannot be blank. Please try again.
+		goto input_google_cse_id
+	)
+	
+	set /p "restricted_sites=Enter the restricted sites (Optional, septate by ;) :"
+	goto skip_selection
 )
 
 REM Check if the current folder matches any option
-for %%a in (1 2 3 4) do (
+for %%a in (1 2 3 4 5) do (
 	if "!models[%%a]!"=="!current_folder!" (
 		echo Using predefined...
 		echo EXECUTOR_TYPE=!models[%%a]!
@@ -115,13 +149,13 @@ if "%1" == "quick" (
 REM Display the options
 echo Select an option:
 
-for %%a in (1 2 3 4 5) do (
+for %%a in (1 2 3 4 5 6) do (
 	echo %%a - !names[%%a]!
 )
 
 REM Ask for user input
 :input_option
-set /p "option=Enter the option number (1-5): "
+set /p "option=Enter the option number (1-6): "
 if not defined models[%option%] (
     echo Invalid option. Please try again.
     goto input_option
@@ -130,7 +164,7 @@ if not defined models[%option%] (
 REM Set the model type based on the selected option
 set "EXECUTOR_TYPE=!models[%option%]!"
 
-if "!option!" == "5" (
+if "!option!" == "6" (
     REM Ask for worker path (must-fill field)
     :input_worker_path
     set /p "worker_path=Enter the worker path: "
@@ -174,6 +208,18 @@ if "!EXECUTOR_TYPE!"=="geminipro" (
     :input_api_key
     set /p "api_key=Enter the API key (press Enter to leave blank): "
     if "!api_key!"=="" goto continue
+) else if "!EXECUTOR_TYPE!"=="ollama" (
+    set "ollama_host="
+    :input_ollama_host
+    set /p "ollama_host=Enter the Ollama host (press Enter to leave blank): "
+	
+	:input_model_name
+    set /p "model_name=Enter the model name: "
+    if "!model_name!"=="" (
+        echo Model name cannot be blank. Please try again.
+        goto input_model_name
+    )
+    goto continue
 )
 
 :continue
@@ -306,16 +352,34 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		IF DEFINED model_path (
 			set command=!command! "--model_path" "!model_path!"
 		)
+		IF DEFINED ollama_host (
+			set command=!command! "--ollama_host" "!ollama_host!"
+		)
+		IF DEFINED model_name (
+			set command=!command! "--model" "!model_name!"
+		)
 	) else (
 		set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
 	)
 	if DEFINED db_path (
-		set command=!command! --database !db_path!
+		set command=!command! "--database" "!db_path!"
+	)
+	if DEFINED google_api_key (
+		set command=!command! "--google_api_key" "!google_api_key!"
+	)
+	if DEFINED google_cse_id (
+		set command=!command! "--google_cse_id" "!google_cse_id!""
+	)
+	if DEFINED restricted_sites (
+		set command=!command! "--restricted_sites" "!restricted_sites!"
 	)
 	IF DEFINED arguments (
 		set command=!command! !arguments!
 	)
-	if "dbQA" == "!current_folder!" (
+	set is_docqa=F
+	if "dbQA" == "!current_folder!" set is_docqa=T
+	if "SearchQA" == "!current_folder!" set is_docqa=T
+	if "!is_docqa!" == "T" (
 		echo pushd ..\..\..\src\executor\docqa\>> run.bat
 		echo !command!>> run.bat
 		echo popd>> run.bat

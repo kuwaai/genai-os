@@ -157,7 +157,8 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         link_regex: Union[str, re.Pattern, None] = None,
         headers: Optional[dict] = None,
         check_response_status: bool = True,
-        cache_proxy_url: bool = None
+        cache_proxy_url: bool = None,
+        forge_user_agent: str = None
     ) -> None:
         """Initialize with URL to crawl and any subdirectories to exclude.
         Args:
@@ -204,6 +205,10 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         self.prevent_outside = prevent_outside if prevent_outside is not None else True
         self.link_regex = link_regex
         self._lock = asyncio.Lock() if self.use_async else None
+        if forge_user_agent is not None:
+            headers = {} if headers is None else headers
+            headers["User-Agent"] = forge_user_agent
+            logger.debug(f"User-Agent: {forge_user_agent}")
         self.headers = headers
         self.check_response_status = check_response_status
         self.cache_proxy_url = cache_proxy_url
@@ -307,6 +312,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
         )
         async with self._lock:  # type: ignore
             visited.add(url)
+        raw_content = ""
         try:
             async with session.get(url, proxy=self.cache_proxy_url) as response:
                 content_type = response.headers.get('content-type')
@@ -321,6 +327,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
                 f"Unable to load {url}. Received error {e} of type "
                 f"{e.__class__.__name__}"
             )
+            logger.debug(f"Content: {raw_content}")
             if close_session:
                 await session.close()
             raise

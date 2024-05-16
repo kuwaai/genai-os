@@ -59,6 +59,7 @@ class DocQaExecutor(LLMExecutor):
                 logger.warning("Failed to unregister from kernel")
 
     def extend_arguments(self, parser):
+        parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
         parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
         parser.add_argument('--database', default=None, type=str, help='The path the the pre-built database.')
         parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
@@ -71,11 +72,16 @@ class DocQaExecutor(LLMExecutor):
         parser.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
         parser.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
         parser.add_argument('--alt_access_code', default=None, type=str, help='The alternate access code.')
+        parser.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+                                            help='The user agent string when issuing the crawler.')
 
     def setup(self):
         i18n.load_path.append(f'lang/{self.args.lang}/')
         i18n.config.set("error_on_missing_translation", True)
         i18n.config.set("locale", self.args.lang)
+        
+        if self.args.visible_gpu:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.pre_built_db = self.args.database
         self.llm = KuwaLlmClient(
@@ -95,10 +101,14 @@ class DocQaExecutor(LLMExecutor):
             document_store = self.document_store,
             vector_db = self.pre_built_db,
             llm = self.llm,
-            lang = self.args.lang
+            lang = self.args.lang,
+            user_agent=self.args.user_agent
         )
         self.alt_access_code = self.args.alt_access_code
         self.proc = False
+        
+        if self.pre_built_db is None:
+            self.document_store.load_embedding_model()
 
     def extract_last_url(self, chat_history: list):
         """

@@ -28,12 +28,14 @@ class DocQa:
     vector_db:str = None,
     llm:KuwaLlmClient = KuwaLlmClient(),
     lang:str="en",
-    with_ref = True
+    with_ref:bool = True,
+    user_agent:str = None
     ):
     self.logger = logging.getLogger(__name__)
     self.llm = llm
     self.lang = lang
     self.with_ref = with_ref
+    self.user_agent = user_agent
     if vector_db != None:
       self.pre_build_db = True
       self.document_store = DocumentStore.load(vector_db)
@@ -88,7 +90,8 @@ class DocQa:
       max_depth=1,
       prevent_outside=False,
       use_async = True,
-      cache_proxy_url = os.environ.get('HTTP_CACHE_PROXY', None)
+      cache_proxy_url = os.environ.get('HTTP_CACHE_PROXY', None),
+      forge_user_agent=self.user_agent
     ) 
     docs = await loader.async_load()
 
@@ -106,15 +109,19 @@ class DocQa:
 
     document_store = self.document_store
     docs = None
-    try:
-      if not self.pre_build_db:
+    if not self.pre_build_db:
+      if len(urls) == 1:
+        try:
+          docs = await self.fetch_documents(urls[0])
+        except HTTPError as e:
+          await asyncio.sleep(2) # To prevent SSE error of web page.
+          yield i18n.t('docqa.error_fetching_document').format(str(e))
+          return
+      else:
         docs = await asyncio.gather(*[self.fetch_documents(url) for url in urls])
         docs = [doc for sub_docs in docs for doc in sub_docs]
-        document_store = await self.construct_document_store(docs)
-    except HTTPError as e:
-      await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield i18n.t('docqa.error_fetching_document').format(str(e))
-      return
+      document_store = await self.construct_document_store(docs)
+
     
     task = ''
     if final_user_input == None:
