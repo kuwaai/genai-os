@@ -9,8 +9,6 @@ REM Check for updates
 git fetch
 git status -uno | findstr "behind"
 IF %ERRORLEVEL% EQU 0 (
-    echo Your branch is behind. You should pull the latest changes.
-    
     REM Prompt the user for input with default 'Y'
     set "response=Y"
     set /p "response=Do you want to update? (Y/N) [Y]: "
@@ -19,7 +17,6 @@ IF %ERRORLEVEL% EQU 0 (
     if "!response!"=="" set response=Y
     
     REM Convert input to uppercase
-    set "response=!response:~0,1!"
     set "response=!response:~0,1!"
     
     REM Check user response
