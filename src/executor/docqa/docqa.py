@@ -71,6 +71,8 @@ class DocQaExecutor(LLMExecutor):
         parser.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
         parser.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
         parser.add_argument('--alt_access_code', default=None, type=str, help='The alternate access code.')
+        parser.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+                                            help='The user agent string when issuing the crawler.')
 
     def setup(self):
         i18n.load_path.append(f'lang/{self.args.lang}/')
@@ -95,7 +97,8 @@ class DocQaExecutor(LLMExecutor):
             document_store = self.document_store,
             vector_db = self.pre_built_db,
             llm = self.llm,
-            lang = self.args.lang
+            lang = self.args.lang,
+            user_agent=self.args.user_agent
         )
         self.alt_access_code = self.args.alt_access_code
         self.proc = False

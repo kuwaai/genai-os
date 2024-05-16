@@ -46,6 +46,10 @@ class SearchQaExecutor(LLMExecutor):
         parser.add_argument('--google_cse_id', default=None, help='The ID of Google Custom Search Engine.')
         parser.add_argument('--restricted_sites', default='', help='A list of restricted sites. Septate by ";".')
         parser.add_argument('--blocked_sites', default='', help='A list of blocked sites. Septate by ";".')
+        parser.add_argument('--num_url', default=3, type=int, help='Search results reference before RAG.')
+        parser.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+                                            help='The user agent string when issuing the crawler.')
+        parser.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
 
     def setup(self):
         i18n.load_path.append(f'lang/{self.args.lang}/')
@@ -67,13 +71,18 @@ class SearchQaExecutor(LLMExecutor):
         self.docqa = DocQa(
             document_store = self.document_store,
             llm = self.llm,
-            lang = self.args.lang
+            lang = self.args.lang,
+            with_ref=False,
+            user_agent=self.args.user_agent
         )
 
         self.google_api_key = self.args.google_api_key
         self.searching_engine_id = self.args.google_cse_id
         self.restricted_sites = self.args.restricted_sites
         self.blocked_sites = self.args.blocked_sites
+        self.num_url = self.args.num_url
+        self.user_agent = self.args.user_agent
+        self.with_ref = not self.args.hide_ref
 
         self.proc = False
 
@@ -87,6 +96,7 @@ class SearchQaExecutor(LLMExecutor):
                 requests.get,
                 url,
                 timeout=timeout,
+                headers = {} if self.user_agent is None else {"User-Agent": self.user_agent},
                 verify=False
                 )
             )
@@ -95,7 +105,7 @@ class SearchQaExecutor(LLMExecutor):
         finally:
             return resp != None and resp.ok
 
-    async def search_url(self, chat_history: [dict], num_url = 3) -> ([dict[str, str]],[str]):
+    async def search_url(self, chat_history: [dict]) -> ([dict[str, str]],[str]):
         """
         Get first URL from the search result.
         """
@@ -146,7 +156,7 @@ class SearchQaExecutor(LLMExecutor):
             logger.debug(list(zip(urls, urls_reachable)))
             urls = list(zip(urls, titles))
             urls = list(itertools.compress(urls, urls_reachable))
-            urls = urls[:min(len(urls), num_url)]
+            urls = urls[:min(len(urls), self.num_url)]
         
         except Exception as e:
             logger.exception('Error while getting URLs for Google searching API')
@@ -171,6 +181,9 @@ class SearchQaExecutor(LLMExecutor):
                     await response_generator.aclose()
                 yield reply
         
+            if not self.with_ref:
+                return
+            
             yield f"\n\n{i18n.t('searchqa.reference')}\n"
             for i, (url, title) in enumerate(urls):
                 yield f'{i+1}. [{title.strip()}]({url})\n'
