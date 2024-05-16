@@ -240,6 +240,7 @@ class ChatController extends Controller
 
     public function SSE(Request $request)
     {
+        $request->input("listening");
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
@@ -252,76 +253,58 @@ class ChatController extends Controller
             }
         });
         $response->setCallback(function () use ($response, $request) {
-            $channel = $request->input('channel');
-            if ($channel != null && strpos($channel, 'aielection_') === 0) {
-                $client = Redis::connection();
-                $client->subscribe($channel, function ($message, $raw_history_id) use ($client, $response) {
-                    [$type, $msg] = explode(' ', $message, 2);
-                    if ($type == 'Ended') {
-                        echo "event: close\n\n";
+            global $listening;
+            $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+            if (count($listening) > 0) {
+                foreach ($listening as $i) {
+                    $history = Histories::find($i);
+                    if (!$history) {
+                        unset($listening[array_search($i, $listening)]);
+                    } elseif ($history && $history->msg !== '* ...thinking... *') {
+                        echo 'data: ' . json_encode(['history_id' => $i, 'msg' => $history->msg]) . "\n\n";
                         ob_flush();
                         flush();
-                        $client->disconnect();
-                    } elseif ($type == 'New') {
-                        echo 'data: ' . json_encode(['msg' => json_decode($msg)->msg]) . "\n\n";
-                        ob_flush();
-                        flush();
+                        unset($listening[array_search($i, $listening)]);
                     }
-                });
-            } else {
-                global $listening;
-                $listening = Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                if (count($listening) > 0) {
-                    foreach ($listening as $i) {
-                        $history = Histories::find($i);
-                        if (!$history) {
-                            unset($listening[array_search($i, $listening)]);
-                        } elseif ($history && $history->msg !== '* ...thinking... *') {
-                            echo 'data: ' . json_encode(['history_id' => $i, 'msg' => $history->msg]) . "\n\n";
-                            ob_flush();
-                            flush();
-                            unset($listening[array_search($i, $listening)]);
-                        }
-                    }
-                    if (count($listening) == 0) {
-                        echo "data: finished\n\n";
-                        echo "event: close\n\n";
-                        ob_flush();
-                        flush();
-                    }
-
-                    $client = Redis::connection();
-                    try {
-                        $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
-                            global $listening;
-                            [$type, $msg] = explode(' ', $message, 2);
-                            $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
-                            if ($type == 'Ended') {
-                                $key = array_search($history_id, $listening);
-                                if ($key !== false) {
-                                    unset($listening[$key]);
-                                }
-                                if (count($listening) == 0) {
-                                    echo "data: finished\n\n";
-                                    echo "event: close\n\n";
-                                    ob_flush();
-                                    flush();
-                                    $client->disconnect();
-                                }
-                            } elseif ($type == 'New') {
-                                echo 'data: ' . json_encode(['history_id' => $history_id, 'msg' => json_decode($msg)->msg]) . "\n\n";
-                                ob_flush();
-                                flush();
-                            }
-                        });
-                    } catch (RedisException) {
-                    }
-                } else {
+                }
+                if (count($listening) == 0) {
                     echo "data: finished\n\n";
                     echo "event: close\n\n";
                     ob_flush();
                     flush();
                 }
+
+                $client = Redis::connection();
+                try {
+                    $client->subscribe($listening, function ($message, $raw_history_id) use ($client, $response) {
+                        global $listening;
+                        [$type, $msg] = explode(' ', $message, 2);
+                        $history_id = substr($raw_history_id, strrpos($raw_history_id, '_') + 1);
+                        if ($type == 'Ended') {
+                            $key = array_search($history_id, $listening);
+                            if ($key !== false) {
+                                unset($listening[$key]);
+                            }
+                            if (count($listening) == 0) {
+                                echo "data: finished\n\n";
+                                echo "event: close\n\n";
+                                ob_flush();
+                                flush();
+                                $client->disconnect();
+                            }
+                        } elseif ($type == 'New') {
+                            echo 'data: ' . json_encode(['history_id' => $history_id, 'msg' => json_decode($msg)->msg]) . "\n\n";
+                            ob_flush();
+                            flush();
+                        }
+                    });
+                } catch (RedisException) {
+                }
+            } else {
+                echo "data: finished\n\n";
+                echo "event: close\n\n";
+                ob_flush();
+                flush();
             }
         });
 

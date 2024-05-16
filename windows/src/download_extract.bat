@@ -15,6 +15,9 @@ if not exist "%check_location%" (
     if "%archive_name:~-7%"==".tar.xz" (
         echo Extracting %archive_name%...
         tar -xf %archive_name% -C "%folder_name%"
+    ) else if "%archive_name:~-7%"==".7z.exe" (
+        echo Extracting %archive_name%...
+        %archive_name% -o "%folder_name%" -y
     ) else (
         echo Extracting %archive_name%...
         powershell Expand-Archive -Path %archive_name% -DestinationPath "%folder_name%"
