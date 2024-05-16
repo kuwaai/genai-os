@@ -2,7 +2,6 @@
 cd "%~dp0"
 REM Initialize everything
 call src\variables.bat
-set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 
 REM Download and extract RunHiddenConsole if not exists
 call src\download_extract.bat %url_RunHiddenConsole% packages\%RunHiddenConsole_folder% packages\%RunHiddenConsole_folder% RunHiddenConsole.zip
@@ -18,6 +17,15 @@ call src\download_extract.bat %url_PHP_Archive% packages\%php_folder_Archive% pa
 
 REM Download and extract xpdfreader if not exists
 call src\download_extract.bat %url_XpdfReader% packages\%xpdfreader_folder% packages\. xpdfreader.zip
+
+REM Download and extract git bash if not exists
+git --version >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    echo Git is installed, skip downloading git bash
+) else (
+	call src\download_extract.bat %url_gitbash% packages\%gitbash_folder% packages\%gitbash_folder% gitbash.7z.exe
+    echo Git is not installed.
+)
 
 IF EXIST packages\%python_folder% (
     echo Python folder already exists.

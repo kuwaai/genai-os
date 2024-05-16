@@ -47,6 +47,12 @@ for %%I in ("%url_XpdfReader%") do set "filename_XpdfReader=%%~nxI"
 set "xpdfreader_folder=%filename_XpdfReader:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_XpdfReader%") do set "version_XpdfReader=%%v"
 
+REM Variables for git bash
+set "url_gitbash=https://github.com/git-for-windows/git/releases/download/v2.45.1.windows.1/PortableGit-2.45.1-64-bit.7z.exe"
+for %%I in ("%url_gitbash%") do set "filename_gitbash=%%~nxI"
+set "gitbash_folder=%filename_gitbash:~0,-7%"
+for /f "tokens=2 delims=-" %%v in ("%filename_gitbash%") do set "version_gitbash=%%v"
+
 REM Prepare migration file
 mkdir src\conf 2>nul
 if not exist "src\conf\migrations.txt" (
@@ -57,7 +63,7 @@ REM Prepare packages folder
 mkdir packages 2>nul
 
 REM init env
-set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%PATH%"
+set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%PATH%"
 REM Run migration
 for %%i in ("src\migration\*.bat") do (
     findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (
