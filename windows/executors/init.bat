@@ -90,6 +90,38 @@ if "taide"=="!current_folder!" (
 	)
 	:skip_db_path
 	goto skip_selection
+) else if "SearchQA" == "!current_folder!" (
+	echo Init SearchQA
+	echo EXECUTOR_TYPE=custom
+	echo EXECUTOR_NAME=SearchQA
+	echo EXECUTOR_ACCESS_CODE=searchqa
+	
+	set "EXECUTOR_TYPE=custom"
+	set "EXECUTOR_NAME=SearchQA"
+	set "EXECUTOR_ACCESS_CODE=searchqa"
+	set "worker_path=searchqa.py"
+
+	REM not quick
+	if "%1" == "quick" (
+		exit /b 0
+	)
+
+	:input_google_api_key
+	set /p "google_api_key=Enter the Google API key:"
+	if "!google_api_key!"=="" (
+		echo Google API key cannot be blank. Please try again.
+		goto input_google_api_key
+	)
+
+	:input_google_cse_id_key
+	set /p "google_cse_id=Enter the Google Custom Search Engine ID:"
+	if "!google_cse_id!"=="" (
+		echo Google Custom Search Engine ID cannot be blank. Please try again.
+		goto input_google_cse_id
+	)
+	
+	set /p "restricted_sites=Enter the restricted sites (Optional, septate by ;) :"
+	goto skip_selection
 )
 
 REM Check if the current folder matches any option
@@ -310,12 +342,24 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
 	)
 	if DEFINED db_path (
-		set command=!command! --database !db_path!
+		set command=!command! --database "!db_path!"
+	)
+	if DEFINED google_api_key (
+		set command=!command! --google_api_key "!google_api_key!"
+	)
+	if DEFINED google_cse_id (
+		set command=!command! --google_cse_id "!google_cse_id!""
+	)
+	if DEFINED restricted_sites (
+		set command=!command! --restricted_sites "!restricted_sites!"
 	)
 	IF DEFINED arguments (
 		set command=!command! !arguments!
 	)
-	if "dbQA" == "!current_folder!" (
+	set is_docqa=F
+	if "dbQA" == "!current_folder!" set is_docqa=T
+	if "SearchQA" == "!current_folder!" set is_docqa=T
+	if "!is_docqa!" == "T" (
 		echo pushd ..\..\..\src\executor\docqa\>> run.bat
 		echo !command!>> run.bat
 		echo popd>> run.bat
