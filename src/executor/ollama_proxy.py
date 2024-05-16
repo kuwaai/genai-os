@@ -6,6 +6,7 @@ import json
 import typing
 import pprint
 import argparse
+from functools import lru_cache
 from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import ollama
@@ -83,35 +84,94 @@ class OllamaExecutor(LLMExecutor):
 
         self.proc = False
 
+    @lru_cache
+    def compile_template(self, chat_template:str):
+        """
+        Compile the chat template. Reference: tokenizers from HuggingFace.
+        """
+        try:
+            import jinja2
+            from jinja2.exceptions import TemplateError
+            from jinja2.sandbox import ImmutableSandboxedEnvironment
+        except ImportError:
+            raise ImportError("compile_template requires jinja2 to be installed.")
+
+        def raise_exception(message):
+            raise TemplateError(message)
+
+        jinja_env = ImmutableSandboxedEnvironment(trim_blocks=True, lstrip_blocks=True)
+        jinja_env.globals["raise_exception"] = raise_exception
+        return jinja_env.from_string(chat_template)
+
+    def synthesis_prompt(self, history: list, system_prompt: str, chat_template: str):
+        """
+        Synthesis the prompt from chat history.
+        """
+        history = history.copy()
+        prompt = ""
+        # Omit the special tokens since we can't obtain them
+        special_tokens_map = {"bos_token": "", "eos_token": "", "unk_token": ""}
+        if system_prompt:
+            history.insert(0, {"role": "system", "content": system_prompt})
+        if not chat_template:
+            raise ValueError(f"chat_template is mandatory when calling {self.synthesis_prompt.__name__}")
+
+        try:
+            compiled_template = self.compile_template(chat_template)
+            prompt = compiled_template.render(
+                messages=history, add_generation_prompt=True, **special_tokens_map
+            )
+        except Exception as e:
+            logger.exception(f"Error in template `{chat_template}` with error: `{e}`")
+            raise
+
+        return prompt
+
     async def llm_compute(self, data):
         try:
             # Parse and process modelfile
-            override_system_prompt, messages, _ = self.parse_modelfile(data.get("modelfile", "[]"))
+            override_system_prompt, messages, template = self.parse_modelfile(data.get("modelfile", "[]"))
             system_prompt = override_system_prompt or self.system_prompt
 
             # Apply parsed modelfile data to inference
             raw_inputs = messages + json.loads(data.get("input"))
             msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in raw_inputs]
-            if system_prompt is not None:
-                msg = [{"content": system_prompt, "role": "system"}] + msg
 
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return
 
+            chat_mode = True
+            if template:
+                chat_mode = False
+                prompt = self.synthesis_prompt(msg, system_prompt, template)
+                logger.debug(f"Prompt: {prompt}")
+            elif system_prompt is not None:
+                msg = [{"content": system_prompt, "role": "system"}] + msg
+
             # [TODO] Trim the history to fit into the context window
 
             self.proc = True
-            response = await self.client.chat(
-                model=self.model_name,
-                messages=msg,
-                options=self.ollama_options,
-                stream=True
-            )
+            if chat_mode:
+                response = await self.client.chat(
+                    model=self.model_name,
+                    messages=msg,
+                    options=self.ollama_options,
+                    stream=True
+                )
+            else:
+                dummy_ollama_template="{{ .Prompt }}{{ .Response }}"
+                response = await self.client.generate(
+                    model=self.model_name,
+                    prompt=prompt,
+                    options=self.ollama_options,
+                    stream=True,
+                    template=dummy_ollama_template,
+                )
             async for i in response:
                 if i['done']: continue
 
-                chunk = i['message']['content']
+                chunk = i['message']['content'] if chat_mode else i['response']
                 if not self.proc: break
                 if not chunk: continue
 

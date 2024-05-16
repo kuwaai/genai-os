@@ -17,4 +17,5 @@ accelerate
 sentencepiece
 
 # ollama
+jinja2
 ollama

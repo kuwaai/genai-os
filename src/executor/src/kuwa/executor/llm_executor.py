@@ -257,7 +257,7 @@ class LLMExecutor:
                     elif role == "system":
                         override_system_prompt += content
                     else:
-                        logging.debug(f"{role} doesn't existed!!")
+                        logger.debug(f"{role} doesn't existed!!")
                 elif command['name'] == "template":
                     template = command['args']
             except Exception as e:
