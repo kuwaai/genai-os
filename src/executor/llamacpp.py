@@ -12,7 +12,7 @@ from llama_cpp import Llama
 import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
 
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, modelfile
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -149,7 +149,7 @@ class LlamaCppExecutor(LLMExecutor):
 
         self.serving_generator = None
 
-    def synthesis_prompt(self, history: list, system_prompt: str, chat_template: str):
+    def synthesis_prompt(self, history: list, system_prompt: str, template: str, parsed: modelfile):
         """
         Synthesis the prompt from chat history.
         """
@@ -157,14 +157,15 @@ class LlamaCppExecutor(LLMExecutor):
         if system_prompt: history.insert(0, {"role": "system", "content": system_prompt})
 
         backup = self.model.chat_handler
-        if chat_template:
+        if template:
             eos_token_id = int(self.model.metadata.get("tokenizer.ggml.eos_token_id", self.model.token_eos()))
             bos_token_id = int(self.model.metadata.get("tokenizer.ggml.bos_token_id", self.model.token_bos()))
             eos_token = self.model._model.token_get_text(eos_token_id)
             bos_token = self.model._model.token_get_text(bos_token_id)
             self.model.chat_handler = llama_chat_format.Jinja2ChatFormatter(
-                template=chat_template, eos_token=eos_token, bos_token=bos_token
+                template=template, eos_token=eos_token, bos_token=bos_token
             ).to_chat_handler()
+        history[-1]['content'] = parsed.before_prompt + history[-1]['content'] + parsed.after_prompt
         try:
             prompt = self.model.chat_handler(
                 llama = ReflectiveLlama(),
@@ -190,7 +191,8 @@ class LlamaCppExecutor(LLMExecutor):
         history = json.loads(data.get("input"))
 
         # Parse and process modelfile
-        override_system_prompt, messages, chat_template = self.parse_modelfile(data.get("modelfile", "[]"))
+        parsed = self.parse_modelfile(data.get("modelfile", "[]"))
+        override_system_prompt, messages, template = parsed.override_system_prompt, parsed.messages, parsed.template
         if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
 
         messages, history = [
@@ -204,7 +206,7 @@ class LlamaCppExecutor(LLMExecutor):
             # Trim the history to fit into the context window
             prompt = ""
             while True:
-                prompt = self.synthesis_prompt(messages + history, override_system_prompt, chat_template)
+                prompt = self.synthesis_prompt(messages + history, override_system_prompt, template, parsed)
                 prompt_length = len(self.model.tokenize(
                     text=prompt.encode('UTF-8', 'ignore'),
                     add_bos=False, special=False

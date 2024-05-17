@@ -24,5 +24,9 @@ return [
     'bot.modelfile.label'=>'該Bot套用的模型設定檔',
     'bot.modelfile'=>'模型設定檔',
     'bot.base_model'=>'選取基底模型',
-    'bot.base_model.label' => '基底模型'
+    'bot.base_model.label' => '基底模型',
+    'bot.before_prompt' => '使用者前提示詞',
+    'bot.after_prompt' => '使用者後提示詞',
+    'bot.before_prompt.label' => '該提示詞會在推論期間加在使用者提示詞前面',
+    'bot.after_prompt.label' => '該提示詞會在推論期間加在使用者提示詞後面'
 ];

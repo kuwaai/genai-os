@@ -111,8 +111,8 @@
                                 for="modelfile">{{ __('store.bot.modelfile') }}</label>
                             <div class="flex items-center">
                                 <textarea id="modelfile" name="modelfile" type="text" oninput="adjustTextareaRows(this)"
-                                    onblur="modelfile_update($(this));" rows="1" max-rows="10" placeholder="{{ __('store.bot.modelfile') }}"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
+                                    onblur="modelfile_update($(this));" rows="10" max-rows="10" placeholder="{{ __('store.bot.modelfile') }}"
+                                    class="bg-gray-50 border scrollbar border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
                         </div>
                     </div>
@@ -207,7 +207,6 @@
 </div>
 <script>
     function detail_update(data, readonly) {
-        console.log(readonly)
         $("#save_bot").hide()
         $("#delete_bot").hide()
         if (!readonly) {
@@ -239,7 +238,6 @@
             $("#del_bot_by_ID input:eq(2)").val(data.id);
             $("#del_bot_by_ID").submit();
         });
-        adjustTextareaRows($("#detail-modal textarea[name=modelfile]")[0])
     }
 
     function checkForm() {

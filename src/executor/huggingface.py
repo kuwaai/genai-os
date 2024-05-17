@@ -13,7 +13,7 @@ from threading import Thread
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, modelfile
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config
 
 logger = logging.getLogger(__name__)
@@ -140,7 +140,7 @@ class HuggingfaceExecutor(LLMExecutor):
         logger.debug(f"Chat template: {self.tokenizer.chat_template}")
         logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
 
-    def synthesis_prompt(self, history: list, system_prompt: str, chat_template: str):
+    def synthesis_prompt(self, history: list, system_prompt: str, template: str, parsed: modelfile):
         """
         Synthesis the prompt from chat history.
         """
@@ -150,7 +150,8 @@ class HuggingfaceExecutor(LLMExecutor):
         elif not self.no_system_prompt:
             history.insert(0, {"role": "system", "content": self.system_prompt})
         backup = self.tokenizer.chat_template
-        if chat_template: self.tokenizer.chat_template = chat_template
+        if template: self.tokenizer.chat_template = template
+        history[-1]['content'] = parsed.before_prompt + history[-1]['content'] + parsed.after_prompt
         try:
             prompt = self.tokenizer.apply_chat_template(
                 history, tokenize=True, add_generation_prompt=True, return_tensors='pt'
@@ -174,7 +175,8 @@ class HuggingfaceExecutor(LLMExecutor):
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
         # Parse and process modelfile
-        override_system_prompt, messages, chat_template = self.parse_modelfile(data.get("modelfile", "[]"))
+        parsed = self.parse_modelfile(data.get("modelfile", "[]"))
+        override_system_prompt, messages, template = parsed.override_system_prompt, parsed.messages, parsed.template
         if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
 
         messages, history = [
@@ -188,7 +190,7 @@ class HuggingfaceExecutor(LLMExecutor):
         # Trim the history to fit into the context window
         prompt_embedding = []
         while True:
-            prompt_embedding = self.synthesis_prompt(messages + history, override_system_prompt, chat_template)
+            prompt_embedding = self.synthesis_prompt(messages + history, override_system_prompt, template, parsed)
             if prompt_embedding.shape[1] <= self.limit: break
 
             history = self.rectify_history(history[1:])
