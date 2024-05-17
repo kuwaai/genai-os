@@ -1,9 +1,13 @@
 @props(['llms', 'tasks'])
 
-<div id="connection_indicator" class="fixed center left-0 right-0 top-0 bottom-0 justify-center items-end flex inset-0 pointer-events-none">
+<div id="connection_indicator"
+    class="fixed center left-0 right-0 top-0 bottom-0 justify-center items-end flex inset-0 pointer-events-none pb-10">
+
+    <div class="w-64 hidden sm:block"></div>
     <div class="flex flex-col pb-20">
-        <div class="flex justify-center items-center"><i class="fas fa-wifi text-white animate-pulse bg-green-500 rounded-full p-4"></i></div>
-        <span class="text-black dark:text-white animate-bounce pt-2">{{__('room.connecting.hint')}}</span>
+        <div class="flex justify-center items-center"><i
+                class="fas fa-wifi text-white animate-pulse bg-green-500 rounded-full p-4"></i></div>
+        <span class="text-black dark:text-white animate-bounce pt-2">{{ __('room.connecting.hint') }}</span>
     </div>
 </div>
 
@@ -89,14 +93,14 @@
     let finsihed = false;
 
     function connect() {
-        const task = new EventSource("{!! $tasks ? route('room.sse', ['listening'=>$tasks]) : route('room.sse') !!}", {
+        const task = new EventSource("{!! $tasks ? route('room.sse', ['listening' => $tasks]) : route('room.sse') !!}", {
             withCredentials: false
         });
         task.addEventListener('open', () => {
             setTimeout(() => {
                 if (finsihed || task.readyState === EventSource.OPEN) {
                     console.log('Connected')
-                    $('#connection_indicator span').text('{{__('room.connected.hint')}}')
+                    $('#connection_indicator span').text('{{ __('room.connected.hint') }}')
                     $('#connection_indicator').fadeOut();
                 }
             }, 1);
