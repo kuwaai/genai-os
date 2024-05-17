@@ -49,7 +49,7 @@ class BotController extends Controller
             }
 
             // Check if the line starts with a command keyword
-            if (strtoupper(substr($line, 0, 4)) === 'FROM' || strtoupper(substr($line, 0, 7)) === 'ADAPTER' || strtoupper(substr($line, 0, 7)) === 'LICENSE' || strtoupper(substr($line, 0, 8)) === 'TEMPLATE' || strtoupper(substr($line, 0, 6)) === 'SYSTEM' || strtoupper(substr($line, 0, 9)) === 'PARAMETER' || strtoupper(substr($line, 0, 7)) === 'MESSAGE') {
+            if (strtoupper(substr($line, 0, 4)) === 'FROM' || strtoupper(substr($line, 0, 7)) === 'ADAPTER' || strtoupper(substr($line, 0, 7)) === 'LICENSE' || strtoupper(substr($line, 0, 8)) === 'TEMPLATE' || strtoupper(substr($line, 0, 6)) === 'SYSTEM' || strtoupper(substr($line, 0, 9)) === 'PARAMETER' || strtoupper(substr($line, 0, 7)) === 'MESSAGE' || strtoupper(substr($line, 0, 13)) === 'BEFORE-PROMPT' || strtoupper(substr($line, 0, 12)) === 'AFTER-PROMPT') {
                 // If a command is already being accumulated, push it to the commands array
                 if ($currentCommand['name'] !== '' && trim($currentCommand['args']) !== '') {
                     $commands[] = $currentCommand;
