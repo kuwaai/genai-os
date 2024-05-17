@@ -28,5 +28,6 @@ return [
     'bot.before_prompt' => '使用者前提示詞',
     'bot.after_prompt' => '使用者後提示詞',
     'bot.before_prompt.label' => '該提示詞會在推論期間加在使用者提示詞前面',
-    'bot.after_prompt.label' => '該提示詞會在推論期間加在使用者提示詞後面'
+    'bot.after_prompt.label' => '該提示詞會在推論期間加在使用者提示詞後面',
+    'bot.button.chat'=>"聊天"
 ];

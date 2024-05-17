@@ -120,6 +120,10 @@
                         </div>
                     </div>
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        <button type="button" onclick="$('#ChatWithBot').submit()"
+                            class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                            {{ __('store.bot.button.chat') }}
+                        </button>
                         <button type="button" id="save_bot" data-modal-target="update_modal"
                             data-modal-toggle="update_modal"
                             class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -136,6 +140,11 @@
         </div>
     </div>
 </div>
+
+<form method="post" id="ChatWithBot" style="display:none" action="{{ route('room.new') }}">
+    @csrf
+    <input name="llm[]" value="">
+</form>
 
 <form id="del_bot_by_ID" method="post" action="{{ route('store.delete') }}" style="display:none">
     @csrf
@@ -241,6 +250,7 @@
             $("#del_bot_by_ID input:eq(2)").val(data.id);
             $("#del_bot_by_ID").submit();
         });
+        $('#ChatWithBot input[name=\'llm[]\']').val(data.id)
     }
 
     function checkForm() {
