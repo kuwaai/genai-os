@@ -117,17 +117,19 @@ sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 > 請使用 Docker Compose V2 以上的版本。
 > Ubuntu APT 中的 `docker-compose` 套件為 Docker Compose V1，無法使用，請參考前面章節安裝新版 Docker Compose
 
-使用 Docker Compose 啟動基礎 Kuwa GenAI OS 系統、PostgreSQL、Gemini-Pro Executor
+使用以下腳本啟動基礎 Kuwa GenAI OS 系統，包含 Gemini-Pro Executor, Document QA, WebQA, Search QA
+可以透過更改 `./run.sh` 中的 `confs` 陣列內容調整要啟動的元件，元件設定都在 `compose` 目錄中
 ```sh
-docker compose -f compose.yaml -f pgsql.yaml -f gemini.yaml up --build
+./run.sh
 ```
 
 ## 進階使用
 
 ### 1. 啟動除錯模式
-Docker 版本預設不會在 Multi-Chat 網頁前端顯示任何錯誤訊息，若您遇到錯誤可以使用以下指令開啟除錯模式。
+Docker 版本預設不會在 Multi-Chat 網頁前端顯示任何錯誤訊息，若您遇到錯誤可以將 `./run.sh` 中的 `# "dev"` 前方註解取消，
+並重新執行以下指令，即可啟動除錯模式
 ```sh
-docker compose -f compose.yaml -f dev.yaml -f <其他 yaml 檔案...> up --build
+./run.sh
 ```
 
 ### 2. 執行多個 Executor

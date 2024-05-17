@@ -3,7 +3,7 @@
 # Define the configuration array
 confs=(
   "base"
-  "dev" # Increase the verbosity for debug
+  # "dev" # Increase the verbosity for debug
   "pgsql"
   "gemini"
   "docqa_webqa"

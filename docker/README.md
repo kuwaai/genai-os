@@ -111,23 +111,23 @@ The files are as follows:
     ADMIN_EMAIL="admin@${DOMAIN_NAME}" # Website default administrator login email, which can be an invalid email
     ```
 
-### 2. Start the system
+### 2. Start the System
 
 > [!WARNING]
-> Please use Docker Compose V2 or above.
-> The `docker-compose` package in Ubuntu APT is Docker Compose V1, which cannot be used. Please refer to the previous section to install the new version of Docker Compose
+> Please use Docker Compose V2 or later.
+> `docker-compose` package in Ubuntu APT is Docker Compose V1 and cannot be used. Please refer to the previous section to install the new version of Docker Compose.
 
-Start the basic Kuwa GenAI OS system, PostgreSQL and Gemini-Pro Executor using Docker Compose
+Use the following script to start the basic Kuwa GenAI OS system, including Gemini-Pro Executor, Document QA, WebQA, and Search QA. You can adjust the components to be started by changing the content of the `confs` array in `./run.sh`. The component settings are all in the `compose` directory.
 ```sh
-docker compose -f compose.yaml -f pgsql.yaml -f gemini.yaml up --build
+./run.sh
 ```
 
 ## Advanced Usage
 
-### 1. Launch Debug Mode
-The docker version will not display any error message on the Multi-Chat web frontend by default. If you encounter an error, you can use the following command to enable the debug mode.
+### 1. Start with Debugging Mode
+By default, the Docker version will not display any error messages on the Multi-Chat web front end. If you encounter an error, you can cancel the annotation before `# "dev"` in `./run.sh`, and then re-execute the following command to start the debugging mode.
 ```sh
-docker compose -f compose.yaml -f dev.yaml -f <other yaml files...> up --build
+./run.sh
 ```
 
 ### 2. Run Multiple Executors
