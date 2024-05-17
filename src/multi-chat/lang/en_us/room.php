@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'route' => ' Chat Room',
-    'button.create_room' => 'Create A New Chat Room',
+    'route' => 'Chat Room',
+    'button.create_room' => 'Create Chatroom',
     'header.new_room' => 'New Chat Room',
     'modal.create_room.header' => 'Create A New Chat Room',
     'modal.label' => 'Please pick a few models you want to use together.',

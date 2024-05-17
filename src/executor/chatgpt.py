@@ -138,7 +138,8 @@ class ChatGptExecutor(LLMExecutor):
             openai_token = data.get("openai_token") or self.args.api_key
             
             # Parse and process modelfile
-            override_system_prompt, messages, _ = self.parse_modelfile(data.get("modelfile", "[]"))
+            parsed = self.parse_modelfile(data.get("modelfile", "[]"))
+            override_system_prompt, messages = parsed.override_system_prompt, parsed.messages
             system_prompt = override_system_prompt or self.system_prompt
 
             # Apply parsed modelfile data to Inference
@@ -147,6 +148,7 @@ class ChatGptExecutor(LLMExecutor):
             if system_prompt is not None:
                 msg = [{"content": system_prompt, "role": "system"}] + msg
 
+            msg[-1]['content'] = parsed.before_prompt + msg[-1]['content'] + parsed.after_prompt
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return

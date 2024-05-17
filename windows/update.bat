@@ -30,3 +30,4 @@ IF %ERRORLEVEL% EQU 0 (
 ) ELSE (
     echo Your branch is up to date.
 )
+pause

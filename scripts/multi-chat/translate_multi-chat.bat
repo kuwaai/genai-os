@@ -10,7 +10,7 @@ for /d %%i in (%source%\*) do (
 		REM ..\translate.py %source%/zh_tw.json %destination%/%%~nxi.json "This is laravel lang json file, Please translate this lang file into %%~nxi language."
 		mkdir %destination%\%%~nxi
 		for %%j in (%source%\zh_tw\*) do (
-			if "%%~nxj" == "room.php" (
+			if "%%~nxj" == "store.php" (
 				..\translate.py %source%/zh_tw/%%~nxj %destination%/%%~nxi/%%~nxj "This is laravel lang php file, Please translate this lang file into %%~nxi language."
 			)
 		)

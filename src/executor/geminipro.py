@@ -96,13 +96,15 @@ class GeminiExecutor(LLMExecutor):
             google_token = data.get("google_token") or self.args.api_key
 
             # Parse and process modelfile
-            override_system_prompt, messages, _ = self.parse_modelfile(data.get("modelfile", "[]"))
+            parsed = self.parse_modelfile(data.get("modelfile", "[]"))
+            override_system_prompt, messages = parsed.override_system_prompt, parsed.messages
             if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
 
             # Apply parsed modelfile data to Inference
             raw_inputs = messages + json.loads(data.get("input"))
             msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in raw_inputs]
             msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
+            msg[-1]["parts"][0]['text'] = parsed.before_prompt + msg[-1]["parts"][0]['text'] + parsed.after_prompt
             
             if not google_token or len(google_token) == 0:
                 yield "[Please enter your Google API Token in the user settings of the website in order to use this model.]"

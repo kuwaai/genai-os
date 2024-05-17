@@ -77,8 +77,11 @@
                 name: '',
                 args: ''
             };
-
-            let systemCommandProcessed = false; // Flag to track if a system command has been processed
+            let flags = {
+                system: false,
+                beforePrompt: false,
+                afterPrompt: false
+            };
 
             // Split the input data into lines
             const lines = data.split('\n');
@@ -88,14 +91,13 @@
                 // Trim whitespace from the beginning and end of the line
                 line = line.trim();
 
+                // Array of command keywords
+                const commandKeywords = ['FROM', 'ADAPTER', 'LICENSE', 'TEMPLATE', 'SYSTEM', 'PARAMETER',
+                    'MESSAGE', 'BEFORE-PROMPT', 'AFTER-PROMPT'
+                ];
+
                 // Check if the line starts with a command keyword
-                if (line.toUpperCase().startsWith('FROM') ||
-                    line.toUpperCase().startsWith('ADAPTER') ||
-                    line.toUpperCase().startsWith('LICENSE') ||
-                    line.toUpperCase().startsWith('TEMPLATE') ||
-                    line.toUpperCase().startsWith('SYSTEM') ||
-                    line.toUpperCase().startsWith('PARAMETER') ||
-                    line.toUpperCase().startsWith('MESSAGE')) {
+                if (commandKeywords.some(keyword => line.toUpperCase().startsWith(keyword))) {
                     // If a command is already being accumulated, push it to the commands array
                     if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
                         commands.push(currentCommand);
@@ -114,19 +116,22 @@
                     currentCommand.name = commandType.toLowerCase();
                     currentCommand.args = commandArgs.trim();
 
-                    // If the command is a system command and it has already been processed, skip it
-                    if (currentCommand.name === 'system' && systemCommandProcessed) {
+                    if (currentCommand.name === 'system' && flags.system ||
+                        currentCommand.name === 'before-prompt' && flags.beforePrompt ||
+                        currentCommand.name === 'after-prompt' && flags.afterPrompt) {
                         currentCommand = {
                             name: '',
                             args: ''
                         };
-                    } else if (currentCommand.name === 'system') {
-                        systemCommandProcessed = true; // Set the flag to true if a system command is processed
+                    } else {
+                        // Set the flag for the current command
+                        flags[currentCommand.name] = true;
                     }
                 } else {
                     // If the line does not start with a command keyword, append it to the current command's arguments
                     currentCommand.args += '\n' + line;
                 }
+
             });
 
             // Push the last command to the commands array if it has non-empty arguments

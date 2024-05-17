@@ -12,7 +12,7 @@ from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import ollama
 
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, modelfile
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -128,7 +128,7 @@ class OllamaExecutor(LLMExecutor):
         jinja_env.globals["raise_exception"] = raise_exception
         return jinja_env.from_string(chat_template)
 
-    def synthesis_prompt(self, history: list, system_prompt: str, chat_template: str):
+    def synthesis_prompt(self, history: list, system_prompt: str, template: str, parsed: modelfile):
         """
         Synthesis the prompt from chat history.
         """
@@ -138,16 +138,17 @@ class OllamaExecutor(LLMExecutor):
         special_tokens_map = {"bos_token": "", "eos_token": "", "unk_token": ""}
         if system_prompt:
             history.insert(0, {"role": "system", "content": system_prompt})
-        if not chat_template:
+        if not template:
             raise ValueError(f"chat_template is mandatory when calling {self.synthesis_prompt.__name__}")
 
+        history[-1]['content'] = parsed.before_prompt + history[-1]['content'] + parsed.after_prompt
         try:
-            compiled_template = self.compile_template(chat_template)
+            compiled_template = self.compile_template(template)
             prompt = compiled_template.render(
                 messages=history, add_generation_prompt=True, **special_tokens_map
             )
         except Exception as e:
-            logger.exception(f"Error in template `{chat_template}` with error: `{e}`")
+            logger.exception(f"Error in template `{template}` with error: `{e}`")
             raise
 
         return prompt
@@ -155,7 +156,8 @@ class OllamaExecutor(LLMExecutor):
     async def llm_compute(self, data):
         try:
             # Parse and process modelfile
-            override_system_prompt, messages, template = self.parse_modelfile(data.get("modelfile", "[]"))
+            parsed = self.parse_modelfile(data.get("modelfile", "[]"))
+            override_system_prompt, messages, template = parsed.override_system_prompt, parsed.messages, parsed.template
             system_prompt = override_system_prompt or self.system_prompt
 
             # Apply parsed modelfile data to inference
@@ -169,7 +171,7 @@ class OllamaExecutor(LLMExecutor):
             chat_mode = True
             if template:
                 chat_mode = False
-                prompt = self.synthesis_prompt(msg, system_prompt, template)
+                prompt = self.synthesis_prompt(msg, system_prompt, template, parsed)
                 logger.debug(f"Prompt: {prompt}")
             elif system_prompt is not None:
                 msg = [{"content": system_prompt, "role": "system"}] + msg
