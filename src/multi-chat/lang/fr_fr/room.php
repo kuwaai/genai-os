@@ -1,6 +1,6 @@
 <?php
 
-retour [
+return [
     'route' => 'Salon de discussion',
     'button.create_room' => 'Créer une salle de discussion',
     'header.new_room' => 'Nouvelle salle de discussion',
