@@ -321,7 +321,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 
 	REM webQA & docQA
 	echo pushd ..\..\..\src\executor\docqa>>run.bat
-	set command=start /b "" "python" "docqa.py" "--access_code" "web_qa" "--alt_access_code" "doc_qa"
+	set command=start /b "" "python" "docqa.py" "--access_code" "web_qa" "doc_qa"
 	if DEFINED target_access_code (
 		set command=!command! --model !target_access_code!
 	)

@@ -13,8 +13,8 @@ services:
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--access_code", "doc-qa",
-      "--alt_access_code", "web-qa"
+      "--model", "llama3",
+      #"--model", "gemini-pro"
       ]
     extra_hosts:
       - "localhost:host-gateway"

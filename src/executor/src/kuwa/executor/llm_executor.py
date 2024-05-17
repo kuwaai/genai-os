@@ -57,7 +57,7 @@ class LLMExecutor:
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         group = parser.add_argument_group('General Options')
-        group.add_argument('--access_code', default=self.LLM_name, help='Access code')
+        group.add_argument('--access_code', default=self.LLM_name, nargs='+', help='Access code')
         group.add_argument('--version', default=self.executor_iface_version, help='Version of the executor interface')
         group.add_argument('--ignore_kernel', action='store_true', help='Ignore kernel')
         group.add_argument('--https', action='store_true', help='Register the executor endpoint with https scheme')
@@ -93,7 +93,7 @@ class LLMExecutor:
         self.executor_path = self.args.executor_path
 
         # Metrics
-        self.metrics = ExecutorMetrics(self.LLM_name)
+        self.metrics = ExecutorMetrics(self.LLM_name[0])
         self.metrics.state.state('idle')
 
         self._register_routes()
@@ -151,24 +151,25 @@ class LLMExecutor:
     def _shut_down(self):
         if not hasattr(self, 'registered') or not self.registered:
             return
-        try:
-            response = requests.post(
-                urljoin(self.kernel_url, f"{self.executor_iface_version}/worker/unregister"),
-                data={"name": self.LLM_name,"endpoint": self.get_reg_endpoint()}
-            )
-            if not response.ok or response.text == "Failed":
-                raise RuntimeWarning()
-            else:
-                logger.info("Unregistered from kernel.")
-                self.registered = False
-        except requests.exceptions.ConnectionError as e:
-            logger.warning("Failed to unregister from kernel")
+        for access_code in self.LLM_name:
+            try:
+                response = requests.post(
+                    urljoin(self.kernel_url, f"{self.executor_iface_version}/worker/unregister"),
+                    data={"name": access_code,"endpoint": self.get_reg_endpoint()}
+                )
+                if not response.ok or response.text == "Failed":
+                    raise RuntimeWarning()
+                else:
+                    logger.info(f"Unregistered {access_code} from kernel.")
+                    self.registered = False
+            except requests.exceptions.ConnectionError as e:
+                logger.warning(f"Failed to unregister {access_code} from kernel")
 
     @retry(tries=5, delay=1, backoff=2, jitter=(0, 1), logger=logger)
-    def _try_register(self):
+    def _try_register(self, access_code):
         resp = requests.post(
             url=urljoin(self.kernel_url, f"{self.executor_iface_version}/worker/register"),
-            data={"name": self.LLM_name, "endpoint": self.get_reg_endpoint()}
+            data={"name": access_code, "endpoint": self.get_reg_endpoint()}
         )
         if not resp.ok or resp.text == "Failed":
             raise RuntimeWarning("The server failed to register to kernel.")
@@ -177,8 +178,9 @@ class LLMExecutor:
         self.registered = False
         if not self.ignore_kernel:
             try:
-                self._try_register()
-                logger.info(f"Registered with the name \"{self.LLM_name}\"")
+                for access_code in self.LLM_name:
+                    self._try_register(access_code)
+                    logger.info(f"Registered with the name \"{access_code}\"")
                 self.registered = True
 
             except Exception as e:

@@ -21,11 +21,12 @@ then
     add_executor
 fi
 
+IFS=';' read -r -a EXECUTOR_ACCESS_CODE_ARR <<< "${EXECUTOR_ACCESS_CODE}"
 if [ -z "${CUSTOM_EXECUTOR_PATH:-}" ]
 then
 exec kuwa-executor ${EXECUTOR_TYPE} \
     --kernel_url ${KERNEL_URL} \
-    --access_code ${EXECUTOR_ACCESS_CODE} \
+    --access_code ${EXECUTOR_ACCESS_CODE_ARR[@]} \
     $@ 2>&1
 else
 dir_name="$(dirname "${CUSTOM_EXECUTOR_PATH}")"
@@ -33,5 +34,6 @@ file_name="$(basename "${CUSTOM_EXECUTOR_PATH}")"
 cd ${dir_name}
 exec python "${file_name}" \
     --kernel_url ${KERNEL_URL} \
+    --access_code ${EXECUTOR_ACCESS_CODE_ARR[@]} \
     $@ 2>&1
 fi

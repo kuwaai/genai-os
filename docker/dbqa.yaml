@@ -14,7 +14,7 @@ services:
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--access_code", "db-qa"
+      #"--model", "gemini-pro"
       "--database", "/var/database"
       ]
     restart: unless-stopped
