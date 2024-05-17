@@ -1,0 +1,24 @@
+services:
+  searchqa-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      CUSTOM_EXECUTOR_PATH: ./docqa/searchqa.py
+      EXECUTOR_ACCESS_CODE: search-qa
+      EXECUTOR_NAME: SearchQA
+    depends_on:
+      - kernel
+      - multi-chat
+    command: [
+      "--api_base_url", "http://web/",
+      "--model", "gemini-pro",
+      "--google_api_key", "<YOUR_GOOGLE_API_KEY>",
+      "--google_cse_id", "<YOUR_GOOGLE_CUSTOM_SEARCH_ENGINE_ID>",
+      #"--restricted_sites", "example.tw;example.com"
+      ]
+    extra_hosts:
+      - "localhost:host-gateway"
+    restart: unless-stopped
+    networks: ["backend", "frontend"]

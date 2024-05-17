@@ -1,22 +1,21 @@
 services:
-  docqa-executor:
+  dbqa-executor:
     build:
-      context: ../
+      context: ../../
       dockerfile: docker/executor/Dockerfile
     image: kuwa-executor
     environment:
       CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
-      EXECUTOR_ACCESS_CODE: doc-qa;web-qa
-      EXECUTOR_NAME: DocQA;WebQA
+      EXECUTOR_ACCESS_CODE: db-qa
+      EXECUTOR_NAME: DB QA
+    volumes: [ "</path/to/vector-database>:/var/database" ]
     depends_on:
       - kernel
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--model", "llama3",
-      #"--model", "gemini-pro"
+      "--model", "gemini-pro"
+      "--database", "/var/database"
       ]
-    extra_hosts:
-      - "localhost:host-gateway"
     restart: unless-stopped
     networks: ["backend", "frontend"]

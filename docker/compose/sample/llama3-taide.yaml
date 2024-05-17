@@ -1,0 +1,25 @@
+services:
+  llama3-taide-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: huggingface
+      EXECUTOR_ACCESS_CODE: llama3-taide-lx-8b-chat
+      EXECUTOR_NAME: Meta Llama3 TAIDE LX 8B Chat
+      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+    depends_on:
+      - kernel
+      - multi-chat
+    command: ["--model_path", "taide/Llama3-TAIDE-LX-8B-Chat-Alpha1", "--stop", "<|eot_id|>", "--visible_gpu", "0,1"]
+    restart: unless-stopped
+    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+    networks: ["backend"]

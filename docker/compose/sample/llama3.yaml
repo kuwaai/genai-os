@@ -1,0 +1,25 @@
+services:
+  llama3-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: huggingface
+      EXECUTOR_ACCESS_CODE: llama3-8b-instruct
+      EXECUTOR_NAME: Meta LLaMA2 8B Instruct
+      # HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+    depends_on:
+      - kernel
+      - multi-chat
+    command: ["--model_path", "NousResearch/Meta-Llama-3-8B-Instruct", "--no_system_prompt", "--stop", "<|eot_id|>"]
+    restart: unless-stopped
+    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+    networks: ["backend"]
