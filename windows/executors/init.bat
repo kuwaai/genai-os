@@ -124,6 +124,11 @@ if "taide"=="!current_folder!" (
 	
 	set /p "restricted_sites=Enter the restricted sites (Optional, septate by ;) :"
 	goto skip_selection
+) else if "ollama" == "!current_folder!" (
+	REM not quick
+	if "%1" == "quick" (
+		exit /b 0
+	)
 )
 
 REM Check if the current folder matches any option
