@@ -6,6 +6,7 @@ import json
 import typing
 import pprint
 import argparse
+import asyncio
 from functools import lru_cache
 from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -82,7 +83,31 @@ class OllamaExecutor(LLMExecutor):
             host = self.ollama_host
         )
 
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.prepare_model())
+
         self.proc = False
+    
+    async def prepare_model(self):
+        try:
+            await self.client.show(self.model_name)
+        except ollama.ResponseError as e:
+            logger.warning(f"Error querying model {self.model_name}: {e.error}")
+            if e.status_code == 404:
+                logger.info(f"Model {self.model_name} not found. Trying to pull it.")
+                await self.pull_model()
+
+    async def pull_model(self):
+        progress = await self.client.pull(self.model_name, stream=True)
+        last_status_line = ""
+        async for i in progress:
+            status_line = f"Pulling model {self.model_name}: {i['status']}"
+            if 'completed' in i:
+                progress = int(i['completed'])/int(i['total'])
+                status_line += " [{0: <10}] {1:.0f}%".format('#'*int(progress*10), progress*100)
+            if status_line != last_status_line:
+                logger.info(status_line)
+                last_status_line = status_line
 
     @lru_cache
     def compile_template(self, chat_template:str):
