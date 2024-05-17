@@ -43,4 +43,4 @@ volumes:
 
 secrets:
   db-password:
-    file: .db-password
+    file: ../.db-password
