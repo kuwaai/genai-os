@@ -157,7 +157,7 @@
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
                             <label
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white cursor-pointer bg-gray-600 hover:bg-gray-800 p-2 rounded-lg"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white cursor-pointer bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-800 p-2 rounded-lg"
                                 onclick="$('.modelfile-toggle').toggle(); adjustTextareaRows($('#modelfile'))"
                                 for="modelfile">{{ __('store.bot.modelfile') }}</label>
                             <div class="flex items-center">
