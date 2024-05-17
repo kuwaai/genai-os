@@ -70,7 +70,7 @@ WORKDIR /usr/local/bin
 RUN chmod +x docker-entrypoint multi-chat
 
 # Setup the entry point
-ENV KUWA_MULTI_CHAT_VERSION="0.3.0-beta1-docker1"
+ENV KUWA_MULTI_CHAT_VERSION="0.3.0-r1-docker1"
 
 ENV KUWA_KERNEL_URL="http://kernel:9000"
 ENV APP_URL="http://localhost/"
