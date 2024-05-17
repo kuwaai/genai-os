@@ -142,3 +142,6 @@ pushd "docqa"
 pip install -r requirements.txt
 popd
 popd
+pushd "..\src\toolchain"
+pip install -r requirements.txt 
+popd
