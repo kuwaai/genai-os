@@ -60,11 +60,11 @@ if "taide"=="!current_folder!" (
 	echo Init dbQA
 	echo EXECUTOR_TYPE=custom
 	echo EXECUTOR_NAME=dbQA
-	echo EXECUTOR_ACCESS_CODE=dbqa
+	echo EXECUTOR_ACCESS_CODE=db_qa
 	
 	set "EXECUTOR_TYPE=custom"
 	set "EXECUTOR_NAME=dbQA"
-	set "EXECUTOR_ACCESS_CODE=dbqa"
+	set "EXECUTOR_ACCESS_CODE=db_qa"
 	set "worker_path=docqa.py"
 	for /d %%i in (*) do (
 		echo "Folder detected, using founded folder."
@@ -96,11 +96,11 @@ if "taide"=="!current_folder!" (
 	echo Init SearchQA
 	echo EXECUTOR_TYPE=custom
 	echo EXECUTOR_NAME=SearchQA
-	echo EXECUTOR_ACCESS_CODE=searchqa
+	echo EXECUTOR_ACCESS_CODE=search_qa
 	
 	set "EXECUTOR_TYPE=custom"
 	set "EXECUTOR_NAME=SearchQA"
-	set "EXECUTOR_ACCESS_CODE=searchqa"
+	set "EXECUTOR_ACCESS_CODE=search_qa"
 	set "worker_path=searchqa.py"
 
 	REM not quick

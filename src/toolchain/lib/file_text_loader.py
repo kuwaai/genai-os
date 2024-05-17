@@ -3,7 +3,7 @@ from typing import List, Optional
 from pathlib import Path
 
 from langchain.docstore.document import Document
-from langchain.document_loaders.text import TextLoader
+from langchain_community.document_loaders.text import TextLoader
 import trafilatura
 import textract
 from magika import Magika
