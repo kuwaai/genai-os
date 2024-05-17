@@ -53,7 +53,7 @@ class OllamaExecutor(LLMExecutor):
 
     def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
-        model_group.add_argument('--ollama_host', default=self.ollama_host, help='The host of the Ollama server. e.g. http://127.0.0.1:11434')
+        model_group.add_argument('--ollama_host', default=self.ollama_host, help='The host of the Ollama server. e.g. 192.168.1.1:11434')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://ollama.com/library')
         model_group.add_argument('--context_window', type=int, default=self.context_window, help='The context window of the model')
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
