@@ -104,6 +104,8 @@ class DocQaExecutor(LLMExecutor):
     async def llm_compute(self, data):
         chat_history = json.loads(data.get("input"))
         auth_token = data.get("user_token") or self.args.api_key
+        parsed_modelfile = self.parse_modelfile(data.get("modelfile", "[]"))
+        override_qa_prompt = parsed_modelfile.override_system_prompt
         url = None
 
         try:
@@ -113,7 +115,12 @@ class DocQaExecutor(LLMExecutor):
             
                 chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
             self.proc = True
-            response_generator = self.docqa.process(urls=[url], chat_history=chat_history, auth_token=auth_token)
+            response_generator = self.docqa.process(
+                urls=[url],
+                chat_history=chat_history,
+                auth_token=auth_token,
+                override_qa_prompt=override_qa_prompt
+            )
             async for reply in response_generator:
                 if not self.proc:
                     await response_generator.aclose()

@@ -43,20 +43,21 @@ class DocQa:
       self.pre_build_db = False
       self.document_store:DocumentStore = document_store
   
-  def generate_llm_input(self, task, question, related_docs):
+  def generate_llm_input(self, task, question, related_docs, override_prompt:str=None):
     
     template_path = f'lang/{self.lang}/prompt_template/llm_input_{task}.mustache'
     llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
       'question': question,
-      'ref': self.with_ref
+      'ref': self.with_ref,
+      'override_prompt': override_prompt
     })
 
     return llm_input
 
-  def replace_chat_history(self, chat_history:[dict], task:str, question:str, related_docs:[str]):
-    llm_input = self.generate_llm_input(task, question, related_docs)
+  def replace_chat_history(self, chat_history:[dict], task:str, question:str, related_docs:[str], override_prompt:str):
+    llm_input = self.generate_llm_input(task, question, related_docs, override_prompt)
     modified_chat_history = chat_history[:-1] + [{"isbot": False, "msg": llm_input}]
     if modified_chat_history[0]["msg"] is None:
       if len(modified_chat_history) != 2: # Multi-round
@@ -103,7 +104,7 @@ class DocQa:
     await document_store.from_documents(docs)
     return document_store
 
-  async def process(self, urls: Iterable, chat_history: [dict], auth_token=None) -> Generator[str, None, None]:
+  async def process(self, urls: Iterable, chat_history: [dict], auth_token=None, override_qa_prompt:str=None) -> Generator[str, None, None]:
 
     final_user_input = self.get_final_user_input(chat_history)
 
@@ -138,13 +139,13 @@ class DocQa:
     # Shortcut
     if docs != None:
       related_docs = docs
-      modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
+      modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs, override_prompt=override_qa_prompt)
 
     if docs == None or self.llm.is_too_long(modified_chat_history):
       # Retrieve
       related_docs = copy.deepcopy(await document_store.retrieve(question))
       while True:
-        modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs)
+        modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs, override_prompt=override_qa_prompt)
         if not self.llm.is_too_long(modified_chat_history): break
         related_docs = related_docs[:-1]
 
@@ -153,7 +154,7 @@ class DocQa:
     gc.collect()
 
     # Generate
-    llm_input = self.generate_llm_input(task, llm_question, related_docs)
+    llm_input = self.generate_llm_input(task, llm_question, related_docs, override_prompt=override_qa_prompt)
     self.logger.info('LLM input: {}'.format(llm_input))
     # result = ''
     generator = self.llm.chat_complete(

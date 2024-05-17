@@ -173,6 +173,8 @@ class SearchQaExecutor(LLMExecutor):
     async def llm_compute(self, data):
         chat_history = json.loads(data.get("input"))
         auth_token = data.get("user_token") or self.args.api_key
+        parsed_modelfile = self.parse_modelfile(data.get("modelfile", "[]"))
+        override_qa_prompt = parsed_modelfile.override_system_prompt
 
         try:
         
@@ -181,7 +183,12 @@ class SearchQaExecutor(LLMExecutor):
             if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
         
             self.proc = True
-            response_generator = self.docqa.process(urls=[u for u,t in urls], chat_history=chat_history, auth_token=auth_token)
+            response_generator = self.docqa.process(
+                urls=[u for u,t in urls],
+                chat_history=chat_history,
+                auth_token=auth_token,
+                override_qa_prompt=override_qa_prompt
+            )
             async for reply in response_generator:
                 if not self.proc:
                     await response_generator.aclose()
