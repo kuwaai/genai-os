@@ -368,7 +368,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		set command=!command! "--google_api_key" "!google_api_key!"
 	)
 	if DEFINED google_cse_id (
-		set command=!command! "--google_cse_id" "!google_cse_id!""
+		set command=!command! "--google_cse_id" "!google_cse_id!"
 	)
 	if DEFINED restricted_sites (
 		set command=!command! "--restricted_sites" "!restricted_sites!"
