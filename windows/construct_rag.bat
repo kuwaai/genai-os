@@ -1,4 +1,5 @@
 @echo off
+if not defined in_subprocess (cmd /U /k set in_subprocess=y ^& %0 %* & exit)
 setlocal EnableDelayedExpansion
 
 cd /D "%~dp0"
@@ -17,6 +18,7 @@ if "!TARGET!"=="" (
     exit /b 0
 )
 for %%f in ("!TARGET!") do set "database_name=%%~nxf"
+set "access_code=db-qa-!database_name!"
 echo "Database name: !database_name!"
 mkdir ".\executors\!database_name!"
 
@@ -41,11 +43,11 @@ set target_access_code=
 
 echo EXECUTOR_TYPE=custom
 echo EXECUTOR_NAME=!database_name!
-echo EXECUTOR_ACCESS_CODE=!database_name!
+echo EXECUTOR_ACCESS_CODE=!access_code!
 
 set "EXECUTOR_TYPE=custom"
 set "EXECUTOR_NAME=!database_name!"
-set "EXECUTOR_ACCESS_CODE=!database_name!"
+set "EXECUTOR_ACCESS_CODE=!access_code!"
 set "worker_path=docqa.py"
 for /d %%i in (*) do (
     echo "Folder detected, using founded folder."

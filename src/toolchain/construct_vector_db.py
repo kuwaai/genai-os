@@ -3,6 +3,8 @@
 import argparse
 import logging
 import sys
+import os
+import tempfile
 from dotenv import load_dotenv, find_dotenv
 from langchain_community.document_loaders import DirectoryLoader
 sys.path.append(".")
@@ -25,11 +27,15 @@ def construct_db(
     Construct vector database from local documents and save to the destination.
     """
 
-    loader = DirectoryLoader(docs_path,
-                         recursive=True,
-                         loader_cls=FileTextLoader,
-                         use_multithreading=True,
-                         show_progress=True)
+    loader = None
+    if os.path.isdir(docs_path):
+        loader = DirectoryLoader(docs_path,
+                            recursive=True,
+                            loader_cls=FileTextLoader,
+                            use_multithreading=True,
+                            show_progress=True)
+    else:
+        loader = FileTextLoader(file_path=docs_path)
     logger.info(f'Loading documents...')
     docs = loader.load()
     logger.debug(docs)
@@ -44,7 +50,9 @@ def construct_db(
     logger.info(f'Constructing vector store...')
     db.from_documents(chunks)
     logger.info(f'Vector store constructed.')
-    db.save(output_path)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        db.save(tmpdirname)
+        os.replace(tmpdirname, output_path)
     logger.info(f'Saved vector store to {output_path}.')
 
 if __name__ == '__main__':
