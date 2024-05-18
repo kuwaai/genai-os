@@ -1,5 +1,5 @@
 @echo off
-if not defined in_subprocess (cmd /U /k set in_subprocess=y ^& %0 %* & exit)
+if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* & exit)
 setlocal EnableDelayedExpansion
 
 cd /D "%~dp0"
@@ -28,7 +28,7 @@ popd
 
 REM Setup the executor
 
-cd ".\executors\!database_name!"
+pushd ".\executors\!database_name!"
 REM Remove variables
 set EXECUTOR_TYPE=
 set EXECUTOR_NAME=
@@ -113,4 +113,7 @@ echo !command!>> run.bat
 echo popd>> run.bat
 
 echo Configuration saved to run.bat
+
+popd
 pause
+exit
