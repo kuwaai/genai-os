@@ -20,6 +20,7 @@ for /l %%i in (1,1,%numWorkers%) do (
     start /b packages\%php_folder%\php.exe ..\src\multi-chat\artisan queue:work --verbose --timeout=6000
 )
 
+:launch_kernel_and_executors
 REM Kernel
 pushd "..\src\kernel"
 del records.pickle
@@ -62,6 +63,9 @@ if not "!exclude_access_codes!"=="" (
 	call ..\..\windows\packages\!php_folder!\php.exe artisan model:prune --force !exclude_access_codes!
 	popd
 )
+if defined web_started (
+    goto loop
+)
 
 REM Start web
 start http://127.0.0.1
@@ -76,11 +80,12 @@ pushd "packages\%nginx_folder%"
 echo "Nginx started!"
 start /b .\nginx.exe
 popd
+set "web_started=True"
 
 REM Loop to wait for commands
 :loop
 set userInput=
-set /p userInput=Enter a command (stop, seed, hf login): 
+set /p userInput=Enter a command (stop, seed, hf login, reload): 
 
 if /I "%userInput%"=="stop" (
     echo Stopping everything...
@@ -93,6 +98,10 @@ if /I "%userInput%"=="stop" (
     echo Running huggingface login command...
     call src\migration\20240403_login_huggingface.bat
     goto loop
+) else if /I "%userInput%"=="reload" (
+    echo Reloading kernel and executors...
+    taskkill /F /IM "python.exe"
+    goto launch_kernel_and_executors
 ) else (
     goto loop
 )
