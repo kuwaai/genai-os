@@ -1,6 +1,6 @@
 <?php
 
-vrátit [
+return [
     'route' => 'Obchod',
     'button.create' => 'Vytvořit bota',
     'label.offical_bots' => 'Systémové boty',
