@@ -370,11 +370,11 @@ class RoomController extends Controller
             if ($firstUrl) {
                 $tmp = $this->getWebPageTitle($firstUrl);
                 if ($tmp != '') {
-                    $chatname = $tmp;
+                    $chatname = rawurldecode($tmp);
                 } else {
                     $tmp = $this->getFilenameFromURL($firstUrl);
                     if ($tmp != '') {
-                        $chatname = $tmp;
+                        $chatname = rawurldecode($tmp);
                     }
                 }
             }
