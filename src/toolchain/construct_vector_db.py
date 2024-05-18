@@ -50,9 +50,10 @@ def construct_db(
     logger.info(f'Constructing vector store...')
     db.from_documents(chunks)
     logger.info(f'Vector store constructed.')
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        db.save(tmpdirname)
-        os.replace(tmpdirname, output_path)
+    #with tempfile.TemporaryDirectory() as tmpdirname:
+    #    db.save(tmpdirname)
+    #    os.replace(tmpdirname, output_path)
+    db.save(output_path)
     logger.info(f'Saved vector store to {output_path}.')
 
 if __name__ == '__main__':
