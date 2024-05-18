@@ -114,3 +114,4 @@ echo popd>> run.bat
 
 echo Configuration saved to run.bat
 pause
+exit
