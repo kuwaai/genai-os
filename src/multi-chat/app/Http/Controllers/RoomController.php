@@ -275,7 +275,7 @@ class RoomController extends Controller
                             }
                         }
                         ImportChat::dispatch($ids, Auth::user()->id);
-                        return Redirect::route('room.chat', $Room->id)->with('selLLMs', $bot_ids->pluck('id'));
+                        return Redirect::route('room.chat', $Room->id)->with('selLLMs', $bot_ids->pluck('id')->toarray());
                     }
                 }
             }

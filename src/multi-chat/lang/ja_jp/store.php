@@ -1,4 +1,3 @@
-```php
 <?php
 
 return [
@@ -32,4 +31,3 @@ return [
     'bot.after_prompt.label' => 'このプロンプトは、推論中にユーザーのプロンプトの後に追加されます',
     'bot.button.chat' => 'チャット',
 ];
-```
