@@ -4,6 +4,7 @@ import argparse
 import logging
 import sys
 import os
+import tempfile
 from dotenv import load_dotenv, find_dotenv
 from langchain_community.document_loaders import DirectoryLoader
 sys.path.append(".")
@@ -49,7 +50,9 @@ def construct_db(
     logger.info(f'Constructing vector store...')
     db.from_documents(chunks)
     logger.info(f'Vector store constructed.')
-    db.save(output_path)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        db.save(tmpdirname)
+        os.replace(tmpdirname, output_path)
     logger.info(f'Saved vector store to {output_path}.')
 
 if __name__ == '__main__':
