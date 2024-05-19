@@ -82,7 +82,9 @@
      cp .env.dev .env
      cd executables/sh
      ./production_update.sh
-     cd ../kernel
+     cd ../../../kernel
+     pip install -r requirement.txt
+     cd ../executor
      pip install -r requirement.txt
      sudo chown -R $(whoami):www-data /var/www/html
      ```
@@ -92,7 +94,9 @@
      copy .env.dev .env
      cd executable/bat
      ./production_update.bat
-     cd ../kernel
+     cd ../../../kernel
+     pip install -r requirement.txt
+     cd ../executor
      pip install -r requirement.txt
      ```
 
@@ -102,7 +106,6 @@
    - 範例設置文件: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
    - 推薦設置:
      - 為了RAG應用，PHP 最大上傳文件大小設置為至少 10MB。
-     - 避免一些較慢的RAG或攏長的模型輸出，將Timeout設置為至少 120 秒或更長時間。
 
 4. **設定 Redis:**
    - 確保已安裝並執行 Redis 伺服器。
