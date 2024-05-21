@@ -49,6 +49,7 @@
         $result = App\Models\Bots::Join('llms', function ($join) {
             $join->on('llms.id', '=', 'bots.model_id');
         })
+            ->where('llms.enabled', '=', true)
             ->select(
                 'llms.*',
                 'bots.*',
@@ -71,37 +72,72 @@
                     ->from('chats')
                     ->selectRaw("group_concat(bot_id, ',') as identifier")
                     ->whereColumn('roomID', 'chatrooms.id')
-                    ->orderBy('bot_id');
+                    ->orderByRaw('bot_id');
             } elseif (config('database.default') == 'mysql') {
                 $query
                     ->from('chats')
-                    ->selectRaw('group_concat(bot_id separator \',\') as identifier')
+                    ->selectRaw('group_concat(bot_id separator \',\' order by bot_id) as identifier')
                     ->whereColumn('roomID', 'chatrooms.id');
             } elseif (config('database.default') == 'pgsql') {
                 $query
                     ->from('chats')
-                    ->selectRaw('string_agg(bot_id::text, \',\') as identifier')
+                    ->selectRaw('string_agg(bot_id::text, \',\' order by bot_id) as identifier')
                     ->whereColumn('roomID', 'chatrooms.id');
             }
         }, 'identifier');
 
         // Get the final result and group by the ordered identifiers
         $DC = $DC->get()->groupBy('identifier');
+
         try {
             if (!session('llms')) {
                 $identifier = collect(Illuminate\Support\Arr::flatten($DC->toarray(), 1))
                     ->where('id', '=', request()->route('room_id'))
                     ->first()['identifier'];
                 $DC = $DC[$identifier];
-                $llms = App\Models\LLMs::whereIn('id', array_map('intval', explode(',', trim($identifier, '{}'))))
-                    ->orderby('id')
+                $llms = App\Models\Bots::whereIn('bots.id', array_map('intval', explode(',', $identifier)))
+                    ->join('llms', function ($join) {
+                        $join->on('llms.id', '=', 'bots.model_id');
+                    })
+                    ->select(
+                        'llms.*',
+                        'bots.*',
+                        DB::raw('COALESCE(bots.description, llms.description) as description'),
+                        DB::raw('COALESCE(bots.config, llms.config) as config'),
+                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                    )
+                    ->orderby('bots.id')
                     ->get();
             } else {
-                $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();
-                $DC = $DC[implode(',', array_reverse($llms->pluck('id')->toArray()))];
+                $llms = App\Models\Bots::whereIn('bots.id', session('llms'))
+                    ->Join('llms', function ($join) {
+                        $join->on('llms.id', '=', 'bots.model_id');
+                    })
+                    ->select(
+                        'llms.*',
+                        'bots.*',
+                        DB::raw('COALESCE(bots.description, llms.description) as description'),
+                        DB::raw('COALESCE(bots.config, llms.config) as config'),
+                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                    )
+                    ->orderby('bots.id')
+                    ->get();
+                $DC = $DC[implode(',', $llms->pluck('id')->toArray())];
             }
         } catch (Exception $e) {
-            $llms = App\Models\LLMs::whereIn('id', session('llms'))->orderby('id')->get();
+            $llms = App\Models\Bots::whereIn('bots.id', session('llms'))
+                ->Join('llms', function ($join) {
+                    $join->on('llms.id', '=', 'bots.model_id');
+                })
+                ->select(
+                    'llms.*',
+                    'bots.*',
+                    DB::raw('COALESCE(bots.description, llms.description) as description'),
+                    DB::raw('COALESCE(bots.config, llms.config) as config'),
+                    DB::raw('COALESCE(bots.image, llms.image) as image'),
+                )
+                ->orderby('bots.id')
+                ->get();
             $DC = null;
         }
     @endphp
