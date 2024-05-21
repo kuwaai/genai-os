@@ -8,21 +8,7 @@
 @endif
 <div id="chatHeader"
     class="bg-gray-300 dark:bg-gray-900/70 p-2 sm:p-4 h-20 text-gray-700 dark:text-white items-center flex">
-    @if ($readonly)
-        @foreach ($llms as $chat)
-            <div
-                class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                <img data-tooltip-target="llm_{{ $chat->id }}_chat" data-tooltip-placement="top"
-                    class="h-full w-full"
-                    src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                <div id="llm_{{ $chat->id }}_chat" role="tooltip"
-                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ $chat->name }}
-                    <div class="tooltip-arrow" data-popper-arrow></div>
-                </div>
-            </div>
-        @endforeach
-    @else
+    @if (!$readonly)
         <button
             class="block sm:hidden text-center text-black hover:text-black dark:text-white hover:text-gray-300 hover:bg-gray-400 dark:bg-gray-800 dark:hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-5 focus:outline-none dark:focus:ring-blue-800"
             type="button" data-drawer-target="chatlist_drawer" data-drawer-show="chatlist_drawer"
