@@ -19,7 +19,7 @@ REM Download and extract xpdfreader if not exists
 call src\download_extract.bat %url_XpdfReader% packages\%xpdfreader_folder% packages\. xpdfreader.zip
 
 REM Download and extract antiword if not exists
-call src\download_extract.bat %url_antiword% packages\%antiword_folder% packages\. xpdfreader.zip
+call src\download_extract.bat %url_antiword% packages\%antiword_folder% packages\. antiword.zip
 
 REM Download and extract git bash if not exists
 git --version >nul 2>&1
