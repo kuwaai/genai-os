@@ -346,7 +346,18 @@ class RoomController extends Controller
         $llms = $request->input('llm');
         $selectedLLMs = $request->input('chatsTo');
         if (count($selectedLLMs) > 0 && count($llms) > 0) {
-            $result = Bots::pluck('bots.id')->toarray();
+            $result = Bots::wherein(
+                'model_id',
+                DB::table('group_permissions')
+                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                    ->where('group_permissions.group_id', Auth::user()->group_id)
+                    ->where('permissions.name', 'like', 'model_%')
+                    ->get()
+                    ->pluck('model_id'),
+            )
+                ->pluck('bots.id')
+                ->toarray();
 
             foreach ($llms as $i) {
                 if (!in_array($i, $result)) {
@@ -410,7 +421,18 @@ class RoomController extends Controller
     {
         $llms = $request->input('llm');
         if (request()->user()->hasPerm('Room_update_new_chat') && count($llms) > 0) {
-            $result = Bots::pluck('id')->toarray();
+            $result = Bots::wherein(
+                'model_id',
+                DB::table('group_permissions')
+                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                    ->where('group_permissions.group_id', Auth::user()->group_id)
+                    ->where('permissions.name', 'like', 'model_%')
+                    ->get()
+                    ->pluck('model_id'),
+            )
+                ->pluck('bots.id')
+                ->toarray();
 
             foreach ($llms as $i) {
                 if (!in_array($i, $result)) {
