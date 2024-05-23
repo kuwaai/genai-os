@@ -22,6 +22,16 @@
                 $bots = App\Models\Bots::Join('llms', function ($join) {
                     $join->on('llms.id', '=', 'bots.model_id');
                 })
+            ->wherein(
+                'bots.model_id',
+                DB::table('group_permissions')
+                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                    ->where('group_permissions.group_id', Auth::user()->group_id)
+                    ->where('permissions.name', 'like', 'model_%')
+                    ->get()
+                    ->pluck('model_id'),
+            )
             ->where('llms.enabled', '=', true)
                     ->select(
                         'llms.*',
