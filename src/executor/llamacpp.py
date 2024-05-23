@@ -125,15 +125,12 @@ class LlamaCppExecutor(LLMExecutor):
         self.stop_words = list(set([eos_token] + self.args.stop))
         
         # Setup the handler
-        chat_handler = self.model.chat_handler or llama_chat_format.get_chat_completion_handler(
-            self.model.chat_format
-        )
         if self.args.override_chat_template:
             chat_handler = llama_chat_format.Jinja2ChatFormatter(
                     template=self.args.override_chat_template, eos_token=eos_token, bos_token=bos_token
                 ).to_chat_handler()
-        self.model.chat_handler = chat_handler
-        
+            self.model.chat_handler = chat_handler
+
         # Setup generation config
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
         arg_gconf = {

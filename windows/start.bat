@@ -50,9 +50,9 @@ for /D %%d in ("executors\*") do (
 
         rem Collect existing access code
         if "!exclude_access_codes!"=="" (
-            set "exclude_access_codes=--exclude=!EXECUTOR_ACCESS_CODE!"
+            set "exclude_access_codes=--exclude="!EXECUTOR_ACCESS_CODE!""
         ) else (
-            set "exclude_access_codes=!exclude_access_codes! --exclude=!EXECUTOR_ACCESS_CODE!"
+            set "exclude_access_codes=!exclude_access_codes! --exclude="!EXECUTOR_ACCESS_CODE!""
         )
     ) 
     popd

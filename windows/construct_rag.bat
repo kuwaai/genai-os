@@ -113,6 +113,7 @@ echo !command!>> run.bat
 echo popd>> run.bat
 
 echo Configuration saved to run.bat
+echo You can now back to the console of Kuwa GenAI OS and type "reload" to reload executors.
 
 popd
 pause

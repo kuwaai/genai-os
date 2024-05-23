@@ -4,12 +4,23 @@
             $join->on('llms.id', '=', 'bots.model_id');
         })
             ->where('llms.enabled', '=', true)
+            ->wherein(
+                'bots.model_id',
+                DB::table('group_permissions')
+                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                    ->where('group_permissions.group_id', Auth::user()->group_id)
+                    ->where('permissions.name', 'like', 'model_%')
+                    ->get()
+                    ->pluck('model_id'),
+            )
             ->select(
                 'llms.*',
                 'bots.*',
                 DB::raw('COALESCE(bots.description, llms.description) as description'),
                 DB::raw('COALESCE(bots.config, llms.config) as config'),
                 DB::raw('COALESCE(bots.image, llms.image) as image'),
+                'llms.name as llm_name',
             )
             ->orderby('llms.order')
             ->orderby('bots.created_at')

@@ -47,6 +47,13 @@ for %%I in ("%url_XpdfReader%") do set "filename_XpdfReader=%%~nxI"
 set "xpdfreader_folder=%filename_XpdfReader:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_XpdfReader%") do set "version_XpdfReader=%%v"
 
+REM Variables for Antiword
+set "url_antiword=https://dl.kuwaai.org/packages/antiword/antiword-0.37-windows.zip"
+for %%I in ("%url_antiword%") do set "filename_antiword=%%~nxI"
+set "antiword_folder=%filename_antiword:~0,-4%"
+for /f "tokens=2 delims=-" %%v in ("%filename_antiword%") do set "version_antiword=%%v"
+set "HOME=%~dp0..\packages\%antiword_folder%\"
+
 REM Variables for git bash
 set "url_gitbash=https://github.com/git-for-windows/git/releases/download/v2.45.1.windows.1/PortableGit-2.45.1-64-bit.7z.exe"
 for %%I in ("%url_gitbash%") do set "filename_gitbash=%%~nxI"
@@ -63,7 +70,7 @@ REM Prepare packages folder
 mkdir packages 2>nul
 
 REM init env
-set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%PATH%"
+set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\bin;%PATH%"
 REM Run migration
 for %%i in ("src\migration\*.bat") do (
     findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (
