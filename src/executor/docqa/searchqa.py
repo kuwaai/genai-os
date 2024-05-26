@@ -111,7 +111,7 @@ class SearchQaExecutor(LLMExecutor):
         finally:
             return resp != None and resp.ok
 
-    async def search_url(self, chat_history: [dict]) -> ([dict[str, str]],[str]):
+    async def search_url(self, chat_history: [dict], parsed_modelfile) -> ([dict[str, str]],[str]):
         """
         Get first URL from the search result.
         """
@@ -122,7 +122,9 @@ class SearchQaExecutor(LLMExecutor):
         latest_user_record = next(filter(lambda x: not x["isbot"], reversed(chat_history)))
         latest_user_msg = latest_user_record["msg"]
 
-        query = latest_user_msg
+        before_prompt = parsed_modelfile.before_prompt
+        after_prompt = parsed_modelfile.after_prompt
+        query = "{} {} {}".format(before_prompt, latest_user_msg, after_prompt)
         query += ''.join([f' site:{s.strip()}' for s in restricted_sites])
         query += ''.join([f' -site:{s.strip()}' for s in blocked_sites])
         
@@ -178,7 +180,7 @@ class SearchQaExecutor(LLMExecutor):
 
         try:
         
-            urls, chat_history = await self.search_url(chat_history)
+            urls, chat_history = await self.search_url(chat_history, parsed_modelfile)
 
             if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
         
