@@ -19,7 +19,7 @@ class NoUrlException(Exception):
     def __str__(self):
         return self.msg
 
-class BrowserExecutor(LLMExecutor):
+class RetrieverExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
 
