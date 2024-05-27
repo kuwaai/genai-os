@@ -18,9 +18,10 @@
             @if (count($llms) > 1)
                 <div
                     class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
+                    <input name="mode_track" value="0" hidden>
                     <div id="send_to_mode"
                         class="cursor-pointer text-black dark:text-white bg-gray-200 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 px-2 py-1 rounded-lg mr-2"
-                        onclick="$(this).next().find('>div').each((e,i)=>{$(i).toggle()}); $(this).text($(this).next().find('>div:eq(0)').attr('style') == '' ? '{{ __('chat.label.multiple_send') }}' : '{{ __('chat.label.direct_send') }}')">
+                        onclick="$(this).prev().val($(this).prev().val() == '0' ? '1' : '0');$(this).next().find('>div').each((e,i)=>{$(i).toggle()}); $(this).text($(this).next().find('>div:eq(0)').attr('style') == '' ? '{{ __('chat.label.multiple_send') }}' : '{{ __('chat.label.direct_send') }}')">
                         {{ __('chat.label.multiple_send') }}</div>
                     <div class="flex flex-1 items-center overflow-hidden">
                         <div class="flex flex-1 mr-auto overflow-auto scrollbar scrollbar-3 sends">

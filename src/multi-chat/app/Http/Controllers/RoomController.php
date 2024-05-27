@@ -414,7 +414,8 @@ class RoomController extends Controller
         }
         return redirect()
             ->route('room.chat', $Room->id)
-            ->with('selLLMs', $selectedLLMs);
+            ->with('selLLMs', $selectedLLMs)
+            ->with('mode_track', request()->input('mode_track'));
     }
 
     public function new(Request $request): RedirectResponse
@@ -542,6 +543,6 @@ class RoomController extends Controller
                 }
             }
         }
-        return redirect()->route('room.chat', $roomId)->with('selLLMs', $selectedLLMs);
+        return redirect()->route('room.chat', $roomId)->with('selLLMs', $selectedLLMs)->with('mode_track', request()->input('mode_track'));
     }
 }
