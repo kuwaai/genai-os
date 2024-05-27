@@ -9,7 +9,7 @@ from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import google.generativeai as genai
 
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -96,15 +96,15 @@ class GeminiExecutor(LLMExecutor):
             google_token = data.get("google_token") or self.args.api_key
 
             # Parse and process modelfile
-            parsed = self.parse_modelfile(data.get("modelfile", "[]"))
+            parsed = Modelfile.from_json(data.get("modelfile", "[]"))
             override_system_prompt, messages = parsed.override_system_prompt, parsed.messages
             if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
 
             # Apply parsed modelfile data to Inference
             raw_inputs = messages + json.loads(data.get("input"))
             msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in raw_inputs]
-            msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
             msg[-1]["parts"][0]['text'] = parsed.before_prompt + msg[-1]["parts"][0]['text'] + parsed.after_prompt
+            msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
             
             if not google_token or len(google_token) == 0:
                 yield "[Please enter your Google API Token in the user settings of the website in order to use this model.]"
@@ -116,14 +116,15 @@ class GeminiExecutor(LLMExecutor):
             # Trim the history to fit into the context window
             while await self.count_token(msg) > self.limit:
                 msg = msg[1:]
-                msg = self.rectify_history(msg)
+                msg = rectify_chat_history(msg)
                 if len(msg) == 0:
-                    logging.debug("Aborted since the input message exceeds the limit.")
+                    logger.debug("Aborted since the input message exceeds the limit.")
                     yield "[Sorry, The input message is too long!]"
                     return
 
             quiz = msg[-1]
             history = msg[:-1]
+            logger.debug(f'msg: {msg}')
             chat = self.model.start_chat(history=history)
             self.proc = True
             response = await chat.send_message_async(

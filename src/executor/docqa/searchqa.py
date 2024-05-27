@@ -14,7 +14,7 @@ import i18n
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, Modelfile
 
 from src.docqa import DocQa
 from src.kuwa_llm_client import KuwaLlmClient
@@ -175,7 +175,7 @@ class SearchQaExecutor(LLMExecutor):
     async def llm_compute(self, data):
         chat_history = json.loads(data.get("input"))
         auth_token = data.get("user_token") or self.args.api_key
-        parsed_modelfile = self.parse_modelfile(data.get("modelfile", "[]"))
+        parsed_modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
         override_qa_prompt = parsed_modelfile.override_system_prompt
 
         try:

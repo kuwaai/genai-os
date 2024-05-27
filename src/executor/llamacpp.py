@@ -12,8 +12,15 @@ from llama_cpp import Llama
 import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
 
-from kuwa.executor import LLMExecutor, modelfile
-from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
+from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.util import (
+    expose_function_parameter,
+    read_config,
+    merge_config,
+    DescriptionParser,
+    to_openai_chat_format,
+    rectify_chat_history
+)
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +72,18 @@ class LlamaHelper:
             ).to_chat_handler()
 
         return chat_handler
+
+    @staticmethod
+    def deduplicate_bos_eos(model:Llama, prompt:str):
+        """
+        Remove the duplicated BOS and EOS token from the prompt since the
+        tokenizer will add them again.
+        """
+
+        bos_token, eos_token = LlamaHelper.get_special_token(model)
+        prompt = prompt.lstrip(bos_token)
+        prompt = prompt.rstrip(eos_token)
+        return prompt
 
 class ReflectiveLlama(Llama):
     """
@@ -192,7 +211,8 @@ class LlamaCppExecutor(LLMExecutor):
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if system_prompt: history.insert(0, {"role": "system", "content": system_prompt})
+        if not self.no_system_prompt and system_prompt:
+            history.insert(0, {"role": "system", "content": system_prompt})
 
         chat_handler = self.model.chat_handler if not template else LlamaHelper.create_chat_handler(self.model, template)
 
@@ -207,43 +227,20 @@ class LlamaCppExecutor(LLMExecutor):
         
         return prompt
 
-    def rectify_history(self, history: list):
-        """
-        Ensure the history begin with "user."
-        """
-        if len(history)==0: return history
-        first_user_idx = 0
-        while history[first_user_idx]["role"] != "user" and first_user_idx+1 < len(history)-1:
-            first_user_idx += 1
-        history = history[first_user_idx:]
-        return history
-
-    def convert_chat_history(self, history: list):
-        """
-        Convert the chat history from Kuwa's format to OpenAI's format.
-        """
-        history = [
-            {
-                "role": "assistant" if i["isbot"] else "user",
-                "content": i["msg"]
-            }
-            for i in history
-        ]
-        return history
-
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
-        history = self.convert_chat_history(history)
+        history = to_openai_chat_format(history)
 
         # Parse and process modelfile
-        modelfile = self.parse_modelfile(data.get("modelfile", "[]"))
+        modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
         system_prompt = modelfile.override_system_prompt or self.system_prompt
-        prepended_messages = self.rectify_history(self.convert_chat_history(modelfile.messages))
-        history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
-            before_prompt = modelfile.before_prompt,
-            original_prompt = history[-1]['content'],
-            after_prompt = modelfile.after_prompt
-        )
+        prepended_messages = rectify_chat_history(to_openai_chat_format(modelfile.messages))
+        if len(history) > 0 and history[-1]['role'] == "user":
+            history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
+                before_prompt = modelfile.before_prompt,
+                original_prompt = history[-1]['content'],
+                after_prompt = modelfile.after_prompt
+            )
 
         try:
             # Trim the history to fit into the context window
@@ -257,14 +254,14 @@ class LlamaCppExecutor(LLMExecutor):
                 logging.debug(f"Prompt ({prompt_length} tokens): {prompt}")
                 if prompt_length <= self.limit: break
 
-                history = self.rectify_history(history[1:])
+                history = rectify_chat_history(history[1:])
                 if len(history) == 0:
                     logging.debug("Aborted since the input message exceeds the limit.")
                     yield "[Sorry, The input message is too long!]"
                     return
             
             output_generator = self.model.create_completion(
-                prompt,
+                LlamaHelper.deduplicate_bos_eos(self.model, prompt),
                 stop=self.stop_words,
                 echo=False,
                 stream=True,

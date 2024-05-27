@@ -13,8 +13,14 @@ from threading import Thread
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 
-from kuwa.executor import LLMExecutor, modelfile
-from kuwa.executor.util import expose_function_parameter, read_config, merge_config
+from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.util import (
+    expose_function_parameter,
+    read_config,
+    merge_config,
+    to_openai_chat_format,
+    rectify_chat_history
+)
 
 logger = logging.getLogger(__name__)
 
@@ -140,18 +146,17 @@ class HuggingfaceExecutor(LLMExecutor):
         logger.debug(f"Chat template: {self.tokenizer.chat_template}")
         logger.debug(f"Generation config:\n{pprint.pformat(self.generation_config, indent=2)}")
 
-    def synthesis_prompt(self, history: list, system_prompt: str, template: str, parsed: modelfile):
+    def synthesis_prompt(self, history: list, system_prompt: str, template: str = None):
         """
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if system_prompt:
+        if not self.no_system_prompt and system_prompt:
             history.insert(0, {"role": "system", "content": system_prompt})
-        elif not self.no_system_prompt:
-            history.insert(0, {"role": "system", "content": self.system_prompt})
-        backup = self.tokenizer.chat_template
-        if template: self.tokenizer.chat_template = template
-        history[-1]['content'] = parsed.before_prompt + history[-1]['content'] + parsed.after_prompt
+
+        chat_template_backup = self.tokenizer.chat_template
+        self.tokenizer.chat_template = template or self.tokenizer.chat_template
+        prompt = None
         try:
             prompt = self.tokenizer.apply_chat_template(
                 history, tokenize=True, add_generation_prompt=True, return_tensors='pt'
@@ -159,47 +164,38 @@ class HuggingfaceExecutor(LLMExecutor):
         except Exception as e:
             logger.exception(f"Error in template `{self.tokenizer.chat_template}` with error: `{e}`")
         finally:
-            self.tokenizer.chat_template = backup
-        return prompt
+            self.tokenizer.chat_template = chat_template_backup
 
-    def rectify_history(self, history: list):
-        """
-        Ensure the history begin with "user."
-        """
-        first_user_idx = 0
-        while history[first_user_idx]["role"] != "user" and first_user_idx+1 < len(history)-1:
-            first_user_idx += 1
-        history = history[first_user_idx:]
-        return history
+        return prompt
 
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
-        # Parse and process modelfile
-        parsed = self.parse_modelfile(data.get("modelfile", "[]"))
-        override_system_prompt, messages, template = parsed.override_system_prompt, parsed.messages, parsed.template
-        if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
+        history = to_openai_chat_format(history)
 
-        messages, history = [
-            [{"role": "assistant" if record["isbot"] else "user", "content": record["msg"]} for record in data]
-            for data in (messages, history)
-        ]
-        history = self.rectify_history(history)
-        modelfile = data.get("modelfile")
-        if modelfile: modelfile = json.loads(modelfile)
+        # Parse and process modelfile
+        modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
+        system_prompt = modelfile.override_system_prompt or self.system_prompt
+        prepended_messages = rectify_chat_history(to_openai_chat_format(modelfile.messages))
+        if len(history) > 0 and history[-1]['role'] == "user":
+            history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
+                before_prompt = modelfile.before_prompt,
+                original_prompt = history[-1]['content'],
+                after_prompt = modelfile.after_prompt
+            )
 
         # Trim the history to fit into the context window
         prompt_embedding = []
         while True:
-            prompt_embedding = self.synthesis_prompt(messages + history, override_system_prompt, template, parsed)
+            prompt_embedding = self.synthesis_prompt(prepended_messages + history, system_prompt, modelfile.template)
             if prompt_embedding.shape[1] <= self.limit: break
 
-            history = self.rectify_history(history[1:])
+            history = rectify_chat_history(history[1:])
             if len(history) == 0:
                 logging.debug("Aborted since the input message exceeds the limit.")
                 yield "[Sorry, The input message is too long!]"
                 return
 
-        logging.debug(self.tokenizer.decode(prompt_embedding[0]))
+        logging.debug(f"Prompt: {self.tokenizer.decode(prompt_embedding[0])}")
         prompt_embedding = prompt_embedding.to(self.model.device)
         streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, timeout=self.timeout)
         thread = Thread(target=self.model.generate, kwargs=dict(
