@@ -79,10 +79,10 @@
                     <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" :extra="'my_bots-'" />
                 </div>
             @endif
-            @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $bots->where('visibility', '=', 1)->count() > 0)
+            @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $bots->where('owner_id', '!=', Auth::user()->id)->where('visibility', '=', 1)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.community_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 1)" :extra="'community_bots-'" />
+                    <x-store.bot-showcase :bots="$bots->where('owner_id', '!=', Auth::user()->id)->where('visibility', '=', 1)" :extra="'community_bots-'" />
                 </div>
             @endif
         </div>
