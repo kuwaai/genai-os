@@ -1,7 +1,7 @@
 services:
   llamacpp-executor:
     build:
-      context: ../
+      context: ../../
       dockerfile: docker/executor/Dockerfile
     image: kuwa-executor
     environment:

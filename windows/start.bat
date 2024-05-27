@@ -1,5 +1,6 @@
 @echo off
 cd "%~dp0"
+if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* 2^>^&1 ^| src\tee.bat logs\start.log ^& exit /b & exit /b)
 setlocal enabledelayedexpansion
 
 REM Include variables from separate file

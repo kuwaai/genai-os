@@ -1,5 +1,7 @@
 @echo off
 cd "%~dp0"
+if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* 2^>^&1 ^| src\tee.bat logs\build.log ^& exit /b & exit /b)
+
 REM Initialize everything
 call src\variables.bat
 

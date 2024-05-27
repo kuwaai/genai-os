@@ -11,8 +11,14 @@ import openai
 import tiktoken
 from openai.resources.chat.completions import AsyncCompletions
 
-from kuwa.executor import LLMExecutor
-from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
+from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.util import (
+    expose_function_parameter,
+    read_config,
+    merge_config,
+    DescriptionParser,
+    to_openai_chat_format
+)
 
 logger = logging.getLogger(__name__)
 
@@ -138,13 +144,13 @@ class ChatGptExecutor(LLMExecutor):
             openai_token = data.get("openai_token") or self.args.api_key
             
             # Parse and process modelfile
-            parsed = self.parse_modelfile(data.get("modelfile", "[]"))
+            parsed = Modelfile.from_json(data.get("modelfile", "[]"))
             override_system_prompt, messages = parsed.override_system_prompt, parsed.messages
             system_prompt = override_system_prompt or self.system_prompt
 
             # Apply parsed modelfile data to Inference
             raw_inputs = messages + json.loads(data.get("input"))
-            msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in raw_inputs]
+            msg = to_openai_chat_format(raw_inputs)
             if system_prompt is not None:
                 msg = [{"content": system_prompt, "role": "system"}] + msg
 
@@ -173,7 +179,7 @@ class ChatGptExecutor(LLMExecutor):
                 base_url=self.openai_base_url
             )
             self.proc = True
-            logger.debug(type(client.chat.completions))
+            logger.debug(f"msg: {msg}")
             response = await client.chat.completions.create(
                 model=self.model_name,
                 messages=msg,

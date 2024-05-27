@@ -12,10 +12,78 @@ from llama_cpp import Llama
 import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
 
-from kuwa.executor import LLMExecutor, modelfile
-from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
+from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.util import (
+    expose_function_parameter,
+    read_config,
+    merge_config,
+    DescriptionParser,
+    to_openai_chat_format,
+    rectify_chat_history
+)
 
 logger = logging.getLogger(__name__)
+
+class LlamaHelper:
+    """
+    Helper functions of llama-cpp-python
+    """
+
+    @staticmethod
+    def get_special_token(model: Llama):
+        """
+        Get EOS and BOS token.
+        Reference: https://github.com/abetlen/llama-cpp-python/blob/aa9f1ae011fbc22893750209af500fee3167f21c/llama_cpp/llama.py#L403
+        """
+        eos_token_id = int(model.metadata.get("tokenizer.ggml.eos_token_id", model.token_eos()))
+        bos_token_id = int(model.metadata.get("tokenizer.ggml.bos_token_id", model.token_bos()))
+        eos_token = model._model.token_get_text(eos_token_id)
+        bos_token = model._model.token_get_text(bos_token_id)
+
+        return bos_token, eos_token
+
+    @staticmethod
+    def get_chat_handler(model:Llama):
+        """
+        Get the chat handler to format the chat history.
+        Reference: https://github.com/abetlen/llama-cpp-python/blob/5a595f035a094574a9bcf153e6696369f63fb585/llama_cpp/llama.py#L1728
+        """
+        
+        chat_handler =  model.chat_handler or \
+                        model._chat_handlers.get(model.chat_format) or \
+                        llama_chat_format.get_chat_completion_handler(
+                            model.chat_format
+                        )
+        return chat_handler
+    
+    @staticmethod
+    def create_chat_handler(model:Llama, template:str):
+        """
+        Create a chat handler from the template.
+        Reference: https://github.com/abetlen/llama-cpp-python/blob/5a595f035a094574a9bcf153e6696369f63fb585/llama_cpp/llama.py#L429
+        """
+
+        bos_token, eos_token = LlamaHelper.get_special_token(model)
+
+        chat_handler = llama_chat_format.Jinja2ChatFormatter(
+                template=template,
+                eos_token=eos_token,
+                bos_token=bos_token
+            ).to_chat_handler()
+
+        return chat_handler
+
+    @staticmethod
+    def deduplicate_bos_eos(model:Llama, prompt:str):
+        """
+        Remove the duplicated BOS and EOS token from the prompt since the
+        tokenizer will add them again.
+        """
+
+        bos_token, eos_token = LlamaHelper.get_special_token(model)
+        prompt = prompt.lstrip(bos_token)
+        prompt = prompt.rstrip(eos_token)
+        return prompt
 
 class ReflectiveLlama(Llama):
     """
@@ -110,27 +178,19 @@ class LlamaCppExecutor(LLMExecutor):
             self.LLM_name = "gguf"
 
         self.limit = self.args.limit
-        self.system_prompt = self.args.system_prompt
         self.no_system_prompt = self.args.no_system_prompt
+        self.system_prompt = "" if self.no_system_prompt else self.args.system_prompt
         self.context_window = self.args.context_window
         self.model = Llama(model_path=self.model_path, n_gpu_layers=self.args.ngl, n_ctx=self.context_window)
 
-        # Get EOS and BOS token.
-        # Reference: https://github.com/abetlen/llama-cpp-python/blob/aa9f1ae011fbc22893750209af500fee3167f21c/llama_cpp/llama.py#L403
-        eos_token_id = int(self.model.metadata.get("tokenizer.ggml.eos_token_id", self.model.token_eos()))
-        bos_token_id = int(self.model.metadata.get("tokenizer.ggml.bos_token_id", self.model.token_bos()))
-        eos_token = self.model._model.token_get_text(eos_token_id)
-        bos_token = self.model._model.token_get_text(bos_token_id)
-        
+        # Setup chat handler
+        _, eos_token = LlamaHelper.get_special_token(self.model)
         self.stop_words = list(set([eos_token] + self.args.stop))
-        
-        # Setup the handler
         if self.args.override_chat_template:
-            chat_handler = llama_chat_format.Jinja2ChatFormatter(
-                    template=self.args.override_chat_template, eos_token=eos_token, bos_token=bos_token
-                ).to_chat_handler()
-            self.model.chat_handler = chat_handler
-
+            self.model.chat_handler = LlamaHelper.create_chat_handler(self.model, self.args.override_chat_template)
+        else:
+            self.model.chat_handler = LlamaHelper.get_chat_handler(self.model)
+        
         # Setup generation config
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
         arg_gconf = {
@@ -146,64 +206,47 @@ class LlamaCppExecutor(LLMExecutor):
 
         self.serving_generator = None
 
-    def synthesis_prompt(self, history: list, system_prompt: str, template: str, parsed: modelfile):
+    def synthesis_prompt(self, history: list, system_prompt: str, template: str):
         """
         Synthesis the prompt from chat history.
         """
         history = history.copy()
-        if system_prompt: history.insert(0, {"role": "system", "content": system_prompt})
+        if not self.no_system_prompt and system_prompt:
+            history.insert(0, {"role": "system", "content": system_prompt})
 
-        backup = self.model.chat_handler
-        if template:
-            eos_token_id = int(self.model.metadata.get("tokenizer.ggml.eos_token_id", self.model.token_eos()))
-            bos_token_id = int(self.model.metadata.get("tokenizer.ggml.bos_token_id", self.model.token_bos()))
-            eos_token = self.model._model.token_get_text(eos_token_id)
-            bos_token = self.model._model.token_get_text(bos_token_id)
-            self.model.chat_handler = llama_chat_format.Jinja2ChatFormatter(
-                template=template, eos_token=eos_token, bos_token=bos_token
-            ).to_chat_handler()
-        history[-1]['content'] = parsed.before_prompt + history[-1]['content'] + parsed.after_prompt
+        chat_handler = self.model.chat_handler if not template else LlamaHelper.create_chat_handler(self.model, template)
+
+        prompt = None
         try:
-            prompt = self.model.chat_handler(
+            prompt = chat_handler(
                 llama = ReflectiveLlama(),
                 messages = history
             )["choices"][0]["message"]["content"]
         except Exception as e:
-            logger.exception(f"Error in template `{self.tokenizer.chat_template}` with error: `{e}`")
-        finally:
-            self.model.chat_handler = backup
+            logger.exception(f"Error in template `{template}` with error: `{e}`")
+        
         return prompt
-
-    def rectify_history(self, history: list):
-        """
-        Ensure the history begin with "user."
-        """
-        first_user_idx = 0
-        while history[first_user_idx]["role"] != "user" and first_user_idx+1 < len(history)-1:
-            first_user_idx += 1
-        history = history[first_user_idx:]
-        return history
 
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
+        history = to_openai_chat_format(history)
 
         # Parse and process modelfile
-        parsed = self.parse_modelfile(data.get("modelfile", "[]"))
-        override_system_prompt, messages, template = parsed.override_system_prompt, parsed.messages, parsed.template
-        if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
+        modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
+        system_prompt = modelfile.override_system_prompt or self.system_prompt
+        prepended_messages = rectify_chat_history(to_openai_chat_format(modelfile.messages))
+        if len(history) > 0 and history[-1]['role'] == "user":
+            history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
+                before_prompt = modelfile.before_prompt,
+                original_prompt = history[-1]['content'],
+                after_prompt = modelfile.after_prompt
+            )
 
-        messages, history = [
-            [{"role": "assistant" if record["isbot"] else "user", "content": record["msg"]} for record in data]
-            for data in (messages, history)
-        ]
-        history = self.rectify_history(history)
-        modelfile = data.get("modelfile")
-        if modelfile: modelfile = json.loads(modelfile)
         try:
             # Trim the history to fit into the context window
             prompt = ""
             while True:
-                prompt = self.synthesis_prompt(messages + history, override_system_prompt, template, parsed)
+                prompt = self.synthesis_prompt(prepended_messages + history, system_prompt, modelfile.template)
                 prompt_length = len(self.model.tokenize(
                     text=prompt.encode('UTF-8', 'ignore'),
                     add_bos=False, special=False
@@ -211,14 +254,14 @@ class LlamaCppExecutor(LLMExecutor):
                 logging.debug(f"Prompt ({prompt_length} tokens): {prompt}")
                 if prompt_length <= self.limit: break
 
-                history = self.rectify_history(history[1:])
+                history = rectify_chat_history(history[1:])
                 if len(history) == 0:
                     logging.debug("Aborted since the input message exceeds the limit.")
                     yield "[Sorry, The input message is too long!]"
                     return
             
             output_generator = self.model.create_completion(
-                prompt,
+                LlamaHelper.deduplicate_bos_eos(self.model, prompt),
                 stop=self.stop_words,
                 echo=False,
                 stream=True,

@@ -12,8 +12,15 @@ from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import ollama
 
-from kuwa.executor import LLMExecutor, modelfile
-from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
+from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.util import (
+    expose_function_parameter,
+    read_config,
+    merge_config,
+    DescriptionParser,
+    to_openai_chat_format,
+    rectify_chat_history
+)
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +135,7 @@ class OllamaExecutor(LLMExecutor):
         jinja_env.globals["raise_exception"] = raise_exception
         return jinja_env.from_string(chat_template)
 
-    def synthesis_prompt(self, history: list, system_prompt: str, template: str, parsed: modelfile):
+    def synthesis_prompt(self, history: list, template: str):
         """
         Synthesis the prompt from chat history.
         """
@@ -136,12 +143,9 @@ class OllamaExecutor(LLMExecutor):
         prompt = ""
         # Omit the special tokens since we can't obtain them
         special_tokens_map = {"bos_token": "", "eos_token": "", "unk_token": ""}
-        if system_prompt:
-            history.insert(0, {"role": "system", "content": system_prompt})
         if not template:
             raise ValueError(f"chat_template is mandatory when calling {self.synthesis_prompt.__name__}")
 
-        history[-1]['content'] = parsed.before_prompt + history[-1]['content'] + parsed.after_prompt
         try:
             compiled_template = self.compile_template(template)
             prompt = compiled_template.render(
@@ -155,26 +159,34 @@ class OllamaExecutor(LLMExecutor):
 
     async def llm_compute(self, data):
         try:
+            history = json.loads(data.get("input"))
+            history = to_openai_chat_format(history)
+
             # Parse and process modelfile
-            parsed = self.parse_modelfile(data.get("modelfile", "[]"))
-            override_system_prompt, messages, template = parsed.override_system_prompt, parsed.messages, parsed.template
-            system_prompt = override_system_prompt or self.system_prompt
+            modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
+            system_prompt = modelfile.override_system_prompt or self.system_prompt
+            prepended_messages = rectify_chat_history(to_openai_chat_format(modelfile.messages))
+            if len(history) > 0 and history[-1]['role'] == "user":
+                history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
+                    before_prompt = modelfile.before_prompt,
+                    original_prompt = history[-1]['content'],
+                    after_prompt = modelfile.after_prompt
+                )
+            history = prepended_messages + history
+            if system_prompt:
+                history.insert(0, {"role": "system", "content": system_prompt})
 
-            # Apply parsed modelfile data to inference
-            raw_inputs = messages + json.loads(data.get("input"))
-            msg = [{"content":i['msg'], "role":"assistant" if i['isbot'] else "user"} for i in raw_inputs]
-
-            if not msg or len(msg) == 0:
+            if not history or len(history) == 0:
                 yield "[No input message entered]"
                 return
 
             chat_mode = True
-            if template:
+            if modelfile.template:
                 chat_mode = False
-                prompt = self.synthesis_prompt(msg, system_prompt, template, parsed)
+                prompt = self.synthesis_prompt(history, modelfile.template)
                 logger.debug(f"Prompt: {prompt}")
-            elif system_prompt is not None:
-                msg = [{"content": system_prompt, "role": "system"}] + msg
+            else:
+                logger.debug(f"History: {history}")
 
             # [TODO] Trim the history to fit into the context window
 
@@ -182,7 +194,7 @@ class OllamaExecutor(LLMExecutor):
             if chat_mode:
                 response = await self.client.chat(
                     model=self.model_name,
-                    messages=msg,
+                    messages=history,
                     options=self.ollama_options,
                     stream=True
                 )

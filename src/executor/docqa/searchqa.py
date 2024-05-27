@@ -14,7 +14,7 @@ import i18n
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, Modelfile
 
 from src.docqa import DocQa
 from src.kuwa_llm_client import KuwaLlmClient
@@ -111,7 +111,7 @@ class SearchQaExecutor(LLMExecutor):
         finally:
             return resp != None and resp.ok
 
-    async def search_url(self, chat_history: [dict]) -> ([dict[str, str]],[str]):
+    async def search_url(self, chat_history: [dict], parsed_modelfile) -> ([dict[str, str]],[str]):
         """
         Get first URL from the search result.
         """
@@ -122,7 +122,9 @@ class SearchQaExecutor(LLMExecutor):
         latest_user_record = next(filter(lambda x: not x["isbot"], reversed(chat_history)))
         latest_user_msg = latest_user_record["msg"]
 
-        query = latest_user_msg
+        before_prompt = parsed_modelfile.before_prompt
+        after_prompt = parsed_modelfile.after_prompt
+        query = "{} {} {}".format(before_prompt, latest_user_msg, after_prompt)
         query += ''.join([f' site:{s.strip()}' for s in restricted_sites])
         query += ''.join([f' -site:{s.strip()}' for s in blocked_sites])
         
@@ -173,12 +175,12 @@ class SearchQaExecutor(LLMExecutor):
     async def llm_compute(self, data):
         chat_history = json.loads(data.get("input"))
         auth_token = data.get("user_token") or self.args.api_key
-        parsed_modelfile = self.parse_modelfile(data.get("modelfile", "[]"))
+        parsed_modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
         override_qa_prompt = parsed_modelfile.override_system_prompt
 
         try:
         
-            urls, chat_history = await self.search_url(chat_history)
+            urls, chat_history = await self.search_url(chat_history, parsed_modelfile)
 
             if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
         

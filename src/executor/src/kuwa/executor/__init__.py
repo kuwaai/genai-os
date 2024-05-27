@@ -1,1 +1,2 @@
-from .llm_executor import LLMExecutor, modelfile
+from .llm_executor import LLMExecutor
+from .modelfile import Modelfile

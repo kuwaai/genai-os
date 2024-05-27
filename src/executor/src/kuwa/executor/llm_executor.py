@@ -7,7 +7,6 @@ import time
 import logging
 import atexit
 import asyncio
-import json
 from urllib.parse import urljoin
 from typing import Optional
 
@@ -27,12 +26,6 @@ def find_free_port():
     with socket.socket() as s:
         port = s.bind(('', 0)) or s.getsockname()[1]
     return port
-
-class modelfile:
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
 
 class LLMExecutor:
     executor_iface_version: str = "v1.0"
@@ -245,39 +238,6 @@ class LLMExecutor:
 
     async def llm_compute(self, data):
         raise NotImplementedError("Executor should implement the \"llm_compute\" method.")
-        
-    def parse_modelfile(self, raw_modelfile):
-        parsed = json.loads(raw_modelfile)
-        if not parsed: parsed = []
-        override_system_prompt = ""
-        before_prompt = ''
-        after_prompt = ''
-        messages = []
-        template = ""
-        for command in parsed:
-            try:
-                if command["name"] == "system":
-                    override_system_prompt += command["args"]
-                elif command["name"] == "message":
-                    role, content = command["args"].split(' ', 1)
-                    if role == "user":
-                        messages += [{"msg":content, "isbot":False}]
-                    elif role == "assistant":
-                        messages += [{"msg":content, "isbot":True}]
-                    elif role == "system":
-                        override_system_prompt += content
-                    else:
-                        logger.debug(f"{role} doesn't existed!!")
-                elif command['name'] == "template":
-                    template = command['args']
-                elif command['name'] == "before-prompt":
-                    before_prompt += command['args']
-                elif command['name'] == "after-prompt":
-                    after_prompt += command['args']
-            except Exception as e:
-                logger.exception(f"Error in modelfile `{command}` with error: `{e}`")
-        return modelfile(override_system_prompt=override_system_prompt, messages=messages, template=template, 
-                        before_prompt=before_prompt, after_prompt=after_prompt)
 
 if __name__ == "__main__":
     executor = LLMExecutor()
