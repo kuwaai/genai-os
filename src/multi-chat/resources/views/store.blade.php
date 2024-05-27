@@ -43,11 +43,14 @@
                     )
                     ->get();
             @endphp
+            @if (request()->user()->hasPerm('Store_update_create_bot'))
             <x-store.modal.create-bot :result="$result" />
+            @endif
             <x-store.modal.bot-detail />
             <div class="my-8">
                 <x-logo />
             </div>
+            @if (request()->user()->hasPerm('Store_update_create_bot'))
             <div class="mb-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
                 data-modal-toggle="create-bot-modal">
                 <button
@@ -55,19 +58,20 @@
                     <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
                 </button>
             </div>
-            @if ($bots->where('visibility', '=', 0)->count() > 0)
+            @endif
+            @if (request()->user()->hasPerm('Store_read_discover_system_bots') && $bots->where('visibility', '=', 0)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.offical_bots') }}</p>
                     <x-store.bot-showcase :bots="$bots->where('visibility', '=', 0)" :extra="'offical_bots-'" />
                 </div>
             @endif
-            @if ($bots->where('owner_id', '=', Auth::user()->id)->count() > 0)
+            @if (request()->user()->hasPerm('Store_read_discover_my_bots') && $bots->where('owner_id', '=', Auth::user()->id)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.my_bots') }}</p>
                     <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" :extra="'my_bots-'" />
                 </div>
             @endif
-            @if ($bots->where('visibility', '=', 1)->count() > 0)
+            @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $bots->where('visibility', '=', 1)->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.community_bots') }}</p>
                     <x-store.bot-showcase :bots="$bots->where('visibility', '=', 1)" :extra="'community_bots-'" />

@@ -137,7 +137,14 @@ return [
     'perm.Profile_update_external_api_token' => 'Upravit externí API klíč',
     'perm.Profile_read_api_token' => 'Přečíst API klíč webu',
     'perm.Profile_delete_account' => 'Smazat účet',
-    
+    'perm.Store_update_create_bot' => 'Vytvořit bota',
+    'perm.Store_update_modify_bot' => 'Upravit bota',
+    'perm.Store_delete_delete_bot' => 'Smazat bota',
+    'perm.Store_read_discover_community_bots' => 'Přístup k botům komunity',
+    'perm.Store_read_discover_system_bots' => 'Přístup k systémovým botům',
+    'perm.Store_read_discover_my_bots' => 'Přístup k mým botům',
+    'perm.Store_read_any_modelfile' => 'Přístup k jakémukoli souboru modelu',
+
     'perm.Chat_update_detail_feedback.describe' => 'Poskytnout podrobnější zpětnou vazbu na odpovědi',
     'perm.Room_update_detail_feedback.describe' => 'Poskytnout podrobnější zpětnou vazbu na odpovědi',
     'perm.Profile_update_name.describe' => 'Aktualizovat vlastní jméno účtu',
@@ -169,4 +176,11 @@ return [
     'perm.Dashboard_read_logs.describe' => 'Popis práva číst systémové záznamy',
     'perm.Dashboard_read_safetyguard.describe' => 'Popis práva číst bezpečnostní ochranu',
     'perm.Dashboard_read_inspect.describe' => 'Popis práva číst prohlížeč zpráv',
+    'perm.Store_update_create_bot.describe' => 'Oprávnění potřebné k vytvoření bota',
+    'perm.Store_update_modify_bot.describe' => 'Oprávnění potřebné k úpravě vlastních botů',
+    'perm.Store_delete_delete_bot.describe' => 'Oprávnění potřebné ke smazání vlastních botů',
+    'perm.Store_read_discover_community_bots.describe' => 'Oprávnění potřebné k zobrazení botů komunity',
+    'perm.Store_read_discover_system_bots.describe' => 'Oprávnění potřebné k zobrazení systémových botů',
+    'perm.Store_read_discover_my_bots.describe' => 'Oprávnění potřebné k zobrazení vlastních botů',
+    'perm.Store_read_any_modelfile.describe' => 'Oprávnění potřebné k přístupu k jakémukoli souboru modelu',
 ];
