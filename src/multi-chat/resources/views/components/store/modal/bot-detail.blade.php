@@ -108,7 +108,6 @@
                             </div>
                         </div>
                     </div>
-                    @if (request()->user()->hasPerm('Store_read_any_modelfile'))
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -120,7 +119,6 @@
                             </div>
                         </div>
                     </div>
-                    @endif
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         @if (request()->user()->hasPerm('Room_update_new_chat'))
                         <button type="button" onclick="$('#ChatWithBot').submit()"
@@ -248,7 +246,17 @@
             config["react_btn"].forEach((a) => {
                 $(`#detail-modal input[value='${a}']`).prop("checked", true);
             });
-            $("#detail-modal textarea[name=modelfile]").val(modelfile_to_string(config['modelfile'] ?? []))
+            modelfile = modelfile_to_string(config['modelfile'] ?? [])
+            if (modelfile.length == 0){
+                $("#detail-modal textarea[name=modelfile]").val('')
+                $("#detail-modal textarea[name=modelfile]").hide()
+            }else{
+                $("#detail-modal textarea[name=modelfile]").show()
+                $("#detail-modal textarea[name=modelfile]").val(modelfile)
+            }
+        }else{
+            $("#detail-modal textarea[name=modelfile]").val('')
+            $("#detail-modal textarea[name=modelfile]").hide()
         }
         $("#update_bot_btn").off('click').on('click', function() {
             $("#update_bot input[name=id]").val(data.id);

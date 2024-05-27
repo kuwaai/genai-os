@@ -42,6 +42,14 @@
                         'llms.name as llm_name',
                     )
                     ->get();
+            if (!request()->user()->hasPerm('Store_read_any_modelfile')){
+                $bots = $bots->map(function ($item) {
+                    if ($item->owner_id != Auth::user()->id) {
+                        $item->config = '';
+                    }
+                    return $item;
+                });
+            }
             @endphp
             @if (request()->user()->hasPerm('Store_update_create_bot'))
             <x-store.modal.create-bot :result="$result" />
