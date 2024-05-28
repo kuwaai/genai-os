@@ -41,7 +41,10 @@ def to_safety_guard_signature(func):
             {'isbot': r['role']=='assistant', 'msg': r['content']}
             for r in chat_history
         ]
-        return func(inputs=json.dumps(chat_history), llm_name=model_id, *args, **kwargs)
+        form = kwargs.pop("form", [])
+        form["inputs"] = json.dumps(chat_history)
+        form["llm_name"] = model_id
+        return func(form=form, *args, **kwargs)
     return wrap
 
 def to_completions_backend_signature(func):
@@ -49,7 +52,9 @@ def to_completions_backend_signature(func):
     Convert the function signature to the completions_backend() compatible one.
     """
 
-    def wrap(inputs:List[dict], llm_name:str, *args, **kwargs):
+    def wrap(form:dict, *args, **kwargs):
+        inputs = form.get("inputs", [])
+        llm_name = form.get("llm_name", "")
         if isinstance(inputs, str):
             inputs = json.loads(inputs)
         inputs = [
