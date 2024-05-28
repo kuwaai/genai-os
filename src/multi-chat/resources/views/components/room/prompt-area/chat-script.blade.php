@@ -131,7 +131,7 @@
                 $("#submit_msg").show()
                 if ($("#abort_btn")) $("#abort_btn").hide();
                 if ($("#upload_btn")) $("#upload_btn").show()
-                $("#chat_input").val("")
+                $("#chat_input").val("{{session('next_input')}}")
                 $("#chat_input").prop("readonly", false)
                 adjustTextareaRows($("#chat_input"))
                 $(".show-on-finished").attr("style", "")

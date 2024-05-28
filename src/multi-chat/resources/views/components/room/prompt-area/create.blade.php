@@ -106,25 +106,5 @@
     </div>
     <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">
         {{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? '' }}</p>
-
 </form>
-<script>
-    function uploadcheck() {
-        if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
-            1024) {
-            $("#attachment").show();
-            $("#attachment button").text($("#upload")[0].files[0].name)
-        } else if ($("#upload")[0].files.length > 0) {
-            $("#error_alert >span").text("{{ __('File Too Large') }}")
-            $("#error_alert").fadeIn();
-            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            $("#upload").val("");
-            $("#attachment").hide();
-            setTimeout(function() {
-                $("#error_alert").fadeOut();
-                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            }, 3000);
-        }
-    }
-</script>
 <x-room.prompt-area.chat-script :llms="$llms" :tasks="$tasks" />

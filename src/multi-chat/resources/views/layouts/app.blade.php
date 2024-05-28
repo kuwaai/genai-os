@@ -43,6 +43,7 @@
                 1024) {
                 $("#attachment").show();
                 $("#attachment button").text($("#upload")[0].files[0].name)
+                $('#prompt_area').submit()
             } else if ($("#upload")[0].files.length > 0) {
                 $("#error_alert >span").text("{{ __('File Too Large') }}")
                 $("#error_alert").fadeIn();
