@@ -163,16 +163,17 @@ class RetrieverExecutor(LLMExecutor):
             get_content = lambda x: x.page_content
 
             yield json.dumps({
+                "succeed": True,
                 "content": list(map(get_content, docs)),
                 "chunk": list(map(get_content, relevant_chunks))
             })
 
         except NoUrlException as e:
-            yield str(e)
+            yield json.dumps({"succeed": False, "msg": str(e)})
 
         except Exception as e:
             logger.exception('Unexpected error')
-            yield str(e)
+            yield json.dumps({"succeed": False, "msg": str(e)})
         
         finally:
             self.proc = False
