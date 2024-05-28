@@ -19,7 +19,7 @@ use Carbon\Carbon;
 class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $access_code, $msgtime, $history_id, $user_id, $channel, $openai_token, $google_token, $user_token, $modelfile;
+    private $input, $access_code, $msgtime, $history_id, $user_id, $channel, $lang, $openai_token, $google_token, $user_token, $modelfile;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
     public static $agent_version = 'v1.0';
@@ -28,12 +28,13 @@ class RequestChat implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($input, $access_code, $user_id, $history_id, $channel = null, $modelfile = null)
+    public function __construct($input, $access_code, $user_id, $history_id, $lang, $channel = null, $modelfile = null)
     {
         $this->input = json_encode(json_decode($input), JSON_UNESCAPED_UNICODE);
         $this->msgtime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 second'));
         $this->access_code = $access_code;
         $this->user_id = $user_id;
+        $this->lang = $lang;
         $this->history_id = $history_id;
         if ($channel == null) {
             $channel = '';
@@ -67,7 +68,7 @@ class RequestChat implements ShouldQueue
                 return;
             }
         }
-        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input));
+        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input) . "|" . $this->lang);
         $start = microtime(true);
         $tmp = '';
         try {
@@ -147,7 +148,7 @@ class RequestChat implements ShouldQueue
                         }
                     }
                     $response = $client->post($agent_location . '/' . self::$agent_version . '/chat/completions', [
-                        'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                        'headers' => ['Content-Type' => 'application/x-www-form-urlencoded', 'Accept-Language' => $this->lang],
                         'form_params' => [
                             'input' => $this->input,
                             'name' => $this->access_code,

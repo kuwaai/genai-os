@@ -9,13 +9,14 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\App;
 use Illuminate\Bus\Queueable;
 use App\Models\Histories;
-use App\Models\User;
 use App\Models\Chats;
+use GuzzleHttp\Client;
+use App\Models\User;
 use App\Models\LLMs;
 use App\Models\Bots;
-use GuzzleHttp\Client;
 use Carbon\Carbon;
 use DB;
 
@@ -79,7 +80,7 @@ class ImportChat implements ShouldQueue
                     ->limit(1);
             }
             $input = $input->get()->toJson();
-            RequestChat::dispatch($input, $access_code, $this->user_id, $id);
+            RequestChat::dispatch($input, $access_code, $this->user_id, $id, App::getLocale());
         }
     }
     public function failed(\Throwable $exception)

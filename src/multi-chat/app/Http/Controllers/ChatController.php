@@ -7,21 +7,22 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\App;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
+use App\Models\APIHistories;
 use App\Models\Histories;
 use App\Jobs\RequestChat;
+use App\Models\Feedback;
 use App\Jobs\ImportChat;
 use GuzzleHttp\Client;
 use App\Models\Chats;
 use App\Models\LLMs;
 use App\Models\User;
-use App\Models\Feedback;
-use App\Models\APIHistories;
 use App\Models\Groups;
 use App\Models\Bots;
 use DB;
@@ -93,7 +94,7 @@ class ChatController extends Controller
             $client = new Client(['timeout' => 300]);
             Redis::rpush('api_' . Auth::user()->id, $history->id);
             Redis::expire('api_' . Auth::user()->id, 1200);
-            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, 'api_' . $history->id);
+            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, App::getLocale(), 'api_' . $history->id);
 
             $req = $client->get(route('api.stream'), [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],

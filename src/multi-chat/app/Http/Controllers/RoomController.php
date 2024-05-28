@@ -7,15 +7,16 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\App;
 use Illuminate\Http\Request;
 use App\Jobs\RequestChat;
+use App\Models\Histories;
 use App\Jobs\ImportChat;
 use App\Models\ChatRoom;
-use App\Models\Histories;
 use App\Models\Chats;
+use GuzzleHttp\Client;
 use App\Models\LLMs;
 use App\Models\Bots;
-use GuzzleHttp\Client;
 use DB;
 use Session;
 
@@ -408,7 +409,7 @@ class RoomController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $dct, 'updated_at' => $dct]);
                     $history->save();
-                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, null, json_decode(Bots::find($llm)->config ?? '')->modelfile ?? null);
+                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, App::getLocale(), null, json_decode(Bots::find($llm)->config ?? '')->modelfile ?? null);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                     Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
@@ -542,7 +543,7 @@ class RoomController extends Controller
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chained' => $chained, 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $deltaStart, 'updated_at' => $deltaStart]);
                     $history->save();
-                    RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, null, json_decode(Bots::find($chat->bot_id)->config ?? '')->modelfile ?? null);
+                    RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, App::getLocale(), null, json_decode(Bots::find($chat->bot_id)->config ?? '')->modelfile ?? null);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                     Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
