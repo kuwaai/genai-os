@@ -14,7 +14,11 @@ def completions():
         dest = [i for i in data[llm_name] if i[1] == "READY" and i[2] == request.form.get("history_id") and i[3] == request.form.get("user_id")]
         if len(dest) > 0:
             dest = dest[0]
-            result = completions_backend(request.form, request.headers, dest)
+            result = completions_backend(
+                form=request.form,
+                headers=request.headers,
+                dest=dest
+            )
             return result
     return ""
 

@@ -41,7 +41,7 @@ def to_safety_guard_signature(func):
             {'isbot': r['role']=='assistant', 'msg': r['content']}
             for r in chat_history
         ]
-        form = kwargs.pop("form", [])
+        form = kwargs.pop("form", {})
         form["inputs"] = json.dumps(chat_history)
         form["llm_name"] = model_id
         return func(form=form, *args, **kwargs)
