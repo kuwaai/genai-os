@@ -176,9 +176,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->prefix('store')
                     ->group(function () {
                         Route::get('/', [BotController::class, 'home'])->name('store.home');
-                        Route::post('/create', [BotController::class, 'create'])->name('store.create');
-                        Route::patch('/update', [BotController::class, 'update'])->name('store.update');
-                        Route::delete('/delete', [BotController::class, 'delete'])->name('store.delete');
+                        Route::middleware(AdminMiddleware::class . ':Store_update_create_bot')
+                        ->post('/create', [BotController::class, 'create'])->name('store.create');
+                        Route::middleware(AdminMiddleware::class . ':Store_update_modify_bot')
+                        ->patch('/update', [BotController::class, 'update'])->name('store.update');
+                        Route::middleware(AdminMiddleware::class . ':Store_delete_delete_bot')
+                        ->delete('/delete', [BotController::class, 'delete'])->name('store.delete');
                     })
                     ->name('store');
                 #---Manage

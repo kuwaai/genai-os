@@ -120,20 +120,26 @@
                         </div>
                     </div>
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        @if (request()->user()->hasPerm('Room_update_new_chat'))
                         <button type="button" onclick="$('#ChatWithBot').submit()"
                             class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                             {{ __('store.bot.button.chat') }}
                         </button>
+                        @endif
+                        @if (request()->user()->hasPerm('Store_update_modify_bot'))
                         <button type="button" id="save_bot" data-modal-target="update_modal"
                             data-modal-toggle="update_modal"
                             class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                             {{ __('manage.button.save') }}
                         </button>
+                        @endif
+                        @if (request()->user()->hasPerm('Store_delete_delete_bot'))
                         <button type="button" id="delete_bot" data-modal-target="delete_modal"
                             data-modal-toggle="delete_modal"
                             class="bg-red-500 hover:bg-red-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                             {{ __('manage.button.delete') }}
                         </button>
+                        @endif
                     </div>
                 </ul>
             </form>
@@ -240,7 +246,17 @@
             config["react_btn"].forEach((a) => {
                 $(`#detail-modal input[value='${a}']`).prop("checked", true);
             });
-            $("#detail-modal textarea[name=modelfile]").val(modelfile_to_string(config['modelfile'] ?? []))
+            modelfile = modelfile_to_string(config['modelfile'] ?? [])
+            if (modelfile.length == 0){
+                $("#detail-modal textarea[name=modelfile]").val('')
+                $("#detail-modal textarea[name=modelfile]").hide()
+            }else{
+                $("#detail-modal textarea[name=modelfile]").show()
+                $("#detail-modal textarea[name=modelfile]").val(modelfile)
+            }
+        }else{
+            $("#detail-modal textarea[name=modelfile]").val('')
+            $("#detail-modal textarea[name=modelfile]").hide()
         }
         $("#update_bot_btn").off('click').on('click', function() {
             $("#update_bot input[name=id]").val(data.id);

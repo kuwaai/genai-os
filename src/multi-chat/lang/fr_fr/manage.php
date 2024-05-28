@@ -138,7 +138,14 @@ return [
     'perm.Profile_update_external_api_token' => 'Modifier la clé API externe',
     'perm.Profile_read_api_token' => 'Lire la clé API du site',
     'perm.Profile_delete_account' => 'Supprimer le compte',
-    
+    'perm.Store_update_create_bot' => 'Créer un bot',
+    'perm.Store_update_modify_bot' => 'Modifier un bot',
+    'perm.Store_delete_delete_bot' => 'Supprimer un bot',
+    'perm.Store_read_discover_community_bots' => 'Accéder aux bots de la communauté',
+    'perm.Store_read_discover_system_bots' => 'Accéder aux bots du système',
+    'perm.Store_read_discover_my_bots' => 'Accéder à mes bots',
+    'perm.Store_read_any_modelfile' => 'Accéder à tous les fichiers de modèle',
+
     'perm.Chat_update_detail_feedback.describe' => 'Étiqueter les réponses avec un feedback plus détaillé',
     'perm.Room_update_detail_feedback.describe' => 'Étiqueter les réponses avec un feedback plus détaillé',
     'perm.Profile_update_name.describe' => 'Autoriser la mise à jour du nom du compte',
@@ -170,4 +177,11 @@ return [
     'perm.Dashboard_read_logs.describe' => 'Accéder aux journaux système',
     'perm.Dashboard_read_safetyguard.describe' => 'Accéder au filtre de sécurité',
     'perm.Dashboard_read_inspect.describe' => 'Accéder au navigateur de messages',
+    'perm.Store_update_create_bot.describe' => 'Autorisation requise pour créer un bot.',
+    'perm.Store_update_modify_bot.describe' => 'Autorisation requise pour modifier un bot que vous avez créé.',
+    'perm.Store_delete_delete_bot.describe' => 'Autorisation requise pour supprimer un bot que vous avez créé.',
+    'perm.Store_read_discover_community_bots.describe' => 'Autorisation requise pour voir les bots de la communauté.',
+    'perm.Store_read_discover_system_bots.describe' => 'Autorisation requise pour voir les bots du système.',
+    'perm.Store_read_discover_my_bots.describe' => 'Autorisation requise pour voir vos bots.',
+    'perm.Store_read_any_modelfile.describe' => 'Autorisation requise pour accéder à tous les fichiers de modèle.',
 ];

@@ -5,6 +5,23 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* 2^>^&1 ^| src\
 REM Initialize everything
 call src\variables.bat
 
+REM Check if VCredist is installed
+set found=0
+
+for /F "tokens=*" %%i in ('reg query "HKLM\SOFTWARE\Microsoft\VisualStudio" /s /f "Installed" 2^>nul') do (
+    set found=1
+    goto found
+)
+
+:found
+if %found%==0 (
+    echo No Visual C++ Redistributable found, Please download vcredist from https://learn.microsoft.com/zh-tw/cpp/windows/latest-supported-vc-redist?view=msvc-170
+    echo Press any key to continue building...
+    pause
+) else (
+    echo Visual C++ Redistributable found.
+)
+
 REM Download and extract RunHiddenConsole if not exists
 call src\download_extract.bat %url_RunHiddenConsole% packages\%RunHiddenConsole_folder% packages\%RunHiddenConsole_folder% RunHiddenConsole.zip
 

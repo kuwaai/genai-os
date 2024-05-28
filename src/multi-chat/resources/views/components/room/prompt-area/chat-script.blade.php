@@ -131,7 +131,7 @@
                 $("#submit_msg").show()
                 if ($("#abort_btn")) $("#abort_btn").hide();
                 if ($("#upload_btn")) $("#upload_btn").show()
-                $("#chat_input").val("")
+                $("#chat_input").val("{{session('next_input')}}")
                 $("#chat_input").prop("readonly", false)
                 adjustTextareaRows($("#chat_input"))
                 $(".show-on-finished").attr("style", "")
@@ -219,8 +219,8 @@ xmlns="http://www.w3.org/2000/svg">
         @foreach (array_diff($llms->pluck('id')->toarray(), session('selLLMs')) as $id)
             $(`#btn_{{ $id }}_toggle`).click()
         @endforeach
-        @if (count(session('selLLMs')) == 1)
-            $('#send_to_mode').click()
-        @endif
+    @endif
+    @if (session('mode_track') == 1)
+        $('#send_to_mode').click()
     @endif
 </script>

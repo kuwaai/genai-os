@@ -19,9 +19,10 @@
             @if ($llms && count($llms) > 1)
                 <div
                     class="flex flex-1 justify-center items-center w-full overflow-hidden dark:text-white mb-2 select-none">
+                    <input name="mode_track" value="0" hidden>
                     <div id="send_to_mode"
                         class="cursor-pointer bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded-lg mr-2"
-                        onclick="$(this).next().find('>div').each((e,i)=>{$(i).toggle()}); $(this).text($(this).next().find('>div:eq(0)').attr('style') == '' ? '{{ __('chat.label.multiple_send') }}' : '{{ __('chat.label.direct_send') }}')">
+                        onclick="$(this).prev().val($(this).prev().val() == '0' ? '1' : '0');$(this).next().find('>div').each((e,i)=>{$(i).toggle()}); $(this).text($(this).next().find('>div:eq(0)').attr('style') == '' ? '{{ __('chat.label.multiple_send') }}' : '{{ __('chat.label.direct_send') }}')">
                         {{ __('chat.label.multiple_send') }}</div>
                     <div class="flex flex-1 items-center overflow-hidden">
                         <div class="flex mr-auto overflow-auto scrollbar scrollbar-3 min-w-[36px] sends">
@@ -105,25 +106,5 @@
     </div>
     <p class="text-xs text-center mb-[-8px] mt-[8px] leading-3 dark:text-gray-200">
         {{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value ?? '' }}</p>
-
 </form>
-<script>
-    function uploadcheck() {
-        if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
-            1024) {
-            $("#attachment").show();
-            $("#attachment button").text($("#upload")[0].files[0].name)
-        } else if ($("#upload")[0].files.length > 0) {
-            $("#error_alert >span").text("{{ __('File Too Large') }}")
-            $("#error_alert").fadeIn();
-            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            $("#upload").val("");
-            $("#attachment").hide();
-            setTimeout(function() {
-                $("#error_alert").fadeOut();
-                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            }, 3000);
-        }
-    }
-</script>
 <x-room.prompt-area.chat-script :llms="$llms" :tasks="$tasks" />
