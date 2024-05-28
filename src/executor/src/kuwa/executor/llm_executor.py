@@ -65,7 +65,7 @@ class LLMExecutor:
         group.add_argument('--executor_path', default=self.executor_path, help='The path this model executor is going to use')
         group.add_argument('--kernel_url', default=self.kernel_url, help='Base URL of Kernel\'s executor management API')
         group.add_argument("--log", type=str.upper, default=self.log_level, help="The logging level.", choices=["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
-
+        
         return parser
     
     def extend_arguments(self, parser: argparse.ArgumentParser):
@@ -110,7 +110,8 @@ class LLMExecutor:
         async def api(request: Request):
             if not self.ready:
                 return JSONResponse({"msg": "Processing another request."}, status_code=429)
-            data = await request.form()
+            data = dict(await request.form())
+            data["lang"] = request.headers.get("Accept-Language")
             if not data:
                 logger.debug("Received empty request!")
                 return JSONResponse({"msg": "Received empty request!"}, status_code=400)
