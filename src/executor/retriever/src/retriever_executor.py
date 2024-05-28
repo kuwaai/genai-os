@@ -6,10 +6,14 @@ import re
 import sys
 import logging
 import json
-from kuwa.executor import LLMExecutor
+import functools
+from kuwa.executor import LLMExecutor, Modelfile
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
+from .document_store import DocumentStore, DocumentStoreFactory
+from .embedding_model_store import EmbeddingModelStore
+from .parallel_splitter import ParallelSplitter
 
 logger = logging.getLogger(__name__)
 
@@ -24,16 +28,44 @@ class RetrieverExecutor(LLMExecutor):
         super().__init__()
 
     def extend_arguments(self, parser):
-        parser.add_argument('--csr_threshold', default=100, type=int, help='If extracted charters below this value, we will launch a real browser to fetch the content.')
-        parser.add_argument('--max_depth', default=1, type=int, help='The maximum depth to download the pages recursively.')
-        parser.add_argument('--prevent_outside', default=False, action="store_true", help='Prevent the recursion outside the root.')
-        parser.add_argument('--timeout', default=10, type=int, help='Timeout to download the page.')
+        crawler_group = parser.add_argument_group('Crawler Options')
+        crawler_group.add_argument('--csr_threshold', default=100, type=int, help='If extracted charters below this value, we will launch a real browser to fetch the content.')
+        crawler_group.add_argument('--max_depth', default=1, type=int, help='The maximum depth to download the pages recursively.')
+        crawler_group.add_argument('--prevent_outside', default=False, action="store_true", help='Prevent the recursion outside the root.')
+        crawler_group.add_argument('--timeout', default=10, type=int, help='Timeout to download the page.')
+        crawler_group.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+                                            help='The user agent string when issuing the crawler.')
+
+        splitter_group = parser.add_argument_group('Splitter Options')
+        splitter_group.add_argument('--chunk_size', default=512, type=int, help='The size of each chunk in char.')
+        splitter_group.add_argument('--chunk_overlap', default=128, type=int, help='The overlap between chunks in char.')
+
+        embedding_model_group = parser.add_argument_group('Embedding Model Options')
+        embedding_model_group.add_argument('--default_embedding_model', default="thenlper/gte-base-zh", help='Name of the default embedding model.')
+        embedding_model_group.add_argument('--n_cached_embedding_model', default=3, type=int, help='Maximum embedding model to cache.')
+
+        retrieving_group = parser.add_argument_group('Retrieving Options')
+        retrieving_group.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
+        retrieving_group.add_argument('--mmr_k', default=6, type=int, help='Number of chunk to retrieve after Maximum Marginal Relevance (MMR).')
 
     def setup(self):
+        if not self.LLM_name:
+            self.LLM_name = "retriever"
+
         self.csr_threshold = self.args.csr_threshold
         self.max_depth = self.args.max_depth
         self.prevent_outside = self.args.prevent_outside
         self.timeout = self.args.timeout
+        self.user_agent = self.args.user_agent
+
+        self.chunk_size = self.args.chunk_size
+        self.chunk_overlap = self.args.chunk_overlap
+        self.embedding_model_name = self.args.default_embedding_model
+        self.embedding_model_store = EmbeddingModelStore(n_cached_model=self.args.n_cached_embedding_model)
+
+        self.mmr_fetch_k = self.args.mmr_fetch_k
+        self.mmr_k = self.args.mmr_k
+
         self.proc = False
 
     def extract_last_url(self, chat_history: list):
@@ -53,36 +85,76 @@ class RetrieverExecutor(LLMExecutor):
                 break
         
         return url, chat_history[begin_index:]
+  
+    def get_final_user_input(self, chat_history: [dict]) -> str:
+        final_user_record = next(filter(lambda x: x['isbot'] == False, reversed(chat_history)))
+        return final_user_record['msg']
 
+    async def _fetch_documents(self, url:str, modelfile:Modelfile=None):
+        """
+        Fetch documents from URL.
+        """
+        logger.info(f'Fetching URL "{url}"')
+        loader = RecursiveUrlMultimediaLoader(
+            url=url,
+            max_depth=self.max_depth,
+            prevent_outside=self.prevent_outside,
+            timeout=self.timeout,
+            csr_threshold=self.csr_threshold,
+            forge_user_agent=self.user_agent,
+            use_async = True,
+            cache_proxy_url = os.environ.get('HTTP_CACHE_PROXY', None)
+        ) 
+        docs = await loader.async_load()
+        docs_len = map(lambda x: len(x.page_content), docs)
+        total_docs_len = functools.reduce(lambda x, y: x+y, docs_len)
+        logger.info(f'Fetched {len(docs)} documents. The total length of the documents is {total_docs_len}')
+
+        return docs
+
+    async def _get_retrieve_chunks(self, docs:list[str], query:str, modelfile:Modelfile=None):
+        """
+        Retrieve the relevant chunks.
+        """
+        splitter = ParallelSplitter(
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.chunk_overlap
+        )
+        embedding_model = await self.embedding_model_store.aload_model(self.embedding_model_name)
+        doc_store_factory = DocumentStoreFactory(
+            splitter=splitter,
+            embedding_model=embedding_model
+        )
+        doc_store = await doc_store_factory.from_documents(docs)
+        retriever = doc_store.get_retriever(
+            k=self.mmr_k,
+            fetch_k=self.mmr_fetch_k
+        )
+        relevant_chunks = await retriever.ainvoke(query)
+        logger.info(f'Got {len(relevant_chunks)} relevant chunks.')
+        logger.debug(f"Chunks: {relevant_chunks}")
+        return relevant_chunks
+    
     async def llm_compute(self, data):
-        chat_history = json.loads(data.get("input"))
+        history = json.loads(data.get("input"))
+        parsed_modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
         url = None
 
         try:
-            url, chat_history = self.extract_last_url(chat_history)
+            url, history = self.extract_last_url(history)
             if url == None : raise NoUrlException("URL not found")
 
             self.proc = True
-            chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
+            final_user_input = self.get_final_user_input(history)
             
-            # Fetching documents
-            logger.info(f'Fetching URL "{url}"')
-            loader = RecursiveUrlMultimediaLoader(
-                url=url,
-                max_depth=self.max_depth,
-                prevent_outside=self.prevent_outside,
-                timeout=self.timeout,
-                csr_threshold=self.csr_threshold,
-                use_async = True,
-                cache_proxy_url = os.environ.get('HTTP_CACHE_PROXY', None)
-            ) 
-            docs = await loader.async_load()
+            docs = await self._fetch_documents(url, parsed_modelfile)
+            relevant_chunks = await self._get_retrieve_chunks(docs, final_user_input)
+            get_content = lambda x: x.page_content
 
-            logger.info(f'Fetched {len(docs)} documents.')
-            for doc in docs:
-                if not self.proc: break
-                logger.debug(doc.page_content)
-                yield doc.page_content
+            yield json.dumps({
+                "content": list(map(get_content, docs)),
+                "chunk": list(map(get_content, relevant_chunks))
+            })
 
         except NoUrlException as e:
             yield str(e)

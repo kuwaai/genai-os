@@ -8,6 +8,7 @@ class Modelfile:
     template:str=None
     before_prompt:str=None
     after_prompt:str=None
+    parameters:dict=field(default_factory=dict)
 
     @classmethod
     def from_json(cls, raw_modelfile:str):
@@ -18,6 +19,7 @@ class Modelfile:
         after_prompt = ''
         messages = []
         template = ""
+        parameters = {}
         for command in parsed:
             try:
                 if command["name"] == "system":
@@ -38,6 +40,9 @@ class Modelfile:
                     before_prompt += command['args']
                 elif command['name'] == "after-prompt":
                     after_prompt += command['args']
+                elif command["name"] == "parameter":
+                    key, value = command["args"].split(' ', 1)
+                    parameters[key] = value
             except Exception as e:
                 logger.exception(f"Error in modelfile `{command}` with error: `{e}`")
         return cls(
@@ -45,7 +50,8 @@ class Modelfile:
             messages=messages,
             template=template, 
             before_prompt=before_prompt,
-            after_prompt=after_prompt
+            after_prompt=after_prompt,
+            parameters=parameters
         )
 
     def __init__(self, **kwargs):
