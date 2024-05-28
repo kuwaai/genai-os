@@ -1,6 +1,24 @@
 import json
 from dataclasses import dataclass, field
 
+def convert_value(value):
+    precedence = [int, float]
+    converted_v = None
+    for target_type in precedence:
+        try:
+            converted_v = target_type(value)
+            break
+        except ValueError:
+            pass
+    if converted_v is None and value is not None:
+        if value.lower() == "true":
+            converted_v = True
+        elif value.lower() == "false":
+            converted_v = False
+        else:
+            converted_v = value
+    return converted_v
+
 @dataclass
 class Modelfile:
     override_system_prompt:str=None
@@ -42,7 +60,7 @@ class Modelfile:
                     after_prompt += command['args']
                 elif command["name"] == "parameter":
                     key, value = command["args"].split(' ', 1)
-                    parameters[key] = value
+                    parameters[key] = convert_value(value)
             except Exception as e:
                 logger.exception(f"Error in modelfile `{command}` with error: `{e}`")
         return cls(

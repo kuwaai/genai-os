@@ -26,7 +26,7 @@ class DocumentStore:
     def get_retriever(self, search_type:str='mmr', **kwargs):
         fine_retriever:VectorStoreRetriever = self.vector_store.as_retriever(
             search_type=search_type,
-            **kwargs
+            search_kwargs=kwargs
         )
         return fine_retriever
 

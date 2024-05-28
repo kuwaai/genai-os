@@ -8,6 +8,7 @@ import logging
 import json
 import functools
 from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.util import merge_config
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
@@ -52,19 +53,23 @@ class RetrieverExecutor(LLMExecutor):
         if not self.LLM_name:
             self.LLM_name = "retriever"
 
-        self.csr_threshold = self.args.csr_threshold
-        self.max_depth = self.args.max_depth
-        self.prevent_outside = self.args.prevent_outside
-        self.timeout = self.args.timeout
-        self.user_agent = self.args.user_agent
+        crawler_config = {}
+        crawler_config['csr_threshold'] = self.args.csr_threshold
+        crawler_config['max_depth'] = self.args.max_depth
+        crawler_config['prevent_outside'] = self.args.prevent_outside
+        crawler_config['timeout'] = self.args.timeout
+        crawler_config['user_agent'] = self.args.user_agent
+        self.crawler_config = crawler_config
 
-        self.chunk_size = self.args.chunk_size
-        self.chunk_overlap = self.args.chunk_overlap
-        self.embedding_model_name = self.args.default_embedding_model
+        retriever_config = {}
+        retriever_config['chunk_size'] = self.args.chunk_size
+        retriever_config['chunk_overlap'] = self.args.chunk_overlap
+        retriever_config['embedding_model_name'] = self.args.default_embedding_model
+        retriever_config['mmr_fetch_k'] = self.args.mmr_fetch_k
+        retriever_config['mmr_k'] = self.args.mmr_k
+        self.retriever_config = retriever_config
+
         self.embedding_model_store = EmbeddingModelStore(n_cached_model=self.args.n_cached_embedding_model)
-
-        self.mmr_fetch_k = self.args.mmr_fetch_k
-        self.mmr_k = self.args.mmr_k
 
         self.proc = False
 
@@ -94,14 +99,16 @@ class RetrieverExecutor(LLMExecutor):
         """
         Fetch documents from URL.
         """
+        crawler_config = merge_config(self.crawler_config, modelfile.parameters)
+        
         logger.info(f'Fetching URL "{url}"')
         loader = RecursiveUrlMultimediaLoader(
             url=url,
-            max_depth=self.max_depth,
-            prevent_outside=self.prevent_outside,
-            timeout=self.timeout,
-            csr_threshold=self.csr_threshold,
-            forge_user_agent=self.user_agent,
+            max_depth=crawler_config['max_depth'],
+            prevent_outside=crawler_config['prevent_outside'],
+            timeout=crawler_config['timeout'],
+            csr_threshold=crawler_config['csr_threshold'],
+            forge_user_agent=crawler_config['user_agent'],
             use_async = True,
             cache_proxy_url = os.environ.get('HTTP_CACHE_PROXY', None)
         ) 
@@ -116,19 +123,22 @@ class RetrieverExecutor(LLMExecutor):
         """
         Retrieve the relevant chunks.
         """
+        retriever_config = merge_config(self.retriever_config, modelfile.parameters)
+        logger.debug(f"Retriever config: {retriever_config}")
+
         splitter = ParallelSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap
+            chunk_size=retriever_config['chunk_size'],
+            chunk_overlap=retriever_config['chunk_overlap']
         )
-        embedding_model = await self.embedding_model_store.aload_model(self.embedding_model_name)
+        embedding_model = await self.embedding_model_store.aload_model(retriever_config['embedding_model_name'])
         doc_store_factory = DocumentStoreFactory(
             splitter=splitter,
             embedding_model=embedding_model
         )
         doc_store = await doc_store_factory.from_documents(docs)
         retriever = doc_store.get_retriever(
-            k=self.mmr_k,
-            fetch_k=self.mmr_fetch_k
+            k=retriever_config['mmr_k'],
+            fetch_k=retriever_config['mmr_fetch_k']
         )
         relevant_chunks = await retriever.ainvoke(query)
         logger.info(f'Got {len(relevant_chunks)} relevant chunks.')
@@ -138,6 +148,7 @@ class RetrieverExecutor(LLMExecutor):
     async def llm_compute(self, data):
         history = json.loads(data.get("input"))
         parsed_modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
+        logger.debug(f"Parameters: {parsed_modelfile.parameters}")
         url = None
 
         try:
@@ -148,7 +159,7 @@ class RetrieverExecutor(LLMExecutor):
             final_user_input = self.get_final_user_input(history)
             
             docs = await self._fetch_documents(url, parsed_modelfile)
-            relevant_chunks = await self._get_retrieve_chunks(docs, final_user_input)
+            relevant_chunks = await self._get_retrieve_chunks(docs, final_user_input, parsed_modelfile)
             get_content = lambda x: x.page_content
 
             yield json.dumps({
