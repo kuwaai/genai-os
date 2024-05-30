@@ -16,7 +16,7 @@ for i in "${confs[@]}"; do
 done
 
 # Join the elements with white space
-joined_confs=$(echo "${new_confs[@]}" | tr ' ' '\n' | paste -sd' ')
+joined_confs=$(echo "${new_confs[@]}" | tr ' ' '\n' | paste -sd' ' -)
 
 subcommand="${@:-up --build --remove-orphans}"
 command="docker compose --env-file ./.env ${joined_confs} ${subcommand}"
