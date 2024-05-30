@@ -74,6 +74,7 @@ class ChatGptExecutor(LLMExecutor):
         model_group.add_argument('--context_window', default=None, help='Override the context window.')
         model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
         model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
+        model_group.add_argument('--no_override_api_key', default=False, action='store_true', help='Disable override the system API key with user API key.')
 
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for OpenAI API. See https://github.com/openai/openai-python/blob/main/src/openai/types/chat/completion_create_params.py')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
@@ -88,6 +89,10 @@ class ChatGptExecutor(LLMExecutor):
         self.model_name = self.args.model
         self.openai_base_url = self.args.base_url
         self.system_prompt = self.args.system_prompt if not self.args.no_system_prompt else None
+        self.api_key = self.args.api_key
+        self.no_override_api_key = self.args.no_override_api_key
+        if not (self.api_key or "").startswith("sk-") and not self.no_override_api_key:
+            logger.warning("By incorporating the \"--no_override_api_key\" argument, you can prevent overriding of the specified third-party API key by the user's OpenAI API key.")
         if not self.LLM_name:
             self.LLM_name = "chatgpt"
         
@@ -141,7 +146,7 @@ class ChatGptExecutor(LLMExecutor):
 
     async def llm_compute(self, data):
         try:
-            openai_token = data.get("openai_token") or self.args.api_key
+            openai_token = self.api_key if self.no_override_api_key else data.get("openai_token") or self.api_key
             
             # Parse and process modelfile
             parsed = Modelfile.from_json(data.get("modelfile", "[]"))

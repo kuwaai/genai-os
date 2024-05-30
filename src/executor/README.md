@@ -134,6 +134,7 @@ The TAIDE API provided by the National Center for High-performance Computing (N
 ```sh    
 kuwa-executor chatgpt --access_code taide-api --log debug \
     --base_url "https://td.nchc.org.tw/api/v1/" `#TAIDE API path on NCHC` \
+    --no_override_api_key `#Disable override the system API key with user API key.` \
     --api_key "YOUR_API_KEY" `#Input the API key that you have applied for` \
     --model "TAIDE/a.2.0.0-SG" `#Using the a.2.0.0 model` \
     --system_prompt "你是一個來自台灣的AI助理，你的名字是TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。" `#TAIDE's default system prompt`

@@ -133,6 +133,7 @@ kuwa-executor chatgpt --access_code vllm --log debug \
 ```sh
 kuwa-executor chatgpt --access_code taide-api --log debug \
     --base_url "https://td.nchc.org.tw/api/v1/" `#國網中心的 TAIDE API 路徑` \
+    --no_override_api_key `#Disable override the system API key with user API key.` \
     --api_key "YOUR_API_KEY" `#輸入已申請的 API key` \
     --model "TAIDE/a.2.0.0-SG" `#使用a.2.0.0模型` \
     --system_prompt "你是一個來自台灣的AI助理，你的名字是TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。" `#TAIDE的預設system prompt`
