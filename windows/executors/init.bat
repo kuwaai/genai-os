@@ -306,7 +306,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		set target_access_code=!EXECUTOR_ACCESS_CODE!
 	)
 	REM Save configuration to run.bat
-	echo set EXECUTOR_ACCESS_CODE=doc_qa --exclude=web_qa> run.bat
+	echo set "EXECUTOR_ACCESS_CODE="doc_qa --exclude=web_qa""> run.bat
 
 	REM webQA
 	echo pushd ..\..\..\src\multi-chat>>run.bat
