@@ -39,6 +39,7 @@ def completions_backend(form: dict, headers: dict, dest:list):
         with the original framework.
     """
 
+    llm_name = form.get("name")
     try:
         response = requests.post(dest[0], headers=headers, data=form, stream=True, timeout=120)
         def event_stream(dest, response):
