@@ -42,7 +42,7 @@ def to_safety_guard_signature(func):
             for r in chat_history
         ]
         form = kwargs.pop("form", {})
-        form["inputs"] = json.dumps(chat_history)
+        form["input"] = json.dumps(chat_history)
         form["llm_name"] = model_id
         return func(form=form, *args, **kwargs)
     return wrap
@@ -53,13 +53,13 @@ def to_completions_backend_signature(func):
     """
 
     def wrap(form:dict, *args, **kwargs):
-        inputs = form.get("inputs", [])
+        input = form.get("input", [])
         llm_name = form.get("llm_name", "")
-        if isinstance(inputs, str):
-            inputs = json.loads(inputs)
-        inputs = [
+        if isinstance(input, str):
+            input = json.loads(input)
+        input = [
             {'role': 'assistant' if r['isbot'] else 'user', 'content': r['msg']}
-            for r in inputs
+            for r in input
         ]
         def at_exit():
             nonlocal kwargs
@@ -70,7 +70,7 @@ def to_completions_backend_signature(func):
             dest[1] = "READY"
             print("Done")
 
-        return func(chat_history=inputs, model_id=llm_name, at_exit=at_exit, *args, **kwargs)
+        return func(chat_history=input, model_id=llm_name, at_exit=at_exit, *args, **kwargs)
     return wrap
 
 def update_safety_guard():
