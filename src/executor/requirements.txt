@@ -19,3 +19,6 @@ sentencepiece
 # ollama
 jinja2
 ollama
+
+# Whisper
+pywhispercpp
