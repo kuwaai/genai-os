@@ -41,9 +41,9 @@ def to_safety_guard_signature(func):
             {'isbot': r['role']=='assistant', 'msg': r['content']}
             for r in chat_history
         ]
-        form = kwargs.pop("form", {})
+        form = dict(kwargs.pop("form"))
         form["input"] = json.dumps(chat_history)
-        form["llm_name"] = model_id
+        form["name"] = model_id
         return func(form=form, *args, **kwargs)
     return wrap
 
@@ -54,7 +54,7 @@ def to_completions_backend_signature(func):
 
     def wrap(form:dict, *args, **kwargs):
         input = form.get("input", [])
-        llm_name = form.get("llm_name", "")
+        llm_name = form.get("name", "")
         if isinstance(input, str):
             input = json.loads(input)
         input = [
@@ -70,7 +70,7 @@ def to_completions_backend_signature(func):
             dest[1] = "READY"
             print("Done")
 
-        return func(chat_history=input, model_id=llm_name, at_exit=at_exit, *args, **kwargs)
+        return func(chat_history=input, model_id=llm_name, at_exit=at_exit, form=form, *args, **kwargs)
     return wrap
 
 def update_safety_guard():
