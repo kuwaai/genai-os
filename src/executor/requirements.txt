@@ -1,0 +1,4 @@
+./ # kuwa-executor
+
+# Whisper
+pywhispercpp
