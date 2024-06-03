@@ -9,11 +9,13 @@ import tempfile
 import queue
 import mimetypes
 import argparse
+import torch
 from functools import lru_cache
 from threading import Thread
 from pywhispercpp.model import Model as WhisperModel
 from pywhispercpp.utils import to_timestamp
 from pywhispercpp.constants import PARAMS_SCHEMA as WHISPER_PARAM_SCHEMA
+from pyannote.audio import Pipeline
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from kuwa.executor import LLMExecutor, Modelfile
@@ -55,6 +57,11 @@ class WhisperExecutor(LLMExecutor):
 
         self.default_model_name = self.args.model
         self.load_model(self.default_model_name)
+        self.diarization_pipeline = Pipeline.from_pretrained(
+            "pyannote/speaker-diarization-3.1"
+            # "pyannote/speech-separation-ami-1.0"
+        )
+        self.diarization_pipeline.to(torch.device("cuda"))
         
         transcribe_param_arg = {
             k: getattr(self.args, k)
@@ -163,21 +170,36 @@ class WhisperExecutor(LLMExecutor):
             logger.debug(f"{transcribe_param}")
             model_name = transcribe_param.pop("model", self.default_model_name)
             disable_timestamp = transcribe_param.pop("disable_timestamp", self.disable_timestamp)
+            num_speakers = transcribe_param.pop("num_speakers", 1)
             transcribe_param = merge_config(self.transcribe_param, transcribe_param)
 
-            result = self.transcribe(
-                filepath=filepath,
-                model_name=model_name,
-                param=transcribe_param
-            )
-            async for segment in result:
-                if not disable_timestamp:
-                    yield "[{} ---> {}] {}\n".format(
-                        to_timestamp(segment.t0), to_timestamp(segment.t1), segment.text
-                    )
-                else:
+            diarization = self.diarization_pipeline(filepath, num_speakers=num_speakers)
+
+            # print the result
+            for turn, _, speaker in diarization.itertracks(yield_label=True):
+                logger.info(f"start={turn.start:.1f}s stop={turn.end:.1f}s {speaker}")
+                yield f"start={turn.start:.1f}s stop={turn.end:.1f}s {speaker}\n"
+
+                transcribe_param = merge_config(transcribe_param, {
+                    "offset_ms": int(turn.start*1000),
+                    "duration_ms": int((turn.end-turn.start)*1000),
+                    "single_segment": True
+                })
+
+                result = self.transcribe(
+                    filepath=filepath,
+                    model_name=model_name,
+                    param=transcribe_param
+                )
+                async for segment in result:
                     yield "{}\n".format(segment.text)
-                if self.stop: break
+                    # if not disable_timestamp:
+                    #     yield "[{} ---> {}] {}\n".format(
+                    #         to_timestamp(segment.t0), to_timestamp(segment.t1), segment.text
+                    #     )
+                    # else:
+                    #     yield "{}\n".format(segment.text)
+                    if self.stop: break
         except Exception as e:
             logger.exception("Error occurs during generation.")
             yield str(e)

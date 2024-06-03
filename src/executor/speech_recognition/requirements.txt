@@ -2,3 +2,4 @@
 
 # Whisper
 pywhispercpp
+pyannote.audio
