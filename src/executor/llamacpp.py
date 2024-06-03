@@ -13,13 +13,12 @@ import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
 
 from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.llm_executor import rectify_chat_history
 from kuwa.executor.util import (
     expose_function_parameter,
     read_config,
     merge_config,
     DescriptionParser,
-    to_openai_chat_format,
-    rectify_chat_history
 )
 
 logger = logging.getLogger(__name__)
@@ -174,9 +173,6 @@ class LlamaCppExecutor(LLMExecutor):
         if not self.model_path:
             raise Exception("You need to configure a .gguf model path!")
 
-        if not self.LLM_name:
-            self.LLM_name = "gguf"
-
         self.limit = self.args.limit
         self.no_system_prompt = self.args.no_system_prompt
         self.system_prompt = "" if self.no_system_prompt else self.args.system_prompt
@@ -227,14 +223,10 @@ class LlamaCppExecutor(LLMExecutor):
         
         return prompt
 
-    async def llm_compute(self, data):
-        history = json.loads(data.get("input"))
-        history = to_openai_chat_format(history)
-
-        # Parse and process modelfile
-        modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
+        # Apply modelfile
         system_prompt = modelfile.override_system_prompt or self.system_prompt
-        prepended_messages = rectify_chat_history(to_openai_chat_format(modelfile.messages))
+        prepended_messages = rectify_chat_history(modelfile.messages)
         if len(history) > 0 and history[-1]['role'] == "user":
             history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
                 before_prompt = modelfile.before_prompt,
@@ -265,7 +257,7 @@ class LlamaCppExecutor(LLMExecutor):
                 stop=self.stop_words,
                 echo=False,
                 stream=True,
-                **self.generation_config
+                **merge_config(self.generation_config, modelfile.parameters["llm_"])
             )
             self.serving_generator = output_generator
             

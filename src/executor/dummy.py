@@ -4,7 +4,7 @@ import asyncio
 import logging
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, Modelfile
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +28,10 @@ class DummyExecutor(LLMExecutor):
         parser.add_argument('--delay', type=int, default=0.02, help='Inter-token delay')
 
     def setup(self):
-        if not self.LLM_name:
-            self.LLM_name = "dummy"
-
         self.stop = False
 
-    async def llm_compute(self, data):
+
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
             self.stop = False
             for i in lorem: 
@@ -41,7 +39,7 @@ class DummyExecutor(LLMExecutor):
                 if self.stop:
                     self.stop = False
                     break
-                await asyncio.sleep(self.args.delay)
+                await asyncio.sleep(modelfile.parameters.get("llm_delay", self.args.delay))
         except Exception as e:
             logger.exception("Error occurs during generation.")
             yield str(e)

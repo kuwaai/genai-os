@@ -90,10 +90,10 @@ class DocQaExecutor(LLMExecutor):
 
         url = None
         begin_index = 0
-        user_records = list(filter(lambda x: not x["isbot"], chat_history))
+        user_records = list(filter(lambda x: x["role"] == "user", chat_history))
         for i, record in enumerate(reversed(user_records)):
 
-            urls_in_msg = re.findall(r'^(https?://[^\s]+)$', record["msg"])
+            urls_in_msg = re.findall(r'^(https?://[^\s]+)$', record["content"])
             if len(urls_in_msg) != 0: 
                 url = urls_in_msg[-1]
                 begin_index = len(chat_history) - i - 1
@@ -101,23 +101,21 @@ class DocQaExecutor(LLMExecutor):
         
         return url, chat_history[begin_index:]
 
-    async def llm_compute(self, data):
-        chat_history = json.loads(data.get("input"))
-        auth_token = data.get("user_token") or self.args.api_key
-        parsed_modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
-        override_qa_prompt = parsed_modelfile.override_system_prompt
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
+        auth_token = modelfile.parameters["_"]["user_token"] or self.args.api_key
+        override_qa_prompt = modelfile.override_system_prompt
         url = None
 
         try:
             if self.pre_built_db == None:
-                url, chat_history = self.extract_last_url(chat_history)
+                url, history = self.extract_last_url(history)
                 if url == None : raise NoUrlException(i18n.t('docqa.no_url_exception'))
             
-                chat_history = [{"isbot": False, "msg": None}] + chat_history[1:]
+                history = [{"role": "user", "content": None}] + history[1:]
             self.proc = True
             response_generator = self.docqa.process(
                 urls=[url],
-                chat_history=chat_history,
+                chat_history=history,
                 auth_token=auth_token,
                 override_qa_prompt=override_qa_prompt
             )

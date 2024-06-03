@@ -14,12 +14,11 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
 
 from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.llm_executor import rectify_chat_history
 from kuwa.executor.util import (
     expose_function_parameter,
     read_config,
     merge_config,
-    to_openai_chat_format,
-    rectify_chat_history
 )
 
 logger = logging.getLogger(__name__)
@@ -102,9 +101,6 @@ class HuggingfaceExecutor(LLMExecutor):
         if not self.model_path:
             raise Exception("You need to configure a local or huggingface model path!")
 
-        if not self.LLM_name:
-            self.LLM_name = "huggingface"
-                
         self.load_8bits = self.args.load_8bits
         self.trust_remote_code = self.args.trust_remote_code
         model_dtype = {}
@@ -168,14 +164,11 @@ class HuggingfaceExecutor(LLMExecutor):
 
         return prompt
 
-    async def llm_compute(self, data):
-        history = json.loads(data.get("input"))
-        history = to_openai_chat_format(history)
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
 
-        # Parse and process modelfile
-        modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
+        # Apply modelfile
         system_prompt = modelfile.override_system_prompt or self.system_prompt
-        prepended_messages = rectify_chat_history(to_openai_chat_format(modelfile.messages))
+        prepended_messages = rectify_chat_history(modelfile.messages)
         if len(history) > 0 and history[-1]['role'] == "user":
             history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
                 before_prompt = modelfile.before_prompt,
@@ -202,7 +195,7 @@ class HuggingfaceExecutor(LLMExecutor):
             input_ids=prompt_embedding,
             streamer=streamer,
             generation_config=GenerationConfig(
-                **self.generation_config
+                **merge_config(self.generation_config, modelfile.parameters["llm_"])
             ),
             stopping_criteria=StoppingCriteriaList([self.CSC])
         ), daemon=True)

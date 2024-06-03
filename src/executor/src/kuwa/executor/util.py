@@ -128,27 +128,3 @@ def merge_config(base: dict, top: dict) -> dict:
     base = base.copy()
     base.update((k, v) for k, v in top.items() if v is not None)
     return base
-
-def to_openai_chat_format(history: list):
-    """
-    Convert the chat history from Kuwa's format to OpenAI's format.
-    """
-    history = [
-        {
-            "role": "assistant" if i["isbot"] else "user",
-            "content": i["msg"]
-        }
-        for i in history
-    ]
-    return history
-
-def rectify_chat_history(history: list):
-    """
-    Ensure the history begin with "user."
-    """
-    if len(history)==0: return history
-    first_user_idx = 0
-    while history[first_user_idx]["role"] != "user" and first_user_idx+1 < len(history)-1:
-        first_user_idx += 1
-    history = history[first_user_idx:]
-    return history
