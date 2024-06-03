@@ -6,8 +6,11 @@ import asyncio
 import logging
 import requests
 import tempfile
+import queue
 import mimetypes
+from threading import Thread
 from pywhispercpp.model import Model as WhisperModel
+from pywhispercpp.utils import to_timestamp
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from kuwa.executor import LLMExecutor
@@ -70,11 +73,37 @@ class WhisperExecutor(LLMExecutor):
             f.write(response.content)
             filepath = f.name
         return filepath
+    
+    async def transcribe(self, filepath):
+        q = queue.Queue() # whisper produces, the generator consumes
+        job_done = object() # signals the processing is done
+
+        # Producer
+        def on_new_segment(segments):
+            for s in segments:
+                q.put(s)
+        def producer_task():
+            self.model.transcribe(filepath, speed_up=self.speedup, new_segment_callback=on_new_segment)
+            q.put(job_done)
+
+        producer_thread = Thread(target=producer_task)
+        producer_thread.start()
+
+        # Consumer
+        while True:
+            try:
+                next_item = q.get(block=False) # Blocks until an input is available
+            except queue.Empty:
+                continue
+            if next_item is job_done:
+                break
+            yield next_item
+
+        producer_thread.join()
 
     async def llm_compute(self, data):
 
         filepath = None
-        logger.debug(data)
         try:
             self.stop = False
             chat_history = json.loads(data.get("input"))
@@ -84,10 +113,11 @@ class WhisperExecutor(LLMExecutor):
 
             filepath = self.download(url)
 
-            segments = self.model.transcribe(filepath, speed_up=self.speedup, new_segment_callback=print)
-            for segment in segments:
-                print(segment.text)
-                yield segment.text
+            result = self.transcribe(filepath=filepath)
+            async for segment in result:
+                yield "[{} ---> {}] {}\n".format(
+                    to_timestamp(segment.t0), to_timestamp(segment.t1), segment.text
+                )
                 if self.stop: break
         except Exception as e:
             logger.exception("Error occurs during generation.")
