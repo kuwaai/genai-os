@@ -105,6 +105,7 @@ class DocQa:
     return document_store
 
   async def process(self, urls: Iterable, chat_history: [dict], auth_token=None, override_qa_prompt:str=None) -> Generator[str, None, None]:
+    chat_history = [{"msg": i["content"], "isbot": i["role"]=="assistant"} for i in chat_history]
 
     final_user_input = self.get_final_user_input(chat_history)
 

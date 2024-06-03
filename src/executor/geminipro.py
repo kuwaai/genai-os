@@ -59,8 +59,6 @@ class GeminiExecutor(LLMExecutor):
         self.limit = self.args.limit
         self.system_prompt = self.args.system_prompt
         self.no_system_prompt = self.args.no_system_prompt
-        if not self.LLM_name:
-            self.LLM_name = "gemini-pro"
 
         # Setup generation config
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
@@ -81,29 +79,21 @@ class GeminiExecutor(LLMExecutor):
         check_resp = await self.model.count_tokens_async(contents=contents)
         return check_resp.total_tokens
     
-    def rectify_history(self, messages: list):
-        """
-        Ensure the history begin with "user."
-        """
-        first_user_idx = 0
-        while messages[first_user_idx]["role"] != "user":
-            first_user_idx += 1
-        messages = messages[first_user_idx:]
-        return messages
-
-    async def llm_compute(self, data):
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
-            google_token = data.get("google_token") or self.args.api_key
+            google_token = modelfile.parameters["_"]["google_token"] or self.args.api_key
 
             # Parse and process modelfile
-            parsed = Modelfile.from_json(data.get("modelfile", "[]"))
-            override_system_prompt, messages = parsed.override_system_prompt, parsed.messages
+            override_system_prompt = modelfile.override_system_prompt
             if not override_system_prompt: override_system_prompt = "" if self.no_system_prompt else self.system_prompt
 
             # Apply parsed modelfile data to Inference
-            raw_inputs = messages + json.loads(data.get("input"))
-            msg = [{"parts":[{"text":i['msg'].encode("utf-8",'ignore').decode("utf-8")}], "role":"model" if i['isbot'] else "user"} for i in raw_inputs]
-            msg[-1]["parts"][0]['text'] = parsed.before_prompt + msg[-1]["parts"][0]['text'] + parsed.after_prompt
+            raw_inputs = modelfile.messages + history
+            msg = [{
+                    "parts":[{"text":i['content'].encode("utf-8",'ignore').decode("utf-8")}],
+                    "role": {"user": "user", "assistant": "model"}[i["role"]]
+                } for i in raw_inputs]
+            msg[-1]["parts"][0]['text'] = modelfile.before_prompt + msg[-1]["parts"][0]['text'] + modelfile.after_prompt
             msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
             
             if not google_token or len(google_token) == 0:
@@ -136,7 +126,9 @@ class GeminiExecutor(LLMExecutor):
                     "HARM_CATEGORY_HATE_SPEECH": "block_none",
                     "HARM_CATEGORY_SEXUALLY_EXPLICIT": "block_none"
                 },
-                generation_config=genai.GenerationConfig(**self.generation_config)
+                generation_config=genai.GenerationConfig(
+                    **merge_config(self.generation_config, modelfile.parameters["llm_"])
+                )
             )
             async for resp in response:
 

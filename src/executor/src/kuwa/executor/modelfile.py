@@ -60,9 +60,9 @@ class Modelfile:
                 elif command["name"] == "message":
                     role, content = command["args"].split(' ', 1)
                     if role == "user":
-                        messages += [{"msg":content, "isbot":False}]
+                        messages += [{"content": content, "role": "user"}]
                     elif role == "assistant":
-                        messages += [{"msg":content, "isbot":True}]
+                        messages += [{"content": content, "role": "assistant"}]
                     elif role == "system":
                         override_system_prompt += content
                     else:
@@ -89,6 +89,5 @@ class Modelfile:
         )
 
     def __init__(self, **kwargs):
-        logger.debug(f"{kwargs}")
         for key, value in kwargs.items():
             setattr(self, key, value)

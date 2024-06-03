@@ -50,9 +50,6 @@ class RetrieverExecutor(LLMExecutor):
         retrieving_group.add_argument('--mmr_k', default=6, type=int, help='Number of chunk to retrieve after Maximum Marginal Relevance (MMR).')
 
     def setup(self):
-        if not self.LLM_name:
-            self.LLM_name = "retriever"
-
         crawler_config = {}
         crawler_config['csr_threshold'] = self.args.csr_threshold
         crawler_config['max_depth'] = self.args.max_depth
@@ -80,10 +77,10 @@ class RetrieverExecutor(LLMExecutor):
 
         url = None
         begin_index = 0
-        user_records = list(filter(lambda x: not x["isbot"], chat_history))
+        user_records = list(filter(lambda x: x["role"] == "user", chat_history))
         for i, record in enumerate(reversed(user_records)):
 
-            urls_in_msg = re.findall(r'^(https?://[^\s]+)$', record["msg"])
+            urls_in_msg = re.findall(r'^(https?://[^\s]+)$', record["content"])
             if len(urls_in_msg) != 0: 
                 url = urls_in_msg[-1]
                 begin_index = len(chat_history) - i - 1
@@ -92,8 +89,8 @@ class RetrieverExecutor(LLMExecutor):
         return url, chat_history[begin_index:]
   
     def get_final_user_input(self, chat_history: [dict]) -> str:
-        final_user_record = next(filter(lambda x: x['isbot'] == False, reversed(chat_history)))
-        return final_user_record['msg']
+        final_user_record = next(filter(lambda x: x['role'] == "user", reversed(chat_history)))
+        return final_user_record['content']
 
     async def _fetch_documents(self, url:str, modelfile:Modelfile=None):
         """
@@ -117,7 +114,7 @@ class RetrieverExecutor(LLMExecutor):
         total_docs_len = functools.reduce(lambda x, y: x+y, docs_len)
         logger.info(f'Fetched {len(docs)} documents. The total length of the documents is {total_docs_len}')
 
-        return docs
+        return docs, total_docs_len
 
     async def _get_retrieve_chunks(self, docs:list[str], query:str, modelfile:Modelfile=None):
         """
@@ -145,10 +142,8 @@ class RetrieverExecutor(LLMExecutor):
         logger.debug(f"Chunks: {relevant_chunks}")
         return relevant_chunks
     
-    async def llm_compute(self, data):
-        history = json.loads(data.get("input"))
-        parsed_modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
-        logger.debug(f"Parameters: {parsed_modelfile.parameters}")
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
+        logger.debug(f"Parameters: {modelfile.parameters}")
         url = None
 
         try:
@@ -158,12 +153,13 @@ class RetrieverExecutor(LLMExecutor):
             self.proc = True
             final_user_input = self.get_final_user_input(history)
             
-            docs = await self._fetch_documents(url, parsed_modelfile)
-            relevant_chunks = await self._get_retrieve_chunks(docs, final_user_input, parsed_modelfile)
+            docs, total_docs_len = await self._fetch_documents(url, modelfile)
+            relevant_chunks = await self._get_retrieve_chunks(docs, final_user_input, modelfile)
             get_content = lambda x: x.page_content
 
             yield json.dumps({
                 "succeed": True,
+                "content-length": total_docs_len,
                 "content": list(map(get_content, docs)),
                 "chunk": list(map(get_content, relevant_chunks))
             })

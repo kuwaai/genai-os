@@ -119,8 +119,8 @@ class SearchQaExecutor(LLMExecutor):
         process_site_list = lambda x: list(filter(None, x.split(';')))
         restricted_sites = process_site_list(self.restricted_sites)
         blocked_sites = process_site_list(self.blocked_sites)
-        latest_user_record = next(filter(lambda x: not x["isbot"], reversed(chat_history)))
-        latest_user_msg = latest_user_record["msg"]
+        latest_user_record = next(filter(lambda x: x["role"] == "user", reversed(chat_history)))
+        latest_user_msg = latest_user_record["content"]
 
         before_prompt = parsed_modelfile.before_prompt
         after_prompt = parsed_modelfile.after_prompt
@@ -172,22 +172,20 @@ class SearchQaExecutor(LLMExecutor):
         finally:
             return urls, [latest_user_record]
 
-    async def llm_compute(self, data):
-        chat_history = json.loads(data.get("input"))
-        auth_token = data.get("user_token") or self.args.api_key
-        parsed_modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
-        override_qa_prompt = parsed_modelfile.override_system_prompt
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
+        auth_token = modelfile.parameters["_"]["user_token"] or self.args.api_key
+        override_qa_prompt = modelfile.override_system_prompt
 
         try:
         
-            urls, chat_history = await self.search_url(chat_history, parsed_modelfile)
+            urls, history = await self.search_url(history, modelfile)
 
             if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
         
             self.proc = True
             response_generator = self.docqa.process(
                 urls=[u for u,t in urls],
-                chat_history=chat_history,
+                chat_history=history,
                 auth_token=auth_token,
                 override_qa_prompt=override_qa_prompt
             )

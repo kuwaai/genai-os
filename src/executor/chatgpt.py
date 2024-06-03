@@ -17,7 +17,6 @@ from kuwa.executor.util import (
     read_config,
     merge_config,
     DescriptionParser,
-    to_openai_chat_format
 )
 
 logger = logging.getLogger(__name__)
@@ -93,8 +92,6 @@ class ChatGptExecutor(LLMExecutor):
         self.no_override_api_key = self.args.no_override_api_key
         if not (self.api_key or "").startswith("sk-") and not self.no_override_api_key:
             logger.warning("By incorporating the \"--no_override_api_key\" argument, you can prevent overriding of the specified third-party API key by the user's OpenAI API key.")
-        if not self.LLM_name:
-            self.LLM_name = "chatgpt"
         
         context_window = [self.args.context_window] if self.args.context_window is not None else \
                          [v for k, v in CONTEXT_WINDOW.items() if self.model_name in k]
@@ -144,22 +141,23 @@ class ChatGptExecutor(LLMExecutor):
         num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
         return num_tokens
 
-    async def llm_compute(self, data):
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
-            openai_token = self.api_key if self.no_override_api_key else data.get("openai_token") or self.api_key
+            openai_token = self.api_key
+            if not self.no_override_api_key:
+                openai_token = modelfile.parameters["_"]["openai_token"] or self.api_key
             
             # Parse and process modelfile
-            parsed = Modelfile.from_json(data.get("modelfile", "[]"))
-            override_system_prompt, messages = parsed.override_system_prompt, parsed.messages
+            override_system_prompt, messages = modelfile.override_system_prompt, modelfile.messages
             system_prompt = override_system_prompt or self.system_prompt
 
             # Apply parsed modelfile data to Inference
-            raw_inputs = messages + json.loads(data.get("input"))
-            msg = to_openai_chat_format(raw_inputs)
+            generation_config = merge_config(self.generation_config, modelfile.parameters["llm_"])
+            msg = messages + history
             if system_prompt is not None:
                 msg = [{"content": system_prompt, "role": "system"}] + msg
 
-            msg[-1]['content'] = parsed.before_prompt + msg[-1]['content'] + parsed.after_prompt
+            msg[-1]['content'] = modelfile.before_prompt + msg[-1]['content'] + modelfile.after_prompt
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return
@@ -189,7 +187,7 @@ class ChatGptExecutor(LLMExecutor):
                 model=self.model_name,
                 messages=msg,
                 stream=True,
-                **self.generation_config
+                **generation_config
             )
             async for i in response:
                 chunk = i.choices[0].delta.content

@@ -5,7 +5,7 @@ import logging
 import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from kuwa.executor import LLMExecutor
+from kuwa.executor import LLMExecutor, Modelfile
 
 logger = logging.getLogger(__name__)
 
@@ -20,20 +20,17 @@ class DebugExecutor(LLMExecutor):
         parser.add_argument('--delay', type=float, default=0.02, help='Inter-token delay')
 
     def setup(self):
-        if not self.LLM_name:
-            self.LLM_name = "debug"
-
         self.stop = False
 
-    async def llm_compute(self, data):
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
             self.stop = False
-            for i in "".join([i['msg'] for i in json.loads(data.get("input"))]).strip():
+            for i in "".join([i['content'] for i in history]).strip():
                 yield i
                 if self.stop:
                     self.stop = False
                     break
-                await asyncio.sleep(self.args.delay)
+                await asyncio.sleep(modelfile.parameters.get("llm_delay", self.args.delay))
         except Exception as e:
             logger.exception("Error occurs during generation.")
             yield str(e)

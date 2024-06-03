@@ -13,13 +13,12 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import ollama
 
 from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.llm_executor import rectify_chat_history
 from kuwa.executor.util import (
     expose_function_parameter,
     read_config,
     merge_config,
     DescriptionParser,
-    to_openai_chat_format,
-    rectify_chat_history
 )
 
 logger = logging.getLogger(__name__)
@@ -76,7 +75,6 @@ class OllamaExecutor(LLMExecutor):
         self.context_window = self.args.context_window
         self.limit = self.args.limit
         self.system_prompt = self.args.system_prompt
-        if self.LLM_name is None: self.LLM_name = "ollama"
         
         # Setup generation config
         file_gconf = read_config(self.args.generation_config) if self.args.generation_config else {}
@@ -157,15 +155,11 @@ class OllamaExecutor(LLMExecutor):
 
         return prompt
 
-    async def llm_compute(self, data):
+    async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
-            history = json.loads(data.get("input"))
-            history = to_openai_chat_format(history)
-
-            # Parse and process modelfile
-            modelfile = Modelfile.from_json(data.get("modelfile", "[]"))
+            # Apply modelfile
             system_prompt = modelfile.override_system_prompt or self.system_prompt
-            prepended_messages = rectify_chat_history(to_openai_chat_format(modelfile.messages))
+            prepended_messages = rectify_chat_history(modelfile.messages)
             if len(history) > 0 and history[-1]['role'] == "user":
                 history[-1]['content'] = "{before_prompt}{original_prompt}{after_prompt}".format(
                     before_prompt = modelfile.before_prompt,
