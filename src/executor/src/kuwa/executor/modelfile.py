@@ -1,5 +1,9 @@
+import re
 import json
+import logging
 from dataclasses import dataclass, field
+
+logger = logging.getLogger(__name__)
 
 def convert_value(value):
     precedence = [int, float]
@@ -11,13 +15,24 @@ def convert_value(value):
         except ValueError:
             pass
     if converted_v is None and value is not None:
-        if value.lower() == "true":
-            converted_v = True
-        elif value.lower() == "false":
-            converted_v = False
-        else:
-            converted_v = value
+        match value.lower():
+            case "true":
+                converted_v = True
+            case "false":
+                converted_v = False
+            case "none":
+                convert_v = None
+            case _:
+                converted_v = value
     return converted_v
+
+class ParameterDict(dict):
+    def __missing__(self, key):
+        """
+        Return a sub-dictionary which has common-prefix in key if not exact match.
+        """
+        prefix_dict = {k[len(key):]: v for k, v in self.items() if k.startswith(key)}
+        return prefix_dict
 
 @dataclass
 class Modelfile:
@@ -26,7 +41,7 @@ class Modelfile:
     template:str=None
     before_prompt:str=None
     after_prompt:str=None
-    parameters:dict=field(default_factory=dict)
+    parameters:ParameterDict=field(default_factory=ParameterDict)
 
     @classmethod
     def from_json(cls, raw_modelfile:str):
@@ -37,7 +52,7 @@ class Modelfile:
         after_prompt = ''
         messages = []
         template = ""
-        parameters = {}
+        parameters = ParameterDict()
         for command in parsed:
             try:
                 if command["name"] == "system":
@@ -58,8 +73,9 @@ class Modelfile:
                     before_prompt += command['args']
                 elif command['name'] == "after-prompt":
                     after_prompt += command['args']
-                elif command["name"] == "parameter":
-                    key, value = command["args"].split(' ', 1)
+                elif command["name"] == "parameter" or command["name"] == "kuwaparam":
+                    args = re.sub(r'#.*$', '', command['args']).strip()
+                    key, value = args.split(' ', 1)
                     parameters[key] = convert_value(value)
             except Exception as e:
                 logger.exception(f"Error in modelfile `{command}` with error: `{e}`")
@@ -73,5 +89,6 @@ class Modelfile:
         )
 
     def __init__(self, **kwargs):
+        logger.debug(f"{kwargs}")
         for key, value in kwargs.items():
             setattr(self, key, value)
