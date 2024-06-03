@@ -41,7 +41,16 @@ class RequestChat implements ShouldQueue
         }
         $this->channel = $channel;
         $this->modelfile = $modelfile;
-        if ($this->modelfile) $this->modelfile = json_encode($this->modelfile);
+        if ($this->modelfile) {
+            $this->modelfile = array_filter($this->modelfile, function($entry) {
+                return !empty($entry->name) && $entry->name[0] !== '#';
+            });
+            $this->modelfile = array_map(function($entry) {
+                $entry->args = trim($entry->args, '"');
+                return $entry;
+            }, $this->modelfile);
+            $this->modelfile = json_encode(array_values($this->modelfile));
+        }
         $user = User::find($user_id);
         $this->openai_token = $user->openai_token;
         $this->google_token = $user->google_token;
@@ -68,7 +77,7 @@ class RequestChat implements ShouldQueue
                 return;
             }
         }
-        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input) . "|" . $this->lang);
+        Log::channel('analyze')->Info('In:' . $this->access_code . '|' . $this->user_id . '|' . $this->history_id . '|' . strlen(trim($this->input)) . '|' . trim($this->input) . "|" . $this->lang . "|" . $this->modelfile);
         $start = microtime(true);
         $tmp = '';
         try {

@@ -110,35 +110,34 @@
                     </div>
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                for="modelfile">{{ __('store.bot.modelfile') }}</label>
-                            <div class="flex items-center">
-                                <textarea id="modelfile" name="modelfile" type="text" oninput="adjustTextareaRows(this)"
-                                    onblur="modelfile_update($(this));" rows="10" max-rows="10" placeholder="{{ __('store.bot.modelfile') }}"
-                                    class="bg-gray-50 border scrollbar border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
+                            <label
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.modelfile') }}</label>
+                            <div>
+                                <textarea name="modelfile" hidden></textarea>
+                                <div id="modelfile-editor" class="w-full h-48"></div>
                             </div>
                         </div>
                     </div>
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         @if (request()->user()->hasPerm('Room_update_new_chat'))
-                        <button type="button" onclick="$('#ChatWithBot').submit()"
-                            class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                            {{ __('store.bot.button.chat') }}
-                        </button>
+                            <button type="button" onclick="$('#ChatWithBot').submit()"
+                                class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                {{ __('store.bot.button.chat') }}
+                            </button>
                         @endif
                         @if (request()->user()->hasPerm('Store_update_modify_bot'))
-                        <button type="button" id="save_bot" data-modal-target="update_modal"
-                            data-modal-toggle="update_modal"
-                            class="bg-green-500 hover:bg-green-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                            {{ __('manage.button.save') }}
-                        </button>
+                            <button type="button" id="save_bot" data-modal-target="update_modal"
+                                data-modal-toggle="update_modal"
+                                class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                {{ __('manage.button.save') }}
+                            </button>
                         @endif
                         @if (request()->user()->hasPerm('Store_delete_delete_bot'))
-                        <button type="button" id="delete_bot" data-modal-target="delete_modal"
-                            data-modal-toggle="delete_modal"
-                            class="bg-red-500 hover:bg-red-600 text-white focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                            {{ __('manage.button.delete') }}
-                        </button>
+                            <button type="button" id="delete_bot" data-modal-target="delete_modal"
+                                data-modal-toggle="delete_modal"
+                                class="bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                {{ __('manage.button.delete') }}
+                            </button>
                         @endif
                     </div>
                 </ul>
@@ -181,7 +180,7 @@
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                     {{ __('manage.modal.update_model.header') }}</h3>
                 <button data-modal-hide="update_modal" type="submit" id="update_bot_btn"
-                    class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                    class="text-white bg-green-500 hover:bg-green-600 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                     {{ __('manage.button.yes') }}
                 </button>
                 <button data-modal-hide="update_modal" type="button"
@@ -214,7 +213,7 @@
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                     {{ __('manage.modal.delete_model.header') }}</h3>
                 <button id="delete_bot_btn" data-modal-hide="delete_modal" type="button"
-                    class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                    class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                     {{ __('manage.button.yes') }}
                 </button>
                 <button data-modal-hide="delete_modal" type="button"
@@ -233,8 +232,8 @@
         }
         $("#detail-modal input").prop("disabled", readonly)
         $("#detail-modal input").prop("readonly", readonly)
-        $("#detail-modal textarea").prop("readonly", readonly)
-        $("#detail-modal textarea").prop("disabled", readonly)
+        ace.edit('modelfile-editor').setReadOnly(readonly);
+        $('#detail-modal textarea[name=modelfile]').val('')
         $("#detail-modal h3").text(data.name);
         $("#detail-modal input[name=llm_name]").val(data.llm_name)
         $("#detail-modal input[name=bot-name]").val(data.name)
@@ -247,16 +246,14 @@
                 $(`#detail-modal input[value='${a}']`).prop("checked", true);
             });
             modelfile = modelfile_to_string(config['modelfile'] ?? [])
-            if (modelfile.length == 0){
-                $("#detail-modal textarea[name=modelfile]").val('')
-                $("#detail-modal textarea[name=modelfile]").hide()
-            }else{
-                $("#detail-modal textarea[name=modelfile]").show()
-                $("#detail-modal textarea[name=modelfile]").val(modelfile)
+            if (modelfile.length == 0) {
+                ace.edit('modelfile-editor').setValue()
+            } else {
+                ace.edit('modelfile-editor').setValue(modelfile)
             }
-        }else{
-            $("#detail-modal textarea[name=modelfile]").val('')
-            $("#detail-modal textarea[name=modelfile]").hide()
+        } else {
+            ace.edit('modelfile-editor').setValue()
+            $("#modelfile-editor textarea").hide()
         }
         $("#update_bot_btn").off('click').on('click', function() {
             $("#update_bot input[name=id]").val(data.id);
@@ -267,10 +264,17 @@
             $("#del_bot_by_ID").submit();
         });
         $('#ChatWithBot input[name=\'llm[]\']').val(data.id)
+        ace.edit('modelfile-editor').gotoLine(0);
     }
 
     function checkForm() {
         if ($("#update_bot input[name='llm_name']").val() && $("#update_bot input[name='bot-name']").val()) {
+            $('#detail-modal textarea[name=modelfile]').val(modelfile_to_string(modelfile_parse(ace.edit(
+                    'modelfile-editor')
+                .getValue())))
+            ace.edit('modelfile-editor').setValue(modelfile_to_string(modelfile_parse(ace.edit('modelfile-editor')
+                .getValue())))
+            ace.edit('modelfile-editor').gotoLine(0);
             return true;
         }
         if (!$("#update_bot input[name='llm_name']").val()) $("#create_error").text(
@@ -279,5 +283,24 @@
             "{{ __('You must name your bot') }}")
         $("#create_error").show().delay(3000).fadeOut();
         return false;
+    }
+    var editor = ace.edit($('#modelfile-editor')[0], {
+        mode: "ace/mode/dockerfile",
+        selectionStyle: "text"
+    })
+    editor.setHighlightActiveLine(true);
+    // Set the onblur event
+    $('#modelfile-editor textarea').on('blur', function() {
+        let data = modelfile_parse(ace.edit('modelfile-editor').getValue());
+        for (let obj of data) {
+            if (obj.name === 'system') {
+                $("#bot-system_prompt").val(obj.args)
+            }
+        }
+        ace.edit('modelfile-editor').setValue(modelfile_to_string(data))
+        ace.edit('modelfile-editor').gotoLine(0);
+    });
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        editor.setTheme("ace/theme/monokai");
     }
 </script>
