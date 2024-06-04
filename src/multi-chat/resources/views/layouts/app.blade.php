@@ -25,6 +25,7 @@
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>
+    <script src="{{ asset('js/ace/ace.js') }}"></script>
 
     <script>
         function chain_toggle() {
@@ -39,7 +40,7 @@
         }
 
         function uploadcheck() {
-            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
+            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 20 * 1024 *
                 1024) {
                 $("#attachment").show();
                 $("#attachment button").text($("#upload")[0].files[0].name)
@@ -85,7 +86,7 @@
             };
 
             // Split the input data into lines
-            const lines = data.split('\n');
+            const lines = data.trim().split('\n');
 
             // Iterate over each line
             lines.forEach(line => {
@@ -98,9 +99,18 @@
                 ];
 
                 // Check if the line starts with a command keyword
-                if (commandKeywords.some(keyword => line.toUpperCase().startsWith(keyword))) {
+                if (line.startsWith('#')) {
                     // If a command is already being accumulated, push it to the commands array
-                    if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
+                    if (currentCommand.name !== '') {
+                        commands.push(currentCommand);
+                    }
+                    currentCommand = {
+                        name: line,
+                        args: ''
+                    };
+                } else if (commandKeywords.some(keyword => line.toUpperCase().startsWith(keyword))) {
+                    // If a command is already being accumulated, push it to the commands array
+                    if (currentCommand.name !== '') {
                         commands.push(currentCommand);
                     }
                     // Start a new command
@@ -130,48 +140,57 @@
                     }
                 } else {
                     // If the line does not start with a command keyword, append it to the current command's arguments
-                    currentCommand.args += '\n' + line;
-                }
+                    if (currentCommand.name.startsWith('#') || currentCommand.args.length > 6 && currentCommand.args.endsWith('"""') && currentCommand.args
+                        .startsWith('"""')) {
+                        commands.push(currentCommand);
+                        // Start a new command
+                        currentCommand = {
+                            name: '',
+                            args: ''
+                        };
+                        // Split the line into command type and arguments
+                        let [commandType, commandArgs] = line.split(/\s+(.+)/);
+                        if (!commandArgs) commandArgs = '';
 
+                        // Set the current command's name and arguments
+                        currentCommand.name = commandType.toLowerCase();
+                        currentCommand.args = commandArgs.trim();
+                        if (line == '') commands.push(currentCommand);
+                    } else if (line == '' && currentCommand.name == '' && currentCommand.args == '') {
+                        commands.push({
+                            name: '',
+                            args: ''
+                        });
+                    } else if (currentCommand.name != '') {
+                        currentCommand.args += '\n' + line;
+                    }
+
+                }
             });
 
-            // Push the last command to the commands array if it has non-empty arguments
-            if (currentCommand.name !== '' && currentCommand.args.trim() !== '') {
+            // Push the last command to the commands array
+            if (currentCommand.name !== '') {
                 commands.push(currentCommand);
             }
-
-            // Remove triple-quotes at the start or end of arguments
-            commands.forEach(command => {
-                if (command.args.startsWith('"""')) {
-                    command.args = command.args.slice(3);
-                }
-                if (command.args.endsWith('"""')) {
-                    command.args = command.args.slice(0, -3);
-                }
-            });
-
             return commands;
-        }
-
-        function modelfile_update(node) {
-            let data = modelfile_parse(node.val());
-            for (let obj of data) {
-                if (obj.name === 'system') {
-                    $("#bot-system_prompt").val(obj.args)
-                }
-            }
-            node.val(modelfile_to_string(data));
         }
 
         function modelfile_to_string(array) {
             return array.map(item => {
                 if (item) {
                     let args = item.args;
-                    if (args) {
-                        if (args.includes('\n')) {
-                            args = '"""' + args + '"""';
+                    if (item.name.startsWith('#')) {
+                        return `${item.name}`;
+                    } else if (args) {
+                        if (args.includes('\n') && !args.trim().startsWith('"')) {
+                            args = '"""' + args;
+                        }
+                        if (args.includes('\n') && !args.trim().endsWith('"')) {
+                            args += '"""';
                         }
                         return `${item.name.toUpperCase()} ${args}`;
+                    } else {
+                        return `${item.name.toUpperCase()}`;
                     }
                 }
                 return ""

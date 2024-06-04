@@ -83,7 +83,7 @@
                                 <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
                                     {{ __('store.bot.react_buttons') }}
                                 </p>
-    
+
                                 @foreach (['Feedback', 'Translate', 'Quote', 'Other'] as $label)
                                     @php $id = strtolower($label); @endphp
                                     <div class="flex items-center">
@@ -106,8 +106,8 @@
                                 for="bot-system_prompt">{{ __('store.bot.system_prompt') }}</label>
                             <div class="flex items-center">
                                 <textarea id="bot-system_prompt" type="text"
-                                    oninput="$('#modelfile').val(modelfile_to_string((modelfile_parse($('#modelfile').val()).some(obj => obj.name === 'system') ? modelfile_parse($('#modelfile').val()) : [...modelfile_parse($('#modelfile').val()), { name: 'system', args: 'uwu' }])
-                                    .map(obj => obj.name === 'system' ? { ...obj, args: $(this).val() } : obj))); adjustTextareaRows(this);adjustTextareaRows('#modelfile');"
+                                    oninput="ace.edit('bot-modelfile-editor').setValue(modelfile_to_string((modelfile_parse(ace.edit('bot-modelfile-editor').getValue()).some(obj => obj.name === 'system') ? modelfile_parse(ace.edit('bot-modelfile-editor').getValue()) : [...modelfile_parse(ace.edit('bot-modelfile-editor').getValue()), { name: 'system', args: 'uwu' }])
+                                    .map(obj => obj.name === 'system' ? { ...obj, args: $(this).val() } : obj))); adjustTextareaRows(this);ace.edit('modelfile-editor').gotoLine(0);"
                                     rows="1" max-rows="4" placeholder="{{ __('store.bot.system_prompt.label') }}"
                                     class="bg-gray-50 border scrollbar border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
@@ -120,8 +120,8 @@
                                 for="bot-before_prompt">{{ __('store.bot.before_prompt') }}</label>
                             <div class="flex items-center">
                                 <textarea id="bot-before_prompt" type="text"
-                                    oninput="$('#modelfile').val(modelfile_to_string((modelfile_parse($('#modelfile').val()).some(obj => obj.name === 'before-prompt') ? modelfile_parse($('#modelfile').val()) : [...modelfile_parse($('#modelfile').val()), { name: 'before-prompt', args: 'uwu' }])
-                                    .map(obj => obj.name === 'before-prompt' ? { ...obj, args: $(this).val() } : obj))); adjustTextareaRows(this);adjustTextareaRows('#modelfile');"
+                                    oninput="ace.edit('bot-modelfile-editor').setValue(modelfile_to_string((modelfile_parse(ace.edit('bot-modelfile-editor').getValue()).some(obj => obj.name === 'before-prompt') ? modelfile_parse(ace.edit('bot-modelfile-editor').getValue()) : [...modelfile_parse(ace.edit('bot-modelfile-editor').getValue()), { name: 'before-prompt', args: 'uwu' }])
+                                    .map(obj => obj.name === 'before-prompt' ? { ...obj, args: $(this).val() } : obj))); adjustTextareaRows(this);ace.edit('modelfile-editor').gotoLine(0);"
                                     rows="1" max-rows="4" placeholder="{{ __('store.bot.before_prompt.label') }}"
                                     class="bg-gray-50 border scrollbar border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
@@ -134,41 +134,27 @@
                                 for="bot-after_prompt">{{ __('store.bot.after_prompt') }}</label>
                             <div class="flex items-center">
                                 <textarea id="bot-after_prompt" type="text"
-                                    oninput="$('#modelfile').val(
+                                    oninput="ace.edit('bot-modelfile-editor').setValue(
                                         modelfile_to_string(
-                                            (modelfile_parse($('#modelfile').val())
+                                            (modelfile_parse(ace.edit('bot-modelfile-editor').getValue())
                                             .some(obj => obj.name === 'after-prompt') ? 
-                                            modelfile_parse($('#modelfile').val()) : [...modelfile_parse($('#modelfile').val())
+                                            modelfile_parse(ace.edit('bot-modelfile-editor').getValue()) : [...modelfile_parse(ace.edit('bot-modelfile-editor').getValue())
                                             , { name: 'after-prompt', args: 'uwu' }])
-                                    .map(obj => obj.name === 'after-prompt' ? { ...obj, args: $(this).val() } : obj))); adjustTextareaRows(this);adjustTextareaRows('#modelfile');"
+                                    .map(obj => obj.name === 'after-prompt' ? { ...obj, args: $(this).val() } : obj))); adjustTextareaRows(this);ace.edit('modelfile-editor').gotoLine(0);"
                                     rows="1" max-rows="4" placeholder="{{ __('store.bot.after_prompt.label') }}"
                                     class="bg-gray-50 border scrollbar border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
                             </div>
                         </div>
                     </div>
-                    <!--<div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap"
-                        id="welcome_prompt">
-                        <div class="w-full">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                for="welcome-message">{{ __('store.bot.welcome_message') }}</label>
-                            <div class="flex items-center">
-                                <textarea id="welcome-message" type="text" oninput="adjustTextareaRows(this)" rows="1" max-rows="4"
-                                    placeholder="{{ __('store.bot.welcome_message.label') }}"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"></textarea>
-                            </div>
-                        </div>
-                    </div>-->
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full">
                             <label
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white cursor-pointer bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-800 p-2 rounded-lg"
-                                onclick="$('.modelfile-toggle').toggle(); adjustTextareaRows($('#modelfile'))"
+                                onclick="$('.modelfile-toggle').toggle()"
                                 for="modelfile">{{ __('store.bot.modelfile') }}</label>
-                            <div class="flex items-center">
-                                <textarea id="modelfile" name="modelfile" type="text" oninput="adjustTextareaRows(this)"
-                                    onblur="modelfile_update($(this));" rows="1" style="display:none;" max-rows="10"
-                                    placeholder="{{ __('store.bot.modelfile.label') }}"
-                                    class="bg-gray-50 border border-gray-300 scrollbar text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none modelfile-toggle"></textarea>
+                            <div class="flex items-center modelfile-toggle" style="display:none">
+                                <textarea name="modelfile" hidden></textarea>
+                                <div id="bot-modelfile-editor" class="w-full h-64"></div>
                             </div>
                         </div>
                     </div>
@@ -193,6 +179,13 @@
 <script>
     function checkForm2() {
         if ($("#create_room input[name='llm_name']").val() && $("#create_room input[name='bot-name']").val()) {
+            $('#create-bot-modal textarea[name=modelfile]').val(modelfile_to_string(modelfile_parse(ace.edit(
+                    'bot-modelfile-editor')
+                .getValue())))
+            ace.edit('bot-modelfile-editor').setValue(modelfile_to_string(modelfile_parse(ace.edit(
+                    'bot-modelfile-editor')
+                .getValue())))
+            ace.edit('bot-modelfile-editor').gotoLine(0);
             return true;
         }
         if (!$("#create_room input[name='llm_name']").val()) $("#create_error").text(
@@ -202,4 +195,37 @@
         $("#create_error").show().delay(3000).fadeOut();
         return false;
     }
+
+    var editor = ace.edit($('#bot-modelfile-editor')[0], {
+        mode: "ace/mode/dockerfile",
+        selectionStyle: "text"
+    })
+    editor.setHighlightActiveLine(true);
+    // Set the onblur event
+    $('#bot-modelfile-editor textarea').on('blur', function() {
+        let data = modelfile_parse(ace.edit('bot-modelfile-editor').getValue());
+        for (let obj of data) {
+            if (obj.name === 'system') {
+                $("#bot-system_prompt").val(obj.args)
+            }
+        }
+        ace.edit('bot-modelfile-editor').setValue(modelfile_to_string(data))
+        ace.edit('bot-modelfile-editor').gotoLine(0);
+    });
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        editor.setTheme("ace/theme/monokai");
+    }
+
+    $('#bot-modelfile-editor textarea').on('change', function() {
+        let data = modelfile_parse(ace.edit('bot-modelfile-editor').getValue());
+        for (let obj of data) {
+            if (obj.name === 'system') {
+                $("#bot-system_prompt").val(obj.args)
+            } else if (obj.name === 'before-prompt') {
+                $("#bot-before_prompt").val(obj.args)
+            } else if (obj.name === 'after-prompt') {
+                $("#bot-after_prompt").val(obj.args)
+            }
+        }
+    });
 </script>

@@ -32,28 +32,46 @@ class BotController extends Controller
             'name' => '',
             'args' => '',
         ];
-
-        $systemCommandProcessed = false; // Flag to track if a system command has been processed
+        $flags = [
+            'system' => false,
+            'beforePrompt' => false,
+            'afterPrompt' => false,
+        ];
 
         // Split the input data into lines
-        $lines = explode("\n", $data);
+        $lines = preg_split('/\r\n|\r|\n/', trim($data));
 
         // Iterate over each line
         foreach ($lines as $line) {
-            // Trim whitespace from the beginning and end of the line
             $line = trim($line);
 
-            // If the line is empty, skip it
-            if (!$line) {
-                continue;
-            }
+            // Array of command keywords
+            $commandKeywords = ['FROM', 'ADAPTER', 'LICENSE', 'TEMPLATE', 'SYSTEM', 'PARAMETER', 'MESSAGE', 'BEFORE-PROMPT', 'AFTER-PROMPT'];
 
             // Check if the line starts with a command keyword
-            if (strtoupper(substr($line, 0, 4)) === 'FROM' || strtoupper(substr($line, 0, 7)) === 'ADAPTER' || strtoupper(substr($line, 0, 7)) === 'LICENSE' || strtoupper(substr($line, 0, 8)) === 'TEMPLATE' || strtoupper(substr($line, 0, 6)) === 'SYSTEM' || strtoupper(substr($line, 0, 9)) === 'PARAMETER' || strtoupper(substr($line, 0, 7)) === 'MESSAGE' || strtoupper(substr($line, 0, 13)) === 'BEFORE-PROMPT' || strtoupper(substr($line, 0, 12)) === 'AFTER-PROMPT') {
+            if (strpos($line, '#') === 0) {
                 // If a command is already being accumulated, push it to the commands array
-                if ($currentCommand['name'] !== '' && trim($currentCommand['args']) !== '') {
+                if ($currentCommand['name'] !== '') {
                     $commands[] = $currentCommand;
                 }
+                $currentCommand = [
+                    'name' => $line,
+                    'args' => '',
+                ];
+            } elseif (
+                array_reduce(
+                    $commandKeywords,
+                    function ($carry, $keyword) use ($line) {
+                        return $carry || stripos($line, $keyword) === 0;
+                    },
+                    false,
+                )
+            ) {
+                // If a command is already being accumulated, push it to the commands array
+                if ($currentCommand['name'] !== '') {
+                    $commands[] = $currentCommand;
+                }
+
                 // Start a new command
                 $currentCommand = [
                     'name' => '',
@@ -61,44 +79,63 @@ class BotController extends Controller
                 ];
 
                 // Split the line into command type and arguments
-                $commandParts = preg_split('/\s+(.+)/', $line, -1, PREG_SPLIT_DELIM_CAPTURE);
-                $commandType = $commandParts[0];
-                $commandargs = isset($commandParts[1]) ? $commandParts[1] : '';
+                if (preg_match('/^(\S+)\s*(.*)$/', $line, $matches)) {
+                    $commandType = $matches[1];
+                    $commandArgs = isset($matches[2]) ? $matches[2] : '';
+                } else {
+                    $commandType = $line;
+                    $commandArgs = '';
+                }
 
                 // Set the current command's name and arguments
                 $currentCommand['name'] = strtolower($commandType);
-                $currentCommand['args'] = trim($commandargs);
+                $currentCommand['args'] = trim($commandArgs);
 
-                // If the command is a system command and it has already been processed, skip it
-                if ($currentCommand['name'] === 'system' && $systemCommandProcessed) {
+                if (($currentCommand['name'] === 'system' && $flags['system']) || ($currentCommand['name'] === 'before-prompt' && $flags['beforePrompt']) || ($currentCommand['name'] === 'after-prompt' && $flags['afterPrompt'])) {
                     $currentCommand = [
                         'name' => '',
                         'args' => '',
                     ];
-                } elseif ($currentCommand['name'] === 'system') {
-                    $systemCommandProcessed = true; // Set the flag to true if a system command is processed
+                } else {
+                    // Set the flag for the current command
+                    $flags[$currentCommand['name']] = true;
                 }
             } else {
                 // If the line does not start with a command keyword, append it to the current command's arguments
-                $currentCommand['args'] .= "\n" . $line;
+                if (strpos($currentCommand['name'], '#') === 0 || (strlen($currentCommand['args']) > 6 && substr($currentCommand['args'], -3) === '"""' && substr($currentCommand['args'], 0, 3) === '"""')) {
+                    $commands[] = $currentCommand;
+                    // Start a new command
+                    $currentCommand = [
+                        'name' => '',
+                        'args' => '',
+                    ];
+                    if (preg_match('/^(\S+)\s*(.*)$/', $line, $matches)) {
+                        $commandType = $matches[1];
+                        $commandArgs = isset($matches[2]) ? $matches[2] : '';
+                    } else {
+                        $commandType = $line;
+                        $commandArgs = '';
+                    }
+                    $currentCommand['name'] = strtolower($commandType);
+                    $currentCommand['args'] = trim($commandArgs);
+                    if ($line === '') {
+                        $commands[] = $currentCommand;
+                    }
+                } elseif ($line === '' && $currentCommand['name'] === '' && $currentCommand['args'] === '') {
+                    $commands[] = [
+                        'name' => '',
+                        'args' => '',
+                    ];
+                } elseif ($currentCommand['name'] !== '') {
+                    $currentCommand['args'] .= "\n" . $line;
+                }
             }
         }
 
-        // Push the last command to the commands array if it has non-empty arguments
-        if ($currentCommand['name'] !== '' && trim($currentCommand['args']) !== '') {
+        // Push the last command to the commands array
+        if ($currentCommand['name'] !== '') {
             $commands[] = $currentCommand;
         }
-
-        // Remove triple-quotes at the start or end of arguments
-        foreach ($commands as &$command) {
-            if (strpos($command['args'], '"""') === 0) {
-                $command['args'] = substr($command['args'], 3);
-            }
-            if (strrpos($command['args'], '"""') === strlen($command['args']) - 3) {
-                $command['args'] = substr($command['args'], 0, -3);
-            }
-        }
-
         return $commands;
     }
 

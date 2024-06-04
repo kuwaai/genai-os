@@ -101,7 +101,7 @@ Alternatively, you can refer to the following steps to install the entire system
    - Configure your web server (Nginx or Apache) to set `src/multi-chat/public` as the website root directory.
    - Example config files: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
    - Recommended settings:
-     - Set max upload file size in PHP to at least 10MB, for RAG applications.
+     - Set max upload file size in PHP to at least 20MB, for RAG applications.
      - Set Timeout to at least 120 seconds or more to avoid slower RAGs or lengthy model outputs.
 
 4. **Setting up Redis:**
