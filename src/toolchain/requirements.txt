@@ -1,0 +1,15 @@
+langchain
+langchain-community
+torch
+accelerate
+transformers
+sentence-transformers
+textract
+# faiss-gpu
+faiss-cpu
+tqdm
+python-dotenv
+jinja2
+simsimd==3.7.7
+trafilatura
+magika
