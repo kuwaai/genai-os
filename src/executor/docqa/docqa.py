@@ -124,12 +124,13 @@ class DocQaExecutor(LLMExecutor):
             )
             source = []
             async for reply, docs in response_generator:
+                docs = docs or []
                 source = list(set(source+[i.metadata["source"] if "source" in i.metadata else None for i in docs]))
                 if not self.proc:
                     await response_generator.aclose()
                 yield reply
             
-            if not self.with_ref:
+            if not self.with_ref or source is None or len(source)==0:
                 return
             
             source = filter(None, source)
