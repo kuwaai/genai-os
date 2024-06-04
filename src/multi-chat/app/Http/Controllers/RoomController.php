@@ -288,7 +288,7 @@ class RoomController extends Controller
     {
         if ($request->file()) {
             $request->validate([
-                'file' => 'max:10240',
+                'file' => 'max:20480',
             ]);
             $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
             $storagePath = public_path('storage/' . $directory); // Adjusted path

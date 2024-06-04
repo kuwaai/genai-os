@@ -101,7 +101,7 @@
    - 設定您的 Web 伺服器（Nginx 或 Apache），將 `src/multi-chat/public` 設置為網站根目錄。
    - 範例設置文件: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
    - 推薦設置:
-     - 為了RAG應用，PHP 最大上傳文件大小設置為至少 10MB。
+     - 為了RAG應用，PHP 最大上傳文件大小設置為至少 20MB。
      - 避免一些較慢的RAG或攏長的模型輸出，將Timeout設置為至少 120 秒或更長時間。
 
 4. **設定 Redis:**

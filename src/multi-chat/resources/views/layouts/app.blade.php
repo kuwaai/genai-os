@@ -40,7 +40,7 @@
         }
 
         function uploadcheck() {
-            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 10 * 1024 *
+            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 20 * 1024 *
                 1024) {
                 $("#attachment").show();
                 $("#attachment button").text($("#upload")[0].files[0].name)
