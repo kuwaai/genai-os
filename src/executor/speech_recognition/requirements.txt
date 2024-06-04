@@ -1,5 +1,4 @@
-./ # kuwa-executor
-
 # Whisper
 pywhispercpp
 pyannote.audio
+whisper-s2t
