@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class SpeechRecognitionExecutor(LLMExecutor):
 
     transcribe_param:dict = {
-        "language": "auto"
+        "language": "en"
     }
     param_prefix:str = "whisper_"
     default_model_name:str = "medium"
@@ -54,6 +54,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
 
     def setup(self):
 
+        os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
         self.default_model_name = self.args.model
         self.default_model_backend = self.args.backend
         self.load_model(self.default_model_name)
