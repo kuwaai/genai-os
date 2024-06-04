@@ -189,7 +189,7 @@ class SearchQaExecutor(LLMExecutor):
                 auth_token=auth_token,
                 override_qa_prompt=override_qa_prompt
             )
-            async for reply in response_generator:
+            async for reply, _ in response_generator:
                 if not self.proc:
                     await response_generator.aclose()
                 yield reply
