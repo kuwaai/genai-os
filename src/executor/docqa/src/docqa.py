@@ -117,7 +117,7 @@ class DocQa:
           docs = await self.fetch_documents(urls[0])
         except HTTPError as e:
           await asyncio.sleep(2) # To prevent SSE error of web page.
-          yield i18n.t('docqa.error_fetching_document').format(str(e))
+          yield (i18n.t('docqa.error_fetching_document').format(str(e)), None)
           return
       else:
         docs = await asyncio.gather(*[self.fetch_documents(url) for url in urls])
@@ -131,7 +131,7 @@ class DocQa:
       llm_question = None
       task = 'summary'
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield i18n.t("docqa.summary_prefix")+'\n'
+      yield (i18n.t("docqa.summary_prefix")+'\n', None)
     else:
       question = final_user_input
       llm_question = question
@@ -147,7 +147,7 @@ class DocQa:
       related_docs = copy.deepcopy(await document_store.retrieve(question))
       while True:
         modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs, override_prompt=override_qa_prompt)
-        if not self.llm.is_too_long(modified_chat_history): break
+        if not self.llm.is_too_long(modified_chat_history) or len(related_docs)==0: break
         related_docs = related_docs[:-1]
 
     # Free the unused VRAM
@@ -156,6 +156,7 @@ class DocQa:
 
     # Generate
     llm_input = self.generate_llm_input(task, llm_question, related_docs, override_prompt=override_qa_prompt)
+    self.logger.info("Related documents: {}".format(related_docs))
     self.logger.info('LLM input: {}'.format(llm_input))
     # result = ''
     generator = self.llm.chat_complete(
@@ -163,7 +164,7 @@ class DocQa:
       messages=modified_chat_history
     )
     async for chunk in generator:
-      yield chunk
+      yield (chunk, related_docs)
 
     # Egress filter
     # is_english = self.is_english(result)

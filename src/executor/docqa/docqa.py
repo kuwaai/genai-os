@@ -11,6 +11,7 @@ import itertools
 import requests
 import json
 import i18n
+import pathlib
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
@@ -48,6 +49,7 @@ class DocQaExecutor(LLMExecutor):
         parser.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
         parser.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
                                             help='The user agent string when issuing the crawler.')
+        parser.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
 
     def setup(self):
         i18n.load_path.append(f'lang/{self.args.lang}/')
@@ -58,6 +60,7 @@ class DocQaExecutor(LLMExecutor):
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
         self.pre_built_db = self.args.database
+        self.with_ref = not self.args.hide_ref
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
             kernel_base_url = self.kernel_url,
@@ -119,10 +122,22 @@ class DocQaExecutor(LLMExecutor):
                 auth_token=auth_token,
                 override_qa_prompt=override_qa_prompt
             )
-            async for reply in response_generator:
+            source = []
+            async for reply, docs in response_generator:
+                docs = docs or []
+                source = list(set(source+[i.metadata["source"] if "source" in i.metadata else None for i in docs]))
                 if not self.proc:
                     await response_generator.aclose()
                 yield reply
+            
+            if not self.with_ref or source is None or len(source)==0:
+                return
+            
+            source = filter(None, source)
+            yield f"\n\n{i18n.t('docqa.reference')}\n"
+            for i, src in enumerate(source):
+                link = src if src.startswith("http") else pathlib.Path(src).as_uri()
+                yield f'{i+1}. [{src}]({link})\n'
 
         except NoUrlException as e:
             yield str(e)

@@ -5,3 +5,4 @@ zh-tw:
   error_fetching_document: 獲取文件時發生錯誤 {}，請確認所提供文件存在且可被公開存取。
   summary_question: 時間、地點、目的、結論、摘要
   summary_prefix: 以下是這篇文章的摘要：
+  reference: "參考資料:"
