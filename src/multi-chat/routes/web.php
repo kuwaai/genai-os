@@ -159,6 +159,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
                             ->get('/share/{room_id}', [RoomController::class, 'share'])
                             ->name('room.share');
+                        Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
+                            ->get('/share/{room_id}/pdf', [RoomController::class, 'export_to_pdf'])
+                            ->name('room.export_pdf');
                         Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('room.translate');
 
                         Route::get('/chain', [ChatController::class, 'update_chain'])->name('room.chain');

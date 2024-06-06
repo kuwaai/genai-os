@@ -18,6 +18,7 @@ return [
     'tooltip.TSV' => 'Tab分隔，可由Excel讀入',
     'button.download.TXT' => '下載TXT檔',
     'button.download.JSON' => '下載JSON檔',
+    'button.download.PDF' => '下載PDF檔',
     'label.TSV' => 'Tab分隔資料(.txt檔)',
     'label.JSON' => 'JSON格式(.json檔)',
     'label.share_link' => '分享連結 (目前只有自己可存取)',

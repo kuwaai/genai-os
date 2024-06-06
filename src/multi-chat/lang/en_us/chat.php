@@ -18,6 +18,7 @@ return [
     'tooltip.TSV' => 'Tab separated, can be opened by excel',
     'button.download.TXT' => 'Download as TXT',
     'button.download.JSON' => 'Download as JSON',
+    'button.download.PDF' => 'Download as PDF',
     'label.TSV' => 'Tab separated data(.txt file)',
     'label.JSON' => 'JSON format(.json file)',
     'label.share_link' => 'Share link (Currently only accessible by you)',

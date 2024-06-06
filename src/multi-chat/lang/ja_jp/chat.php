@@ -18,6 +18,7 @@ return [
     'tooltip.TSV' => 'Excel で読み込めるタブ区切り',
     'button.download.TXT' => 'TXT ファイルをダウンロード',
     'button.download.JSON' => 'JSON ファイルをダウンロード',
+    'button.download.PDF' => 'PDF ファイルをダウンロード',
     'label.TSV' => 'タブ区切りデータ（.txt ファイル）',
     'label.JSON' => 'JSON 形式（.json ファイル）',
     'label.share_link' => '共有リンク（現在は自分だけがアクセスできます）',

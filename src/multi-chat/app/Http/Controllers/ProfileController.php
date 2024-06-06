@@ -281,6 +281,7 @@ class ProfileController extends Controller
                         $llm = $llm->first();
 
                         $tmp = json_encode($jsonData['messages']);
+                        $lang = $jsonData['lang'] ?? key(config('app.LANGUAGES'));
 
                         if ($tmp === false && json_last_error() !== JSON_ERROR_NONE) {
                             $errorResponse = [
@@ -305,7 +306,7 @@ class ProfileController extends Controller
                                 $client = new Client(['timeout' => 300]);
                                 Redis::rpush('api_' . $user->tokenable_id, $history->id);
                                 Redis::expire('usertask_' . $user->tokenable_id, 1200);
-                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, 'api_' . $history->id);
+                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $lang, 'api_' . $history->id);
 
                                 $req = $client->get(route('api.stream'), [
                                     'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],

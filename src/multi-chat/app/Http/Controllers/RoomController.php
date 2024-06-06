@@ -17,6 +17,8 @@ use App\Models\Chats;
 use GuzzleHttp\Client;
 use App\Models\LLMs;
 use App\Models\Bots;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use DB;
 use Session;
 
@@ -31,6 +33,28 @@ class RoomController extends Controller
             return redirect()->route('room.home');
         }
     }
+    public function export_to_pdf(Request $request)
+    {
+        $chat = ChatRoom::find($request->route('room_id'));
+        if ($chat && $chat->user_id == Auth::user()->id) {
+            if ($request->input('debug')){
+                return view('room.export_pdf');
+            }else{
+                $options = new Options();
+            $options->set('isRemoteEnabled', true);
+            $dompdf = new Dompdf($options);
+            // instantiate and use the dompdf class
+            $html = view('room.export_pdf');
+            $dompdf->loadHtml($html, 'UTF-8');
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+            $dompdf->stream();
+            }
+        } else {
+            return redirect()->route('room.home');
+        }
+    }
+
     public function abort(Request $request)
     {
         $chatIDs = Chats::where('roomID', '=', $request->route('room_id'))->pluck('id')->toArray();

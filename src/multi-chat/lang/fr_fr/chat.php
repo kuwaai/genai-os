@@ -18,6 +18,7 @@ return [
     'tooltip.TSV' => 'Séparé par une tabulation, peut être lu avec Excel',
     'button.download.TXT' => 'Télécharger le fichier TXT',
     'button.download.JSON' => 'Télécharger le fichier JSON',
+    'button.download.PDF' => 'Télécharger le fichier PDF',
     'label.TSV' => 'Données séparées par une tabulation (fichier .txt)',
     'label.JSON' => 'Format JSON (fichier .json)',
     'label.share_link' => 'Partager un lien (actuellement accessible uniquement pour vous)',

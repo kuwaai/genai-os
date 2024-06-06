@@ -10,6 +10,8 @@
         "carbonphp/carbon-doctrine-types": "2.*",
         "directorytree/ldaprecord-laravel": "^3.1",
         "doctrine/dbal": "3.*",
+        "dompdf/dompdf": "^3.0",
+        "graham-campbell/markdown": "^15.2",
         "guzzlehttp/guzzle": "^7.5",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",

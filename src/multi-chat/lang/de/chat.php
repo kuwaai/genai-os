@@ -18,6 +18,7 @@ return [
     'tooltip.TSV' => 'Tabulatorgetrennt, kann von Excel eingelesen werden',
     'button.download.TXT' => 'TXT-Datei herunterladen',
     'button.download.JSON' => 'JSON-Datei herunterladen',
+    'button.download.PDF' => 'PDF-Datei herunterladen',
     'label.TSV' => 'Tabulatorgetrennte Daten (.txt-Datei)',
     'label.JSON' => 'JSON-Format (.json-Datei)',
     'label.share_link' => 'Link teilen (derzeit nur für dich selbst zugänglich)',

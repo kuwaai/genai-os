@@ -76,6 +76,8 @@
                 <button data-modal-hide="exportModal" data-tooltip-target="export_txt_btn"
                     onclick='$("#download_holder_tsv").attr("href",window.URL.createObjectURL(new Blob([$("#export_tsv").val()], { type: "text/plain" }))); $("#download_holder_tsv")[0].click();'
                     class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.download.TXT') }}</button>
+                    <a data-tooltip-target="export_pdf_btn" target="_blank" href="{{route('room.export_pdf', request()->route('room_id'))}}"
+                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.download.PDF') }}</a>
             </div>
         </div>
     </div>

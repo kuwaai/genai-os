@@ -18,6 +18,7 @@ return [
     'tooltip.TSV' => '制表符分隔，可由 Excel 读入',
     'button.download.TXT' => '下载 TXT 文件',
     'button.download.JSON' => '下载 JSON 文件',
+    'button.download.PDF' => '下载 PDF 文件',
     'label.TSV' => '制表符分隔数据（.txt 文件）',
     'label.JSON' => 'JSON 格式（.json 文件）',
     'label.share_link' => '分享链接（目前只有自己可访问）',
