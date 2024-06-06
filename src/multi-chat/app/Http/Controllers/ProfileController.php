@@ -302,7 +302,7 @@ class ProfileController extends Controller
                             $response->headers->set('charset', 'utf-8');
                             $response->headers->set('Connection', 'close');
 
-                            $response->setCallback(function () use ($request, $history, $tmp, $llm, $user) {
+                            $response->setCallback(function () use ($request, $history, $tmp, $llm, $user, $lang) {
                                 $client = new Client(['timeout' => 300]);
                                 Redis::rpush('api_' . $user->tokenable_id, $history->id);
                                 Redis::expire('usertask_' . $user->tokenable_id, 1200);
