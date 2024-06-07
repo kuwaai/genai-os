@@ -4,7 +4,7 @@
 @elseif (session('llms'))
     <div class="flex flex-1 flex-col border border-black dark:border-white border-1 rounded-lg overflow-hidden">
         <div
-            class="flex px-2 scrollbar scrollbar-3 overflow-x-auto overflow-y-hidden py-3 border-b border-black dark:border-white">
+            class="flex px-2 items-center scrollbar scrollbar-3 overflow-x-auto overflow-y-hidden py-3 border-b border-black dark:border-white">
             @foreach ($llms as $llm)
                 <div
                     class="mx-1 flex-shrink-0 h-5 w-5 rounded-full border border-gray-400 dark:border-gray-900 bg-black flex items-center justify-center overflow-hidden">
@@ -23,7 +23,7 @@
             @endforeach
 
             @if (count($llms) == 1)
-                <span class="text-center w-full line-clamp-1">{{ $llms[0]->name }}</span>
+                <span class="text-center w-full line-clamp-1 text-black dark:text-white">{{ $llms[0]->name }}</span>
             @endif
         </div>
         @if (request()->user()->hasPerm('Room_update_new_chat'))
@@ -92,7 +92,7 @@
     @if ($llms && $DC)
         <div class="flex flex-1 flex-col border border-black dark:border-white border-1 rounded-lg overflow-hidden">
             <div
-                class="flex px-2 scrollbar scrollbar-3 overflow-x-auto overflow-y-hidden py-3 border-b border-black dark:border-white">
+                class="flex items-center px-2 scrollbar scrollbar-3 overflow-x-auto overflow-y-hidden py-3 border-b border-black dark:border-white">
 
                 @foreach (App\Models\Chats::join('bots', 'bots.id', '=', 'bot_id')->Join('llms', function ($join) {
             $join->on('llms.id', '=', 'bots.model_id');
@@ -112,6 +112,10 @@
                         </div>
                     </div>
                 @endforeach
+
+                @if (count($llms) == 1)
+                    <span class="text-center w-full line-clamp-1 text-black dark:text-white">{{ $llms[0]->name }}</span>
+                @endif
             </div>
             @if (request()->user()->hasPerm('Room_update_new_chat'))
                 <div class="m-2 border border-green-400 border-1 rounded-lg h-12 overflow-hidden">
