@@ -36,18 +36,18 @@
 
 * Multi-lingual turnkey solution for GenAI development and deployment on Linux and Windows
 
-* Concurrent multi-chat, quoting, full prompt-list import/export/share and more for users
+* Concurrent multi-chat, quoting, full prompt-list import/export/share, and more for users
 
 * Flexible orchestration of prompts x RAGs x bots x models x hardware/GPUs
 
-* Heterogeneous supports from virtual hosts, laptops, PCs, edge servers to cloud
+* Heterogeneous support from virtual hosts, laptops, PCs, and edge servers to cloud
 
-* Open source, allowing developers to contribute and customize the system according to their needs
+* Open-sourced, allowing developers to contribute and customize the system according to their needs
 
 ![screenshot](./src/multi-chat/public/images/demo.gif)
 
 ## Architecture
-> **Warning**: This draft is a preliminary version and may be subject to further changes.
+> **Warning**: This a preliminary draft and may be subject to further changes.
 
 [![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
@@ -63,12 +63,12 @@ To run this application, please make sure the following packages are installed o
 - CUDA
 - Git
 
-For Windows and Linux, please follow the steps below to set up and run:
+For Windows and Linux, please follow the steps below to set up and execute:
 
 ## Installation Guide
-If you want to try running fast to see, we provide a [Portable Windows version](./windows/README.md) and a [Docker version](./docker/README.md), which have been tested in Windows 10 x64 and Ubuntu 22.04LTS environments. You can try them out!
+If you wish to test out a quick demo version, we provide a [Portable Windows version](./windows/README.md) and a [Docker version](./docker/README.md), which have been tested in Windows 10 x64 and Ubuntu 22.04LTS environments.
 
-Alternatively, you can refer to the following steps to install the entire system on your host. Before proceeding, please make sure you have installed all the dependencies listed above.
+Alternatively, you can refer to the following steps to install the entire system on your host. Before proceeding, please ensure you have installed all the dependencies listed above.
 1. **Clone the project:**
    ```sh
    git clone https://github.com/kuwaai/genai-os.git
@@ -96,7 +96,7 @@ Alternatively, you can refer to the following steps to install the entire system
      pip install -r requirement.txt
      ```
 
-3. **Setting up PHP & PHP-FPM:**
+3. **Set up PHP & PHP-FPM:**
    - Make sure PHP is installed and configured properly.
    - Configure your web server (Nginx or Apache) to set `src/multi-chat/public` as the website root directory.
    - Example config files: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
@@ -104,28 +104,28 @@ Alternatively, you can refer to the following steps to install the entire system
      - Set max upload file size in PHP to at least 20MB, for RAG applications.
      - Set Timeout to at least 120 seconds or more to avoid slower RAGs or lengthy model outputs.
 
-4. **Setting up Redis:**
+4. **Set up Redis:**
    - Make sure you have a Redis server installed and running.
    - Relevant settings can be adjusted in `.env`.
-   - Run `php artisan queue:work --timeout=0` under `src/multi-chat/` to start the Redis Worker, which handles user requests. It is recommended to run at least 5 Redis Workers at the same time.
+   - Run `php artisan queue:work --timeout=0` under `src/multi-chat/` to start the Redis Worker, which handles user requests. We recommended running at least 5 Redis Workers at the same time.
 
 5. **Run the application:**
    - Start your web server and PHP-FPM.
-   - Run the Kernel `src/kernel/main.py`. It is recommended to copy the Kernel folder to another location before running it.
+   - Run the Kernel `src/kernel/main.py`. It is recommended that you copy the Kernel folder to another location before running it.
 
 6. **Connect to the application:**
-   - First you need to create an admin account, go to `src/multi-chat/`, and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
+   - First, you need to create an admin account. Go to `src/multi-chat/,` and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
    - Open your browser and access the URL of your deployed Nginx/Apache application.
    - Log in with your admin account, and start using Kuwa GenAI OS!
 
 7. **Deploy models:**
     - No model is provided by default. Please read [this README](./src/executor/README.md) to deploy some models.
-    - After the deployment is complete, the models will not appear on the website out of thin air. The administrator must set the corresponding access_code on the website to access the model.
+    - The models do not appear automatically after deployment. The administrator must set the corresponding access_code on the website to access the model.
     - Please note that the Kernel must be started before deploying the model (you can check if you can connect to `127.0.0.1:9000` to confirm)
 
 ## Download
 
-You can [download](https://github.com/kuwaai/genai-os/releases) the latest version of Kuwa GenAI OS, supporting Windows and Linux.
+You can [download](https://github.com/kuwaai/genai-os/releases) the latest Kuwa GenAI OS version that supports Windows and Linux.
 
 ## Community
 
@@ -145,7 +145,7 @@ You can [download](https://github.com/kuwaai/genai-os/releases) the latest versi
 
 ## Support
 
-Our team currently has only two people. If you are interested in this project we are developing together, you can help us develop it together, help us make this open source project better. If you are willing to help, please do not hesitate to contact us at any time!
+Our team currently has only two people. If you are interested in this project, you can help us develop it together and improve this open-source project. Please do not hesitate to contact us anytime if you are willing to help!
 
 ## Packages & Applications
 
@@ -162,7 +162,7 @@ The following packages and applications are used in this project:
 - [Nvidia CUDA](https://developer.nvidia.com/cuda-toolkit)
 
 ## Acknowledgements
-Grateful to the MOST TAIDE project and the Taiwan AI Academy for their assistance in the early development of this project.
+We want to acknowledge NSTC's TAIDE project and the Taiwan AI Academy for their assistance in the early development of this project.
 <a href="https://www.nuk.edu.tw/"><img src="./src/multi-chat/public/images/logo_NUK.jpg" height="100px"></a>
 <a href="https://taide.tw/"><img src="./src/multi-chat/public/images/logo_taide.jpg" height="100px"></a>
 <a href="https://www.nstc.gov.tw/"><img src="./src/multi-chat/public/images/logo_NSTCpng.jpg" height="100px"></a>
