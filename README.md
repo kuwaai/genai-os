@@ -114,7 +114,7 @@ Alternatively, you can refer to the following steps to install the entire system
    - Run the Kernel `src/kernel/main.py`. It is recommended that you copy the Kernel folder to another location before running it.
 
 6. **Connect to the application:**
-   - First, you need to create an admin account. Go to `src/multi-chat/,` and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
+   - First, you need to create an admin account. Go to `src/multi-chat/`, and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
    - Open your browser and access the URL of your deployed Nginx/Apache application.
    - Log in with your admin account, and start using Kuwa GenAI OS!
 
@@ -159,7 +159,7 @@ The following packages and applications are used in this project:
 - [Redis](https://redis.io/)
 - [Marked](https://github.com/chjj/marked)
 - [highlight.js](https://highlightjs.org/)
-- [Nvidia CUDA](https://developer.nvidia.com/cuda-toolkit)
+- [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit)
 
 ## Acknowledgements
 We want to acknowledge NSTC's TAIDE project and the Taiwan AI Academy for their assistance in the early development of this project.
