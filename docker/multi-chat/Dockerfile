@@ -49,8 +49,8 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "${PHP_INI_DIR}/php.ini"
 # Install required PHP extensions
 RUN apt-get update &&\
     apt-get install -y libldap-dev libzip-dev libcurl4-openssl-dev libonig-dev \
-                       libxml2-dev libpq-dev &&\
-    docker-php-ext-install curl mbstring xml zip ldap mysqli pdo_mysql pgsql pdo_pgsql
+                       libxml2-dev libpq-dev libpng-dev &&\
+    docker-php-ext-install curl mbstring xml zip ldap mysqli pdo_mysql pgsql pdo_pgsql gd
 RUN pecl install redis-6.0.2 &&\
     docker-php-ext-enable redis
 
@@ -70,7 +70,7 @@ WORKDIR /usr/local/bin
 RUN chmod +x docker-entrypoint multi-chat
 
 # Setup the entry point
-ENV KUWA_MULTI_CHAT_VERSION="0.3.0-r1-docker1"
+ENV KUWA_MULTI_CHAT_VERSION="0.3.1-docker1"
 
 ENV KUWA_KERNEL_URL="http://kernel:9000"
 ENV APP_URL="http://localhost/"
