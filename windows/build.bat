@@ -1,7 +1,10 @@
 @echo off
 cd "%~dp0"
-if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* 2^>^&1 ^| src\tee.bat logs\build.log ^& exit /b & exit /b)
+if "%1" equ "__start__" (shift & goto main)
+cmd /s /c "%0 __start__ %* 2>&1 | src\tee.bat logs\build.log"
+exit /b
 
+:main
 REM Initialize everything
 call src\variables.bat
 
