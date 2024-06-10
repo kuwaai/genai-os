@@ -132,7 +132,7 @@ class LlamaCppExecutor(LLMExecutor):
     limit: int = 1024*3
     context_window: int = 4096
     stop_words: list = []
-    system_prompt: str = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
+    system_prompt: str = None
     no_system_prompt: bool = False
     generation_config: dict = {
         "max_tokens": None
