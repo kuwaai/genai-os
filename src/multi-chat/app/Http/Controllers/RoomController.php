@@ -582,7 +582,7 @@ class RoomController extends Controller
             }
             $input = $request->input('input');
             $next_input = '';
-            $url = $this->upload_file($request);
+            $url = rawurldecode($this->upload_file($request));
             if ($url) {
                 $next_input = $input;
                 $input = $url;
@@ -694,7 +694,7 @@ class RoomController extends Controller
         $roomId = $request->input('room_id');
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
-        $url = $this->upload_file($request);
+        $url = rawurldecode($this->upload_file($request));
         $next_input = '';
         if ($url) {
             $next_input = $input;
