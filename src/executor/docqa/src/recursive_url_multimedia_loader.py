@@ -345,7 +345,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
             results.append(
                 Document(
                     page_content=content,
-                    metadata=self.metadata_extractor(content, url, content_type),
+                    metadata=self.metadata_extractor(raw_content, url, content_type),
                 )
             )
         if 'text/' in content_type and depth < self.max_depth - 1:

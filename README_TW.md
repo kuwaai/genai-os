@@ -159,7 +159,7 @@
 - [Redis](https://redis.io/)
 - [Marked](https://github.com/chjj/marked)
 - [highlight.js](https://highlightjs.org/)
-- [Nvidia CUDA](https://developer.nvidia.com/cuda-toolkit)
+- [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit)
 
 ## 致謝
 在此感謝國科會TAIDE計畫、台灣人工智慧學校對本計畫初期開發時的協助。

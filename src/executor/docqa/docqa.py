@@ -125,7 +125,14 @@ class DocQaExecutor(LLMExecutor):
             source = []
             async for reply, docs in response_generator:
                 docs = docs or []
-                source = list(set(source+[i.metadata["source"] if "source" in i.metadata else None for i in docs]))
+                src = [
+                    {
+                        "source": doc.metadata.get("source"),
+                        "title": doc.metadata.get("title", doc.metadata.get("filename")),
+                    }
+                    for doc in docs if "source" in doc.metadata
+                ] 
+                source += list(filter(lambda x: x not in source, src))
                 if not self.proc:
                     await response_generator.aclose()
                 yield reply
@@ -133,11 +140,13 @@ class DocQaExecutor(LLMExecutor):
             if not self.with_ref or source is None or len(source)==0:
                 return
             
-            source = filter(None, source)
+            source = filter(lambda x: x["source"], source)
             yield f"\n\n{i18n.t('docqa.reference')}\n"
-            for i, src in enumerate(source):
+            for i, ref in enumerate(source):
+                src = ref["source"]
+                title = ref["title"] if ref.get("title") is not None else src
                 link = src if src.startswith("http") else pathlib.Path(src).as_uri()
-                yield f'{i+1}. [{src}]({link})\n'
+                yield f'{i+1}. [{title}]({link})\n'
 
         except NoUrlException as e:
             yield str(e)
