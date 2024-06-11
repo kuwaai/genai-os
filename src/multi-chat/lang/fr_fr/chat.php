@@ -19,6 +19,7 @@ return [
     'button.download.TXT' => 'Télécharger le fichier TXT',
     'button.download.JSON' => 'Télécharger le fichier JSON',
     'button.download.PDF' => 'Télécharger le fichier PDF',
+    'button.download.ODT' => 'Télécharger le fichier ODT',
     'label.TSV' => 'Données séparées par une tabulation (fichier .txt)',
     'label.JSON' => 'Format JSON (fichier .json)',
     'label.share_link' => 'Partager un lien (actuellement accessible uniquement pour vous)',

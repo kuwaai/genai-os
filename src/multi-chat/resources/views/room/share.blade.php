@@ -2,9 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-hidden h-full">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <title>{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}</title>
 
@@ -50,12 +50,23 @@
             $join->on('llms.id', '=', 'bots.model_id');
         })
             ->where('llms.enabled', '=', true)
+            ->wherein(
+                'bots.model_id',
+                DB::table('group_permissions')
+                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                    ->where('group_permissions.group_id', Auth::user()->group_id)
+                    ->where('permissions.name', 'like', 'model_%')
+                    ->get()
+                    ->pluck('model_id'),
+            )
             ->select(
                 'llms.*',
                 'bots.*',
                 DB::raw('COALESCE(bots.description, llms.description) as description'),
                 DB::raw('COALESCE(bots.config, llms.config) as config'),
                 DB::raw('COALESCE(bots.image, llms.image) as image'),
+                'llms.name as llm_name',
             )
             ->orderby('llms.order')
             ->orderby('bots.created_at')
@@ -172,9 +183,11 @@
                                 DB::raw('COALESCE(bots.description, llms.description) as description'),
                                 DB::raw('COALESCE(bots.config, llms.config) as config'),
                                 DB::raw('COALESCE(bots.image, llms.image) as image'),
+                                DB::raw('COALESCE(bots.name, llms.name) as name'),
                                 'feedback.nice',
                                 'feedback.detail',
                                 'feedback.flags',
+                                'access_code',
                             );
 
                         $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
@@ -195,9 +208,11 @@
                                 DB::raw('COALESCE(bots.description, llms.description) as description'),
                                 DB::raw('COALESCE(bots.config, llms.config) as config'),
                                 DB::raw('COALESCE(bots.image, llms.image) as image'),
+                                DB::raw('COALESCE(bots.name, llms.name) as name'),
                                 DB::raw('NULL as nice'),
                                 DB::raw('NULL as detail'),
                                 DB::raw('NULL as flags'),
+                                'access_code',
                             );
 
                         $mergedChats = $botChats

@@ -162,6 +162,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
                             ->get('/share/{room_id}/pdf', [RoomController::class, 'export_to_pdf'])
                             ->name('room.export_pdf');
+                        Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
+                            ->get('/share/{room_id}/odt', [RoomController::class, 'export_to_odt'])
+                            ->name('room.export_odt');
                         Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('room.translate');
 
                         Route::get('/chain', [ChatController::class, 'update_chain'])->name('room.chain');
@@ -180,11 +183,14 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->group(function () {
                         Route::get('/', [BotController::class, 'home'])->name('store.home');
                         Route::middleware(AdminMiddleware::class . ':Store_update_create_bot')
-                        ->post('/create', [BotController::class, 'create'])->name('store.create');
+                            ->post('/create', [BotController::class, 'create'])
+                            ->name('store.create');
                         Route::middleware(AdminMiddleware::class . ':Store_update_modify_bot')
-                        ->patch('/update', [BotController::class, 'update'])->name('store.update');
+                            ->patch('/update', [BotController::class, 'update'])
+                            ->name('store.update');
                         Route::middleware(AdminMiddleware::class . ':Store_delete_delete_bot')
-                        ->delete('/delete', [BotController::class, 'delete'])->name('store.delete');
+                            ->delete('/delete', [BotController::class, 'delete'])
+                            ->name('store.delete');
                     })
                     ->name('store');
                 #---Manage

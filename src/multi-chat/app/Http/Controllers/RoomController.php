@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\App;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Http\Request;
 use App\Jobs\RequestChat;
 use App\Models\Histories;
@@ -19,6 +21,7 @@ use App\Models\LLMs;
 use App\Models\Bots;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Arr;
 use DB;
 use Session;
 
@@ -33,14 +36,197 @@ class RoomController extends Controller
             return redirect()->route('room.home');
         }
     }
+
+    public function export_to_odt(Request $request)
+    {
+        $chat = ChatRoom::find($request->route('room_id'));
+        if ($chat && $chat->user_id == Auth::user()->id) {
+            $result = Bots::Join('llms', function ($join) {
+                $join->on('llms.id', '=', 'bots.model_id');
+            })
+                ->where('llms.enabled', '=', true)
+                ->wherein(
+                    'bots.model_id',
+                    DB::table('group_permissions')
+                        ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                        ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                        ->where('group_permissions.group_id', Auth::user()->group_id)
+                        ->where('permissions.name', 'like', 'model_%')
+                        ->get()
+                        ->pluck('model_id'),
+                )
+                ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'), 'llms.name as llm_name')
+                ->orderby('llms.order')
+                ->orderby('bots.created_at')
+                ->get();
+            $DC = ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
+                ->where('chats.user_id', Auth::user()->id)
+                ->select('chatrooms.*', DB::raw('count(chats.id) as counts'))
+                ->groupBy('chatrooms.id');
+            // Fetch the ordered identifiers based on `bot_id` for each database
+            $DC = $DC->selectSub(function ($query) {
+                if (config('database.default') == 'sqlite') {
+                    $query->from('chats')->selectRaw("group_concat(bot_id, ',') as identifier")->whereColumn('roomID', 'chatrooms.id')->orderByRaw('bot_id');
+                } elseif (config('database.default') == 'mysql') {
+                    $query->from('chats')->selectRaw('group_concat(bot_id separator \',\' order by bot_id) as identifier')->whereColumn('roomID', 'chatrooms.id');
+                } elseif (config('database.default') == 'pgsql') {
+                    $query->from('chats')->selectRaw('string_agg(bot_id::text, \',\' order by bot_id) as identifier')->whereColumn('roomID', 'chatrooms.id');
+                }
+            }, 'identifier');
+
+            // Get the final result and group by the ordered identifiers
+            $DC = $DC->get()->groupBy('identifier');
+
+            try {
+                if (!session('llms')) {
+                    $identifier = collect(Arr::flatten($DC->toarray(), 1))->where('id', '=', request()->route('room_id'))->first()['identifier'];
+                    $DC = $DC[$identifier];
+                    $llms = Bots::whereIn('bots.id', array_map('intval', explode(',', $identifier)))
+                        ->join('llms', function ($join) {
+                            $join->on('llms.id', '=', 'bots.model_id');
+                        })
+                        ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'))
+                        ->orderby('bots.id')
+                        ->get();
+                } else {
+                    $llms = Bots::whereIn('bots.id', session('llms'))
+                        ->Join('llms', function ($join) {
+                            $join->on('llms.id', '=', 'bots.model_id');
+                        })
+                        ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'))
+                        ->orderby('bots.id')
+                        ->get();
+                    $DC = $DC[implode(',', $llms->pluck('id')->toArray())];
+                }
+            } catch (Exception $e) {
+                $llms = Bots::whereIn('bots.id', session('llms'))
+                    ->Join('llms', function ($join) {
+                        $join->on('llms.id', '=', 'bots.model_id');
+                    })
+                    ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'))
+                    ->orderby('bots.id')
+                    ->get();
+                $DC = null;
+            }
+            $roomId = request()->route('room_id');
+
+            $roomId = \Illuminate\Support\Facades\Request::route('room_id');
+
+            $botChats = Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
+                ->leftJoin('feedback', 'history_id', '=', 'histories.id')
+                ->join('bots', 'bots.id', '=', 'chats.bot_id')
+                ->Join('llms', function ($join) {
+                    $join->on('llms.id', '=', 'bots.model_id');
+                })
+                ->where('isbot', true)
+                ->whereIn('chats.id', Chats::where('roomID', $roomId)->pluck('id'))
+                ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.bot_id as bot_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'), DB::raw('COALESCE(bots.name, llms.name) as name'), 'feedback.nice', 'feedback.detail', 'feedback.flags', 'access_code');
+
+            $nonBotChats = Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
+                ->leftjoin('bots', 'bots.id', '=', 'chats.bot_id')
+                ->Join('llms', function ($join) {
+                    $join->on('llms.id', '=', 'bots.model_id');
+                })
+                ->where('isbot', false)
+                ->whereIn('chats.id', Chats::where('roomID', $roomId)->pluck('id'))
+                ->select('histories.chained as chained', 'chats.id as chat_id', 'histories.id as id', 'chats.bot_id as bot_id', 'histories.created_at as created_at', 'histories.msg as msg', 'histories.isbot as isbot', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), DB::raw('COALESCE(bots.image, llms.image) as image'), DB::raw('COALESCE(bots.name, llms.name) as name'), DB::raw('NULL as nice'), DB::raw('NULL as detail'), DB::raw('NULL as flags'), 'access_code');
+
+            $mergedChats = $botChats
+                ->union($nonBotChats)
+                ->get()
+                ->sortBy(function ($chat) {
+                    return [$chat->created_at, $chat->id, $chat->bot_id, -$chat->history_id];
+                });
+            $mergedMessages = [];
+            // Filter and merge the chats based on the condition
+            $filteredChats = $mergedChats->filter(function ($chat) use (&$mergedMessages) {
+                if (!$chat->isbot && !in_array($chat->msg, $mergedMessages)) {
+                    // Add the message to the merged messages array
+                    $mergedMessages[] = $chat->msg;
+                    return true; // Keep this chat in the final result
+                } elseif ($chat->isbot) {
+                    $mergedMessages = [];
+                    return true; // Keep bot chats in the final result
+                }
+                return false; // Exclude duplicate non-bot chats
+            });
+
+            // Sort the filtered chats
+            $mergedChats = $filteredChats->sortBy(function ($chat) {
+                return [$chat->created_at, $chat->name, -$chat->id];
+            });
+            $refers = $mergedChats->where('isbot', '=', true);
+
+            // Initialize the result array
+            $chatMessages = [];
+
+            // Iterate over each chat message
+            foreach ($mergedChats->select('msg', 'name', 'isbot') as $chat) {
+                $user = $chat['isbot'] ? $chat['name'] : request()->user()->name;
+                $chatMessages[] = ['user' => $user, 'message' => $chat['msg']];
+            }
+
+            // Create a new PhpWord object
+            $phpWord = new PhpWord();
+
+            // Add a new section to the document
+            $section = $phpWord->addSection();
+
+            // Set font style for "user" to always be black
+            $styles = [
+                'user' => ['name' => 'Tahoma', 'size' => 12, 'color' => '000000'],
+            ];
+
+            // Function to generate a random color
+            function getRandomColor()
+            {
+                do {
+                    $color = sprintf('%06X', mt_rand(0, 0xffffff));
+                } while (hexdec($color) > 0xcccccc); // Ensure the color is not too close to white
+                return $color;
+            }
+
+            // Define a base style for messages
+            $baseStyle = ['name' => 'Tahoma', 'size' => 12];
+            // Add chat messages to the document with random colors
+            foreach ($chatMessages as $chat) {
+                $user = $chat['user'];
+                $message = $chat['message'];
+
+                // Assign random color if not already assigned and not "user"
+                if (!isset($styles[$user]) && $user !== 'user') {
+                    $styles[$user] = ['name' => 'Tahoma', 'size' => 12, 'color' => getRandomColor()];
+                }
+                // Add the user name with the respective style
+                $section->addText("$user:", $user === 'user' ? $userStyle : array_merge($baseStyle, ['bold' => true, 'color' => $styles[$user]['color']]));
+
+                // Split message by new lines and add each line separately
+                $messageLines = explode("\n", $message);
+                foreach ($messageLines as $line) {
+                    $section->addText($line, $styles[$user] ?? $baseStyle);
+                }
+
+                // Add space after the message for readability
+                $section->addTextBreak(1);
+            }
+
+            // Save the document as ODT
+            $fileName = ChatRoom::find(request()->route('room_id'))->name . '.odt';
+            $objWriter = IOFactory::createWriter($phpWord, 'ODText');
+            $objWriter->save(storage_path("$fileName"));
+
+            return response()
+                ->download(storage_path("$fileName"))
+                ->deleteFileAfterSend(true);
+        } else {
+            return redirect()->route('room.home');
+        }
+    }
     public function export_to_pdf(Request $request)
     {
         $chat = ChatRoom::find($request->route('room_id'));
         if ($chat && $chat->user_id == Auth::user()->id) {
-            if ($request->input('debug')){
-                return view('room.export_pdf');
-            }else{
-                $options = new Options();
+            $options = new Options();
             $options->set('isRemoteEnabled', true);
             $dompdf = new Dompdf($options);
             // instantiate and use the dompdf class
@@ -49,7 +235,6 @@ class RoomController extends Controller
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
             $dompdf->stream();
-            }
         } else {
             return redirect()->route('room.home');
         }
