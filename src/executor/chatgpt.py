@@ -145,7 +145,7 @@ class ChatGptExecutor(LLMExecutor):
         try:
             openai_token = self.api_key
             if not self.no_override_api_key:
-                openai_token = modelfile.parameters["_"]["openai_token"] or self.api_key
+                openai_token = modelfile.parameters["_"].get("openai_token") or self.api_key
             
             # Parse and process modelfile
             override_system_prompt, messages = modelfile.override_system_prompt, modelfile.messages
