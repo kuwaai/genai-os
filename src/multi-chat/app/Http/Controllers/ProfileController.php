@@ -456,7 +456,11 @@ class ProfileController extends Controller
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-
+        set_exception_handler(function ($exception) {
+            if ($exception->getMessage() != 'Connection closed') {
+                Log::error('Uncaught SSE Exception: ' . $exception->getMessage());
+            }
+        });
         $response->setCallback(function () use ($request) {
             if (config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
                 if ($request->input('history_id') && $request->input('user_id')) {

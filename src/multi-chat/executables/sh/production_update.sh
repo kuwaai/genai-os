@@ -1,5 +1,5 @@
 cd ../..
-sudo apt install php-pgsql php-xml php php-curl php-ldap php-redis composer redis php-gd
+sudo apt install php-pgsql php-xml php php-curl php-ldap php-redis composer redis php-gd php-zip
 composer update
 php artisan key:generate --force
 php artisan db:seed --class=InitSeeder --force

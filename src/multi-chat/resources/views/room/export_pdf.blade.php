@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}</title>
 
@@ -200,7 +200,7 @@
                             @foreach ($llms as $llm)
                                 <div class="mx-1 h-10 w-10 rounded-full bg-black overflow-hidden">
                                     <img class="h-full w-full"
-                                        src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                        src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}" />
                                 </div>
                             @endforeach
                         </div>
@@ -210,8 +210,6 @@
 
             <div id="chatroom" class="p-4 scrollbar bg-gray-200 dark:bg-gray-600">
                 @php
-                    $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-
                     $roomId = request()->route('room_id');
 
                     $roomId = Illuminate\Support\Facades\Request::route('room_id');
@@ -235,9 +233,11 @@
                             DB::raw('COALESCE(bots.description, llms.description) as description'),
                             DB::raw('COALESCE(bots.config, llms.config) as config'),
                             DB::raw('COALESCE(bots.image, llms.image) as image'),
+                            DB::raw('COALESCE(bots.name, llms.name) as name'),
                             'feedback.nice',
                             'feedback.detail',
                             'feedback.flags',
+                            'access_code',
                         );
 
                     $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
@@ -258,9 +258,11 @@
                             DB::raw('COALESCE(bots.description, llms.description) as description'),
                             DB::raw('COALESCE(bots.config, llms.config) as config'),
                             DB::raw('COALESCE(bots.image, llms.image) as image'),
+                            DB::raw('COALESCE(bots.name, llms.name) as name'),
                             DB::raw('NULL as nice'),
                             DB::raw('NULL as detail'),
                             DB::raw('NULL as flags'),
+                            'access_code',
                         );
 
                     $mergedChats = $botChats
@@ -364,7 +366,7 @@
                                     <div class="h-full w-full bg-black flex justify-center items-center text-white">
                                         ?</div>
                                 @else
-                                    <img src="{{ $botimgurl }}" class="h-full w-full">
+                                    <img src="{{ $botimgurl }}" class="h-full w-full" />
                                 @endif
                             </div>
                         @endif
@@ -375,8 +377,7 @@
                                     {{-- blade-formatter-enable --}}
                         </div>
                         @if (!$history->isbot)
-                            <div
-                                class="h-10 w-10 rounded-full bg-gray-300 overflow-hidden ml-3 float-start">
+                            <div class="h-10 w-10 rounded-full bg-gray-300 overflow-hidden ml-3 float-start">
                                 User
                             </div>
                         @endif
