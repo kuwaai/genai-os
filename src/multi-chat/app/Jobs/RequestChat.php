@@ -62,6 +62,20 @@ class RequestChat implements ShouldQueue
     }
 
     /**
+     * Read an GuzzleHttp stream.
+     */
+    private function read_stream(&$stream, $timeout_sec=0.1)
+    {
+        $buffer = '';
+        $start_time = microtime(true);
+        while (!$stream->eof() && (microtime(true) - $start_time) < $timeout_sec) {
+            $chunk = $stream->read(1);
+            $buffer .= $chunk;
+        }
+        return $buffer;
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
@@ -177,25 +191,26 @@ class RequestChat implements ShouldQueue
                     $cached = '';
                     $tmp = '';
                     while (!$stream->eof()) {
-                        $chunk = $stream->read(1);
+                        $chunk = $this->read_stream($stream);
                         $buffer .= $chunk;
-                        $bufferLength = mb_strlen($buffer, 'UTF-8');
+                        $bufferLength = mb_strlen($buffer, '8bit');
                         $messageLength = null;
-                        for ($i = 1; $i <= $bufferLength; $i++) {
-                            if (ord($buffer[$i - 1]) < 128 || $i == $bufferLength) {
+                        for ($i = $bufferLength; $i > 0 ; $i--) {
+                            $message = mb_substr($buffer, 0, $i, '8bit');
+                            if (mb_check_encoding($message, 'UTF-8')) {
                                 $messageLength = $i;
                                 break;
                             }
                         }
                         if ($messageLength !== null) {
-                            $message = mb_substr($buffer, 0, $messageLength, 'UTF-8');
+                            $message = mb_substr($buffer, 0, $messageLength, '8bit');
                             if (mb_check_encoding($message, 'UTF-8')) {
                                 if ($this->channel != $this->history_id) {
                                     $tmp .= $message;
                                     Redis::publish($this->channel, 'New ' . json_encode(['msg' => $message]));
-                                    $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
+                                    $buffer = mb_substr($buffer, $messageLength, null, '8bit');
                                 } else {
-                                    if ($message === '<' && !$cache) {
+                                    if (str_starts_with($message, '<') && !$cache) {
                                         $cache = true;
                                     }
                                     if (!$cache) {
@@ -244,7 +259,7 @@ class RequestChat implements ShouldQueue
                                             $cached = '';
                                         }
                                     }
-                                    $buffer = mb_substr($buffer, $messageLength, null, 'UTF-8');
+                                    $buffer = mb_substr($buffer, $messageLength, null, '8bit');
                                 }
                             }
                         }
