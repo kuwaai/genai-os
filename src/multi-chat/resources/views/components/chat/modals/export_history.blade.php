@@ -80,9 +80,9 @@
                 <a data-tooltip-target="export_pdf_btn" target="_blank"
                     href="{{ route('room.export_pdf', request()->route('room_id')) }}"
                     class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.download.PDF') }}</a>
-                <a data-tooltip-target="export_odt_btn" target="_blank"
-                    href="{{ route('room.export_odt', request()->route('room_id')) }}"
-                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.download.ODT') }}</a>
+                <a data-tooltip-target="export_doc_btn" target="_blank"
+                    href="{{ route('room.export_doc', request()->route('room_id')) }}"
+                    class="bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.download.DOC') }}</a>
             </div>
         </div>
     </div>

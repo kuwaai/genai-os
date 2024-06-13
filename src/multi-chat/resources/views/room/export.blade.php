@@ -88,6 +88,7 @@
 
 <body class="antialiased h-full">
     @php
+        $Parsedown = new \Parsedown();
         $result = App\Models\Bots::Join('llms', function ($join) {
             $join->on('llms.id', '=', 'bots.model_id');
         })
@@ -373,7 +374,7 @@
                         <div style="display: table-cell; max-width: calc(100% - 40px);"
                             class="p-3 transition-colors {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-cyan-500 text-white rounded-l-lg rounded-br-lg' }}">
                             {{-- blade-formatter-disable --}}
-                                    <div class="text-sm space-y-3 break-words">{!! GrahamCampbell\Markdown\Facades\Markdown::convert($message)->getContent() !!}</div>
+                                    <div class="text-sm space-y-3 break-words">{!! $Parsedown->text($message) !!}</div>
                                     {{-- blade-formatter-enable --}}
                         </div>
                         @if (!$history->isbot)
