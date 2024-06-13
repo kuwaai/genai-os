@@ -1,0 +1,12 @@
+nginx*/
+node*/
+php*/
+cmake*/
+python*/
+RunHiddenConsole*/
+Redis*/
+composer.phar
+packages
+*.zip
+src/conf/migrations.txt
+logs/

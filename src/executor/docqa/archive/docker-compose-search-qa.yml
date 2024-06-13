@@ -1,0 +1,42 @@
+version: '3'
+name: search-qa
+
+services:
+  api:
+    runtime: nvidia
+    image: doc-qa
+    build: .
+    container_name: ${LLM_NAME}-api-${PORT}
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ["${GPU_ID}"]
+            capabilities: [gpu]
+    env_file: .env.prod
+    environment:
+      - LLM_NAME=${LLM_NAME}
+      - PORT=${PORT}
+      - LAYOUT_CONFIG=layout_search_qa.yaml
+      # - HTTP_CACHE_PROXY=http://web_cache:10250
+    networks:
+      - squid_backend
+    ports:
+      - ${PORT}:${PORT}
+    healthcheck:
+      test: "curl --fail http://localhost:${PORT}/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /var/models/taide-7b-b.11:/llm/:ro
+      - log:/var/log/doc_qa
+
+# Connect to the network created by web_agent and squid
+networks:
+  squid_backend:
+    external: true
+volumes:
+  log:

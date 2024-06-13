@@ -1,0 +1,12 @@
+{
+    "Please click the button below to verify your email address." : "请点击下面的按钮验证您的电子邮件地址。",
+    "Hello!" : "你好！",
+    "If you did not create an account, no further action is required." : "如果您没有创建任何帐户，无需进一步操作。",
+    "If you did not request a password reset, no further action is required.":"如果您没有尝试重置密码，无需进一步操作。",
+    "This password reset link will expire in :count minutes.":"此密码重置链接将在 :count 分钟内失效",
+    "You are receiving this email because we received a password reset request for your account.":"由于我们收到一个关于您的帐户密码重置请求，因此发送了此电子邮件。",
+    "Regards" : "此致",
+    "Reset Password":"重置密码",
+    "Reset Password Notification":"重置密码通知",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:" : "如果您无法单击\“:actionText\"按钮，请将 URL 复制并粘贴到您的网络浏览器中："
+}

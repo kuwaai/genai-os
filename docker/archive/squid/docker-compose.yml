@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  web_cache:
+    image: b4tman/squid:5.9.0-ssl-bump
+    restart: always
+    ports:
+      - 10250:10250
+    volumes:
+      - ./squid.conf:/etc/squid/squid.conf:ro
+      - ./cert:/cert:ro
+#      - ./logs:/var/log/squid
+    networks:
+      - backend
+
+# The client from other container will connect to this network
+networks:
+  backend:
+    driver: bridge

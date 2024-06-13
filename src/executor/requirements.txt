@@ -1,0 +1,21 @@
+./ # kuwa-executor
+
+# Gemini-Pro
+google-generativeai
+
+# GPT
+openai
+tiktoken
+
+# llama.cpp
+llama-cpp-python
+
+# Huggingface
+torch
+transformers
+accelerate
+sentencepiece
+
+# ollama
+jinja2
+ollama

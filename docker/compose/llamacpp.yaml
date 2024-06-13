@@ -1,0 +1,24 @@
+services:
+  llamacpp-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: llamacpp
+      EXECUTOR_ACCESS_CODE: taide-4bit
+      EXECUTOR_NAME: TAIDE 4bit
+    depends_on:
+      - kernel
+      - multi-chat
+    command: ["--model_path", "/var/model/taide-4bit.gguf", "--ngl", "-1", "--temperature", "0"]
+    restart: unless-stopped
+    volumes: ["/path/to/taide/model.gguf:/var/model/taide-4bit.gguf"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+    networks: ["backend"]

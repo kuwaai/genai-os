@@ -1,0 +1,7 @@
+{{#history}}
+<s>[INST]{{#system}} <<SYS>>
+{{.}}
+<</SYS>>
+
+{{/system}}{{^system}} {{/system}}{{user}} [/INST]
+ {{#bot}}{{.}} </s>{{/bot}}{{^bot}}{{/bot}}{{/history}}

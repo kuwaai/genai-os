@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Define the configuration array
+confs=(
+  "base"
+  # "dev" # Increase the verbosity for debug
+  "pgsql"
+  "gemini"
+  "docqa_webqa"
+  "searchqa"
+)
+
+# Append "-f" before each element
+for i in "${confs[@]}"; do
+  new_confs+=("-f" "compose/${i}.yaml" )
+done
+
+# Join the elements with white space
+joined_confs=$(echo "${new_confs[@]}" | tr ' ' '\n' | paste -sd' ' -)
+
+subcommand="${@:-up --build --remove-orphans}"
+command="docker compose --env-file ./.env ${joined_confs} ${subcommand}"
+
+echo "Command: ${command}"
+bash -c "${command}"

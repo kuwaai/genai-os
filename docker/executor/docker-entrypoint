@@ -1,0 +1,39 @@
+#!/bin/bash
+set -xeu
+
+add_executor(){
+    if [ -z "${EXECUTOR_NAME:-}" ] || [ -z "${EXECUTOR_ACCESS_CODE:-}" ]
+    then
+        return
+    fi
+    IFS=';' read -r -a access_code_arr <<< "${EXECUTOR_ACCESS_CODE}"
+    IFS=';' read -r -a name_arr <<< "${EXECUTOR_NAME}"
+    for idx in "${!name_arr[@]}"
+    do
+        access_code="${access_code_arr[idx]}"
+        name="${name_arr[idx]}"
+        multi-chat-client add-executor "${access_code}" "${name}" || true
+    done
+}
+
+if [ "${ADD_EXECUTOR_TO_MULTI_CHAT}" = true ]
+then
+    add_executor
+fi
+
+IFS=';' read -r -a EXECUTOR_ACCESS_CODE_ARR <<< "${EXECUTOR_ACCESS_CODE}"
+if [ -z "${CUSTOM_EXECUTOR_PATH:-}" ]
+then
+exec kuwa-executor ${EXECUTOR_TYPE} \
+    --kernel_url ${KERNEL_URL} \
+    --access_code ${EXECUTOR_ACCESS_CODE_ARR[@]} \
+    $@ 2>&1
+else
+dir_name="$(dirname "${CUSTOM_EXECUTOR_PATH}")"
+file_name="$(basename "${CUSTOM_EXECUTOR_PATH}")"
+cd ${dir_name}
+exec python "${file_name}" \
+    --kernel_url ${KERNEL_URL} \
+    --access_code ${EXECUTOR_ACCESS_CODE_ARR[@]} \
+    $@ 2>&1
+fi

@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+service Detection {
+  // Check whether the user input is safe.
+  rpc PreFilter (FilterRequest) returns (CheckingResponse) {}
+
+  // Check whether the model output is safe.
+  rpc PostFilter (FilterRequest) returns (CheckingResponse) {}
+}
+
+// Single record of the chat history.
+message ChatRecord {
+  enum Role {
+    ROLE_UNSPECIFIED = 0; // The default value. This value is requited by the protocol buffer.
+    ROLE_USER = 1;        // The prompt from the user.
+    ROLE_ASSISTANT = 2;   // The responae from the model.
+  }
+
+  Role role = 1;
+  string content = 2;
+}
+
+message FilterRequest {
+  string model_id = 1; // The target model identity.
+  // string user_id = 2;  // The user identity. A rule is identified by (model_id, user_id)
+  reserved "user_id";  // The user_id field is reservered for future extension.
+  reserved 2;
+
+  /*
+    The records of the chat that are to be investigated.
+    Note that the role of the last record to invoke the pre-filter/post-filter
+    should be ROLE_USER/ROLE_ASSITANT, respectively.
+  */
+  repeated ChatRecord chat_records = 3;
+}
+
+message CheckingResponse {
+  enum Action {
+    ACTION_UNSPECIFIED = 0; // Equivelant to ACTION_NONE.
+    ACTION_WARN = 1;        // Output a specified warning message without terminate the session.
+    ACTION_BLOCK = 2;       // Terminate the session with optional warning message.
+    ACTION_OVERWRITE = 3;   // Overwrite the message by the system.
+  }
+
+  bool safe = 1; // A boolean to indicate whether the request is safe.
+  optional Action action = 2; // The action to perform when it's unsafe.
+  optional string message = 3; // Optional message to show when it's unsafe.
+}

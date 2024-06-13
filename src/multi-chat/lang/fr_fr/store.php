@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'route' => 'Boutique',
+    'button.create' => 'Créer un bot',
+    'label.offical_bots' => 'Bots officiels',
+    'hint.must_select_base_model' => 'Vous devez choisir un modèle de base',
+    'label.community_bots' => 'Bots de la communauté',
+    'label.my_bots' => 'Mes bots',
+    'bot.system_prompt' => 'Invite système',
+    'bot.welcome_message' => 'Message de bienvenue',
+    'bot.name' => 'Nom de l\'application',
+    'bot.name.label' => 'Nom',
+    'bot.description' => 'Description de l\'application',
+    'bot.description.label' => 'Description',
+    'bot.system_prompt.label' => "L'invite système affectera le comportement du modèle",
+    'bot.welcome_message.label' => 'Le message de bienvenue ne s\'affichera que mais ne sera pas utilisé pour l\'inférence',
+    'bot.button.create'=>"Créer",
+    'bot.react_buttons'=>'Boutons de réaction',
+    'bot.react.allow_translate'=>'Autoriser le bouton de traduction',
+    'bot.react.allow_feedback'=>'Autoriser le bouton de retour',
+    'bot.react.allow_quote'=>'Autoriser le bouton de citation',
+    'bot.react.allow_other'=>'Autoriser d\'autres boutons',
+    'bot.modelfile.label'=>'Le fichier de configuration du modèle utilisé par ce bot',
+    'bot.modelfile'=>'Fichier de configuration du modèle',
+    'bot.base_model'=>'Sélectionnez le modèle de base',
+    'bot.base_model.label' => 'Modèle de base',
+    'bot.before_prompt' => 'Invite avant l\'utilisateur',
+    'bot.after_prompt' => 'Invite après l\'utilisateur',
+    'bot.before_prompt.label' => 'Cette invite sera ajoutée avant l\'invite utilisateur pendant l\'inférence',
+    'bot.after_prompt.label' => 'Cette invite sera ajoutée après l\'invite utilisateur pendant l\'inférence',
+    'bot.button.chat'=>"Discuter"
+];

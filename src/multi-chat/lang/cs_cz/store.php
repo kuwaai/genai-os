@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'route' => 'Obchod',
+    'button.create' => 'Vytvořit bota',
+    'label.offical_bots' => 'Systémové boty',
+    'hint.must_select_base_model' => 'Musíte vybrat základní model',
+    'label.community_bots' => 'Komunitní boty',
+    'label.my_bots' => 'Moje boty',
+    'bot.system_prompt' => 'Systémové výzvy',
+    'bot.welcome_message' => 'Uvítací zpráva',
+    'bot.name' => 'Název aplikace',
+    'bot.name.label' => 'Název',
+    'bot.description' => 'Popis aplikace',
+    'bot.description.label' => 'Popis',
+    'bot.system_prompt.label' => 'Systémové výzvy ovlivní chování modelu',
+    'bot.welcome_message.label' => 'Uvítací zpráva se zobrazí, ale nebude zahrnuta do vyvozování',
+    'bot.button.create'=>"Vytvořit",
+    'bot.react_buttons'=>'Reakční tlačítka',
+    'bot.react.allow_translate'=>'Povolit tlačítko překladu',
+    'bot.react.allow_feedback'=>'Povolit tlačítko zpětné vazby',
+    'bot.react.allow_quote'=>'Povolit tlačítko citace',
+    'bot.react.allow_other'=>'Povolit další tlačítka',
+    'bot.modelfile.label'=>'Soubor nastavení modelu používaný pro tohoto bota',
+    'bot.modelfile'=>'Soubor nastavení modelu',
+    'bot.base_model'=>'Vybrat základní model',
+    'bot.base_model.label' => 'Základní model',
+    'bot.before_prompt' => 'Předchozí systémová výzva uživatele',
+    'bot.after_prompt' => 'Následující systémová výzva uživatele',
+    'bot.before_prompt.label' => 'Tato výzva bude během vyvozování přidána před výzvu uživatele',
+    'bot.after_prompt.label' => 'Tato výzva bude během vyvozování přidána za výzvu uživatele',
+    'bot.button.chat'=>"Chatovat"
+];

@@ -1,0 +1,25 @@
+services:
+  hf-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: huggingface
+      EXECUTOR_ACCESS_CODE: gemma-7b-it
+      EXECUTOR_NAME: Google Gemma 7B Instruct
+      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+    depends_on:
+      - kernel
+      - multi-chat
+    command: ["--model_path", "google/gemma-7b-it", "--no_system_prompt"]
+    restart: unless-stopped
+    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+    networks: ["backend"]

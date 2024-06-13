@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'route' => 'Store',
+    'button.create' => 'Create Bot',
+    'label.offical_bots' => 'Offical Bots',
+    'hint.must_select_base_model' => 'You must select a base model',
+    'label.community_bots' => 'Community Bots',
+    'label.my_bots' => 'My Bots',
+    'bot.system_prompt' => 'System Prompt',
+    'bot.welcome_message' => 'Welcome Message',
+    'bot.name' => 'Application Name',
+    'bot.name.label' => 'Name',
+    'bot.description' => 'Application Description',
+    'bot.description.label' => 'Description',
+    'bot.system_prompt.label' => 'The system prompt affects the model\'s behavior',
+    'bot.welcome_message.label' => 'The welcome message is only displayed and not substituted in the inference',
+    'bot.button.create'=>"Create",
+    'bot.react_buttons'=>'Reaction Buttons',
+    'bot.react.allow_translate'=>'Allow Translate Button',
+    'bot.react.allow_feedback'=>'Allow Feedback Button',
+    'bot.react.allow_quote'=>'Allow Quote Button',
+    'bot.react.allow_other'=>'Allow Other Buttons',
+    'bot.modelfile.label'=>'Model Config File of the bot',
+    'bot.modelfile'=>'Model Config File',
+    'bot.base_model'=>'Select Base Model',
+    'bot.base_model.label' => 'Base Model',
+    'bot.before_prompt' => 'User Before Prompt',
+    'bot.after_prompt' => 'User After Prompt',
+    'bot.before_prompt.label' => 'The prompt will be added in front of user prompt during inference',
+    'bot.after_prompt.label' => 'The prompt will be added behind user prompt during inference',
+    'bot.button.chat'=>"Chat"
+];

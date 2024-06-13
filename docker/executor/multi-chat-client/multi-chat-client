@@ -1,0 +1,59 @@
+#!/bin/env python
+
+import argparse
+import sys
+import logging
+from urllib.parse import urlencode
+from fcgi_client import PHPFPMClient
+from retry import retry
+
+def add_executor(client:PHPFPMClient, access_code:str, name:str, verbose:bool=False):
+
+    request_data = urlencode({
+        "access_code": access_code,
+        "name": name
+    }).encode("utf-8")
+    params = {
+        "CONTENT_TYPE": "application/x-www-form-urlencoded",
+        "CONTENT_LENGTH": len(request_data)
+    }
+    
+    logging.info(f"Sending add-executor request.")
+
+    @retry(tries=8, delay=5, backoff=2, jitter=(0,1))
+    def request(data, params):
+        response = client.post(file="/app/add-executor.php", post=request_data, options=params)
+        if not response: raise RuntimeError("Request error!")
+        
+        return response
+
+    response = request(request_data, params)
+    logging.info(f"Received response:")
+    logging.info(response)
+
+    sys.exit(0)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='A utility to invoke multi-chat API.')
+    parser.add_argument('-t', '--target', help='Target to call, host:port or unix://path', default="multi-chat:9000")
+    parser.add_argument('-m', '--timeout', help='Socket timeout in ms', default=3000, type=int)
+    parser.add_argument('-v', '--verbose', help='Verbose output', action="store_true", default=False)
+
+    subparsers = parser.add_subparsers(required=True, dest="subcommand", description="Sub-commands")
+    add_model_parser = subparsers.add_parser('add-executor', help='Add a new executor')
+    add_model_parser.add_argument("access_code", type=str, help="The access code of the executor")
+    add_model_parser.add_argument("name", type=str, help="The name of the executor")
+    args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(format=f"%(levelname)s - %(message)s", level=logging.DEBUG)
+    else:
+        logging.basicConfig(format=f"%(levelname)s - %(message)s", level=logging.INFO)
+
+    client = PHPFPMClient(args.target, args.timeout)
+    if args.subcommand == "add-executor":
+        add_executor(client, args.access_code, args.name)
+    else:
+        logging.error(f"Sub-command {args.subcommand} is not supported.")
+        sys.exit(1)
+

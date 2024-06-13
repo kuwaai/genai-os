@@ -1,0 +1,5 @@
+opencc==1.1.6
+# jieba @ git+https://github.com/APCLab/jieba-tw.git@v0.36
+ckip_transformers==0.3.4
+# cppjieba-py==0.0.12
+cjieba==0.4.4

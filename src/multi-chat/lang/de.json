@@ -1,0 +1,12 @@
+{
+    "Please click the button below to verify your email address." : "Bitte klicken Sie auf die untenstehende Schaltfläche, um Ihre E-Mail-Adresse zu bestätigen.",
+    "Hello!" : "Hallo!",
+    "If you did not create an account, no further action is required." : "Wenn Sie keinen Account erstellt haben, ist keine weitere Aktion nötig.",
+    "If you did not request a password reset, no further action is required.":"Wenn Sie keinen Passwortrücksetzungsantrag gestellt haben, ist keine weitere Aktion nötig.",
+    "This password reset link will expire in :count minutes.":"Dieser Link für die Passwort-Rückstellung läuft in :count Minuten ab.",
+    "You are receiving this email because we received a password reset request for your account.":"Sie erhalten diese E-Mail, da wir eine Anfrage zum Zurücksetzen des Passworts für Ihr Konto erhalten haben.",
+    "Regards" : "Mit freundlichen Grüßen",
+    "Reset Password":"Passwort zurücksetzen",
+    "Reset Password Notification":"Hinweis zum Zurücksetzen des Passworts",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:" : "Sollten Sie Probleme beim Klicken auf \":actionText\" haben, kopieren Sie den untenstehenden Link und fügen Sie ihn in Ihrem Webbrowser ein:"
+}

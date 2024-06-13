@@ -1,0 +1,8 @@
+en:
+  no_url_exception: No URL found.
+  default_exception_msg: An error occurred, please try again or contact the administrator.
+  summary_prompt: "Please provide a summary of this article:"
+  error_fetching_document: An error occurred while trying to fetch the document {}. Please make sure the submitted document exists and is publicly available.
+  summary_question: When, where, what, outcome, summary
+  summary_prefix: "Here is a summary of the article:"
+  reference: "Reference:"

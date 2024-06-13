@@ -1,0 +1,21 @@
+services:
+  ollama-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: ollama
+      EXECUTOR_ACCESS_CODE: llama3
+      EXECUTOR_NAME: Llama3
+    depends_on:
+      - kernel
+      - multi-chat
+    command: [
+      "--ollama_host", "host.docker.internal", # The ollama server on host
+      "--model", "llama3"
+    ]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    networks: ["backend"]

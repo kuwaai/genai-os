@@ -1,0 +1,143 @@
+version: '3'
+
+services:
+  
+  manager:
+    image: safety-guard-manager:latest
+    build:
+      context: .
+      dockerfile: manager.Dockerfile
+    environment:
+      EMBED_HOST: http://embed-infer:8080
+      EMBED_MODEL: thenlper/gte-large-zh
+      DB_CONN: postgresql+psycopg2://app:safety-guard@db/app
+
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8000
+    depends_on:
+      - db
+      - embed-infer
+    healthcheck:
+      test: "curl --fail http://localhost:8000/v1/management/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+
+  detector:
+    image: safety-guard-detector:latest
+    build:
+      context: .
+      dockerfile: detector.Dockerfile
+    environment:
+      EMBED_HOST: http://embed-infer:8080
+      EMBED_MODEL: thenlper/gte-large-zh
+      EMBED_DIM: 1024
+      TGI_URL: http://tgi:80
+      DB_CONN: postgresql+psycopg2://app:safety-guard@db/app
+
+      SERVER_LISTEN_ADDR: "[::]:50051"
+      LOCAL_RULE_INDEXING_PERIOD: 30.0
+    depends_on:
+      - db
+      - embed-infer
+      - tgi
+    healthcheck:
+      test: /bin/grpc_health_probe -addr=:50051 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      replicas: 1 # arbitrary value. The optimal value is TBD.
+    ports:
+      - 50051:50051
+  
+  embed-infer:
+    image: michaelf34/infinity:latest
+    command:
+      - --model-name-or-path=thenlper/gte-large-zh
+      - --port=8080
+      - --batch-size=1024
+      - --log-level=info
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          # Deploy with docker swarm
+          # generic_resources:
+          #   - discrete_resource_spec:
+          #       kind: "NVIDIA-GPU"
+          #       value: 1
+          # Local deployment (docker compose)
+          devices:
+          - driver: nvidia
+            device_ids: ["0"]
+            capabilities: [gpu]
+      replicas: 1 # Set to 7 replicas can utilize the whole computing power of
+                  # the single V100 GPU
+    volumes:
+      - cache:/app/.cache/torch
+    # ports:
+    #   - 8181:8080
+  
+  tgi: # The inference server of LlamaGuard
+    image: ghcr.io/huggingface/text-generation-inference:1.3
+    shm_size: '1gb'
+    command:
+      - --model-id=meta-llama/LlamaGuard-7b
+      - --max-input-length=4090
+      - --max-total-tokens=4096
+      - --max-batch-prefill-tokens=17900
+      - --max-batch-total-tokens=18000
+      - --quantize=eetq # 8-bits
+    env_file:
+      - .env # For HUGGING_FACE_HUB_TOKEN
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          # Deploy with docker swarm
+          # generic_resources:
+          #   - discrete_resource_spec:
+          #       kind: "NVIDIA-GPU"
+          #       value: 1
+          # Local deployment (docker compose)
+          devices:
+          - driver: nvidia
+            device_ids: ["1"]
+            capabilities: [gpu]
+    volumes:
+      - cache:/data
+    # ports:
+    #   - 8182:80
+  
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: safety-guard
+      POSTGRES_USER: app
+    volumes:
+      - db_data:/var/lib/postgresql
+    # ports:
+    #   - 5432:5432
+
+  db-ui:
+    image: adminer
+    depends_on:
+      - db
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+
+volumes:
+  cache:
+  db_data:
+
+networks:
+  taide:
+    name: taide
+    external: true

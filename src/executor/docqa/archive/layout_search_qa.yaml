@@ -1,0 +1,4 @@
+version: 1
+override-process:
+  class: 'web_adapter.SearchQaProcess'
+  args: {}

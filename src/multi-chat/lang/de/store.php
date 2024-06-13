@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'route' => 'Store',
+    'button.create' => 'Bot erstellen',
+    'label.offical_bots' => 'System-Bots',
+    'hint.must_select_base_model' => 'Es muss ein Basismodell ausgewählt werden.',
+    'label.community_bots' => 'Community-Bots',
+    'label.my_bots' => 'Meine Bots',
+    'bot.system_prompt' => 'System-Eingabeaufforderung',
+    'bot.welcome_message' => 'Begrüßungsnachricht',
+    'bot.name' => 'Anwendungsname',
+    'bot.name.label' => 'Name',
+    'bot.description' => 'Anwendungsbeschreibung',
+    'bot.description.label' => 'Beschreibung',
+    'bot.system_prompt.label' => 'Die System-Eingabeaufforderung wirkt sich auf das Verhalten des Modells aus.',
+    'bot.welcome_message.label' => 'Die Begrüßungsnachricht wird nur angezeigt, aber nicht in die Inferenz einbezogen.',
+    'bot.button.create'=>"Erstellen",
+    'bot.react_buttons'=>'Reaktionsbuttons',
+    'bot.react.allow_translate'=>'Übersetzungsbutton erlauben',
+    'bot.react.allow_feedback'=>'Feedbackbutton erlauben',
+    'bot.react.allow_quote'=>'Zitatbutton erlauben',
+    'bot.react.allow_other'=>'Andere Buttons erlauben',
+    'bot.modelfile.label'=>'Die für diesen Bot verwendete Modellkonfigurationsdatei',
+    'bot.modelfile'=>'Modellkonfigurationsdatei',
+    'bot.base_model'=>'Basismodell auswählen',
+    'bot.base_model.label' => 'Basismodell',
+    'bot.before_prompt' => 'Benutzerworte als Eingabeaufforderung davor',
+    'bot.after_prompt' => 'Benutzerworte als Eingabeaufforderung danach',
+    'bot.before_prompt.label' => 'Diese Eingabeaufforderung wird der Eingabeaufforderung des Benutzers während der Inferenz vorangestellt.',
+    'bot.after_prompt.label' => 'Diese Eingabeaufforderung wird der Eingabeaufforderung des Benutzers während der Inferenz angefügt.',
+    'bot.button.chat'=>"Chatten"
+];
