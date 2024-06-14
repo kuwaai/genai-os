@@ -39,7 +39,7 @@ class RoomController extends Controller
     {
         $chat = ChatRoom::find($request->route('room_id'));
         if ($chat && $chat->user_id == Auth::user()->id) {
-            $html = view('room.export')->render(); // Generate the HTML content
+            $html = view('room.export')->with('hide_header',true)->with('no_bot_img',true)->with('same_direction',true)->render();
 
             // Set headers for Word document
             return response($html)
@@ -55,15 +55,7 @@ class RoomController extends Controller
     {
         $chat = ChatRoom::find($request->route('room_id'));
         if ($chat && $chat->user_id == Auth::user()->id) {
-            $options = new Options();
-            $options->set('isRemoteEnabled', true);
-            $dompdf = new Dompdf($options);
-            // instantiate and use the dompdf class
-            $html = view('room.export');
-            $dompdf->loadHtml($html, 'UTF-8');
-            $dompdf->setPaper('A4', 'portrait');
-            $dompdf->render();
-            $dompdf->stream(ChatRoom::find(request()->route('room_id'))->name . '.pdf');
+            return view('room.export');
         } else {
             return redirect()->route('room.home');
         }
