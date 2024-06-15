@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-hidden h-full bg-gray-200 dark:bg-gray-600 shadow-xl">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    class="overflow-hidden h-full bg-gray-200 dark:bg-gray-600 shadow-xl">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -365,8 +366,7 @@
                     @endphp
                     <div class="table mt-2 {{ $history->isbot ? '' : 'ml-auto' }} {{ $visable ? '' : 'hidden' }}">
                         @if (isset($same_direction) || $history->isbot)
-                            <div class="h-10 w-10 mr-3"
-                                style="display: table-cell; vertical-align:top;">
+                            <div class="h-10 w-10 mr-3" style="display: table-cell; vertical-align:top;">
                                 @if ($history->isbot)
                                     @if ($anonymous)
                                         <div class="h-full w-full bg-black text-white">
@@ -378,7 +378,8 @@
                                                 {{ $history->name }}
                                             </div>
                                         @else
-                                            <img src="{{ $botimgurl }}" class="h-full w-full rounded-full overflow-hidden" />
+                                            <img src="{{ $botimgurl }}"
+                                                class="h-full w-full rounded-full overflow-hidden" />
                                         @endif
                                     @endif
                                 @elseif (isset($same_direction))
@@ -409,7 +410,11 @@
     <script>
         html2pdf().set({
             filename: "{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}.pdf"
-        }).from(document.body).save();
+        }).from(document.body).save().then(() => {
+            setTimeout(() => {
+                window.close();
+            }, 1000);
+        });
     </script>
 </body>
 
