@@ -1,4 +1,9 @@
 # Whisper
 pywhispercpp
-pyannote.audio
 whisper-s2t
+
+# Speaker separation
+# scipy
+# git+https://github.com/speechbrain/speechbrain.git@develop
+# pyannote.audio[separation]==3.3.0
+pyannote.audio
