@@ -59,25 +59,28 @@ Name: "slovenian"; MessagesFile: "compiler:Languages\Slovenian.isl"
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
+; These two has to be download from https://jrsoftware.org/files/istrans/
+Name: "chinesetraditional"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
+Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 
 [Files]
-Source: "..\..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "Kuwa-GenAI-OS.exe";
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{group}\Start GenAI OS"; Filename: "{app}\windows\start.bat"; IconFilename: "{#MyAppIcon}"
-Name: "{group}\Construct Rag"; Filename: "{app}\windows\construct_rag.bat"; IconFilename: "{#MyAppIcon}"
-Name: "{userdesktop}\Start GenAI OS"; Filename: "{app}\windows\start.bat"; WorkingDir: "{app}\windows"; IconFilename: "{#MyAppIcon}"
-Name: "{userdesktop}\Construct Rag"; Filename: "{app}\windows\construct_rag.bat"; WorkingDir: "{app}\windows"; IconFilename: "{#MyAppIcon}"
+Name: "{group}\Start GenAI OS"; Filename: "{app}\windows\start.bat"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
+Name: "{group}\Construct Rag"; Filename: "{app}\windows\construct_rag.bat"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
+Name: "{userdesktop}\Start GenAI OS"; Filename: "{app}\windows\start.bat"; WorkingDir: "{app}\windows"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
+Name: "{userdesktop}\Construct Rag"; Filename: "{app}\windows\construct_rag.bat"; WorkingDir: "{app}\windows"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
 
 [Run]
 Filename: "{app}\windows\src\switch.bat"; Flags: shellexec
 Filename: "{app}\windows\build & start.bat"; Flags: shellexec
 
 [UninstallRun]
-Filename: "{app}\windows\tool.bat"; Parameters: "stop"; Flags: shellexec
+Filename: "{app}\windows\tool.bat"; Parameters: "stop"; Flags: shellexec; RunOnceId: "KuwaUninstall"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
