@@ -84,7 +84,7 @@ class StableDiffusionExecutor(LLMExecutor):
         pipe = None
         if img_url is not None:
             pipe = self.load_pipe(task=Task.IMG2IMG, model_name=model_name)
-            init_image = load_image(img_url).resize((512, 512))
+            init_image = load_image(img_url)
             generation_conf["image"] = init_image
         else:
             pipe = self.load_pipe(task=Task.TEXT2IMG, model_name=model_name)
