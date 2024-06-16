@@ -81,7 +81,7 @@ class GeminiExecutor(LLMExecutor):
     
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
-            google_token = modelfile.parameters["_"]["google_token"] or self.args.api_key
+            google_token = modelfile.parameters["_"].get("google_token") or self.args.api_key
 
             # Parse and process modelfile
             override_system_prompt = modelfile.override_system_prompt

@@ -1,3 +1,4 @@
+import re
 import json
 import logging
 from .base_executor import BaseExecutor
@@ -28,7 +29,7 @@ class LLMExecutor(BaseExecutor):
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         raise NotImplementedError("LLM Executor should implement the \"llm_compute\" method.")
 
-def to_openai_chat_format(history: list):
+def to_openai_chat_format(history: list[dict]):
     """
     Convert the chat history from Kuwa's format to OpenAI's format.
     """
@@ -41,7 +42,7 @@ def to_openai_chat_format(history: list):
     ]
     return history
 
-def rectify_chat_history(history: list):
+def rectify_chat_history(history: list[dict]):
     """
     Ensure the history begin with "user."
     """
@@ -51,6 +52,31 @@ def rectify_chat_history(history: list):
         first_user_idx += 1
     history = history[first_user_idx:]
     return history
+
+def extract_last_url(chat_history: list[dict]) -> (str, list[dict]):
+    """
+    Find the latest URL provided by the user and trim the chat history to there.
+    Note: the input is OpenAI chat format.
+    """
+
+    url_regex = r'(https?://[^\s]+)'
+    url = None
+    begin_index = 0
+    for i, record in enumerate(reversed(chat_history)):
+        if record["role"] != "user":
+            continue
+
+        urls_in_msg = re.findall(url_regex, record["content"])
+        if len(urls_in_msg) != 0:
+            url = urls_in_msg[-1]
+            begin_index = len(chat_history) - i - 1
+            break
+    
+    logger.debug("URL: {}\nFrom message: {}".format(url, chat_history[begin_index]["content"]))
+    trimmed_chat_history = list(chat_history[begin_index:])
+    trimmed_chat_history[0]["content"] = re.sub(url_regex, '', trimmed_chat_history[0]["content"]).strip()
+
+    return url, trimmed_chat_history
 
 if __name__ == "__main__":
     executor = LLMExecutor()

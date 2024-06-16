@@ -172,7 +172,7 @@
             </div>-->
             <div class="space-y-2">
                 <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
-                    {{ __('React Buttons') }}
+                    {{ __('store.bot.react_buttons') }}
                 </p>
 
                 @foreach (['Feedback', 'Translate', 'Quote', "Other"] as $label)
@@ -182,7 +182,7 @@
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         <label for="{{ $id }}"
                             class="ml-2 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            {{ __('Allow ' . $label) }}
+                            {{ __('store.bot.react.allow_' . $id) }}
                         </label>
                     </div>
                 @endforeach

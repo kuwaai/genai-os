@@ -1,3 +1,23 @@
+<style>
+@keyframes gradient-shift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .animate-gradient-left-to-right {
+        background: linear-gradient(to right, rgba(0, 150, 255, 1), rgba(0, 100, 255, 0.5));
+        background-size: 200% 100%;
+        animation: gradient-shift 2s linear infinite;
+    }
+</style>
+
 <script>
     var isMac = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     var histories = {}
@@ -54,21 +74,38 @@ fill="currentFill" />
 </svg>`);
             } else {
                 let warnings = /&lt;&lt;&lt;WARNING&gt;&gt;&gt;([\s\S]*?)&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g
-                    .exec(DOMPurify.sanitize(this));
-                $(this).html(DOMPurify.sanitize(this.innerHTML).replace(
-                    /&lt;&lt;&lt;WARNING&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g, ''));
+                    .exec(this.innerHTML);
+
+                let infos = /&lt;&lt;&lt;INFO&gt;&gt;&gt;([\s\S]*?)&lt;&lt;&lt;\/INFO&gt;&gt;&gt;/g
+                    .exec(this.innerHTML);
+
+                function parseProgressBar(line) {
+                    if (line.startsWith('[PROGRESS_BAR]')) {
+                        //Render as progress bar
+                        datas = line.replace('[PROGRESS_BAR]', '').split('%/')
+                        return `${datas[1]}<div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+    <div class="bg-blue-600 h-2.5 rounded-full animate-pulse animate-gradient-left-to-right" style="width: ${datas[0]}%"></div>
+</div>`
+                    }
+                    return line;
+                }
+                $(this).html(this.innerHTML.replace(
+                        /&lt;&lt;&lt;WARNING&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/WARNING&gt;&gt;&gt;/g, '')
+                    .replace(
+                        /&lt;&lt;&lt;INFO&gt;&gt;&gt;[\s\S]*?&lt;&lt;&lt;\/INFO&gt;&gt;&gt;/g, ''));
                 $msg = this
                 if ($(this).hasClass("bot-msg")) {
                     if (warnings) {
-                        warnings = warnings[1].split("\n")
+                        warnings = warnings.filter(function(line){return !line.startsWith('&lt;&lt;&lt;WARNING&gt;&gt;&gt;')}).map(function(line) {
+                            return parseProgressBar(line);
+                        })
                         var listItems = warnings.map(function(line) {
-                            return `<div class="warning_msg mt-2 flex items-center p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 role="alert">
+                            return `<div class="warning_msg mt-2 flex items-center p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50" role="alert">
   <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
   </svg>
-  <span class="sr-only">Info</span>
-  <div class="ml-2">
-    <span class="font-medium">` + line + `</span>
+  <div class="ml-2 flex-1 overflow-hidden flex">
+    <span class="font-medium overflow-hidden flex-1">` + line + `</span>
   </div>
 </div>`;
                         });
@@ -77,12 +114,31 @@ fill="currentFill" />
                         // Append the list items after the target element
                         $(this).after(listItems.join(''));
                     }
-                    $msg = translate_msg(DOMPurify.sanitize($msg));
+                    if (infos) {
+                        infos = infos.filter(function(line){return !line.startsWith('&lt;&lt;&lt;INFO&gt;&gt;&gt;')}).map(function(line) {
+                            return parseProgressBar(line);
+                        })
+                        var listItems = infos.map(function(line) {
+                            return `<div class="info_msg mt-2 flex items-center p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:text-blue-400 bg-blue-400" role="alert">
+  <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+  </svg>
+  <div class="ml-2 flex-1 overflow-hidden flex">
+    <span class="font-medium overflow-hidden flex-1">` + line + `</span>
+  </div>
+</div>`;
+                        });
+                        //Clear previous warning
+                        $(this).parent().find("div.info_msg").remove();
+                        // Append the list items after the target element
+                        $(this).after(listItems.join(''));
+                        console.log(infos);
+                    }
+                    $msg = translate_msg($msg.innerHTML);
+                }else{
+                    $msg = $msg.innerHTML;
                 }
-                $(this).html(marked.parse(DOMPurify.sanitize($msg, {
-                    ALLOWED_TAGS: [],
-                    ALLOWED_ATTR: []
-                })));
+                $(this).html(marked.parse(DOMPurify.sanitize($('<div>').html($msg).text())));
                 $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
                 $(node).find('div.text-sm.space-y-3.break-words table *').addClass(
                     'border border-2 border-gray-500 border-solid p-1');
@@ -131,7 +187,8 @@ xmlns="http://www.w3.org/2000/svg">
 
                 $(node).find("div.text-sm.space-y-3.break-words h5").each(function() {
                     var pattern = /<%ref-(\d+)%>/;
-                    var match = DOMPurify.sanitize(this).replaceAll("&lt;","<").replaceAll("&gt;",">").match(pattern);
+                    var match = DOMPurify.sanitize(this).replaceAll("&lt;", "<").replaceAll("&gt;", ">")
+                        .match(pattern);
                     if (match) {
                         var refNumber = match[1];
                         $msg = DOMPurify.sanitize($("#history_" + refNumber).find("div:eq(3) div div")[
@@ -158,6 +215,7 @@ xmlns="http://www.w3.org/2000/svg">
         var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
         return urlPattern.test(url);
     }
+
     function scrollToRef(refNumber) {
         $('#chatroom').animate({
             scrollTop: $(`#history_${refNumber}`).offset().top - $('#chatroom').offset().top + $('#chatroom')
@@ -177,7 +235,8 @@ xmlns="http://www.w3.org/2000/svg">
                             return true
                         }
                         return false
-                    } else if ($(this).find("img").attr("data-tooltip-target").split('_')[2] == $(node).parent().parent()
+                    } else if ($(this).find("img").attr("data-tooltip-target").split('_')[2] == $(node).parent()
+                        .parent()
                         .find(
                             "div img").attr("data-tooltip-target").split('_')[2]) {
                         $trigger = true;
