@@ -12,6 +12,9 @@ RUN sed -i '/\.[/]*/d' ./requirements.txt &&\
 RUN pip install --no-cache-dir -r requirements.txt
 COPY src/executor/docqa/requirements.txt ./docqa/requirements.txt
 RUN pip install --no-cache-dir -r ./docqa/requirements.txt
+COPY src/executor/speech_recognition/requirements.txt ./speech_recognition/requirements.txt
+RUN apt-get install -y ffmpeg &&\
+    pip install --no-cache-dir -r ./speech_recognition/requirements.txt
 
 # Install the executor framework
 COPY src/executor/. .

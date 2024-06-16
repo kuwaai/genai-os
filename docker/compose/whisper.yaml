@@ -1,0 +1,22 @@
+services:
+  whisper-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      CUSTOM_EXECUTOR_PATH: ./speech_recognition/main.py
+      EXECUTOR_ACCESS_CODE: whisper
+      EXECUTOR_NAME: Whisper
+      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+    depends_on:
+      - kernel
+      - multi-chat
+    command: []
+    volumes: [
+      "~/.cache/huggingface:/root/.cache/huggingface",
+      "~/.cache/torch:/root/.cache/torch",
+      "~/.cache/whisper_s2t:/root/.cache/whisper_s2t",
+    ]
+    restart: unless-stopped
+    networks: ["backend"]
