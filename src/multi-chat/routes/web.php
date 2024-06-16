@@ -163,8 +163,8 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                             ->get('/share/{room_id}/pdf', [RoomController::class, 'export_to_pdf'])
                             ->name('room.export_pdf');
                         Route::middleware(AdminMiddleware::class . ':Room_read_export_chat')
-                            ->get('/share/{room_id}/odt', [RoomController::class, 'export_to_odt'])
-                            ->name('room.export_odt');
+                            ->get('/share/{room_id}/doc', [RoomController::class, 'export_to_doc'])
+                            ->name('room.export_doc');
                         Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('room.translate');
 
                         Route::get('/chain', [ChatController::class, 'update_chain'])->name('room.chain');

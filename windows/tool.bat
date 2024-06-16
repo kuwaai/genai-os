@@ -3,6 +3,13 @@ REM Loop to wait for commands
 call src\variables.bat
 setlocal enabledelayedexpansion
 set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
+
+if "%1"=="stop" (
+    echo Stopping everything
+    call src\stop.bat
+    goto end
+)
+
 :loop
 set userInput=
 set /p userInput=Enter a command (quit, seed, hf login, prune, switch, stop, cmd): 

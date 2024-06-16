@@ -19,7 +19,7 @@ return [
     'button.download.TXT' => 'TXT 파일 다운로드',
     'button.download.JSON' => 'JSON 파일 다운로드',
     'button.download.PDF' => 'PDF 파일 다운로드',
-    'button.download.ODT' => 'ODT 파일 다운로드',
+    'button.download.DOC' => 'DOC 파일 다운로드',
     'label.TSV' => '탭으로 구분된 데이터(.txt 파일)',
     'label.JSON' => 'JSON 형식(.json 파일)',
     'label.share_link' => '공유 링크(현재는 자신만 액세스 가능)',

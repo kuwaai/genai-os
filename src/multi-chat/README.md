@@ -13,13 +13,13 @@
 * [Finished] Markdown output supported
 * [Finished] Highlight the input output prompt
 * [Finished] Blinded model feedback testing
+* [Finished] DOC chat history export
+* [Finished] Bot stores
 * [WIP] Regenerate & Edit message button
-* [WIP] Rule-based control in Model worker
-* [WIP] Bot stores
-* [WIP] A fully working API
-* [WIP] Live streaming chat
+* [Working] Rule-based control in Model worker
+* [Working] A fully working API
+* [WIP] Live streaming chatroom with multiple users
 * [WIP] Auto scaling models
-* [WIP] ODT chat history export
 * [WIP] System stress measure
 
 ### How to update

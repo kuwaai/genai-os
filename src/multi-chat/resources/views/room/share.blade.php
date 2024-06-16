@@ -22,6 +22,7 @@
     <script src="{{ asset('js/marked.min.js') }}"></script>
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>
+    <script src="{{ asset('js/html2pdf.bundle.min.js') }}"></script>
     <style>
         @media print {
             .new-page {
@@ -286,6 +287,13 @@
             </div>
         </div>
     </div>
+    @if (isset($print))
+        <script>
+            html2pdf().set({
+                filename: "{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}.pdf"
+            }).from(document.body).save();
+        </script>
+    @endif
 </body>
 
 </html>

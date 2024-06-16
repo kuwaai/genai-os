@@ -19,7 +19,7 @@ return [
     'button.download.TXT' => 'Stáhnout jako TXT',
     'button.download.JSON' => 'Stáhnout jako JSON',
     'button.download.PDF' => 'Stáhnout jako PDF',
-    'button.download.ODT' => 'Stáhnout jako ODT',
+    'button.download.DOC' => 'Stáhnout jako DOC',
     'label.TSV' => 'Data oddělená tabulátory (.txt soubor)',
     'label.JSON' => 'Formát JSON (.json soubor)',
     'label.share_link' => 'Sdílený odkaz (v současné době přístupný pouze pro vás)',

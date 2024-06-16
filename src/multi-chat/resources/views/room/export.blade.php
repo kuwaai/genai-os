@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-hidden h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    class="overflow-hidden h-full bg-gray-200 dark:bg-gray-600 shadow-xl">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}</title>
+    <script src="{{ asset('js/html2pdf.bundle.min.js') }}"></script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -86,8 +88,9 @@
     </style>
 </head>
 
-<body class="antialiased h-full">
+<body class="antialiased h-full bg-gray-200 dark:bg-gray-600 shadow-xl">
     @php
+        $Parsedown = new \Parsedown();
         $result = App\Models\Bots::Join('llms', function ($join) {
             $join->on('llms.id', '=', 'bots.model_id');
         })
@@ -183,32 +186,35 @@
             $DC = null;
         }
     @endphp
-    <div class="h-full">
-        <div class="h-full w-full bg-gray-200 dark:bg-gray-600 shadow-xl">
-            <div class="bg-gray-300 dark:bg-gray-900/70 p-2 sm:p-4 text-gray-700 dark:text-white overflow-hidden w-full">
-                <div style="display: table; width: 100%;">
-                    <p
-                        style="display: table-cell; max-width: calc(100% - 60px); vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 5px;">
-                        @if (session('llms'))
-                            {{ __('room.header.new_room') }}
-                        @else
-                            {{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}
-                        @endif
-                    </p>
-                    <div style="display: table-cell; width: 60px; vertical-align: top;">
-                        <div class="mr-1">
-                            @foreach ($llms as $llm)
-                                <div class="mx-1 h-10 w-10 rounded-full bg-black overflow-hidden">
-                                    <img class="h-full w-full"
-                                        src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}" />
-                                </div>
-                            @endforeach
+    <div class="h-full bg-gray-200 dark:bg-gray-600 shadow-xl">
+        <div class="h-full w-full">
+            @if (!isset($hide_header))
+                <div
+                    class="bg-gray-300 dark:bg-gray-900/70 p-2 sm:p-4 text-gray-700 dark:text-white overflow-hidden w-full">
+                    <div class="table w-full">
+                        <p
+                            style="display: table-cell; max-width: calc(100% - 60px); vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 5px;">
+                            @if (session('llms'))
+                                {{ __('room.header.new_room') }}
+                            @else
+                                {{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}
+                            @endif
+                        </p>
+                        <div style="display: table-cell; width: 60px; vertical-align: top;">
+                            <div class="mr-1">
+                                @foreach ($llms as $llm)
+                                    <div class="mx-1 h-10 w-10 rounded-full bg-black overflow-hidden">
+                                        <img class="h-full w-full"
+                                            src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}" />
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
-            <div id="chatroom" class="p-4 scrollbar bg-gray-200 dark:bg-gray-600">
+            <div id="chatroom" class="p-4 scrollbar bg-gray-200 dark:bg-gray-600 overflow-auto h-full">
                 @php
                     $roomId = request()->route('room_id');
 
@@ -358,27 +364,42 @@
                             }
                         }
                     @endphp
-                    <div
-                        class="table mt-2 {{ $history->isbot ? '' : 'ml-auto justify-end' }} {{ $visable ? '' : 'hidden' }}">
-                        @if ($history->isbot)
-                            <div class="h-10 w-10 rounded-full bg-black overflow-hidden mr-3">
-                                @if ($anonymous)
-                                    <div class="h-full w-full bg-black flex justify-center items-center text-white">
-                                        ?</div>
-                                @else
-                                    <img src="{{ $botimgurl }}" class="h-full w-full" />
+                    <div class="table mt-2 {{ $history->isbot ? '' : 'ml-auto' }} {{ $visable ? '' : 'hidden' }}">
+                        @if (isset($same_direction) || $history->isbot)
+                            <div class="h-10 w-10 mr-3" style="display: table-cell; vertical-align:top;">
+                                @if ($history->isbot)
+                                    @if ($anonymous)
+                                        <div class="h-full w-full bg-black text-white">
+                                            ?</div>
+                                    @else
+                                        @if (isset($no_bot_img))
+                                            <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden"
+                                                style="justify-items: center; align-content: center;">
+                                                {{ $history->name }}
+                                            </div>
+                                        @else
+                                            <img src="{{ $botimgurl }}"
+                                                class="h-full w-full rounded-full overflow-hidden" />
+                                        @endif
+                                    @endif
+                                @elseif (isset($same_direction))
+                                    <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden"
+                                        style="justify-items: center; align-content: center;">User</div>
                                 @endif
                             </div>
+                            <div style="width: 10px;display: table-cell;"></div>
                         @endif
                         <div style="display: table-cell; max-width: calc(100% - 40px);"
                             class="p-3 transition-colors {{ $history->isbot ? 'bg-gray-300 rounded-r-lg rounded-bl-lg' : 'bg-cyan-500 text-white rounded-l-lg rounded-br-lg' }}">
                             {{-- blade-formatter-disable --}}
-                                    <div class="text-sm space-y-3 break-words">{!! GrahamCampbell\Markdown\Facades\Markdown::convert($message)->getContent() !!}</div>
+                                    <div class="text-sm space-y-3 break-words">{!! $Parsedown->text($message) !!}</div>
                                     {{-- blade-formatter-enable --}}
                         </div>
-                        @if (!$history->isbot)
-                            <div class="h-10 w-10 rounded-full bg-gray-300 overflow-hidden ml-3 float-start">
-                                User
+                        @if (!isset($same_direction) && !$history->isbot)
+                            <div style="width: 10px; display: table-cell;"></div>
+                            <div class="h-10 w-10 ml-3" style="display: table-cell; vertical-align:top;">
+                                <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden"
+                                    style="justify-items: center; align-content: center;">User</div>
                             </div>
                         @endif
                     </div>
@@ -386,6 +407,15 @@
             </div>
         </div>
     </div>
+    <script>
+        html2pdf().set({
+            filename: "{{ App\Models\ChatRoom::findOrFail(request()->route('room_id'))->name }}.pdf"
+        }).from(document.body).save().then(() => {
+            setTimeout(() => {
+                window.close();
+            }, 1000);
+        });
+    </script>
 </body>
 
 </html>

@@ -19,7 +19,7 @@ return [
     'button.download.TXT' => 'TXT-Datei herunterladen',
     'button.download.JSON' => 'JSON-Datei herunterladen',
     'button.download.PDF' => 'PDF-Datei herunterladen',
-    'button.download.ODT' => 'ODT-Datei herunterladen',
+    'button.download.DOC' => 'DOC-Datei herunterladen',
     'label.TSV' => 'Tabulatorgetrennte Daten (.txt-Datei)',
     'label.JSON' => 'JSON-Format (.json-Datei)',
     'label.share_link' => 'Link teilen (derzeit nur für dich selbst zugänglich)',
