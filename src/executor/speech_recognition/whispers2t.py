@@ -23,7 +23,7 @@ from kuwa.executor.util import merge_config
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from src.speaker_diarization import PyannoteSpeakerDiarizer
+from src.diarizer import PyannoteSpeakerDiarizer
 from src.transcriber import WhisperS2tTranscriber
 
 logger = logging.getLogger(__name__)
@@ -100,14 +100,34 @@ class SpeechRecognitionExecutor(LLMExecutor):
         return filepath
 
     def read_param_from_history(self, history:[dict], param:str, type=None, default=None):
-        value = default
+        get_value = lambda v: type(v) if type is not None and v is not None else v
+        result = []
         target = f"/{param}"
-        for record in reversed(history):
+        for record in history:
             if record["role"] != "user": continue
             if record["content"].startswith(target):
                 value = record["content"][len(target):]
-        return type(value) if type is not None and value is not None else value
+                result.append(get_value(value.strip()))
+        return result if len(result) > 0 else [default]
     
+    def split_args(self, string):
+        if string is None: return []
+        args = []
+        current_arg = ""
+        in_quotes = False
+        for char in string:
+            if char == " " and not in_quotes:
+                if current_arg:
+                    args.append(current_arg)
+                    current_arg = ""
+            elif char == '"':
+                in_quotes = not in_quotes
+            else:
+                current_arg += char
+        if current_arg:
+            args.append(current_arg)
+        return args
+
     async def transcribe(self, filepath, model_name:str, model_backend:str, lang:str, prompt:str=None, param={}):
         logger.debug(f"Transcribe param: {param}")
         
@@ -158,12 +178,34 @@ class SpeechRecognitionExecutor(LLMExecutor):
         
         result = "{}{}\n".format(speaker, text)
         if output_timestamp:
-            result = "[{} ---> {}] {}\n".format(
+            result = "[{} ---> {}] {}".format(
                 format_timestamp(start_sec, always_include_hours=True),
                 format_timestamp(end_sec, always_include_hours=True),
                 result
             )
         return result
+
+    def _replace(self, message, history:[dict]) -> str:
+        if message is None: return None
+        replace_list = self.read_param_from_history(
+            history=history,
+            param="replace",
+            type=str
+        )
+        replace_list = map(lambda x: self.split_args(x), replace_list)
+        replace_list = filter(lambda x: len(x) == 2, replace_list)
+        for target, replace in replace_list:
+            message = re.sub(target, replace, message, flags=re.MULTILINE)
+        
+        return message
+
+    def check_replace(self, history:[dict]) -> str:
+        if len(history) < 2: return None
+        if history[-1]["role"] != "user" or not history[-1]["content"].startswith("/replace"): return None
+        assistant_output = list(filter(lambda x: x["role"]=="assistant", history))
+        if len(assistant_output) == 0: return None
+
+        return self._replace(message=assistant_output[-1]["content"], history=history)
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
 
@@ -174,6 +216,11 @@ class SpeechRecognitionExecutor(LLMExecutor):
             url, history = extract_last_url(history)
             if url is None: 
                 raise ValueError("An URL to a audio file is expected.")
+
+            if (replace_output := self.check_replace(history)) is not None:
+                logger.debug(replace_output)
+                yield replace_output
+                return
 
             src_file = self.download(url)
             gc_paths.append(src_file)
@@ -189,7 +236,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
             disable_timestamp = transcribe_param.pop("disable_timestamp", self.disable_timestamp)
             disable_diarization = transcribe_param.pop("disable_diarization", self.disable_diarization)
             lang = transcribe_param.pop("language", self.language)
-            num_speakers = self.read_param_from_history(history=history, param="speakers", type=int)
+            num_speakers = self.read_param_from_history(history=history, param="speakers", type=int)[-1]
             diar_thld_sec = transcribe_param.pop("diar_thld_sec", self.diar_thld_sec)
 
             transcribe_param["word_timestamps"] = not disable_diarization
@@ -222,6 +269,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
 
             logger.debug(f"Final Result: {result}")
             output = "".join([self._format_output(i, not disable_timestamp) for i in result])
+            output = self._replace(message=output, history=history)
 
             yield output
             
