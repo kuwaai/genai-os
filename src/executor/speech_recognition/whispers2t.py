@@ -36,7 +36,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
     default_model_backend:str = "CTranslate2"
     language:str = "en"
     batch_size:int = 24
-    diar_thld_sec:float = 1.0
+    diar_thold_sec:float = 1.0
     disable_timestamp:bool = False
     disable_diarization:bool = False
 
@@ -51,7 +51,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
         model_group.add_argument('--batch_size', default=self.batch_size, type=int, help='The batch size')
         model_group.add_argument('--disable_timestamp', action="store_true", help='Do not output the timestamp.')
         model_group.add_argument('--disable_diarization', action="store_true", help='Disable speaker diarization annotation.')
-        model_group.add_argument('--diar_thld_sec', default=self.diar_thld_sec, type=float, help='The threshold of diarization in seconds.')
+        model_group.add_argument('--diar_thold_sec', default=self.diar_thold_sec, type=float, help='The threshold of diarization in seconds.')
         transcribe_group = parser.add_argument_group('Transcribe Options')
         for param, value in BEST_ASR_CONFIG.items():
             if type(value) not in (str, int, float, bool, type(None)):
@@ -69,7 +69,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
         self.default_model_backend = self.args.backend
         self.language = self.args.language
         self.batch_size = self.args.batch_size
-        self.diar_thld_sec = self.args.diar_thld_sec
+        self.diar_thold_sec = self.args.diar_thold_sec
         
         transcribe_param_arg = {
             k: getattr(self.args, k)
@@ -151,10 +151,10 @@ class SpeechRecognitionExecutor(LLMExecutor):
 
         return result[0]
 
-    async def speaker_diarization(self, filepath:str, num_speakers:int, diar_thld_sec:float):
+    async def speaker_diarization(self, filepath:str, num_speakers:int, diar_thold_sec:float):
         self.diarizer = self.diarizer if hasattr(self, "diarizer") else PyannoteSpeakerDiarizer()
         logger.debug(f"num_speakers={num_speakers}")
-        logger.debug(f"diar_thld_sec={diar_thld_sec}")
+        logger.debug(f"diar_thold_sec={diar_thold_sec}")
         
         loop = asyncio.get_event_loop()
         mp_context = mp.get_context("spawn") # Torch with CUDA needs a "spawn" context to work
@@ -163,7 +163,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
                 self.diarizer.diarization,
                 src_audio_file=filepath,
                 num_speakers=num_speakers,
-                duration_thld_sec=diar_thld_sec
+                duration_thld_sec=diar_thold_sec
             )
             result = await loop.run_in_executor(pool, job)
 
@@ -237,7 +237,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
             disable_diarization = transcribe_param.pop("disable_diarization", self.disable_diarization)
             lang = transcribe_param.pop("language", self.language)
             num_speakers = self.read_param_from_history(history=history, param="speakers", type=int)[-1]
-            diar_thld_sec = transcribe_param.pop("diar_thld_sec", self.diar_thld_sec)
+            diar_thold_sec = transcribe_param.pop("diar_thold_sec", self.diar_thold_sec)
 
             transcribe_param["word_timestamps"] = not disable_diarization
             transcribe_job = self.transcribe(
@@ -254,7 +254,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
                 diarization_job = self.speaker_diarization(
                     filepath=src_file,
                     num_speakers=num_speakers,
-                    diar_thld_sec=diar_thld_sec
+                    diar_thold_sec=diar_thold_sec
                 )
                 result, diary = await asyncio.gather(transcribe_job, diarization_job)
                 result = [
