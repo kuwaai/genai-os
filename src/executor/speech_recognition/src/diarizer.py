@@ -1,4 +1,5 @@
 import logging
+import string
 import torch
 import torchaudio
 import pyannote.audio
@@ -8,6 +9,14 @@ from pyannote.audio.pipelines.utils.hook import ProgressHook
 logger = logging.getLogger(__name__)
 
 class Diary:
+    punctuation = string.punctuation + "！？｡。＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏."
+    segment_template = {
+        "start_time": 0,
+        "end_time": 0,
+        "text": "",
+        "speaker": []
+    }
+
     def __init__(self, duration_thld_sec=1.0):
         self.diary = []
         self.duration_thld_sec = duration_thld_sec
@@ -35,33 +44,36 @@ class Diary:
             speaker = record["speaker"]
             result[speaker] = result.get(speaker, 0) + overlap_len
         return sorted(result.keys())
+
+    def merge_segment(self, orig, next):
+        result = orig.copy()
+        result["text"] = orig["text"] + next["text"]
+        result["end_time"] = max(orig["end_time"], next["end_time"])
+
+        return result
     
     def annotate_transcript(self, transcript:[dict]):
         """
         Annotate the transcript with speaker.
         """
-        segment_template = {
-            "start_time": 0,
-            "end_time": 0,
-            "text": "",
-            "speaker": []
-        }
-        last_segment = segment_template.copy()
+        
+        last_segment = self.segment_template.copy()
         result = []
         for segment in transcript:
             speaker = self.query(segment["start_time"], segment["end_time"])
             if speaker == last_segment["speaker"] or len(speaker) == 0:
-                last_segment["text"] += segment["text"]
-                last_segment["end_time"] = max(last_segment["end_time"], segment["end_time"])
-            else:
-                if last_segment["text"].strip() != "":
-                    last_segment["text"] = last_segment["text"].strip()
-                    result.append(last_segment)
-                last_segment = segment_template.copy()
-                last_segment["start_time"] = segment["start_time"]
-                last_segment["end_time"] = segment["end_time"]
-                last_segment["text"] = segment["text"]
-                last_segment["speaker"] = speaker
+                last_segment = self.merge_segment(last_segment, segment)
+                continue
+            
+            last_segment["text"] = last_segment["text"].strip()
+            if last_segment["text"] != "":
+                if last_segment["text"] in self.punctuation and len(result) > 0:
+                    result[-1] = self.merge_segment(result[-1], last_segment)
+                else:
+                    result.append(last_segment.copy())
+
+            last_segment.update(segment)
+            last_segment["speaker"] = speaker
         result = result + [last_segment]
         return result
     
