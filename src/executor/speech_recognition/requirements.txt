@@ -1,5 +1,5 @@
 # Whisper
-pywhispercpp
+# pywhispercpp
 whisper-s2t
 
 # Speaker separation
