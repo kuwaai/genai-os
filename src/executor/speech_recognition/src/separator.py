@@ -24,7 +24,9 @@ class PyannoteSpeakerSeparator(SpeakerSeparator):
             # "pyannote/speaker-diarization-3.1"
             pipeline_name
         )
-        self.pipeline.to(torch.device("cuda"))
+        if torch.cuda.is_available():
+            logger.info("Using CUDA")
+            self.pipeline.to(torch.device("cuda"))
 
     async def separate(self, src_audio_file:str, output_dir:str, num_speakers:int, **kwargs) -> [str]:
         waveform, sample_rate = torchaudio.load(src_audio_file, normalize=True)

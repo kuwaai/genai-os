@@ -233,7 +233,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
             logger.debug(f"{transcribe_param}")
 
             # Extract parameters
-            user_prompts = list(filter(lambda x: x["role"] == "user" and not x["content"].startswith("/"), history))
+            user_prompts = [i for i in history if i["role"] == "user" and not i["content"].startswith("/")]
             prompt = "{system}{before}{user}{after}".format(
                 system=modelfile.override_system_prompt,
                 before=modelfile.before_prompt,

@@ -105,7 +105,9 @@ class PyannoteSpeakerDiarizer(SpeakerDiarizer):
         self.pipeline = pyannote.audio.Pipeline.from_pretrained(
             self.pipeline_name
         )
-        self.pipeline.to(torch.device("cuda"))
+        if torch.cuda.is_available():
+            logger.info("Using CUDA")
+            self.pipeline.to(torch.device("cuda"))
 
     def diarization(self, src_audio_file:str, num_speakers:int, **kwargs) -> [dict]:
         self._load_pipeline()
