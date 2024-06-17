@@ -129,6 +129,9 @@ class SpeechRecognitionExecutor(LLMExecutor):
         return args
 
     async def transcribe(self, filepath, model_name:str, model_backend:str, lang:str, prompt:str=None, param={}):
+        logger.debug(f"Language code: {lang}")
+        logger.debug(f"Model name (backend): {model_name} ({model_backend})")
+        logger.debug(f"Prompt: {prompt}")
         logger.debug(f"Transcribe param: {param}")
         
         model_params = merge_config(BEST_ASR_CONFIG, param)
@@ -230,7 +233,13 @@ class SpeechRecognitionExecutor(LLMExecutor):
             logger.debug(f"{transcribe_param}")
 
             # Extract parameters
-            prompt = modelfile.override_system_prompt
+            user_prompts = list(filter(lambda x: x["role"] == "user" and not x["content"].startswith("/"), history))
+            prompt = "{system}{before}{user}{after}".format(
+                system=modelfile.override_system_prompt,
+                before=modelfile.before_prompt,
+                user="" if len(user_prompts) == 0 else user_prompts[-1]["content"],
+                after=modelfile.after_prompt
+            )
             model_name = transcribe_param.pop("model", self.default_model_name)
             model_backend = transcribe_param.pop("backend", self.default_model_backend)
             disable_timestamp = transcribe_param.pop("disable_timestamp", self.disable_timestamp)

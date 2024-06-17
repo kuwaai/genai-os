@@ -37,11 +37,13 @@ The default Whisper Medium model is used with the speaker labeling function enab
 - `/speakers <num_speaker>`: Specify the number of speakers. If not specified, the number of speakers will be determined automatically.
 - `/replace <pattern> <replace>`: Replace the content of the recognition result, which can be used to replace speaker labels or correct proper nouns.
 
+Otherwise, it will be treated as a user prompt and fed to the model in the format of `<system prompt>|<before prompt>|<last user prompt>|<after prompt>` (| means string concatenation)
+
 ## Configuration Summary
 The Kuwa Speech Recognizer can adjust parameters through command line parameters when the Executor is started or through the Modelfile passed from the front end. Refer to the Modelfile below:
 
 ```dockerfile
-SYSTEM "Add punctuation." #System prompts that can affect the output text
+SYSTEM "Add punctuation." #Custom vocabulary or prompting
 PARAMETER whisper_model medium #Model name. Choses: large-v1, large-v2, large-v3, medium, base, small, tiny
 PARAMETER whisper_disable_timestamp False #Do not prepend the text a timestamp
 PARAMETER whisper_disable_diarization False #Do not label the speaker

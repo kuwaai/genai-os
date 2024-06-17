@@ -37,11 +37,13 @@ Kuwa Speech Recognizer 可以透過上傳錄音檔來產生逐字稿，支援時
 - `/speakers <num_speaker>`: 指定有多少個說話者，若未指定則會自動判斷
 - `/replace <pattern> <replace>`: 替換辨識結果的內容，可用在替換語者標記或是修正專有名詞
 
+若非以上指令，則會被當成 user prompt 送入模型，格式為 `<system prompt>|<before prompt>|<最後一個 user prompt>|<after prompt>` (|表示字串串接)
+
 ## 設定簡介
 Kuwa Speech Recognizer可以透過啟動 Executor 時的命令列參數，或是前端傳過來的 Modelfile 調整參數，可參考以下 Modelfile：
 
 ```dockerfile
-SYSTEM "Add punctuation." #System prompts that can affect the output text
+SYSTEM "加入標點符號。" #Custom vocabulary or prompting
 PARAMETER whisper_model medium #Model name. Choses: large-v1, large-v2, large-v3, medium, base, small, tiny
 PARAMETER whisper_disable_timestamp False #Do not prepend the text a timestamp
 PARAMETER whisper_disable_diarization False #Do not label the speaker
