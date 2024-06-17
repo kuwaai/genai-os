@@ -54,10 +54,12 @@ class StableDiffusionExecutor(LLMExecutor):
         self.model_name = self.args.model
         self.n_cache = self.args.n_cache
         self.show_progress = self.args.show_progress
+        self.load_pipe(task=Task.IMG2IMG, model_name=self.model_name)
         self.stop = False
         setattr(self, "load_pipe", lru_cache(maxsize=self.n_cache)(self._load_pipe))
 
     def _load_pipe(self, task:Task, model_name:str):
+        logger.info(f"Loading model {model_name}")
         pipe_class_map = {
             Task.TEXT2IMG: AutoPipelineForText2Image,
             Task.IMG2IMG: AutoPipelineForImage2Image,
@@ -65,6 +67,7 @@ class StableDiffusionExecutor(LLMExecutor):
         }
         pipe_class = pipe_class_map[task]
         pipe = pipe_class.from_pretrained(model_name, torch_dtype=torch.float16)
+        logger.info(f"Model {model_name} loaded.")
         return pipe
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
