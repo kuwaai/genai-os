@@ -54,7 +54,7 @@ class StableDiffusionExecutor(LLMExecutor):
         self.model_name = self.args.model
         self.n_cache = self.args.n_cache
         self.show_progress = self.args.show_progress
-        self.load_pipe(task=Task.IMG2IMG, model_name=self.model_name)
+        self._load_pipe(task=Task.TEXT2IMG, model_name=self.model_name)
         self.stop = False
         setattr(self, "load_pipe", lru_cache(maxsize=self.n_cache)(self._load_pipe))
 
