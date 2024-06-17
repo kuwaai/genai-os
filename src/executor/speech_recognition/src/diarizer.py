@@ -57,11 +57,13 @@ class Diary:
         Annotate the transcript with speaker.
         """
         
+        if len(transcript) == 0: return []
         last_segment = self.segment_template.copy()
+        last_segment["speaker"] = [sorted(self.diary, key=lambda x: x["start"])[0]["speaker"]]
         result = []
         for segment in transcript:
             speaker = self.query(segment["start_time"], segment["end_time"])
-            if speaker == last_segment["speaker"] or len(speaker) == 0:
+            if speaker == last_segment["speaker"] or len(speaker) == 0 or segment["text"] in self.punctuation:
                 last_segment = self.merge_segment(last_segment, segment)
                 continue
             
