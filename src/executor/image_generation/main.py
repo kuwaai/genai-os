@@ -48,7 +48,7 @@ class StableDiffusionExecutor(LLMExecutor):
         model_group.add_argument('--n_cache', type=int, default=self.n_cache, help='How many models to cache.')
         
         display_group = parser.add_argument_group('Display Options')
-        model_group.add_argument('--show_progress', action="store_true", help='Whether to show the progress of generation.')
+        display_group.add_argument('--show_progress', action="store_true", help='Whether to show the progress of generation.')
 
     def setup(self):
         self.model_name = self.args.model
