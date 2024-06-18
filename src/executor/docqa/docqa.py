@@ -4,6 +4,7 @@
 import os
 import re
 import sys
+import gc
 import logging
 import asyncio
 import functools
@@ -17,6 +18,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from typing import Generator
 from urllib.parse import urljoin
 from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.modelfile import ParameterDict
+from kuwa.executor.llm_executor import extract_last_url
 
 from src.docqa import DocQa
 from src.kuwa_llm_client import KuwaLlmClient
@@ -52,66 +55,65 @@ class DocQaExecutor(LLMExecutor):
         parser.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
 
     def setup(self):
-        i18n.load_path.append(f'lang/{self.args.lang}/')
-        i18n.config.set("error_on_missing_translation", True)
-        i18n.config.set("locale", self.args.lang)
-        
+
         if self.args.visible_gpu:
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
+        self._app_setup()
+
+    def _app_setup(self, params:ParameterDict=ParameterDict()):
+        general_params = params["_"]
+        crawler_params = params["crawler_"]
+        retriever_params = params["retriever_"]
+        generator_params = params["generator_"]
+        display_params = params["display_"]
+        
+        lang = general_params.get("lang", self.args.lang)
+        i18n.load_path.append(f'lang/{lang}/')
+        i18n.config.set("error_on_missing_translation", True)
+        i18n.config.set("locale", lang)
+
+        # [TODO] Fetch pre-built DB from web
         self.pre_built_db = self.args.database
-        self.with_ref = not self.args.hide_ref
+        self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
             kernel_base_url = self.kernel_url,
-            model=self.args.model,
-            auth_token=self.args.api_key
+            model=generator_params.get("model", self.args.model),
+            auth_token=general_params.get("user_token", self.args.api_key)
         )
         self.document_store = DocumentStore(
-            embedding_model = self.args.embedding_model,
-            mmr_k = self.args.mmr_k,
-            mmr_fetch_k = self.args.mmr_fetch_k,
-            chunk_size = self.args.chunk_size,
-            chunk_overlap = self.args.chunk_overlap
+            embedding_model = retriever_params.get("embedding_model", self.args.embedding_model),
+            mmr_k = retriever_params.get("mmr_k", self.args.mmr_k),
+            mmr_fetch_k = retriever_params.get("mmr_fetch_k", self.args.mmr_fetch_k),
+            chunk_size = retriever_params.get("chunk_size", self.args.chunk_size),
+            chunk_overlap = retriever_params.get("chunk_overlap", self.args.chunk_overlap)
         )
         self.docqa = DocQa(
             document_store = self.document_store,
             vector_db = self.pre_built_db,
             llm = self.llm,
-            lang = self.args.lang,
-            user_agent=self.args.user_agent
+            lang = lang,
+            user_agent=crawler_params.get("user_agent", self.args.user_agent)
         )
         self.proc = False
         
         if self.pre_built_db is None:
             self.document_store.load_embedding_model()
 
-    def extract_last_url(self, chat_history: list):
-        """
-        Find the latest URL provided by the user and trim the chat history to there.
-        """
-
-        url = None
-        begin_index = 0
-        user_records = list(filter(lambda x: x["role"] == "user", chat_history))
-        for i, record in enumerate(reversed(user_records)):
-
-            urls_in_msg = re.findall(r'^(https?://[^\s]+)$', record["content"])
-            if len(urls_in_msg) != 0: 
-                url = urls_in_msg[-1]
-                begin_index = len(chat_history) - i - 1
-                break
-        
-        return url, chat_history[begin_index:]
+        gc.collect()
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
+        self._app_setup(params=modelfile.parameters)
+
         auth_token = modelfile.parameters["_"]["user_token"] or self.args.api_key
+        lang = modelfile.parameters["_"].get("lang", self.args.lang)
         override_qa_prompt = modelfile.override_system_prompt
         url = None
 
         try:
             if self.pre_built_db == None:
-                url, history = self.extract_last_url(history)
+                url, history = extract_last_url(history)
                 if url == None : raise NoUrlException(i18n.t('docqa.no_url_exception'))
             
                 history = [{"role": "user", "content": None}] + history[1:]

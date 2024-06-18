@@ -1,4 +1,4 @@
-zh-tw:
+zh_tw:
   no_url_exception: 找不到URL。
   default_exception_msg: 發生錯誤，請再試一次或是聯絡管理員。
   summary_prompt: 請提供這篇文章的摘要
