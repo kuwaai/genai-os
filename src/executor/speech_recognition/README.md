@@ -49,7 +49,6 @@ PARAMETER whisper_disable_timestamp False #Do not prepend the text a timestamp
 PARAMETER whisper_disable_diarization False #Do not label the speaker
 PARAMETER whisper_diar_thold_sec 2 #Time before speakers are tagged in paragraphs that are longer than. (in seconds)
 PARAMETER whisper_language en #The language of the audio
-
 PARAMETER whisper_n_threads None #Number of threads to allocate for the inference. default to min(4, available hardware_concurrency)
 PARAMETER whisper_n_max_text_ctx 16384 #max tokens to use from past text as prompt for the decoder
 PARAMETER whisper_offset_ms 0 #start offset in ms
