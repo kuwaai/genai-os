@@ -16,6 +16,7 @@ import pathlib
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
+from collections import namedtuple
 from urllib.parse import urljoin
 from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.executor.modelfile import ParameterDict
@@ -26,6 +27,8 @@ from src.kuwa_llm_client import KuwaLlmClient
 from src.document_store import DocumentStore
 
 logger = logging.getLogger(__name__)
+
+Reference = namedtuple("Reference", "source, title, content")
 
 class NoUrlException(Exception):
     def __init__(self, msg):
@@ -40,19 +43,28 @@ class DocQaExecutor(LLMExecutor):
     def extend_arguments(self, parser):
         parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
         parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
-        parser.add_argument('--database', default=None, type=str, help='The path the the pre-built database.')
-        parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
-        parser.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
-        parser.add_argument('--limit', default=3072, type=int, help='The limit of the LLM\'s context window')
-        parser.add_argument('--model', default=None, help='The model name (access code) on Kuwa multi-chat WebUI')
-        parser.add_argument('--embedding_model', default="thenlper/gte-base-zh", help='The HuggingFace name of the embedding model.')
-        parser.add_argument('--mmr_k', default=6, type=int, help='Number of chunk to retrieve after Maximum Marginal Relevance (MMR).')
-        parser.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
-        parser.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
-        parser.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
-        parser.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+
+        crawler_group = parser.add_argument_group('Crawler Options')
+        crawler_group.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
                                             help='The user agent string when issuing the crawler.')
-        parser.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
+
+        retriever_group = parser.add_argument_group('Retriever Options')
+        retriever_group.add_argument('--database', default=None, type=str, help='The path the the pre-built database.')
+        retriever_group.add_argument('--embedding_model', default="thenlper/gte-base-zh", help='The HuggingFace name of the embedding model.')
+        retriever_group.add_argument('--mmr_k', default=6, type=int, help='Number of chunk to retrieve after Maximum Marginal Relevance (MMR).')
+        retriever_group.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
+        retriever_group.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
+        retriever_group.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
+        
+        generator_group = parser.add_argument_group('Generator Options')
+        generator_group.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
+        generator_group.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
+        generator_group.add_argument('--limit', default=3072, type=int, help='The limit of the LLM\'s context window')
+        generator_group.add_argument('--model', default=None, help='The model name (access code) on Kuwa multi-chat WebUI')
+        
+        display_group = parser.add_argument_group('Display Options')
+        display_group.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
+        
 
     def setup(self):
 
@@ -104,12 +116,24 @@ class DocQaExecutor(LLMExecutor):
 
         gc.collect()
 
+    def format_references(self, refs:[Reference]):
+        refs = filter(lambda x: x.source, refs)
+        result = f"\n\n<details><summary>{i18n.t('docqa.reference')}</summary>\n\n"
+        for i, ref in enumerate(refs):
+            src = ref.source
+            title = ref.title if ref.title is not None else src
+            content = ref.content
+            link = src if src.startswith("http") else pathlib.Path(src).as_uri()
+            result += f'{i+1}. [{title}]({link})\n\n```plaintext\n{content}\n```\n\n'
+        result += f"</details>"
+
+        return result
+
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         self._app_setup(params=modelfile.parameters)
 
         auth_token = modelfile.parameters["_"]["user_token"] or self.args.api_key
         lang = modelfile.parameters["_"].get("lang", self.args.lang)
-        override_qa_prompt = modelfile.override_system_prompt
         url = None
 
         try:
@@ -123,20 +147,20 @@ class DocQaExecutor(LLMExecutor):
                 urls=[url],
                 chat_history=history,
                 auth_token=auth_token,
-                override_qa_prompt=override_qa_prompt
+                modelfile=modelfile,
             )
             source = []
             async for reply, docs in response_generator:
                 docs = docs or []
                 src = [
-                    {
-                        "source": doc.metadata.get("source"),
-                        "title": doc.metadata.get("title", doc.metadata.get("filename")),
-                        "content": doc.page_content,
-                    }
+                    Reference(
+                        source=doc.metadata.get("source"),
+                        title=doc.metadata.get("title", doc.metadata.get("filename")),
+                        content=doc.page_content,
+                    )
                     for doc in docs if "source" in doc.metadata
                 ] 
-                source += list(filter(lambda x: x not in source, src))
+                source = list(set(source+src))
                 if not self.proc:
                     await response_generator.aclose()
                 yield reply
@@ -144,15 +168,7 @@ class DocQaExecutor(LLMExecutor):
             if not self.with_ref or source is None or len(source)==0:
                 return
             
-            source = filter(lambda x: x["source"], source)
-            yield f"\n\n<details><summary>{i18n.t('docqa.reference')}</summary>\n\n"
-            for i, ref in enumerate(source):
-                src = ref["source"]
-                title = ref["title"] if ref.get("title") is not None else src
-                content = ref["content"]
-                link = src if src.startswith("http") else pathlib.Path(src).as_uri()
-                yield f'{i+1}. [{title}]({link})\n\n```plaintext\n{content}\n```\n\n'
-            yield f"</details>"
+            yield self.format_references(refs=source)
 
         except NoUrlException as e:
             yield str(e)

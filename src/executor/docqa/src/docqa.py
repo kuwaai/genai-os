@@ -5,12 +5,13 @@ from typing import Generator, Iterable
 from pathlib import Path
 from urllib.error import HTTPError
 from langchain.docstore.document import Document
-import i18n
+from kuwa.executor import Modelfile
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from .document_store import DocumentStore
 from .kuwa_llm_client import KuwaLlmClient
 
+import i18n
 import re
 import gc
 import os
@@ -28,13 +29,11 @@ class DocQa:
     vector_db:str = None,
     llm:KuwaLlmClient = KuwaLlmClient(),
     lang:str="en",
-    with_ref:bool = True,
     user_agent:str = None
     ):
     self.logger = logging.getLogger(__name__)
     self.llm = llm
     self.lang = lang
-    self.with_ref = with_ref
     self.user_agent = user_agent
     if vector_db != None:
       self.pre_build_db = True
@@ -50,7 +49,6 @@ class DocQa:
     llm_input = chevron.render(llm_input_template, {
       'docs': related_docs,
       'question': question,
-      'ref': self.with_ref,
       'override_prompt': override_prompt
     })
 
@@ -104,10 +102,25 @@ class DocQa:
     await document_store.from_documents(docs)
     return document_store
 
-  async def process(self, urls: Iterable, chat_history: [dict], auth_token=None, override_qa_prompt:str=None) -> Generator[str, None, None]:
+  def filter_detail(self, msg):
+    if msg is None: return None
+    pattern = r"<details>.*</details>"
+    return re.sub(pattern=pattern, repl='', string=msg, flags=re.DOTALL)
+
+  async def process(self, urls: Iterable, chat_history: [dict], modelfile:Modelfile, auth_token=None) -> Generator[str, None, None]:
+    override_qa_prompt = modelfile.override_system_prompt
     chat_history = [{"msg": i["content"], "isbot": i["role"]=="assistant"} for i in chat_history]
+    chat_history = [{"msg": self.filter_detail(i["msg"]), "isbot": i["isbot"]} for i in chat_history]
+
+    self.logger.debug(f"Chat history: {chat_history}")
 
     final_user_input = self.get_final_user_input(chat_history)
+    if final_user_input is not None:
+      final_user_input = "{before}{user}{after}".format(
+        before = modelfile.before_prompt,
+        user = final_user_input,
+        after = modelfile.after_prompt
+      )
 
     document_store = self.document_store
     docs = None
@@ -126,7 +139,7 @@ class DocQa:
 
     
     task = ''
-    if final_user_input == None:
+    if final_user_input is None:
       question = i18n.t("docqa.summary_question") 
       llm_question = None
       task = 'summary'
@@ -145,10 +158,12 @@ class DocQa:
     if docs == None or self.llm.is_too_long(modified_chat_history):
       # Retrieve
       related_docs = copy.deepcopy(await document_store.retrieve(question))
+      self.logger.info("Related documents: {}".format(related_docs))
       while True:
         modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs, override_prompt=override_qa_prompt)
         if not self.llm.is_too_long(modified_chat_history) or len(related_docs)==0: break
         related_docs = related_docs[:-1]
+        self.logger.info("Prompt length exceeded the permitted limit, necessitating truncation.")
 
     # Free the unused VRAM
     del document_store
