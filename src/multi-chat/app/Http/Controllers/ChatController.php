@@ -177,7 +177,8 @@ class ChatController extends Controller
                 $fileName = time() . '_' . $request->file->getClientOriginalName();
                 $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
 
-                $files = File::files($storagePath);
+                // old files auto delection
+                /*$files = File::files($storagePath);
 
                 if (count($files) > 5) {
                     usort($files, function ($a, $b) {
@@ -188,7 +189,8 @@ class ChatController extends Controller
                         $oldestFile = array_shift($files);
                         File::delete($storagePath . '/' . $oldestFile->getFilename());
                     }
-                }
+                }*/
+                
                 //Create a chat and send that url into the llm
                 $msg = url('storage/' . $directory . '/' . rawurlencode($fileName));
                 $chat = new Chats();
