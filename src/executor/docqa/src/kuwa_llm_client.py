@@ -36,9 +36,10 @@ class KuwaLlmClient:
     async def chat_complete(self, auth_token:str=None, messages:list=[], timeout=120):
 
         url = urljoin(self.base_url, "/v1.0/chat/completions")
+        auth_token = self.auth_token if self.auth_token is not None else auth_token
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.auth_token if self.auth_token is not None else auth_token}",
+            "Authorization": f"Bearer {auth_token}",
         }
         model = self.model if self.model is not None else await self.get_available_llm()
         logger.debug(f"Use model {model}")

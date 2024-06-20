@@ -31,4 +31,6 @@ server {
     location ~ /\.(?!well-known).* {
         deny all;
     }
+    
+    client_max_body_size 100M;
 }

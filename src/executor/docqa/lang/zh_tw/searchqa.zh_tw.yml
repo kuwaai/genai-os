@@ -1,0 +1,4 @@
+zh_tw:
+  default_exception_msg: 發生錯誤，請再試一次或是聯絡管理員。
+  reference: "參考資料"
+  search_unreachable: 外部搜尋暫無法連上，請稍後重試或是聯絡管理員。

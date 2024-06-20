@@ -1,4 +1,4 @@
 en:
   default_exception_msg: An error occurred, please try again or contact the administrator.
-  reference: "Reference"
+  reference: "Reference:"
   search_unreachable: External search can't be connected for the moment, please try again later or contact the administrator.

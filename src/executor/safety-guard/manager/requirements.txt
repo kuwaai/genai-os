@@ -1,0 +1,8 @@
+sqlalchemy
+psycopg2-binary
+fastapi
+aiohttp
+numpy
+requests
+uvicorn
+python-dotenv
