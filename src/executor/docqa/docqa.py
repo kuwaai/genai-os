@@ -16,7 +16,6 @@ import pathlib
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
-from collections import namedtuple
 from urllib.parse import urljoin
 from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.executor.modelfile import ParameterDict
@@ -27,8 +26,6 @@ from src.kuwa_llm_client import KuwaLlmClient
 from src.document_store import DocumentStore
 
 logger = logging.getLogger(__name__)
-
-Reference = namedtuple("Reference", "source, title, content")
 
 class NoUrlException(Exception):
     def __init__(self, msg):
@@ -107,6 +104,7 @@ class DocQaExecutor(LLMExecutor):
             vector_db = self.pre_built_db,
             llm = self.llm,
             lang = lang,
+            with_ref = self.with_ref,
             user_agent=crawler_params.get("user_agent", self.args.user_agent)
         )
         self.proc = False
@@ -115,19 +113,6 @@ class DocQaExecutor(LLMExecutor):
             self.document_store.load_embedding_model()
 
         gc.collect()
-
-    def format_references(self, refs:[Reference]):
-        refs = filter(lambda x: x.source, refs)
-        result = f"\n\n<details><summary>{i18n.t('docqa.reference')}</summary>\n\n"
-        for i, ref in enumerate(refs):
-            src = ref.source
-            title = ref.title if ref.title is not None else src
-            content = ref.content
-            link = src if src.startswith("http") else pathlib.Path(src).as_uri()
-            result += f'{i+1}. [{title}]({link})\n\n```plaintext\n{content}\n```\n\n'
-        result += f"</details>"
-
-        return result
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         self._app_setup(params=modelfile.parameters)
@@ -149,26 +134,10 @@ class DocQaExecutor(LLMExecutor):
                 auth_token=auth_token,
                 modelfile=modelfile,
             )
-            source = []
-            async for reply, docs in response_generator:
-                docs = docs or []
-                src = [
-                    Reference(
-                        source=doc.metadata.get("source"),
-                        title=doc.metadata.get("title", doc.metadata.get("filename")),
-                        content=doc.page_content,
-                    )
-                    for doc in docs if "source" in doc.metadata
-                ] 
-                source = list(set(source+src))
+            async for reply in response_generator:
                 if not self.proc:
                     await response_generator.aclose()
                 yield reply
-            
-            if not self.with_ref or source is None or len(source)==0:
-                return
-            
-            yield self.format_references(refs=source)
 
         except NoUrlException as e:
             yield str(e)

@@ -2,6 +2,7 @@
 # -#- coding: UTF-8 -*-
 
 from typing import Generator, Iterable
+from collections import namedtuple
 from pathlib import Path
 from urllib.error import HTTPError
 from langchain.docstore.document import Document
@@ -20,6 +21,7 @@ import chevron
 import asyncio
 import copy
 import time
+import pathlib
 
 class DocQa:
 
@@ -29,11 +31,13 @@ class DocQa:
     vector_db:str = None,
     llm:KuwaLlmClient = KuwaLlmClient(),
     lang:str="en",
+    with_ref:bool=False,
     user_agent:str = None
     ):
     self.logger = logging.getLogger(__name__)
     self.llm = llm
     self.lang = lang
+    self.with_ref = with_ref
     self.user_agent = user_agent
     if vector_db != None:
       self.pre_build_db = True
@@ -107,6 +111,28 @@ class DocQa:
     pattern = r"<details>.*</details>"
     return re.sub(pattern=pattern, repl='', string=msg, flags=re.DOTALL)
 
+  def format_references(self, docs:[Document]):
+    Reference = namedtuple("Reference", "source, title, content")
+    refs = [
+      Reference(
+        source=doc.metadata.get("source"),
+        title=doc.metadata.get("title", doc.metadata.get("filename")),
+        content=doc.page_content,
+      ) for doc in docs
+    ]
+    refs = filter(lambda x: x.source, refs)
+    result = f"\n\n<details><summary>{i18n.t('docqa.reference')}</summary>\n\n"
+    for i, ref in enumerate(refs):
+      
+      src = ref.source
+      title = ref.title if ref.title is not None else src
+      content = ref.content
+      link = src if src.startswith("http") else pathlib.Path(src).as_uri()
+      result += f'{i+1}. [{title}]({link})\n\n```plaintext\n{content}\n```\n\n'
+    result += f"</details>"
+
+    return result
+
   async def process(self, urls: Iterable, chat_history: [dict], modelfile:Modelfile, auth_token=None) -> Generator[str, None, None]:
     override_qa_prompt = modelfile.override_system_prompt
     chat_history = [{"msg": i["content"], "isbot": i["role"]=="assistant"} for i in chat_history]
@@ -130,7 +156,7 @@ class DocQa:
           docs = await self.fetch_documents(urls[0])
         except HTTPError as e:
           await asyncio.sleep(2) # To prevent SSE error of web page.
-          yield (i18n.t('docqa.error_fetching_document').format(str(e)), None)
+          yield i18n.t('docqa.error_fetching_document').format(str(e))
           return
       else:
         docs = await asyncio.gather(*[self.fetch_documents(url) for url in urls])
@@ -144,7 +170,7 @@ class DocQa:
       llm_question = None
       task = 'summary'
       await asyncio.sleep(2) # To prevent SSE error of web page.
-      yield (i18n.t("docqa.summary_prefix")+'\n', None)
+      yield i18n.t("docqa.summary_prefix")+'\n'
     else:
       question = final_user_input
       llm_question = question
@@ -159,6 +185,7 @@ class DocQa:
       # Retrieve
       related_docs = copy.deepcopy(await document_store.retrieve(question))
       self.logger.info("Related documents: {}".format(related_docs))
+      # [TODO] the related-document will be cleared when the history is too long
       while True:
         modified_chat_history = self.replace_chat_history(chat_history, task, llm_question, related_docs, override_prompt=override_qa_prompt)
         if not self.llm.is_too_long(modified_chat_history) or len(related_docs)==0: break
@@ -179,7 +206,10 @@ class DocQa:
       messages=modified_chat_history
     )
     async for chunk in generator:
-      yield (chunk, related_docs)
+      yield chunk
+
+    if self.with_ref and len(related_docs)!=0:
+      yield self.format_references(related_docs)
 
     # Egress filter
     # is_english = self.is_english(result)

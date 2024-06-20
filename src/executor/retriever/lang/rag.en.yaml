@@ -1,0 +1,7 @@
+en:
+  no_url_exception: No URL found.
+  default_exception_msg: An error occurred, please try again or contact the administrator.
+  qa_prompt: "First evaluate the relevance of the following content to the topic, and then answer the questions based on the relevant content."
+  error_fetching_document: An error occurred while trying to fetch the document {}. Please make sure the submitted document exists and is publicly available.
+  summary_question: When, where, what, outcome, summary
+  summary_prefix: "Here is a summary of the article:"

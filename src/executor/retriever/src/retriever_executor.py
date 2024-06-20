@@ -96,7 +96,7 @@ class RetrieverExecutor(LLMExecutor):
         """
         Fetch documents from URL.
         """
-        crawler_config = merge_config(self.crawler_config, modelfile.parameters)
+        crawler_config = merge_config(self.crawler_config, modelfile.parameters["crawler_"])
         
         logger.info(f'Fetching URL "{url}"')
         loader = RecursiveUrlMultimediaLoader(
@@ -120,7 +120,7 @@ class RetrieverExecutor(LLMExecutor):
         """
         Retrieve the relevant chunks.
         """
-        retriever_config = merge_config(self.retriever_config, modelfile.parameters)
+        retriever_config = merge_config(self.retriever_config, modelfile.parameters["retrieval_"])
         logger.debug(f"Retriever config: {retriever_config}")
 
         splitter = ParallelSplitter(
@@ -155,13 +155,13 @@ class RetrieverExecutor(LLMExecutor):
             
             docs, total_docs_len = await self._fetch_documents(url, modelfile)
             relevant_chunks = await self._get_retrieve_chunks(docs, final_user_input, modelfile)
-            get_content = lambda x: x.page_content
+            get_result = lambda x: {"content": x.page_content, "metadata": x.metadata}
 
             yield json.dumps({
                 "succeed": True,
                 "content-length": total_docs_len,
-                "content": list(map(get_content, docs)),
-                "chunk": list(map(get_content, relevant_chunks))
+                "content": list(map(get_result, docs)),
+                "chunk": list(map(get_result, relevant_chunks))
             })
 
         except NoUrlException as e:
