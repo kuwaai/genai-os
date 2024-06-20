@@ -20,18 +20,20 @@ Kuwa Speech Recognizer 可以透過上傳錄音檔來產生逐字稿，支援時
 2. 目前 Diarizer 因為多行程的關係，導致每次都會重新載入模型，拉長響應時間
 3. 多語者同時講話時容易誤判內容
 
-## 使用方法
-0. 預設會開啟語者標示功能，請按照以下步驟取得模型存取權限。若想關閉此功能請在開啟 Executor 時的命令列加入參數 `--disable_diarization`
-    1. 同意 [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0) 與 [pyannote/speaker-diarization-3.1](https://hf.co/pyannote/speaker-diarization-3.1) 的授權條款
-    2. 參考各版本的指南加入 HuggingFace access token
-        1. [Windows 版指南](https://kuwaai.org/zh-Hant/blog/kuwa-os-v0.2.0-llama3-windows#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
-        2. [Docker 版指南](https://kuwaai.org/zh-Hant/blog/kuwa-os-v0.2.0-llama3-linux#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
+## 基本使用方法
 1. 參考各版本 Kuwa 的 Executor 啟動方式，啟動 Kuwa Speech Recognizer 的 Executor
     1. Windows 版請參考目錄 `windows/executors/whisper`
     2. Docker 版請參考設定檔 `docker/compose/whisper.yaml`
 
 2. 一個名為 Whisper 的 Executor 應會被加入您的 Kuwa 系統中，您可以上傳一個語音檔來產生逐字搞，預設辨識語言為英文
 3. 可以參考[設定簡介章節](#設定簡介)調整辨識語言、顯示時間戳記、顯示語者標記等參數
+
+## 語者辨識開啟方法
+1. 同意 [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0) 與 [pyannote/speaker-diarization-3.1](https://hf.co/pyannote/speaker-diarization-3.1) 的授權條款
+2. 參考各版本的指南加入 HuggingFace access token
+    1. [Windows 版指南](https://kuwaai.org/zh-Hant/blog/kuwa-os-v0.2.0-llama3-windows#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
+    2. [Docker 版指南](https://kuwaai.org/zh-Hant/blog/kuwa-os-v0.2.0-llama3-linux#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
+3. 於開啟 Executor 時的命令列加入參數 `--enable_diarization`，或是修改Modelfile相關參數
 
 ## 聊天指令
 - `/speakers <num_speaker>`: 指定有多少個說話者，若未指定則會自動判斷
@@ -45,8 +47,8 @@ Kuwa Speech Recognizer可以透過啟動 Executor 時的命令列參數，或是
 ```dockerfile
 SYSTEM "加入標點符號。" #Custom vocabulary or prompting
 PARAMETER whisper_model medium #Model name. Choses: large-v1, large-v2, large-v3, medium, base, small, tiny
-PARAMETER whisper_disable_timestamp False #Do not prepend the text a timestamp
-PARAMETER whisper_disable_diarization False #Do not label the speaker
+PARAMETER whisper_enable_timestamp True #Prepend the text a timestamp
+PARAMETER whisper_enable_diarization True #Label the speaker
 PARAMETER whisper_diar_thold_sec 2 #Time before speakers are tagged in paragraphs that are longer than. (in seconds)
 PARAMETER whisper_language zh #The language of the audio
 PARAMETER whisper_n_threads None #Number of threads to allocate for the inference. default to min(4, available hardware_concurrency)

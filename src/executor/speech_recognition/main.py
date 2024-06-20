@@ -37,8 +37,8 @@ class SpeechRecognitionExecutor(LLMExecutor):
     language:str = "en"
     batch_size:int = 24
     diar_thold_sec:float = 1.0
-    disable_timestamp:bool = False
-    disable_diarization:bool = False
+    enable_timestamp:bool = False
+    enable_diarization:bool = False
 
     def __init__(self):
         super().__init__()
@@ -49,8 +49,8 @@ class SpeechRecognitionExecutor(LLMExecutor):
         model_group.add_argument('--backend', default=self.default_model_backend, help='The model backend.')
         model_group.add_argument('--language', default=self.language, help='The language to transcribe.')
         model_group.add_argument('--batch_size', default=self.batch_size, type=int, help='The batch size')
-        model_group.add_argument('--disable_timestamp', action="store_true", help='Do not output the timestamp.')
-        model_group.add_argument('--disable_diarization', action="store_true", help='Disable speaker diarization annotation.')
+        model_group.add_argument('--enable_timestamp', action="store_true", help='Enable displaying the timestamp.')
+        model_group.add_argument('--enable_diarization', action="store_true", help='Enable speaker diarization annotation.')
         model_group.add_argument('--diar_thold_sec', default=self.diar_thold_sec, type=float, help='The threshold of diarization in seconds.')
         transcribe_group = parser.add_argument_group('Transcribe Options')
         for param, value in BEST_ASR_CONFIG.items():
@@ -77,14 +77,14 @@ class SpeechRecognitionExecutor(LLMExecutor):
             if f"--{k}" in sys.argv
         }
         self.transcribe_param = merge_config(self.transcribe_param, transcribe_param_arg)
-        self.disable_timestamp = self.args.disable_timestamp
-        self.disable_diarization = self.args.disable_diarization
+        self.enable_timestamp = self.args.enable_timestamp
+        self.enable_diarization = self.args.enable_diarization
 
         self.stop = False
         
         # Initialize the pipelines
         self.transcriber = WhisperS2tTranscriber()
-        if not self.disable_diarization:
+        if not self.enable_diarization:
             self.diarizer = PyannoteSpeakerDiarizer()
 
     def download(self, url):
@@ -242,13 +242,13 @@ class SpeechRecognitionExecutor(LLMExecutor):
             )
             model_name = transcribe_param.pop("model", self.default_model_name)
             model_backend = transcribe_param.pop("backend", self.default_model_backend)
-            disable_timestamp = transcribe_param.pop("disable_timestamp", self.disable_timestamp)
-            disable_diarization = transcribe_param.pop("disable_diarization", self.disable_diarization)
+            enable_timestamp = transcribe_param.pop("enable_timestamp", self.enable_timestamp)
+            enable_diarization = transcribe_param.pop("enable_diarization", self.enable_diarization)
             lang = transcribe_param.pop("language", self.language)
             num_speakers = self.read_param_from_history(history=history, param="speakers", type=int)[-1]
             diar_thold_sec = transcribe_param.pop("diar_thold_sec", self.diar_thold_sec)
 
-            transcribe_param["word_timestamps"] = not disable_diarization
+            transcribe_param["word_timestamps"] = enable_diarization
             transcribe_job = self.transcribe(
                 filepath=src_file,
                 model_name=model_name,
@@ -257,7 +257,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
                 lang=lang,
                 param=transcribe_param
             )
-            if disable_diarization:
+            if not enable_diarization:
                 result = await transcribe_job
             else:
                 diarization_job = self.speaker_diarization(
@@ -277,7 +277,7 @@ class SpeechRecognitionExecutor(LLMExecutor):
                 result = diary.annotate_transcript(result)
 
             logger.debug(f"Final Result: {result}")
-            output = "".join([self._format_output(i, not disable_timestamp) for i in result])
+            output = "".join([self._format_output(i, enable_timestamp) for i in result])
             output = self._replace(message=output, history=history)
 
             yield output

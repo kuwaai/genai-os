@@ -3,50 +3,60 @@
 The Kuwa Speech Recognizer can generate transcripts by uploading audio files and supports timestamps and speaker labels.
 
 ## Issues and Known Limitations
+
 ### Hardware Requirements
+
 The default Whisper Medium model is used with the speaker labeling function enabled. If running on a GPU, the VRAM consumption is as shown in the table below.
 
-| Model Name | Number of Parameters | VRAM Required | Relative Recognition Speed |
-| :------ | :------ | :------ | :------ |
-| tiny | 39M | ~1 GB | ~32x |
-| base | 74M | ~1 GB | ~16x |
-| small | 244M | ~2 GB | ~6x |
-| medium | 769M | ~5 GB | ~2x |
-| large | 1550M | ~10 GB | 1x |
-| pyannote/speaker-diarization-3.1<br>(Speaker Recognition) | - | ~3GB | - |
+| Model Name                                                | Number of Parameters | VRAM Required | Relative Recognition Speed |
+| :-------------------------------------------------------- | :------------------- | :------------ | :------------------------- |
+| tiny                                                      | 39M                  | ~1 GB         | ~32x                       |
+| base                                                      | 74M                  | ~1 GB         | ~16x                       |
+| small                                                     | 244M                 | ~2 GB         | ~6x                        |
+| medium                                                    | 769M                 | ~5 GB         | ~2x                        |
+| large                                                     | 1550M                | ~10 GB        | 1x                         |
+| pyannote/speaker-diarization-3.1<br>(Speaker Recognition) | -                    | ~3GB          | -                          |
 
 ### Known Limitations
+
 1. The input language cannot be automatically detected at present and must be specified manually.
 2. The Diarizer currently reloads the model during each run due to multi-tasking, which lengthens the response time.
 3. When multiple speakers speak simultaneously, the content is easily misjudged.
 
-## User Guide
-0. By default, the speaker labeling function is enabled. Please follow the steps below to obtain model access rights. To disable this function, add the parameter `--disable_diarization` in the command line when opening the Executor.
-    1. Agree to the terms and conditions of [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0) and [pyannote/speaker-diarization-3.1](https://hf.co/pyannote/speaker-diarization-3.1).
-    2. Refer to the guidelines for each version to add the HuggingFace access token:
-        1. [Windows Version Guide](https://kuwaai.org/blog/kuwa-os-v0.2.0-llama3-windows#method-1-applying-for-access-on-huggingface)
-        2. [Docker Version Guide](https://kuwaai.org/blog/kuwa-os-v0.2.0-llama3-linux#method-1-applying-for-access-on-huggingface)
-1. Refer to the Executor startup method for each version of Kuwa to start the Kuwa Speech Recognizer Executor.
-    1. For the Windows version, please refer to the `windows/executors/whisper` directory.
-    2. For the Docker version, please refer to the configuration file `docker/compose/whisper.yaml`.
+## Basic Usage
 
-2. An Executor named `Whisper` should be added to your Kuwa system, and you can upload an audio file to generate a transcript. The default recognition language is English.
-3. Refer to the [Configuration Summary](#Configuration%20Summary) section to adjust parameters such as the recognition language, display of timestamps, and display of speaker labels.
+1. Referring to the Executor startup methods of various Kuwa versions, start the Executor of Kuwa Speech Recognizer:
+
+   1. For Windows version, please refer to the directory `windows/executors/whisper`
+   2. For Docker version, please refer to the configuration file `docker/compose/whisper.yaml`
+
+2. An Executor named Whisper should be added to your Kuwa system, and you can upload an audio file to generate the transcript, the default recognition language is English.
+3. You can refer to the [Configuration Instructions Section](#Configuration-Instructions) to adjust parameters such as recognition language, display timestamps, display speaker labels, etc.
+
+## How to Enable Speaker Recognition
+
+1. Agree to the terms of [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0) and [pyannote/speaker-diarization-3.1](https://hf.co/pyannote/speaker-diarization-3.1)
+2. Refer to the guides of each version to add HuggingFace access token
+   1. [Guide for Windows](https://kuwaai.org/blog/kuwa-os-v0.2.0-llama3-windows)
+   2. [Guide for Docker](https://kuwaai.org/blog/kuwa-os-v0.2.0-llama3-linux)
+3. Add the parameter `--enable_diarization` to the command line when the Executor is opened, or modify the corresponding parameters in the Modelfile
 
 ## Chat Commands
+
 - `/speakers <num_speaker>`: Specify the number of speakers. If not specified, the number of speakers will be determined automatically.
 - `/replace <pattern> <replace>`: Replace the content of the recognition result, which can be used to replace speaker labels or correct proper nouns.
 
 Otherwise, it will be treated as a user prompt and fed to the model in the format of `<system prompt>|<before prompt>|<last user prompt>|<after prompt>` (| means string concatenation)
 
-## Configuration Summary
+## Configuration Instruction
+
 The Kuwa Speech Recognizer can adjust parameters through command line parameters when the Executor is started or through the Modelfile passed from the front end. Refer to the Modelfile below:
 
 ```dockerfile
 SYSTEM "Add punctuation." #Custom vocabulary or prompting
 PARAMETER whisper_model medium #Model name. Choses: large-v1, large-v2, large-v3, medium, base, small, tiny
-PARAMETER whisper_disable_timestamp False #Do not prepend the text a timestamp
-PARAMETER whisper_disable_diarization False #Do not label the speaker
+PARAMETER whisper_enable_timestamp True #Prepend the text a timestamp
+PARAMETER whisper_enable_diarization True #Label the speaker
 PARAMETER whisper_diar_thold_sec 2 #Time before speakers are tagged in paragraphs that are longer than. (in seconds)
 PARAMETER whisper_language en #The language of the audio
 PARAMETER whisper_n_threads None #Number of threads to allocate for the inference. default to min(4, available hardware_concurrency)
@@ -100,5 +110,6 @@ Merge -- (timestamp, speaker, text) --> Output
 ```
 
 The following open source project packages are used in the process. Thanks for providing high-quality and easy-to-use libraries.
+
 - ASR currently uses [WhisperS2T](https://github.com/shashikg/WhisperS2T)
 - The Diarizer currently uses[pyannote-audio](https://github.com/pyannote/pyannote-audio)
