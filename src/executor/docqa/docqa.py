@@ -80,7 +80,8 @@ class DocQaExecutor(LLMExecutor):
             base_url = self.args.api_base_url,
             kernel_base_url = self.kernel_url,
             model=generator_params.get("model", self.args.model),
-            auth_token=general_params.get("user_token", self.args.api_key)
+            auth_token=general_params.get("user_token", self.args.api_key),
+            limit=generator_params.get("limit", self.args.limit)
         )
         self.document_store = DocumentStore(
             embedding_model = retriever_params.get("embedding_model", self.args.embedding_model),
@@ -131,6 +132,7 @@ class DocQaExecutor(LLMExecutor):
                     {
                         "source": doc.metadata.get("source"),
                         "title": doc.metadata.get("title", doc.metadata.get("filename")),
+                        "content": doc.page_content,
                     }
                     for doc in docs if "source" in doc.metadata
                 ] 
@@ -143,12 +145,14 @@ class DocQaExecutor(LLMExecutor):
                 return
             
             source = filter(lambda x: x["source"], source)
-            yield f"\n\n{i18n.t('docqa.reference')}\n"
+            yield f"\n\n<details><summary>{i18n.t('docqa.reference')}</summary>\n\n"
             for i, ref in enumerate(source):
                 src = ref["source"]
                 title = ref["title"] if ref.get("title") is not None else src
+                content = ref["content"]
                 link = src if src.startswith("http") else pathlib.Path(src).as_uri()
-                yield f'{i+1}. [{title}]({link})\n'
+                yield f'{i+1}. [{title}]({link})\n\n```plaintext\n{content}\n```\n\n'
+            yield f"</details>"
 
         except NoUrlException as e:
             yield str(e)
