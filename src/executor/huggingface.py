@@ -11,10 +11,14 @@ from inspect import cleandoc
 from typing import Optional
 from threading import Thread
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from transformers import AutoTokenizer, GenerationConfig, TextIteratorStreamer, StoppingCriteria, StoppingCriteriaList, AutoModelForCausalLM
+from transformers import (
+    AutoTokenizer, AutoModelForCausalLM, AutoProcessor,
+    GenerationConfig, TextIteratorStreamer,
+    StoppingCriteria, StoppingCriteriaList,
+)
 
 from kuwa.executor import LLMExecutor, Modelfile
-from kuwa.executor.llm_executor import rectify_chat_history
+from kuwa.executor.llm_executor import rectify_chat_history, extract_last_url
 from kuwa.executor.util import (
     expose_function_parameter,
     read_config,

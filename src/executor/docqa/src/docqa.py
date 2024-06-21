@@ -96,10 +96,13 @@ class DocQa:
       cache_proxy_url = os.environ.get('HTTP_CACHE_PROXY', None),
       forge_user_agent=self.user_agent
     ) 
-    docs = await loader.async_load()
-
-    self.logger.info(f'Fetched {len(docs)} documents.')
-    return docs
+    try:
+      docs = await loader.async_load()
+      self.logger.info(f'Fetched {len(docs)} documents.')
+    except Exception as e:
+      docs = []
+    finally:
+      return docs
     
   async def construct_document_store(self, docs: [Document]):
     document_store = self.document_store
@@ -152,11 +155,11 @@ class DocQa:
     docs = None
     if not self.pre_build_db:
       if len(urls) == 1:
-        try:
-          docs = await self.fetch_documents(urls[0])
-        except HTTPError as e:
+        
+        docs = await self.fetch_documents(urls[0])
+        if len(docs) == 0:
           await asyncio.sleep(2) # To prevent SSE error of web page.
-          yield i18n.t('docqa.error_fetching_document').format(str(e))
+          yield i18n.t('docqa.error_fetching_document')
           return
       else:
         docs = await asyncio.gather(*[self.fetch_documents(url) for url in urls])
