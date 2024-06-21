@@ -136,6 +136,11 @@ fill="currentFill" />
                     }
                     $msg = translate_msg($msg.innerHTML);
                 }else{
+                    // Render user uploaded image
+                    if (isImgUrl($msg.innerHTML)){
+                        url = $msg.innerHTML
+                        $msg.innerHTML = `![${url}](${url})`
+                    }
                     $msg = $msg.innerHTML;
                 }
                 $(this).html(marked.parse(DOMPurify.sanitize($('<div>').html($msg).text())));
@@ -214,6 +219,11 @@ xmlns="http://www.w3.org/2000/svg">
     function isValidURL(url) {
         var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
         return urlPattern.test(url);
+    }
+    function isImgUrl(url) {
+        if(typeof url !== 'string') return false;
+        imgPattern = /\.(jpeg|jpg|gif|png|avif|webp|bmp|ico|cur|tiff|tif)$/
+        return isValidURL && imgPattern.test(url);
     }
 
     function scrollToRef(refNumber) {
