@@ -10,7 +10,6 @@ import queue
 import mimetypes
 import argparse
 import torch
-import whisper_s2t
 import concurrent.futures
 import functools
 import multiprocessing as mp
