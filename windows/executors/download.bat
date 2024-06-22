@@ -124,7 +124,7 @@ if "%option%"=="1" (
 	)
     pause
 ) else if "%option%"=="5" (
-    exit /b
+    exit
 )
 
 goto main
