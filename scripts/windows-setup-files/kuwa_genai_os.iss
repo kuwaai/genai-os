@@ -64,6 +64,7 @@ Name: "chinesetraditional"; MessagesFile: "compiler:Languages\ChineseTraditional
 Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 
 [Files]
+Source: "..\..\.git\*"; DestDir: "{app}\.git"; Flags: ignoreversion recursesubdirs createallsubdirs; Attribs: hidden;
 Source: "..\..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "Kuwa-GenAI-OS.exe";
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
