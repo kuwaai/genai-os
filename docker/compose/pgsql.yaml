@@ -15,8 +15,6 @@ services:
   db:
     image: postgres
     restart: unless-stopped
-    container_name: pgsql
-    hostname: db
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD_FILE: /run/secrets/db-password

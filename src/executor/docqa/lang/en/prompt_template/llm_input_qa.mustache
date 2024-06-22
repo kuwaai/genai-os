@@ -1,6 +1,7 @@
 {{#override_prompt}}{{.}}{{/override_prompt}}{{^override_prompt}}First evaluate the relevance of the following content to the topic, and then answer the questions based on the relevant content.{{/override_prompt}}
 
-{{#docs}}{{page_content}}
+{{#docs}}{{#title}}{{.}}:
+{{/title}}{{page_content}}
 
 {{/docs}}
 

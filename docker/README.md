@@ -98,7 +98,7 @@ sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 
 ### 1. Change configuration files
 
-Copy `.admin-password.sample`, `.db-password.sample`, `.env.sample` and remove the `.sample` suffix.  
+Copy `.admin-password.sample`, `.db-password.sample`, `.env.sample`, `run.sh.sample` and remove the `.sample` suffix.  
 The files are as follows:
 - `.admin-password`: Default administrator password, it is recommended not to keep the default value
 - `.db-password`: System built-in database password, it is recommended to set it to a random string of sufficient length

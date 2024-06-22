@@ -122,7 +122,7 @@ if "taide"=="!current_folder!" (
 		goto input_google_cse_id
 	)
 	
-	set /p "restricted_sites=Enter the restricted sites (Optional, septate by ;) :"
+	set /p "advanced_search_params=Enter the advanced search parameters (optional):"
 	goto skip_selection
 ) else if "ollama" == "!current_folder!" (
 	REM not quick
@@ -375,8 +375,8 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 	if DEFINED google_cse_id (
 		set command=!command! "--google_cse_id" "!google_cse_id!"
 	)
-	if DEFINED restricted_sites (
-		set command=!command! "--restricted_sites" "!restricted_sites!"
+	if DEFINED advanced_search_params (
+		set command=!command! "--advanced_search_params" "!advanced_search_params!"
 	)
 	IF DEFINED arguments (
 		set command=!command! !arguments!

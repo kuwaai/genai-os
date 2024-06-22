@@ -1,4 +1,4 @@
-@echo off
+::@echo off
 if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* & exit)
 setlocal EnableDelayedExpansion
 
@@ -7,24 +7,46 @@ echo Now in: "%cd%"
 call src\variables.bat
 set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 
-REM Construct the database
+:: Import the database
 
-set TARGET=%~1
+set "TARGET=%~1"
 
-REM Extract the folder name from the input
+:: Extract the folder name from the input
 if "!TARGET!"=="" (
-    echo Please drag the data folder to this script.
+    echo Please drag a data folder, database folder or an archive file to this script.
     pause
-    exit /b 0
+    exit 1
 )
+set "original_target=!TARGET!"
 for %%f in ("!TARGET!") do set "database_name=%%~nxf"
+
+:: Extract the archived database
+if "!database_name:~-4!"==".zip" (
+    set "database_name=!database_name:~0,-4!"
+    set "target_folder=%tmp%\kuwa-vdb-!database_name!-%RANDOM%"
+    echo Extracting !TARGET! to !target_folder!...
+    powershell Expand-Archive -Path "!TARGET!" -DestinationPath "!target_folder!"
+    for /d %%i in (!target_folder!\*) do set "TARGET=%%i"
+)
+
+set valid_database=T
+if not exist "!TARGET!\config.json" set valid_database=F
+if not exist "!TARGET!\index.faiss" set valid_database=F
+if not exist "!TARGET!\index.pkl" set valid_database=F
+if "!valid_database!" == "T" (
+    xcopy /E !TARGET!\*.* ".\executors\!database_name!\db\"
+) else (
+    pushd "%~dp0\..\src\toolchain"
+    python construct_vector_db.py "!TARGET!" "..\..\windows\executors\!database_name!\db"
+    popd
+    @REM echo !original_target! is not a valid database. Abort importing.
+    @REM pause
+    @REM exit 1
+)
+
 set "access_code=db-qa-!database_name!"
 echo "Database name: !database_name!"
-mkdir ".\executors\!database_name!"
-
-pushd "%~dp0\..\src\toolchain"
-python construct_vector_db.py "!TARGET!" "..\..\windows\executors\!database_name!\db"
-popd
+mkdir ".\executors\!database_name!\db"
 
 REM Setup the executor
 
@@ -50,7 +72,7 @@ set "EXECUTOR_NAME=!database_name!"
 set "EXECUTOR_ACCESS_CODE=!access_code!"
 set "worker_path=docqa.py"
 for /d %%i in (*) do (
-    echo "Folder detected, using founded folder."
+    echo Folder detected, using founded folder.
     for %%F in ("%%~pi.") do (
         for %%G in ("%%~pi\..") do (
             for %%H in ("%%~pi\..\..") do (

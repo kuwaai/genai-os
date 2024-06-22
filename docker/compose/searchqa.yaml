@@ -16,7 +16,7 @@ services:
       "--model", "gemini-pro",
       "--google_api_key", "<YOUR_GOOGLE_API_KEY>",
       "--google_cse_id", "<YOUR_GOOGLE_CUSTOM_SEARCH_ENGINE_ID>",
-      #"--restricted_sites", "example.tw;example.com"
+      #"--advanced_params", "site:example.tw site:example.com"
       ]
     extra_hosts:
       - "localhost:host-gateway"
