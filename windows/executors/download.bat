@@ -56,7 +56,7 @@ if "%option%"=="1" (
     set userInput=n
     set /p "userInput=璶更 Whisper Medium 家盾 ( 1.4GB) [y/N] "
     
-    if /I "%userInput%"=="y" (
+    if /I "!userInput!"=="y" (
     	echo タ更家...
 		set python_exe=..\packages\%python_folder%\python.exe
 		if exist "!python_exe!" (
@@ -74,7 +74,7 @@ if "%option%"=="1" (
     set userInput=n
     set /p "userInput=璶更 Llama3-TAIDE-LX-8B-Chat-Alpha1.Q4_K_M  GGUF 家盾 ( 4.7GB) [y/N] "
     
-    if /I "%userInput%"=="y" (
+    if /I "!userInput!"=="y" (
     	echo タ更家...
     	curl -L -o "taide/taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/nctu6/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1-Q4_K_M.gguf?download=true
 		echo 更Ч拨
@@ -90,7 +90,7 @@ if "%option%"=="1" (
     set userInput=n
     set /p "userInput=璶更 Stable diffusion 2 家盾 ( 4.8GB) [y/N] "
     
-    if /I "%userInput%"=="y" (
+    if /I "!userInput!"=="y" (
     	echo タ更家...
 		set python_exe=..\packages\%python_folder%\python.exe
 
@@ -109,7 +109,7 @@ if "%option%"=="1" (
 	set userInput=n
     set /p "userInput=璶更 infgrad/stella-base-zh 家盾 ( 196.5MB) [y/N] "
     
-    if /I "%userInput%"=="y" (
+    if /I "!userInput!"=="y" (
     	echo タ更家...
 		set python_exe=..\packages\%python_folder%\python.exe
 
