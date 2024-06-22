@@ -98,7 +98,7 @@ sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 
 ### 1. 更改設定檔
 
-複製`.admin-password.sample`, `.db-password.sample`, `.env.sample` 並把 `.sample` 副檔名去掉  
+複製`.admin-password.sample`, `.db-password.sample`, `.env.sample`, `run.sh.sample` 並把 `.sample` 副檔名去掉  
 檔案說明如下:
 - `.admin-password`: 預設管理者密碼，建議不要維持預設值
 - `.db-password`: 系統自帶資料庫密碼，建議設定成足夠長度的隨機字串
