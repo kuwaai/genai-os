@@ -82,7 +82,9 @@ Alternatively, you can refer to the following steps to install the entire system
      cp .env.dev .env
      cd executable/sh
      ./production_update.sh
-     cd ../kernel
+     cd ../../../kernel
+     pip install -r requirement.txt
+     cd ../executor
      pip install -r requirement.txt
      sudo chown -R $(whoami):www-data /var/www/html
      ```
@@ -92,7 +94,9 @@ Alternatively, you can refer to the following steps to install the entire system
      copy .env.dev .env
      cd executable/bat
      ./production_update.bat
-     cd ../kernel
+     cd ../../../kernel
+     pip install -r requirement.txt
+     cd ../executor
      pip install -r requirement.txt
      ```
 
@@ -102,7 +106,6 @@ Alternatively, you can refer to the following steps to install the entire system
    - Example config files: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
    - Recommended settings:
      - Set max upload file size in PHP to at least 20MB, for RAG applications.
-     - Set Timeout to at least 120 seconds or more to avoid slower RAGs or lengthy model outputs.
 
 4. **Set up Redis:**
    - Make sure you have a Redis server installed and running.
