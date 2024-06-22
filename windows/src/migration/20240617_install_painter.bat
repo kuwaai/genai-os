@@ -1,8 +1,7 @@
 REM This patch will install the dependency of the Painter (Stable Diffusion) executor
-set pip_exe=packages\%python_folder%\Scripts\pip.exe
-if exist "%pip_exe%" (
+if exist "packages\%python_folder%\Scripts\pip.exe" (
 	pushd ..\src\executor\image_generation
-	%pip_exe% install --default-timeout=1000 -r requirements.txt
+	pip install --default-timeout=1000 -r requirements.txt
 	popd
 	exit /b 0
 ) else (

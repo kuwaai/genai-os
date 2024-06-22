@@ -94,8 +94,8 @@ if "%option%"=="1" (
     	echo 正在下載模型...
 		set python_exe=..\packages\%python_folder%\python.exe
 
-		if exist "%python_exe%" (
-			%python_exe% ../../src/executor/image_generation/download_model.py
+		if exist "!python_exe!" (
+			!python_exe! ../../src/executor/image_generation/download_model.py
 		) else (
 			echo 缺少該檔案 !python_exe! ，請先執行完畢build.bat！
 		)
@@ -113,8 +113,8 @@ if "%option%"=="1" (
     	echo 正在下載模型...
 		set python_exe=..\packages\%python_folder%\python.exe
 
-		if exist "%python_exe%" (
-			%python_exe% ../../src/executor/docqa/download_model.py
+		if exist "!python_exe!" (
+			!python_exe! ../../src/executor/docqa/download_model.py
 		) else (
 			echo 缺少該檔案 !python_exe! ，請先執行完畢build.bat！
 		)
