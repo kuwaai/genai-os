@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
-use App\Http\Requests\ChatRequest;
+use App\Http\Requests\BotCreateRequest;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\Histories;
 use App\Jobs\ImportChat;
@@ -145,7 +146,21 @@ class BotController extends Controller
     }
     public function create(Request $request)
     {
-        $model_id = LLMs::where('name', '=', $request->input('llm_name'))->first()->id;
+        $rules = (new BotCreateRequest())->rules();
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $validated = $validator->validated();
+        $model = LLMs::where('name', '=', $request->input('llm_name'))->first();
+
+        if (!$model) {
+            // Add custom error message
+            $validator->errors()->add('llm_name', 'The selected model does not exist.');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $model_id = $model->id;
         if ($model_id) {
             $bot = new Bots();
             $config = [];
@@ -156,12 +171,59 @@ class BotController extends Controller
                 $config['react_btn'] = $request->input('react_btn');
             }
             $config = json_encode($config);
-            $bot->fill(['name' => $request->input('bot-name'), 'type' => 'prompt', 'visibility' => 1, 'description' => $request->input('bot-describe'), 'owner_id' => $request->user()->id, 'model_id' => $model_id, 'config' => $config]);
+            $bot->fill(['name' => $request->input('bot_name'), 'type' => 'prompt', 'visibility' => 1, 'description' => $request->input('bot_describe'), 'owner_id' => $request->user()->id, 'model_id' => $model_id, 'config' => $config]);
             $bot->save();
+            return redirect()->route('store.home')->with('last_bot_id', $bot->id);
         }
 
         return redirect()->route('store.home');
     }
+
+    public function api_create_bot(Request $request)
+    {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            Auth::setUser(User::find($user->id));
+            if (User::find($user->id)->hasPerm('Store_update_create_bot')) {
+                $rules = (new BotCreateRequest())->rules();
+                $validator = Validator::make($request->all(), $rules);
+
+                if ($validator->fails()) {
+                    return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 422, [], JSON_UNESCAPED_UNICODE);
+                }
+                $model = LLMs::where('name', '=', $request->input('llm_name'))->first();
+        
+                if (!$model) {
+                    // Add custom error message
+                    $validator->errors()->add('llm_name', 'The selected model does not exist.');
+                    return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 404, [], JSON_UNESCAPED_UNICODE);
+                }
+                $model_id = $model->id;
+                $this->create($request);
+                return response()->json(['status' => 'success', 'last_bot_id'=>session('last_bot_id')], 200, [], JSON_UNESCAPED_UNICODE);
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
+
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
     public function update(Request $request)
     {
         $bot = Bots::findOrFail($request->input('id'));
@@ -175,11 +237,11 @@ class BotController extends Controller
             $config['react_btn'] = $request->input('react_btn');
         }
         $config = json_encode($config);
-        if ($request->input('bot-name')) {
-            $bot->name = $request->input('bot-name');
+        if ($request->input('bot_name')) {
+            $bot->name = $request->input('bot_name');
         }
-        if ($request->input('bot-describe')) {
-            $bot->description = $request->input('bot-describe');
+        if ($request->input('bot_describe')) {
+            $bot->description = $request->input('bot_describe');
         }
         $bot->model_id = $model_id;
         $bot->config = $config;

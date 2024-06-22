@@ -70,18 +70,18 @@
                         <div class="w-full md:col-span-2">
                             <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                                 <div class="w-full">
-                                    <label for="bot-name"
+                                    <label for="bot_name"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.name') }}</label>
-                                    <input type="text" name="bot-name" autocomplete="off"
+                                    <input type="text" name="bot_name" autocomplete="off"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="{{ __('store.bot.name.label') }}">
                                 </div>
                             </div>
                             <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                                 <div class="w-full">
-                                    <label for="bot-describe"
+                                    <label for="bot_describe"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.description') }}</label>
-                                    <input type="text" name="bot-describe" autocomplete="off"
+                                    <input type="text" name="bot_describe" autocomplete="off"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="{{ __('store.bot.description.label') }}">
                                 </div>
@@ -233,18 +233,20 @@
         $("#detail-modal input").prop("disabled", readonly)
         $("#detail-modal input").prop("readonly", readonly)
         ace.edit('modelfile-editor').setReadOnly(readonly);
-        $('#detail-modal textarea[name=modelfile]').val('')
+        $("#detail-modal textarea[name='modelfile']").val('')
         $("#detail-modal h3").text(data.name);
-        $("#detail-modal input[name=llm_name]").val(data.llm_name)
-        $("#detail-modal input[name=bot-name]").val(data.name)
+        $("#detail-modal input[name='llm_name']").val(data.llm_name)
+        $("#detail-modal input[name='bot_name']").val(data.name)
         $("#detail-modal img").attr("src", data.image)
-        $("#detail-modal input[name=bot-describe]").val(data.description)
+        $("#detail-modal input[name='bot_describe']").val(data.description)
         $("#detail-modal input[name='react_btn[]']").prop("checked", false);
         if (data.config) {
             config = JSON.parse(data.config)
-            config["react_btn"].forEach((a) => {
-                $(`#detail-modal input[value='${a}']`).prop("checked", true);
-            });
+            if (config["react_btn"]) {
+                config["react_btn"].forEach((a) => {
+                    $(`#detail-modal input[value='${a}']`).prop("checked", true);
+                });
+            }
             modelfile = modelfile_to_string(config['modelfile'] ?? [])
             if (modelfile.length == 0) {
                 ace.edit('modelfile-editor').setValue()
@@ -268,7 +270,7 @@
     }
 
     function checkForm() {
-        if ($("#update_bot input[name='llm_name']").val() && $("#update_bot input[name='bot-name']").val()) {
+        if ($("#update_bot input[name='llm_name']").val() && $("#update_bot input[name='bot_name']").val()) {
             $('#detail-modal textarea[name=modelfile]').val(modelfile_to_string(modelfile_parse(ace.edit(
                     'modelfile-editor')
                 .getValue())))
@@ -279,7 +281,7 @@
         }
         if (!$("#update_bot input[name='llm_name']").val()) $("#create_error").text(
             "{{ __('store.hint.must_select_base_model') }}")
-        else if (!$("#update_bot input[name='bot-name']").val()) $("#create_error").text(
+        else if (!$("#update_bot input[name='bot_name']").val()) $("#create_error").text(
             "{{ __('You must name your bot') }}")
         $("#create_error").show().delay(3000).fadeOut();
         return false;

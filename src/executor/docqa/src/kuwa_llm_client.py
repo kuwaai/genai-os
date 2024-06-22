@@ -33,6 +33,46 @@ class KuwaLlmClient:
         llm.append(None)
         return llm[0]
 
+    async def create_base_model(self, name: str, access_code:str, auth_token: str = None, order: int = None, version:str=None, description:str=None, system_prompt:str=None, react_btn:str=None):
+        url = urljoin(self.base_url, "/api/user/create/base_model")
+        auth_token = self.auth_token if self.auth_token is not None else auth_token
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {auth_token}",
+        }
+        request_body = {
+            "name": name,
+            "access_code": access_code,
+            "order": order,
+            "version": version,
+            "description": description,
+            "system_prompt": system_prompt,
+            "react_btn": react_btn,
+        }
+        resp = requests.post(url, headers=headers, json=request_body)
+        if not resp.ok:
+            raise RuntimeError(f'Request failed with status {resp.status_code}, {resp.json()}')
+        return resp.json()
+
+    async def create_bot(self, llm_name:str, bot_name: str, auth_token: str = None, modelfile:str=None, react_btn:str=None, bot_describe:str=None):
+        url = urljoin(self.base_url, "/api/user/create/bot")
+        auth_token = self.auth_token if self.auth_token is not None else auth_token
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {auth_token}",
+        }
+        request_body = {
+            "llm_name": llm_name,
+            "modelfile": modelfile,
+            "react_btn": react_btn,
+            "bot_name": bot_name,
+            "bot_describe": bot_describe,
+        }
+        resp = requests.post(url, headers=headers, json=request_body)
+        if not resp.ok:
+            raise RuntimeError(f'Request failed with status {resp.status_code}, {resp.json()}')
+        return resp.json()
+
     async def chat_complete(self, auth_token: str = None, messages: list = [], timeout=120, streaming=True):
         url = urljoin(self.base_url, "/v1.0/chat/completions")
         auth_token = self.auth_token if self.auth_token is not None else auth_token
@@ -63,3 +103,66 @@ class KuwaLlmClient:
                         full_response.append(chunk)
             if not streaming:
                 yield "".join(full_response)
+
+# Init Example
+"""
+client = KuwaLlmClient(
+    base_url="http://localhost",
+    model="gemini-pro",
+    auth_token="YOUR_API_TOKEN_HERE"
+)
+"""
+
+# Chat API Example
+"""
+messages = [
+    {"isbot": False, "msg": "Hi"}
+]
+
+async def main():
+    async for chunk in client.chat_complete(messages=messages):
+        print(chunk, end='')
+    print()
+
+asyncio.run(main())
+"""
+
+# Create Base Model Example
+"""
+async def main():
+    try:
+        response = await client.create_base_model(
+            name="API_TEST_MODEL",
+            access_code="API_TEST_MODEL",
+            order=1,
+        )
+        print("Model created:", response)
+    except Exception as e:
+        print("Failed to create model:", e)
+
+asyncio.run(main())
+"""
+
+# Way to create a base model then create a bot with it.
+"""
+async def main():
+    try:
+        response = await client.create_base_model(
+            name="API_TEST_MODEL",
+            access_code="API_TEST_MODEL",
+            order=1,
+        )
+        print("Model created:", response)
+    except Exception as e:
+        print("Failed to create model:", e)
+    try:
+        response = await client.create_bot(
+            bot_name="API_TEST_MODEL",
+            llm_name="API_TEST_MODEL",
+        )
+        print("Bot created:", response)
+    except Exception as e:
+        print("Failed to create bot:", e)
+
+asyncio.run(main())
+"""

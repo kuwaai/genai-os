@@ -16,6 +16,7 @@ use App\Models\Permissions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use DB;
 
 class ManageController extends Controller
 {
@@ -195,7 +196,9 @@ class ManageController extends Controller
         $model = LLMs::findOrFail($request->input('id'));
         $validated = $request->validated();
         if ($file = $request->file('image')) {
-            if ($model->image) Storage::delete($model->image);
+            if ($model->image) {
+                Storage::delete($model->image);
+            }
             $validated['image'] = $file->store('public/images');
         }
         if (is_null($validated['order'])) {
@@ -219,16 +222,61 @@ class ManageController extends Controller
     public function llm_delete(Request $request): RedirectResponse
     {
         $model = LLMs::findOrFail($request->input('id'));
-        if ($model->image) Storage::delete($model->image);
+        if ($model->image) {
+            Storage::delete($model->image);
+        }
         $model->delete();
         Permissions::where('name', '=', 'model_' . $request->input('id'))->delete();
         return Redirect::route('manage.home')->with('last_tab', 'llms')->with('last_llm_id', $request->input('id'));
     }
 
-    public function llm_create(LLMCreateRequest $request): RedirectResponse
+    public function api_create_base_model(Request $request)
     {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            if (User::find($user->id)->hasPerm('tab_Manage')) {
+                $rules = (new LLMCreateRequest())->rules();
+                $validator = Validator::make($request->all(), $rules);
+
+                if ($validator->fails()) {
+                    return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 422, [], JSON_UNESCAPED_UNICODE);
+                }
+                $this->llm_create($request);
+                return response()->json(['status' => 'success', 'model_id'=>session('last_llm_id')], 200, [], JSON_UNESCAPED_UNICODE);
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
+
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function llm_create(Request $request): RedirectResponse
+    {
+        $rules = (new LLMCreateRequest())->rules();
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $validated = $validator->validated();
+        // Validation passed, create your model instance
         $model = new LLMs();
-        $validated = $request->validated();
         if ($file = $request->file('image')) {
             $validated['image'] = $file->store('public/images');
         }
@@ -250,15 +298,15 @@ class ManageController extends Controller
         $perm = new Permissions();
         $perm->fill(['name' => 'model_' . $model->id]);
         $perm->save();
-        
+
         $groups = GroupPermissions::pluck('group_id')->toArray();
-        $targetPermID = Permissions::where("name", "=", "tab_Manage")->first()->id;
+        $targetPermID = Permissions::where('name', '=', 'tab_Manage')->first()->id;
         $currentTimestamp = now();
         foreach ($groups as $group) {
             GroupPermissions::where('group_id', $group)
                 ->where('perm_id', '=', $perm->id)
                 ->delete();
-            if (GroupPermissions::where('group_id', $group)->where('perm_id', '=', $targetPermID)->exists()){
+            if (GroupPermissions::where('group_id', $group)->where('perm_id', '=', $targetPermID)->exists()) {
                 GroupPermissions::insert([
                     'group_id' => $group,
                     'perm_id' => $perm->id,

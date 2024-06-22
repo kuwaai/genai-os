@@ -44,15 +44,20 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return view('errors.IPNotAllowed');
     })->name('errors.ipnotallowed');
 
-    # This allow other registering from other platform
     Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
-
+    
     Route::middleware('ipCheck')->group(function () {
         # This will auth the user token that is used to connect.
         Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
         Route::post('/v1.0/chat/abort', [ProfileController::class, 'api_abort']);
         # This will auth the server secret that is used by localhost
         Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
+
+        # User API routes
+        Route::prefix('api/user/create')->group(function () {
+            Route::post('/base_model', [ManageController::class, 'api_create_base_model'])->name('api.user.create.base_model');
+            Route::post('/bot', [BotController::class, 'api_create_bot'])->name('api.user.create.bot');
+        });
 
         # Admin routes, require admin permission
         Route::middleware('auth', 'verified', AdminMiddleware::class . ':tab_Dashboard', 'auth.check')->group(function () {
