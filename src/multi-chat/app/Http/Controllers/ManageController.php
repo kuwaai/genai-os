@@ -247,7 +247,7 @@ class ManageController extends Controller
                     return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 422, [], JSON_UNESCAPED_UNICODE);
                 }
                 $this->llm_create($request);
-                return response()->json(['status' => 'success', 'model_id'=>session('last_llm_id')], 200, [], JSON_UNESCAPED_UNICODE);
+                return response()->json(['status' => 'success', 'last_llm_id'=>session('last_llm_id')], 200, [], JSON_UNESCAPED_UNICODE);
             } else {
                 $errorResponse = [
                     'status' => 'error',
