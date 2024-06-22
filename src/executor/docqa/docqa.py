@@ -85,7 +85,7 @@ class DocQaExecutor(LLMExecutor):
         i18n.config.set("locale", lang)
 
         # [TODO] Fetch pre-built DB from web
-        self.pre_built_db = self.args.database
+        self.pre_built_db = retriever_params.get("database", self.args.database)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
