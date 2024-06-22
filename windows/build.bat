@@ -115,6 +115,7 @@ REM Install pip for python
 if not exist "packages\%python_folder%\Scripts\pip.exe" (
 	pushd "packages\%python_folder%"
 	python get-pip.py --no-warn-script-location
+    python -m pip install pip==24.0
 	popd
 ) else (
     echo pip already installed, skipping installing.
@@ -158,16 +159,16 @@ echo Creating shortcut from %nginx_folder%/html to ../public...
 mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
 
 REM Download required pip packages
-pip install -r .\src\requirements.txt
+pip install --default-timeout=1000 -r .\src\requirements.txt
 pushd "..\src\kernel"
-pip install -r requirements.txt 
+pip install --default-timeout=1000 -r requirements.txt 
 popd
 pushd "..\src\executor"
-pip install -r requirements.txt
+pip install --default-timeout=1000 -r requirements.txt
 pushd "docqa"
-pip install -r requirements.txt
+pip install --default-timeout=1000 -r requirements.txt
 popd
 popd
 pushd "..\src\toolchain"
-pip install -r requirements.txt 
+pip install --default-timeout=1000 -r requirements.txt 
 popd
