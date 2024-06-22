@@ -48,10 +48,11 @@ class DocQa:
   
   def generate_llm_input(self, task, question, related_docs, override_prompt:str=None):
     
+    docs = [dict(title=doc.metadata.get("title"), **dict(doc)) for doc in related_docs]
     template_path = f'lang/{self.lang}/prompt_template/llm_input_{task}.mustache'
     llm_input_template = Path(template_path).read_text(encoding="utf8")
     llm_input = chevron.render(llm_input_template, {
-      'docs': related_docs,
+      'docs': docs,
       'question': question,
       'override_prompt': override_prompt
     })

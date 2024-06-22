@@ -84,8 +84,10 @@ class SearchQaExecutor(LLMExecutor):
         display_params = params["display_"]
         
         lang = general_params.get("lang", self.args.lang)
+        lang = lang if lang in os.listdir("lang/") else "en"
         i18n.load_path.append(f'lang/{lang}/')
         i18n.config.set("error_on_missing_translation", True)
+        i18n.config.set("fallback", "en")
         i18n.config.set("locale", lang)
 
         self.advanced_search_params = search_params.get("advanced_params", self.args.advanced_search_params)
