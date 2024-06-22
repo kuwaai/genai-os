@@ -1,4 +1,5 @@
 @echo off
+cd "%~dp0.."
 
 REM Variables for RunHiddenConsole
 set "url_RunHiddenConsole=https://github.com/wenshui2008/RunHiddenConsole/releases/download/1.0/RunHiddenConsole.zip"

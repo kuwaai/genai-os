@@ -3,8 +3,9 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* & exit)
 setlocal EnableDelayedExpansion
 
 cd /D "%~dp0"
-echo Now in: "%cd%"
 call src\variables.bat
+cd /D "%~dp0"
+echo Now in: "%cd%"
 set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 
 :: Import the database

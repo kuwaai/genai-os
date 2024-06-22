@@ -9,6 +9,7 @@ setlocal enabledelayedexpansion
 
 REM Include variables from separate file
 call src\variables.bat
+cd "%~dp0"
 
 REM Redis Server
 pushd packages\%redis_folder%

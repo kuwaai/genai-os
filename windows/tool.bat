@@ -1,6 +1,8 @@
 REM Loop to wait for commands
 @echo off
+cd "%~dp0"
 call src\variables.bat
+cd "%~dp0"
 setlocal enabledelayedexpansion
 set "PATH=%~dp0packages\%python_folder%;%~dp0packages\%python_folder%\Scripts;%PATH%"
 

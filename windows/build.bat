@@ -7,6 +7,7 @@ exit /b
 :main
 REM Initialize everything
 call src\variables.bat
+cd "%~dp0"
 
 REM Check if VCredist is installed
 set found=0

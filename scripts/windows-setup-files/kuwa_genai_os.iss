@@ -22,7 +22,7 @@ DefaultDirName=C:/kuwa/GenAI OS
 DefaultGroupName=Kuwa GenAI OS
 AllowNoIcons=yes
 LicenseFile=../../LICENSE
-InfoBeforeFile=Informations.txt
+; InfoBeforeFile=Informations.txt
 PrivilegesRequired=lowest
 OutputDir=.
 OutputBaseFilename=Kuwa-GenAI-OS
@@ -71,11 +71,14 @@ Source: "..\..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createa
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{group}\Start GenAI OS"; Filename: "{app}\windows\start.bat"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
-Name: "{group}\Construct Rag"; Filename: "{app}\windows\construct_rag.bat"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
+Name: "{group}\Construct RAG"; Filename: "{app}\windows\construct_rag.bat"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
+Name: "{group}\Model Download"; Filename: "{app}\windows\executors\download.bat"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
 Name: "{userdesktop}\Start GenAI OS"; Filename: "{app}\windows\start.bat"; WorkingDir: "{app}\windows"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
-Name: "{userdesktop}\Construct Rag"; Filename: "{app}\windows\construct_rag.bat"; WorkingDir: "{app}\windows"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
+Name: "{userdesktop}\Construct RAG"; Filename: "{app}\windows\construct_rag.bat"; WorkingDir: "{app}\windows"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
+Name: "{userdesktop}\Model Download"; Filename: "{app}\windows\executors\download.bat"; WorkingDir: "{app}\windows"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
 
 [Run]
+Filename: "{app}\windows\executors\download.bat"; Flags: shellexec
 Filename: "{app}\windows\src\switch.bat"; Flags: shellexec
 Filename: "{app}\windows\build & start.bat"; Flags: shellexec
 

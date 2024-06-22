@@ -9,7 +9,7 @@ set "archive_name=%4"
 
 if not exist "%check_location%" (
     echo Downloading %url%...
-    curl -L -o "%archive_name%" %url%
+    curl -L -# -o "%archive_name%" %url%
 
     :: Check if the file is a tar.xz archive
     if "%archive_name:~-7%"==".tar.xz" (
