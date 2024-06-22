@@ -43,8 +43,7 @@ class SearchQaExecutor(LLMExecutor):
         search_group = parser.add_argument_group('Search Engine Options')
         search_group.add_argument('--google_api_key', default=None, help='The API key of Google API.')
         search_group.add_argument('--google_cse_id', default=None, help='The ID of Google Custom Search Engine.')
-        search_group.add_argument('--restricted_sites', default='', help='A list of restricted sites. Septate by ";".')
-        search_group.add_argument('--blocked_sites', default='youtube.com;facebook.com;instagram.com;twitter.com;threads.net;play.google.com;apps.apple.com;www.messenger.com', help='A list of blocked sites. Septate by ";".')
+        search_group.add_argument('--advanced_search_params', default='-site:youtube.com -site:facebook.com -site:instagram.com -site:twitter.com -site:threads.net -site:play.google.com -site:apps.apple.com -site:www.messenger.com', help='Advanced search parameters')
         
         crawler_group = parser.add_argument_group('Crawler Options')
         crawler_group.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
@@ -89,8 +88,7 @@ class SearchQaExecutor(LLMExecutor):
         i18n.config.set("error_on_missing_translation", True)
         i18n.config.set("locale", lang)
 
-        self.restricted_sites = search_params.get("restricted_sites", self.args.restricted_sites)
-        self.blocked_sites = search_params.get("blocked_sites", self.args.blocked_sites)
+        self.advanced_search_params = search_params.get("advanced_params", self.args.advanced_search_params)
         self.num_url = search_params.get("num_url", self.args.num_url)
         self.user_agent = crawler_params.get("user_agent", self.args.user_agent)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
@@ -145,18 +143,10 @@ class SearchQaExecutor(LLMExecutor):
         Get first URL from the search result.
         """
 
-        process_site_list = lambda x: list(filter(None, x.split(';')))
-        restricted_sites = process_site_list(self.restricted_sites)
-        blocked_sites = process_site_list(self.blocked_sites)
         latest_user_record = next(filter(lambda x: x["role"] == "user", reversed(chat_history)))
         latest_user_msg = latest_user_record["content"]
 
-        query = latest_user_msg
-        query += ''.join([f' site:{s.strip()}' for s in restricted_sites])
-        query += ''.join([f' -site:{s.strip()}' for s in blocked_sites])
-        
-        logger.debug(f'Restricted sites: {restricted_sites}')
-        logger.debug(f'Blocked sites: {blocked_sites}')
+        query = "{user} {params}".format(user=latest_user_msg, params=self.advanced_search_params)
         logger.debug(f'Query: {query}')
 
         endpoint = 'https://customsearch.googleapis.com/customsearch/v1'
