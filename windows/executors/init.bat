@@ -363,6 +363,9 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		IF DEFINED model_name (
 			set command=!command! "--model" "!model_name!"
 		)
+		if "taide"=="!current_folder!" (
+			set command=!command! "--system_prompt" "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
+		)
 	) else (
 		set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
 	)
