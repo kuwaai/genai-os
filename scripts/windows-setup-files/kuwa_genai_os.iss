@@ -79,12 +79,11 @@ Name: "{userdesktop}\Construct RAG"; Filename: "{app}\windows\construct_rag.bat"
 Name: "{userdesktop}\Model Download"; Filename: "{app}\windows\executors\download.bat"; WorkingDir: "{app}\windows"; IconFilename: "{app}\src\multi-chat\public\images\kuwa-logo.ico"
 
 [Run]
-Filename: "{app}\windows\executors\download.bat"; Flags: shellexec
 Filename: "{app}\windows\src\switch.bat"; Flags: shellexec
 Filename: "{app}\windows\build & start.bat"; Flags: shellexec
 
 [UninstallRun]
-Filename: "{app}\windows\tool.bat"; Parameters: "stop"; Flags: shellexec; RunOnceId: "KuwaUninstall"
+Filename: "{app}\windows\tool.bat"; Parameters: "stop"; Flags: shellexec waituntilterminated; RunOnceId: "KuwaUninstall"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"

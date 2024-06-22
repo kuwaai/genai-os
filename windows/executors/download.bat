@@ -1,12 +1,16 @@
 @echo off
 cd "%~dp0"
-call ..\src\variables.bat
+if "%1"=="quick" (
+	call ..\src\variables.bat no_migrate
+) else (
+	call ..\src\variables.bat
+)
 cd "%~dp0"
-setlocal EnableDelayedExpansion
-
 if "%1"=="quick" (
     goto function2
 )
+setlocal EnableDelayedExpansion
+
 
 REM Define an array to store the model types and their names
 set "names[1]=Whisper Model"
@@ -72,7 +76,7 @@ if "%option%"=="1" (
     
     if /I "%userInput%"=="y" (
     	echo タ更家...
-    	curl -L -o "taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/nctu6/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1-Q4_K_M.gguf?download=true
+    	curl -L -o "taide/taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/nctu6/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1-Q4_K_M.gguf?download=true
 		echo 更Ч拨
 	) else (
 		echo 盢ぃ穦更赣家

@@ -72,16 +72,22 @@ mkdir packages 2>nul
 
 REM init env
 set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\bin;%PATH%"
-REM Run migration
-for %%i in ("src\migration\*.bat") do (
-    findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (
-        echo Running %%~nxi
-        call "%%i"
-        if errorlevel 1 (
-            echo %%~nxi did not execute successfully.
-        ) else (
-            echo %%~nxi executed successfully.
-            echo %%~nxi>>"src\conf\migrations.txt"
+
+if "%1"=="no_migrate" (
+    echo Skipped migration
+) else (
+    REM Run migration
+    for %%i in ("src\migration\*.bat") do (
+        findstr /i /c:"%%~nxi" "src\conf\migrations.txt" >nul || (
+            echo Running %%~nxi
+            call "%%i"
+            if errorlevel 1 (
+                echo %%~nxi did not execute successfully.
+            ) else (
+                echo %%~nxi executed successfully.
+                echo %%~nxi>>"src\conf\migrations.txt"
+            )
         )
     )
 )
+
