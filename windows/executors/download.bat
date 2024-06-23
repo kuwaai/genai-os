@@ -54,32 +54,32 @@ set "EXECUTOR_TYPE=!models[%option%]!"
 if "%option%"=="1" (
     :function1
     set userInput=n
-    set /p "userInput=ï¿½nï¿½Uï¿½ï¿½ Whisper Medium ï¿½Ò«ï¿½ï¿½ï¿½ (ï¿½ï¿½ 1.4GB)ï¿½H [y/N] "
+    set /p "userInput=­n¤U¸ü Whisper Medium ¼Ò«¬¶Ü (¬ù 1.4GB)¡H [y/N] "
     
     if /I "!userInput!"=="y" (
-    	echo ï¿½ï¿½ï¿½bï¿½Uï¿½ï¿½ï¿½Ò«ï¿½...
+    	echo ¥¿¦b¤U¸ü¼Ò«¬...
 		set python_exe=..\packages\%python_folder%\python.exe
 		if exist "!python_exe!" (
 			!python_exe! ../../src/executor/speech_recognition/download_model.py
 		) else (
-			echo ï¿½Ê¤Ö¸ï¿½ï¿½É®ï¿½ !python_exe! ï¿½Aï¿½Ð¥ï¿½ï¿½ï¿½ï¿½æ§¹ï¿½ï¿½build.batï¿½I
+			echo ¯Ê¤Ö¸ÓÀÉ®× !python_exe! ¡A½Ð¥ý°õ¦æ§¹²¦build.bat¡I
 		)
-		echo ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½I
+		echo ¤U¸ü§¹²¦¡I
 	) else (
-		echo ï¿½Nï¿½ï¿½ï¿½|ï¿½Uï¿½ï¿½ï¿½Ó¼Ò«ï¿½
+		echo ±N¤£·|¤U¸ü¸Ó¼Ò«¬
 	)
     pause
 ) else if "%option%"=="2" (
     :function2
     set userInput=n
-    set /p "userInput=ï¿½nï¿½Uï¿½ï¿½ Llama3-TAIDE-LX-8B-Chat-Alpha1.Q4_K_M ï¿½ï¿½ GGUF ï¿½Ò«ï¿½ï¿½ï¿½ (ï¿½ï¿½ 4.7GB)ï¿½H [y/N] "
+    set /p "userInput=­n¤U¸ü Llama3-TAIDE-LX-8B-Chat-Alpha1.Q4_K_M ªº GGUF ¼Ò«¬¶Ü (¬ù 4.7GB)¡H [y/N] "
     
     if /I "!userInput!"=="y" (
-    	echo ï¿½ï¿½ï¿½bï¿½Uï¿½ï¿½ï¿½Ò«ï¿½...
+    	echo ¥¿¦b¤U¸ü¼Ò«¬...
     	curl -L -o "taide/taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/nctu6/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1-Q4_K_M.gguf?download=true
-		echo ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½I
+		echo ¤U¸ü§¹²¦¡I
 	) else (
-		echo ï¿½Nï¿½ï¿½ï¿½|ï¿½Uï¿½ï¿½ï¿½Ó¼Ò«ï¿½
+		echo ±N¤£·|¤U¸ü¸Ó¼Ò«¬
 	)
 	if "%1"=="quick" (
 		exit
@@ -88,39 +88,39 @@ if "%option%"=="1" (
 ) else if "%option%"=="3" (
     :function3
     set userInput=n
-    set /p "userInput=ï¿½nï¿½Uï¿½ï¿½ Stable diffusion 2 ï¿½Ò«ï¿½ï¿½ï¿½ (ï¿½ï¿½ 4.8GB)ï¿½H [y/N] "
+    set /p "userInput=­n¤U¸ü Stable diffusion 2 ¼Ò«¬¶Ü (¬ù 4.8GB)¡H [y/N] "
     
     if /I "!userInput!"=="y" (
-    	echo ï¿½ï¿½ï¿½bï¿½Uï¿½ï¿½ï¿½Ò«ï¿½...
+    	echo ¥¿¦b¤U¸ü¼Ò«¬...
 		set python_exe=..\packages\%python_folder%\python.exe
 
 		if exist "!python_exe!" (
 			!python_exe! ../../src/executor/image_generation/download_model.py
 		) else (
-			echo ï¿½Ê¤Ö¸ï¿½ï¿½É®ï¿½ !python_exe! ï¿½Aï¿½Ð¥ï¿½ï¿½ï¿½ï¿½æ§¹ï¿½ï¿½build.batï¿½I
+			echo ¯Ê¤Ö¸ÓÀÉ®× !python_exe! ¡A½Ð¥ý°õ¦æ§¹²¦build.bat¡I
 		)
-		echo ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½I
+		echo ¤U¸ü§¹²¦¡I
 	) else (
-		echo ï¿½Nï¿½ï¿½ï¿½|ï¿½Uï¿½ï¿½ï¿½Ó¼Ò«ï¿½
+		echo ±N¤£·|¤U¸ü¸Ó¼Ò«¬
 	)
     pause
 ) else if "%option%"=="4" (
     :function4
 	set userInput=n
-    set /p "userInput=ï¿½nï¿½Uï¿½ï¿½ infgrad/stella-base-zh ï¿½Ò«ï¿½ï¿½ï¿½ (ï¿½ï¿½ 196.5MB)ï¿½H [y/N] "
+    set /p "userInput=­n¤U¸ü infgrad/stella-base-zh ¼Ò«¬¶Ü (¬ù 196.5MB)¡H [y/N] "
     
     if /I "!userInput!"=="y" (
-    	echo ï¿½ï¿½ï¿½bï¿½Uï¿½ï¿½ï¿½Ò«ï¿½...
+    	echo ¥¿¦b¤U¸ü¼Ò«¬...
 		set python_exe=..\packages\%python_folder%\python.exe
 
 		if exist "!python_exe!" (
 			!python_exe! ../../src/executor/docqa/download_model.py
 		) else (
-			echo ï¿½Ê¤Ö¸ï¿½ï¿½É®ï¿½ !python_exe! ï¿½Aï¿½Ð¥ï¿½ï¿½ï¿½ï¿½æ§¹ï¿½ï¿½build.batï¿½I
+			echo ¯Ê¤Ö¸ÓÀÉ®× !python_exe! ¡A½Ð¥ý°õ¦æ§¹²¦build.bat¡I
 		)
-		echo ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½I
+		echo ¤U¸ü§¹²¦¡I
 	) else (
-		echo ï¿½Nï¿½ï¿½ï¿½|ï¿½Uï¿½ï¿½ï¿½Ó¼Ò«ï¿½
+		echo ±N¤£·|¤U¸ü¸Ó¼Ò«¬
 	)
     pause
 ) else if "%option%"=="5" (
