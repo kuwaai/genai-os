@@ -24,9 +24,8 @@ IF %ERRORLEVEL% EQU 0 (
     if /I "!response!"=="Y" (
         git stash
         git pull
-		pushd
         call src\switch.bat
-		popd
+        cd "%~dp0"
         call build.bat
     ) else (
         echo Update skipped.
