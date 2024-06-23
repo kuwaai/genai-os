@@ -1,6 +1,8 @@
 import logging
 import whisper_s2t
 import functools
+from whisper_s2t.backends.ctranslate2.hf_utils import download_model as whisper_s2t_download_model
+from huggingface_hub.constants import HUGGINGFACE_HUB_CACHE
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +18,12 @@ class WhisperS2tTranscriber:
     def load_model(self, name = None, backend = "CTranslate2", enable_word_ts:bool=False):
         if name is None: return None
         model_params = {"asr_options":{"word_timestamps": True}} if enable_word_ts else {}
+        model_path = whisper_s2t_download_model(
+            name,
+            cache_dir=HUGGINGFACE_HUB_CACHE,
+        )
         model = whisper_s2t.load_model(
-            model_identifier=name,
+            model_identifier=model_path,
             backend=backend,
             **model_params
         )
