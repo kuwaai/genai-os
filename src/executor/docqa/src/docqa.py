@@ -169,7 +169,7 @@ class DocQa:
 
     
     task = ''
-    if final_user_input is None:
+    if final_user_input == "":
       question = i18n.t("docqa.summary_question") 
       llm_question = None
       task = 'summary'
