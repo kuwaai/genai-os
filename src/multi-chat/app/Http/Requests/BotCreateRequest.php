@@ -13,7 +13,7 @@ class BotCreateRequest extends FormRequest
         return [
             'llm_name' => ['string'],
             'modelfile' => ['string', 'nullable'],
-            'react_btn' => ['string', 'nullable'],
+            'react_btn' => ['nullable'],
             'bot_name' => ['string'],
             'bot_describe' => ['string', 'nullable']
         ];
