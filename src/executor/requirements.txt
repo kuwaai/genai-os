@@ -12,9 +12,12 @@ llama-cpp-python
 
 # Huggingface
 torch
+torchvision
 transformers
 accelerate
 sentencepiece
+pillow
+requests
 
 # ollama
 jinja2

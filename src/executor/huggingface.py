@@ -7,13 +7,17 @@ import re
 import json
 import pprint
 import argparse
+import functools
+import mimetypes
+import requests
 from inspect import cleandoc
 from typing import Optional
 from threading import Thread
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from transformers import (
     AutoTokenizer, AutoModelForCausalLM, AutoProcessor,
-    GenerationConfig, TextIteratorStreamer,
+    PaliGemmaForConditionalGeneration, LlavaForConditionalGeneration, LlavaNextForConditionalGeneration,
+    PretrainedConfig, GenerationConfig, TextIteratorStreamer,
     StoppingCriteria, StoppingCriteriaList,
 )
 
@@ -24,8 +28,26 @@ from kuwa.executor.util import (
     read_config,
     merge_config,
 )
+from transformers.utils import is_vision_available
+
+if is_vision_available():
+    from PIL import Image
 
 logger = logging.getLogger(__name__)
+
+VLM_TYPE_MAPPING = {
+    "llava": LlavaForConditionalGeneration,
+    "llava_next": LlavaNextForConditionalGeneration,
+    "paligemma": PaliGemmaForConditionalGeneration,
+    "phi3_v": AutoModelForCausalLM,
+}
+
+VLM_IMAGE_TOKEN = {
+    "llava": "<image>",
+    "llava_next": "<image>",
+    "paligemma": "<image>",
+    "phi3_v": "<|image_1|>",
+}
 
 class CustomStoppingCriteria(StoppingCriteria):
     def __init__(self):
@@ -90,6 +112,7 @@ class HuggingfaceExecutor(LLMExecutor):
         model_group.add_argument('--load_8bits', action="store_true", default=False, help='Load the model in 8bit.')
         model_group.add_argument('--trust_remote_code', action="store_true", default=False, help='Trust the remote code when loading model.')
         model_group.add_argument('--tokenizer', type=str, default=None, help='Override the tokenizer.')
+        model_group.add_argument('--processor', type=str, default=None, help='Override the processor.')
         
         # Generation Options
         gen_group = parser.add_argument_group('Generation Options', 'GenerationConfig for Transformers. See https://huggingface.co/docs/transformers/en/main_classes/text_generation#transformers.GenerationConfig')
@@ -102,26 +125,39 @@ class HuggingfaceExecutor(LLMExecutor):
 
         self.model_path = self.args.model_path
         self.tokenizer_name = self.args.tokenizer if self.args.tokenizer is not None else self.model_path
+        self.processor_name = self.args.processor if self.args.processor is not None else self.model_path
         if not self.model_path:
             raise Exception("You need to configure a local or huggingface model path!")
 
         self.load_8bits = self.args.load_8bits
         self.trust_remote_code = self.args.trust_remote_code
         model_dtype = {}
+        model_class = AutoModelForCausalLM
         if self.load_8bits:
             model_dtype["load_in_8bit"] = True
         else:
             model_dtype["torch_dtype"] = torch.float16 
 
-        self.model = AutoModelForCausalLM.from_pretrained(
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name,
+            trust_remote_code=self.trust_remote_code,
+        )
+        self.processor = None
+        processor = AutoProcessor.from_pretrained(
+            self.processor_name,
+            trust_remote_code=self.trust_remote_code,
+        )
+        if type(processor) != type(self.tokenizer):
+            self.processor = processor
+        model_config = PretrainedConfig.from_pretrained(self.model_path)
+        self.model_type = model_config.model_type
+        model_class = VLM_TYPE_MAPPING.get(self.model_type, AutoModelForCausalLM)
+        logger.debug(f"Model type; Model class: {self.model_type}; {model_class}")
+        self.model = model_class.from_pretrained(
             self.model_path,
             device_map="auto",
             trust_remote_code=self.trust_remote_code,
             **model_dtype
-        )
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.tokenizer_name,
-            trust_remote_code=self.trust_remote_code,
         )
         self.system_prompt = self.args.system_prompt
         self.no_system_prompt = self.args.no_system_prompt
@@ -167,9 +203,30 @@ class HuggingfaceExecutor(LLMExecutor):
             self.tokenizer.chat_template = chat_template_backup
 
         return prompt
+    
+    @functools.cache
+    def get_supported_image_mime(self):
+        ext2mime = lambda ext: mimetypes.guess_type(f"a{ext}")[0]
+        exts = Image.registered_extensions()
+        exts = {ex for ex, f in exts.items() if f in Image.OPEN}
+        mimes = {ext2mime(ex) for ex in exts} - {None}
+        return mimes
+
+    def fetch_and_process_image(self, url: str, prompt:str = ""):
+        if self.processor == None: return None
+        
+        images = []
+        if requests.head(url, allow_redirects=True).headers["content-type"] in self.get_supported_image_mime():
+            images = [Image.open(requests.get(url, stream=True, allow_redirects=True).raw)]
+        logger.info("Image fetched. Processing...")
+        result = self.processor(prompt, images, return_tensors="pt")
+        logger.info("Image processed.")
+        return result
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
-
+        if self.processor != None:
+            url, history = extract_last_url(history)
+            modelfile.before_prompt = f"{VLM_IMAGE_TOKEN.get(self.model_type, '')}{modelfile.before_prompt}"
         # Apply modelfile
         system_prompt = modelfile.override_system_prompt or self.system_prompt
         prepended_messages = rectify_chat_history(modelfile.messages)
@@ -191,12 +248,15 @@ class HuggingfaceExecutor(LLMExecutor):
                 logging.debug("Aborted since the input message exceeds the limit.")
                 yield "[Sorry, The input message is too long!]"
                 return
-
-        logging.debug(f"Prompt: {self.tokenizer.decode(prompt_embedding[0])}")
-        prompt_embedding = prompt_embedding.to(self.model.device)
+        prompt = self.tokenizer.decode(prompt_embedding[0])
+        logging.debug(f"Prompt: {prompt}")
+        model_inputs = {"input_ids": prompt_embedding}
+        if self.processor != None:
+            model_inputs = self.fetch_and_process_image(url=url, prompt=prompt)
+        model_inputs = model_inputs.to(self.model.device)
         streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, timeout=self.timeout)
         thread = Thread(target=self.model.generate, kwargs=dict(
-            input_ids=prompt_embedding,
+            **model_inputs,
             streamer=streamer,
             generation_config=GenerationConfig(
                 **merge_config(self.generation_config, modelfile.parameters["llm_"])
@@ -227,6 +287,8 @@ class HuggingfaceExecutor(LLMExecutor):
                     buffer = buffer[output_length:]
             
             if len(buffer) > 0:
+                for word in self.stop_words:
+                    buffer = buffer.replace(word, "")
                 if self.in_debug(): print(end=buffer, flush=True)
                 yield buffer # Flush buffer
 
