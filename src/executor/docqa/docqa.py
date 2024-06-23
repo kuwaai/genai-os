@@ -127,8 +127,7 @@ class DocQaExecutor(LLMExecutor):
             if self.pre_built_db == None:
                 url, history = extract_last_url(history)
                 if url == None : raise NoUrlException(i18n.t('docqa.no_url_exception'))
-            
-                history = [{"role": "user", "content": None}] + history[1:]
+
             self.proc = True
             response_generator = self.docqa.process(
                 urls=[url],
