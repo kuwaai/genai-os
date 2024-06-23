@@ -306,6 +306,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		set target_access_code=!EXECUTOR_ACCESS_CODE!
 	)
 	REM Save configuration to run.bat
+	echo call ..\..\src\variables.bat
 	echo set "EXECUTOR_ACCESS_CODE="doc_qa --exclude=web_qa""> run.bat
 
 	REM webQA
@@ -337,6 +338,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 	echo popd>> run.bat
 ) else (
 	REM Save configuration to run.bat
+	echo call ..\..\src\variables.bat
 	echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!> run.bat
 
 	REM model:config

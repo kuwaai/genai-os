@@ -16,32 +16,34 @@ REM Define an array to store the model types and their names
 set "names[1]=Whisper Model"
 set "names[2]=TAIDE Model"
 set "names[3]=Stable Diffusion Model"
+set "names[4]=Diarization Model"
 REM set "names[4]=Embedding Model"
 REM set "names[5]=GGUF Model"
 REM set "names[6]=HuggingFace Model"
-set "names[4]=Exit"
+set "names[5]=Exit"
 
 REM Define an array to store the model types and their names
 set "models[1]=whisper"
 set "models[2]=taide"
 set "models[3]=stable_diffusion"
+set "models[4]=diarization"
 REM set "models[4]=embedding_model"
 REM set "models[5]=gguf_model"
 REM set "models[6]=huggingface"
-set "models[4]=exit"
+set "models[5]=exit"
 :main
 cls
 echo Now in: "%cd%"
 
 echo Download Model:
 
-for %%a in (1 2 3 4) do (
+for %%a in (1 2 3 4 5) do (
     echo %%a - !names[%%a]!
-    if "%%a" == "3" (
+    if "%%a" == "4" (
         echo ------------
     )
 )
-set /p "option=Enter the option number (1-4): "
+set /p "option=Enter the option number (1-5): "
 if not defined models[%option%] (
     echo Invalid option. Please try again.
     goto main
@@ -102,6 +104,25 @@ if "%option%"=="1" (
 	)
     pause
 ) else if "%option%"=="4" (
+    :function4
+    set userInput=n
+    set /p "userInput=要下載 pyannote/speaker-diarization-3.1 模型嗎 (約 31.2MB)？ [y/N] "
+    
+    if /I "!userInput!"=="y" (
+    	echo 正在下載模型...
+		set python_exe=..\packages\%python_folder%\python.exe
+
+		if exist "!python_exe!" (
+			!python_exe! ../../src/executor/speech_recognition/download_model.py --diarizer
+		) else (
+			echo 缺少該檔案 !python_exe! ，請先執行完畢build.bat！
+		)
+		echo 下載完畢！
+	) else (
+		echo 將不會下載該模型
+	)
+    pause
+) else if "%option%"=="5" (
     exit
 )
 
