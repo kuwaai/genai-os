@@ -158,6 +158,9 @@ REM Make shortcut from nginx_folder/html to ../public
 echo Creating shortcut from %nginx_folder%/html to ../public...
 mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
 
+REM Download Embedding Model
+python ../src/executor/docqa/download_model.py
+
 REM Download required pip packages
 pip install --default-timeout=1000 -r .\src\requirements.txt
 pushd "..\src\kernel"
