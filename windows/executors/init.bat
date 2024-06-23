@@ -396,7 +396,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 			set command=!command! "--model" "!model_name!"
 		)
 		if "taide"=="!current_folder!" (
-			set command=!command! "--system_prompt" "ä½ æ˜¯ä¸€å€‹ä¾†è‡ªå°ç£çš„AIåŠ©ç†ï¼Œä½ çš„åå­—æ˜¯ TAIDEï¼Œæ¨‚æ–¼ä»¥å°ç£äººçš„ç«‹å ´å¹«åŠ©ä½¿ç”¨è€…ï¼Œæœƒç”¨ç¹é«”ä¸­æ–‡å›ç­”å•é¡Œã€‚"
+			set command=!command! "--system_prompt" "§A¬O¤@­Ó¨Ó¦Û¥xÆWªºAI§U²z¡A§Aªº¦W¦r¬O TAIDE¡A¼Ö©ó¥H¥xÆW¤Hªº¥ß³õÀ°§U¨Ï¥ÎªÌ¡A·|¥ÎÁcÅé¤¤¤å¦^µª°İÃD¡C"
 		)
 	) else (
 		set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
