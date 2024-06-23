@@ -6,7 +6,7 @@ The Kuwa Speech Recognizer can generate transcripts by uploading audio files and
 
 ### Hardware Requirements
 
-The default Whisper Medium model is used with the speaker labeling function enabled. If running on a GPU, the VRAM consumption is as shown in the table below.
+The default Whisper Medium model is used with the speaker labeling function disabled. If running on a GPU, the VRAM consumption is as shown in the table below.
 
 | Model Name                                                | Number of Parameters | VRAM Required | Relative Recognition Speed |
 | :-------------------------------------------------------- | :------------------- | :------------ | :------------------------- |
