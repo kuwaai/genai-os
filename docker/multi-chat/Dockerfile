@@ -63,6 +63,7 @@ RUN apt-get install -y netcat-openbsd wget &&\
 COPY --from=build /app /app
 COPY docker/multi-chat/app.env /app/.env
 COPY docker/multi-chat/add-executor.php /app/add-executor.php
+COPY docker/multi-chat/icons/ /app/default-icons/
 
 # Copy the scripts
 COPY docker/multi-chat/docker-entrypoint docker/multi-chat/multi-chat /usr/local/bin/

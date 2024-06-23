@@ -8,6 +8,7 @@ services:
       CUSTOM_EXECUTOR_PATH: ./speech_recognition/main.py
       EXECUTOR_ACCESS_CODE: whisper
       EXECUTOR_NAME: Whisper
+      EXECUTOR_IMAGE: whisper.png # Refer to docker/multi-chat/icons/
       HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
       - kernel
