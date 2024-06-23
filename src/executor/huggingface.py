@@ -216,7 +216,8 @@ class HuggingfaceExecutor(LLMExecutor):
         if self.processor == None: return None
         
         images = []
-        if requests.head(url, allow_redirects=True).headers["content-type"] in self.get_supported_image_mime():
+        if (url is not None and url != "") and\
+            requests.head(url, allow_redirects=True).headers["content-type"] in self.get_supported_image_mime():
             images = [Image.open(requests.get(url, stream=True, allow_redirects=True).raw)]
         logger.info("Image fetched. Processing...")
         result = self.processor(prompt, images, return_tensors="pt")
@@ -224,9 +225,10 @@ class HuggingfaceExecutor(LLMExecutor):
         return result
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
-        if self.processor != None:
+        if self.processor is not None:
             url, history = extract_last_url(history)
-            modelfile.before_prompt = f"{VLM_IMAGE_TOKEN.get(self.model_type, '')}{modelfile.before_prompt}"
+            if url is not None:
+                modelfile.before_prompt = f"{VLM_IMAGE_TOKEN.get(self.model_type, '')}{modelfile.before_prompt}"
         # Apply modelfile
         system_prompt = modelfile.override_system_prompt or self.system_prompt
         prepended_messages = rectify_chat_history(modelfile.messages)
@@ -250,10 +252,9 @@ class HuggingfaceExecutor(LLMExecutor):
                 return
         prompt = self.tokenizer.decode(prompt_embedding[0])
         logging.debug(f"Prompt: {prompt}")
-        model_inputs = {"input_ids": prompt_embedding}
-        if self.processor != None:
-            model_inputs = self.fetch_and_process_image(url=url, prompt=prompt)
-        model_inputs = model_inputs.to(self.model.device)
+        model_inputs = {"input_ids": prompt_embedding.to(self.model.device)}
+        if self.processor != None and url is not None:
+            model_inputs = self.fetch_and_process_image(url=url, prompt=prompt).to(self.model.device)
         streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, timeout=self.timeout)
         thread = Thread(target=self.model.generate, kwargs=dict(
             **model_inputs,
