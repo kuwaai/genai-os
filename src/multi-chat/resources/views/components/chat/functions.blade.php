@@ -137,11 +137,7 @@ fill="currentFill" />
                     $msg = translate_msg($msg.innerHTML);
                 }else{
                     // Render user uploaded image
-                    if (isImgUrl($msg.innerHTML)){
-                        url = $msg.innerHTML
-                        $msg.innerHTML = `![${url}](${url})`
-                    }
-                    $msg = $msg.innerHTML;
+                    $msg = replaceImageUrlWithMarkdown($msg.innerHTML)
                 }
                 $(this).html(marked.parse(DOMPurify.sanitize($('<div>').html($msg).text())));
                 $(node).find('div.text-sm.space-y-3.break-words table').addClass('table-auto');
@@ -220,10 +216,18 @@ xmlns="http://www.w3.org/2000/svg">
         var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
         return urlPattern.test(url);
     }
-    function isImgUrl(url) {
-        if(typeof url !== 'string') return false;
-        imgPattern = /\.(jpeg|jpg|gif|png|avif|webp|bmp|ico|cur|tiff|tif)$/
-        return isValidURL && imgPattern.test(url);
+    
+    function replaceImageUrlWithMarkdown(input) {
+        const regex = /(https?:\/\/[^\s]*\.(?:jpeg|jpg|gif|png|avif|webp|bmp|ico|cur|tiff|tif))/g;
+        const matches = [...new Set(input.match(regex))];
+
+        if (matches) {
+            for (const match of matches) {
+                input = input.replaceAll(match, `![${match}](${match})`);
+            }
+        }
+
+        return input;
     }
 
     function scrollToRef(refNumber) {
