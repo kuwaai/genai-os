@@ -27,7 +27,7 @@ if "!database_name:~-4!"==".zip" (
     set "target_folder=%tmp%\kuwa-vdb-!database_name!-%RANDOM%"
     echo Extracting !TARGET! to !target_folder!...
     powershell Expand-Archive -Path '!TARGET!' -DestinationPath '!target_folder!'
-    for /d %%i in (!target_folder!\*) do set "TARGET=%%i"
+    for /d %%i in ("!target_folder!\*") do set "TARGET=%%i"
 )
 
 set valid_database=T
