@@ -25,6 +25,7 @@ IF %ERRORLEVEL% EQU 0 (
         git stash
         git pull
         call src\switch.bat
+        cd "%~dp0"
         call build.bat
     ) else (
         echo Update skipped.
