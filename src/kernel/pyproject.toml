@@ -7,7 +7,7 @@ packages = ["src/kuwa"]
 
 [project]
 name = "kuwa-kernel"
-version = "0.3.0"
+version = "0.3.1"
 authors = [
   { name="Drift", email="taifu9920923@gmail.com" },
   { name="Yung-Hsiang Hu", email="iftnt1999@gmail.com" },
