@@ -15,6 +15,8 @@ RUN pip install --no-cache-dir -r ./docqa/requirements.txt
 COPY src/executor/speech_recognition/requirements.txt ./speech_recognition/requirements.txt
 RUN apt-get install -y ffmpeg &&\
     pip install --no-cache-dir -r ./speech_recognition/requirements.txt
+COPY src/executor/image_generation/requirements.txt ./image_generation/requirements.txt
+RUN pip install --no-cache-dir -r ./image_generation/requirements.txt
 
 # Install the executor framework
 COPY src/executor/. .
