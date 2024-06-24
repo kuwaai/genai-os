@@ -34,6 +34,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint
 ENV EXECUTOR_TYPE="debug"
 ENV EXECUTOR_ACCESS_CODE="debug"
 ENV EXECUTOR_NAME="Debug Executor"
+ENV EXECUTOR_IMAGE=""
 ENV ADD_EXECUTOR_TO_MULTI_CHAT="true"
 ENV KERNEL_URL="http://kernel:9000/"
 ENTRYPOINT [ "docker-entrypoint" ]

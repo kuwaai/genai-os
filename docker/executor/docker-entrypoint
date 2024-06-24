@@ -19,7 +19,7 @@ add_executor(){
         else
             image=""
         fi
-        multi-chat-client add-executor "${access_code}" "${name}" "${image}" || true
+        multi-chat-client add-executor "${access_code}" "${name}" ${image} || true
     done
 }
 
