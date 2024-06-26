@@ -12,7 +12,12 @@ services:
     depends_on:
       - kernel
       - multi-chat
-    command: ["--model_path", "taide/Llama3-TAIDE-LX-8B-Chat-Alpha1", "--stop", "<|eot_id|>", "--visible_gpu", "0,1"]
+    command: [
+      "--model_path", "taide/Llama3-TAIDE-LX-8B-Chat-Alpha1",
+      "--stop", "<|eot_id|>",
+      "",
+      "--visible_gpu", "0"
+    ]
     restart: unless-stopped
     volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
     deploy:

@@ -61,6 +61,21 @@ for %%I in ("%url_gitbash%") do set "filename_gitbash=%%~nxI"
 set "gitbash_folder=%filename_gitbash:~0,-7%"
 for /f "tokens=2 delims=-" %%v in ("%filename_gitbash%") do set "version_gitbash=%%v"
 
+REM Variables for FFmpeg
+set "url_ffmpeg=https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.1-essentials_build.zip"
+for %%I in ("%url_ffmpeg%") do set "filename_ffmpeg=%%~nxI"
+set "ffmpeg_folder=%filename_ffmpeg:~0,-4%"
+for /f "tokens=2 delims=-" %%v in ("%filename_ffmpeg%") do set "version_ffmpeg=%%v"
+
+REM Environment variables for model cache
+set "KUWA_CACHE=%~dp0..\cache"
+mkdir "%KUWA_CACHE%"
+set "TORCH_HOME=%KUWA_CACHE%\torch"
+set "CSIDL_LOCAL_APPDATA=%KUWA_CACHE%\appdata"
+set "HF_HOME=%KUWA_CACHE%\huggingface"
+set "CACHE_PATH_ENV=%KUWA_CACHE%\selenium"
+set "PYANNOTE_CACHE=%KUWA_CACHE%\torch\pyannote"
+
 REM Prepare migration file
 mkdir src\conf 2>nul
 if not exist "src\conf\migrations.txt" (
@@ -71,7 +86,7 @@ REM Prepare packages folder
 mkdir packages 2>nul
 
 REM init env
-set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\bin;%PATH%"
+set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\bin;%~dp0..\packages\%ffmpeg_folder%\bin;%PATH%"
 
 if "%1"=="no_migrate" (
     echo Skipped migration

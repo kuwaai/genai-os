@@ -66,6 +66,7 @@ if "taide"=="!current_folder!" (
 	set "EXECUTOR_NAME=dbQA"
 	set "EXECUTOR_ACCESS_CODE=db_qa"
 	set "worker_path=docqa.py"
+	set "working_dir=..\..\..\src\executor\docqa\"
 	for /d %%i in (*) do (
 		echo "Folder detected, using founded folder."
 		for %%F in ("%%~pi.") do (
@@ -102,6 +103,7 @@ if "taide"=="!current_folder!" (
 	set "EXECUTOR_NAME=SearchQA"
 	set "EXECUTOR_ACCESS_CODE=search_qa"
 	set "worker_path=searchqa.py"
+	set "working_dir=..\..\..\src\executor\docqa\"
 
 	REM not quick
 	if "%1" == "quick" (
@@ -129,6 +131,30 @@ if "taide"=="!current_folder!" (
 	if "%1" == "quick" (
 		exit /b 0
 	)
+) else if "whisper" == "!current_folder!" (
+	echo Init Whisper
+	echo EXECUTOR_TYPE=custom
+	echo EXECUTOR_NAME=Whisper
+	echo EXECUTOR_ACCESS_CODE=whisper
+	
+	set "EXECUTOR_TYPE=custom"
+	set "EXECUTOR_NAME=Whisper"
+	set "EXECUTOR_ACCESS_CODE=whisper"
+	set "worker_path=main.py"
+	set "working_dir=..\..\..\src\executor\speech_recognition\"
+	goto continue
+) else if "painter" == "!current_folder!" (
+	echo Init Painter
+	echo EXECUTOR_TYPE=custom
+	echo EXECUTOR_NAME=Painter
+	echo EXECUTOR_ACCESS_CODE=painter
+	
+	set "EXECUTOR_TYPE=custom"
+	set "EXECUTOR_NAME=Painter"
+	set "EXECUTOR_ACCESS_CODE=painter"
+	set "worker_path=main.py"
+	set "working_dir=..\..\..\src\executor\image_generation\"
+	goto continue
 )
 
 REM Check if the current folder matches any option
@@ -306,7 +332,10 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		set target_access_code=!EXECUTOR_ACCESS_CODE!
 	)
 	REM Save configuration to run.bat
-	echo set "EXECUTOR_ACCESS_CODE="doc_qa --exclude=web_qa""> run.bat
+	echo pushd %cd%> run.bat
+	echo call ..\..\src\variables.bat>> run.bat
+	echo popd>> run.bat
+	echo set "EXECUTOR_ACCESS_CODE="doc_qa --exclude=web_qa"">> run.bat
 
 	REM webQA
 	echo pushd ..\..\..\src\multi-chat>>run.bat
@@ -337,7 +366,10 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 	echo popd>> run.bat
 ) else (
 	REM Save configuration to run.bat
-	echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!> run.bat
+	echo pushd %cd%> run.bat
+	echo call ..\..\src\variables.bat>> run.bat
+	echo popd>> run.bat
+	echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!>> run.bat
 
 	REM model:config
 	echo pushd ..\..\..\src\multi-chat>>run.bat
@@ -364,7 +396,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 			set command=!command! "--model" "!model_name!"
 		)
 		if "taide"=="!current_folder!" (
-			set command=!command! "--system_prompt" "ä½ æ˜¯ä¸€å€‹ä¾†è‡ªå°ç£çš„AIåŠ©ç†ï¼Œä½ çš„åå­—æ˜¯ TAIDEï¼Œæ¨‚æ–¼ä»¥å°ç£äººçš„ç«‹å ´å¹«åŠ©ä½¿ç”¨è€…ï¼Œæœƒç”¨ç¹é«”ä¸­æ–‡å›žç­”å•é¡Œã€‚"
+			set command=!command! "--system_prompt" "§A¬O¤@­Ó¨Ó¦Û¥xÆWªºAI§U²z¡A§Aªº¦W¦r¬O TAIDE¡A¼Ö©ó¥H¥xÆW¤Hªº¥ß³õÀ°§U¨Ï¥ÎªÌ¡A·|¥ÎÁcÅé¤¤¤å¦^µª°ÝÃD¡C"
 		)
 	) else (
 		set command=start /b "" "python" !worker_path! "--access_code" "!EXECUTOR_ACCESS_CODE!"
@@ -384,15 +416,12 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 	IF DEFINED arguments (
 		set command=!command! !arguments!
 	)
-	set is_docqa=F
-	if "dbQA" == "!current_folder!" set is_docqa=T
-	if "SearchQA" == "!current_folder!" set is_docqa=T
-	if "!is_docqa!" == "T" (
-		echo pushd ..\..\..\src\executor\docqa\>> run.bat
-		echo !command!>> run.bat
+	IF DEFINED working_dir (
+		echo pushd !working_dir!>> run.bat
+	)
+	echo !command!>> run.bat
+	IF DEFINED working_dir (
 		echo popd>> run.bat
-	) else (
-		echo !command!>> run.bat
 	)
 )
 echo Configuration saved to run.bat

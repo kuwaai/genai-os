@@ -15,6 +15,8 @@ RUN pip install --no-cache-dir -r ./docqa/requirements.txt
 COPY src/executor/speech_recognition/requirements.txt ./speech_recognition/requirements.txt
 RUN apt-get install -y ffmpeg &&\
     pip install --no-cache-dir -r ./speech_recognition/requirements.txt
+COPY src/executor/image_generation/requirements.txt ./image_generation/requirements.txt
+RUN pip install --no-cache-dir -r ./image_generation/requirements.txt
 
 # Install the executor framework
 COPY src/executor/. .
@@ -32,6 +34,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint
 ENV EXECUTOR_TYPE="debug"
 ENV EXECUTOR_ACCESS_CODE="debug"
 ENV EXECUTOR_NAME="Debug Executor"
+ENV EXECUTOR_IMAGE=""
 ENV ADD_EXECUTOR_TO_MULTI_CHAT="true"
 ENV KERNEL_URL="http://kernel:9000/"
 ENTRYPOINT [ "docker-entrypoint" ]

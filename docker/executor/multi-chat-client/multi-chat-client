@@ -7,12 +7,15 @@ from urllib.parse import urlencode
 from fcgi_client import PHPFPMClient
 from retry import retry
 
-def add_executor(client:PHPFPMClient, access_code:str, name:str, verbose:bool=False):
-
-    request_data = urlencode({
+def add_executor(client:PHPFPMClient, access_code:str, name:str, image:str=None, verbose:bool=False):
+    request = {
         "access_code": access_code,
-        "name": name
-    }).encode("utf-8")
+        "name": name,
+    }
+    if image is not None:
+        request["image"] = image
+
+    request_data = urlencode(request).encode("utf-8")
     params = {
         "CONTENT_TYPE": "application/x-www-form-urlencoded",
         "CONTENT_LENGTH": len(request_data)
@@ -43,6 +46,7 @@ if __name__ == '__main__':
     add_model_parser = subparsers.add_parser('add-executor', help='Add a new executor')
     add_model_parser.add_argument("access_code", type=str, help="The access code of the executor")
     add_model_parser.add_argument("name", type=str, help="The name of the executor")
+    add_model_parser.add_argument("--image", type=str, default=None, help="The image of the executor. Reference to the directory \"/app/default-icons/\" on multi-chat.")
     args = parser.parse_args()
 
     if args.verbose:
@@ -52,7 +56,7 @@ if __name__ == '__main__':
 
     client = PHPFPMClient(args.target, args.timeout)
     if args.subcommand == "add-executor":
-        add_executor(client, args.access_code, args.name)
+        add_executor(client, access_code=args.access_code, name=args.name, image=args.image)
     else:
         logging.error(f"Sub-command {args.subcommand} is not supported.")
         sys.exit(1)

@@ -1,0 +1,1 @@
+call ..\init.bat %1

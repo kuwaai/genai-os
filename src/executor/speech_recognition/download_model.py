@@ -4,15 +4,16 @@ import logging
 import argparse
 import whisper_s2t
 import pyannote.audio
+from whisper_s2t.backends.ctranslate2.hf_utils import download_model as whisper_s2t_download_model
+from huggingface_hub.constants import HUGGINGFACE_HUB_CACHE
 
 logger = logging.getLogger(__name__)
 
 def load_whisper(model_name = "medium", model_backend = "CTranslate2"):
     logger.info(f"Downloading model {model_name}")
-    _ = whisper_s2t.load_model(
-        model_identifier=model_name,
-        backend=model_backend,
-        compute_type="float32"
+    _ = whisper_s2t_download_model(
+        model_name,
+        cache_dir=HUGGINGFACE_HUB_CACHE,
     )
     logger.info(f"Done")
 

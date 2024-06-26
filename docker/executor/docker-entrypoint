@@ -8,11 +8,18 @@ add_executor(){
     fi
     IFS=';' read -r -a access_code_arr <<< "${EXECUTOR_ACCESS_CODE}"
     IFS=';' read -r -a name_arr <<< "${EXECUTOR_NAME}"
+    IFS=';' read -r -a image_arr <<< "${EXECUTOR_IMAGE}"
     for idx in "${!name_arr[@]}"
     do
         access_code="${access_code_arr[idx]}"
         name="${name_arr[idx]}"
-        multi-chat-client add-executor "${access_code}" "${name}" || true
+        if [ "$idx" -lt "${#image_arr[@]}" ]
+        then
+            image="--image=${image_arr[idx]}"
+        else
+            image=""
+        fi
+        multi-chat-client add-executor "${access_code}" "${name}" ${image} || true
     done
 }
 

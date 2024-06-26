@@ -1,0 +1,30 @@
+services:
+  painter-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      CUSTOM_EXECUTOR_PATH: ./image_generation/main.py
+      EXECUTOR_ACCESS_CODE: painter
+      EXECUTOR_NAME: Painter
+      EXECUTOR_IMAGE: painter.png # Refer to docker/multi-chat/icons/
+      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+    depends_on:
+      - kernel
+      - multi-chat
+    command: []
+    volumes: [
+      "~/.cache/huggingface:/root/.cache/huggingface",
+    ]
+    extra_hosts:
+      - "localhost:host-gateway"
+    restart: unless-stopped
+    networks: ["backend", "frontend"]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #       - driver: nvidia
+    #         device_ids: ['0']
+    #         capabilities: [gpu]

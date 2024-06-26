@@ -93,7 +93,8 @@ class StableDiffusionExecutor(LLMExecutor):
             pipe = self.load_pipe(task=Task.TEXT2IMG, model_name=model_name)
 
         assert pipe is not None
-        pipe = pipe.to("cuda")
+        if torch.cuda.is_available():
+            pipe = pipe.to("cuda")
         result_image = pipe(prompt, **generation_conf).images[0]
 
         yield "![{}]({})".format(prompt, image_to_data_url(result_image))

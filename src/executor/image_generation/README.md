@@ -1,6 +1,6 @@
-# Kuwa Image Generator
+# Kuwa Painter
 
-The Kuwa Image Generator can generate an image from a text input.
+The Kuwa Painter can generate an image from a text input.
 
 ## Known Issues and Limitations
 ### Hardware Requirements
@@ -20,7 +20,7 @@ The default model uses stable-diffusion-2. The VRAM consumption when running on 
 
 ## How to Use
 
-1. Refer to the startup methods of the Executors for each version of Kuwa to start the Executor for the Kuwa Image Generator.
+1. Refer to the startup methods of the Executors for each version of Kuwa to start the Executor for the Kuwa Painter.
     1. For the Windows version, please refer to the directory `windows/executors/painter`.
     2. For the Docker version, please refer to the configuration file `docker/compose/painter.yaml`.
 
@@ -31,7 +31,7 @@ The default model uses stable-diffusion-2. The VRAM consumption when running on 
 
 ## Configuration Guide
 
-The Kuwa Image Generator can adjust the generation parameters through the Modelfile in the frontend Store. Commonly used adjustable parameters are as follows:
+The Kuwa Painter can adjust the generation parameters through the Modelfile in the frontend Store. Commonly used adjustable parameters are as follows:
 
 ```dockerfile
 PARAMETER model_name stabilityai/stable-diffusion-xl-base-1.0
@@ -42,7 +42,7 @@ PARAMETER imgen_guidance_scale 0.0 #A higher guidance scale value encourages the
 PARAMETER imgen_denoising_end 0.8 # What % of steps to be run on each experts (80/20) (SDXL only)
 ```
 
-In addition, the Kuwa Image Generator can also be configured via dynamic command line parameters. The configurable parameters are as follows:
+In addition, the Kuwa Painter can also be configured via dynamic command line parameters. The configurable parameters are as follows:
 
 ```
 Model Options:

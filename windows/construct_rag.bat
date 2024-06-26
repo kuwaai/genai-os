@@ -1,4 +1,4 @@
-::@echo off
+@echo off
 if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* & exit)
 setlocal EnableDelayedExpansion
 
@@ -26,8 +26,8 @@ if "!database_name:~-4!"==".zip" (
     set "database_name=!database_name:~0,-4!"
     set "target_folder=%tmp%\kuwa-vdb-!database_name!-%RANDOM%"
     echo Extracting !TARGET! to !target_folder!...
-    powershell Expand-Archive -Path "!TARGET!" -DestinationPath "!target_folder!"
-    for /d %%i in (!target_folder!\*) do set "TARGET=%%i"
+    powershell Expand-Archive -Path '!TARGET!' -DestinationPath '!target_folder!'
+    for /d %%i in ("!target_folder!\*") do set "TARGET=%%i"
 )
 
 set valid_database=T
@@ -35,7 +35,7 @@ if not exist "!TARGET!\config.json" set valid_database=F
 if not exist "!TARGET!\index.faiss" set valid_database=F
 if not exist "!TARGET!\index.pkl" set valid_database=F
 if "!valid_database!" == "T" (
-    xcopy /E !TARGET!\*.* ".\executors\!database_name!\db\"
+    xcopy /E "!TARGET!\*.*" ".\executors\!database_name!\db\"
 ) else (
     pushd "%~dp0\..\src\toolchain"
     python construct_vector_db.py "!TARGET!" "..\..\windows\executors\!database_name!\db"

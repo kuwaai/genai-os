@@ -1,6 +1,7 @@
 # Whisper
 # pywhispercpp
 whisper-s2t
+huggingface_hub
 
 # Speaker separation
 # scipy

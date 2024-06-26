@@ -8,6 +8,7 @@ services:
       EXECUTOR_TYPE: chatgpt
       EXECUTOR_ACCESS_CODE: chatgpt
       EXECUTOR_NAME: ChatGPT
+      EXECUTOR_IMAGE: chatgpt.png # Refer to docker/multi-chat/icons/
     depends_on:
       - kernel
     command: ["--temperature", "0.2"]
