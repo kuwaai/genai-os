@@ -327,6 +327,7 @@ class RoomController extends Controller
 
             $files = File::files($storagePath);
 
+            /* Disable auto delete files
             if (count($files) > 5) {
                 usort($files, function ($a, $b) {
                     return filectime($a) - filectime($b);
@@ -336,7 +337,7 @@ class RoomController extends Controller
                     $oldestFile = array_shift($files);
                     File::delete($storagePath . '/' . $oldestFile->getFilename());
                 }
-            }
+            }*/
             //Create a chat and send that url into the llm
             $url = url('storage/' . $directory . '/' . rawurlencode($fileName));
             return $url;
@@ -403,7 +404,7 @@ class RoomController extends Controller
             }
             $input = $request->input('input');
             $next_input = '';
-            $url = rawurldecode($this->upload_file($request));
+            $url = $this->upload_file($request);
             if ($url) {
                 $next_input = $input;
                 $input = $url;
@@ -515,7 +516,7 @@ class RoomController extends Controller
         $roomId = $request->input('room_id');
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
-        $url = rawurldecode($this->upload_file($request));
+        $url = $this->upload_file($request);
         $next_input = '';
         if ($url) {
             $next_input = $input;

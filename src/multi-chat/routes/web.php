@@ -173,10 +173,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::get('/translate/{history_id}', [ChatController::class, 'translate'])->name('room.translate');
 
                         Route::get('/chain', [ChatController::class, 'update_chain'])->name('room.chain');
-
-                        Route::middleware(AdminMiddleware::class . ':Room_update_upload_file')
-                            ->post('/upload', [ChatController::class, 'upload'])
-                            ->name('room.upload');
                         Route::post('/feedback', [ChatController::class, 'feedback'])->name('room.feedback');
                         Route::get('/{room_id}', [RoomController::class, 'main'])->name('room.chat');
                     })

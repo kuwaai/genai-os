@@ -146,9 +146,22 @@ fill="currentFill" />
                 $(node).find('div.text-sm.space-y-3.break-words ul').addClass('list-inside list-disc');
                 $(node).find('div.text-sm.space-y-3.break-words ol').addClass('list-inside list-decimal');
                 $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
-                $(node).find('div.text-sm.space-y-3.break-words a').addClass(
-                    'text-blue-700 hover:text-blue-900').prop('target',
-                    '_blank');
+                var links = $(node).find('div.text-sm.space-y-3.break-words a');
+
+                // Add classes and set target attribute
+                links.addClass('text-blue-700 hover:text-blue-900').prop('target', '_blank');
+
+                // Iterate over each <a> element
+                links.each(function() {
+                    // Get the current href attribute
+                    var originalUrl = $(this).attr('href');
+
+                    // Decode the URL
+                    var decodedUrl = decodeURIComponent(originalUrl);
+
+                    // Set the decoded URL back to the href attribute
+                    $(this).text(decodedUrl);
+                });
                 $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
                     $(this).html(this.textContent)
                     hljs.highlightElement($(this)[0]);
