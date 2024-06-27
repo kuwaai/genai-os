@@ -224,9 +224,9 @@
                             <button class="h-full w-full flex flex-col items-center justify-start">
                                 <img id="llm_img" class="rounded-full mx-auto bg-black" width="50px" height="50px"
                                     src="{{ $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                                <p class="text-sm line-clamp-4">{{ $bot->name }}</p>
+                                <p class="text-sm line-clamp-2">{{ $bot->name }}</p>
                                 @if ($bot->description)
-                                    <p class="text-gray-500 dark:text-gray-300 line-clamp-4 max-w-full text-xs">
+                                    <p class="text-gray-500 dark:text-gray-300 line-clamp-1 max-w-full text-xs">
                                         {{ $bot->description }}</p>
                                 @endif
                                 <input name="llm[]" value="{{ $bot->id }}" style="display:none;">
