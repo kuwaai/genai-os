@@ -55,9 +55,6 @@
             <x-store.modal.create-bot :result="$result" />
             @endif
             <x-store.modal.bot-detail />
-            <div class="my-8">
-                <x-logo />
-            </div>
             @if (request()->user()->hasPerm('Store_update_create_bot'))
             <div class="mb-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
                 data-modal-toggle="create-bot-modal">
