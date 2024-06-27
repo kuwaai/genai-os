@@ -156,11 +156,14 @@ class BotController extends Controller
         $model = LLMs::where('name', '=', $request->input('llm_name'))->first();
 
         if (!$model) {
-            // Add custom error message
             $validator->errors()->add('llm_name', 'The selected model does not exist.');
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $model_id = $model->id;
+        if (!$request->user()->hasPerm('model_' . $model_id)) {
+            $validator->errors()->add('llm_name', 'You do not have permission to use this model.');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
         if ($model_id) {
             $bot = new Bots();
             $config = [];
@@ -206,6 +209,10 @@ class BotController extends Controller
                     return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 404, [], JSON_UNESCAPED_UNICODE);
                 }
                 $model_id = $model->id;
+                if (!$user->hasPerm('model_' . $model_id)) {
+                    $validator->errors()->add('llm_name', 'You do not have permission to use this model.');
+                    return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 404, [], JSON_UNESCAPED_UNICODE);
+                }
                 $this->create($request);
                 return response()->json(['status' => 'success', 'last_bot_id' => session('last_bot_id')], 200, [], JSON_UNESCAPED_UNICODE);
             } else {
