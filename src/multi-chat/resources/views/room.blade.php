@@ -218,7 +218,7 @@
                     class="mx-4 mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
                     @foreach ($result as $bot)
                         <form method="post"
-                            class="text-black dark:text-white w-[135px] h-[135px] p-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-500 dark:hover:bg-gray-600 transition"
+                            class="text-black dark:text-white w-[135px] h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
                             action="{{ route('room.new') }}">
                             @csrf
                             <button class="h-full w-full flex flex-col items-center justify-start">
