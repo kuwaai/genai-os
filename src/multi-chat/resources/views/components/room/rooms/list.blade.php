@@ -49,7 +49,7 @@
             @if ($DC)
                 @foreach ($DC->sortbydesc('created_at') as $dc)
                     <div
-                        class="m-2 overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
+                        class="overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
                         <a class="menu-btn text-gray-700 dark:text-white w-full flex justify-center items-center overflow-hidden {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                             href="{{ route('room.chat', $dc->id) }}">
                             <p
@@ -58,7 +58,7 @@
                         </a>
                         <button
                             data-dropdown-toggle="{{ $extra }}chat_{{ $channel }}_dropdown_{{ $dc->id }}"
-                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-3 text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
+                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-1 text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" class="icon-md">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -139,7 +139,7 @@
             <div class="overflow-y-auto scrollbar flex-1">
                 @foreach ($DC->sortbydesc('created_at')  as $dc)
                     <div
-                        class="m-2 overflow-hidden border border-black dark:border-white border-1 rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
+                        class="overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
                         <a class="menu-btn text-gray-700 dark:text-white w-full flex justify-center items-center overflow-hidden {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                             href="{{ route('room.chat', $dc->id) }}">
                             <p
@@ -148,7 +148,7 @@
                         </a>
                         <button
                             data-dropdown-toggle="{{ $extra }}chat_{{ $channel }}_dropdown_{{ $dc->id }}"
-                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-3 text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
+                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-1 text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" class="icon-md">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
