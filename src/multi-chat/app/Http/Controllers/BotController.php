@@ -173,7 +173,9 @@ class BotController extends Controller
             $config = json_encode($config);
             $bot->fill(['name' => $request->input('bot_name'), 'type' => 'prompt', 'visibility' => 1, 'description' => $request->input('bot_describe'), 'owner_id' => $request->user()->id, 'model_id' => $model_id, 'config' => $config]);
             $bot->save();
-            return redirect()->route('store.home')->with('last_bot_id', $bot->id);
+            return redirect()
+                ->route('store.home')
+                ->with('last_bot_id', $bot->id);
         }
 
         return redirect()->route('store.home');
@@ -197,7 +199,7 @@ class BotController extends Controller
                     return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 422, [], JSON_UNESCAPED_UNICODE);
                 }
                 $model = LLMs::where('name', '=', $request->input('llm_name'))->first();
-        
+
                 if (!$model) {
                     // Add custom error message
                     $validator->errors()->add('llm_name', 'The selected model does not exist.');
@@ -205,7 +207,7 @@ class BotController extends Controller
                 }
                 $model_id = $model->id;
                 $this->create($request);
-                return response()->json(['status' => 'success', 'last_bot_id'=>session('last_bot_id')], 200, [], JSON_UNESCAPED_UNICODE);
+                return response()->json(['status' => 'success', 'last_bot_id' => session('last_bot_id')], 200, [], JSON_UNESCAPED_UNICODE);
             } else {
                 $errorResponse = [
                     'status' => 'error',
@@ -227,34 +229,38 @@ class BotController extends Controller
     public function update(Request $request)
     {
         $bot = Bots::findOrFail($request->input('id'));
-        $model_id = LLMs::where('name', '=', $request->input('llm_name'))->first()->id;
+        if ($request->user()->id == $bot->owner_id || $request->user()->hasPerm('tab_Manage')) {
+            $model_id = LLMs::where('name', '=', $request->input('llm_name'))->first()->id;
 
-        $config = [];
-        if ($request->input('modelfile')) {
-            $config['modelfile'] = $this->modelfile_parse($request->input('modelfile'));
+            $config = [];
+            if ($request->input('modelfile')) {
+                $config['modelfile'] = $this->modelfile_parse($request->input('modelfile'));
+            }
+            if ($request->input('react_btn')) {
+                $config['react_btn'] = $request->input('react_btn');
+            }
+            $config = json_encode($config);
+            if ($request->input('bot_name')) {
+                $bot->name = $request->input('bot_name');
+            }
+            if ($request->input('bot_describe')) {
+                $bot->description = $request->input('bot_describe');
+            }
+            $bot->model_id = $model_id;
+            $bot->config = $config;
+            $bot->save();
         }
-        if ($request->input('react_btn')) {
-            $config['react_btn'] = $request->input('react_btn');
-        }
-        $config = json_encode($config);
-        if ($request->input('bot_name')) {
-            $bot->name = $request->input('bot_name');
-        }
-        if ($request->input('bot_describe')) {
-            $bot->description = $request->input('bot_describe');
-        }
-        $bot->model_id = $model_id;
-        $bot->config = $config;
-        $bot->save();
         return redirect()->route('store.home');
     }
     public function delete(Request $request): RedirectResponse
     {
         $bot = Bots::findOrFail($request->input('id'));
-        if ($bot->image) {
-            Storage::delete($bot->image);
+        if ($request->user()->id == $bot->owner_id || $request->user()->hasPerm('tab_Manage')) {
+            if ($bot->image) {
+                Storage::delete($bot->image);
+            }
+            $bot->delete();
         }
-        $bot->delete();
         return Redirect::route('store.home');
     }
 }
