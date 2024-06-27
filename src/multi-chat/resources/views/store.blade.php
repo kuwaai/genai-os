@@ -56,7 +56,7 @@
             @endif
             <x-store.modal.bot-detail />
             @if (request()->user()->hasPerm('Store_update_create_bot'))
-            <div class="mb-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
+            <div class="pt-4 my-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
                 data-modal-toggle="create-bot-modal">
                 <button
                     class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-200 transition duration-300 rounded-lg overflow-hidden">

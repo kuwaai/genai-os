@@ -213,9 +213,8 @@
                     aria-controls="chatlist_drawer">
                     <i class="fas fa-bars"></i>
                 </button>
-                <p class="text-black dark:text-white mx-auto my-5">{{ __('room.model.hint') }}</p>
                 <div
-                    class="mx-4 mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
+                    class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
                     @foreach ($result as $bot)
                         <form method="post"
                             class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
