@@ -32,7 +32,7 @@
 @endphp
 @foreach ($DCs as $DC)
     @if (array_diff(explode(',', $DC->first()->identifier), $result->pluck('id')->toArray()) == [])
-        <div class="mb-2 border border-black dark:border-white border-1 rounded-lg">
+        <div class="mb-2 rounded-lg">
             @if (request()->user()->hasPerm('Room_update_new_chat'))
                 <form method="post" action="{{ route('room.new') }}">
                     @csrf
@@ -105,8 +105,7 @@
             @endif
             <div class="max-h-[182px] overflow-y-auto scrollbar">
                 @foreach ($DC->sortbydesc('created_at') as $dc)
-                    <div
-                        class="m-2 overflow-hidden border border-black dark:border-white border-1 rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
+                    <div class="overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
                         <a class="menu-btn flex-1 text-gray-700 dark:text-white w-full flex justify-center items-center overflow-hidden {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                             href="{{ route('room.chat', $dc->id) }}">
                             <p
@@ -115,7 +114,7 @@
                         </a>
 
                         <button data-dropdown-toggle="{{ $extra }}chat_dropdown_{{ $dc->id }}"
-                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} p-3 text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
+                            class="{{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} text-black hover:text-black dark:text-white dark:hover:text-gray-300"><svg
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" class="icon-md">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
