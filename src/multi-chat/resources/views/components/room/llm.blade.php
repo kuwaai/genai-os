@@ -28,7 +28,7 @@
     }, 'identifier');
 
     // Get the final result and group by the ordered identifiers
-    $DCs = $DCs->get()->groupBy('identifier');
+    $DCs = $DCs->get()->groupBy('identifier')->reverse();
 @endphp
 @foreach ($DCs as $DC)
     @if (array_diff(explode(',', $DC->first()->identifier), $result->pluck('id')->toArray()) == [])
