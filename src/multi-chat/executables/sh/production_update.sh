@@ -8,6 +8,7 @@ rm public/storage
 php artisan storage:link
 npm install
 npm ci --no-audit --no-progress
+npm audit fix
 php artisan route:cache
 php artisan view:cache
 php artisan optimize
