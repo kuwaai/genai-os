@@ -6,9 +6,10 @@ php artisan db:seed --class=InitSeeder --force
 php artisan migrate --force
 rm public/storage
 php artisan storage:link
-npm install
-npm ci --no-audit --no-progress
 npm audit fix
+npm install
+npm audit fix
+npm ci --no-audit --no-progress
 php artisan route:cache
 php artisan view:cache
 php artisan optimize
