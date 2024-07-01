@@ -75,4 +75,6 @@ return [
     'hint.failed' => 'Fehlgeschlagen',
     "hint.copied"=> "Kopiert",
     'hint.processing' => 'Nachricht wird verarbeitet... Bitte warten...',
+    'hint.upload_file_too_large' => 'Die Datei überschreitet die maximale Dateigröße.',
+    'hint.upload_not_allowed_ext' => 'Dieser Dateityp ist nicht zulässig.',
 ];

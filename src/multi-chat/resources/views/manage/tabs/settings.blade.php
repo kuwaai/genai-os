@@ -79,6 +79,22 @@
                         value="{{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value }}" autocomplete="off" />
                 </div>
             </div>
+            <div>
+                <x-input-label for="upload_max_size_mb" :value="__('manage.label.upload_max_size_mb')" />
+                <div class="flex items-center">
+                    <x-text-input id="upload_max_size_mb" name="upload_max_size_mb" type="text"
+                        class="mr-2 mb-1 block w-full"
+                        value="{{ \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value }}" autocomplete="off" />
+                </div>
+            </div>
+            <div>
+                <x-input-label for="upload_allowed_extensions" :value="__('manage.label.upload_allowed_extensions')" />
+                <div class="flex items-center">
+                    <x-text-input id="upload_allowed_extensions" name="upload_allowed_extensions" type="text"
+                        class="mr-2 mb-1 block w-full"
+                        value="{{ \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value }}" autocomplete="off" />
+                </div>
+            </div>
 
             <div class="flex items-center gap-4">
                 @if (session('last_action') === 'update' && session('status') === 'success')

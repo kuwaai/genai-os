@@ -105,6 +105,8 @@ return [
     'label.safety_guard_API' => 'Emplacement de la connexion au filtre de sécurité',
     'label.anno' => 'Annonce système',
     'label.tos' => 'Conditions d\'utilisation',
+    'label.upload_max_size_mb' => 'Taille maximale de fichier (Mo)',
+    'label.upload_allowed_extensions' => 'Extensions de fichiers autorisées',
 
     //Permissions
     'perm.Room_update_import_chat' => 'Importer la conversation',

@@ -105,6 +105,8 @@ return [
      'label.safety_guard_API' => '安全过滤连线位置',
      'label.anno' => '系统公告',
      'label.tos' => '服务条款',
+     'label.upload_max_size_mb' => '上传文件大小限制(MB)',
+     'label.upload_allowed_extensions' => '允许上传的文件扩展名',
 
      //Permissions
      'perm.Room_update_import_chat' => '汇入对话',

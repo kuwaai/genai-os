@@ -316,33 +316,40 @@ class RoomController extends Controller
 
     public function upload_file(Request $request)
     {
-        if ($request->file()) {
-            $request->validate([
-                'file' => 'max:20480',
-            ]);
-            $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
-            $storagePath = public_path('storage/' . $directory); // Adjusted path
-            $fileName = time() . '_' . $request->file->getClientOriginalName();
-            $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
-
-            $files = File::files($storagePath);
-
-            /* Disable auto delete files
-            if (count($files) > 5) {
-                usort($files, function ($a, $b) {
-                    return filectime($a) - filectime($b);
-                });
-
-                while (count($files) > 5) {
-                    $oldestFile = array_shift($files);
-                    File::delete($storagePath . '/' . $oldestFile->getFilename());
-                }
-            }*/
-            //Create a chat and send that url into the llm
-            $url = url('storage/' . $directory . '/' . rawurlencode($fileName));
-            return $url;
+        if (!$request->file()) {
+            return null;
         }
-        return null;
+        $max_file_size_mb = \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
+        $allowed_file_exts = \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
+        $max_file_size_mb = $max_file_size_mb ?: '20480';
+        $allowed_file_exts = $allowed_file_exts ?: 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpg,bmp,png,zip';
+        $request->validate([
+            'file' => [
+                'max:' . $max_file_size_mb,
+                'mimes:' . $allowed_file_exts
+            ]
+        ]);
+        $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
+        $storagePath = public_path('storage/' . $directory); // Adjusted path
+        $fileName = time() . '_' . $request->file->getClientOriginalName();
+        $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
+
+        $files = File::files($storagePath);
+
+        /* Disable auto delete files
+        if (count($files) > 5) {
+            usort($files, function ($a, $b) {
+                return filectime($a) - filectime($b);
+            });
+
+            while (count($files) > 5) {
+                $oldestFile = array_shift($files);
+                File::delete($storagePath . '/' . $oldestFile->getFilename());
+            }
+        }*/
+        //Create a chat and send that url into the llm
+        $url = url('storage/' . $directory . '/' . rawurlencode($fileName));
+        return $url;
     }
     function getWebPageTitle($url)
     {

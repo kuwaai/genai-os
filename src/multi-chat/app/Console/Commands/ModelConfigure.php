@@ -13,7 +13,7 @@ use DB;
 
 class ModelConfigure extends Command
 {
-    protected $signature = 'model:config {access_code} {name} {--image=} {--do_not_create_bot}';
+    protected $signature = 'model:config {access_code} {name} {--image=} {--do_not_create_bot} {--force}';
     protected $description = 'Quickly configure a model for admins';
     public function __construct()
     {
@@ -24,11 +24,12 @@ class ModelConfigure extends Command
     {
         $accessCode = $this->argument('access_code');
         $name = $this->argument('name');
+        $force = !!$this->option('do_not_create_bot');
 
         try {
-            if (LLMs::where('access_code', '=', $accessCode)->exists()) {
+            if (!$force && LLMs::where('access_code', '=', $accessCode)->exists()) {
                 $this->error('The access code already exists! Aborted.');
-            } elseif (LLMs::where('name', '=', $name)->exists()) {
+            } elseif (!$force && LLMs::where('name', '=', $name)->exists()) {
                 $this->error('The name already exists! Aborted.');
             } else {
                 DB::beginTransaction(); // Start a database transaction
@@ -40,8 +41,11 @@ class ModelConfigure extends Command
                     $path = 'public/images/' . $imageName;
                     Storage::put($path, $fileContents);
                 }
-
-                $model = new LLMs();
+                
+                $model = LLMs::where('access_code', '=', $accessCode);
+                if (!$model->exists()){
+                    $model = new LLMs();
+                }
                 $model->fill(['name' => $name, 'access_code' => $accessCode, 'image' => $path]);
                 $model->save();
                 $perm = new Permissions();

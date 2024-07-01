@@ -75,4 +75,6 @@ return [
     'hint.failed' => '실패',
     "hint.copied"=> "복사되었습니다.",
     'hint.processing' => '메시지를 처리하는 중입니다... 잠시 기다려 주세요...',
+    'hint.upload_file_too_large' => '파일 크기가 제한을 초과했습니다.',
+    'hint.upload_not_allowed_ext' => '업로드가 허용되지 않은 파일 형식입니다.',
 ];

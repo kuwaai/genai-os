@@ -78,6 +78,16 @@ class SystemController extends Controller
         $model = SystemSetting::where('key', 'warning_footer')->first();
         $model->value = $request->input('warning_footer') ?? '';
         $model->save();
+        
+        $model = SystemSetting::where('key', 'upload_max_size_mb')->first();
+        $model->value = strval(intval($request->input('upload_max_size_mb') ?? '0'));
+        $model->save();
+
+        $model = SystemSetting::where('key', 'upload_allowed_extensions')->first();
+        $upload_allowed_extensions = array_filter(explode(',', $request->input('upload_allowed_extensions') ?? ''));
+        $upload_allowed_extensions = array_map(fn($v): string => trim($v), $upload_allowed_extensions);
+        $model->value = implode(',', $upload_allowed_extensions);
+        $model->save();
 
         $model = SystemSetting::where('key', 'tos')->first();
         $oldtos = $model->value;

@@ -75,4 +75,6 @@ return [
     'hint.failed' => '失败',
     "hint.copied"=> "已复制",
     'hint.processing' => '信息处理中...请稍后...',
+    'hint.upload_file_too_large' => '文件大小超过限制',
+    'hint.upload_not_allowed_ext' => '不允许上传的文件类型',
 ];

@@ -104,6 +104,8 @@ return [
     'label.safety_guard_API' => '안전 가드 API 연결 위치',
     'label.anno' => '시스템 공지',
     'label.tos' => '이용 약관',
+    'label.upload_max_size_mb' => '업로드 파일 크기 제한(MB)',
+    'label.upload_allowed_extensions' => '허용된 업로드 파일 확장자',
 
     //Permissions
     'perm.Room_update_import_chat' => '대화 가져오기',

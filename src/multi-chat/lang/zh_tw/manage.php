@@ -105,6 +105,8 @@ return [
     'label.safety_guard_API' => '安全過濾連線位置',
     'label.anno' => '系統公告',
     'label.tos' => '服務條款',
+    'label.upload_max_size_mb' => '上傳檔案大小限制(MB)',
+    'label.upload_allowed_extensions' => '允許上傳的副檔名',
 
     //Permissions
     'perm.Room_update_import_chat' => '匯入對話',

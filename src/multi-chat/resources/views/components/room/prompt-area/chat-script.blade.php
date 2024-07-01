@@ -11,6 +11,45 @@
     </div>
 </div>
 
+@php
+    use Illuminate\Support\Facades\Cache;
+    use App\Models\SystemSetting;
+
+    $upload_max_size_mb = SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
+    $upload_allowed_extensions = SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
+@endphp
+<script>
+    function uploadcheck() {
+        if (!$("#upload")[0].files || $("#upload")[0].files[0].length <= 0) return;
+
+        showErrorMsg = (msg) =>{
+            $("#error_alert >span").text(msg)
+            $("#error_alert").fadeIn();
+            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+            $("#upload").val("");
+            $("#attachment").hide();
+            setTimeout(function() {
+                $("#error_alert").fadeOut();
+                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+            }, 3000);
+        }
+
+        if ($("#upload")[0].files[0].size > {{ $upload_max_size_mb * (2 ** 20)}}){
+            showErrorMsg("{{ __('chat.hint.upload_file_too_large') }}");
+            return;
+        } 
+        
+        if (!$("#upload")[0].files[0].name.match(/\.({{ str_replace(',', '|', $upload_allowed_extensions) }})$/)){
+            showErrorMsg("{{ __('chat.hint.upload_not_allowed_ext') }}");
+            return;
+        
+        }
+        $("#attachment").show();
+        $("#attachment button").text($("#upload")[0].files[0].name)
+        $('#prompt_area').submit()
+    }
+</script>
+
 <script>
     if ($("#chat_input")) {
         $("#chat_input").prop("readonly", true)

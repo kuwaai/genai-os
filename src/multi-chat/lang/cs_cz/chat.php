@@ -75,4 +75,6 @@ return [
     'hint.failed' => 'Neúspěšné',
     "hint.copied"=> "Zkopírováno",
     'hint.processing' => 'Zpráva se zpracovává... Čekejte...',
+    'hint.upload_file_too_large' => 'Velikost souboru překračuje limit',
+    'hint.upload_not_allowed_ext' => 'Tento typ souboru není povolen k nahrání',
 ];

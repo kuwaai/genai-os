@@ -104,6 +104,8 @@ return [
     'label.safety_guard_API' => 'Adresa bezpečnostní brány',
     'label.anno' => 'Oznámení systému',
     'label.tos' => 'Podmínky služby',
+    'label.upload_max_size_mb' => 'Maximální velikost nahrávaného souboru (MB)',
+    'label.upload_allowed_extensions' => 'Povolené přípony souborů',
 
     //Permissions
     'perm.Room_update_import_chat' => 'Importovat konverzaci',

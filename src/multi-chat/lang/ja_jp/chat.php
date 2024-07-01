@@ -75,4 +75,6 @@ return [
     'hint.failed' => '失敗',
     'hint.copied' => 'コピーしました',
     'hint.processing' => 'メッセージを処理しています...しばらくお待ちください...',
+    'hint.upload_file_too_large' => 'ファイルサイズが上限を超えています',
+    'hint.upload_not_allowed_ext' => 'アップロードが許可されていないファイルの種類です',
 ];

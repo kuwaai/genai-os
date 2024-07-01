@@ -105,6 +105,8 @@ return [
     'label.safety_guard_API' => 'Sicherheitsfilter Verbindungsposition',
     'label.anno' => 'Systemmitteilungen',
     'label.tos' => 'Nutzungsbedingungen',
+    'label.upload_max_size_mb' => 'Maximale Upload-Dateigröße (MB)',
+    'label.upload_allowed_extensions' => 'Erlaubte Dateierweiterungen',
 
     // Berechtigungen
     'perm.Room_update_import_chat' => 'Chat importieren',

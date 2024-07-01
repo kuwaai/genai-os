@@ -75,4 +75,6 @@ return [
     'hint.failed' => '失敗',
     "hint.copied"=> "已複製",
     'hint.processing' => '訊息處理中...請稍後...',
+    'hint.upload_file_too_large' => '檔案大小超過限制',
+    'hint.upload_not_allowed_ext' => '未允許上傳的檔案類型',
 ];

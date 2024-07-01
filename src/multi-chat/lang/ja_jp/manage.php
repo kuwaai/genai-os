@@ -104,6 +104,8 @@ return [
     'label.safety_guard_API' => '安全保護API接続先',
     'label.anno' => 'システム公告',
     'label.tos' => '利用規約',
+    'label.upload_max_size_mb' => 'アップロードファイルサイズ制限(MB)',
+    'label.upload_allowed_extensions' => '許可されるアップロードファイル拡張子',
 
     //Permissions
     'perm.Room_update_import_chat' => 'チャットのインポート',

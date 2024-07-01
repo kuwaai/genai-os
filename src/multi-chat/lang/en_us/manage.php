@@ -104,6 +104,8 @@ return [
     'label.safety_guard_API' => 'Safety Guard Location',
     'label.anno' => 'Announcement',
     'label.tos' => 'Terms of Service',
+    'label.upload_max_size_mb' => 'Maximum upload file size (MB)',
+    'label.upload_allowed_extensions' => 'Allowed file extensions',
 
     //Permissions
     'perm.Room_update_import_chat' => 'Import Chat',

@@ -39,25 +39,6 @@
             })
         }
 
-        function uploadcheck() {
-            if ($("#upload")[0].files && $("#upload")[0].files.length > 0 && $("#upload")[0].files[0].size <= 20 * 1024 *
-                1024) {
-                $("#attachment").show();
-                $("#attachment button").text($("#upload")[0].files[0].name)
-                $('#prompt_area').submit()
-            } else if ($("#upload")[0].files.length > 0) {
-                $("#error_alert >span").text("{{ __('File Too Large') }}")
-                $("#error_alert").fadeIn();
-                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                $("#upload").val("");
-                $("#attachment").hide();
-                setTimeout(function() {
-                    $("#error_alert").fadeOut();
-                    $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-                }, 3000);
-            }
-        }
-
         function adjustTextareaRows(obj) {
             obj = $(obj)
             if (obj.length) {
