@@ -22,17 +22,18 @@
                 $bots = App\Models\Bots::Join('llms', function ($join) {
                     $join->on('llms.id', '=', 'bots.model_id');
                 })
-            ->wherein(
-                'bots.model_id',
-                DB::table('group_permissions')
-                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
-                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
-                    ->where('group_permissions.group_id', Auth::user()->group_id)
-                    ->where('permissions.name', 'like', 'model_%')
-                    ->get()
-                    ->pluck('model_id'),
-            )
-            ->where('llms.enabled', '=', true)
+                    ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
+                    ->wherein(
+                        'bots.model_id',
+                        DB::table('group_permissions')
+                            ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                            ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                            ->where('group_permissions.group_id', Auth::user()->group_id)
+                            ->where('permissions.name', 'like', 'model_%')
+                            ->get()
+                            ->pluck('model_id'),
+                    )
+                    ->where('llms.enabled', '=', true)
                     ->select(
                         'llms.*',
                         'bots.*',
@@ -40,46 +41,84 @@
                         DB::raw('COALESCE(bots.config, llms.config) as config'),
                         DB::raw('COALESCE(bots.image, llms.image) as image'),
                         'llms.name as llm_name',
+                        'users.group_id',
                     )
                     ->get();
-            if (!request()->user()->hasPerm('Store_read_any_modelfile')){
-                $bots = $bots->map(function ($item) {
-                    if ($item->owner_id != Auth::user()->id) {
-                        $item->config = '';
-                    }
-                    return $item;
-                });
-            }
+                if (!request()->user()->hasPerm('Store_read_any_modelfile')) {
+                    $bots = $bots->map(function ($item) {
+                        if ($item->owner_id != Auth::user()->id) {
+                            $item->config = '';
+                        }
+                        return $item;
+                    });
+                }
             @endphp
-            @if (request()->user()->hasPerm('Store_update_create_bot'))
-            <x-store.modal.create-bot :result="$result" />
+            @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
+                <x-store.modal.create-bot :result="$result" />
             @endif
             <x-store.modal.bot-detail />
-            @if (request()->user()->hasPerm('Store_update_create_bot'))
-            <div class="pt-4 my-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
-                data-modal-toggle="create-bot-modal">
-                <button
-                    class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-200 transition duration-300 rounded-lg overflow-hidden">
-                    <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
-                </button>
-            </div>
-            @endif
-            @if (request()->user()->hasPerm('Store_read_discover_system_bots') && $bots->where('visibility', '=', 0)->count() > 0)
-                <div class="w-full p-4">
-                    <p class="mb-2">{{ __('store.label.offical_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('visibility', '=', 0)" :extra="'offical_bots-'" />
+            @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
+                <div class="pt-4 my-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
+                    data-modal-toggle="create-bot-modal">
+                    <button
+                        class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-300 transition duration-300 rounded-lg overflow-hidden">
+                        <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
+                    </button>
                 </div>
             @endif
-            @if (request()->user()->hasPerm('Store_read_discover_my_bots') && $bots->where('owner_id', '=', Auth::user()->id)->count() > 0)
+            @php
+                function sortBots($bots)
+                {
+                    $userId = request()->user()->id;
+                    // Filter and sort the bots owned by the current user
+                    $userBots = $bots
+                        ->filter(function ($bot) use ($userId) {
+                            return $bot->owner_id == $userId;
+                        })
+                        ->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
+
+                    // Filter the remaining bots and randomize them
+                    $otherBots = $bots
+                        ->filter(function ($bot) use ($userId) {
+                            return $bot->owner_id != $userId;
+                        })
+                        ->sortByDesc('created_at');
+
+                    // Merge the sorted user bots with the randomized other bots
+                    return $userBots->merge($otherBots)->values();
+                }
+                $system_bots = sortBots($bots->where('visibility', '=', 0));
+                $community_bots = sortBots($bots->where('visibility', '=', 1));
+                $group_bots = $bots->where('visibility', '=', 2);
+                if (!request()->user()->hasPerm('tab_Manage')) {
+                    $group_bots = $group_bots->where('group_id', '=', request()->user()->group_id);
+                }
+                $group_bots = sortBots($group_bots);
+                $private_bots = sortBots($bots->where('visibility', '=', 3));
+            @endphp
+
+            @if (request()->user()->hasPerm('Store_read_discover_system_bots') && $system_bots->count() > 0)
                 <div class="w-full p-4">
-                    <p class="mb-2">{{ __('store.label.my_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('owner_id', '=', Auth::user()->id)" :extra="'my_bots-'" />
+                    <p class="mb-2">{{ __('store.label.system_bots') }}</p>
+                    <x-store.bot-showcase :bots="$system_bots" :extra="'offical_bots-'" />
                 </div>
             @endif
-            @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $bots->where('owner_id', '!=', Auth::user()->id)->where('visibility', '=', 1)->count() > 0)
+            @if (request()->user()->hasPerm('Store_read_discover_private_bots') && $private_bots->count() > 0)
+                <div class="w-full p-4">
+                    <p class="mb-2">{{ __('store.label.private') }}</p>
+                    <x-store.bot-showcase :bots="$private_bots" :extra="'my_bots-'" />
+                </div>
+            @endif
+            @if (request()->user()->hasPerm('Store_read_discover_group_bots') && $group_bots->count() > 0)
+                <div class="w-full p-4">
+                    <p class="mb-2">{{ __('store.label.groups_bots') }}</p>
+                    <x-store.bot-showcase :bots="$group_bots" :extra="'group_bots-'" />
+                </div>
+            @endif
+            @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $community_bots->count() > 0)
                 <div class="w-full p-4">
                     <p class="mb-2">{{ __('store.label.community_bots') }}</p>
-                    <x-store.bot-showcase :bots="$bots->where('owner_id', '!=', Auth::user()->id)->where('visibility', '=', 1)" :extra="'community_bots-'" />
+                    <x-store.bot-showcase :bots="$community_bots" :extra="'community_bots-'" />
                 </div>
             @endif
         </div>

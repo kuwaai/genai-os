@@ -3,7 +3,7 @@
 <div id="create-bot-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
     data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-2xl max-h-full">
+    <div class="relative w-full max-w-4xl max-h-full">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <button type="button"
@@ -18,8 +18,9 @@
                 <span class="sr-only">Close modal</span>
             </button>
             <!-- Modal header -->
-            <div class="px-6 py-4 border-b rounded-t dark:border-gray-600">
-                <h3 class="text-base font-semibold text-gray-900 lg:text-xl dark:text-white">
+            <div class="pl-6 pr-12 py-2 border-b rounded-t dark:border-gray-600 flex">
+                <h3
+                    class="text-xl font-semibold text-gray-900 lg:text-xl dark:text-white mr-auto text-center leading-loose">
                     {{ __('store.button.create') }}
                 </h3>
             </div>
@@ -27,76 +28,166 @@
             <form method="post" action="{{ route('store.create') }}" class="p-6" id="create_room"
                 onsubmit="return checkForm2()">
                 @csrf
-                <ul class="flex flex-wrap -mx-3 mb-2 items-center">
-                    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                        <div class="flex flex-wrap -mx-3">
-                            <div class="w-full px-3 flex flex-col items-center">
-                                <label for="llm_name">
-                                    <img id="llm_img" class="rounded-full m-auto bg-black" width="50px"
-                                        height="50px" src="/{{ config('app.LLM_DEFAULT_IMG') }}">
-                                </label>
+                <ul class="flex flex-wrap flex-col -mx-3 mb-2 items-center">
+                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        <div class="w-full md:w-1/3 mb-2">
+                            <div class="w-full px-3 mb-5">
+                                <div class="flex flex-wrap -mx-3">
+                                    <div class="w-full px-3 flex flex-col items-center">
+                                        <label for="llm_name">
+                                            <img id="llm_img" class="rounded-full m-auto bg-black" width="50px"
+                                                height="50px" src="/{{ config('app.LLM_DEFAULT_IMG') }}">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full flex justify-center items-center">
+                                <button id="visibility" data-dropdown-toggle="visibility_list"
+                                    class="text-white rounded-l-lg bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-blue-300 font-medium text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700"
+                                    type="button">{{ __('store.button.community') }}</button>
+                                <div id="visibility_list"
+                                    class="z-10 hidden bg-gray-200 divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-800 dark:divide-gray-600">
+                                    <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200"
+                                        aria-labelledby="visibility">
+                                        @php
+                                            $radioItems = [];
+                                            if (request()->user()->hasPerm('tab_Manage')) {
+                                                $radioItems[] = [
+                                                    'id' => 'visibility_system_option',
+                                                    'title' => __('store.button.system'),
+                                                    'description' => __('store.hint.button.system'),
+                                                    'value' => '0',
+                                                    'checked' => request()
+                                                        ->user()
+                                                        ->hasPerm('Store_create_community_bot')
+                                                        ? false
+                                                        : true,
+                                                    'onchange' =>
+                                                        "this.value == 0 ? $('#visibility').text('" . __('store.button.system') . "') : 1",
+                                                    'name' => 'visibility',
+                                                ];
+                                            }
+                                            if (request()->user()->hasPerm('Store_create_community_bot')) {
+                                                $radioItems[] = [
+                                                    'id' => 'visibility_community_option',
+                                                    'title' => __('store.button.community'),
+                                                    'description' => __('store.hint.button.community'),
+                                                    'value' => '1',
+                                                    'checked' => true,
+                                                    'onchange' =>
+                                                        "this.value == 1 ? $('#visibility').text('" . __('store.button.community') . "') : 1",
+                                                    'name' => 'visibility',
+                                                ];
+                                            }
+                                            if (request()->user()->hasPerm('Store_create_group_bot')) {
+                                                $radioItems[] = [
+                                                    'id' => 'visibility_group_option',
+                                                    'title' => __('store.button.groups'),
+                                                    'description' => __('store.hint.button.groups'),
+                                                    'value' => '2',
+                                                    'checked' => request()
+                                                        ->user()
+                                                        ->hasPerm('Store_create_community_bot')
+                                                        ? false
+                                                        : true,
+                                                    'onchange' =>
+                                                        "this.value == 2 ? $('#visibility').text('" . __('store.button.groups') . "') : 1",
+                                                    'name' => 'visibility',
+                                                ];
+                                            }
+                                            if (request()->user()->hasPerm('Store_create_private_bot')) {
+                                                $radioItems[] = [
+                                                    'id' => 'visibility_private_option',
+                                                    'title' => __('store.button.private'),
+                                                    'description' => __('store.hint.button.private'),
+                                                    'value' => '3',
+                                                    'checked' => request()
+                                                        ->user()
+                                                        ->hasPerm('Store_create_community_bot')
+                                                        ? false
+                                                        : true,
+                                                    'onchange' =>
+                                                        "this.value == 3 ? $('#visibility').text('" . __('store.button.private') . "') : 1",
+                                                    'name' => 'visibility',
+                                                ];
+                                            }
+                                        @endphp
+
+                                        @foreach ($radioItems as $item)
+                                            @include('components.radio_item', $item)
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                <script>
+                                    $('#visibility_list input[checked]:last()').click()
+                                </script>
+                                <button id="react_button" data-dropdown-toggle="react_button_list"
+                                    class="text-white rounded-r-lg bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-blue-300 font-medium text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700"
+                                    type="button">{{ __('store.bot.react_buttons') }}
+                                </button>
+                                <div id="react_button_list"
+                                    class="z-10 hidden bg-gray-200 divide-y divide-gray-100 rounded-lg shadow w-72 dark:bg-gray-800 dark:divide-gray-600">
+                                    <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200"
+                                        aria-labelledby="react_button">
+
+                                        @foreach (['Feedback', 'Translate', 'Quote', 'Other'] as $label)
+                                            @php $id = strtolower($label); @endphp
+                                            <li>
+                                                <div class="flex rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                                    <label for="{{ $id }}"
+                                                        class="inline-flex p-2 items-center w-full cursor-pointer">
+                                                        <input checked id="{{ $id }}" name="react_btn[]"
+                                                            value="{{ $id }}" type="checkbox"
+                                                            class="sr-only peer">
+                                                        <div
+                                                            class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:translate-x-[-100%] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600">
+                                                        </div>
+                                                        <span
+                                                            class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{{ __('store.bot.react.allow_' . strtolower($label)) }}</span>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="w-full md:w-2/3 px-3 flex justify-center items-center flex-wrap md:flex-nowrap">
-                        <div class="w-full">
-                            <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
-                                for="llm_name">
-                                {{ __('store.bot.base_model') }}
-                            </label>
-                            <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
-                                oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="{{ __('store.bot.base_model.label') }}">
-                            <datalist id="llm-list">
-                                @foreach ($result as $LLM)
-                                    <option
-                                        src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
-                                        value="{{ $LLM->name }}"></option>
-                                @endforeach
-                            </datalist>
-                        </div>
-                    </div>
-                    <div class="w-full grid grid-cols-2 gaps-2 md:grid-cols-3 md:gaps-2">
-                        <div class="w-full md:col-span-2">
-                            <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        <div class="w-full md:w-2/3">
+                            <div class="w-full">
+                                <label class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2"
+                                    for="llm_name">
+                                    {{ __('store.bot.base_model') }}
+                                </label>
+                                <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
+                                    oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="{{ __('store.bot.base_model.label') }}">
+                                <datalist id="llm-list">
+                                    @foreach ($result as $LLM)
+                                        <option
+                                            src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
+                                            value="{{ $LLM->name }}"></option>
+                                    @endforeach
+                                </datalist>
+                            </div>
+                            <div class="w-full mt-2">
                                 <div class="w-full">
                                     <label for="bot_name"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.name') }}</label>
+                                        class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">{{ __('store.bot.name') }}</label>
                                     <input type="text" id="bot_name" name="bot_name" autocomplete="off"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="{{ __('store.bot.name.label') }}">
                                 </div>
                             </div>
-                            <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
-                                <div class="w-full">
-                                    <label for="bot_describe"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.description') }}</label>
-                                    <input type="text" id="bot_describe" name="bot_describe" autocomplete="off"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="{{ __('store.bot.description.label') }}">
-                                </div>
-                            </div>
                         </div>
-                        <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
-                            <div class="w-full">
-                                <p class="block uppercase tracking-wide dark:text-white text-xs font-bold mb-2">
-                                    {{ __('store.bot.react_buttons') }}
-                                </p>
-
-                                @foreach (['Feedback', 'Translate', 'Quote', 'Other'] as $label)
-                                    @php $id = strtolower($label); @endphp
-                                    <div class="flex items-center">
-                                        <input checked id="{{ $id }}" name="react_btn[]"
-                                            value="{{ $id }}" type="checkbox"
-                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                        <label for="{{ $id }}"
-                                            class="ml-2 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                            {{ __('store.bot.react.allow_' . strtolower($label)) }}
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
+                    </div>
+                    <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
+                        <div class="w-full">
+                            <label for="bot_describe"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('store.bot.description') }}</label>
+                            <input type="text" id="bot_describe" name="bot_describe" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="{{ __('store.bot.description.label') }}">
                         </div>
                     </div>
                     <div

@@ -143,7 +143,7 @@
                                     </p>
                                 </div>
                                 <div style="display:none;">
-                                    @foreach (['Update', 'Read', 'Delete'] as $action)
+                                    @foreach (['Create', 'Update', 'Read', 'Delete'] as $action)
                                         @php
                                             $sub_perms = App\Models\Permissions::where(
                                                 'name',
@@ -351,7 +351,7 @@
                                     </p>
                                 </div>
                                 <div style="display:none;">
-                                    @foreach (['Update', 'Read', 'Delete'] as $action)
+                                    @foreach (['Create','Update', 'Read', 'Delete'] as $action)
                                         @php
                                             $sub_perms = App\Models\Permissions::where(
                                                 'name',

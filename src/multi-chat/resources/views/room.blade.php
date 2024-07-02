@@ -1,8 +1,30 @@
 <x-app-layout>
     @php
+        function sortBots($bots)
+        {
+            $userId = request()->user()->id;
+            // Filter and sort the bots owned by the current user
+            $userBots = $bots
+                ->filter(function ($bot) use ($userId) {
+                    return $bot->owner_id == $userId;
+                })
+                ->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
+
+            // Filter the remaining bots and randomize them
+            $otherBots = $bots
+                ->filter(function ($bot) use ($userId) {
+                    return $bot->owner_id != $userId;
+                })
+                ->sortByDesc('created_at');
+
+            // Merge the sorted user bots with the randomized other bots
+            return $userBots->merge($otherBots)->values();
+        }
+
         $result = App\Models\Bots::Join('llms', function ($join) {
             $join->on('llms.id', '=', 'bots.model_id');
         })
+            ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
             ->where('llms.enabled', '=', true)
             ->wherein(
                 'bots.model_id',
@@ -14,6 +36,18 @@
                     ->get()
                     ->pluck('model_id'),
             )
+            ->where(function ($query) {
+                $query
+                    ->where('bots.visibility', '=', 0)->orwhere('bots.visibility', '=', 1)
+                    ->orWhere(function ($query) {
+                        $query->where('bots.visibility', '=', 3)->where('bots.owner_id', '=', request()->user()->id);
+                    })
+                    ->orWhere(function ($query) {
+                        $query
+                            ->where('bots.visibility', '=', 2)
+                            ->where('users.group_id', '=', request()->user()->group_id);
+                    });
+            })
             ->select(
                 'llms.*',
                 'bots.*',
@@ -25,6 +59,8 @@
             ->orderby('llms.order')
             ->orderby('bots.created_at')
             ->get();
+
+        $result = sortBots($result);
     @endphp
     @env('arena')
     @php
