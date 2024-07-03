@@ -183,7 +183,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                     ->prefix('store')
                     ->group(function () {
                         Route::get('/', [BotController::class, 'home'])->name('store.home');
-                        Route::middleware(AdminMiddleware::class . ':Store_update_create_bot')
+                        Route::middleware([AdminMiddleware::class . ':tab_Manage,Store_create_community_bot,Store_create_group_bot,Store_create_private_bot'])
                             ->post('/create', [BotController::class, 'create'])
                             ->name('store.create');
                         Route::middleware(AdminMiddleware::class . ':Store_update_modify_bot')

@@ -41,6 +41,20 @@ class LoginRequest extends FormRequest
         }
     }
 
+            
+    function handleAuthAttempt($credentials) {
+        if (!Auth::attempt($credentials, $this->filled('remember'))) {
+            RateLimiter::hit($this->throttleKey());
+    
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+    
+        if (!Auth::user()->hasVerifiedEmail() && Auth::user()->guid && Auth::user()->domain) {
+            Auth::user()->markEmailAsVerified();
+        }
+    }
     /**
      * Attempt to authenticate the request's credentials.
      *
@@ -99,20 +113,18 @@ class LoginRequest extends FormRequest
                     $user->password = Hash::make($this->password);
                     $user->save();
                 }
-            } catch (\Illuminate\Database\UniqueConstraintViolationException) {
-                #This means the user are already in the database record, But LDAP also have the same user,
-                #Here we decide to override the Server DB's record
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                // This means the user is already in the database record, but LDAP also has the same user.
+                // Here we decide to override the Kuwa DB's record.
                 User::where('email', $this->email)->delete();
-                if (!Auth::attempt($credentials, $this->filled('remember'))) {
-                    RateLimiter::hit($this->throttleKey());
-
-                    throw ValidationException::withMessages([
-                        'email' => __('auth.failed'),
-                    ]);
-                }
-                if (!Auth::user()->hasVerifiedEmail() && Auth::user()->guid && Auth::user()->domain) {
-                    Auth::user()->markEmailAsVerified();
-                }
+                $this->handleAuthAttempt($credentials);
+            } catch (\Throwable $e) {
+                // This usually means the LDAP server is unreachable.
+                $credentials = [
+                    'email' => $this->email,
+                    'password' => $this->password,
+                ];
+                $this->handleAuthAttempt($credentials);
             }
             RateLimiter::clear($this->throttleKey());
         }

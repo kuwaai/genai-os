@@ -164,7 +164,15 @@ class BotController extends Controller
             $validator->errors()->add('llm_name', 'You do not have permission to use this model.');
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        if ($model_id) {
+        $visibility = $request->input('visibility');
+        $permissions = [
+            0 => 'tab_Manage',
+            1 => 'Store_create_community_bot',
+            2 => 'Store_create_group_bot',
+            3 => 'Store_create_private_bot',
+        ];
+
+        if ($model_id && isset($permissions[$visibility]) && $request->user()->hasPerm($permissions[$visibility])) {
             $bot = new Bots();
             $config = [];
             if ($request->input('modelfile')) {
@@ -174,7 +182,7 @@ class BotController extends Controller
                 $config['react_btn'] = $request->input('react_btn');
             }
             $config = json_encode($config);
-            $bot->fill(['name' => $request->input('bot_name'), 'type' => 'prompt', 'visibility' => 1, 'description' => $request->input('bot_describe'), 'owner_id' => $request->user()->id, 'model_id' => $model_id, 'config' => $config]);
+            $bot->fill(['name' => $request->input('bot_name'), 'type' => 'prompt', 'visibility' => $visibility, 'description' => $request->input('bot_describe'), 'owner_id' => $request->user()->id, 'model_id' => $model_id, 'config' => $config]);
             $bot->save();
             return redirect()
                 ->route('store.home')
@@ -194,7 +202,15 @@ class BotController extends Controller
         if ($result) {
             $user = $result;
             Auth::setUser(User::find($user->id));
-            if (User::find($user->id)->hasPerm('Store_update_create_bot')) {
+            $visibility = $request->input('visibility');
+            $permissions = [
+                0 => 'tab_Manage',
+                1 => 'Store_create_community_bot',
+                2 => 'Store_create_group_bot',
+                3 => 'Store_create_private_bot',
+            ];
+
+            if (isset($permissions[$visibility]) && $request->user()->hasPerm($permissions[$visibility])) {
                 $rules = (new BotCreateRequest())->rules();
                 $validator = Validator::make($request->all(), $rules);
 
@@ -246,16 +262,26 @@ class BotController extends Controller
             if ($request->input('react_btn')) {
                 $config['react_btn'] = $request->input('react_btn');
             }
-            $config = json_encode($config);
-            if ($request->input('bot_name')) {
-                $bot->name = $request->input('bot_name');
+            $visibility = $request->input('visibility');
+            $permissions = [
+                0 => 'tab_Manage',
+                1 => 'Store_create_community_bot',
+                2 => 'Store_create_group_bot',
+                3 => 'Store_create_private_bot',
+            ];
+            if ($visibility == $bot->visibility || ($visibility != $bot->visibility && isset($permissions[$visibility]) && $request->user()->hasPerm($permissions[$visibility]))) {
+                $bot->visibility = $visibility;
+                $config = json_encode($config);
+                if ($request->input('bot_name')) {
+                    $bot->name = $request->input('bot_name');
+                }
+                if ($request->input('bot_describe')) {
+                    $bot->description = $request->input('bot_describe');
+                }
+                $bot->model_id = $model_id;
+                $bot->config = $config;
+                $bot->save();
             }
-            if ($request->input('bot_describe')) {
-                $bot->description = $request->input('bot_describe');
-            }
-            $bot->model_id = $model_id;
-            $bot->config = $config;
-            $bot->save();
         }
         return redirect()->route('store.home');
     }

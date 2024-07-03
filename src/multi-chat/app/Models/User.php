@@ -53,13 +53,23 @@ class User extends Authenticatable implements MustVerifyEmail, LdapAuthenticatab
         'email_verified_at' => 'datetime',
     ];
 
-
-    public function hasPerm($permission)
+    public function hasPerm($permissions)
     {
-        if($this->group_id){
-            $perm_id = Permissions::where("name","=",$permission)->first()->id;
-            return GroupPermissions::where("group_id",'=',$this->group_id)->where("perm_id", "=",$perm_id)->exists();
+        if ($this->group_id) {
+            // If $permissions is not an array, convert it to an array
+            if (!is_array($permissions)) {
+                $permissions = [$permissions];
+            }
+            
+            // Get the permission IDs for all provided permissions
+            $perm_ids = Permissions::whereIn("name", $permissions)->pluck('id')->toArray();
+            
+            // Check if any of the permissions exist for the group
+            return GroupPermissions::where("group_id", $this->group_id)
+                                   ->whereIn("perm_id", $perm_ids)
+                                   ->exists();
         }
         return false;
     }
+    
 }
