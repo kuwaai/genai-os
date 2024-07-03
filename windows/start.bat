@@ -91,7 +91,8 @@ set "web_started=True"
 REM Loop to wait for commands
 :loop
 set userInput=
-set /p userInput=Enter a command (stop, seed, hf login, reload): 
+echo Enter a command (stop, seed, hf login, reload): 
+set /p userInput=
 
 if /I "%userInput%"=="stop" (
     echo Stopping everything...

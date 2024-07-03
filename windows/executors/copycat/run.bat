@@ -1,4 +1,3 @@
-call ..\..\src\variables.bat
 set EXECUTOR_ACCESS_CODE=copycat
 pushd ..\..\..\src\multi-chat
 php artisan model:config "copycat" "CopyCat" --image "..\..\windows\executors\copycat\copycat.png"

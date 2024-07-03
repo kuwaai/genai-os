@@ -1,4 +1,3 @@
-call ..\..\src\variables.bat
 set EXECUTOR_ACCESS_CODE=sysinfo
 pushd ..\..\..\src\multi-chat
 php artisan model:config "sysinfo" "System Info" --image "..\..\windows\executors\sysinfo\sysinfo.png"
