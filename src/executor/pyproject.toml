@@ -16,7 +16,7 @@ packages = ["src/kuwa"]
 
 [project]
 name = "kuwa-executor"
-version = "0.3.1"
+version = "0.3.2"
 authors = [
   { name="Drift", email="taifu9920923@gmail.com" },
   { name="Yung-Hsiang Hu", email="iftnt1999@gmail.com" },
@@ -33,7 +33,7 @@ dependencies=[
   'fastapi~=0.110.0',
   'prometheus_client~=0.20.0',
   'python-multipart~=0.0.9',
-  'requests~=2.31.0',
+  'requests~=2.32.0',
   'retry~=0.9.2',
   'uvicorn[standard]~=0.29.0',
   'PyYAML~=6.0.1'
