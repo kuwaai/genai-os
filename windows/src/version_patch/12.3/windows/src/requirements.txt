@@ -1,4 +1,5 @@
 hatchling
+hatch-vcs
 https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.77-cu123/llama_cpp_python-0.2.77-cp310-cp310-win_amd64.whl
 https://www.piwheels.org/simple/compressed-rtf/compressed_rtf-1.0.6-py3-none-any.whl#sha256=d6729750a95e2350a7ec0fd3284852a1f7f7e35bfae2699c67f9f4a9b7e6063d
 https://download.pytorch.org/whl/cu121/torch-2.3.0%2Bcu121-cp310-cp310-win_amd64.whl#sha256=002027d18a9c054f08fe9cf7a729e041229e783e065a71349015dcccc9a7137e
