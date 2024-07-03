@@ -410,11 +410,9 @@ class RoomController extends Controller
                 }
             }
             $input = $request->input('input');
-            $next_input = '';
             $url = $this->upload_file($request);
             if ($url) {
-                $next_input = $input;
-                $input = $url;
+                $input = $url . '\n' . $input;
             }
             $chatname = $input;
             $first_url = preg_match('/\bhttps?:\/\/\S+/i', $input, $matches);
@@ -449,8 +447,7 @@ class RoomController extends Controller
         return redirect()
             ->route('room.chat', $Room->id)
             ->with('selLLMs', $selectedLLMs)
-            ->with('mode_track', request()->input('mode_track'))
-            ->with('next_input', $next_input);
+            ->with('mode_track', request()->input('mode_track'));
     }
 
     public function new(Request $request): RedirectResponse
@@ -517,10 +514,8 @@ class RoomController extends Controller
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
         $url = $this->upload_file($request);
-        $next_input = '';
         if ($url) {
-            $next_input = $input;
-            $input = $url;
+            $input = $url . '\n' . $input;
         }
 
         $chained = (Session::get('chained') ?? true) == true;
@@ -580,6 +575,6 @@ class RoomController extends Controller
                 }
             }
         }
-        return redirect()->route('room.chat', $roomId)->with('selLLMs', $selectedLLMs)->with('mode_track', request()->input('mode_track'))->with('next_input', $next_input);
+        return redirect()->route('room.chat', $roomId)->with('selLLMs', $selectedLLMs)->with('mode_track', request()->input('mode_track'));
     }
 }

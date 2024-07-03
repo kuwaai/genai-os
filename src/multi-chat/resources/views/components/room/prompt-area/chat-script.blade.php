@@ -46,7 +46,6 @@
         }
         $("#attachment").show();
         $("#attachment button").text($("#upload")[0].files[0].name)
-        $('#prompt_area').submit()
     }
 </script>
 
@@ -170,7 +169,6 @@
                 $("#submit_msg").show()
                 if ($("#abort_btn")) $("#abort_btn").hide();
                 if ($("#upload_btn")) $("#upload_btn").show()
-                $("#chat_input").val("{{session('next_input')}}")
                 $("#chat_input").prop("readonly", false)
                 adjustTextareaRows($("#chat_input"))
                 $(".show-on-finished").attr("style", "")
