@@ -3,7 +3,7 @@ FROM python:3.10-slim
 WORKDIR /usr/src/app
 
 RUN apt-get update &&\
-    apt-get install -y cmake build-essential
+    apt-get install -y cmake build-essential git
 
 # Install the dependency of executor
 COPY src/executor/requirements.txt ./
@@ -19,8 +19,10 @@ COPY src/executor/image_generation/requirements.txt ./image_generation/requireme
 RUN pip install --no-cache-dir -r ./image_generation/requirements.txt
 
 # Install the executor framework
+COPY .git ../../.git
 COPY src/executor/. .
-RUN pip install .
+RUN pip install . &&\
+    rm -rf ../../.git
 
 # Install the multi-chat-client and the entrypoint
 COPY docker/executor/multi-chat-client/requirements.txt /tmp/

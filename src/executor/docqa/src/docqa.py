@@ -101,6 +101,7 @@ class DocQa:
       docs = await loader.async_load()
       self.logger.info(f'Fetched {len(docs)} documents.')
     except Exception as e:
+      logger.warning(str(e))
       docs = []
     finally:
       return docs

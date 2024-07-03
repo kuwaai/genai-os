@@ -6,6 +6,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../../"))
 
 EXECUTORS = [
     {
+        "name": "sysinfo",
+        "description": "[Tool] System information executor. It will print the system information for debugging.",
+        "class": "sysinfo.SysInfoExecutor"
+    },
+    {
         "name": "debug",
         "description": "[Tool] Debugging executor. It will reflect the last input.",
         "class": "debug.DebugExecutor"

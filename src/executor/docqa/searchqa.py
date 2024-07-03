@@ -136,7 +136,7 @@ class SearchQaExecutor(LLMExecutor):
                 )
             )
         except Exception as e:
-            logger.exception(e)
+            logger.debug(str(e))
         finally:
             return resp != None and resp.ok
 
@@ -178,10 +178,10 @@ class SearchQaExecutor(LLMExecutor):
             resp  = resp.json()
             
             urls = [item['link'] for item in resp['items']]
-            titles = [item['title'] for item in resp['items']]
+            # titles = [item['title'] for item in resp['items']]
             urls_reachable = await asyncio.gather(*[self.is_url_reachable(url) for url in urls])
             logger.debug(list(zip(urls, urls_reachable)))
-            urls = list(zip(urls, titles))
+            # urls = list(zip(urls, titles))
             urls = list(itertools.compress(urls, urls_reachable))
             urls = urls[:min(len(urls), self.num_url)]
         
@@ -203,7 +203,7 @@ class SearchQaExecutor(LLMExecutor):
         
             self.proc = True
             response_generator = self.docqa.process(
-                urls=[u for u,_ in urls],
+                urls=urls,
                 chat_history=history,
                 auth_token=auth_token,
                 modelfile=modelfile,
@@ -221,6 +221,8 @@ class SearchQaExecutor(LLMExecutor):
             await asyncio.sleep(2) # To prevent SSE error of web page.
             logger.exception('Unexpected error')
             yield i18n.t("searchqa.default_exception_msg")
+        finally:
+            logger.info("Done")
 
     async def abort(self):
         if self.proc:

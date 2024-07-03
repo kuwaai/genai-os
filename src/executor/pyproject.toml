@@ -15,6 +15,7 @@ version-file = "src/kuwa/executor/_version.py"
 [tool.hatch.metadata.hooks.vcs]
 
 [tool.hatch.build.targets.wheel.force-include]
+"sysinfo.py" = "kuwa/executor/example/sysinfo.py"
 "debug.py" = "kuwa/executor/example/debug.py"
 "dummy.py" = "kuwa/executor/example/dummy.py"
 "geminipro.py" = "kuwa/executor/example/geminipro.py"

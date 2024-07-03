@@ -1,0 +1,16 @@
+services:
+  sysinfo-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: sysinfo
+      EXECUTOR_ACCESS_CODE: sysinfo
+      EXECUTOR_NAME: System Info
+      EXECUTOR_IMAGE: info.png # Refer to docker/multi-chat/icons/
+    depends_on:
+      - kernel
+    command: []
+    restart: unless-stopped
+    networks: ["backend"]

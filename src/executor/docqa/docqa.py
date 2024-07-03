@@ -147,7 +147,9 @@ class DocQaExecutor(LLMExecutor):
             await asyncio.sleep(2) # To prevent SSE error of web page.
             logger.exception('Unexpected error')
             yield i18n.t("docqa.default_exception_msg")
-    
+        finally:
+            logger.info("Done")
+
     async def abort(self):
         if self.proc:
             self.proc = False
