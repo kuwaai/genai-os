@@ -26,8 +26,9 @@ return new class extends Migration
         $setting = new SystemSetting();
         $setting->fill([
             'key' => $this->field_upload_allowed_extensions,
-            'value' => 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,'.
+            'value' => 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,log,csv,json,'.
                        'jpeg,jpg,gif,png,avif,webp,bmp,ico,cur,tiff,tif,'.
+                       'mp3,wav,flac,wma,m4a,aac,'.
                        'zip' ,
         ]);
         $setting->save();

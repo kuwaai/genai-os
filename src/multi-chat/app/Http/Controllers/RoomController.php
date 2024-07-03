@@ -322,7 +322,7 @@ class RoomController extends Controller
         $max_file_size_mb = \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
         $allowed_file_exts = \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
         $max_file_size_mb = $max_file_size_mb ?: '20480';
-        $allowed_file_exts = $allowed_file_exts ?: 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpg,bmp,png,zip';
+        $allowed_file_exts = $allowed_file_exts ?: 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpg,bmp,png,zip,mp3,wav,flac,wma,m4a,aac';
         $request->validate([
             'file' => [
                 'max:' . $max_file_size_mb,
@@ -420,15 +420,8 @@ class RoomController extends Controller
             $first_url = preg_match('/\bhttps?:\/\/\S+/i', $input, $matches);
             $firstUrl = isset($matches[0]) ? $matches[0] : null;
             if ($firstUrl) {
-                $tmp = $this->getWebPageTitle($firstUrl);
-                if ($tmp != '') {
-                    $chatname = rawurldecode($tmp);
-                } else {
-                    $tmp = $this->getFilenameFromURL($firstUrl);
-                    if ($tmp != '') {
-                        $chatname = rawurldecode($tmp);
-                    }
-                }
+                $raw_chat_title = $this->getWebPageTitle($firstUrl) ?: $this->getFilenameFromURL($firstUrl);
+                $chatname = rawurldecode($raw_chat_title);
             }
 
             $Room = new ChatRoom();
