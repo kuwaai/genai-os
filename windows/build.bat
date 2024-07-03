@@ -164,9 +164,11 @@ python ../src/executor/docqa/download_model.py
 REM Download required pip packages
 pip install --default-timeout=1000 -r .\src\requirements.txt
 pushd "..\src\kernel"
+pip install --default-timeout=1000 --force-reinstall .
 pip install --default-timeout=1000 -r requirements.txt 
 popd
 pushd "..\src\executor"
+pip install --default-timeout=1000 --force-reinstall .
 pip install --default-timeout=1000 -r requirements.txt
 pushd "docqa"
 pip install --default-timeout=1000 -r requirements.txt
