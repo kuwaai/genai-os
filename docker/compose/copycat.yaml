@@ -1,0 +1,16 @@
+services:
+  copycat-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: debug
+      EXECUTOR_ACCESS_CODE: copycat
+      EXECUTOR_NAME: CopyCat
+      EXECUTOR_IMAGE: copy.png # Refer to docker/multi-chat/icons/
+    depends_on:
+      - kernel
+    command: ["--delay", "0.02"]
+    restart: unless-stopped
+    networks: ["backend"]
