@@ -15,7 +15,7 @@
         @foreach ($bots as $bot)
             <div onclick="detail_update({{ json_encode(array_merge($bot->toArray(), ['image' => $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG')])) }}, {{ request()->user()->id == $bot->owner_id || request()->user()->hasPerm('tab_Manage') ? 'false' : 'true' }})"
                 data-modal-target="detail-modal" data-modal-toggle="detail-modal"
-                class="{{ $bot->owner_id == request()->user()->id ? 'bg-blue-200 hover:bg-blue-300 dark:bg-blue-600 dark:hover:bg-blue-500' : ' hover:bg-gray-300 dark:hover:bg-gray-700' }} overflow-hidden flex flex-col border border-1 rounded-lg cursor-pointer border-gray-700 min-w-[150px] max-w-[150px] w-[150px] p-2">
+                class="{{ $bot->owner_id == request()->user()->id ? 'bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-500 dark:hover:bg-neutral-700' : ' hover:bg-gray-300 dark:hover:bg-gray-700' }} overflow-hidden flex flex-col border border-1 rounded-lg cursor-pointer border-gray-500 min-w-[150px] max-w-[150px] w-[150px] p-2">
                 <img class="rounded-full mx-auto bg-black" width="50px" height="50px"
                     src="{{ $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                 <p class="line-clamp-2 text-sm mb-auto">{{ $bot->name }}</p>
