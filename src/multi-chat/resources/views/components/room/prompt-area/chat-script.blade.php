@@ -170,6 +170,7 @@
                 if ($("#abort_btn")) $("#abort_btn").hide();
                 if ($("#upload_btn")) $("#upload_btn").show()
                 $("#chat_input").prop("readonly", false)
+                $("#chat_input").val("")
                 adjustTextareaRows($("#chat_input"))
                 $(".show-on-finished").attr("style", "")
                 hljs.configure({
