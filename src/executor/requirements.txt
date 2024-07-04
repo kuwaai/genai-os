@@ -8,11 +8,11 @@ openai
 tiktoken
 
 # llama.cpp
-llama-cpp-python==0.2.77
+llama-cpp-python==0.2.77*
 
 # Huggingface
-torch~=2.3.0
-torchvision~=2.3.0
+torch==2.3.0
+torchvision==0.18.0
 transformers
 accelerate
 sentencepiece
