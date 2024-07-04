@@ -22,7 +22,7 @@ jobs:
               @{
                   Uri = "$baseUri/Languages/Unofficial/ChineseSimplified.isl"
                   OutFile = "$downloadDir/ChineseTraditional.isl"
-              },
+              }
           )
 
           $jobs = @()
