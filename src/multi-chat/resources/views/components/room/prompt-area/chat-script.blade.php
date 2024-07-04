@@ -19,20 +19,23 @@
     $upload_allowed_extensions = SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
 @endphp
 <script>
+@if (session('errorString'))
+    showErrorMsg("{{session('errorString')}}")
+@endif
+
+    function showErrorMsg(msg){
+        $("#error_alert >span").text(msg)
+        $("#error_alert").fadeIn();
+        $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+        $("#upload").val("");
+        $("#attachment").hide();
+        setTimeout(function() {
+            $("#error_alert").fadeOut();
+            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
+        }, 3000);
+    }
     function uploadcheck() {
         if (!$("#upload")[0].files || $("#upload")[0].files[0].length <= 0) return;
-
-        showErrorMsg = (msg) =>{
-            $("#error_alert >span").text(msg)
-            $("#error_alert").fadeIn();
-            $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            $("#upload").val("");
-            $("#attachment").hide();
-            setTimeout(function() {
-                $("#error_alert").fadeOut();
-                $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
-            }, 3000);
-        }
 
         if ($("#upload")[0].files[0].size > {{ $upload_max_size_mb * (2 ** 20)}}){
             showErrorMsg("{{ __('chat.hint.upload_file_too_large') }}");

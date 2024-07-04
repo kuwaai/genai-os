@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Jobs\RequestChat;
 use App\Models\Histories;
@@ -317,18 +319,37 @@ class RoomController extends Controller
     public function upload_file(Request $request)
     {
         if (!$request->file()) {
-            return null;
+            return [
+                'succeed' => false,
+                'url' => null,
+                'msg' => 'File not specified.',
+            ];
         }
         $max_file_size_mb = \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
         $allowed_file_exts = \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
-        $max_file_size_mb = $max_file_size_mb ?: '20480';
+        $max_file_size_kb = strval(intval($max_file_size_mb ?: 20) * 1024);
         $allowed_file_exts = $allowed_file_exts ?: 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpg,bmp,png,zip,mp3,wav,flac,wma,m4a,aac';
-        $request->validate([
+
+        Log::channel('analyze')->Debug("max_file_size_kb:". $max_file_size_kb);
+        Log::channel('analyze')->Debug("allowed_file_exts:". $allowed_file_exts);
+        $validator = Validator::make($request->all(), [
             'file' => [
-                'max:' . $max_file_size_mb,
+                'file',
+                'max:' . $max_file_size_kb,
                 'mimes:' . $allowed_file_exts
             ]
         ]);
+
+        if ($validator->fails()) {
+            $errorString = implode(",",$validator->messages()->all());
+            Log::channel('analyze')->Debug("validation failed:\n". $errorString);
+            return [
+                'succeed' => false,
+                'url' => null,
+                'msg' => $errorString,
+            ];
+        }
+ 
         $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
         $storagePath = public_path('storage/' . $directory); // Adjusted path
         $fileName = time() . '_' . $request->file->getClientOriginalName();
@@ -349,7 +370,11 @@ class RoomController extends Controller
         }*/
         //Create a chat and send that url into the llm
         $url = url('storage/' . $directory . '/' . rawurlencode($fileName));
-        return $url;
+        return [
+            'succeed' => true,
+            'url' => $url,
+            'msg' => 'Succeed.',
+        ];
     }
     function getWebPageTitle($url)
     {
@@ -411,10 +436,16 @@ class RoomController extends Controller
             }
             $input = $request->input('input');
             $next_input = '';
-            $url = $this->upload_file($request);
-            if ($url) {
-                $next_input = $input;
-                $input = $url;
+            if ($request->file()) {
+                $upload_result = $this->upload_file($request);
+                if ($upload_result['succeed']) {
+                    $next_input = $input;
+                    $input = $upload_result['url'];
+                }else{
+                    return redirect()
+                        ->route('room.home')
+                        ->with('errorString', $upload_result['msg']);
+                }
             }
             $chatname = $input;
             $first_url = preg_match('/\bhttps?:\/\/\S+/i', $input, $matches);
@@ -518,9 +549,17 @@ class RoomController extends Controller
         $input = $request->input('input');
         $url = $this->upload_file($request);
         $next_input = '';
-        if ($url) {
-            $next_input = $input;
-            $input = $url;
+        if ($request->file()) {
+            $upload_result = $this->upload_file($request);
+            if ($upload_result['succeed']) {
+                $next_input = $input;
+                $input = $upload_result['url'];
+            }else{
+                return redirect()
+                    ->route('room.chat', $roomId)
+                    ->with('errorString', $upload_result['msg'])
+                    ->withInput();
+            }
         }
 
         $chained = (Session::get('chained') ?? true) == true;
