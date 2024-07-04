@@ -10,6 +10,12 @@ exit /b
 function stripAnsi(str) {
   return str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }
+
+// Launch a powershell to enable ANSI color support
+// Reference: https://www.dostips.com/forum/viewtopic.php?p=59696#p59696
+var ps = WScript.CreateObject("WScript.Shell").Exec("powershell.exe -nop -ep Bypass -c \"exit\"");
+while (ps.Status == 0) WScript.Sleep(50);
+
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 var mode=2;
 if (WScript.Arguments.Count()==2) {mode=8;}
