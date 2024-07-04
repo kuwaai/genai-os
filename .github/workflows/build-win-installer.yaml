@@ -4,8 +4,42 @@ jobs:
   build:
     name: Build the Inno Setup Installer
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Language
+        run: |
+          $baseUri = 'https://raw.github.com/jrsoftware/issrc/main/Files'
+          $downloadDir = "$env:ProgramFiles(x86)/Inno Setup 6/Languages"
+          $files = @(
+              @{
+                  Uri = "$baseUri/Languages/Unofficial/ChineseTraditional.isl"
+                  OutFile = "$downloadDir/ChineseTraditional.isl"
+              },
+              @{
+                  Uri = "$baseUri/Languages/Unofficial/ChineseSimplified.isl"
+                  OutFile = "$downloadDir/ChineseTraditional.isl"
+              },
+          )
+
+          $jobs = @()
+
+          foreach ($file in $files) {
+              $jobs += Start-ThreadJob -Name $file.OutFile -ScriptBlock {
+                  $params = $using:file
+                  Invoke-WebRequest @params
+              }
+          }
+
+          Write-Host "Downloads started..."
+          Wait-Job -Job $jobs
+
+          foreach ($job in $jobs) {
+              Receive-Job -Job $job
+          }
 
       - name: Compile .ISS to .EXE Installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
