@@ -10,6 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - id: commit
+        uses: prompt/actions-commit-hash@v3
+
       - name: Install Language
         run: |
           $baseUri = 'https://raw.github.com/jrsoftware/issrc/main/Files'
@@ -48,7 +51,8 @@ jobs:
           path: scripts/windows-setup-files/kuwa_genai_os.iss
           options: /O+
       
-      - name: Download compiled installer
-        uses: actions/download-artifact@v4
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
         with:
-          name: D:\a\genai-os\genai-os\scripts\windows-setup-files\Kuwa-GenAI-OS.exe
+          name: Kuwa-GenAI-OS-${{ steps.commit.outputs.short }}.exe
+          path: D:\a\genai-os\genai-os\scripts\windows-setup-files\Kuwa-GenAI-OS.exe
