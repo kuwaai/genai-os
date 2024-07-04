@@ -11,8 +11,8 @@ tiktoken
 llama-cpp-python==0.2.77
 
 # Huggingface
-torch
-torchvision
+torch~=2.3.0
+torchvision~=2.3.0
 transformers
 accelerate
 sentencepiece
