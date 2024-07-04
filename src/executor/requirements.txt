@@ -8,7 +8,7 @@ openai
 tiktoken
 
 # llama.cpp
-llama-cpp-python==0.2.77*
+llama-cpp-python==0.2.77
 
 # Huggingface
 torch==2.3.0
