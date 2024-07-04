@@ -34,5 +34,5 @@ if not exist "%check_location%" (
     RD /Q /S "%folder_name%"
     exit /b 0
 ) else (
-    echo Target file already exists, skipping download and extraction.
+    echo "%check_location%" already exists, skipping download and extraction.
 )

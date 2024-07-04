@@ -19,9 +19,16 @@ if (!fso.FolderExists(parentPath)) {
   fso.CreateFolder(parentPath);
 }
 var out = fso.OpenTextFile(logFile, mode, true);
+var char;
 var line;
 while( !WScript.StdIn.AtEndOfStream ) {
-  line=stripAnsi(WScript.StdIn.ReadLine());
-  WScript.StdOut.WriteLine(line);
-  out.WriteLine(line);
+  char = "";
+  line = "";
+  while( char != "\n" ) {
+    char=WScript.StdIn.Read(1);
+    WScript.StdOut.Write(char);
+    line = line + char;
+  }
+  line=stripAnsi(line);
+  out.Write(line);
 }
