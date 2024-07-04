@@ -6,6 +6,8 @@ confs=(
   # "dev" # Increase the verbosity for debug
   "pgsql"
   "copycat"
+  "sysinfo"
+  "token_counter"
   "gemini"
   "docqa_webqa"
   "searchqa"

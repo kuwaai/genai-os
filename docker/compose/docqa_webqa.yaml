@@ -8,6 +8,7 @@ services:
       CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
       EXECUTOR_ACCESS_CODE: doc-qa;web-qa
       EXECUTOR_NAME: DocQA;WebQA
+      EXECUTOR_IMAGE: doc-qa.png;web-qa.png # Refer to src/multi-chat/public/images
     depends_on:
       - kernel
       - multi-chat
