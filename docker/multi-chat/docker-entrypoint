@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xeu
+set -e
 
 # Ensure the storage directory have the proper structure
 construct_storage() {
