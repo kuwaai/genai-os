@@ -8,6 +8,7 @@ services:
       EXECUTOR_TYPE: huggingface
       EXECUTOR_ACCESS_CODE: llama3-taide-lx-8b-chat
       EXECUTOR_NAME: Meta Llama3 TAIDE LX 8B Chat
+      EXECUTOR_IMAGE: taide.png # Refer to docker/multi-chat/icons/
       HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
       - kernel
