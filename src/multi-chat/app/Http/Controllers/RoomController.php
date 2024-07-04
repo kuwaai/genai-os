@@ -435,12 +435,10 @@ class RoomController extends Controller
                 }
             }
             $input = $request->input('input');
-            $next_input = '';
             if ($request->file()) {
                 $upload_result = $this->upload_file($request);
                 if ($upload_result['succeed']) {
-                    $next_input = $input;
-                    $input = $upload_result['url'] . '\n' . $input;
+                    $input = $upload_result['url'] . "\n" . $input;
                 }else{
                     return redirect()
                         ->route('room.home')
@@ -546,13 +544,10 @@ class RoomController extends Controller
         $roomId = $request->input('room_id');
         $selectedLLMs = $request->input('chatsTo');
         $input = $request->input('input');
-        $url = $this->upload_file($request);
-        $next_input = '';
         if ($request->file()) {
             $upload_result = $this->upload_file($request);
             if ($upload_result['succeed']) {
-                $next_input = $input;
-                $input = $upload_result['url'] . '\n' . $input;
+                $input = $upload_result['url'] . "\n" . $input;
             }else{
                 return redirect()
                     ->route('room.chat', $roomId)
