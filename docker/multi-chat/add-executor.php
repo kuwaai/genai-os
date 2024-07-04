@@ -7,7 +7,7 @@ $access_code = escapeshellarg($_POST["access_code"]);
 $name = escapeshellarg($_POST["name"]);
 $image = "";
 if (isset($_POST["image"])){
-    $image = '/app/default-icons/' . $_POST["image"];
+    $image = '/app/public/images/' . $_POST["image"];
     $image = "--image=".escapeshellarg($image);
 }
 

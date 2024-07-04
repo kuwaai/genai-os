@@ -8,7 +8,7 @@ services:
       EXECUTOR_TYPE: debug
       EXECUTOR_ACCESS_CODE: copycat
       EXECUTOR_NAME: CopyCat
-      EXECUTOR_IMAGE: copy.png # Refer to docker/multi-chat/icons/
+      EXECUTOR_IMAGE: copy.png # Refer to src/multi-chat/public/images
     depends_on:
       - kernel
     command: ["--delay", "0.02"]

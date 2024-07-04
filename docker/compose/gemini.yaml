@@ -8,7 +8,7 @@ services:
       EXECUTOR_TYPE: geminipro
       EXECUTOR_ACCESS_CODE: gemini-pro
       EXECUTOR_NAME: Gemini Pro
-      EXECUTOR_IMAGE: gemini.png # Refer to docker/multi-chat/icons/
+      EXECUTOR_IMAGE: gemini.png # Refer to src/multi-chat/public/images
     depends_on:
       - kernel
       - multi-chat

@@ -8,7 +8,7 @@ services:
       CUSTOM_EXECUTOR_PATH: ./docqa/searchqa.py
       EXECUTOR_ACCESS_CODE: search-qa
       EXECUTOR_NAME: SearchQA
-      EXECUTOR_IMAGE: search-qa.png # Refer to docker/multi-chat/icons/
+      EXECUTOR_IMAGE: search-qa.png # Refer to src/multi-chat/public/images
     depends_on:
       - kernel
       - multi-chat

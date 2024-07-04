@@ -8,7 +8,7 @@ services:
       EXECUTOR_TYPE: huggingface
       EXECUTOR_ACCESS_CODE: llava-v1.6-7b
       EXECUTOR_NAME: LLaVA v1.6 7B
-      EXECUTOR_IMAGE: llava.png # Refer to docker/multi-chat/icons/
+      EXECUTOR_IMAGE: llava.png # Refer to src/multi-chat/public/images
       # HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
       - kernel

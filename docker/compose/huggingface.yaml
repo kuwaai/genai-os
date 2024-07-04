@@ -8,7 +8,7 @@ services:
       EXECUTOR_TYPE: huggingface
       EXECUTOR_ACCESS_CODE: gemma-7b-it
       EXECUTOR_NAME: Google Gemma 7B Instruct
-      EXECUTOR_IMAGE: huggingface.svg # Refer to docker/multi-chat/icons/
+      EXECUTOR_IMAGE: huggingface.svg # Refer to src/multi-chat/public/images
       HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
       - kernel
