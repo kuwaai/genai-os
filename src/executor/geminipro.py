@@ -29,7 +29,7 @@ class GeminiDescParser(DescriptionParser):
         return description
 class GeminiExecutor(LLMExecutor):
 
-    model_name: str = "gemini-1.0-pro"
+    model_name: str = "gemini-1.5-pro"
     system_prompt: str = ""
     no_system_prompt: bool = False
     limit: int = 30720

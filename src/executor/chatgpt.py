@@ -53,7 +53,7 @@ class ChatGptDescParser(DescriptionParser):
 
 class ChatGptExecutor(LLMExecutor):
 
-    model_name: str = "gpt-3.5-turbo"
+    model_name: str = "gpt-4o"
     no_system_prompt: bool = False
     openai_base_url: str = "https://api.openai.com/v1"
     context_window: int = 0
