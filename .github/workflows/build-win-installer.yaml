@@ -9,6 +9,12 @@ jobs:
         shell: pwsh
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: ''
+      
+      - name: Remove extra header in git config
+        run: |
+          git config --unset http.https://github.com/.extraheader
 
       - id: commit
         uses: prompt/actions-commit-hash@v3
