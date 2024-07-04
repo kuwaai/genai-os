@@ -47,3 +47,8 @@ jobs:
         with:
           path: scripts/windows-setup-files/kuwa_genai_os.iss
           options: /O+
+      
+      - name: Download compiled installer
+        uses: actions/download-artifact@v4
+        with:
+          name: D:\a\genai-os\genai-os\scripts\windows-setup-files\Kuwa-GenAI-OS.exe
