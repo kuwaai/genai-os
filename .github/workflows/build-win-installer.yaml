@@ -54,5 +54,5 @@ jobs:
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
         with:
-          name: Kuwa-GenAI-OS-${{ steps.commit.outputs.short }}.exe
+          name: Kuwa-GenAI-OS-${{ github.ref_name }}${{ steps.commit.outputs.short }}
           path: D:\a\genai-os\genai-os\scripts\windows-setup-files\Kuwa-GenAI-OS.exe
