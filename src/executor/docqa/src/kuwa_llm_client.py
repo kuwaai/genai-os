@@ -28,7 +28,7 @@ class KuwaLlmClient:
         resp = await loop.run_in_executor(None, requests.get, url)
         if not resp.ok:
             return None
-        llm = [executor for executor in reversed(resp.json()) if not re.match(r"(.*[-_b]qa.*|whisper|painter)", executor)]
+        llm = [executor for executor in reversed(resp.json()) if not re.match(r"(.*[-_b]qa.*|whisper|painter|tool/.*)", executor)]
         logger.debug(llm)
         llm.append(None)
         return llm[0]
