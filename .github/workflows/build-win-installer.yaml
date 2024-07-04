@@ -21,11 +21,12 @@ jobs:
               },
               @{
                   Uri = "$baseUri/Languages/Unofficial/ChineseSimplified.isl"
-                  OutFile = "$downloadDir/ChineseTraditional.isl"
-              },
+                  OutFile = "$downloadDir/ChineseSimplified.isl"
+              }
           )
 
           $jobs = @()
+          New-Item -ItemType Directory -Path $downloadDir -Force
 
           foreach ($file in $files) {
               $jobs += Start-ThreadJob -Name $file.OutFile -ScriptBlock {
