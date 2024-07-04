@@ -10,16 +10,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-tags: ''
+          fetch-tags: true
       
       - name: Remove extra header in git config
         run: |
-          git config --unset http.https://github.com/.extraheader
+          git config --unset "http.https://github.com/.extraheader"
 
       - id: commit
         uses: prompt/actions-commit-hash@v3
 
-      - name: Install Language
+      - name: Install extra language file of Inno Setup 6
         run: |
           $baseUri = 'https://raw.github.com/jrsoftware/issrc/main/Files'
           $downloadDir = "$env:ProgramFiles (x86)\Inno Setup 6\Languages"
@@ -51,13 +51,13 @@ jobs:
               Receive-Job -Job $job
           }
 
-      - name: Compile .ISS to .EXE Installer
+      - name: Compile .ISS to .EXE installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
           path: scripts/windows-setup-files/kuwa_genai_os.iss
           options: /O+
       
-      - name: Archive code coverage results
+      - name: Export the installer
         uses: actions/upload-artifact@v4
         with:
           name: Kuwa-GenAI-OS-${{ github.ref_name }}${{ steps.commit.outputs.short }}
