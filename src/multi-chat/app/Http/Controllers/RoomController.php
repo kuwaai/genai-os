@@ -440,7 +440,7 @@ class RoomController extends Controller
                 $upload_result = $this->upload_file($request);
                 if ($upload_result['succeed']) {
                     $next_input = $input;
-                    $input = $upload_result['url'];
+                    $input = $upload_result['url'] . '\n' . $input;
                 }else{
                     return redirect()
                         ->route('room.home')
@@ -480,8 +480,7 @@ class RoomController extends Controller
         return redirect()
             ->route('room.chat', $Room->id)
             ->with('selLLMs', $selectedLLMs)
-            ->with('mode_track', request()->input('mode_track'))
-            ->with('next_input', $next_input);
+            ->with('mode_track', request()->input('mode_track'));
     }
 
     public function new(Request $request): RedirectResponse
@@ -553,7 +552,7 @@ class RoomController extends Controller
             $upload_result = $this->upload_file($request);
             if ($upload_result['succeed']) {
                 $next_input = $input;
-                $input = $upload_result['url'];
+                $input = $upload_result['url'] . '\n' . $input;
             }else{
                 return redirect()
                     ->route('room.chat', $roomId)
@@ -619,6 +618,6 @@ class RoomController extends Controller
                 }
             }
         }
-        return redirect()->route('room.chat', $roomId)->with('selLLMs', $selectedLLMs)->with('mode_track', request()->input('mode_track'))->with('next_input', $next_input);
+        return redirect()->route('room.chat', $roomId)->with('selLLMs', $selectedLLMs)->with('mode_track', request()->input('mode_track'));
     }
 }
