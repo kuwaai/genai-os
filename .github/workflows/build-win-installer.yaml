@@ -13,7 +13,7 @@ jobs:
       - name: Install Language
         run: |
           $baseUri = 'https://raw.github.com/jrsoftware/issrc/main/Files'
-          $downloadDir = "$env:ProgramFiles(x86)\Inno Setup 6\Languages"
+          $downloadDir = "$env:ProgramFiles (x86)\Inno Setup 6\Languages"
           $files = @(
               @{
                   Uri = "$baseUri/Languages/Unofficial/ChineseTraditional.isl"
