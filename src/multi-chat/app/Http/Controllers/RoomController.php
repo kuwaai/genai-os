@@ -580,20 +580,7 @@ class RoomController extends Controller
                     $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false, 'created_at' => $start, 'updated_at' => $start]);
                     $history->save();
                     $access_code = LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code;
-                    if (in_array($access_code, ['doc_qa', 'web_qa', 'doc_qa_b5', 'web_qa_b5']) && !$chained) {
-                        $tmp = json_encode([
-                            [
-                                'msg' => Histories::where('chat_id', '=', $chat->id)
-                                    ->select('msg')
-                                    ->orderby('created_at')
-                                    ->orderby('id', 'desc')
-                                    ->get()
-                                    ->first()->msg,
-                                'isbot' => false,
-                            ],
-                            ['msg' => $request->input('input'), 'isbot' => false],
-                        ]);
-                    } elseif ($chained) {
+                    if ($chained) {
                         $tmp = Histories::where('chat_id', '=', $chat->id)
                             ->select('msg', 'isbot')
                             ->orderby('created_at')
@@ -601,7 +588,7 @@ class RoomController extends Controller
                             ->get()
                             ->toJson();
                     } else {
-                        $tmp = json_encode([['msg' => $request->input('input'), 'isbot' => false]]);
+                        $tmp = json_encode([['msg' => $input, 'isbot' => false]]);
                     }
 
                     $history = new Histories();
