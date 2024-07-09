@@ -4,3 +4,4 @@ php artisan model:config "tool/token_counter" "TokenCounter" --image "..\..\wind
 popd
 pushd ..\..\..\src\executor\token_counter
 start /b "" "python" "main.py" "--access_code" "tool/token_counter"
+popd

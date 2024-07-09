@@ -366,7 +366,7 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 	echo popd>> run.bat
 ) else (
 	REM Save configuration to run.bat
-	echo pushd %cd%> run.bat
+	echo pushd "%cd%"> run.bat
 	echo call ..\..\src\variables.bat>> run.bat
 	echo popd>> run.bat
 	echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!>> run.bat
