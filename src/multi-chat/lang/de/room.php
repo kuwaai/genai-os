@@ -13,5 +13,10 @@ return [
     'label.share_link' => 'Link teilen (derzeit nur für Sie zugänglich)',
     'model.hint' => 'Bitte wählen Sie ein Modell aus, das Sie verwenden möchten:',
     'connecting.hint' => '- Verbinden -',
-    'connected.hint' => 'Verbindung erfolgreich'
+    'connected.hint' => 'Verbindung erfolgreich',
+    'button.sort_by' => 'Sortieren nach',
+    'sort_by.date' => 'Sortieren nach Datum',
+    'sort_by.name' => 'Sortieren nach Name (a-z)',
+    'sort_by.name_desc' => 'Sortieren nach Name (z-a)',
+    'sort_by.model' => 'Sortieren nach Modellreihenfolge',
 ];

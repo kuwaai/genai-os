@@ -13,5 +13,10 @@ return [
     'label.share_link' => 'リンクの共有 (現在は自分でのみアクセスできます)',
     'model.hint' => '使用するモデルを 1 つ選択してください:',
     'connecting.hint' => '- 接続中 -',
-    'connected.hint' => '接続に成功しました。'
+    'connected.hint' => '接続に成功しました。',
+    'button.sort_by' => '並び替え',
+    'sort_by.date' => '日付順',
+    'sort_by.name' => '名前順 (昇順)',
+    'sort_by.name_desc' => '名前順 (降順)',
+    'sort_by.model' => 'モデル順',
 ];

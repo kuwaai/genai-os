@@ -1,32 +1,77 @@
 <x-app-layout>
     @php
-        function sortBots($bots)
+        function sortBotsByDate($bots)
         {
+            /*
+             * Sort the bots according to the creation date (most recent first).
+             */
+            $bots = $bots->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
+            return $bots;
+        }
+        function sortBotsByModel($bots)
+        {
+            /*
+             * Sort the bots according to the model order specified in the
+             * database, prioritizing the creation date (most recent first) for
+             * bots with the same model order.
+             */
+            $bots = $bots
+                ->sortBy('order')
+                ->groupBy('order')
+                ->map(function ($subSet) {
+                    return sortBotsByDate($subSet);
+                })->collapse();
+            return $bots;
+        }
+        function sortBotsByName($bots)
+        {
+            /*
+             * Sort the bots according to their name (a-z).
+             */
+            $bots = $bots->sortBy('name');
+            return $bots;
+        }
+        function sortBotsByNameDesc($bots)
+        {
+            /*
+             * Sort the bots according to their name (z-a).
+             */
+            $bots = $bots->sortByDesc('name');
+            return $bots;
+        }
+        function sortUserBots($bots, $sortingFunc = 'sortBotsByModel')
+        {
+            /*
+             * Prioritize sorting the user's bot over other bots.
+             */
+
             $userId = request()->user()->id;
             // Filter and sort the bots owned by the current user
             $userBots = $bots
                 ->filter(function ($bot) use ($userId) {
                     return $bot->owner_id == $userId;
-                })
-                ->sortBy('order')
-                ->groupBy('order')
-                ->map(function ($subSet) {
-                    return $subSet->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
-                })->collapse();
+                });
+            $userBots = $sortingFunc($userBots);
 
-            // Filter the remaining bots and randomize them
+            // Filter the remaining bots and sorting them
             $otherBots = $bots
                 ->filter(function ($bot) use ($userId) {
                     return $bot->owner_id != $userId;
-                })
-                ->sortBy('order')
-                ->groupBy('order')
-                ->map(function ($subSet) {
-                    return $subSet->sortByDesc('created_at'); 
-                })->collapse();
+                });
+            $otherBots = $sortingFunc($otherBots);
 
             // Merge the sorted user bots with the randomized other bots
             return $userBots->merge($otherBots)->values();
+        }
+        function addIndexProperty($arr_of_objs, $prop_name = 'index') {
+            /*
+             * Add the index as a property to each item in the array of objects.
+             */
+            $result = $arr_of_objs->map(function (object $item, int $index) use ($prop_name) {
+                $item->$prop_name = $index;
+                return $item;
+            });
+            return $result;
         }
 
         $result = App\Models\Bots::Join('llms', function ($join) {
@@ -67,7 +112,38 @@
             ->orderby('llms.order')
             ->orderby('bots.created_at')
             ->get();
-        $result = sortBots($result);
+
+        $sorting_methods = [
+            // The default sorting method
+            [
+                "index_data_attribute" => "model-order-index",
+                "sorting_method" => "sortBotsByModel",
+                "name" => __('room.sort_by.model')
+            ],
+            
+            // Other sorting method
+            [
+                "index_data_attribute" => "date-order-index",
+                "sorting_method" => "sortBotsByDate",
+                "name" => __('room.sort_by.date')
+            ],
+            [
+                "index_data_attribute" => "name-order-index",
+                "sorting_method" => "sortBotsByName",
+                "name" => __('room.sort_by.name')
+            ],
+            [
+                "index_data_attribute" => "name-desc-order-index",
+                "sorting_method" => "sortBotsByNameDesc",
+                "name" => __('room.sort_by.name_desc')
+            ],
+        ];
+
+        foreach ($sorting_methods as $method) {
+            $result = sortUserBots($result, $method["sorting_method"]);
+            $result = addIndexProperty($result, $method["index_data_attribute"]);
+        }
+        $result = sortUserBots($result, $sorting_methods[0]["sorting_method"]);
     @endphp
     @env('arena')
     @php
@@ -256,15 +332,63 @@
                     aria-controls="chatlist_drawer">
                     <i class="fas fa-bars"></i>
                 </button>
+                <div class="flex justify-end">
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button onclick="$(this).find('.fa-chevron-up').toggleClass('rotate-180')"
+                                class="inline-flex items-center px-3 py-3 text-sm leading-4 font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 focus:outline-none transition ease-in-out duration-150">
+                                <div>{{__('room.button.sort_by')}}</div>
+
+                                <div class="ml-1">
+                                    <i class="fas fa-chevron-up mx-3 transform duration-500 rotate-180"
+                                        style="font-size:10px;"></i>
+                                </div>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            @foreach ($sorting_methods as $method)
+                                @php
+                                $onclick = "sortBots('" . $method["index_data_attribute"] . "')";
+                                @endphp
+                                <x-dropdown-link href="#" onclick="{{ $onclick }}" class="kuwa-bot-sorting-method {{ $loop->index==0 ? 'underline' : '' }}" data-key="{{ $method['index_data_attribute'] }}">
+                                    {{ $method["name"] }}
+                                </x-dropdown-link>
+                            @endforeach
+                            <script>
+                                function sortBots(key) {
+                                    let container = $('.kuwa-bots-container');
+                                    let bots = container.children();
+                                    bots.sort((a, b) => $(a).data(key) - $(b).data(key))
+                                        .appendTo(container);
+                                    
+                                    let sorting_options = $('.kuwa-bot-sorting-method');
+                                    sorting_options.each((index, element) => {$(element).removeClass('underline')});
+                                    sorting_options.filter(`*[data-key="${key}"]`).addClass('underline');
+                                }
+                            </script>
+                        </x-slot>
+                        
+                    </x-dropdown>
+
+                </div>
+                
                 <div
-                    class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
+                    class="kuwa-bots-container mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
                     @foreach ($result as $bot)
                         <form method="post"
                             class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
-                            action="{{ route('room.new') }}">
+                            action="{{ route('room.new') }}"
+                            @foreach ($sorting_methods as $sorting_method)
+                                @php
+                                $data_attribute = $sorting_method["index_data_attribute"];
+                                @endphp
+                                data-{{ $data_attribute }}="{{ $bot->$data_attribute }}"
+                            @endforeach
+                        >
                             @csrf
                             <button class="h-full w-full flex flex-col items-center justify-start">
-                                <img id="llm_img" class="rounded-full mx-auto bg-black" width="50px" height="50px"
+                                <img class="rounded-full mx-auto bg-black" width="50px" height="50px"
                                     src="{{ $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                                 <p class="text-sm line-clamp-2">{{ $bot->name }}</p>
                                 @if ($bot->description)
@@ -275,6 +399,7 @@
                             </button>
                         </form>
                     @endforeach
+                    </div>
                 </div>
             </div>
         @else

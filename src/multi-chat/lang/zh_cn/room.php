@@ -13,5 +13,10 @@ return [
     'label.share_link' => '分享链接（目前只有自己可存取）',
     'model.hint' => '请选择一个您想使用的模型：',
     'connecting.hint' => '- 连接中 -',
-    'connected.hint' => '连接成功'
+    'connected.hint' => '连接成功',
+    'button.sort_by' => '排序方式',
+    'sort_by.date' => '按日期排序',
+    'sort_by.name' => '按名称排序 (a-z)',
+    'sort_by.name_desc' => '按名称排序 (z-a)',
+    'sort_by.model' => '按模型顺序排序',
 ];
