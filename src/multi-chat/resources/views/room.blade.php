@@ -8,14 +8,22 @@
                 ->filter(function ($bot) use ($userId) {
                     return $bot->owner_id == $userId;
                 })
-                ->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
+                ->sortBy('order')
+                ->groupBy('order')
+                ->map(function ($subSet) {
+                    return $subSet->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
+                })->collapse();
 
             // Filter the remaining bots and randomize them
             $otherBots = $bots
                 ->filter(function ($bot) use ($userId) {
                     return $bot->owner_id != $userId;
                 })
-                ->sortByDesc('created_at');
+                ->sortBy('order')
+                ->groupBy('order')
+                ->map(function ($subSet) {
+                    return $subSet->sortByDesc('created_at'); 
+                })->collapse();
 
             // Merge the sorted user bots with the randomized other bots
             return $userBots->merge($otherBots)->values();
@@ -59,7 +67,6 @@
             ->orderby('llms.order')
             ->orderby('bots.created_at')
             ->get();
-
         $result = sortBots($result);
     @endphp
     @env('arena')
