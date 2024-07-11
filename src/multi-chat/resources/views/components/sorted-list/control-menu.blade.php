@@ -15,12 +15,12 @@ Structure of sorting_methods:
 ]
 */ ?>
 
-@props(['sorting_methods' => [], 'id' => 'bots'])
+@props(['sorting_methods' => [], 'id' => 'bots', 'btn_class' => ''])
 
 <x-dropdown {{ $attributes->merge(['align' => 'right', 'width' => '48']) }}>
     <x-slot name="trigger">
         <button onclick="$(this).find('.fa-chevron-up').toggleClass('rotate-180')"
-            class="inline-flex items-center px-3 py-3 text-sm leading-4 font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 focus:outline-none transition ease-in-out duration-150">
+            class="{{ $btn_class }} inline-flex items-center focus:outline-none transition ease-in-out duration-150">
             <div>{{__('room.button.sort_by')}}</div>
 
             <div class="ml-1">
