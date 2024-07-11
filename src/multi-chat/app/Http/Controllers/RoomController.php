@@ -84,17 +84,17 @@ class RoomController extends Controller
     public function main(Request $request)
     {
         $room_id = $request->route('room_id');
-        if ($room_id) {
-            $chat = ChatRoom::find($room_id);
-            if ($chat == null || $chat->user_id != Auth::user()->id) {
-                return redirect()->route('room.home');
-            } else {
-                #LLMs::findOrFail($chat->bot_id)->enabled == true) {
-                return view('room');
-            }
+        if (!$room_id) {
+            return view('room.home');
+            #return redirect()->route('archives', $request->route('chat_id'));
         }
-        return view('room');
-        #return redirect()->route('archives', $request->route('chat_id'));
+        $chat = ChatRoom::find($room_id);
+        if ($chat == null || $chat->user_id != Auth::user()->id) {
+            return redirect()->route('room.home');
+        } else {
+            #LLMs::findOrFail($chat->bot_id)->enabled == true) {
+            return view('room');
+        }
     }
 
     public function import(Request $request)
