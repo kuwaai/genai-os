@@ -63,10 +63,11 @@
             // Merge the sorted user bots with the randomized other bots
             return $userBots->merge($otherBots)->values();
         }
-        function addIndexProperty($arr_of_objs, $prop_name = 'index') {
+        function addIndexProperty($arr_of_objs, $key) {
             /*
              * Add the index as a property to each item in the array of objects.
              */
+            $prop_name = "{$key}-order-index";
             $result = $arr_of_objs->map(function (object $item, int $index) use ($prop_name) {
                 $item->$prop_name = $index;
                 return $item;
@@ -116,24 +117,24 @@
         $sorting_methods = [
             // The default sorting method
             [
-                "index_data_attribute" => "model-order-index",
+                "index_key" => "model",
                 "sorting_method" => "sortBotsByModel",
                 "name" => "room.sort_by.model"
             ],
             
             // Other sorting method
             [
-                "index_data_attribute" => "date-order-index",
+                "index_key" => "date",
                 "sorting_method" => "sortBotsByDate",
                 "name" => "room.sort_by.date"
             ],
             [
-                "index_data_attribute" => "name-order-index",
+                "index_key" => "name",
                 "sorting_method" => "sortBotsByName",
                 "name" => "room.sort_by.name"
             ],
             [
-                "index_data_attribute" => "name-desc-order-index",
+                "index_key" => "name-desc",
                 "sorting_method" => "sortBotsByNameDesc",
                 "name" => "room.sort_by.name_desc"
             ],
@@ -141,7 +142,7 @@
 
         foreach ($sorting_methods as $method) {
             $result = sortUserBots($result, $method["sorting_method"]);
-            $result = addIndexProperty($result, $method["index_data_attribute"]);
+            $result = addIndexProperty($result, $method["index_key"]);
         }
         $result = sortUserBots($result, $sorting_methods[0]["sorting_method"]);
     @endphp
@@ -337,18 +338,12 @@
                     </x-sorted-list.control-menu>
                 </div>
                 
-                <div
-                    class="kuwa-sorted-list-bots mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
-                    @foreach ($result as $bot)
-                        <form method="post"
+                <div class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
+                    @foreach($result as $bot)
+                        <x-sorted-list.item html_tag="form" :$sorting_methods :record="$bot"
+                            method="post"
                             class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
                             action="{{ route('room.new') }}"
-                            @foreach ($sorting_methods as $sorting_method)
-                                @php
-                                $data_attribute = $sorting_method["index_data_attribute"];
-                                @endphp
-                                data-{{ $data_attribute }}="{{ $bot->$data_attribute }}"
-                            @endforeach
                         >
                             @csrf
                             <button class="h-full w-full flex flex-col items-center justify-start">
@@ -361,9 +356,8 @@
                                 @endif
                                 <input name="llm[]" value="{{ $bot->id }}" style="display:none;">
                             </button>
-                        </form>
+                        </x-sorted-list.item>
                     @endforeach
-                    </div>
                 </div>
             </div>
         @else
