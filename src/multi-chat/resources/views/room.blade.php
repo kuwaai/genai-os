@@ -118,24 +118,24 @@
             [
                 "index_data_attribute" => "model-order-index",
                 "sorting_method" => "sortBotsByModel",
-                "name" => __('room.sort_by.model')
+                "name" => "room.sort_by.model"
             ],
             
             // Other sorting method
             [
                 "index_data_attribute" => "date-order-index",
                 "sorting_method" => "sortBotsByDate",
-                "name" => __('room.sort_by.date')
+                "name" => "room.sort_by.date"
             ],
             [
                 "index_data_attribute" => "name-order-index",
                 "sorting_method" => "sortBotsByName",
-                "name" => __('room.sort_by.name')
+                "name" => "room.sort_by.name"
             ],
             [
                 "index_data_attribute" => "name-desc-order-index",
                 "sorting_method" => "sortBotsByNameDesc",
-                "name" => __('room.sort_by.name_desc')
+                "name" => "room.sort_by.name_desc"
             ],
         ];
 
@@ -333,50 +333,12 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="flex justify-end">
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            <button onclick="$(this).find('.fa-chevron-up').toggleClass('rotate-180')"
-                                class="inline-flex items-center px-3 py-3 text-sm leading-4 font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 focus:outline-none transition ease-in-out duration-150">
-                                <div>{{__('room.button.sort_by')}}</div>
-
-                                <div class="ml-1">
-                                    <i class="fas fa-chevron-up mx-3 transform duration-500 rotate-180"
-                                        style="font-size:10px;"></i>
-                                </div>
-                            </button>
-                        </x-slot>
-
-                        <x-slot name="content">
-                            @foreach ($sorting_methods as $method)
-                                @php
-                                $onclick = "sortBots('" . $method["index_data_attribute"] . "')";
-                                @endphp
-                                <x-dropdown-link href="#" onclick="{{ $onclick }}" class="kuwa-bot-sorting-method" data-key="{{ $method['index_data_attribute'] }}">
-                                    {{ $method["name"] }}
-                                </x-dropdown-link>
-                            @endforeach
-                            <script>
-                                function sortBots(key) {
-                                    let container = $('.kuwa-bots-container');
-                                    let bots = container.children();
-                                    bots.sort((a, b) => $(a).data(key) - $(b).data(key))
-                                        .appendTo(container);
-                                    
-                                    let sorting_options = $('.kuwa-bot-sorting-method');
-                                    sorting_options.each((index, element) => {$(element).removeClass('underline')});
-                                    sorting_options.filter(`*[data-key="${key}"]`).addClass('underline');
-                                    localStorage.setItem("kuwa-bots-sort-by", key);
-                                }
-                                $(sortBots(localStorage.getItem("kuwa-bots-sort-by") || "{{$sorting_methods[0]['index_data_attribute']}}"));
-                            </script>
-                        </x-slot>
-                        
-                    </x-dropdown>
-
+                    <x-sorted-list.control-menu :$sorting_methods>
+                    </x-sorted-list.control-menu>
                 </div>
                 
                 <div
-                    class="kuwa-bots-container mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
+                    class="kuwa-sorted-list-bots mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
                     @foreach ($result as $bot)
                         <form method="post"
                             class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
