@@ -351,7 +351,7 @@
                                 @php
                                 $onclick = "sortBots('" . $method["index_data_attribute"] . "')";
                                 @endphp
-                                <x-dropdown-link href="#" onclick="{{ $onclick }}" class="kuwa-bot-sorting-method {{ $loop->index==0 ? 'underline' : '' }}" data-key="{{ $method['index_data_attribute'] }}">
+                                <x-dropdown-link href="#" onclick="{{ $onclick }}" class="kuwa-bot-sorting-method" data-key="{{ $method['index_data_attribute'] }}">
                                     {{ $method["name"] }}
                                 </x-dropdown-link>
                             @endforeach
@@ -365,7 +365,9 @@
                                     let sorting_options = $('.kuwa-bot-sorting-method');
                                     sorting_options.each((index, element) => {$(element).removeClass('underline')});
                                     sorting_options.filter(`*[data-key="${key}"]`).addClass('underline');
+                                    localStorage.setItem("kuwa-bots-sort-by", key);
                                 }
+                                $(sortBots(localStorage.getItem("kuwa-bots-sort-by") || "{{$sorting_methods[0]['index_data_attribute']}}"));
                             </script>
                         </x-slot>
                         
