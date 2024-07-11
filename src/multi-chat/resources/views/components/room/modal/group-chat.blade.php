@@ -1,4 +1,6 @@
-@props(['result'])
+{{-- The "Create Chatroom" popup --}}
+
+@props(['result', 'sorting_methods'])
 
 <div id="create-model-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
     tabindex="-1" aria-hidden="true"
@@ -28,11 +30,18 @@
             <form method="post" action="{{ route('room.new') }}" class="p-6 overflow-hidden flex-1 flex-col flex"
                 id="create_room" onsubmit="return checkForm()">
                 @csrf
-                <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    {{ __('room.modal.label') }}</p>
+                <div class="flex justify-between">
+                    <p class="inline-block text-sm font-normal text-gray-500 dark:text-gray-400" style="line-height: 1.5rem;">
+                        {{ __('room.modal.label') }}
+                    </p>
+                
+                    <x-sorted-list.control-menu :$sorting_methods
+                     btn_class="rounded-md text-sm font-normal text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100"
+                    />
+                </div>
                 <ul class="my-4 space-y-3 overflow-auto scrollbar flex-1">
                     @foreach ($result as $LLM)
-                        <li>
+                        <x-sorted-list.item html_tag="li" :$sorting_methods :record="$LLM">
                             <input type="checkbox" name="llm[]" id="llm_create_check_{{ $LLM->id }}"
                                 value="{{ $LLM->id }}" class="hidden peer">
                             <label for="llm_create_check_{{ $LLM->id }}"
@@ -51,7 +60,7 @@
                                     </div>
                                 </div>
                             </label>
-                        </li>
+                        </x-sorted.list.item>
                     @endforeach
                 </ul>
                 <div>
