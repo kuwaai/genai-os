@@ -35,7 +35,7 @@ Structure of sorting_methods:
             @php
             $onclick = "sortLists('" . $id . "', $(this).data('key'))";
             @endphp
-            <x-dropdown-link href="#" onclick="{{ $onclick }}" class="kuwa-{{ $id }}-sorting-method" data-key="{{ $method['index_key'] }}">
+            <x-dropdown-link href="javascript:;" onclick="{{ $onclick }}" class="kuwa-{{ $id }}-sorting-method" data-key="{{ $method['index_key'] }}">
                 {{ __($method["name"]) }}
             </x-dropdown-link>
         @endforeach
