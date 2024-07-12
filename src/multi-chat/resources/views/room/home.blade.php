@@ -1,154 +1,12 @@
 <x-app-layout>
+    @include('includes/sorted-bots');
     @php
-        function sortBotsByDate($bots)
-        {
-            /*
-             * Sort the bots according to the creation date (most recent first).
-             */
-            $bots = $bots->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
-            return $bots;
-        }
-        function sortBotsByModel($bots)
-        {
-            /*
-             * Sort the bots according to the model order specified in the
-             * database, prioritizing the creation date (most recent first) for
-             * bots with the same model order.
-             */
-            $bots = $bots
-                ->sortBy('order')
-                ->groupBy('order')
-                ->map(function ($subSet) {
-                    return sortBotsByDate($subSet);
-                })->collapse();
-            return $bots;
-        }
-        function sortBotsByName($bots)
-        {
-            /*
-             * Sort the bots according to their name (a-z).
-             */
-            $bots = $bots->sortBy('name');
-            return $bots;
-        }
-        function sortBotsByNameDesc($bots)
-        {
-            /*
-             * Sort the bots according to their name (z-a).
-             */
-            $bots = $bots->sortByDesc('name');
-            return $bots;
-        }
-        function sortUserBots($bots, $sortingFunc = 'sortBotsByModel')
-        {
-            /*
-             * Prioritize sorting the user's bot over other bots.
-             */
-
-            $userId = request()->user()->id;
-            // Filter and sort the bots owned by the current user
-            $userBots = $bots
-                ->filter(function ($bot) use ($userId) {
-                    return $bot->owner_id == $userId;
-                });
-            $userBots = $sortingFunc($userBots);
-
-            // Filter the remaining bots and sorting them
-            $otherBots = $bots
-                ->filter(function ($bot) use ($userId) {
-                    return $bot->owner_id != $userId;
-                });
-            $otherBots = $sortingFunc($otherBots);
-
-            // Merge the sorted user bots with the randomized other bots
-            return $userBots->merge($otherBots)->values();
-        }
-        function addIndexProperty($arr_of_objs, $key) {
-            /*
-             * Add the index as a property to each item in the array of objects.
-             */
-            $prop_name = "{$key}-order-index";
-            $result = $arr_of_objs->map(function (object $item, int $index) use ($prop_name) {
-                $item->$prop_name = $index;
-                return $item;
-            });
-            return $result;
-        }
-
-        $result = App\Models\Bots::Join('llms', function ($join) {
-            $join->on('llms.id', '=', 'bots.model_id');
-        })
-            ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
-            ->where('llms.enabled', '=', true)
-            ->wherein(
-                'bots.model_id',
-                DB::table('group_permissions')
-                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
-                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
-                    ->where('group_permissions.group_id', Auth::user()->group_id)
-                    ->where('permissions.name', 'like', 'model_%')
-                    ->get()
-                    ->pluck('model_id'),
-            )
-            ->where(function ($query) {
-                $query
-                    ->where('bots.visibility', '=', 0)->orwhere('bots.visibility', '=', 1)
-                    ->orWhere(function ($query) {
-                        $query->where('bots.visibility', '=', 3)->where('bots.owner_id', '=', request()->user()->id);
-                    })
-                    ->orWhere(function ($query) {
-                        $query
-                            ->where('bots.visibility', '=', 2)
-                            ->where('users.group_id', '=', request()->user()->group_id);
-                    });
-            })
-            ->select(
-                'llms.*',
-                'bots.*',
-                DB::raw('COALESCE(bots.description, llms.description) as description'),
-                DB::raw('COALESCE(bots.config, llms.config) as config'),
-                DB::raw('COALESCE(bots.image, llms.image) as image'),
-                'llms.name as llm_name',
-            )
-            ->orderby('llms.order')
-            ->orderby('bots.created_at')
-            ->get();
-
-        $sorting_methods = [
-            // The default sorting method
-            [
-                "index_key" => "model",
-                "sorting_method" => "sortBotsByModel",
-                "name" => "room.sort_by.model"
-            ],
-            
-            // Other sorting method
-            [
-                "index_key" => "date",
-                "sorting_method" => "sortBotsByDate",
-                "name" => "room.sort_by.date"
-            ],
-            [
-                "index_key" => "name",
-                "sorting_method" => "sortBotsByName",
-                "name" => "room.sort_by.name"
-            ],
-            [
-                "index_key" => "name-desc",
-                "sorting_method" => "sortBotsByNameDesc",
-                "name" => "room.sort_by.name_desc"
-            ],
-        ];
-
-        foreach ($sorting_methods as $method) {
-            $result = sortUserBots($result, $method["sorting_method"]);
-            $result = addIndexProperty($result, $method["index_key"]);
-        }
-        $result = sortUserBots($result, $sorting_methods[0]["sorting_method"]);
+        $bots = getSortedBots();
+        $sorting_methods = getBotSortingMethods();
     @endphp
     @env('arena')
     @php
-        $result = $result->where('access_code', '!=', 'feedback');
+        $bots = $bots->where('access_code', '!=', 'feedback');
     @endphp
     @endenv
     <x-chat.functions />
@@ -157,9 +15,9 @@
         <x-room.modal.delete_confirm />
     @endif
     @if (request()->user()->hasPerm('Room_update_new_chat'))
-        <x-room.modal.group-chat :$result :$sorting_methods />
+        <x-room.modal.group-chat :result="$bots" :$sorting_methods />
     @endif
-    <x-room.rooms.drawer :result="$result" />
+    <x-room.rooms.drawer :result="$bots" />
     @if (request()->user()->hasPerm('Room_update_import_chat'))
         <x-chat.modals.import_history :llms="$llms ?? []" />
     @endif
@@ -167,7 +25,7 @@
         <div
             class="bg-white dark:bg-gray-800 text-white w-64 hidden sm:flex flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 flex flex-1 flex-col h-full overflow-y-auto scrollbar">
-                @if ($result->count() == 0)
+                @if ($bots->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                         {!! __('chat.hint.no_llms') !!}
@@ -199,7 +57,7 @@
                             @endif
                         </div>
                     </div>
-                    <x-room.llm :result="$result" />
+                    <x-room.llm :result="$bots" />
                 @endif
             </div>
         </div>
@@ -218,7 +76,10 @@
             </div>
             
             <div class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
-                @foreach($result as $bot)
+                @foreach($bots as $bot)
+                    @php
+                    error_log(print_r($bot, true), 0);
+                    @endphp
                     <x-sorted-list.item html_tag="form" :$sorting_methods :record="$bot"
                         method="post"
                         class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
