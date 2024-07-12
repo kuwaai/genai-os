@@ -1,3 +1,4 @@
+{{-- This component will only appear in the mobile view --}}
 @props(['llms' => null, 'DC' => null, 'result' => null])
 
 <div id="chatlist_drawer"

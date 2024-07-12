@@ -157,10 +157,10 @@
         <x-room.modal.delete_confirm />
     @endif
     @if (request()->user()->hasPerm('Room_update_new_chat'))
-        <x-room.modal.group-chat :result="$result" />
+        <x-room.modal.group-chat :$result :$sorting_methods />
     @endif
     @if (!(request()->route('room_id') || session('llms')))
-        <x-room.rooms.drawer :result="$result" />
+        <x-room.rooms.drawer :$result />
     @else
         @if (request()->route('room_id'))
             @if (request()->user()->hasPerm('Room_update_feedback'))

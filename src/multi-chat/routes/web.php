@@ -143,7 +143,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::middleware(AdminMiddleware::class . ':tab_Room')
                     ->prefix('room')
                     ->group(function () {
-                        Route::get('/', [RoomController::class, 'main'])->name('room.home');
+                        Route::get('/', [RoomController::class, 'home'])->name('room.home');
 
                         Route::post('/new', [RoomController::class, 'new'])->name('room.new');
                         Route::middleware(AdminMiddleware::class . ':Room_update_new_chat')
@@ -174,7 +174,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
 
                         Route::get('/chain', [ChatController::class, 'update_chain'])->name('room.chain');
                         Route::post('/feedback', [ChatController::class, 'feedback'])->name('room.feedback');
-                        Route::get('/{room_id}', [RoomController::class, 'main'])->name('room.chat');
+                        Route::get('/{room_id}', [RoomController::class, 'chat_room'])->name('room.chat');
                     })
                     ->name('room');
 

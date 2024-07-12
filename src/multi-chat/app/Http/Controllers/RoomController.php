@@ -25,6 +25,8 @@ use Illuminate\Support\Arr;
 use DB;
 use Session;
 
+use function Laravel\Prompts\error;
+
 class RoomController extends Controller
 {
     public function share(Request $request)
@@ -81,18 +83,24 @@ class RoomController extends Controller
         ]);
         return response('Aborted', 200);
     }
-    public function main(Request $request)
+    public function home(Request $request)
+    {
+        // The selected bots are stored in the 'llms' session data.
+        if ($request->session()->exists('llms')){
+            return view('room');
+        } else {
+            return view('room.home');
+        }
+        // LLMs::findOrFail($chat->bot_id)->enabled == true) {
+        // return redirect()->route('archives', $request->route('chat_id'));
+    }
+    public function chat_room(Request $request)
     {
         $room_id = $request->route('room_id');
-        if (!$room_id) {
-            return view('room.home');
-            #return redirect()->route('archives', $request->route('chat_id'));
-        }
         $chat = ChatRoom::find($room_id);
         if ($chat == null || $chat->user_id != Auth::user()->id) {
             return redirect()->route('room.home');
         } else {
-            #LLMs::findOrFail($chat->bot_id)->enabled == true) {
             return view('room');
         }
     }
@@ -484,8 +492,10 @@ class RoomController extends Controller
     public function new(Request $request): RedirectResponse
     {
         $llms = $request->input('llm');
-        if (request()->user()->hasPerm('Room_update_new_chat') && count($llms) > 0) {
-            $result = Bots::wherein(
+        if (!request()->user()->hasPerm('Room_update_new_chat') || count($llms) == 0) {
+            return redirect()->route('room.home');
+        }
+        $result = Bots::wherein(
                 'model_id',
                 DB::table('group_permissions')
                     ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
@@ -495,19 +505,16 @@ class RoomController extends Controller
                     ->get()
                     ->pluck('model_id'),
             )
-                ->pluck('bots.id')
-                ->toarray();
+            ->pluck('bots.id')
+            ->toarray();
 
-            foreach ($llms as $i) {
-                if (!in_array($i, $result)) {
-                    return Redirect::route('room.home');
-                }
+        foreach ($llms as $i) {
+            if (!in_array($i, $result)) {
+                return Redirect::route('room.home');
             }
-
-            return redirect()->route('room.home')->with('llms', $llms);
         }
 
-        return redirect()->route('room.home');
+        return redirect()->route('room.home')->with('llms', $llms);
     }
 
     public function delete(Request $request): RedirectResponse
