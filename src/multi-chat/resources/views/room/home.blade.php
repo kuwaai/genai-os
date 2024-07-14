@@ -77,9 +77,6 @@
             
             <div class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
                 @foreach($bots as $bot)
-                    @php
-                    error_log(print_r($bot, true), 0);
-                    @endphp
                     <x-sorted-list.item html_tag="form" :$sorting_methods :record="$bot"
                         method="post"
                         class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
