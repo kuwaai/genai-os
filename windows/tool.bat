@@ -36,7 +36,7 @@ if /I "%userInput%"=="quit" (
     goto loop
 ) else if /I "%userInput%"=="switch" (
 	set version=
-	set /p version=Switch to version ^(cpu | 12.3 | 12.2 | 12.1^):
+	set /p version="Switch to version (cpu | 12.3 | 12.2 | 12.1):"
     pushd src
 	call switch.bat !version!
 	popd
