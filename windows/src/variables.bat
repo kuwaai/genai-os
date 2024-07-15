@@ -70,6 +70,8 @@ for /f "tokens=2 delims=-" %%v in ("%filename_ffmpeg%") do set "version_ffmpeg=%
 REM Environment variables for model cache
 set "KUWA_CACHE=%~dp0..\cache"
 mkdir "%KUWA_CACHE%"
+set "XDG_CACHE_HOME=%KUWA_CACHE%"
+set "PIP_CACHE_DIR=%KUWA_CACHE%\pip"
 set "TORCH_HOME=%KUWA_CACHE%\torch"
 set "CSIDL_LOCAL_APPDATA=%KUWA_CACHE%\appdata"
 set "HF_HOME=%KUWA_CACHE%\huggingface"
