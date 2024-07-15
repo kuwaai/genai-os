@@ -6,6 +6,8 @@ RUN apt-get update &&\
     apt-get install -y cmake build-essential git
 
 # Install the dependency of executor
+COPY docker/executor/requirements.txt ./requirements-docker.txt
+RUN pip install --no-cache-dir -r requirements-docker.txt
 COPY src/executor/requirements.txt ./
 RUN sed -i '/\.[/]*/d' ./requirements.txt &&\
     sed -i '/torch.*/d' ./requirements.txt
