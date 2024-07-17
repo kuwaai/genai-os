@@ -13,13 +13,28 @@
 
 <p align="center">
   <a href="http://makeapullrequest.com">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?logo=github&logoColor=white">
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square">
   </a>
   <a href="https://laravel.com/docs/10.x/releases">
-    <img src="https://img.shields.io/badge/maintained%20with-Laravel-cc00ff.svg">
+    <img src="https://img.shields.io/badge/maintained%20with-Laravel-cc00ff.svg?logo=laravel&logoColor=white">
+  </a>
+  <a href="https://discord.gg/Gu7zPavEmN">
+    <img src="https://img.shields.io/badge/discord-active-blue?logo=discord&logoColor=white">
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/github/v/release/kuwaai/genai-os">
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/github/downloads/kuwaai/genai-os/total">
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/github/license/kuwaai/genai-os">
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/github/stars/kuwaai">
   </a>
 </p>
 
