@@ -124,6 +124,7 @@ docker run --runtime nvidia --gpus all \
 kuwa-executor chatgpt --access_code vllm --log debug \
     --base_url "http://localhost:8000/v1" `# Change the API base URL to vLLM` \
     --api_key dummy `# Dummy API Key` \
+    --no_override_api_key `#Disable override the system API key with user API key.` \
     --model "google/gemma-7b-it" `# Specify Gemma 7B model`
 ```
 
