@@ -9,7 +9,12 @@ from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import google.generativeai as genai
 
+import mimetypes
+import requests
+import base64
+
 from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.llm_executor import extract_last_url
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -78,6 +83,48 @@ class GeminiExecutor(LLMExecutor):
         contents = [m["parts"][0]["text"] for m in messages]
         check_resp = await self.model.count_tokens_async(contents=contents)
         return check_resp.total_tokens
+
+    def fetch_attachment(self, url: str):
+        # Ref: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference#blob
+        supported_mime_types=[
+            "application/pdf", "text/plain",
+            "audio/mpeg", "audio/mp3", "audio/wav",
+            "image/png", "image/jpeg",
+            "video/mov", "video/mpeg", "video/mp4", "video/mpg",
+            "video/avi", "video/wmv", "video/mpegps", "video/flv",
+        ]
+
+        mime_type = None
+        content = None 
+        if url is not None and url != "":
+            mime_type = requests.head(url, allow_redirects=True).headers["content-type"]
+            if mime_type in supported_mime_types:
+                content = base64.b64encode(requests.get(url, stream=True, allow_redirects=True).content).decode("UTF-8")
+            logger.info("Attachment fetched.")
+
+        return mime_type, content
+
+    def parse_messages(self, msgs:[dict]):
+        """
+        Parse multi-modal messages from chat history.
+        """
+        result = []
+        for msg in msgs:
+            new_msg = {
+                    "parts":[],
+                    "role": {"user": "user", "assistant": "model"}[msg["role"]]
+                }
+            url, text = extract_last_url([msg])
+            mime_type, file_content = self.fetch_attachment(url)
+            new_msg["parts"].append({"text":text[0]["content"].encode("utf-8",'ignore').decode("utf-8")})
+            if file_content is not None:
+                new_msg["parts"].append({
+                    "mime_type": mime_type,
+                    "data": file_content
+                })
+            result.append(new_msg)
+
+        return result 
     
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
@@ -89,10 +136,7 @@ class GeminiExecutor(LLMExecutor):
 
             # Apply parsed modelfile data to Inference
             raw_inputs = modelfile.messages + history
-            msg = [{
-                    "parts":[{"text":i['content'].encode("utf-8",'ignore').decode("utf-8")}],
-                    "role": {"user": "user", "assistant": "model"}[i["role"]]
-                } for i in raw_inputs]
+            msg = self.parse_messages(raw_inputs)
             msg[-1]["parts"][0]['text'] = modelfile.before_prompt + msg[-1]["parts"][0]['text'] + modelfile.after_prompt
             msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
             
