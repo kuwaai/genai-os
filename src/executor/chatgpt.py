@@ -11,7 +11,15 @@ import openai
 import tiktoken
 from openai.resources.chat.completions import AsyncCompletions
 
+import io
+import functools
+import mimetypes
+import requests
+import base64
+from PIL import Image
+
 from kuwa.executor import LLMExecutor, Modelfile
+from kuwa.executor.llm_executor import extract_last_url
 from kuwa.executor.util import (
     expose_function_parameter,
     read_config,
@@ -27,7 +35,7 @@ CONTEXT_WINDOW = {
     ("gpt-3.5-turbo-instruct",): 4096,
     ("gpt-4", "gpt-4-0613"): 8192,
     ("gpt-4-32k", "gpt-4-32k-0613"): 32768,
-    ("gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-4-1106-preview", "gpt-4-vision-preview", "gpt-4-1106-vision-preview", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13"): 128000,
+    ("gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-4-1106-preview", "gpt-4-vision-preview", "gpt-4-1106-vision-preview", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-mini", "gpt-4o-mini-2024-07-18"): 128000,
 }
 
 class ChatGptDescParser(DescriptionParser):
@@ -135,11 +143,56 @@ class ChatGptExecutor(LLMExecutor):
         for message in messages:
             num_tokens += tokens_per_message
             for key, value in message.items():
+                if key=="content" and type(value) is list:
+                    value = [v["text"] for v in value if v["type"]=="text"][0]
                 num_tokens += len(encoding.encode(value))
                 if key == "name":
                     num_tokens += tokens_per_name
         num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
         return num_tokens
+
+    @functools.cache
+    def get_supported_image_mime(self):
+        ext2mime = lambda ext: mimetypes.guess_type(f"a{ext}")[0]
+        exts = Image.registered_extensions()
+        exts = {ex for ex, f in exts.items() if f in Image.OPEN}
+        mimes = {ext2mime(ex) for ex in exts} - {None}
+        return mimes
+
+    def fetch_image_as_data_url(self, url: str):
+        def image_to_data_url(img):
+            if img is None:
+                return None
+            buffered = io.BytesIO()
+            img.save(buffered, format="JPEG")
+            return 'data:image/jpeg;base64,' + base64.b64encode(buffered.getvalue()).decode("utf-8")
+        
+        image = None
+        if (url is not None and url != "") and\
+            requests.head(url, allow_redirects=True).headers["content-type"] in self.get_supported_image_mime():
+            image = Image.open(requests.get(url, stream=True, allow_redirects=True).raw)
+            logger.info("Image fetched.")
+
+        result = image_to_data_url(image) if image is not None else None
+        return result
+    
+    def parse_images(self, history: [dict]):
+        """
+        Parse image URL to image data URL in the messages.
+        """
+        result = []
+        for msg in history:
+            new_msg = msg.copy()
+            url, text = extract_last_url([msg])
+            data_url = self.fetch_image_as_data_url(url)
+            if data_url is not None:
+                new_msg["content"] = [
+                    {"type": "text", "text": text[0]["content"]},
+                    {"type": "image_url", "image_url": {"url": data_url}}
+                ]
+            result.append(new_msg)
+            
+        return result
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
@@ -158,6 +211,7 @@ class ChatGptExecutor(LLMExecutor):
                 msg = [{"content": system_prompt, "role": "system"}] + msg
 
             msg[-1]['content'] = modelfile.before_prompt + msg[-1]['content'] + modelfile.after_prompt
+            msg = self.parse_images(msg)
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return
