@@ -46,18 +46,23 @@ class GoogleFileStore:
         genai.configure(api_key=google_token)
     
     async def upload_file(self, content, mime_type:str):
-        checksum = hashlib.sha512(content).hexdigest()
-        if checksum in self.files:
-            return self.files[checksum]
+        name = hashlib.sha512(content).hexdigest()
+        suffix = mimetypes.guess_extension(mime_type)
+        try:
+            # Shortcut for the cached and valid file
+            if name in self.files and genai.get_file(name):
+                return self.files[name]
+        except:
+            pass
 
         uploaded_file = None
-        with tempfile.NamedTemporaryFile(suffix=mimetypes.guess_extension(mime_type)) as f:
+        with tempfile.NamedTemporaryFile(suffix=suffix) as f:
             f.write(content)
             f.flush()
-            uploaded_file = genai.upload_file(path=f.name, display_name=checksum)
-            logger.info(f"Uploaded file {checksum}")
+            uploaded_file = genai.upload_file(path=f.name, display_name=name)
+            logger.info(f"Uploaded file {name}")
             f.close()
-        self.files[checksum] = uploaded_file
+        self.files[name] = uploaded_file
         await self.wait_file_active(uploaded_file)
         return uploaded_file
 
@@ -78,8 +83,12 @@ class GoogleFileStore:
             return
         logger.info(f"Cleaning uploaded files")
         for file in self.files.values():
-            file.delete()
-            file = None
+            try:
+                file.delete()
+            except Exception as e:
+                logger.exception("Error deleting file")
+            finally:
+                file = None
         self.files = filter(None, self.files)
 
 class GeminiExecutor(LLMExecutor):
