@@ -11,7 +11,10 @@ import google.generativeai as genai
 
 import mimetypes
 import requests
-import base64
+import hashlib
+import tempfile
+import mimetypes
+import inspect
 
 from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.executor.llm_executor import extract_last_url
@@ -32,6 +35,53 @@ class GeminiDescParser(DescriptionParser):
         else:
             description = None
         return description
+
+class GoogleFileStore:
+    """
+    Upload files and delete through Gemini File API.
+    """
+
+    files = {} # Hashmap to cache uploaded files
+    def __init__(self, google_token):
+        genai.configure(api_key=google_token)
+    
+    async def upload_file(self, content, mime_type:str):
+        checksum = hashlib.sha512(content).hexdigest()
+        if checksum in self.files:
+            return self.files[checksum]
+
+        uploaded_file = None
+        with tempfile.NamedTemporaryFile(suffix=mimetypes.guess_extension(mime_type)) as f:
+            f.write(content)
+            f.flush()
+            uploaded_file = genai.upload_file(path=f.name, display_name=checksum)
+            logger.info(f"Uploaded file {checksum}")
+            f.close()
+        self.files[checksum] = uploaded_file
+        await self.wait_file_active(uploaded_file)
+        return uploaded_file
+
+    async def wait_file_active(self, file, retry_second=2.0, backoff_factor=1.1):
+        """
+        Wait until the uploaded file in ACTIVE state.
+        """
+        while True:
+            resp = genai.get_file(name=file.name)
+            logger.info(f"Waiting file state become ACTIVE. Current: {resp.state}")
+            if resp.state == genai.protos.File.State.ACTIVE:
+                break
+            await asyncio.sleep(retry_second)
+            retry_second *= backoff_factor
+
+    async def delete_all_files(self):
+        if len(self.files) == 0:
+            return
+        logger.info(f"Cleaning uploaded files")
+        for file in self.files.values():
+            file.delete()
+            file = None
+        self.files = filter(None, self.files)
+
 class GeminiExecutor(LLMExecutor):
 
     model_name: str = "gemini-1.5-pro"
@@ -99,12 +149,12 @@ class GeminiExecutor(LLMExecutor):
         if url is not None and url != "":
             mime_type = requests.head(url, allow_redirects=True).headers["content-type"]
             if mime_type in supported_mime_types:
-                content = base64.b64encode(requests.get(url, stream=True, allow_redirects=True).content).decode("UTF-8")
+                content = requests.get(url, stream=True, allow_redirects=True).content
             logger.info("Attachment fetched.")
 
         return mime_type, content
 
-    def parse_messages(self, msgs:[dict]):
+    async def parse_messages(self, msgs:[dict], file_store:GoogleFileStore):
         """
         Parse multi-modal messages from chat history.
         """
@@ -119,8 +169,10 @@ class GeminiExecutor(LLMExecutor):
             new_msg["parts"].append({"text":text[0]["content"].encode("utf-8",'ignore').decode("utf-8")})
             if file_content is not None:
                 new_msg["parts"].append({
-                    "mime_type": mime_type,
-                    "data": file_content
+                    "file_data": {
+                        "mime_type": mime_type,
+                        "file_uri": (await file_store.upload_file(file_content, mime_type)).uri
+                    }
                 })
             result.append(new_msg)
 
@@ -129,6 +181,7 @@ class GeminiExecutor(LLMExecutor):
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
             google_token = modelfile.parameters["_"].get("google_token") or self.args.api_key
+            file_store = GoogleFileStore(google_token)
 
             # Parse and process modelfile
             override_system_prompt = modelfile.override_system_prompt
@@ -136,7 +189,7 @@ class GeminiExecutor(LLMExecutor):
 
             # Apply parsed modelfile data to Inference
             raw_inputs = modelfile.messages + history
-            msg = self.parse_messages(raw_inputs)
+            msg = await self.parse_messages(raw_inputs, file_store)
             msg[-1]["parts"][0]['text'] = modelfile.before_prompt + msg[-1]["parts"][0]['text'] + modelfile.after_prompt
             msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
             
@@ -187,6 +240,7 @@ class GeminiExecutor(LLMExecutor):
             logger.exception("Error occurs when calling Gemini-Pro API.")
             yield str(e)
         finally:
+            await file_store.delete_all_files()
             self.proc = False
             logger.debug("finished")
 
