@@ -71,8 +71,10 @@ IF EXIST packages\%nginx_folder% (
 ) ELSE (
     REM Download and extract Nginx if not exists
     call src\download_extract.bat %url_Nginx% packages\%nginx_folder% packages\. nginx.zip
-    REM Overwrite the nginx.conf file
-    echo Overwrite the nginx.conf file.
+    ren "packages\%nginx_folder%\conf\nginx.conf" "nginx.conf.old"
+)
+IF NOT EXIST packages\%nginx_folder%\conf\nginx.conf (
+    echo Copying default nginx configuration.
     copy /Y src\nginx.conf "packages\%nginx_folder%\conf\nginx.conf"
 )
 
