@@ -17,6 +17,8 @@ RUN apt-get install -y libldap-dev libzip-dev &&\
 COPY src/multi-chat /app
 WORKDIR /app
 ## Install dependencies using npm and composer
+ENV HTTP_PROXY_REQUEST_FULLURI=0
+ENV HTTPS_PROXY_REQUEST_FULLURI=0
 RUN composer update --no-interaction &&\
     composer install --no-interaction --optimize-autoloader --no-dev &&\
     npm install
@@ -51,7 +53,8 @@ RUN apt-get update &&\
     apt-get install -y libldap-dev libzip-dev libcurl4-openssl-dev libonig-dev \
                        libxml2-dev libpq-dev libpng-dev &&\
     docker-php-ext-install curl mbstring xml zip ldap mysqli pdo_mysql pgsql pdo_pgsql gd
-RUN pecl install redis-6.0.2 &&\
+RUN pear config-set http_proxy "${https_proxy:-${HTTPS_PROXY}}" &&\
+    pecl install redis-6.0.2 &&\
     docker-php-ext-enable redis
 
 # Install tools to check service status
@@ -72,6 +75,8 @@ RUN chmod +x docker-entrypoint multi-chat
 # Setup the entry point
 ENV KUWA_MULTI_CHAT_VERSION="0.3.2-docker1"
 
+ENV no_proxy="kernel,web,localhost,127.0.0.0/8,::1,${no_proxy}"
+ENV NO_PROXY="kernel,web,localhost,127.0.0.0/8,::1,${NO_PROXY}"
 ENV KUWA_KERNEL_URL="http://kernel:9000"
 ENV APP_URL="http://localhost/"
 ENV APP_ENV="production"

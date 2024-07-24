@@ -1,6 +1,8 @@
 @echo off
 cd "%~dp0.."
 
+call src\getproxy.bat
+
 REM Variables for RunHiddenConsole
 set "url_RunHiddenConsole=https://github.com/wenshui2008/RunHiddenConsole/releases/download/1.0/RunHiddenConsole.zip"
 for %%I in ("%url_RunHiddenConsole%") do set "filename_RunHiddenConsole=%%~nxI"

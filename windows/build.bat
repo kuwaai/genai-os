@@ -133,6 +133,7 @@ if not exist "..\src\multi-chat\.env" (
 set "PATH=%~dp0packages\%node_folder%;%PATH%"
 
 REM Production update
+SET HTTP_PROXY_REQUEST_FULLURI=0
 pushd "..\src\multi-chat"
 call php ..\..\windows\packages\composer.phar update
 call php artisan key:generate --force

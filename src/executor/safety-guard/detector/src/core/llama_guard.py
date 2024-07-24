@@ -165,7 +165,7 @@ class LlamaGuard(GuardInterface):
     base_url = os.environ.get('TGI_URL', 'http://127.0.0.1:8182')
 
     result = ''
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(trust_env=True) as session:
         async with session.post(f'{base_url}/generate', json=data, headers=headers) as resp:
             response = await resp.json()
             result = response['generated_text'].strip()

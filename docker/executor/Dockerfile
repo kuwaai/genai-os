@@ -35,6 +35,8 @@ COPY docker/executor/docker-entrypoint /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 # Default parameters
+ENV no_proxy="kernel,web,localhost,127.0.0.0/8,::1,${no_proxy}"
+ENV NO_PROXY="kernel,web,localhost,127.0.0.0/8,::1,${NO_PROXY}"
 ENV EXECUTOR_TYPE="debug"
 ENV EXECUTOR_ACCESS_CODE="debug"
 ENV EXECUTOR_NAME="Debug Executor"

@@ -313,6 +313,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
                 connector=aiohttp.TCPConnector(ssl=False),
                 timeout=aiohttp.ClientTimeout(total=self.timeout),
                 headers=self.headers,
+                trust_env=True,
             )
         )
         async with self._lock:  # type: ignore
