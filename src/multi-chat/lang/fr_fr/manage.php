@@ -40,6 +40,7 @@ return [
     'hint.group_updated' => 'Groupe mis à jour avec succès !',
     'hint.group_created' => 'Groupe créé avec succès !',
     'modal.delete_group.header' => 'Êtes-vous sûr de vouloir supprimer ce groupe ?',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'La réduction du nombre maximal de fichiers téléchargeables supprimera les fichiers des utilisateurs excédentaires. Êtes-vous sûr ?',
 
     //Users
     'header.menu' => 'Menu principal',
@@ -108,6 +109,7 @@ return [
     'label.tos' => 'Conditions d\'utilisation',
     'label.upload_max_size_mb' => 'Taille maximale de fichier (Mo)',
     'label.upload_allowed_extensions' => 'Extensions de fichiers autorisées',
+    'label.upload_max_file_count' => 'Nombre maximum de fichiers téléchargeables (-1 pour illimité)',
 
     //Permissions
     'perm.Room_update_import_chat' => 'Importer la conversation',

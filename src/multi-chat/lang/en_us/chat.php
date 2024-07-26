@@ -77,4 +77,5 @@ return [
     'hint.processing' => 'Processing message...please wait...',
     'hint.upload_file_too_large' => 'The uploaded file exceeds the size limit.',
     'hint.upload_not_allowed_ext' => 'The uploaded file type is not allowed.',
+    'hint.upload_disabled_by_admin' => 'File upload has been disabled by the administrator',
 ];

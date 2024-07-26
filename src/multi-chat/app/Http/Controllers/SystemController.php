@@ -89,6 +89,10 @@ class SystemController extends Controller
         $model->value = implode(',', $upload_allowed_extensions);
         $model->save();
 
+        $model = SystemSetting::where('key', 'upload_max_file_count')->first();
+        $model->value = strval(intval($request->input('upload_max_file_count') ?? '-1'));
+        $model->save();
+
         $model = SystemSetting::where('key', 'tos')->first();
         $oldtos = $model->value;
         $model->value = $request->input('tos') ?? '';

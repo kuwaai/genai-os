@@ -335,8 +335,18 @@ class RoomController extends Controller
         }
         $max_file_size_mb = \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
         $allowed_file_exts = \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
+        $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
         $max_file_size_kb = strval(intval($max_file_size_mb ?: 20) * 1024);
         $allowed_file_exts = $allowed_file_exts ?: 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpg,bmp,png,zip,mp3,wav,flac,wma,m4a,aac';
+        $upload_max_file_count = intval($upload_max_file_count ?: -1);
+        
+        if ($upload_max_file_count == 0) {
+            return [
+                'succeed' => false,
+                'url' => null,
+                'msg' => __("chat.hint.upload_disabled_by_admin"),
+            ];
+        }
 
         Log::channel('analyze')->Debug("max_file_size_kb:". $max_file_size_kb);
         Log::channel('analyze')->Debug("allowed_file_exts:". $allowed_file_exts);
@@ -371,17 +381,18 @@ class RoomController extends Controller
 
         $files = File::files($storagePath);
 
-        /* Disable auto delete files
-        if (count($files) > 5) {
+        // Auto delete files
+        if ($upload_max_file_count >= 0 && count($files) > $upload_max_file_count) {
             usort($files, function ($a, $b) {
                 return filectime($a) - filectime($b);
             });
 
-            while (count($files) > 5) {
+            while (count($files) > $upload_max_file_count) {
                 $oldestFile = array_shift($files);
                 File::delete($storagePath . '/' . $oldestFile->getFilename());
             }
-        }*/
+        }
+
         //Create a chat and send that url into the llm
         $url = url('storage/' . $directory . '/' . rawurlencode($fileName));
         return [

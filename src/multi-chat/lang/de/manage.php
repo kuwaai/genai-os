@@ -92,6 +92,7 @@ return [
     'label.description' => 'Beschreibung',
     'modal.update_model.header' => 'Möchten Sie dieses Sprachmodellprofil wirklich aktualisieren?',
     'modal.delete_model.header' => 'Möchten Sie dieses Sprachmodellprofil wirklich löschen?',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'Das Verringern der maximalen Anzahl von Uploads löscht die überschüssigen Benutzerdateien. Sind Sie sicher?',
 
     // Einstellungen
     'header.settings' => 'Systemeinstellungen',
@@ -108,6 +109,7 @@ return [
     'label.tos' => 'Nutzungsbedingungen',
     'label.upload_max_size_mb' => 'Maximale Upload-Dateigröße (MB)',
     'label.upload_allowed_extensions' => 'Erlaubte Dateierweiterungen',
+    'label.upload_max_file_count' => 'Maximale Anzahl hochzuladender Dateien (-1 für unbegrenzt)',
 
     // Berechtigungen
     'perm.Room_update_import_chat' => 'Chat importieren',

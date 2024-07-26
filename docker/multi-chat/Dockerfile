@@ -73,7 +73,7 @@ WORKDIR /usr/local/bin
 RUN chmod +x docker-entrypoint multi-chat
 
 # Setup the entry point
-ENV KUWA_MULTI_CHAT_VERSION="0.3.2-docker1"
+ENV KUWA_MULTI_CHAT_VERSION="0.3.2-docker2"
 
 ENV no_proxy="kernel,web,localhost,127.0.0.0/8,::1,${no_proxy}"
 ENV NO_PROXY="kernel,web,localhost,127.0.0.0/8,::1,${NO_PROXY}"

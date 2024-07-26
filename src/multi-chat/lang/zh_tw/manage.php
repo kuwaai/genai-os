@@ -92,6 +92,7 @@ return [
     'label.description' => '敘述',
     'modal.update_model.header' => '您確定要更新這個語言模型設定檔嗎',
     'modal.delete_model.header' => '您確定要刪除這個語言模型設定檔嗎',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => '降低上傳檔案總數限制會刪除超出的使用者檔案，您確定嗎?',
 
     //setting
     'header.settings' => '系統設定',
@@ -108,6 +109,7 @@ return [
     'label.tos' => '服務條款',
     'label.upload_max_size_mb' => '上傳檔案大小限制(MB)',
     'label.upload_allowed_extensions' => '允許上傳的副檔名',
+    'label.upload_max_file_count' => '上傳檔案總數限制 (-1 表示不限制數量)',
 
     //Permissions
     'perm.Room_update_import_chat' => '匯入對話',

@@ -91,6 +91,7 @@ return [
     'label.description' => '설명',
     'modal.update_model.header' => '이 언어 모델 설정 파일을 업데이트 하시겠습니까?',
     'modal.delete_model.header' => '이 언어 모델 설정 파일을 삭제하시겠습니까?',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => '업로드 가능한 파일 개수 제한을 줄이면 초과된 사용자 파일이 삭제됩니다. 계속하시겠습니까?',
 
     //setting
     'header.settings' => '시스템 설정',
@@ -107,6 +108,7 @@ return [
     'label.tos' => '이용 약관',
     'label.upload_max_size_mb' => '업로드 파일 크기 제한(MB)',
     'label.upload_allowed_extensions' => '허용된 업로드 파일 확장자',
+    'label.upload_max_file_count' => '업로드 가능한 파일 개수 제한 (-1은 무제한)',
 
     //Permissions
     'perm.Room_update_import_chat' => '대화 가져오기',

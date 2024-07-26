@@ -91,6 +91,7 @@ return [
     'label.description' => 'Description',
     'modal.update_model.header' => 'Are you sure you want to UPDATE this LLM Profile?',
     'modal.delete_model.header' => 'Are you sure you want to DELETE this LLM Profile?',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'Decreasing the maximum number of uploaded files will delete the exceeding user files, are you sure?',
 
     //setting
     'header.settings' => 'System Settings',
@@ -107,6 +108,7 @@ return [
     'label.tos' => 'Terms of Service',
     'label.upload_max_size_mb' => 'Maximum upload file size (MB)',
     'label.upload_allowed_extensions' => 'Allowed file extensions',
+    'label.upload_max_file_count' => 'Maximum number of files allowed to upload (-1 means no limit)',
 
     //Permissions
     'perm.Room_update_import_chat' => 'Import Chat',

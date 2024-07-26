@@ -40,6 +40,7 @@ return [
     'hint.group_updated' => 'グループが正常に更新されました！',
     'hint.group_created' => 'グループが正常に作成されました！',
     'modal.delete_group.header' => '本当にこのグループを削除しますか',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'アップロードファイルの総数制限を減らすと、超過したユーザーファイルが削除されます。よろしいですか？',
 
     //Users
     'header.menu' => 'メインメニュー',
@@ -107,6 +108,7 @@ return [
     'label.tos' => '利用規約',
     'label.upload_max_size_mb' => 'アップロードファイルサイズ制限(MB)',
     'label.upload_allowed_extensions' => '許可されるアップロードファイル拡張子',
+    'label.upload_max_file_count' => 'アップロードファイルの総数制限 (-1 は無制限)',
 
     //Permissions
     'perm.Room_update_import_chat' => 'チャットのインポート',

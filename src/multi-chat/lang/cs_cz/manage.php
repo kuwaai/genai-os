@@ -39,6 +39,7 @@ return [
     'hint.group_updated' => 'Skupina byla úspěšně aktualizována!',
     'hint.group_created' => 'Skupina byla úspěšně vytvořena!',
     'modal.delete_group.header' => 'Opravdu chcete smazat tuto skupinu?',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'Snížení maximálního počtu nahraných souborů povede k odstranění souborů uživatelů přesahujících tento limit. Opravdu to chcete udělat?',
 
     // Users
     'header.menu' => 'Hlavní menu',
@@ -107,6 +108,7 @@ return [
     'label.tos' => 'Podmínky služby',
     'label.upload_max_size_mb' => 'Maximální velikost nahrávaného souboru (MB)',
     'label.upload_allowed_extensions' => 'Povolené přípony souborů',
+    'label.upload_max_file_count' => 'Maximální počet souborů pro nahrání (-1 znamená neomezeně)',
 
     //Permissions
     'perm.Room_update_import_chat' => 'Importovat konverzaci',

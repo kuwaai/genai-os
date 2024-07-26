@@ -77,4 +77,5 @@ return [
     'hint.processing' => 'メッセージを処理しています...しばらくお待ちください...',
     'hint.upload_file_too_large' => 'ファイルサイズが上限を超えています',
     'hint.upload_not_allowed_ext' => 'アップロードが許可されていないファイルの種類です',
+    'hint.upload_disabled_by_admin' => 'ファイルのアップロード機能は管理者によって無効化されています',
 ];

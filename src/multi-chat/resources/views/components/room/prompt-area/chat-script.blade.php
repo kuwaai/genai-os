@@ -17,6 +17,7 @@
 
     $upload_max_size_mb = SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
     $upload_allowed_extensions = SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
+    $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
 @endphp
 <script>
 @if (session('errorString'))
@@ -36,6 +37,10 @@
     }
     function uploadcheck() {
         if (!$("#upload")[0].files || $("#upload")[0].files[0].length <= 0) return;
+        if ({{ $upload_max_file_count == '0' ? 'true' : 'false' }}) {
+            showErrorMsg("{{ __('chat.hint.upload_disabled_by_admin') }}");
+            return;
+        }
 
         if ($("#upload")[0].files[0].size > {{ $upload_max_size_mb * (2 ** 20)}}){
             showErrorMsg("{{ __('chat.hint.upload_file_too_large') }}");

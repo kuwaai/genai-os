@@ -92,6 +92,7 @@ return [
      'label.description' => '叙述',
      'modal.update_model.header' => '您确定要更新这个语言模型设定档吗',
      'modal.delete_model.header' => '您确定要删除这个语言模型设定档吗',
+     'modal.confirm_setting_modal.shrink_max_upload_file_count' => '降低上传文件总数限制会删除超出的用户文件，您确定吗?',
 
      //setting
      'header.settings' => '系统设定',
@@ -108,6 +109,7 @@ return [
      'label.tos' => '服务条款',
      'label.upload_max_size_mb' => '上传文件大小限制(MB)',
      'label.upload_allowed_extensions' => '允许上传的文件扩展名',
+     'label.upload_max_file_count' => '上传文件总数限制 (-1 表示不限制数量)',
 
      //Permissions
      'perm.Room_update_import_chat' => '汇入对话',
