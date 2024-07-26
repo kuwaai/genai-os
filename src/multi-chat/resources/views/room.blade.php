@@ -1,5 +1,5 @@
 <x-app-layout>
-    @include('includes/sorted-bots');
+    @include('includes/sorted-bots')
     @php
         $bots = getSortedBots();
         $sorting_methods = getBotSortingMethods();
