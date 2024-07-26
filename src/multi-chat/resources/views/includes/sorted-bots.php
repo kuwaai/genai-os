@@ -16,7 +16,7 @@ function sortBotsByModel($bots)
         * bots with the same model order.
         */
     $bots = $bots
-        ->sortBy('order')
+        ->sortBy('order', SORT_NUMERIC)
         ->groupBy('order')
         ->map(function ($subSet) {
             return sortBotsByDate($subSet);
@@ -28,7 +28,7 @@ function sortBotsByName($bots)
     /*
         * Sort the bots according to their name (a-z).
         */
-    $bots = $bots->sortBy('name');
+    $bots = $bots->sortBy('name', SORT_LOCALE_STRING);
     return $bots;
 }
 function sortBotsByNameDesc($bots)
@@ -36,7 +36,7 @@ function sortBotsByNameDesc($bots)
     /*
         * Sort the bots according to their name (z-a).
         */
-    $bots = $bots->sortByDesc('name');
+    $bots = $bots->sortByDesc('name', SORT_LOCALE_STRING);
     return $bots;
 }
 function sortUserBots($bots, $sortingFunc = 'sortBotsByModel')
