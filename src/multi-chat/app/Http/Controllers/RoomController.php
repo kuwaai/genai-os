@@ -360,7 +360,13 @@ class RoomController extends Controller
  
         $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
         $storagePath = public_path('storage/' . $directory); // Adjusted path
-        $fileName = time() . '_' . $request->file->getClientOriginalName();
+        $filePathParts = pathinfo($request->file->getClientOriginalName());
+        $fileName = sprintf(
+            "%s-%s%s",
+            $filePathParts["filename"],
+            time(),
+            $filePathParts["extension"] ? ("." . $filePathParts["extension"]) : ""
+        );
         $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
 
         $files = File::files($storagePath);
