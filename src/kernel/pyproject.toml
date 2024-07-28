@@ -38,7 +38,7 @@ dependencies=[
 ]
 
 [project.urls]
-"Homepage" = "https://kuwaai.org/os/Intro"
+"Homepage" = "https://kuwaai.tw/os/Intro"
 "Bug Tracker" = "https://github.com/kuwaai/genai-os/issues"
 
 [project.scripts]

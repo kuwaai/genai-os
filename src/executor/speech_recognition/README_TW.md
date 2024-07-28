@@ -31,8 +31,8 @@ Kuwa Speech Recognizer 可以透過上傳錄音檔來產生逐字稿，支援時
 ## 語者辨識開啟方法
 1. 同意 [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0) 與 [pyannote/speaker-diarization-3.1](https://hf.co/pyannote/speaker-diarization-3.1) 的授權條款
 2. 參考各版本的指南加入 HuggingFace access token
-    1. [Windows 版指南](https://kuwaai.org/zh-Hant/blog/kuwa-os-v0.2.0-llama3-windows#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
-    2. [Docker 版指南](https://kuwaai.org/zh-Hant/blog/kuwa-os-v0.2.0-llama3-linux#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
+    1. [Windows 版指南](https://kuwaai.tw/zh-Hant/blog/kuwa-os-v0.2.0-llama3-windows#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
+    2. [Docker 版指南](https://kuwaai.tw/zh-Hant/blog/kuwa-os-v0.2.0-llama3-linux#%E6%96%B9%E6%B3%95%E4%B8%80%E7%99%BB%E5%85%A5-huggingface-%E5%90%91-meta-%E7%94%B3%E8%AB%8B%E5%AD%98%E5%8F%96%E6%AC%8A%E9%99%90)
 3. 於開啟 Executor 時的命令列加入參數 `--enable_diarization`，或是修改Modelfile相關參數
 
 ## 聊天指令

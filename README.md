@@ -2,7 +2,7 @@
 
 <h1 align="center">
   <br>
-  <a href="https://kuwaai.org/en-US/">
+  <a href="https://kuwaai.tw/en-US/">
   <img src="./src/multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
@@ -64,7 +64,7 @@
 ## Architecture
 > **Warning**: This a preliminary draft and may be subject to further changes.
 
-[![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
+[![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.tw/os/Intro)
 
 ## Dependencies
 

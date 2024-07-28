@@ -2,7 +2,7 @@
 
 <h1 align="center">
   <br>
-  <a href="https://kuwaai.org/zh-Hant/">
+  <a href="https://kuwaai.tw/zh-Hant/">
   <img src="./src/multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
@@ -49,7 +49,7 @@
 ## 架構
 > **警告**: 本草案為初步版本，可能會有進一步的更改。
 
-[![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
+[![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.tw/os/Intro)
 
 ## 依賴套件
 

@@ -37,8 +37,8 @@ The default Whisper Medium model is used with the speaker labeling function disa
 
 1. Agree to the terms of [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0) and [pyannote/speaker-diarization-3.1](https://hf.co/pyannote/speaker-diarization-3.1)
 2. Refer to the guides of each version to add HuggingFace access token
-   1. [Guide for Windows](https://kuwaai.org/blog/kuwa-os-v0.2.0-llama3-windows)
-   2. [Guide for Docker](https://kuwaai.org/blog/kuwa-os-v0.2.0-llama3-linux)
+   1. [Guide for Windows](https://kuwaai.tw/blog/kuwa-os-v0.2.0-llama3-windows)
+   2. [Guide for Docker](https://kuwaai.tw/blog/kuwa-os-v0.2.0-llama3-linux)
 3. Add the parameter `--enable_diarization` to the command line when the Executor is opened, or modify the corresponding parameters in the Modelfile
 
 ## Chat Commands

@@ -45,15 +45,15 @@ set "redis_folder=%filename_Redis:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_Redis%") do set "version_Redis=%%v"
 
 REM Variables for XpdfReader
-set "url_XpdfReader=https://dl.kuwaai.org/packages/xpdf/xpdf-tools-win-4.05.zip"
+set "url_XpdfReader=https://github.com/kuwaai/xpdf/releases/download/4.05-kuwa1/xpdf-tools-4.05-kuwa1-win-x64.zip"
 for %%I in ("%url_XpdfReader%") do set "filename_XpdfReader=%%~nxI"
 set "xpdfreader_folder=%filename_XpdfReader:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_XpdfReader%") do set "version_XpdfReader=%%v"
 
 REM Variables for Antiword
-set "url_antiword=https://dl.kuwaai.org/packages/antiword/antiword-0.37-windows.zip"
+set "url_antiword=https://softpedia-secure-download.com/dl/38dcd67da529881c2013aa6a09267623/66a6587b/100136188/software/office/antiword-0_37-windows.zip"
 for %%I in ("%url_antiword%") do set "filename_antiword=%%~nxI"
-set "antiword_folder=%filename_antiword:~0,-4%"
+set "antiword_folder=antiword"
 for /f "tokens=2 delims=-" %%v in ("%filename_antiword%") do set "version_antiword=%%v"
 set "HOME=%~dp0..\packages\%antiword_folder%\"
 
@@ -90,7 +90,7 @@ REM Prepare packages folder
 mkdir packages 2>nul
 
 REM init env
-set "PATH=%~dp0\bin;%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\bin;%~dp0..\packages\%ffmpeg_folder%\bin;%PATH%"
+set "PATH=%~dp0\bin;%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\;%~dp0..\packages\%ffmpeg_folder%\bin;%PATH%"
 
 if "%1"=="no_migrate" (
     echo Skipped migration
