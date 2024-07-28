@@ -55,7 +55,7 @@
                                             <img id="llm_img2" class="rounded-full m-auto bg-black" width="50px"
                                                 height="50px">
                                         </label>
-                                        <input id="update-bot_image" name="bot_image" onchange="change_bot_image()"
+                                        <input id="update-bot_image" name="bot_image" onchange="change_bot_image('#llm_img2', '#update-bot_image')"
                                                type="file" accept="image/*" style="display:none">
                                     </div>
                                 </div>
@@ -171,7 +171,7 @@
                                     {{ __('store.bot.base_model') }}
                                 </label>
                                 <input id="llm_name2" type="text" list="llm-list" name="llm_name" autocomplete="off"
-                                    oninput='change_bot_image($(this).val())'
+                                    oninput="change_bot_image('#llm_img2', '#update-bot_image', $(this).val())"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="{{ __('store.bot.base_model.label') }}">
                             </div>
@@ -307,30 +307,9 @@
         </div>
     </div>
 </div>
-<script>
-    function change_bot_image(new_base_bot_name) {
-        /**
-         * Dynamically updates the bot's displayed image based on user interaction.
-         *
-         * Image selection priority:
-         * 1. User-uploaded image (highest)
-         * 2. Base bot image (if the bot image hasn't been changed)
-         * 3. Original image (lowest)
-         */
-        const bot_image_elem = $("#llm_img2");
-        const [user_uploaded_image] = $("#update-bot_image")[0].files;
-        const follow_base_bot = bot_image_elem.data("follow-base-bot");
-        console.log(user_uploaded_image, new_base_bot_name, follow_base_bot)
-        let bot_image_uri = bot_image_elem.attr("src");
-        if (user_uploaded_image) {
-            bot_image_uri = URL.createObjectURL(user_uploaded_image);
-        } else if (follow_base_bot && new_base_bot_name) {
-            const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
-            bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") || fallback_image_uri;
-        }
-        bot_image_elem.attr("src", bot_image_uri);
-    }
+<script> 
     function detail_update(data, readonly) {
+        console.log(data);
         $("#save_bot").hide()
         $("#delete_bot").hide()
         if (!readonly) {

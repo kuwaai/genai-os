@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
@@ -182,7 +183,19 @@ class BotController extends Controller
                 $config['react_btn'] = $request->input('react_btn');
             }
             $config = json_encode($config);
-            $bot->fill(['name' => $request->input('bot_name'), 'type' => 'prompt', 'visibility' => $visibility, 'description' => $request->input('bot_describe'), 'owner_id' => $request->user()->id, 'model_id' => $model_id, 'config' => $config]);
+            $bot->fill([
+                'name' => $request->input('bot_name'),
+                'type' => 'prompt',
+                'visibility' => $visibility,
+                'description' => $request->input('bot_describe'),
+                'owner_id' => $request->user()->id,
+                'model_id' => $model_id,
+                'config' => $config
+            ]);
+            if ($file = $request->file('bot_image')) {
+                if ($bot->image) Storage::delete($bot->image);
+                $bot->image = $file->store('public/images');
+            }
             $bot->save();
             return redirect()
                 ->route('store.home')

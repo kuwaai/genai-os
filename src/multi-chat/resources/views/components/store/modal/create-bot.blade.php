@@ -25,7 +25,7 @@
                 </h3>
             </div>
             <!-- Modal body -->
-            <form method="post" action="{{ route('store.create') }}" class="p-6" id="create_room"
+            <form method="post" action="{{ route('store.create') }}" class="p-6" id="create_room" enctype="multipart/form-data"
                 onsubmit="return checkForm2()">
                 @csrf
                 <ul class="flex flex-wrap flex-col -mx-3 mb-2 items-center">
@@ -34,10 +34,12 @@
                             <div class="w-full px-3 mb-5">
                                 <div class="flex flex-wrap -mx-3">
                                     <div class="w-full px-3 flex flex-col items-center">
-                                        <label for="llm_name">
+                                        <label for="create-bot_image">
                                             <img id="llm_img" class="rounded-full m-auto bg-black" width="50px"
-                                                height="50px" src="/{{ config('app.LLM_DEFAULT_IMG') }}">
+                                                height="50px" src="{{ asset('/'. config('app.LLM_DEFAULT_IMG')) }}">
                                         </label>
+                                        <input id="create-bot_image" name="bot_image" onchange="change_bot_image('#llm_img', '#create-bot_image')"
+                                               type="file" accept="image/*" style="display:none">
                                     </div>
                                 </div>
                             </div>
@@ -159,7 +161,7 @@
                                     {{ __('store.bot.base_model') }}
                                 </label>
                                 <input type="text" list="llm-list" name="llm_name" autocomplete="off" id="llm_name"
-                                    oninput='$("#llm_img").attr("src",$(`#llm-list option[value="${$(this).val()}"]`).attr("src") ?? "/{{ config('app.LLM_DEFAULT_IMG') }}")'
+                                    oninput="change_bot_image('#llm_img', '#create-bot_image', $(this).val())"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="{{ __('store.bot.base_model.label') }}">
                                 <datalist id="llm-list">

@@ -133,6 +133,27 @@
         </div>
     </div>
     <script>
+        function change_bot_image(bot_image_elem, user_upload_elem, new_base_bot_name) {
+            /**
+             * Dynamically updates the bot's displayed image based on user interaction.
+             *
+             * Image selection priority:
+             * 1. User-uploaded image (highest)
+             * 2. Base bot image (if the bot image hasn't been changed)
+             * 3. Original image (lowest)
+             */
+            const [user_uploaded_image] = $(user_upload_elem)[0].files;
+            console.log('follow-base-bot',  $(bot_image_elem).data("follow-base-bot"));
+            const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
+            let bot_image_uri = $(bot_image_elem).attr("src");
+            if (user_uploaded_image) {
+                bot_image_uri = URL.createObjectURL(user_uploaded_image);
+            } else if (follow_base_bot && new_base_bot_name) {
+                const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
+                bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
+            }
+            $(bot_image_elem).attr("src", bot_image_uri);
+        }
         $(document).ready(function() {
             var div = $('.bot-showcase')[0];
             if (div) {
