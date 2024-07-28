@@ -278,6 +278,10 @@ class BotController extends Controller
                 if ($request->input('bot_describe')) {
                     $bot->description = $request->input('bot_describe');
                 }
+                if ($file = $request->file('bot_image')) {
+                    if ($bot->image) Storage::delete($bot->image);
+                    $bot->image = $file->store('public/images');
+                }
                 $bot->model_id = $model_id;
                 $bot->config = $config;
                 $bot->save();

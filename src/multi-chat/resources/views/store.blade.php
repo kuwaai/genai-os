@@ -39,7 +39,8 @@
                         'bots.*',
                         DB::raw('COALESCE(bots.description, llms.description) as description'),
                         DB::raw('COALESCE(bots.config, llms.config) as config'),
-                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                        'bots.image as image',
+                        'llms.image as base_image',
                         'llms.name as llm_name',
                         'users.group_id',
                     )
