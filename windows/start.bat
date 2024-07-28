@@ -1,7 +1,8 @@
 @echo off
 cd "%~dp0"
 if "%1" equ "__start__" (shift & goto main)
-cmd /s /c "%0 __start__ %* 2>&1 | src\tee.bat logs\start.log"
+if not exist "logs" mkdir logs
+cmd /s /c "%0 __start__ %* 2>&1 | src\bin\tee.exe logs\start.log"
 exit /b
 
 :main

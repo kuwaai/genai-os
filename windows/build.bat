@@ -1,7 +1,8 @@
 @echo off
 cd "%~dp0"
 if "%1" equ "__start__" (shift & goto main)
-cmd /s /c "%0 __start__ %* 2>&1 | src\tee.bat logs\build.log"
+if not exist "logs" mkdir logs
+cmd /s /c "%0 __start__ %* 2>&1 | src\bin\tee.exe logs\build.log"
 exit /b
 
 :main
@@ -10,21 +11,17 @@ call src\variables.bat
 cd "%~dp0"
 
 REM Check if VCredist is installed
-set found=0
 
 for /F "tokens=*" %%i in ('reg query "HKLM\SOFTWARE\Microsoft\VisualStudio" /s /f "Installed" 2^>nul') do (
-    set found=1
-    goto found
+    goto found_vcredist
 )
 
-:found
-if %found%==0 (
-    echo No Visual C++ Redistributable found, Please download vcredist from https://learn.microsoft.com/zh-tw/cpp/windows/latest-supported-vc-redist?view=msvc-170
-    echo Press any key to continue building...
-    pause
-) else (
-    echo Visual C++ Redistributable found.
-)
+echo No Visual C++ Redistributable found, Please download vcredist from https://learn.microsoft.com/zh-tw/cpp/windows/latest-supported-vc-redist?view=msvc-170
+echo Press any key to continue building...
+pause
+
+:found_vcredist
+echo Visual C++ Redistributable found.
 
 REM Download and extract RunHiddenConsole if not exists
 call src\download_extract.bat %url_RunHiddenConsole% packages\%RunHiddenConsole_folder% packages\%RunHiddenConsole_folder% RunHiddenConsole.zip

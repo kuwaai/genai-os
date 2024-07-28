@@ -71,7 +71,7 @@ for /f "tokens=2 delims=-" %%v in ("%filename_ffmpeg%") do set "version_ffmpeg=%
 
 REM Environment variables for model cache
 set "KUWA_CACHE=%~dp0..\cache"
-mkdir "%KUWA_CACHE%"
+if not exist "%KUWA_CACHE%" mkdir "%KUWA_CACHE%"
 set "XDG_CACHE_HOME=%KUWA_CACHE%"
 set "PIP_CACHE_DIR=%KUWA_CACHE%\pip"
 set "TORCH_HOME=%KUWA_CACHE%\torch"
@@ -90,7 +90,7 @@ REM Prepare packages folder
 mkdir packages 2>nul
 
 REM init env
-set "PATH=%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\bin;%~dp0..\packages\%ffmpeg_folder%\bin;%PATH%"
+set "PATH=%~dp0\bin;%~dp0..\packages\%xpdfreader_folder%\bin64;%~dp0..\packages\%python_folder%\Scripts;%~dp0..\packages\%python_folder%;%~dp0..\packages\%php_folder%;%~dp0..\packages\%node_folder%;%~dp0..\packages\%gitbash_folder%\cmd;%~dp0..\packages\%antiword_folder%\bin;%~dp0..\packages\%ffmpeg_folder%\bin;%PATH%"
 
 if "%1"=="no_migrate" (
     echo Skipped migration
