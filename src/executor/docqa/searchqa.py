@@ -64,6 +64,7 @@ class SearchQaExecutor(LLMExecutor):
         
         display_group = parser.add_argument_group('Display Options')
         display_group.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
+        display_group.add_argument('--hide_ref_content', action="store_true", help="Do not show the content of references.")
 
     def setup(self):
 
@@ -94,6 +95,7 @@ class SearchQaExecutor(LLMExecutor):
         self.num_url = search_params.get("num_url", self.args.num_url)
         self.user_agent = crawler_params.get("user_agent", self.args.user_agent)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
+        self.display_ref_content = not display_params.get("hide_ref_content", self.args.hide_ref_content)
         
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
@@ -114,6 +116,7 @@ class SearchQaExecutor(LLMExecutor):
             llm = self.llm,
             lang = lang,
             with_ref = self.with_ref,
+            display_ref_content = self.display_ref_content,
             user_agent=self.user_agent
         )
         self.proc = False

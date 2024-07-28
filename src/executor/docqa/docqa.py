@@ -61,6 +61,7 @@ class DocQaExecutor(LLMExecutor):
         
         display_group = parser.add_argument_group('Display Options')
         display_group.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
+        display_group.add_argument('--hide_ref_content', action="store_true", help="Do not show the content of references.")
         
 
     def setup(self):
@@ -87,6 +88,7 @@ class DocQaExecutor(LLMExecutor):
         # [TODO] Fetch pre-built DB from web
         self.pre_built_db = retriever_params.get("database", self.args.database)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
+        self.display_ref_content = not display_params.get("hide_ref_content", self.args.hide_ref_content)
         self.llm = KuwaLlmClient(
             base_url = self.args.api_base_url,
             kernel_base_url = self.kernel_url,
@@ -107,6 +109,7 @@ class DocQaExecutor(LLMExecutor):
             llm = self.llm,
             lang = lang,
             with_ref = self.with_ref,
+            display_ref_content = self.display_ref_content,
             user_agent=crawler_params.get("user_agent", self.args.user_agent)
         )
         self.proc = False

@@ -32,12 +32,14 @@ class DocQa:
     llm:KuwaLlmClient = KuwaLlmClient(),
     lang:str="en",
     with_ref:bool=False,
+    display_ref_content:bool=True,
     user_agent:str = None
     ):
     self.logger = logging.getLogger(__name__)
     self.llm = llm
     self.lang = lang
     self.with_ref = with_ref
+    self.display_ref_content = display_ref_content
     self.user_agent = user_agent
     if vector_db != None:
       self.pre_build_db = True
@@ -131,9 +133,9 @@ class DocQa:
       
       src = ref.source
       title = ref.title if ref.title is not None else src
-      content = ref.content
+      content = f'\n\n```plaintext\n{ref.content}\n```\n' if self.display_ref_content else ''
       link = src if src.startswith("http") else pathlib.Path(src).as_uri()
-      result += f'{i+1}. [{title}]({link})\n\n```plaintext\n{content}\n```\n\n'
+      result += f'{i+1}. [{title}]({link}){content}\n'
     result += f"</details>"
 
     return result
