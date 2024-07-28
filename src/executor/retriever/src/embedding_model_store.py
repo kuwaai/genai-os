@@ -37,7 +37,7 @@ class EmbeddingModelStore:
     def __init__(self, n_cached_model=3):
         self.cache = LRUCache(n_cached_model)
 
-    def load_model(self, model_name="thenlper/gte-base-zh"):
+    def load_model(self, model_name="intfloat/multilingual-e5-small"):
         """
         Load a embedding model.
         model_name: The sentence-transformers pre-trained model
@@ -53,7 +53,7 @@ class EmbeddingModelStore:
             logger.info(f'Embedding model {model_name} loaded.')
         return model
     
-    async def aload_model(self, model_name:str="thenlper/gte-base-zh"):
+    async def aload_model(self, model_name:str="intfloat/multilingual-e5-small"):
         loop = asyncio.get_running_loop()
         model = await loop.run_in_executor(None, self.load_model, model_name)
         return model

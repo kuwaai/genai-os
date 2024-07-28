@@ -50,7 +50,7 @@ class SearchQaExecutor(LLMExecutor):
                                             help='The user agent string when issuing the crawler.')
 
         retriever_group = parser.add_argument_group('Retriever Options')
-        retriever_group.add_argument('--embedding_model', default="thenlper/gte-base-zh", help='The HuggingFace name of the embedding model.')
+        retriever_group.add_argument('--embedding_model', default="intfloat/multilingual-e5-small", help='The HuggingFace name of the embedding model.')
         retriever_group.add_argument('--mmr_k', default=6, type=int, help='Number of chunk to retrieve after Maximum Marginal Relevance (MMR).')
         retriever_group.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
         retriever_group.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')

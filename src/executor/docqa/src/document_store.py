@@ -20,7 +20,7 @@ class DocumentStore:
 
   def __init__(
     self,
-    embedding_model = 'thenlper/gte-base-zh',
+    embedding_model = 'intfloat/multilingual-e5-small',
     mmr_k = 6,
     mmr_fetch_k = 12,
     chunk_size = 512,

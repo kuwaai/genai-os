@@ -14,7 +14,7 @@ class DocumentStore:
 
   config_filename = 'config.json'
 
-  def __init__(self, embedding_model_name = 'thenlper/gte-base-zh'):
+  def __init__(self, embedding_model_name = 'intfloat/multilingual-e5-small'):
     """
     Initialize the document store.
     embedding_model: The sentence-transformers pre-trained model

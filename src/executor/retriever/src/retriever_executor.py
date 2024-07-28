@@ -42,7 +42,7 @@ class RetrieverExecutor(LLMExecutor):
         splitter_group.add_argument('--chunk_overlap', default=128, type=int, help='The overlap between chunks in char.')
 
         embedding_model_group = parser.add_argument_group('Embedding Model Options')
-        embedding_model_group.add_argument('--default_embedding_model', default="thenlper/gte-base-zh", help='Name of the default embedding model.')
+        embedding_model_group.add_argument('--default_embedding_model', default="intfloat/multilingual-e5-small", help='Name of the default embedding model.')
         embedding_model_group.add_argument('--n_cached_embedding_model', default=3, type=int, help='Maximum embedding model to cache.')
 
         retrieving_group = parser.add_argument_group('Retrieving Options')

@@ -21,7 +21,7 @@ def construct_db(
     output_path:str,
     chunk_size:int = 512,
     chunk_overlap:int = 128,
-    embedding_model:str = 'thenlper/gte-base-zh'
+    embedding_model:str = 'intfloat/multilingual-e5-small'
     ):
     """
     Construct vector database from local documents and save to the destination.
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
     parser.add_argument("--chunk-size", help="The chunk size to split the document.", type=int, default=512)
     parser.add_argument("--chunk-overlap", help="The chunk size to split the document.", type=int, default=128)
-    parser.add_argument("--embedding-model", help="the embedding model to use", type=str, default="thenlper/gte-base-zh")
+    parser.add_argument("--embedding-model", help="the embedding model to use", type=str, default="intfloat/multilingual-e5-small")
     parser.add_argument("--log", help="the log level. (INFO, DEBUG, ...)", type=str, default="INFO")
     args = parser.parse_args()
     
