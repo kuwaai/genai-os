@@ -151,8 +151,9 @@ fill="currentFill" />
                 // Add classes and set target attribute
                 links.addClass('text-blue-700 hover:text-blue-900').prop('target', '_blank');
 
-                // Iterate over each <a> element
-                links.each(function() {
+                // Display decoded URL
+                links.filter(function(){return isValidURL($(this).text());})
+                     .each(function() {
                     // Get the current href attribute
                     var originalUrl = $(this).attr('href');
 
