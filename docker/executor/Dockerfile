@@ -9,7 +9,7 @@ RUN apt-get update &&\
 COPY docker/executor/requirements.txt ./requirements-docker.txt
 RUN pip install --no-cache-dir -r requirements-docker.txt
 COPY src/executor/requirements.txt ./
-RUN sed -i '/\.[/]*/d' ./requirements.txt &&\
+RUN sed -i '/^\.[\/]*/d' ./requirements.txt &&\
     sed -i '/torch.*/d' ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY src/executor/docqa/requirements.txt ./docqa/requirements.txt
