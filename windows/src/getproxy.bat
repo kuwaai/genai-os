@@ -23,7 +23,9 @@ if "!proxyEnable!" neq "0x1" (
 :: Get ProxyServer value
 for /f "tokens=3" %%a in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer ^| findstr /i "ProxyServer"') do set "proxyServer=%%a"
 
-if "!proxyServer:==!" equ "!proxyServer!" (
+:: Check if the ProxyServer does not match the form <scheme>=<proxy>.
+echo !ProxyServer! | findstr "=" >nul
+if %errorlevel% neq 0 (
     :: Use one setting for all protocols
     set "proxyServer=http=!proxyServer!;https=!proxyServer!;ftp=!proxyServer!"
 )
@@ -54,14 +56,14 @@ for %%p in ("!proxyServer:;=" "!") do (
 
 :: Use SOCKS proxy for HTTP(S) if available
 if "!socks_proxy!" neq "" (
-    if "!http_proxy!" equ ""  set "http_proxy=http://!socks_proxy!"
-    if "!https_proxy!" equ "" set "https_proxy=https://!socks_proxy!"
+    if "!http_proxy!" equ ""  set "http_proxy=!socks_proxy!"
+    if "!https_proxy!" equ "" set "https_proxy=!socks_proxy!"
 )
 
 :: Parse no_proxy configuration
 for /f "tokens=3" %%a in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyOverride ^| findstr /i "REG_SZ"') do set "no_proxy=%%a"
 set "no_proxy=!no_proxy:;=,!"
-set "no_proxy=!no_proxy:<local>=localhost,127.0.0.0/8,::1/128!"
+set "no_proxy=!no_proxy:<local>=localhost,127.0.0.0/8!"
 
 ::Clean up
 set proxyEnable=
