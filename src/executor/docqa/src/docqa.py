@@ -63,14 +63,14 @@ class DocQa:
 
   def replace_chat_history(self, chat_history:[dict], task:str, question:str, related_docs:[str], override_prompt:str):
     llm_input = self.generate_llm_input(task, question, related_docs, override_prompt)
-    modified_chat_history = chat_history[:-1] + [{"isbot": False, "msg": llm_input}]
-    if modified_chat_history[0]["msg"] is None:
+    modified_chat_history = chat_history[:-1] + [{"role": "user", "content": llm_input}]
+    if modified_chat_history[0]["content"] is None:
       if len(modified_chat_history) != 2: # Multi-round
-        modified_chat_history[0]["msg"] = i18n.t("docqa.summary_prompt")
+        modified_chat_history[0]["content"] = i18n.t("docqa.summary_prompt")
       else: # Single-round
         modified_chat_history = modified_chat_history[1:]
     modified_chat_history = [
-      {"msg": "[Empty message]", "isbot": r["isbot"]} if r["msg"] == '' else r
+      {"content": "[Empty message]", "role": r["role"]} if r["content"] == '' else r
       for r in modified_chat_history
     ]
 
@@ -84,8 +84,8 @@ class DocQa:
     return english_rate >= threshold
 
   def get_final_user_input(self, chat_history: [dict]) -> str:
-    final_user_record = next(filter(lambda x: x['isbot'] == False, reversed(chat_history)))
-    return final_user_record['msg']
+    final_user_record = next(filter(lambda x: x['role'] == "user", reversed(chat_history)))
+    return final_user_record['content']
 
   async def fetch_documents(self, url:str):
     # Fetching documents
@@ -142,8 +142,7 @@ class DocQa:
 
   async def process(self, urls: Iterable, chat_history: [dict], modelfile:Modelfile, auth_token=None) -> Generator[str, None, None]:
     override_qa_prompt = modelfile.override_system_prompt
-    chat_history = [{"msg": i["content"], "isbot": i["role"]=="assistant"} for i in chat_history]
-    chat_history = [{"msg": self.filter_detail(i["msg"]), "isbot": i["isbot"]} for i in chat_history]
+    chat_history = [{"content": self.filter_detail(i["content"]), "role": i["role"]} for i in chat_history]
 
     self.logger.debug(f"Chat history: {chat_history}")
 
@@ -226,8 +225,8 @@ class DocQa:
     #     auth_token=auth_token,
     #     messages=[
     #       {
-    #         "isbot": False,
-    #         "msg": self.generate_llm_input('translate', result, [])
+    #         "role": "user",
+    #         "content": self.generate_llm_input('translate', result, [])
     #       },
     #     ]
     #   )

@@ -12,7 +12,7 @@ def invoke_model(prompt, model="gemini-pro", base_url="https://chatdev.gai.tw"):
         "Authorization": f"Bearer {auth_token}",
     }
     request_body = {
-        "messages": [{"isbot": False, "msg": prompt,}],
+        "messages": [{"role": "user", "content": prompt,}],
         "model": model,
     }
 

@@ -271,131 +271,130 @@ class ProfileController extends Controller
             ->join('users', 'tokenable_id', '=', 'users.id')
             ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
-        if ($result->exists()) {
-            $user = $result->first();
-            if (User::find($user->id)->hasPerm('Room_read_access_to_api') || (config('app.API_Key') != null && config('app.API_Key') == $request->input('key'))) {
-                if (isset($jsonData['messages']) && isset($jsonData['model'])) {
-                    $llm = LLMs::where('access_code', '=', $jsonData['model']);
-
-                    if ($llm->exists()) {
-                        $llm = $llm->first();
-
-                        $tmp = json_encode($jsonData['messages']);
-                        $lang = $jsonData['lang'] ?? key(config('app.LANGUAGES'));
-
-                        if ($tmp === false && json_last_error() !== JSON_ERROR_NONE) {
-                            $errorResponse = [
-                                'status' => 'error',
-                                'message' => 'The msg format is incorrect.',
-                            ];
-                            return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
-                        } else {
-                            // Input is a valid JSON string
-                            $history = new APIHistories();
-                            $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => $user->id]);
-                            $history->save();
-
-                            $response = new StreamedResponse();
-                            $response->headers->set('Content-Type', 'text/event-stream');
-                            $response->headers->set('Cache-Control', 'no-cache');
-                            $response->headers->set('X-Accel-Buffering', 'no');
-                            $response->headers->set('charset', 'utf-8');
-                            $response->headers->set('Connection', 'close');
-
-                            $response->setCallback(function () use ($request, $history, $tmp, $llm, $user, $lang) {
-                                $client = new Client(['timeout' => 300]);
-                                Redis::rpush('api_' . $user->tokenable_id, $history->id);
-                                Redis::expire('usertask_' . $user->tokenable_id, 1200);
-                                RequestChat::dispatch($tmp, $llm->access_code, $user->id, $history->id, $lang, 'api_' . $history->id);
-
-                                $req = $client->get(route('api.stream'), [
-                                    'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-                                    'query' => [
-                                        'key' => config('app.API_Key'),
-                                        'user_id' => $user->tokenable_id,
-                                        'history_id' => $history->id,
-                                    ],
-                                    'stream' => true,
-                                ]);
-                                $stream = $req->getBody();
-                                $resp = [
-                                    'choices' => [
-                                        [
-                                            'delta' => [
-                                                'content' => '',
-                                                'role' => null,
-                                            ],
-                                        ],
-                                    ],
-                                    'created' => time(),
-                                    'id' => 'chatcmpl-' . $history->id,
-                                    'model' => $llm->access_code,
-                                    'object' => 'chat.completion',
-                                    'usage' => [],
-                                ];
-                                $line = '';
-                                while (!$stream->eof()) {
-                                    $char = $stream->read(1);
-
-                                    if ($char === "\n") {
-                                        $line = trim($line);
-                                        if (substr($line, 0, 5) === 'data:') {
-                                            $jsonData = (object) json_decode(trim(substr($line, 5)));
-                                            if ($jsonData !== null) {
-                                                $resp['choices'][0]['delta']['content'] = $jsonData->msg;
-                                                echo 'data: ' . json_encode($resp) . "\n\n";
-                                                ob_flush();
-                                                flush();
-                                            }
-                                        } elseif (substr($line, 0, 6) === 'event:') {
-                                            if (trim(substr($line, 5)) == 'close') {
-                                                echo "event: close\n\n";
-                                                ob_flush();
-                                                flush();
-                                                $client->disconnect();
-                                                break;
-                                            }
-                                        }
-                                        $line = '';
-                                    } else {
-                                        $line .= $char;
-                                    }
-                                }
-                                $history->fill(['output' => $resp['choices'][0]['delta']['content']]);
-                                $history->save();
-                            });
-                            return $response;
-                        }
-                    } else {
-                        // Handle the case where the specified model doesn't exist
-                        $errorResponse = [
-                            'status' => 'error',
-                            'message' => 'The specified model does not exist.',
-                        ];
-                        return response()->json($errorResponse, 404, [], JSON_UNESCAPED_UNICODE);
-                    }
-                } else {
-                    // Handle the case where 'messages' and 'model' are not present in $jsonData
-                    $errorResponse = [
-                        'status' => 'error',
-                        'message' => 'The JSON data is missing required fields.',
-                    ];
-                    return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
-                }
-            } else {
-                $errorResponse = [
-                    'status' => 'error',
-                    'message' => 'You have no permission to use Chat API',
-                ];
-            }
-        } else {
+        if (!$result->exists()) {
             $errorResponse = [
                 'status' => 'error',
                 'message' => 'Authentication failed',
             ];
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
         }
 
-        return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        $user = $result->first();
+        if (
+            !User::find($user->id)->hasPerm('Room_read_access_to_api') &&
+            (config('app.API_Key') == null || config('app.API_Key') != $request->input('key'))
+        ) {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'You have no permission to use Chat API',
+            ];
+            return response()->json($errorResponse, 403, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        if (!isset($jsonData['messages']) || !isset($jsonData['model'])) {
+            // Handle the case where 'messages' and 'model' are not present in $jsonData
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'The JSON data is missing required fields.',
+            ];
+            return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $llm = LLMs::where('access_code', '=', $jsonData['model']);
+
+        if (!$llm->exists()) {
+            // Handle the case where the specified model doesn't exist
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'The specified model does not exist.',
+            ];
+            return response()->json($errorResponse, 404, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $llm = $llm->first();
+
+        $jsonData['messages'] = array_map(function($x){
+            return [
+                'isbot' => $x['role'] === 'user' ? false : true,
+                'msg' => $x['content']
+            ];
+        },$jsonData['messages']);
+        $messages_json = json_encode($jsonData['messages']);
+        $lang = $jsonData['lang'] ?? key(config('app.LANGUAGES'));
+
+        if ($messages_json === false && json_last_error() !== JSON_ERROR_NONE) {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'The msg format is incorrect.',
+            ];
+            return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        error_log($messages_json, 1);
+        
+        // Input is a valid JSON string
+        $history = new APIHistories();
+        $history->fill(['input' => $messages_json, 'output' => '* ...thinking... *', 'user_id' => $user->id]);
+        $history->save();
+
+        Redis::rpush('api_' . $user->tokenable_id, $history->id);
+        Redis::expire('usertask_' . $user->tokenable_id, 1200);
+        RequestChat::dispatch($messages_json, $llm->access_code, $user->id, $history->id, $lang, 'api_' . $history->id);
+
+        $response = new StreamedResponse();
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        $response->headers->set('charset', 'utf-8');
+        $response->headers->set('Connection', 'close');
+        
+        set_exception_handler(function ($exception) {
+            if ($exception->getMessage() != 'Connection closed') {
+                Log::error('Uncaught exception when reading backend stream: ' . $exception->getMessage());
+            }
+        });
+
+        $response->setCallback(function() use ($user, $history, $llm) {
+            $backend_callback = function ($event, $message) use ($history, $llm){
+                $resp = [
+                    'choices' => [
+                        [
+                            'delta' => [
+                                'content' => '',
+                                'role' => "assistant",
+                            ],
+                        ],
+                    ],
+                    'created' => time(),
+                    'id' => 'chatcmpl-' . $history->id,
+                    'model' => $llm->access_code,
+                    'object' => 'chat.completion',
+                    'usage' => [],
+                ];
+                if ($event == 'Ended') {
+                    echo "event: close\n\n";
+                    ob_flush();
+                    flush();
+                } elseif ($event == 'New') {
+                    $resp['choices'][0]['delta']['content'] = $message;
+                    echo 'data: ' . json_encode($resp) . "\n\n";
+                    ob_flush();
+                    flush();
+                } elseif ($event == 'Error') {
+                    throw new Exception($message);
+                }
+                
+                $history->fill(['output' => $resp['choices'][0]['delta']['content']]);
+                $history->save();
+            };
+            $this->read_backend_stream(
+                $history->id,
+                $user->tokenable_id,
+                $backend_callback
+            );
+
+        });
+        return $response;
     }
 
     public function api_abort(Request $request)
@@ -405,85 +404,110 @@ class ProfileController extends Controller
             ->join('users', 'tokenable_id', '=', 'users.id')
             ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')));
-        if ($result->exists()) {
-            $user = $result->first();
-            if (User::find($user->id)->hasPerm('Room_read_access_to_api') || (config('app.API_Key') != null && config('app.API_Key') == $request->input('key'))) {
-                $list = \Illuminate\Support\Facades\Redis::lrange('api_' . $user->tokenable_id, 0, -1);
-                $integers = array_map(function ($element) {
-                    return is_string($element) ? -((int) $element) : null;
-                }, $list);
-                $integers = array_filter($integers, function ($element) {
-                    return $element !== null;
-                });
-                $client = new Client(['timeout' => 300]);
-                $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
-                $msg = $client->post($agent_location . '/' . RequestChat::$agent_version . '/chat/abort', [
-                    'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-                    'form_params' => [
-                        'history_id' => json_encode($integers),
-                        'user_id' => $user->tokenable_id,
-                    ],
-                ]);
-                $response = [
-                    'status' => 'success',
-                    'message' => 'Aborted',
-                    'tokenable_id' => $user->tokenable_id,
-                    'name' => $user->name,
-                ];
-
-                return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
-            } else {
-                $errorResponse = [
-                    'status' => 'error',
-                    'message' => 'You have no permission to use Chat API',
-                ];
-            }
-        } else {
-            $errorResponse = [
+        if (!$result->exists()) {
+             $errorResponse = [
                 'status' => 'error',
                 'message' => 'Authentication failed',
             ];
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
         }
 
-        return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        $user = $result->first();
+        
+        if (!User::find($user->id)->hasPerm('Room_read_access_to_api') && 
+            (config('app.API_Key') == null || config('app.API_Key') != $request->input('key'))) {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'You have no permission to use Chat API',
+            ];
+            return response()->json($errorResponse, 403, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $list = Redis::lrange('api_' . $user->tokenable_id, 0, -1);
+        $integers = array_map(function ($element) {
+            return is_string($element) ? -((int) $element) : null;
+        }, $list);
+        $integers = array_filter($integers, function ($element) {
+            return $element !== null;
+        });
+        $client = new Client(['timeout' => 300]);
+        $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
+        $msg = $client->post($agent_location . '/' . RequestChat::$agent_version . '/chat/abort', [
+            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'form_params' => [
+                'history_id' => json_encode($integers),
+                'user_id' => $user->tokenable_id,
+            ],
+        ]);
+        $response = [
+            'status' => 'success',
+            'message' => 'Aborted',
+            'tokenable_id' => $user->tokenable_id,
+            'name' => $user->name,
+        ];
+
+        return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
     public function api_stream(Request $request)
     {
+        set_exception_handler(function ($exception) {
+            if ($exception->getMessage() != 'Connection closed') {
+                Log::error('Uncaught SSE Exception: ' . $exception->getMessage());
+            }
+        });
+
+        if (config('app.API_Key') == null || config('app.API_Key') != $request->input('key')) {
+            throw new Exception("API key doesn't match app.API_Key.");
+        }
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no');
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
-        set_exception_handler(function ($exception) {
-            if ($exception->getMessage() != 'Connection closed') {
-                Log::error('Uncaught SSE Exception: ' . $exception->getMessage());
-            }
-        });
-        $response->setCallback(function () use ($request) {
-            if (config('app.API_Key') != null && config('app.API_Key') == $request->input('key')) {
-                if ($request->input('history_id') && $request->input('user_id')) {
-                    if (in_array($request->input('history_id'), Redis::lrange('api_' . $request->input('user_id'), 0, -1))) {
-                        $client = Redis::connection();
-                        $client->subscribe('api_' . $request->input('history_id'), function ($message, $raw_history_id) use ($client) {
-                            [$type, $msg] = explode(' ', $message, 2);
-                            if ($type == 'Ended') {
-                                echo 'event: close\n\n';
-                                ob_flush();
-                                flush();
-                                $client->disconnect();
-                            } elseif ($type == 'New') {
-                                echo 'data: ' . $msg . "\n";
-                                ob_flush();
-                                flush();
-                            }
-                        });
-                    }
+        
+        $response->setCallback(function() use ($request) {
+            $backend_callback = function ($event, $message){
+                if ($event == 'Ended') {
+                    echo "event: close\n\n";
+                    ob_flush();
+                    flush();
+                } elseif ($event == 'New') {
+                    echo 'data: ' . $message . "\n";
+                    ob_flush();
+                    flush();
+                } elseif ($event == 'Error') {
+                    throw new Exception($message);
                 }
+            };
+            $this->read_backend_stream(
+                $request->input('history_id'),
+                $request->input('user_id'),
+                $backend_callback
+            );
+
+        });
+        return $response;
+    }
+    private function read_backend_stream($history_id, $user_id, $callback){
+        
+        if (!$history_id || !$user_id) {
+            $callback("Error", "Missing history_id or user_id.");
+            return;
+        }
+        if (!in_array($history_id, Redis::lrange('api_' . $user_id, 0, -1))) {
+            $callback("Error", "No activated session related to the user_id.");
+            return;
+        }
+        $client = Redis::connection();
+        $client->subscribe('api_' . $history_id, function ($message, $raw_history_id) use ($client, $callback) {
+            error_log($message, 1);
+            [$event, $msg] = explode(' ', $message, 2);
+            $callback($event, $msg);
+            if ($event == 'Ended') {
+                $client->disconnect();
             }
         });
-
-        return $response;
     }
 }

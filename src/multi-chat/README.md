@@ -77,7 +77,7 @@ You can use the `curl` command line tool to make POST requests to our API. Here'
 ```bash
 curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d '{
     "messages": [
-        { "isbot": false, "msg": "請自我介紹" }
+        { "role": "user", "content": "請自我介紹" }
     ],
     "model": "gemini-pro"
 }' http://127.0.0.1/v1.0/chat/completions
@@ -88,7 +88,7 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_
 For Windows you need to escape these characters, here's how to do it:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"isbot\": false, \"msg\": \"請自我介紹\" }],\"model\": \"gemini-pro\"}" http://127.0.0.1/v1.0/chat/completions
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"role\": \"user\", \"content\": \"請自我介紹\" }],\"model\": \"gemini-pro\"}" http://127.0.0.1/v1.0/chat/completions
 ```
 
 ### Using JavaScript
@@ -98,7 +98,7 @@ You can also use JavaScript and the `fetch` API to send message to our API.
 // Define the data to be sent in the request
 const requestData = {
     messages: [
-        { isbot: false, msg: "請自我介紹" } // Requesting a self-introduction
+        { role: "user", content: "請自我介紹" } // Requesting a self-introduction
     ],
     model: "gemini-pro" // Using the Gemini Pro model
 };
@@ -186,7 +186,7 @@ headers = {
 # Define the request payload as a dictionary for single round chatting.
 request_data = {
     "messages": [
-        { "isbot": False, "msg": "請自我介紹" }
+        { "role": "user", "content": "請自我介紹" }
     ],
     "model": "gemini-pro"
 }
@@ -211,9 +211,9 @@ For multiple rounds of chatting, you can extend the `messages` field with the co
 
 ```json
 "messages": [
-    { "isbot": false, "msg": "你好" },
-    { "isbot": true, "msg": "你好，我是一個機器人" },
-    { "isbot": false, "msg": "嗨" }
+    { "role": "user", "content": "你好" },
+    { "role": "assistant", "content": "你好，我是一個機器人" },
+    { "role": "user", "content": "嗨" }
 ]
 ```
 
@@ -229,7 +229,7 @@ Once you make a successful request to our API, you will receive multiple streami
         {
             "delta": {
                 "content": "你",
-                "role": null
+                "role": "assistant"
             }
         }
     ],
@@ -244,7 +244,7 @@ Once you make a successful request to our API, you will receive multiple streami
         {
             "delta": {
                 "content": "好",
-                "role": null
+                "role": "assistant"
             }
         }
     ],
@@ -259,7 +259,7 @@ Once you make a successful request to our API, you will receive multiple streami
         {
             "delta": {
                 "content": "，",
-                "role": null
+                "role": "assistant"
             }
         }
     ],
@@ -274,7 +274,7 @@ Once you make a successful request to our API, you will receive multiple streami
         {
             "delta": {
                 "content": "我",
-                "role": null
+                "role": "assistant"
             }
         }
     ],

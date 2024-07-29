@@ -113,7 +113,7 @@ class GeneratorExecutor(LLMExecutor):
             self.logger.info('LLM input: {}'.format(llm_input))
             generator = self.llm.chat_complete(
                 auth_token=kuwa_api_token,
-                messages=[{"isbot":False, "content": llm_input}]
+                messages=[{"role": "user", "content": llm_input}]
             )
 
             self.stop = False

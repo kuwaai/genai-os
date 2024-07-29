@@ -116,7 +116,7 @@ client = KuwaLlmClient(
 # Chat API Example
 """
 messages = [
-    {"isbot": False, "msg": "Hi"}
+    {"role": "user", "content": "Hi"}
 ]
 
 async def main():
