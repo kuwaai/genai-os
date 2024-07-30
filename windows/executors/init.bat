@@ -44,6 +44,16 @@ if "taide"=="!current_folder!" (
 	set "EXECUTOR_NAME=TAIDE"
 	set "EXECUTOR_ACCESS_CODE=taide"
 	goto skip_selection
+) else if "llama3_1"=="!current_folder!" (
+	echo Init LLaMA3.1 8B Instruct
+	echo EXECUTOR_TYPE=llamacpp
+	echo EXECUTOR_NAME=LLaMA3.1 8B Instruct
+	echo EXECUTOR_ACCESS_CODE=llama3.1-8b-instruct
+	
+	set "EXECUTOR_TYPE=llamacpp"
+	set "EXECUTOR_NAME=LLaMA3.1 8B Instruct"
+	set "EXECUTOR_ACCESS_CODE=llama3.1-8b-instruct"
+	goto skip_selection
 ) else if "docQA & webQA"=="!current_folder!" (
 	echo Init docQA and webQA
 	echo EXECUTOR_TYPE=custom
