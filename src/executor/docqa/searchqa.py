@@ -55,6 +55,7 @@ class SearchQaExecutor(LLMExecutor):
         retriever_group.add_argument('--mmr_fetch_k', default=12, type=int, help='Number of chunk to retrieve before Maximum Marginal Relevance (MMR).')
         retriever_group.add_argument('--chunk_size', default=512, type=int, help='The charters in the chunk.')
         retriever_group.add_argument('--chunk_overlap', default=128, type=int, help='The overlaps between chunks.')
+        retriever_group.add_argument('--vector_db_ttl_sec', default=600, type=int, help='The duration of a cached on-demand vector database remains active before requiring an update from the source.')
         
         generator_group = parser.add_argument_group('Generator Options')
         generator_group.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI')
@@ -113,6 +114,7 @@ class SearchQaExecutor(LLMExecutor):
         )
         self.docqa = DocQa(
             document_store = self.document_store,
+            vector_db_ttl_sec = retriever_params.get("ttl_sec", self.args.vector_db_ttl_sec),
             llm = self.llm,
             lang = lang,
             with_ref = self.with_ref,
