@@ -10,6 +10,7 @@ services:
       EXECUTOR_NAME: Google Gemma 7B Instruct
       EXECUTOR_IMAGE: huggingface.svg # Refer to src/multi-chat/public/images
       HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0}
     depends_on:
       - kernel
       - multi-chat

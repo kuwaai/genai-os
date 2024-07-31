@@ -8,6 +8,7 @@ services:
       CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
       EXECUTOR_ACCESS_CODE: db-qa
       EXECUTOR_NAME: DB QA
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
     volumes: [ "</path/to/vector-database>:/var/database" ]
     depends_on:
       - kernel
@@ -17,5 +18,6 @@ services:
       "--model", "gemini-pro"
       "--database", "/var/database"
       ]
+    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
     restart: unless-stopped
     networks: ["backend", "frontend"]

@@ -9,13 +9,16 @@ services:
       EXECUTOR_ACCESS_CODE: doc-qa;web-qa
       EXECUTOR_NAME: DocQA;WebQA
       EXECUTOR_IMAGE: doc-qa.png;web-qa.png # Refer to src/multi-chat/public/images
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
     depends_on:
       - kernel
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--model", "gemini-pro"
+      "--model", "gemini-pro",
+      "--log", "debug"
       ]
+    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
     extra_hosts:
       - "localhost:host-gateway"
     restart: unless-stopped

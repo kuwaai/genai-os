@@ -12,6 +12,6 @@ services:
     depends_on:
       - kernel
       - multi-chat
-    command: ["--api_key", "<YOUR_GLOBAL_API_KEY_HERE>"]
+    command: ["--api_key", "<YOUR_GLOBAL_API_KEY_HERE>", "--log", "debug"]
     restart: unless-stopped
     networks: ["backend"]
