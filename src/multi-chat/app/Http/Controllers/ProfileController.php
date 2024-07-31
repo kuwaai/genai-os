@@ -330,8 +330,6 @@ class ProfileController extends Controller
             return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
         }
 
-        error_log($messages_json, 1);
-        
         // Input is a valid JSON string
         $history = new APIHistories();
         $history->fill(['input' => $messages_json, 'output' => '* ...thinking... *', 'user_id' => $user->id]);
@@ -354,8 +352,9 @@ class ProfileController extends Controller
             }
         });
 
-        $response->setCallback(function() use ($user, $history, $llm) {
-            $backend_callback = function ($event, $message) use ($history, $llm){
+        $response->setCallback(function() use (&$user, &$history, &$llm) {
+            $bot_output = "";
+            $backend_callback = function ($event, $message) use (&$history, &$llm, &$bot_output){
                 $resp = [
                     'choices' => [
                         [
@@ -372,19 +371,22 @@ class ProfileController extends Controller
                     'usage' => [],
                 ];
                 if ($event == 'Ended') {
-                    echo "event: close\n\n";
-                    ob_flush();
-                    flush();
+                    $message = "";
+                    echo "event: close\n";
                 } elseif ($event == 'New') {
                     $resp['choices'][0]['delta']['content'] = $message;
-                    echo 'data: ' . json_encode($resp) . "\n\n";
-                    ob_flush();
-                    flush();
+                    echo 'data: ' . json_encode($resp) . "\n";
                 } elseif ($event == 'Error') {
                     throw new Exception($message);
                 }
+
+                ob_flush();
+                flush();
+
+                error_log($bot_output, 0);
                 
-                $history->fill(['output' => $resp['choices'][0]['delta']['content']]);
+                $bot_output .= $message;
+                $history->fill(['output' => $bot_output]);
                 $history->save();
             };
             $this->read_backend_stream(
@@ -392,7 +394,6 @@ class ProfileController extends Controller
                 $user->tokenable_id,
                 $backend_callback
             );
-
         });
         return $response;
     }
@@ -467,7 +468,7 @@ class ProfileController extends Controller
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
         
-        $response->setCallback(function() use ($request) {
+        $response->setCallback(function() use (&$request) {
             $backend_callback = function ($event, $message){
                 if ($event == 'Ended') {
                     echo "event: close\n\n";
@@ -487,10 +488,17 @@ class ProfileController extends Controller
                 $backend_callback
             );
 
+            ob_flush();
+            flush();
         });
         return $response;
     }
     private function read_backend_stream($history_id, $user_id, $callback){
+        /**
+         * Read from the backend redis message queue.
+         * The new result will pass to the callback function.
+         * This function will block until all message is received.
+         */
         
         if (!$history_id || !$user_id) {
             $callback("Error", "Missing history_id or user_id.");
@@ -501,11 +509,16 @@ class ProfileController extends Controller
             return;
         }
         $client = Redis::connection();
-        $client->subscribe('api_' . $history_id, function ($message, $raw_history_id) use ($client, $callback) {
-            error_log($message, 1);
+        $channel = 'api_' . $history_id;
+        // The subscribe loop will block until the channel is unsubscribed or the client is disconnected.
+        $client->subscribe($channel, function ($message, $channel) use (&$client, &$callback) {
             [$event, $msg] = explode(' ', $message, 2);
+            if ($event == 'New') {
+                $msg = json_decode($msg, false, JSON_INVALID_UTF8_IGNORE)->msg;
+            }
             $callback($event, $msg);
             if ($event == 'Ended') {
+                // Terminate the subscribe loop
                 $client->disconnect();
             }
         });
