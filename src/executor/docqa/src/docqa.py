@@ -129,11 +129,13 @@ class DocQa:
     """
   
     urls = frozenset(urls)
-    ttl_hash = time.time() / ttl_sec
+    ttl_hash = time.time() // ttl_sec
 
     logger.debug(f"Parameter to cache: {urls}, {ttl_hash}")
 
-    return await self._cached_construct_document_store(urls, ttl_hash)
+    result = await self._cached_construct_document_store(urls, ttl_hash)
+    logger.debug(f"Cache info: {self._cached_construct_document_store.cache_info()}")
+    return result
 
   @lru_cache()
   async def _cached_construct_document_store(self, urls:frozenset, ttl_hash:int=None):
