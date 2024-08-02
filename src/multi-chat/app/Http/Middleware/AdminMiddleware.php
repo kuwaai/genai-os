@@ -13,7 +13,7 @@ class AdminMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $config): Response
+    public function handle(Request $request, Closure $next, ... $config): Response
     {
         if (
             auth()->check() &&
