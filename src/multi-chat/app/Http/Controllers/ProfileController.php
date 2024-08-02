@@ -339,6 +339,57 @@ class ProfileController extends Controller
         Redis::expire('usertask_' . $user->tokenable_id, 1200);
         RequestChat::dispatch($messages_json, $llm->access_code, $user->id, $history->id, $lang, 'api_' . $history->id);
 
+        if (isset($jsonData['stream']) ? boolval($jsonData['stream']) : false){
+            return $this->streaming_response($user, $history, $llm);
+        } else {
+            return $this->nonstreaming_response($user, $history, $llm);
+        }
+
+    }
+    
+    private function nonstreaming_response(&$user, &$history, &$llm){
+
+        $bot_output = "";
+        $backend_callback = function ($event, $message) use (&$history, &$llm, &$bot_output){
+            
+            if ($event == 'Error') {
+                throw new Exception($message);
+            }
+
+            $bot_output .= $message;
+            $history->fill(['output' => $bot_output]);
+            $history->save();
+        };
+        $this->read_backend_stream(
+            $history->id,
+            $user->tokenable_id,
+            $backend_callback
+        );
+
+        $resp = [
+            "choices" => [
+                [
+                    "index" => 0,
+                    "message" => [
+                        "role" => "assistant",
+                        "content" => $bot_output,
+                    ],
+                    "logprobs" => null,
+                    "finish_reason" => "stop"
+                ]
+            ],
+            'created' => time(),
+            'id' => 'chatcmpl-' . $history->id,
+            'model' => $llm->access_code,
+            'object' => 'chat.completion',
+            'usage' => [],
+        ];
+
+        return response()->json($resp);
+    }
+
+    private function streaming_response(&$user, &$history, &$llm){
+
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
@@ -346,12 +397,6 @@ class ProfileController extends Controller
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
         
-        set_exception_handler(function ($exception) {
-            if ($exception->getMessage() != 'Connection closed') {
-                Log::error('Uncaught exception when reading backend stream: ' . $exception->getMessage());
-            }
-        });
-
         $response->setCallback(function() use (&$user, &$history, &$llm) {
             $bot_output = "";
             $backend_callback = function ($event, $message) use (&$history, &$llm, &$bot_output){
@@ -383,8 +428,6 @@ class ProfileController extends Controller
                 ob_flush();
                 flush();
 
-                error_log($bot_output, 0);
-                
                 $bot_output .= $message;
                 $history->fill(['output' => $bot_output]);
                 $history->save();
@@ -395,6 +438,7 @@ class ProfileController extends Controller
                 $backend_callback
             );
         });
+
         return $response;
     }
 
@@ -452,12 +496,6 @@ class ProfileController extends Controller
 
     public function api_stream(Request $request)
     {
-        set_exception_handler(function ($exception) {
-            if ($exception->getMessage() != 'Connection closed') {
-                Log::error('Uncaught SSE Exception: ' . $exception->getMessage());
-            }
-        });
-
         if (config('app.API_Key') == null || config('app.API_Key') != $request->input('key')) {
             throw new Exception("API key doesn't match app.API_Key.");
         }
@@ -508,19 +546,26 @@ class ProfileController extends Controller
             $callback("Error", "No activated session related to the user_id.");
             return;
         }
-        $client = Redis::connection();
-        $channel = 'api_' . $history_id;
-        // The subscribe loop will block until the channel is unsubscribed or the client is disconnected.
-        $client->subscribe($channel, function ($message, $channel) use (&$client, &$callback) {
-            [$event, $msg] = explode(' ', $message, 2);
-            if ($event == 'New') {
-                $msg = json_decode($msg, false, JSON_INVALID_UTF8_IGNORE)->msg;
+        try {
+            $client = Redis::connection();
+            $channel = 'api_' . $history_id;
+            // The subscribe loop will block until the channel is unsubscribed or the client is disconnected.
+            $client->subscribe($channel, function ($message, $channel) use (&$client, &$callback) {
+                [$event, $msg] = explode(' ', $message, 2);
+                if ($event == 'New') {
+                    $msg = json_decode($msg, false, JSON_INVALID_UTF8_IGNORE)->msg;
+                }
+                $callback($event, $msg);
+                if ($event == 'Ended') {
+                    // Terminate the subscribe loop
+                    $client->disconnect();
+                }
+            });
+        } catch (\RedisException $e) {
+            error_log(print_r($e, true), 0);
+            if ($e->getMessage() != 'Connection closed') {
+                Log::error('Caught exception when reading backend stream: ' . $e->getMessage());
             }
-            $callback($event, $msg);
-            if ($event == 'Ended') {
-                // Terminate the subscribe loop
-                $client->disconnect();
-            }
-        });
+        }
     }
 }
