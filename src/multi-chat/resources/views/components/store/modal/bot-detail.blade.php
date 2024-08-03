@@ -217,6 +217,12 @@
                                 {{ __('manage.button.save') }}
                             </button>
                         @endif
+                        <button type="button" id="export_bot"
+                            class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+                            onclick="exportBot()"
+                        >
+                            {{ __('manage.button.export') }}
+                        </button>
                         @if (request()->user()->hasPerm('Store_delete_delete_bot'))
                             <button type="button" id="delete_bot" data-modal-target="delete_modal"
                                 data-modal-toggle="delete_modal"
@@ -394,6 +400,85 @@
         $("#create_error").show().delay(3000).fadeOut();
         return false;
     }
+
+    function saveTextAsFile(textToWrite, fileNameToSaveAs)
+    {
+        console.log(textToWrite);
+        var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'}); 
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileNameToSaveAs;
+        downloadLink.innerHTML = "Download File";
+        if (window.webkitURL != null)
+        {
+            // Chrome allows the link to be clicked
+            // without actually adding it to the DOM.
+            downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+        }
+        else
+        {
+            // Firefox requires the link to be added to the DOM
+            // before it can be clicked.
+            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+            downloadLink.onclick = destroyClickedElement;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+        }
+
+        downloadLink.click();
+    }
+    function formatDate() {
+        const date = new Date();
+
+        const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' });
+        const day = date.toLocaleString('en-US', { day: '2-digit' });
+        const month = date.toLocaleString('en-US', { month: 'short' });
+        const year = date.getFullYear();
+        const hours = date.toLocaleString('en-US', { hour: '2-digit', hour12: false });
+        const minutes = date.toLocaleString('en-US', { minute: '2-digit' });
+        const seconds = date.toLocaleString('en-US', { second: '2-digit' });
+
+        // Get timezone offset in hours and minutes
+        const timezoneOffset = -date.getTimezoneOffset();
+        const tzHours = Math.floor(Math.abs(timezoneOffset) / 60);
+        const tzMinutes = Math.abs(timezoneOffset) % 60;
+        const tzSign = timezoneOffset >= 0 ? '+' : '-';
+        const timezone = `${tzSign}${String(tzHours).padStart(2, '0')}${String(tzMinutes).padStart(2, '0')}`;
+
+        return `${dayOfWeek}, ${day} ${month} ${year} ${hours}:${minutes}:${seconds} ${timezone}`;
+    }
+
+    function exportBot(){
+        let name = $("#bot_name2").val();
+        let description = $("#bot_describe2").val() ;
+        let base = $("#llm_name2").val();
+        let modelfile = ace.edit('modelfile-editor').getValue();
+
+        const prefix = "KUWABOT"
+        modelfile = modelfile.replace(new RegExp(`^${prefix}.*`, "gm"), '');
+        modelfile = "#\n" + (name ? `KUWABOT name "${name}"\n` : "") + 
+                    (description ? `KUWABOT description "${description}"\n` : "") + 
+                    (base ? `KUWABOT base "${base}"\n` : "") + 
+                    modelfile
+
+        let boundary= "kuwa"+(Math.random() + 1).toString(36).slice(-5);
+        let botfile = [
+            `Subject: ${name}`,
+            `Date: ${formatDate()}`,
+            `Content-Type: multipart/related; boundary="${boundary}"; type=application/vnd.kuwabot`,
+            "Content-Transfer-Encoding: quoted-printable",
+            "",
+            `--${boundary}`,
+            "Content-Type: application/vnd.kuwabot;",
+            "",
+            modelfile.trim(),
+            "",
+        ]
+        // [TODO] append bot avatar
+        botfile.push(`--${boundary}--`);
+                    
+        saveTextAsFile(botfile.join('\r\n'), `bot-${name.replace(/\s+/g, '_')}.txt`);
+    }
+
     var editor = ace.edit($('#modelfile-editor')[0], {
         mode: "ace/mode/dockerfile",
         selectionStyle: "text"

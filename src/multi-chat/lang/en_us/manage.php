@@ -12,6 +12,7 @@ return [
     'button.cancel' => 'Cancel',
     'button.close' => 'Close',
     'button.accept' => 'I accepted',
+    'button.export' => 'Export',
 
     //Tabs
     'tab.groups' => 'Groups',
