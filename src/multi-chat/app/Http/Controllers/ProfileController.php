@@ -286,7 +286,7 @@ class ProfileController extends Controller
         ) {
             $errorResponse = [
                 'status' => 'error',
-                'message' => 'You have no permission to use Chat API',
+                'message' => 'Use of the chat completion API is not authorized.',
             ];
             return response()->json($errorResponse, 403, [], JSON_UNESCAPED_UNICODE);
         }
@@ -295,7 +295,7 @@ class ProfileController extends Controller
             // Handle the case where 'messages' and 'model' are not present in $jsonData
             $errorResponse = [
                 'status' => 'error',
-                'message' => 'The JSON data is missing required fields.',
+                'message' => 'The request is missing the "message" or "model" field.',
             ];
             return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
         }
@@ -325,7 +325,7 @@ class ProfileController extends Controller
         if ($messages_json === false && json_last_error() !== JSON_ERROR_NONE) {
             $errorResponse = [
                 'status' => 'error',
-                'message' => 'The msg format is incorrect.',
+                'message' => 'The "message" field is not formatted correctly.',
             ];
             return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
         }
@@ -400,6 +400,10 @@ class ProfileController extends Controller
         $response->setCallback(function() use (&$user, &$history, &$llm) {
             $bot_output = "";
             $backend_callback = function ($event, $message) use (&$history, &$llm, &$bot_output){
+                if ($event == 'Error') {
+                    throw new Exception($message);
+                }
+
                 $resp = [
                     'choices' => [
                         [
@@ -407,24 +411,28 @@ class ProfileController extends Controller
                                 'content' => '',
                                 'role' => "assistant",
                             ],
+                            'logprobs' => null,
+                            'finish_reason' => null
                         ],
                     ],
                     'created' => time(),
                     'id' => 'chatcmpl-' . $history->id,
                     'model' => $llm->access_code,
-                    'object' => 'chat.completion',
-                    'usage' => [],
+                    'object' => 'chat.completion.chunk',
                 ];
+                
                 if ($event == 'Ended') {
                     $message = "";
-                    echo "event: close\n";
+                    $resp['choices'][0]['delta'] = (object) null;
+                    $resp['choices'][0]['finish_reason'] = 'stop';
                 } elseif ($event == 'New') {
                     $resp['choices'][0]['delta']['content'] = $message;
-                    echo 'data: ' . json_encode($resp) . "\n";
-                } elseif ($event == 'Error') {
-                    throw new Exception($message);
                 }
-
+                echo 'data: ' . json_encode($resp) . "\n\n";
+                
+                if ($event == 'Ended') {
+                    echo "data: [DONE]\n\n";
+                }
                 ob_flush();
                 flush();
 
@@ -562,7 +570,6 @@ class ProfileController extends Controller
                 }
             });
         } catch (\RedisException $e) {
-            error_log(print_r($e, true), 0);
             if ($e->getMessage() != 'Connection closed') {
                 Log::error('Caught exception when reading backend stream: ' . $e->getMessage());
             }

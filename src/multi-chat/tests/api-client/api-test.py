@@ -1,6 +1,7 @@
 import os
-import openai
 import logging
+import argparse
+import openai
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +43,26 @@ class TestKuwaApi:
             print("****************")
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    parser = argparse.ArgumentParser(
+        description="Test the Kuwa API.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("--base-url", default=os.environ.get('KUWA_API_BASE_URL', 'http://localhost/v1.0/'), help="The custom base URL for the Kuwa API.")
+    parser.add_argument("--api-key", default=os.environ.get('KUWA_API_KEY'), help="The API token for authentication with Kuwa.")
+    parser.add_argument("--model", default="gemini-pro", help="The custom base URL for the Kuwa API.")
+    parser.add_argument("--log", type=str, default="INFO", help="the log level. (INFO, DEBUG, ...)")
+    args = parser.parse_args()
+
+    # Setup logger
+    numeric_level = getattr(logging, args.log.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError(f'Invalid log level: {args.log}')
+    logging.basicConfig(level=numeric_level)
+    
     api_client = TestKuwaApi(
-        base_url = os.environ.get('KUWA_API_BASE_URL'),
-        api_key = os.environ.get('KUWA_API_KEY'),
-        model = 'gemini-pro'
+        base_url = args.base_url,
+        api_key = args.api_key,
+        model = args.model
     )
     api_client.test_non_stream()
     api_client.test_stream()

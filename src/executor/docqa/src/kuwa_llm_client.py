@@ -93,10 +93,11 @@ class KuwaLlmClient:
 
             full_response = []
             for line in resp.iter_lines(decode_unicode=True):
-                if line == "event: close":
+                if line == "data: [DONE]":
                     break
                 elif line.startswith("data: "):
                     chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
+                    if chunk is None: continue
                     if streaming:
                         yield chunk
                     else:
