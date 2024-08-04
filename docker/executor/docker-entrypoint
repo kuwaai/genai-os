@@ -1,6 +1,12 @@
 #!/bin/bash
 set -xeu
 
+init_kuwa_filesystem_hierarchy(){
+    mkdir -p /var/kuwa/bin && \
+    mkdir -p /var/kuwa/database && \
+    mkdir -p /var/kuwa/custom
+}
+
 add_executor(){
     if [ -z "${EXECUTOR_NAME:-}" ] || [ -z "${EXECUTOR_ACCESS_CODE:-}" ]
     then
@@ -23,6 +29,7 @@ add_executor(){
     done
 }
 
+init_kuwa_filesystem_hierarchy
 if [ "${ADD_EXECUTOR_TO_MULTI_CHAT}" = true ]
 then
     add_executor

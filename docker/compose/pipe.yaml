@@ -13,7 +13,8 @@ services:
       - kernel
       - multi-chat
     command: ["--log", "debug"]
-    extra_hosts:
-      - "localhost:host-gateway"
+    volumes: [
+      "../root:/var/kuwa:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+    ]
     restart: unless-stopped
     networks: ["backend", "frontend"]

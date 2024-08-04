@@ -9,7 +9,10 @@ services:
       EXECUTOR_ACCESS_CODE: db-qa
       EXECUTOR_NAME: DB QA
       TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
-    volumes: [ "</path/to/vector-database>:/var/database" ]
+    volumes: [
+      "</path/to/vector-database>:/var/database",
+      "../root:/var/kuwa:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+    ]
     depends_on:
       - kernel
       - multi-chat

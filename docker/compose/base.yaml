@@ -39,7 +39,10 @@ services:
       ADMIN_PASSWORD_FILE: /run/secrets/admin-password
     secrets:
       - admin-password
-    volumes: ["multi-chat-storage:/app/storage:rw"]
+    volumes: [
+      "multi-chat-storage:/app/storage:rw",
+      "../root/custom:/app/resources/views/components/custom:ro"
+    ]
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck"]
       timeout: 10s
