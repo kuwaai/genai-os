@@ -447,22 +447,38 @@
         return `${dayOfWeek}, ${day} ${month} ${year} ${hours}:${minutes}:${seconds} ${timezone}`;
     }
 
-    function exportBot(){
+    async function imageUrl2Base64(url) {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((onSuccess, onError) => {
+            try {
+            const reader = new FileReader() ;
+            reader.onload = function(){ onSuccess(this.result) } ;
+            reader.readAsDataURL(blob) ;
+            } catch(e) {
+            onError(e);
+            }
+        });
+    }
+
+    async function exportBot(){
         let name = $("#bot_name2").val();
         let description = $("#bot_describe2").val() ;
         let base = $("#llm_name2").val();
         let modelfile = ace.edit('modelfile-editor').getValue();
+        let follow_base_bot = $("#detail-modal img").data("follow-base-bot");
 
         const prefix = "KUWABOT"
         modelfile = modelfile.replace(new RegExp(`^${prefix}.*`, "gm"), '');
-        modelfile = "#\n" + (name ? `KUWABOT name "${name}"\n` : "") + 
-                    (description ? `KUWABOT description "${description}"\n` : "") + 
-                    (base ? `KUWABOT base "${base}"\n` : "") + 
+        modelfile = "#\n" + `${prefix} version 0.3.3\n` +
+                    (name ? `${prefix} name "${name}"\n` : "") + 
+                    (description ? `${prefix} description "${description}"\n` : "") + 
+                    (base ? `${prefix} base "${base}"\n` : "") + 
                     modelfile
 
         let boundary= "kuwa"+(Math.random() + 1).toString(36).slice(-5);
         let botfile = [
-            `Subject: ${name}`,
+            `Subject: Exported bot "${name}"`,
             `Date: ${formatDate()}`,
             `Content-Type: multipart/related; boundary="${boundary}"; type=application/vnd.kuwabot`,
             "Content-Transfer-Encoding: quoted-printable",
@@ -473,6 +489,21 @@
             modelfile.trim(),
             "",
         ]
+        if (follow_base_bot) {
+            const avatar_data_url = await imageUrl2Base64($("#detail-modal img")[0].src);
+            const matches = avatar_data_url.match(/^data:(.+);base64,(.+)$/);
+            const content_type = matches[1];
+            const avatar_data = matches[2];
+            botfile.push(
+                `--${boundary}`,
+                `Content-Type: ${content_type}`,
+                `Content-Transfer-Encoding: base64`,
+                `Content-Location: /bot-avatar`,
+                "",
+                `${avatar_data}`,
+                ""
+            );
+        }
         // [TODO] append bot avatar
         botfile.push(`--${boundary}--`);
                     
