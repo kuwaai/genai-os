@@ -59,12 +59,16 @@
             @endif
             <x-store.modal.bot-detail />
             @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
-                <div class="pt-4 my-2 mx-auto w-[150px] h-[50px]" data-modal-target="create-bot-modal"
+                <div class="create-bot-btn pt-4 my-2 mx-auto w-[150px] h-[50px] flex" data-modal-target="create-bot-modal"
                     data-modal-toggle="create-bot-modal">
                     <button
-                        class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-300 transition duration-300 rounded-lg overflow-hidden">
+                        class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-300 transition duration-300 rounded-l-lg overflow-hidden">
                         <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
                     </button>
+                    <label for="upload_bot_modelfile" class="bg-green-500 hover:bg-green-600 h-12 text-white font-bold py-3 px-4 rounded-r-lg  flex items-center justify-center transition duration-300">
+                        <i class="fas fa-file-import"></i>
+                    </label>
+                    <input type="file" accept=".bot" class="hidden" id="upload_bot_modelfile" onchange="importBot($(this)[0].files)"/>
                 </div>
             @endif
             @php
@@ -143,7 +147,6 @@
              * 3. Original image (lowest)
              */
             const [user_uploaded_image] = $(user_upload_elem)[0].files;
-            console.log('follow-base-bot',  $(bot_image_elem).data("follow-base-bot"));
             const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
             let bot_image_uri = $(bot_image_elem).attr("src");
             if (user_uploaded_image) {
@@ -154,6 +157,7 @@
             }
             $(bot_image_elem).attr("src", bot_image_uri);
         }
+ 
         $(document).ready(function() {
             var div = $('.bot-showcase')[0];
             if (div) {

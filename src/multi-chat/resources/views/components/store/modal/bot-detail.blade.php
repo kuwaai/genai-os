@@ -468,9 +468,11 @@
         let modelfile = ace.edit('modelfile-editor').getValue();
         let follow_base_bot = $("#detail-modal img").data("follow-base-bot");
 
-        const prefix = "KUWABOT"
+        const prefix = "KUWABOT";
+        const shebang = "#!";
         modelfile = modelfile.replace(new RegExp(`^${prefix}.*`, "gm"), '');
-        modelfile = "#\n" + `${prefix} version 0.3.3\n` +
+        modelfile = modelfile.replace(new RegExp(`^${shebang}.*`), '');
+        modelfile = `${shebang}\n` + `${prefix} version 0.3.3\n` +
                     (name ? `${prefix} name "${name}"\n` : "") + 
                     (description ? `${prefix} description "${description}"\n` : "") + 
                     (base ? `${prefix} base "${base}"\n` : "") + 
@@ -489,7 +491,7 @@
             modelfile.trim(),
             "",
         ]
-        if (follow_base_bot) {
+        if (!follow_base_bot) {
             const avatar_data_url = await imageUrl2Base64($("#detail-modal img")[0].src);
             const matches = avatar_data_url.match(/^data:(.+);base64,(.+)$/);
             const content_type = matches[1];
@@ -507,7 +509,7 @@
         // [TODO] append bot avatar
         botfile.push(`--${boundary}--`);
                     
-        saveTextAsFile(botfile.join('\r\n'), `bot-${name.replace(/\s+/g, '_')}.txt`);
+        saveTextAsFile(botfile.join('\r\n'), `bot-${name.replace(/\s+/g, '_')}.bot`);
     }
 
     var editor = ace.edit($('#modelfile-editor')[0], {

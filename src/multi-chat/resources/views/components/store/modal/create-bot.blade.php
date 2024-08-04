@@ -289,6 +289,93 @@
         return false;
     }
 
+    function importBotModelfile(modelfile){
+        console.log(modelfile);
+        modelfile = modelfile_parse(modelfile);
+        let get_bot_config = function (modelfile, k) {
+                modelfile = modelfile.map((inst) => `${inst['name'].toLowerCase()} ${inst['args']}`);
+                let config = modelfile.filter((inst) => inst.startsWith(k));
+                if (config.length ==0) return '';
+                value = config[config.length - 1].replace(k, '').trim().replace(/^"(.+)"$/,'$1');
+                return value;
+            }
+        const prefix = 'kuwabot'
+        $("#create_room input[name='llm_name']").val(get_bot_config(modelfile, `${prefix} base`));
+        $("#create_room input[name='bot_name']").val(get_bot_config(modelfile, `${prefix} name`));
+        $("#create_room input[name='bot_describe']").val(get_bot_config(modelfile, `${prefix} description`));
+        $("#bot-system_prompt").val(get_bot_config(modelfile, "system"));
+        $("#bot-before_prompt").val(get_bot_config(modelfile, "before-prompt"));
+        $("#bot-after_prompt").val(get_bot_config(modelfile, "after-prompt"));
+
+        modelfile = modelfile.filter((inst) => inst['name'].toLowerCase() != 'kuwabot');
+        ace.edit('bot-modelfile-editor').setValue(modelfile_to_string(modelfile))
+        ace.edit('bot-modelfile-editor').gotoLine(0);
+    }
+
+    function importBotAvatar(content_type, base64_data){
+        
+        function dataUrl2File(content_type, base64_data){
+
+            const byte_string = atob(base64_data);
+            
+            // write the bytes of the string to an ArrayBuffer
+            let buffer = new ArrayBuffer(byte_string.length);
+            let buffer_uint8_view = new Uint8Array(buffer);
+            for (var i = 0; i < byte_string.length; i++) {
+                buffer_uint8_view[i] = byte_string.charCodeAt(i);
+            }
+            return new File([buffer], {type: content_type});
+        }
+
+        const avatar_file = dataUrl2File(content_type, base64_data);
+        const input = $("#create-bot_image")[0];
+        const transfer = new DataTransfer();
+        transfer.items.add(avatar_file);
+        input.files = transfer.files;
+        const event = new Event("change", {
+            bubbles: !0,
+        });
+        input.dispatchEvent(event);
+    }
+
+    function importBot(files){
+        const reader = new FileReader()
+        const getMimeHeader = (x) => x.substr(0, x.indexOf('\r\n\r\n')); 
+        const getMimeBody = (x) => x.substr(x.indexOf('\r\n\r\n') + 1); 
+        const handleFileLoad = function(e){
+            console.log(e.target.result);
+            let header = getMimeHeader(e.target.result);
+            let body = getMimeBody(e.target.result);
+            header=new Headers(header.split('\r\n').map((x)=>x.split(': ')));
+            console.log("Header:", header, "Body: ", body);
+            const parser = new MultipartRelatedParser(header.get('Content-Type'));
+            const parts = parser.read(new TextEncoder().encode(body));
+            console.log(parts);
+            if (parts.length == 0){
+                console.warn("Wrong botfile format.");
+                return;
+            }
+
+            let modelfile = new TextDecoder().decode(parts[0].data);
+            let avatar_part = parts.filter((x)=>x.headers["Content-Location"] === "/bot-avatar");
+
+            importBotModelfile(modelfile);
+
+            if (avatar_part.length != 0) {
+                console.log(avatar_part);
+                let avatar_type = avatar_part[0].headers["Content-Type"];
+                let avatar_base64_data = new TextDecoder().decode(avatar_part[0].data)
+                importBotAvatar(avatar_type, avatar_base64_data)
+            }
+
+            
+            $(".create-bot-btn").click();
+        }
+
+        reader.onload = handleFileLoad;
+        reader.readAsText(files[0]);
+    }
+
     var editor = ace.edit($('#bot-modelfile-editor')[0], {
         mode: "ace/mode/dockerfile",
         selectionStyle: "text"

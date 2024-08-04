@@ -76,7 +76,7 @@
 
                 // Array of command keywords
                 const commandKeywords = ['FROM', 'ADAPTER', 'LICENSE', 'TEMPLATE', 'SYSTEM', 'PARAMETER',
-                    'MESSAGE', 'BEFORE-PROMPT', 'AFTER-PROMPT'
+                    'MESSAGE', 'BEFORE-PROMPT', 'AFTER-PROMPT', 'KUWABOT'
                 ];
 
                 // Check if the line starts with a command keyword
