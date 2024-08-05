@@ -85,25 +85,25 @@ class KuwaLlmClient:
         request_body = {
             "messages": messages,
             "model": model,
+            "stream": streaming
         }
 
         with requests.post(url, headers=headers, json=request_body, stream=True, timeout=timeout) as resp:
             if not resp.ok:
                 raise RuntimeError(f'Request failed with status {resp.status_code}')
 
-            full_response = []
             for line in resp.iter_lines(decode_unicode=True):
+                logger.debug(line)
+                if not streaming:
+                    yield json.loads(line)["choices"][0]["message"]["content"]
+                    continue
+
                 if line == "data: [DONE]":
                     break
                 elif line.startswith("data: "):
-                    chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]["content"]
-                    if chunk is None: continue
-                    if streaming:
-                        yield chunk
-                    else:
-                        full_response.append(chunk)
-            if not streaming:
-                yield "".join(full_response)
+                    chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]
+                    if not chunk: continue
+                    yield chunk["content"]
 
 # Init Example
 """
