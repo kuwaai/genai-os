@@ -8,10 +8,10 @@ from urllib.error import HTTPError
 from functools import lru_cache
 from langchain.docstore.document import Document
 from kuwa.executor import Modelfile
+from kuwa.client import KuwaClient
 
 from .recursive_url_multimedia_loader import RecursiveUrlMultimediaLoader
 from .document_store import DocumentStore
-from .kuwa_llm_client import KuwaLlmClient
 
 import i18n
 import re
@@ -33,7 +33,7 @@ class DocQa:
     document_store:DocumentStore = DocumentStore,
     vector_db:str = None,
     vector_db_ttl_sec:int = 600,
-    llm:KuwaLlmClient = KuwaLlmClient(),
+    llm:KuwaClient = KuwaClient(),
     lang:str="en",
     with_ref:bool=False,
     display_ref_content:bool=True,

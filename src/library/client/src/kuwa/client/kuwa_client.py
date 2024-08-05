@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 logger = logging.getLogger(__name__)
 
-class KuwaLlmClient:
+class KuwaClient:
     def __init__(self, base_url="http://localhost", kernel_base_url="http://localhost:9000", model=None, auth_token=None, limit: int = 3072):
         self.base_url = base_url
         self.kernel_base_url = kernel_base_url
@@ -107,7 +107,7 @@ class KuwaLlmClient:
 
 # Init Example
 """
-client = KuwaLlmClient(
+client = KuwaClient(
     base_url="http://localhost",
     model="gemini-pro",
     auth_token="YOUR_API_TOKEN_HERE"

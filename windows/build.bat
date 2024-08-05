@@ -163,6 +163,9 @@ pushd "..\src\kernel"
 pip install --default-timeout=1000 --force-reinstall .
 pip install --default-timeout=1000 -r requirements.txt 
 popd
+pushd "..\src\library\client"
+pip install --default-timeout=1000 --force-reinstall .
+popd
 pushd "..\src\executor"
 pip install --default-timeout=1000 --force-reinstall .
 pip install --default-timeout=1000 -r requirements.txt

@@ -20,10 +20,13 @@ RUN apt-get install -y ffmpeg &&\
 COPY src/executor/image_generation/requirements.txt ./image_generation/requirements.txt
 RUN pip install --no-cache-dir -r ./image_generation/requirements.txt
 
-# Install the executor framework
+# Install the executor framework and client library
 COPY .git ../../.git
 COPY src/executor/. .
+COPY src/library/client ../library/client
+
 RUN pip install . &&\
+    pip install --no-cache-dir ../library/client &&\
     rm -rf ../../.git
 
 # Install the multi-chat-client and the entrypoint

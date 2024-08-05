@@ -20,9 +20,9 @@ from urllib.parse import urljoin
 from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.executor.modelfile import ParameterDict
 from kuwa.executor.llm_executor import extract_last_url
+from kuwa.client import KuwaClient
 
 from src.docqa import DocQa
-from src.kuwa_llm_client import KuwaLlmClient
 from src.document_store import DocumentStore
 
 logger = logging.getLogger(__name__)
@@ -90,7 +90,7 @@ class DocQaExecutor(LLMExecutor):
         self.pre_built_db = retriever_params.get("database", self.args.database)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
         self.display_ref_content = not display_params.get("hide_ref_content", self.args.hide_ref_content)
-        self.llm = KuwaLlmClient(
+        self.llm = KuwaClient(
             base_url = self.args.api_base_url,
             kernel_base_url = self.kernel_url,
             model=generator_params.get("model", self.args.model),
