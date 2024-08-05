@@ -19,5 +19,7 @@ services:
     volumes: [
       "../root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
     ]
+    extra_hosts:
+      - "localhost:host-gateway"
     restart: unless-stopped
     networks: ["backend", "frontend"]
