@@ -2,6 +2,9 @@ import logging
 import asyncio
 import functools
 import json
+import zipfile
+import tempfile
+import hashlib
 from pathlib import Path
 from langchain.docstore.document import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -106,7 +109,31 @@ class DocumentStore:
     Load constructed document store from local filesystem.
     """
 
-    logger.info('Loading document store...')
+    if not Path(path).exists():
+      raise RuntimeError("The specified database doesn't exist.")
+
+    if path.endswith('.zip'):
+
+      # A temporary directory to store extracted database
+      target_dir_name = hashlib.sha1(path.encode()).hexdigest()
+      target_dir = Path(tempfile.gettempdir())/"kuwa-dbqa"/target_dir_name
+
+      # Don't extract the archive if it's already extracted.
+      if not target_dir.exists() or target_dir.lstat().st_mtime < Path(path).lstat().st_mtime:
+        logger.info('Extracting archived document store...')
+        target_dir.mkdir(parents=True, exist_ok=True)
+        # Open the zip file
+        with zipfile.ZipFile(path, 'r') as zip_ref:
+          # Extract all files to the temporary directory
+          zip_ref.extractall(target_dir)
+        logger.info(f'Extracted document store to {target_dir}')
+
+      config_path = list(Path(target_dir).rglob(DocumentStore.config_filename))
+      if len(config_path) == 0:
+        raise RuntimeError("Could not find the configuration file of the database.") 
+      path = config_path[-1].parents[0]
+        
+    logger.info(f'Loading document store from {path}...')
     config = {}
     with open(Path(path)/DocumentStore.config_filename, 'r') as f:
       config = json.load(f)
