@@ -12,7 +12,10 @@ services:
     depends_on:
       - kernel
       - multi-chat
-    command: ["--log", "debug"]
+    command: [
+      "--path", "/var/kuwa/bin",
+      "--log", "debug"
+    ]
     volumes: [
       "../root:/var/kuwa:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
     ]
