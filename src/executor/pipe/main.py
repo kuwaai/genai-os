@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import asyncio
 import logging
@@ -127,23 +128,62 @@ class PipeExecutor(LLMExecutor):
         parser.add_argument('--argv', default="", help='Arguments.')
         parser.add_argument('--encoding', default="utf-8", help='The encoding of the standard I/O streams. Set to None indicating I/O raw bytes.')
         parser.add_argument('--hide_stderr', action='store_true', help='Hide the stderr content in the executor response.')
+        parser.add_argument('--extract_last_codeblock', action='store_true', help='Make sure the program only gets the code from inside the last code block.')
 
     def setup(self):
         self.sub_process = None
 
+    def extract_code_from_markdown(self, markdown_text):
+        """
+        Extracts code from markdown code blocks using the provided regular expression.
+
+        Args:
+            markdown_text: The markdown text to extract code from.
+
+        Returns:
+            A list of dictionaries, where each dictionary represents a code block
+            and contains the following keys:
+            - 'language': The language of the code block (if specified), otherwise None.
+            - 'code': The code within the code block.
+        """
+
+        regex = r"```(?P<language>[^`\r\n]*)[\r\n]+(?P<code>.+?)```"
+        matches = re.findall(regex, markdown_text, re.DOTALL)
+
+        code_blocks = []
+        for match in matches:
+            code_block = {
+                'language': match[0].strip() if match[1].strip() else None,
+                'code': match[1].strip()
+            }
+            code_blocks.append(code_block)
+
+        return code_blocks
+
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
+        # Read configurations from modelfile.
         pipe_config = modelfile.parameters["pipe_"]
         program = pipe_config.get("program", self.args.program)
+        argv = pipe_config.get("argv", self.args.argv)
         encoding = pipe_config.get("encoding", self.args.encoding)
-        argv = shlex.split(pipe_config.get("argv", self.args.argv))
         encoding = None if encoding is None or encoding.lower() == 'none' else encoding
         hide_stderr = pipe_config.get("hide_stderr", self.args.hide_stderr)
-        sub_proc_input = history[-1]['content']
+        extract_last_codeblock = pipe_config.get("extract_last_codeblock", self.args.extract_last_codeblock)
+
+        # Initialize the context and helper of the subprocess
+        last_user_prompt = history[-1]['content']
+        sub_proc_input = last_user_prompt
+        if extract_last_codeblock:
+            codeblocks = self.extract_code_from_markdown(last_user_prompt)
+            logger.debug(codeblocks)
+            sub_proc_input = codeblocks[-1]['code']+'\n' if len(codeblocks) > 0 else last_user_prompt
+        argv = shlex.split(argv)
         output_queue = asyncio.Queue()
         helper = SubProcessHelper(encoding=encoding)
+        
+        # Check whether the program is under the specified path 
         path = os.path.abspath(self.args.path)
         program = os.path.abspath(f"{self.args.path}/{program}")
-
         logger.info(f"Program: {program}")
         if not program.startswith(path):
             yield "Access outside the root directory is forbidden."
