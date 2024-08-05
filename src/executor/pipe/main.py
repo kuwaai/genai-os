@@ -3,6 +3,7 @@ import sys
 import asyncio
 import logging
 import json
+import shlex
 import subprocess
 from enum import Enum
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -123,6 +124,7 @@ class PipeExecutor(LLMExecutor):
         """
         parser.add_argument('--path', default="../../tools", help='The path to find executables.')
         parser.add_argument('--program', default="cat", help='The program to run.')
+        parser.add_argument('--argv', default="", help='Arguments.')
         parser.add_argument('--encoding', default="utf-8", help='The encoding of the standard I/O streams. Set to None indicating I/O raw bytes.')
         parser.add_argument('--display_stderr', action='store_true', help='Show the stderr content in the executor response.')
 
@@ -133,21 +135,22 @@ class PipeExecutor(LLMExecutor):
         pipe_config = modelfile.parameters["pipe_"]
         program = pipe_config.get("program", self.args.program)
         encoding = pipe_config.get("encoding", self.args.encoding)
+        argv = shlex.split(pipe_config.get("argv", self.args.argv), posix=False)
         encoding = None if encoding is None or encoding.lower() == 'none' else encoding
         display_stderr = pipe_config.get("display_stderr", self.args.display_stderr)
         sub_proc_input = history[-1]['content']
         output_queue = asyncio.Queue()
         helper = SubProcessHelper(encoding=encoding)
-        path = os.path.realpath(self.args.path)
-        program = os.path.realpath(f"{self.args.path}/{program}")
+        path = os.path.abspath(self.args.path)
+        program = os.path.abspath(f"{self.args.path}/{program}")
 
+        logger.info(f"Program: {program}")
         if not program.startswith(path):
             yield "Access outside the root directory is forbidden."
             return
-        logger.debug(f"{path} {program}")
 
         # Run a subprocess with stdin from the request.
-        self.sub_process = await helper.create_subprocess([program], sub_proc_input)
+        self.sub_process = await helper.create_subprocess([program]+argv, sub_proc_input)
         logger.debug(f"Created sub-process with PID: {self.sub_process.pid}")
         logger.debug(f"Wrote {sub_proc_input} to stdin.")
 

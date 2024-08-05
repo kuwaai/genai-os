@@ -2,8 +2,8 @@
 set -xeu
 
 init_kuwa_filesystem_hierarchy(){
-    mkdir -p /var/kuwa/bin && \
-    mkdir -p /var/kuwa/database && \
+    mkdir -p /var/kuwa/bin
+    mkdir -p /var/kuwa/database
     mkdir -p /var/kuwa/custom
 }
 

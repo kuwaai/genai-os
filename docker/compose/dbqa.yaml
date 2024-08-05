@@ -12,15 +12,15 @@ services:
     volumes: [
       "</path/to/vector-database>:/var/database",
       "../root:/var/kuwa:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+      "~/.cache/huggingface:/root/.cache/huggingface"
     ]
     depends_on:
       - kernel
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--model", "gemini-pro"
+      "--model", "gemini-pro",
       "--database", "/var/database"
       ]
-    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
     restart: unless-stopped
     networks: ["backend", "frontend"]
