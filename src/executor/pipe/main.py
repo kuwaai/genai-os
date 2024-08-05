@@ -90,7 +90,7 @@ class SubProcessHelper:
             stdout=asyncio.subprocess.PIPE, # Capturing stdout
             stderr=asyncio.subprocess.PIPE  # Capturing stderr
         )
-        if input_data != None:
+        if input_data != None and not process.stdin.is_closing():
             process.stdin.write(input_data.encode(encoding=self.encoding))
             process.stdin.close()
         return process
