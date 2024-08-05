@@ -92,7 +92,7 @@
    - 對於 Windows:
      ```bat
      copy .env.dev .env
-     cd executable/bat
+     cd executables/bat
      ./production_update.bat
      cd ../../../kernel
      pip install -r requirement.txt

@@ -95,7 +95,7 @@ Alternatively, you can refer to the following steps to install the entire system
    - For Linux:
      ```sh
      cp .env.dev .env
-     cd executable/sh
+     cd executables/sh
      ./production_update.sh
      cd ../../../kernel
      pip install -r requirement.txt
@@ -107,7 +107,7 @@ Alternatively, you can refer to the following steps to install the entire system
    - For Windows:
      ```bat
      copy .env.dev .env
-     cd executable/bat
+     cd executables/bat
      ./production_update.bat
      cd ../../../kernel
      pip install -r requirement.txt
