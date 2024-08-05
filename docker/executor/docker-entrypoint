@@ -2,9 +2,9 @@
 set -xeu
 
 init_kuwa_filesystem_hierarchy(){
-    mkdir -p /var/kuwa/bin
-    mkdir -p /var/kuwa/database
-    mkdir -p /var/kuwa/custom
+    mkdir -p /var/kuwa/docker/root/bin
+    mkdir -p /var/kuwa/docker/root/database
+    mkdir -p /var/kuwa/docker/root/custom
 }
 
 add_executor(){

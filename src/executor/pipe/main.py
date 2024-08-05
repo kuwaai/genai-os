@@ -126,7 +126,7 @@ class PipeExecutor(LLMExecutor):
         parser.add_argument('--program', default="cat", help='The program to run.')
         parser.add_argument('--argv', default="", help='Arguments.')
         parser.add_argument('--encoding', default="utf-8", help='The encoding of the standard I/O streams. Set to None indicating I/O raw bytes.')
-        parser.add_argument('--display_stderr', action='store_true', help='Show the stderr content in the executor response.')
+        parser.add_argument('--hide_stderr', action='store_true', help='Hide the stderr content in the executor response.')
 
     def setup(self):
         self.sub_process = None
@@ -135,9 +135,9 @@ class PipeExecutor(LLMExecutor):
         pipe_config = modelfile.parameters["pipe_"]
         program = pipe_config.get("program", self.args.program)
         encoding = pipe_config.get("encoding", self.args.encoding)
-        argv = shlex.split(pipe_config.get("argv", self.args.argv), posix=False)
+        argv = shlex.split(pipe_config.get("argv", self.args.argv))
         encoding = None if encoding is None or encoding.lower() == 'none' else encoding
-        display_stderr = pipe_config.get("display_stderr", self.args.display_stderr)
+        hide_stderr = pipe_config.get("hide_stderr", self.args.hide_stderr)
         sub_proc_input = history[-1]['content']
         output_queue = asyncio.Queue()
         helper = SubProcessHelper(encoding=encoding)
@@ -150,7 +150,9 @@ class PipeExecutor(LLMExecutor):
             return
 
         # Run a subprocess with stdin from the request.
-        self.sub_process = await helper.create_subprocess([program]+argv, sub_proc_input)
+        cmd = [os.path.realpath(program)]+argv
+        logger.info(f"Cmd: {cmd}")
+        self.sub_process = await helper.create_subprocess(cmd, sub_proc_input)
         logger.debug(f"Created sub-process with PID: {self.sub_process.pid}")
         logger.debug(f"Wrote {sub_proc_input} to stdin.")
 
@@ -171,7 +173,7 @@ class PipeExecutor(LLMExecutor):
                 case StreamName.STDOUT: yield chunk
                 case StreamName.STDERR:
                     logger.info(f"STDERR ({self.sub_process.pid}): {chunk}")
-                    if display_stderr: yield chunk
+                    if not hide_stderr: yield chunk
                 case _: pass
         
         await SubProcessHelper.terminate_subprocess(self.sub_process)
