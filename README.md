@@ -66,24 +66,26 @@
 
 [![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.tw/os/Intro)
 
-## Dependencies
+## Quick Installation
+### Linux (with Docker)
+```
+curl -fsSL https://github.com/kuwaai/genai-os/tree/main/docker/build.sh | sh
+```
+### Windows
+[Download the latest GenAI OS Windows binary](https://github.com/kuwaai/genai-os/releases)
 
-To run this application, please make sure the following packages are installed on your system:
+## Installation from Scratch (for Professionals)
+If you wish to test out a quick demo version, we provide a [Portable Windows version](./windows/README.md) and a [Docker version](./docker/README.md), which have been tested in Windows 10 x64 and Ubuntu 22.04LTS environments.
 
+Alternatively, you can refer to the following steps to install the entire system on your host. Before proceeding, please ensure you have installed all the dependencies listed below.
 - Node.js v20.11.1 & npm
 - PHP 8.1 & php-fpm & Composer
 - Python 3.10 & pip
 - Nginx or Apache
 - Redis 6.0.20
-- CUDA
+- CUDA (for Nvidia GPU)
 - Git
-
-For Windows and Linux, please follow the steps below to set up and execute:
-
-## Installation Guide
-If you wish to test out a quick demo version, we provide a [Portable Windows version](./windows/README.md) and a [Docker version](./docker/README.md), which have been tested in Windows 10 x64 and Ubuntu 22.04LTS environments.
-
-Alternatively, you can refer to the following steps to install the entire system on your host. Before proceeding, please ensure you have installed all the dependencies listed above.
+  
 1. **Clone the project:**
    ```sh
    git clone https://github.com/kuwaai/genai-os.git
