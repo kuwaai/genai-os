@@ -4,7 +4,7 @@ import sys
 import asyncio
 import logging
 import shlex
-
+from importlib.metadata import version
 from kuwa.executor import LLMExecutor, Modelfile
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -99,6 +99,7 @@ class PipeExecutor(LLMExecutor):
         env = os.environ.copy()
         env["KUWA_BASE_URL"] = self.args.api_base_url
         env["KUWA_API_KEY"] = modelfile.parameters["_"]["user_token"]
+        env["KUWA_VERSION"] = version('kuwa-executor')
         logger.info(f"Cmd: {cmd}")
         logger.debug(f"Env: {env}")
         self.sub_process = await helper.create_subprocess(cmd, sub_proc_input, env=env)
