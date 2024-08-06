@@ -24,6 +24,7 @@ class PipeExecutor(LLMExecutor):
         parser.add_argument('--program', default="cat", help='The program to run.')
         parser.add_argument('--argv', default="", help='Arguments.')
         parser.add_argument('--encoding', default="utf-8", help='The encoding of the standard I/O streams. Set to None indicating I/O raw bytes.')
+        parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI. This value will pass to the subprocess.')
         parser.add_argument('--hide_stderr', action='store_true', help='Hide the stderr content in the executor response.')
         parser.add_argument('--extract_last_codeblock', action='store_true', help='Make sure the program only gets the code from inside the last code block.')
 
@@ -88,8 +89,12 @@ class PipeExecutor(LLMExecutor):
 
         # Run a subprocess with stdin from the request.
         cmd = [os.path.realpath(program)]+argv
+        env = os.environ.copy()
+        env["KUWA_BASE_URL"] = self.args.api_base_url
+        env["KUWA_API_KEY"] = modelfile.parameters["_"]["user_token"]
         logger.info(f"Cmd: {cmd}")
-        self.sub_process = await helper.create_subprocess(cmd, sub_proc_input)
+        logger.debug(f"Env: {env}")
+        self.sub_process = await helper.create_subprocess(cmd, sub_proc_input, env=env)
         logger.debug(f"Created sub-process with PID: {self.sub_process.pid}")
         logger.debug(f"Wrote {sub_proc_input} to stdin.")
 

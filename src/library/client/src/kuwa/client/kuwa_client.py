@@ -1,3 +1,4 @@
+import os
 import re
 import json
 import asyncio
@@ -8,11 +9,11 @@ from urllib.parse import urljoin
 logger = logging.getLogger(__name__)
 
 class KuwaClient:
-    def __init__(self, base_url="http://localhost", kernel_base_url="http://localhost:9000", model=None, auth_token=None, limit: int = 3072):
-        self.base_url = base_url
+    def __init__(self, base_url=None, kernel_base_url="http://localhost:9000", model=None, auth_token=None, limit: int = 3072):
+        self.base_url = base_url if base_url is not None else os.environ.get("KUWA_BASE_URL", "http://localhost")
         self.kernel_base_url = kernel_base_url
         self.model = model
-        self.auth_token = auth_token
+        self.auth_token = auth_token if auth_token is not None else os.environ.get("KUWA_API_KEY", None)
         self.limit = limit
 
     def is_too_long(self, chat_history: [dict]):

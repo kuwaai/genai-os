@@ -34,7 +34,7 @@ class SubProcessHelper:
                 await queue.put((name, None)) # None indicates end-of-stream
                 break
 
-    async def create_subprocess(self, cmd, input_data:str|None = None):
+    async def create_subprocess(self, cmd, input_data:str|None = None, **kwargs):
         """
         Create a subprocess with optional input data.
         """
@@ -43,7 +43,8 @@ class SubProcessHelper:
             *cmd,
             stdin=asyncio.subprocess.PIPE,  # Providing input from a stream
             stdout=asyncio.subprocess.PIPE, # Capturing stdout
-            stderr=asyncio.subprocess.PIPE  # Capturing stderr
+            stderr=asyncio.subprocess.PIPE,  # Capturing stderr
+            **kwargs
         )
         if input_data != None and not process.stdin.is_closing():
             process.stdin.write(input_data.encode(encoding=self.encoding))
