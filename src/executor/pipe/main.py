@@ -3,117 +3,14 @@ import re
 import sys
 import asyncio
 import logging
-import json
 import shlex
-import subprocess
-from enum import Enum
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from kuwa.executor import LLMExecutor, Modelfile
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from src.subprocess_helper import SubProcessHelper, StreamName
+
 logger = logging.getLogger(__name__)
-
-class StreamName(Enum):
-    STDIN = 0
-    STDOUT = 1
-    STDERR = 2
-
-class TextBuffer:
-    """
-    Decode text from byte stream.
-    """
-    def __init__(self, coding:str|None = None):
-        self.coding = coding
-        self.buffer = b''
-    
-    def get_chunk(self, raw_chunk:bytes, eof:bool) -> str|None:
-        """
-        Continuously append incoming raw data chunks to a buffer.
-        Decode complete chunks from this buffer whenever possible.
-        If the end-of-file flag is set, decode the entire remaining buffer content.
-        Arguments:
-          - raw_chunk (bytes): The raw data chunk from the stream.
-          - eof (bool): The end-of-file flag.
-        """
-        if self.coding is None or raw_chunk is None:
-            return raw_chunk
-
-        logger.debug(f"Got new bytes: {raw_chunk}")
-        self.buffer += raw_chunk
-        buffer_len = len(self.buffer)
-        chunk = None
-        for end in range(buffer_len, 0, -1):
-            try:
-                chunk = self.buffer[:end].decode(
-                    encoding=self.coding,
-                    errors='strict' if not eof else 'ignore'
-                )
-                self.buffer = self.buffer[end:]
-                break
-            except UnicodeError:
-                continue
-        logger.debug(f"Decoded chunk: {chunk}")
-        return chunk
-
-class SubProcessHelper:
-    """
-    Helper functions to manipulate asyncio.subprocess
-    """
-    
-    def __init__(self, encoding:str|None="utf-8", max_chunk_bytes = 4096):
-        self.encoding = encoding
-        self.max_chunk_bytes = max_chunk_bytes
-
-    async def _read_stream(self, stream, name:StreamName, queue):
-        """
-        Read the stream into queue.
-        """
-        
-        buffer = TextBuffer(self.encoding)
-        while True:
-            raw_chunk = await stream.read(self.max_chunk_bytes)
-            eof = stream.at_eof()
-            chunk = buffer.get_chunk(raw_chunk, eof)
-            await queue.put((name, chunk))
-            if eof:
-                await queue.put((name, None)) # None indicates end-of-stream
-                break
-
-    async def create_subprocess(self, cmd, input_data:str|None = None):
-        """
-        Create a subprocess with optional input data.
-        """
-
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdin=asyncio.subprocess.PIPE,  # Providing input from a stream
-            stdout=asyncio.subprocess.PIPE, # Capturing stdout
-            stderr=asyncio.subprocess.PIPE  # Capturing stderr
-        )
-        if input_data != None and not process.stdin.is_closing():
-            process.stdin.write(input_data.encode(encoding=self.encoding))
-            process.stdin.close()
-        return process
-
-    async def stream_subprocess(self, process, queue):
-        """
-        Read both of STDOUT and STDERR stream into queue.
-        Item:
-          - For STDOUT: (StreamName.STDOUT, decode chunk)
-          - For STDERR: (StreamName.STDERR, decode chunk)
-        """
-        await asyncio.gather(
-            self._read_stream(process.stdout, StreamName.STDOUT, queue),
-            self._read_stream(process.stderr, StreamName.STDERR, queue)
-        )
-        return None
-    
-    @staticmethod
-    async def terminate_subprocess(process):
-        if process.returncode is None:
-            process.terminate()
-            await process.wait()
-
 
 class PipeExecutor(LLMExecutor):
     def __init__(self):
