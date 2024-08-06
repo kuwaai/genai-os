@@ -57,6 +57,9 @@ class PipeExecutor(LLMExecutor):
             code_blocks.append(code_block)
 
         return code_blocks
+    
+    def is_exe(self, fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         # Read configurations from modelfile.
@@ -88,7 +91,11 @@ class PipeExecutor(LLMExecutor):
             return
 
         # Run a subprocess with stdin from the request.
-        cmd = [os.path.realpath(program)]+argv
+        program = os.path.realpath(program)
+        if not self.is_exe(program):
+            yield "The program is not executable; please check its file permissions."
+            return
+        cmd = [program]+argv
         env = os.environ.copy()
         env["KUWA_BASE_URL"] = self.args.api_base_url
         env["KUWA_API_KEY"] = modelfile.parameters["_"]["user_token"]

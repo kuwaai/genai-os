@@ -8,6 +8,7 @@ confs=(
   "copycat"
   "sysinfo"
   "pipe"
+  "file_manager"
   "token_counter"
   "gemini"
   "docqa_webqa"
