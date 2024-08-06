@@ -107,7 +107,7 @@ return [
     'label.anno' => 'Oznámení systému',
     'label.tos' => 'Podmínky služby',
     'label.upload_max_size_mb' => 'Maximální velikost nahrávaného souboru (MB)',
-    'label.upload_allowed_extensions' => 'Povolené přípony souborů',
+    'label.upload_allowed_extensions' => 'Povolené přípony souborů (* pro libovolnou příponu)',
     'label.upload_max_file_count' => 'Maximální počet souborů pro nahrání (-1 znamená neomezeně)',
 
     //Permissions
@@ -118,6 +118,7 @@ return [
     'perm.Room_update_react_message' => 'Reagovat na zprávu',
     'perm.Room_read_export_chat' => 'Exportovat konverzaci',
     'perm.Room_delete_chatroom' => 'Smazat konverzaci',
+    'perm.Room_update_ignore_upload_constraint' => 'Ignorovat omezení nahrávání',
     'perm.Chat_update_react_message' => 'Reagovat na zprávu',
     'perm.Dashboard_read_statistics' => 'Číst statistiky',
     'perm.Dashboard_read_blacklist' => 'Číst blacklist',
@@ -178,6 +179,7 @@ return [
     'perm.Room_update_import_chat.describe' => 'Popis práva importovat chatovou historii místnosti (vyžaduje právo vytvořit místnost)',
     'perm.Chat_update_react_message.describe' => 'Popis práva reagovat na zprávy pomocí dalších tlačítek (např. citace, překlad)',
     'perm.Room_update_react_message.describe' => 'Popis práva reagovat na zprávy v místnostech pomocí dalších tlačítek (např. citace, překlad)',
+    'perm.Room_update_ignore_upload_constraint.describe' => 'Ignorovat všechna omezení pro nahrávání souborů nastavená v systémových nastaveních, což umožňuje nahrát jakýkoli soubor',
     'perm.Dashboard_read_statistics.describe' => 'Popis práva číst statistiky',
     'perm.Dashboard_read_blacklist.describe' => 'Popis práva číst černou listinu',
     'perm.Dashboard_read_feedbacks.describe' => 'Popis práva číst zpětnou vazbu',

@@ -108,7 +108,7 @@ return [
     'label.anno' => 'Announcement',
     'label.tos' => 'Terms of Service',
     'label.upload_max_size_mb' => 'Maximum upload file size (MB)',
-    'label.upload_allowed_extensions' => 'Allowed file extensions',
+    'label.upload_allowed_extensions' => 'Allowed file extensions (* for any extension)',
     'label.upload_max_file_count' => 'Maximum number of files allowed to upload (-1 means no limit)',
 
     //Permissions
@@ -120,6 +120,7 @@ return [
     'perm.Room_read_export_chat' => 'Export Chat',
     'perm.Room_delete_chatroom' => 'Delete Chatroom',
     'perm.Room_update_upload_file' => 'Upload File',
+    'perm.Room_update_ignore_upload_constraint' => 'Ignore Upload Constraints',
     'perm.Chat_update_react_message' => 'React Buttons',
     'perm.Dashboard_read_statistics' => 'Statistics',
     'perm.Dashboard_read_blacklist' => 'Blacklist',
@@ -181,6 +182,7 @@ return [
     'perm.Room_update_import_chat.describe' => 'Permission to import history',
     'perm.Chat_update_react_message.describe' => 'Permission to use extra react buttons',
     'perm.Room_update_react_message.describe' => 'Permission to use extra react buttons',
+    'perm.Room_update_ignore_upload_constraint.describe' => 'Ignore all file upload limits set in the system settings, allowing any file to be uploaded',
     'perm.Dashboard_read_statistics.describe' => 'Permission to access statistics tab',
     'perm.Dashboard_read_blacklist.describe' => 'Permission to access blacklist tab',
     'perm.Dashboard_read_feedbacks.describe' => 'Permission to access feedbacks tab',

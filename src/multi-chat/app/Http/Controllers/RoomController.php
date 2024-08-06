@@ -333,13 +333,20 @@ class RoomController extends Controller
                 'msg' => 'File not specified.',
             ];
         }
-        $max_file_size_mb = \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
-        $allowed_file_exts = \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
-        $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
+        $verify_uploaded_file = !request()->user()->hasPerm('Room_update_ignore_upload_constraint');
+        if (!$verify_uploaded_file){
+            $max_file_size_mb = PHP_INT_MAX;
+            $allowed_file_exts = "*";
+            $upload_max_file_count = -1;
+        } else {
+            $max_file_size_mb = \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
+            $allowed_file_exts = \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
+            $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
+        }
         $max_file_size_kb = strval(intval($max_file_size_mb ?: 20) * 1024);
         $allowed_file_exts = $allowed_file_exts ?: 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpg,bmp,png,zip,mp3,wav,flac,wma,m4a,aac';
         $upload_max_file_count = intval($upload_max_file_count ?: -1);
-        
+
         if ($upload_max_file_count == 0) {
             return [
                 'succeed' => false,
@@ -350,12 +357,15 @@ class RoomController extends Controller
 
         Log::channel('analyze')->Debug("max_file_size_kb:". $max_file_size_kb);
         Log::channel('analyze')->Debug("allowed_file_exts:". $allowed_file_exts);
+        $file_validation_rule = [
+            'file',
+            'max:' . $max_file_size_kb,
+        ];
+        if ($allowed_file_exts !== "*"){
+            array_push($file_validation_rule, 'mimes:' . $allowed_file_exts);
+        }
         $validator = Validator::make($request->all(), [
-            'file' => [
-                'file',
-                'max:' . $max_file_size_kb,
-                'mimes:' . $allowed_file_exts
-            ]
+            'file' => $file_validation_rule
         ]);
 
         if ($validator->fails()) {
@@ -375,7 +385,7 @@ class RoomController extends Controller
             "%s-%s%s",
             $filePathParts["filename"],
             time(),
-            $filePathParts["extension"] ? ("." . $filePathParts["extension"]) : ""
+            isset($filePathParts["extension"]) ? ("." . $filePathParts["extension"]) : ""
         );
         $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
 

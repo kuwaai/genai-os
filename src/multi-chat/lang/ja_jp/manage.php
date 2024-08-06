@@ -107,7 +107,7 @@ return [
     'label.anno' => 'システム公告',
     'label.tos' => '利用規約',
     'label.upload_max_size_mb' => 'アップロードファイルサイズ制限(MB)',
-    'label.upload_allowed_extensions' => '許可されるアップロードファイル拡張子',
+    'label.upload_allowed_extensions' => '許可されるアップロードファイルの拡張子 (* は任意の拡張子)',
     'label.upload_max_file_count' => 'アップロードファイルの総数制限 (-1 は無制限)',
 
     //Permissions
@@ -119,6 +119,7 @@ return [
     'perm.Room_read_export_chat' => 'チャットのエクスポート',
     'perm.Room_delete_chatroom' => 'チャットルームの削除',
     'perm.Room_update_upload_file' => 'ファイルのアップロード',
+    'perm.Room_update_ignore_upload_constraint' => 'アップロード制限を無視する',
     'perm.Chat_update_react_message' => '追加のメッセージ操作ボタン',
     'perm.Dashboard_read_statistics' => '統計情報の閲覧',
     'perm.Dashboard_read_blacklist' => 'ブラックリストの閲覧',
@@ -180,6 +181,7 @@ return [
     'perm.Room_update_import_chat.describe' => 'チャット履歴をインポートする権限（チャットの作成権限も必要です）',
     'perm.Chat_update_react_message.describe' => 'メッセージに追加の操作ボタンを使用する権限（引用、翻訳などの機能）',
     'perm.Room_update_react_message.describe' => 'メッセージに追加の操作ボタンを使用する権限（引用、翻訳などの機能）',
+    'perm.Room_update_ignore_upload_constraint.describe' => 'システム設定で設定されているすべてのファイルアップロード制限を無視し、あらゆるファイルをアップロードできるようにします',
     'perm.Dashboard_read_statistics.describe' => '統計情報にアクセスする権限',
     'perm.Dashboard_read_blacklist.describe' => 'ブラックリストにアクセスする権限',
     'perm.Dashboard_read_feedbacks.describe' => 'フィードバックにアクセスする権限',

@@ -108,7 +108,7 @@ return [
     'label.anno' => 'Annonce système',
     'label.tos' => 'Conditions d\'utilisation',
     'label.upload_max_size_mb' => 'Taille maximale de fichier (Mo)',
-    'label.upload_allowed_extensions' => 'Extensions de fichiers autorisées',
+    'label.upload_allowed_extensions' => 'Extensions de fichiers autorisées (* pour toute extension)',
     'label.upload_max_file_count' => 'Nombre maximum de fichiers téléchargeables (-1 pour illimité)',
 
     //Permissions
@@ -119,6 +119,7 @@ return [
     'perm.Room_update_react_message' => 'Bouton d\'action supplémentaire',
     'perm.Room_read_export_chat' => 'Exporter la conversation',
     'perm.Room_delete_chatroom' => 'Supprimer la conversation',
+    'perm.Room_update_ignore_upload_constraint' => 'Ignorer les contraintes de téléchargement',
     'perm.Chat_update_react_message' => 'Bouton d\'action supplémentaire',
     'perm.Dashboard_read_statistics' => 'Statistiques',
     'perm.Dashboard_read_blacklist' => 'Liste noire',
@@ -179,6 +180,7 @@ return [
     'perm.Room_update_import_chat.describe' => 'Importer des conversations (nécessite le droit de créer une conversation)',
     'perm.Chat_update_react_message.describe' => 'Utiliser les boutons d\'action supplémentaires (comme citer, traduire, etc.)',
     'perm.Room_update_react_message.describe' => 'Utiliser les boutons d\'action supplémentaires (comme citer, traduire, etc.)',
+    'perm.Room_update_ignore_upload_constraint.describe' => 'Ignorer toutes les limites de téléchargement de fichiers définies dans les paramètres système, permettant le téléchargement de tout fichier',
     'perm.Dashboard_read_statistics.describe' => 'Accéder aux statistiques',
     'perm.Dashboard_read_blacklist.describe' => 'Accéder à la liste noire',
     'perm.Dashboard_read_feedbacks.describe' => 'Accéder aux rétroactions',

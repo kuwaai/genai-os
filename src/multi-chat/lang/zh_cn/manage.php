@@ -108,7 +108,7 @@ return [
      'label.anno' => '系统公告',
      'label.tos' => '服务条款',
      'label.upload_max_size_mb' => '上传文件大小限制(MB)',
-     'label.upload_allowed_extensions' => '允许上传的文件扩展名',
+     'label.upload_allowed_extensions' => '允许上传的文件扩展名 (* 表示任意扩展名)',
      'label.upload_max_file_count' => '上传文件总数限制 (-1 表示不限制数量)',
 
      //Permissions
@@ -119,6 +119,7 @@ return [
      'perm.Room_update_react_message' => '额外操作按钮',
      'perm.Room_read_export_chat' => '汇出对话',
      'perm.Room_delete_chatroom' => '删除对话',
+     'perm.Room_update_ignore_upload_constraint' => '忽略上传限制',
      'perm.Chat_update_react_message' => '额外操作按钮',
      'perm.Dashboard_read_statistics' => '统计资讯',
      'perm.Dashboard_read_blacklist' => '黑名单',
@@ -179,6 +180,7 @@ return [
      'perm.Room_update_import_chat.describe' => '汇入聊天纪录的权限（仍需要建立对话的权限）',
      'perm.Chat_update_react_message.describe' => '对讯息使用额外操作按钮的权限(如引用、翻译等功能)',
      'perm.Room_update_react_message.describe' => '对讯息使用额外操作按钮的权限(如引用、翻译等功能)',
+     'perm.Room_update_ignore_upload_constraint.describe' => '忽略系统设置中设定的所有文件上传限制，允许上传任何文件',
      'perm.Dashboard_read_statistics.describe' => '存取统计资讯',
      'perm.Dashboard_read_blacklist.describe' => '存取黑名单',
      'perm.Dashboard_read_feedbacks.describe' => '存取回馈资料',

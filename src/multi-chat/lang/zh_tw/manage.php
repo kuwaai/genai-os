@@ -108,7 +108,7 @@ return [
     'label.anno' => '系統公告',
     'label.tos' => '服務條款',
     'label.upload_max_size_mb' => '上傳檔案大小限制(MB)',
-    'label.upload_allowed_extensions' => '允許上傳的副檔名',
+    'label.upload_allowed_extensions' => '允許上傳的副檔名 (* 表示任意副檔名)',
     'label.upload_max_file_count' => '上傳檔案總數限制 (-1 表示不限制數量)',
 
     //Permissions
@@ -120,6 +120,7 @@ return [
     'perm.Room_read_export_chat' => '匯出對話',
     'perm.Room_delete_chatroom' => '刪除對話',
     'perm.Room_update_upload_file' => '上傳檔案',
+    'perm.Room_update_ignore_upload_constraint' => '忽略上傳限制',
     'perm.Chat_update_react_message' => '額外操作按鈕',
     'perm.Dashboard_read_statistics' => '統計資訊',
     'perm.Dashboard_read_blacklist' => '黑名單',
@@ -181,6 +182,7 @@ return [
     'perm.Room_update_import_chat.describe' => '匯入聊天紀錄的權限（仍需要建立對話的權限）',
     'perm.Chat_update_react_message.describe' => '對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)',
     'perm.Room_update_react_message.describe' => '對訊息使用額外操作按鈕的權限(如引用、翻譯等功能)',
+    'perm.Room_update_ignore_upload_constraint.describe' => '忽略系統設定中的所有檔案上傳限制，可以上傳任意檔案',
     'perm.Dashboard_read_statistics.describe' => '存取統計資訊',
     'perm.Dashboard_read_blacklist.describe' => '存取黑名單',
     'perm.Dashboard_read_feedbacks.describe' => '存取回饋資料',

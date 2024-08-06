@@ -108,7 +108,7 @@ return [
     'label.anno' => 'Systemmitteilungen',
     'label.tos' => 'Nutzungsbedingungen',
     'label.upload_max_size_mb' => 'Maximale Upload-Dateigröße (MB)',
-    'label.upload_allowed_extensions' => 'Erlaubte Dateierweiterungen',
+    'label.upload_allowed_extensions' => 'Erlaubte Dateierweiterungen (* für beliebige Endungen)',
     'label.upload_max_file_count' => 'Maximale Anzahl hochzuladender Dateien (-1 für unbegrenzt)',
 
     // Berechtigungen
@@ -119,6 +119,7 @@ return [
     'perm.Room_update_react_message' => 'Zusätzliche Aktionsschaltflächen',
     'perm.Room_read_export_chat' => 'Chat exportieren',
     'perm.Room_delete_chatroom' => 'Chatraum löschen',
+    'perm.Room_update_ignore_upload_constraint' => 'Uploadbeschränkungen ignorieren',
     'perm.Chat_update_react_message' => 'Zusätzliche Aktionsschaltflächen',
     'perm.Dashboard_read_statistics' => 'Statistiken anzeigen',
     'perm.Dashboard_read_blacklist' => 'Schwarze Liste',
@@ -179,6 +180,7 @@ return [
     'perm.Room_update_import_chat.describe' => 'Berechtigung zum Importieren von Chat-Protokollen (erfordert weiterhin Berechtigung zum Erstellen von Chats)',
     'perm.Chat_update_react_message.describe' => 'Berechtigung zum Verwenden von zusätzlichen Aktionsschaltflächen für Nachrichten (wie Zitieren, Übersetzen usw.)',
     'perm.Room_update_react_message.describe' => 'Berechtigung zum Verwenden von zusätzlichen Aktionsschaltflächen für Nachrichten (wie Zitieren, Übersetzen usw.)',
+    'perm.Room_update_ignore_upload_constraint.describe' => 'Alle in den Systemeinstellungen festgelegten Dateigrößenbeschränkungen für Uploads ignorieren, sodass beliebige Dateien hochgeladen werden können',
     'perm.Dashboard_read_statistics.describe' => 'Berechtigung zum Zugriff auf Statistiken',
     'perm.Dashboard_read_blacklist.describe' => 'Berechtigung zum Zugriff auf die Schwarze Liste',
     'perm.Dashboard_read_feedbacks.describe' => 'Berechtigung zum Zugriff auf Feedback-Daten',

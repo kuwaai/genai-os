@@ -15,9 +15,16 @@
     use Illuminate\Support\Facades\Cache;
     use App\Models\SystemSetting;
 
-    $upload_max_size_mb = SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
-    $upload_allowed_extensions = SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
-    $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
+    $verify_uploaded_file = !request()->user()->hasPerm('Room_update_ignore_upload_constraint');
+    if (!$verify_uploaded_file){
+        $upload_max_size_mb = PHP_INT_MAX;
+        $upload_allowed_extensions = "*";
+        $upload_max_file_count = -1;
+    } else {
+        $upload_max_size_mb = SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
+        $upload_allowed_extensions = SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
+        $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
+    }
 @endphp
 <script>
 @if (session('errorString'))
@@ -46,11 +53,14 @@
             showErrorMsg("{{ __('chat.hint.upload_file_too_large') }}");
             return;
         } 
-        
-        if (!$("#upload")[0].files[0].name.match(/\.({{ str_replace(',', '|', $upload_allowed_extensions) }})$/)){
+        @if ($upload_allowed_extensions === "*")
+        file_regex = /.*/;
+        @else
+        file_regex = /\.({{ str_replace(',', '|', $upload_allowed_extensions) }})$/;
+        @endif
+        if (!$("#upload")[0].files[0].name.match(file_regex)){
             showErrorMsg("{{ __('chat.hint.upload_not_allowed_ext') }}");
             return;
-        
         }
         $("#attachment").show();
         $("#attachment button").text($("#upload")[0].files[0].name)

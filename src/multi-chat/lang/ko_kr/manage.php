@@ -107,7 +107,7 @@ return [
     'label.anno' => '시스템 공지',
     'label.tos' => '이용 약관',
     'label.upload_max_size_mb' => '업로드 파일 크기 제한(MB)',
-    'label.upload_allowed_extensions' => '허용된 업로드 파일 확장자',
+    'label.upload_allowed_extensions' => '허용되는 업로드 파일 확장자 (*는 모든 확장자)',
     'label.upload_max_file_count' => '업로드 가능한 파일 개수 제한 (-1은 무제한)',
 
     //Permissions
@@ -118,6 +118,7 @@ return [
     'perm.Room_update_react_message' => '추가 조작 버튼',
     'perm.Room_read_export_chat' => '대화 내보내기',
     'perm.Room_delete_chatroom' => '대화 삭제',
+    'perm.Room_update_ignore_upload_constraint' => '업로드 제한 무시',
     'perm.Chat_update_react_message' => '추가 조작 버튼',
     'perm.Dashboard_read_statistics' => '통계 정보',
     'perm.Dashboard_read_blacklist' => '블랙리스트',
@@ -178,6 +179,7 @@ return [
     'perm.Room_update_import_chat.describe' => '채팅 내용을 가져오는 권한 (대화 생성 권한이 필요함)',
     'perm.Chat_update_react_message.describe' => '메시지에 대해 추가 작업 버튼을 사용하는 권한 (인용, 번역 등 기능)',
     'perm.Room_update_react_message.describe' => '메시지에 대해 추가 작업 버튼을 사용하는 권한 (인용, 번역 등 기능)',
+    'perm.Room_update_ignore_upload_constraint.describe' => '시스템 설정에 설정된 모든 파일 업로드 제한을 무시하여 모든 파일을 업로드할 수 있도록 합니다.',
     'perm.Dashboard_read_statistics.describe' => '통계 정보에 액세스하는 권한',
     'perm.Dashboard_read_blacklist.describe' => '블랙리스트에 액세스하는 권한',
     'perm.Dashboard_read_feedbacks.describe' => '피드백 데이터에 액세스하는 권한',
