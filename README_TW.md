@@ -33,15 +33,11 @@
 </p>
 
 ## 關鍵功能
-
-* 提供多語言GenAI開發與部署的整體解決方案，支援Windows及Linux
-
-* 提供群聊、引用、完整 Prompt 列表的匯入/匯出/分享等友善使用功能
-
-* 可靈活組合 Prompt x RAGs x Bot x 模型 x 硬體/GPUs以滿足應用所需
-
-* 支援從虛擬主機、筆記型電腦、個人電腦、地端伺服器到公私雲端的各種環境
-
+* 提供多語言生成式人工智慧的使用、開發與部署的整體解決方案，支援Windows、Linux及MacOS
+* 提供多模型群聊、引用、劇本匯入、生成內容完整匯出、多樣分享等自主編導與指揮的友善使用功能 
+* 支援多模態模型，整合多項現有RAG/Agent開發工具，可串接傳統應用程式、自建Store應用商店
+* 可免寫程式，靈活組合「提示劇本x知識庫x模型x工具x腳本」等即可打造個人化強大的GenAI應用
+* 支援單板電腦、筆記型電腦、個人電腦、虛擬主機、地端伺服器，以及公私或混合雲端等各種環境
 * 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
 
 ![screenshot](./src/multi-chat/public/images/demo.gif)
@@ -51,80 +47,25 @@
 
 [![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.org/os/Intro)
 
-## 依賴套件
-
-為了執行此應用，請確保您的系統上安裝了以下套件：
-
-- Node.js v20.11.1 & npm
-- PHP 8.1 & php-fpm & Composer
-- Python 3.10 & pip
-- Nginx 或 Apache
-- Redis 6.0.20
-- CUDA
-- Git
-
-請按照以下步驟在 Windows 和 Linux 上設置和執行：
-
 ## 安裝指南
-如果你想嘗鮮試著快速跑起來玩玩，我們有提供[Windows可攜式版本](./windows/README_TW.md)與[Docker版本](./docker/README_TW.md)，分別在Windows 10 x64 與 Ubuntu 22.04LTS 環境測試過，可以試試看！
+### 快速安裝
+可下載單一Script或檔案，依指示操作即可快速安裝
+* **Windows**
+下載最新版本GenAI OS的[Windows版單一執行檔](https://github.com/kuwaai/genai-os/releases)
+* **Linux/Docker**
+可利用 [build.sh](./docker/build.sh) 或在Linux下執行以下指令即可自動下載及安裝Docker、CUDA及Kuwa
+  ```
+  curl -fsSL https://github.com/kuwaai/genai-os/tree/main/docker/build.sh | sh
+  ```
+### 手動安裝
+可參考安裝文件逐步進行手動安裝
+* [Windows可攜式版本](./windows/README_TW.md)
+* [Linux/Docker版本](./docker/README_TW.md)
+### 進階安裝
+具經驗的專業人士可參考 [建置文件](./BUILD_TW.md) 從頭逐步進行安裝。
 
-或者你可以參考以下步驟來將整套系統安裝在主機上，在繼續之前，請確保您已經安裝了上述所有依賴套件。
-1. **複製專案:**
-   ```sh
-   git clone https://github.com/kuwaai/genai-os.git
-   cd genai-os/src/multi-chat/
-   ```
-
-2. **安裝依賴套件:**
-
-   - 對於 Linux:
-     ```sh
-     cp .env.dev .env
-     cd executables/sh
-     ./production_update.sh
-     cd ../../../kernel
-     pip install -r requirement.txt
-     cd ../executor
-     pip install -r requirement.txt
-     sudo chown -R $(whoami):www-data /var/www/html
-     ```
-
-   - 對於 Windows:
-     ```bat
-     copy .env.dev .env
-     cd executable/bat
-     ./production_update.bat
-     cd ../../../kernel
-     pip install -r requirement.txt
-     cd ../executor
-     pip install -r requirement.txt
-     ```
-
-3. **設定 PHP 和 PHP-FPM:**
-   - 確保已安裝並正確設定了 PHP。
-   - 設定您的 Web 伺服器（Nginx 或 Apache），將 `src/multi-chat/public` 設置為網站根目錄。
-   - 範例設置文件: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
-   - 推薦設置:
-     - 為了RAG應用，PHP 最大上傳文件大小設置為至少 20MB。
-
-4. **設定 Redis:**
-   - 確保已安裝並執行 Redis 伺服器。
-   - 可以從 `.env` 中調整相關設定。
-   - 在 `src/multi-chat/` 下執行 `php artisan queue:work --timeout=0` 來啟動 Redis Worker，來處理使用者的請求，建議同時執行至少 5 個Redis Worker。
-
-5. **執行應用程式:**
-   - 啟動您的 Web 伺服器和 PHP-FPM。
-   - 執行Kernel `src/kernel/main.py`。建議在執行之前將該Kernel資料夾複製到另一個位置。
-
-6. **連線到應用程式:**
-   - 首先您需要建立一個管理員帳號，前往 `src/multi-chat/`，並執行 `php artisan db:seed --class=AdminSeeder --force` 以播種您的第一個管理員帳號。
-   - 打開您的瀏覽器，並連到你架設的Nginx/Apache應用程式的 URL。
-   - 使用您的管理員帳號登錄，開始使用Kuwa GenAI OS
-
-7. **架設模型:**
-    - 預設是沒有模型的，請閱讀[這份README](./src/executor/README_TW.md)來架設一些模型。
-    - 架設完畢後，模型不會屏空出現在網站上，管理員必須在網站上設定對應的access_code才能存取該模型。
-    - 請注意架設模型前Kernel必須先啟動(你可以檢查`127.0.0.1:9000`是否可以連線來確定)
+### 模型架設與環境設定
+Kuwa透過Executor來支援多種模型架設及應用串接方式，安裝後您可能需要再下載模型或設定後才能發揮更多功能，請參考[Executor說明](./src/executor/README_TW.md)來進行進一步的設定。
 
 ## 下載
 
@@ -148,11 +89,11 @@
 
 ## 支援
 
-我們團隊目前只有兩個人，如果您對我們合力開發的這個專案感興趣，可以一起協助我們開發，幫助我們把這個開源專案做的更好，如果您願意協助，請不要猶豫，隨時與我們聯繫！
+如果您對我們合力開發的這個專案感興趣，可以一起協助我們開發，幫助我們把這個開源專案做的更好，如果您願意協助，請不要猶豫，隨時與我們聯繫！
 
 ## 套件與程式
 
-該專案用到了以下套件和程式：
+此專案用到了以下套件和程式：
 
 - [PHP & PHP-FPM](https://www.php.net/)
 - [Laravel 10](https://laravel.com/)
