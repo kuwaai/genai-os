@@ -16,7 +16,7 @@ class ImportBot extends Command
      *
      * @var string
      */
-    protected $signature = 'bot:import {botfile}';
+    protected $signature = 'bot:import {botfile} {--retry=10}';
 
     /**
      * The console command description.
@@ -34,19 +34,17 @@ class ImportBot extends Command
         $botfileContents = file_get_contents($botfilePath);
         $botfile = $this->parseBotfile($botfileContents);
         
-        $model = LLMs::where('name', '=', $botfile['base'])->first();
-
+        $model = $this->findModel($botfile['base'], $this->option('retry'));
         if (!$model) {
-            print('The selected model does not exist.'."\n");
+            error_log("Model ".$botfile['base']." does not exist. Can not import the bot.");
             return;
         }
         $model_id = $model->id;
         $visibility = 0; // System bot
         
-
         $bot = Bots::where('name', '=', $botfile['name'])->first();
         if ($bot) {
-            print('The bot "'.$botfile['name']. '" already exists. Skipped.'."\n");
+            error_log('The bot "'.$botfile['name']. '" already exists. Skipped.'."\n");
             return;
         }
 
@@ -72,8 +70,29 @@ class ImportBot extends Command
         print('Bot "'.$botfile['name']. '" imported successfully.'."\n");
     
     }
+    private function findModel($name, $retry)
+    {
+        $baseDelay = 0.1;
+        $model = null;
 
-    private function getExtension($contentType) {
+        for ($attempt=0; $attempt < $retry; $attempt++) {
+            $model = LLMs::where('name', '=', $name)->first();
+            if ($model) {
+                break;
+            }
+
+            // Calculate exponential backoff delay
+            $delay = $baseDelay * pow(2, $attempt);
+
+            // Log the error and retry information
+            error_log("Model $name not found. Retry in $delay seconds...");
+            sleep($delay);
+        }
+        return $model; 
+    }
+
+    private function getExtension($contentType)
+    {
         $mimeTypes = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
