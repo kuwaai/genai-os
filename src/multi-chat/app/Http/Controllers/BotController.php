@@ -212,47 +212,8 @@ class BotController extends Controller
             ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
             ->first();
-        if ($result) {
-            $user = $result;
-            Auth::setUser(User::find($user->id));
-            $visibility = $request->input('visibility');
-            $permissions = [
-                0 => 'tab_Manage',
-                1 => 'Store_create_community_bot',
-                2 => 'Store_create_group_bot',
-                3 => 'Store_create_private_bot',
-            ];
-
-            if (isset($permissions[$visibility]) && $request->user()->hasPerm($permissions[$visibility])) {
-                $rules = (new BotCreateRequest())->rules();
-                $validator = Validator::make($request->all(), $rules);
-
-                if ($validator->fails()) {
-                    return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 422, [], JSON_UNESCAPED_UNICODE);
-                }
-                $model = LLMs::where('name', '=', $request->input('llm_name'))->first();
-
-                if (!$model) {
-                    // Add custom error message
-                    $validator->errors()->add('llm_name', 'The selected model does not exist.');
-                    return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 404, [], JSON_UNESCAPED_UNICODE);
-                }
-                $model_id = $model->id;
-                if (!$user->hasPerm('model_' . $model_id)) {
-                    $validator->errors()->add('llm_name', 'You do not have permission to use this model.');
-                    return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 404, [], JSON_UNESCAPED_UNICODE);
-                }
-                $this->create($request);
-                return response()->json(['status' => 'success', 'last_bot_id' => session('last_bot_id')], 200, [], JSON_UNESCAPED_UNICODE);
-            } else {
-                $errorResponse = [
-                    'status' => 'error',
-                    'message' => 'You have no permission to use Chat API',
-                ];
-
-                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
-            }
-        } else {
+        
+        if (!$result) {
             $errorResponse = [
                 'status' => 'error',
                 'message' => 'Authentication failed',
@@ -260,6 +221,54 @@ class BotController extends Controller
 
             return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
         }
+        $user = $result;
+        Auth::setUser(User::find($user->id));
+        $visibility = $request->input('visibility');
+        $permissions = [
+            0 => 'tab_Manage',
+            1 => 'Store_create_community_bot',
+            2 => 'Store_create_group_bot',
+            3 => 'Store_create_private_bot',
+        ];
+
+        if (!isset($permissions[$visibility]) || !$request->user()->hasPerm($permissions[$visibility])) {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'You have no permission to use the bot creation API',
+            ];
+
+            return response()->json($errorResponse, 403, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $rules = (new BotCreateRequest())->rules();
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => json_decode($validator->errors()),
+            ];
+            return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
+        }
+        $model = LLMs::where('name', '=', $request->input('llm_name'))->first();
+
+        if (!$model) {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'The base model does not exist.',
+            ];
+            return response()->json($errorResponse, 404, [], JSON_UNESCAPED_UNICODE);
+        }
+        $model_id = $model->id;
+        if (!$user->hasPerm('model_' . $model_id)) {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'You do not have permission to use this model.',
+            ];
+            return response()->json($errorResponse, 403, [], JSON_UNESCAPED_UNICODE);
+        }
+        $this->create($request);
+        return response()->json(['status' => 'success', 'last_bot_id' => session('last_bot_id')], 200, [], JSON_UNESCAPED_UNICODE);
     }
 
     public function update(Request $request)
