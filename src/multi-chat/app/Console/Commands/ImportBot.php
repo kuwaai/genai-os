@@ -70,13 +70,13 @@ class ImportBot extends Command
         print('Bot "'.$botfile['name']. '" imported successfully.'."\n");
     
     }
-    private function findModel($name, $retry)
+    private function findModel($access_code, $retry)
     {
         $baseDelay = 0.1;
         $model = null;
 
         for ($attempt=0; $attempt < $retry; $attempt++) {
-            $model = LLMs::where('name', '=', $name)->first();
+            $model = LLMs::where('access_code', '=', $access_code)->first();
             if ($model) {
                 break;
             }
@@ -85,7 +85,7 @@ class ImportBot extends Command
             $delay = $baseDelay * pow(2, $attempt);
 
             // Log the error and retry information
-            error_log("Model $name not found. Retry in $delay seconds...");
+            error_log("Model ".$access_code." not found. Retry in $delay seconds...");
             sleep($delay);
         }
         return $model; 
@@ -154,14 +154,15 @@ class ImportBot extends Command
         $lines = explode("\n", $rawContent);
 
         foreach ($lines as $line) {
+            $char_to_remove=" \"\n\r\t\v\x00";
             if (strpos($line, 'KUWABOT version ') === 0) {
-                $kuwaModelfile['version'] = trim(str_replace('KUWABOT version ', '', $line), '"');
+                $kuwaModelfile['version'] = trim(str_replace('KUWABOT version ', '', $line), $char_to_remove);
             } elseif (strpos($line, 'KUWABOT name ') === 0) {
-                $kuwaModelfile['name'] = trim(str_replace('KUWABOT name ', '', $line), '"');
+                $kuwaModelfile['name'] = trim(str_replace('KUWABOT name ', '', $line), $char_to_remove);
             } elseif (strpos($line, 'KUWABOT description ') === 0) {
-                $kuwaModelfile['description'] = trim(str_replace('KUWABOT description ', '', $line), '"');
+                $kuwaModelfile['description'] = trim(str_replace('KUWABOT description ', '', $line), $char_to_remove);
             } elseif (strpos($line, 'KUWABOT base ') === 0) {
-                $kuwaModelfile['base'] = trim(str_replace('KUWABOT base ', '', $line), '"');
+                $kuwaModelfile['base'] = trim(str_replace('KUWABOT base ', '', $line), $char_to_remove);
             } else {
                 $kuwaModelfile['modelfile'] .= $line . "\n";
             }

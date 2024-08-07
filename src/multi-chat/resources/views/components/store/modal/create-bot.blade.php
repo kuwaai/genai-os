@@ -168,7 +168,7 @@
                                     @foreach ($result as $LLM)
                                         <option
                                             src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
-                                            value="{{ $LLM->name }}"></option>
+                                            value="{{ $LLM->name }}" data-access-code="{{ $LLM->access_code }}"></option>
                                     @endforeach
                                 </datalist>
                             </div>
@@ -300,7 +300,9 @@
                 return value;
             }
         const prefix = 'kuwabot'
-        $("#create_room input[name='llm_name']").val(get_bot_config(modelfile, `${prefix} base`));
+        let base_access_code = get_bot_config(modelfile, `${prefix} base`);
+        let base = $(`#llm-list option[data-access-code='${base_access_code}']`).val() 
+        $("#create_room input[name='llm_name']").val(base);
         $("#create_room input[name='bot_name']").val(get_bot_config(modelfile, `${prefix} name`));
         $("#create_room input[name='bot_describe']").val(get_bot_config(modelfile, `${prefix} description`));
         $("#bot-system_prompt").val(get_bot_config(modelfile, "system"));

@@ -10,7 +10,7 @@ Content-Type: application/vnd.kuwabot;
 KUWABOT version 0.3.3
 KUWABOT name "Calculator"
 KUWABOT description "It can calculate the simple math expression"
-KUWABOT base "Pipe"
+KUWABOT base "pipe"
 PARAMETER pipe_program calc
 
 --kuwa207xj

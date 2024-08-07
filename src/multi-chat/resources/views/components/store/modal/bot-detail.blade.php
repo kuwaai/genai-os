@@ -403,7 +403,6 @@
 
     function saveTextAsFile(textToWrite, fileNameToSaveAs)
     {
-        console.log(textToWrite);
         var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'}); 
         var downloadLink = document.createElement("a");
         downloadLink.download = fileNameToSaveAs;
@@ -464,7 +463,8 @@
     async function exportBot(){
         let name = $("#bot_name2").val();
         let description = $("#bot_describe2").val() ;
-        let base = $("#llm_name2").val();
+        let base_name = $("#llm_name2").val();
+        let base = $(`#llm-list option[value='${base_name}']`).data('access-code') 
         let modelfile = ace.edit('modelfile-editor').getValue();
         let follow_base_bot = $("#detail-modal img").data("follow-base-bot");
 
@@ -506,7 +506,6 @@
                 ""
             );
         }
-        // [TODO] append bot avatar
         botfile.push(`--${boundary}--`);
                     
         saveTextAsFile(botfile.join('\r\n'), `bot-${name.replace(/\s+/g, '_')}.bot`);
