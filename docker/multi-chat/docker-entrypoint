@@ -91,6 +91,16 @@ seed_kernel() {
     php artisan web:config --kernel_endpoint ${KUWA_KERNEL_URL} || return 0
 }
 
+# Import the default bots in bootstrap stage
+import_default_bots() {
+    for botfile in /var/kuwa/docker/root/bootstrap/bot/*.bot; do
+    # Check if the file exists
+    if [ -f "$botfile" ]; then
+        php artisan bot:import "$botfile"
+    fi
+    done
+}
+
 # Check whether should update 
 VERSION_FILE="/app/storage/app/VERSION"
 should_update() {
@@ -112,8 +122,11 @@ upgrade() {
     printf "Successfully upgraded Kuwa Multi-Chat and it's database to version ${KUWA_MULTI_CHAT_VERSION}\n"
     
     echo "Try to seeding the database."
-    seed_kernel
-    seed_admin
+    seed_kernel || true
+    seed_admin || true
+    
+    echo "Try to import default bots."
+    import_default_bots
 }
 
 #=========================================
