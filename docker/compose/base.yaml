@@ -65,6 +65,12 @@ services:
 
 volumes:
   multi-chat-storage: {}
+  kuwa-root: # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+    driver: local
+    driver_opts:
+      type: none
+      device: "../root"
+      o: bind
 
 secrets:
   admin-password:

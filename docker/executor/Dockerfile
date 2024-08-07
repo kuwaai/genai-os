@@ -38,11 +38,13 @@ COPY docker/executor/docker-entrypoint /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 # Make the filesystem hierarchy of kuwa
-RUN mkdir -p /var/kuwa/docker/root/bin && \
-    mkdir -p /var/kuwa/docker/root/database && \
-    mkdir -p /var/kuwa/docker/root/custom
+ENV KUWA_ROOT="/var/kuwa/docker/root"
+VOLUME ${KUWA_ROOT}
+RUN mkdir -p ${KUWA_ROOT}/bin && \
+    mkdir -p ${KUWA_ROOT}/database && \
+    mkdir -p ${KUWA_ROOT}/custom
 RUN ln -s $(which python) /bin/python
-COPY src/tools /var/kuwa/src/tools
+COPY src/tools ${KUWA_ROOT}/../../src/tools
 
 # Default parameters
 ENV no_proxy="kernel,web,localhost,127.0.0.0/8,::1,${no_proxy}"

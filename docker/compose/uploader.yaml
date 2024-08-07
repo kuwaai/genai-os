@@ -5,20 +5,19 @@ services:
       dockerfile: docker/executor/Dockerfile
     image: kuwa-executor
     environment:
-      CUSTOM_EXECUTOR_PATH: ./file_manager/main.py
-      EXECUTOR_ACCESS_CODE: file-manager
-      EXECUTOR_NAME: File Manager
+      CUSTOM_EXECUTOR_PATH: ./uploader/main.py
+      EXECUTOR_ACCESS_CODE: uploader
+      EXECUTOR_NAME: Uploader
       EXECUTOR_IMAGE: file-manager.png # Refer to src/multi-chat/public/images
     depends_on:
       - kernel
       - multi-chat
     command: [
-      "--root", "/var/kuwa/docker/root",
       "--api_base_url", "http://web/",
       "--log", "debug"
     ]
     volumes: [
-      "../root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+      "kuwa-root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
     ]
     extra_hosts:
       - "localhost:host-gateway"

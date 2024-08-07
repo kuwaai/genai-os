@@ -20,7 +20,8 @@ class PipeExecutor(LLMExecutor):
         """
         Add custom command-line arguments.
         """
-        parser.add_argument('--path', default="../../tools", help='The path to find executables.')
+        kuwa_root_path = os.environ.get("KUWA_ROOT", os.path.join(os.path.expanduser("~"), "kuwa"))
+        parser.add_argument('--path', default=os.path.join(kuwa_root_path, "bin"), help='The path to find executables.')
         parser.add_argument('--program', default="cat", help='The program to run.')
         parser.add_argument('--argv', default="", help='Arguments.')
         parser.add_argument('--encoding', default="utf-8", help='The encoding of the standard I/O streams. Set to None indicating I/O raw bytes.')

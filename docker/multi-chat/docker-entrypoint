@@ -93,7 +93,8 @@ seed_kernel() {
 
 # Import the default bots in bootstrap stage
 import_default_bots() {
-    for botfile in /var/kuwa/docker/root/bootstrap/bot/*.bot; do
+    mkdir -p ${KUWA_ROOT}/bootstrap/bot
+    for botfile in ${KUWA_ROOT}/bootstrap/bot/*.bot; do
     # Check if the file exists
     if [ -f "$botfile" ]; then
         php artisan bot:import "$botfile"

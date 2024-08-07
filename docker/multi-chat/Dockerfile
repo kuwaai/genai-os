@@ -73,9 +73,10 @@ WORKDIR /usr/local/bin
 RUN chmod +x docker-entrypoint multi-chat
 
 # Copy the bootstrap bots
-COPY src/bot /var/kuwa/src/bot
-RUN mkdir -p /var/kuwa/docker/root/bootstrap/ && \
-    ln -s /var/kuwa/docker/root/bootstrap/bot /var/kuwa/src/bot
+ENV KUWA_ROOT="/var/kuwa/docker/root"
+VOLUME ${KUWA_ROOT}
+COPY src/bot ${KUWA_ROOT}/../../src/bot
+RUN mkdir -p ${KUWA_ROOT}/bootstrap/bot
 
 # Setup the entry point
 ENV KUWA_MULTI_CHAT_VERSION="0.3.2-docker3"

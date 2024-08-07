@@ -11,7 +11,7 @@ services:
       TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
     volumes: [
       "</path/to/vector-database>:/var/database/",
-      "../root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+      "kuwa-root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
       "~/.cache/huggingface:/root/.cache/huggingface"
     ]
     depends_on:

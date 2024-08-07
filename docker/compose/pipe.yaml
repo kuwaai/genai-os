@@ -13,12 +13,11 @@ services:
       - kernel
       - multi-chat
     command: [
-      "--path", "/var/kuwa/docker/root/bin",
       "--api_base_url", "http://web/",
       "--log", "debug"
     ]
     volumes: [
-      "../root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+      "kuwa-root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
     ]
     extra_hosts:
       - "localhost:host-gateway"
