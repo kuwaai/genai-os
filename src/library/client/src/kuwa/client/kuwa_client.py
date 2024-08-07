@@ -55,7 +55,7 @@ class KuwaClient:
             raise RuntimeError(f'Request failed with status {resp.status_code}, {resp.json()}')
         return resp.json()
 
-    async def create_bot(self, llm_name:str, bot_name: str, auth_token: str = None, modelfile:str=None, react_btn:str=None, bot_describe:str=None):
+    async def create_bot(self, llm_access_code:str, bot_name: str, auth_token: str = None, modelfile:str=None, react_btn:str=None, bot_description:str=None, visibility:int=3):
         url = urljoin(self.base_url, "/api/user/create/bot")
         auth_token = self.auth_token if self.auth_token is not None else auth_token
         headers = {
@@ -63,11 +63,12 @@ class KuwaClient:
             "Authorization": f"Bearer {auth_token}",
         }
         request_body = {
-            "llm_name": llm_name,
+            "llm_access_code": llm_access_code,
             "modelfile": modelfile,
             "react_btn": react_btn,
             "bot_name": bot_name,
-            "bot_describe": bot_describe,
+            "bot_describe": bot_description,
+            "visibility": visibility,
         }
         resp = requests.post(url, headers=headers, json=request_body)
         if not resp.ok:
@@ -105,66 +106,3 @@ class KuwaClient:
                     chunk = json.loads(line[len("data: "):])["choices"][0]["delta"]
                     if not chunk: continue
                     yield chunk["content"]
-
-# Init Example
-"""
-client = KuwaClient(
-    base_url="http://localhost",
-    model="gemini-pro",
-    auth_token="YOUR_API_TOKEN_HERE"
-)
-"""
-
-# Chat API Example
-"""
-messages = [
-    {"role": "user", "content": "Hi"}
-]
-
-async def main():
-    async for chunk in client.chat_complete(messages=messages):
-        print(chunk, end='')
-    print()
-
-asyncio.run(main())
-"""
-
-# Create Base Model Example
-"""
-async def main():
-    try:
-        response = await client.create_base_model(
-            name="API_TEST_MODEL",
-            access_code="API_TEST_MODEL",
-            order=1,
-        )
-        print("Model created:", response)
-    except Exception as e:
-        print("Failed to create model:", e)
-
-asyncio.run(main())
-"""
-
-# Way to create a base model then create a bot with it.
-"""
-async def main():
-    try:
-        response = await client.create_base_model(
-            name="API_TEST_MODEL",
-            access_code="API_TEST_MODEL",
-            order=1,
-        )
-        print("Model created:", response)
-    except Exception as e:
-        print("Failed to create model:", e)
-    try:
-        response = await client.create_bot(
-            bot_name="API_TEST_MODEL",
-            llm_name="API_TEST_MODEL",
-        )
-        print("Bot created:", response)
-    except Exception as e:
-        print("Failed to create bot:", e)
-
-asyncio.run(main())
-"""

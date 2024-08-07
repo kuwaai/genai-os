@@ -17,6 +17,7 @@ class BotCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'llm_access_code' => ['string', 'nullable'],
             'llm_name' => ['string'],
             'modelfile' => ['string', 'nullable'],
             'react_btn' => ['nullable'],

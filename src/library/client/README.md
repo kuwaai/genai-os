@@ -6,6 +6,7 @@ This Python library simplifies interaction with the Kuwa GenAI OS APIs.
 > This library is currently under active development and its interface may change in future releases.
 
 ## Installation
+
 ```bash
 cd genai-os/src/library/client
 pip install .
@@ -35,7 +36,7 @@ This code snippet imports the `KuwaClient` and creates an instance configured to
 The following example demonstrates how to use the chat completion feature:
 
 ```python
-from kuwa_client import KuwaClient
+from kuwa.client import KuwaClient
 import asyncio
 
 messages = [
@@ -57,7 +58,7 @@ This example defines a list of messages representing a conversation and uses the
 This example shows how to create a new base model:
 
 ```python
-from kuwa_client import KuwaClient
+from kuwa.client import KuwaClient
 import asyncio
 
 async def main():
@@ -74,14 +75,14 @@ async def main():
 asyncio.run(main())
 ```
 
-Here, the `create_base_model` method sends a request to create a new base model with the specified name, access code, and order. 
+Here, the `create_base_model` method sends a request to create a new base model with the specified name, access code, and order.
 
 ### Creating a Bot with a Base Model
 
 This example demonstrates creating a new bot and linking it to a previously created base model:
 
 ```python
-from kuwa_client import KuwaClient
+from kuwa.client import KuwaClient
 import asyncio
 
 async def main():
@@ -95,7 +96,7 @@ async def main():
 
         response = await client.create_bot(
             bot_name="API_TEST_MODEL_BOT",
-            llm_name="API_TEST_MODEL",
+            llm_access_code="API_TEST_MODEL",
         )
         print("Bot created:", response)
     except Exception as e:
@@ -104,6 +105,6 @@ async def main():
 asyncio.run(main())
 ```
 
-This example first creates a new base model and then uses the `create_bot` method to create a new bot that utilizes the newly created base model. 
+This example first creates a new base model and then uses the `create_bot` method to create a new bot that utilizes the newly created base model.
 
 These examples showcase the basic usage of the Kuwa Client Library. For more advanced features and detailed documentation, please refer to the official documentation.

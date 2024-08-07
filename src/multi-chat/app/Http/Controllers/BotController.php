@@ -250,7 +250,7 @@ class BotController extends Controller
             ];
             return response()->json($errorResponse, 400, [], JSON_UNESCAPED_UNICODE);
         }
-        $model = LLMs::where('name', '=', $request->input('llm_name'))->first();
+        $model = LLMs::where('access_code', '=', $request->input('llm_access_code'))->first();
 
         if (!$model) {
             $errorResponse = [
@@ -260,13 +260,14 @@ class BotController extends Controller
             return response()->json($errorResponse, 404, [], JSON_UNESCAPED_UNICODE);
         }
         $model_id = $model->id;
-        if (!$user->hasPerm('model_' . $model_id)) {
+        if (!$request->user()->hasPerm('model_' . $model_id)) {
             $errorResponse = [
                 'status' => 'error',
                 'message' => 'You do not have permission to use this model.',
             ];
             return response()->json($errorResponse, 403, [], JSON_UNESCAPED_UNICODE);
         }
+        $request->merge(['llm_name' => $model->name]);
         $this->create($request);
         return response()->json(['status' => 'success', 'last_bot_id' => session('last_bot_id')], 200, [], JSON_UNESCAPED_UNICODE);
     }
