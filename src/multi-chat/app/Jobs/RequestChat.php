@@ -46,7 +46,9 @@ class RequestChat implements ShouldQueue
                 return !empty($entry->name) && $entry->name[0] !== '#';
             });
             $this->modelfile = array_map(function($entry) {
-                $entry->args = trim($entry->args, '"');
+                if (str_starts_with($entry->args, '"')){
+                    $entry->args = trim($entry->args, '"');
+                }
                 return $entry;
             }, $this->modelfile);
             $this->modelfile = json_encode(array_values($this->modelfile));

@@ -290,7 +290,7 @@
     }
 
     function importBotModelfile(modelfile){
-        console.log(modelfile);
+        console.debug(modelfile);
         modelfile = modelfile_parse(modelfile);
         let get_bot_config = function (modelfile, k) {
                 modelfile = modelfile.map((inst) => `${inst['name'].toLowerCase()} ${inst['args']}`);
@@ -343,14 +343,13 @@
         const getMimeHeader = (x) => x.substr(0, x.indexOf('\r\n\r\n')); 
         const getMimeBody = (x) => x.substr(x.indexOf('\r\n\r\n') + 1); 
         const handleFileLoad = function(e){
-            console.log(e.target.result);
             let header = getMimeHeader(e.target.result);
             let body = getMimeBody(e.target.result);
             header=new Headers(header.split('\r\n').map((x)=>x.split(': ')));
-            console.log("Header:", header, "Body: ", body);
+            console.debug("Header:", header, "Body: ", body);
             const parser = new MultipartRelatedParser(header.get('Content-Type'));
             const parts = parser.read(new TextEncoder().encode(body));
-            console.log(parts);
+            console.debug(parts);
             if (parts.length == 0){
                 console.warn("Wrong botfile format.");
                 return;
@@ -362,7 +361,7 @@
             importBotModelfile(modelfile);
 
             if (avatar_part.length != 0) {
-                console.log(avatar_part);
+                console.debug(avatar_part);
                 let avatar_type = avatar_part[0].headers["Content-Type"];
                 let avatar_base64_data = new TextDecoder().decode(avatar_part[0].data)
                 importBotAvatar(avatar_type, avatar_base64_data)

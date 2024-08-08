@@ -315,7 +315,7 @@
 </div>
 <script> 
     function detail_update(data, readonly) {
-        console.log(data);
+        console.debug(data);
         $("#save_bot").hide()
         $("#delete_bot").hide()
         if (!readonly) {
