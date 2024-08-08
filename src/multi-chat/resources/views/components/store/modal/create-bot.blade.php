@@ -305,13 +305,11 @@
         $("#create_room input[name='llm_name']").val(base);
         $("#create_room input[name='bot_name']").val(get_bot_config(modelfile, `${prefix} name`));
         $("#create_room input[name='bot_describe']").val(get_bot_config(modelfile, `${prefix} description`));
-        $("#bot-system_prompt").val(get_bot_config(modelfile, "system"));
-        $("#bot-before_prompt").val(get_bot_config(modelfile, "before-prompt"));
-        $("#bot-after_prompt").val(get_bot_config(modelfile, "after-prompt"));
 
         modelfile = modelfile.filter((inst) => inst['name'].toLowerCase() != 'kuwabot');
         ace.edit('bot-modelfile-editor').setValue(modelfile_to_string(modelfile))
         ace.edit('bot-modelfile-editor').gotoLine(0);
+        $('#bot-modelfile-editor textarea').trigger("change");
     }
 
     function importBotAvatar(content_type, base64_data){
