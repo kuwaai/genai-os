@@ -18,7 +18,10 @@ services:
       "--model", "gemini-pro",
       "--log", "debug"
       ]
-    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
+    volumes: [
+      "kuwa-root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+      "~/.cache/huggingface:/root/.cache/huggingface"
+    ]
     extra_hosts:
       - "localhost:host-gateway"
     restart: unless-stopped

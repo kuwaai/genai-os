@@ -1,0 +1,17 @@
+Subject: Exported bot "Upload Tool"
+Content-Type: multipart/related; boundary="kuwaxyfpe"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwaxyfpe
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "Upload Tool"
+KUWABOT description "Augment Kuwa with a new program/tool."
+KUWABOT base "uploader"
+PARAMETER uploader_dst_dir "/bin"
+PARAMETER uploader_succeed_message "Success! Your tool is ready to go."
+PARAMETER uploader_bot_template "KUWABOT name 'Tool ({{file_name}})'\nKUWABOT base 'pipe'\nKUWABOT description 'Created by \"Upload Tool\"'\nPARAMETER pipe_program '{{file_name}}'"
+
+--kuwaxyfpe--

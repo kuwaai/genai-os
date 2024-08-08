@@ -55,7 +55,7 @@
 * **Linux/Docker**
 可執行 sudo [build.sh](./docker/build.sh) 或在Linux下執行以下指令即可自動下載及安裝Docker、CUDA及Kuwa
   ```
-  curl -fsSL https://raw.githubusercontent.com/kuwaai/genai-os/main/docker/build.sh | sh
+  curl -fsSL https://raw.githubusercontent.com/kuwaai/genai-os/main/docker/build.sh | sudo sh
   ```
 ### 手動安裝
 可參考安裝文件逐步進行手動安裝
