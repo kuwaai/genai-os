@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.executor.llm_executor import extract_last_url
+from kuwa.executor.modelfile import extract_text_from_quotes
 from kuwa.client import KuwaClient
 
 logger = logging.getLogger(__name__)
@@ -68,22 +69,23 @@ class UploaderExecutor(LLMExecutor):
         Returns:
             A tuple containing the bot name and base model as strings.
         """
-        name = None
-        base_model = None
-        description = None
+        result = {
+            'metadata': {},
+            'modelfile': ""
+        }
+        metadata_prefix = "KUWABOT"
 
         for line in botfile_content.splitlines():
-            match_name = re.match(r'^KUWABOT name [\'"]?([^\'"]+)[\'"]?$', line.strip())
-            match_base = re.match(r'^KUWABOT base [\'"]?([^\'"]*)[\'"]?$', line.strip())
-            match_description = re.match(r'^KUWABOT description [\'"]?([^\'"]*)[\'"]?$', line.strip())
-            if match_name:
-                name = match_name.group(1)
-            if match_base:
-                base_model = match_base.group(1)
-            if match_description:
-                description = match_description.group(1)
+            if not line.startswith(metadata_prefix):
+                continue
+            matches = re.match(rf'{metadata_prefix}\s+(?P<key>\S+)\s+(?P<value>.*)', line.strip())
+            result['metadata'][matches.group('key')] = extract_text_from_quotes(matches.group('value'))
+        
+        result['modelfile'] = re.sub(rf'^{metadata_prefix}.*\n?', '', botfile_content, flags=re.MULTILINE)
 
-        return name, base_model, description
+        logger.debug(json.dumps(result, indent=2))
+
+        return result
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         dst_dir = modelfile.parameters["uploader_"].get("dst_dir", "/database")
@@ -92,6 +94,13 @@ class UploaderExecutor(LLMExecutor):
 
         url, history = extract_last_url(history)
         dst_path = os.path.abspath(os.path.join(self.args.root, "./"+dst_dir))
+        
+        # Check whether the destination path is under the root path 
+        if not dst_path.startswith(os.path.abspath(self.args.root)):
+            logger.debug(f"Root path:{os.path.abspath(self.args.root)}\nDst path: {dst_path}")
+            yield "Access outside the root directory is forbidden."
+            return
+        
         file_name, file_path = self.download_file(url, dst_path)
         yield f"{succeed_message}\n"
 
@@ -102,11 +111,8 @@ class UploaderExecutor(LLMExecutor):
         botfile = bot_template.replace("{{file_name}}", file_name)\
                               .replace("{{file_path}}", file_path)
         botfile = bytes(botfile, "utf-8").decode("unicode_escape")
-        bot_name, bot_base = self.parse_botfile(botfile)
-        logger.debug(f"bot_name={bot_name}")
-        logger.debug(f"bot_base={bot_base}")
-        logger.debug(f"botfile={botfile}")
-        if bot_name is None or bot_base is None:
+        botfile = self.parse_botfile(botfile)
+        if botfile['metadata'].get('name') is None or botfile['metadata'].get('base') is None:
             yield "Missed name or base in botfile. Failed to create bot.\n"
             return
 
@@ -116,11 +122,12 @@ class UploaderExecutor(LLMExecutor):
             auth_token=kuwa_api_token
         )
         response = await client.create_bot(
-            bot_name=bot_name,
-            llm_access_code=bot_base,
-            modelfile=botfile
+            bot_name=botfile['metadata'].get('name'),
+            bot_description=botfile['metadata'].get('description'),
+            llm_access_code=botfile['metadata'].get('base'),
+            modelfile=botfile['modelfile']
         )
-        yield f"Bot \"{bot_name}\" created successfully."
+        yield f"Bot \"{botfile['metadata'].get('name')}\" created successfully."
 
     async def abort(self):
         logger.debug("aborted")
