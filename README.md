@@ -2,7 +2,7 @@
 
 <h1 align="center">
   <br>
-  <a href="https://kuwaai.tw/en-US/">
+  <a href="https://kuwaai.tw/">
   <img src="./src/multi-chat/public/images/kuwa.png" alt="Kuwa GenAI OS" width="200"></a>
   <br>
   Kuwa GenAI OS
@@ -71,56 +71,6 @@ Download the script or the executable file, run it, and follow its steps to have
 
 * **Linux/Docker**
 
-<<<<<<< HEAD
-   - For Linux:
-     ```sh
-     cp .env.dev .env
-     cd executables/sh
-     ./production_update.sh
-     cd ../../../kernel
-     pip install -r requirement.txt
-     cd ../executor
-     pip install -r requirement.txt
-     sudo chown -R $(whoami):www-data /var/www/html
-     ```
-
-   - For Windows:
-     ```bat
-     copy .env.dev .env
-     cd executables/bat
-     ./production_update.bat
-     cd ../../../kernel
-     pip install -r requirement.txt
-     cd ../executor
-     pip install -r requirement.txt
-     ```
-
-3. **Set up PHP & PHP-FPM:**
-   - Make sure PHP is installed and configured properly.
-   - Configure your web server (Nginx or Apache) to set `src/multi-chat/public` as the website root directory.
-   - Example config files: [nginx_config_example](src/multi-chat/nginx_config_example), [php.ini](src/multi-chat/php.ini)
-   - Recommended settings:
-     - Set max upload file size in PHP to at least 20MB, for RAG applications.
-
-4. **Set up Redis:**
-   - Make sure you have a Redis server installed and running.
-   - Relevant settings can be adjusted in `.env`.
-   - Run `php artisan queue:work --timeout=0` under `src/multi-chat/` to start the Redis Worker, which handles user requests. We recommended running at least 5 Redis Workers at the same time.
-
-5. **Run the application:**
-   - Start your web server and PHP-FPM.
-   - Run the Kernel `src/kernel/main.py`. It is recommended that you copy the Kernel folder to another location before running it.
-
-6. **Connect to the application:**
-   - First, you need to create an admin account. Go to `src/multi-chat/`, and run `php artisan db:seed --class=AdminSeeder --force` to seed your first admin account.
-   - Open your browser and access the URL of your deployed Nginx/Apache application.
-   - Log in with your admin account, and start using Kuwa GenAI OS!
-
-7. **Deploy models:**
-    - No model is provided by default. Please read [this README](./src/executor/README.md) to deploy some models.
-    - The models do not appear automatically after deployment. The administrator must set the corresponding access_code on the website to access the model.
-    - Please note that the Kernel must be started before deploying the model (you can check if you can connect to `127.0.0.1:9000` to confirm)
-=======
   Download and run [build.sh](./docker/build.sh) , or invoke the following command to automatically install Docker, Cuda, and Kuwa
   ```
   curl -fsSL https://github.com/kuwaai/genai-os/tree/main/docker/build.sh | sh
@@ -131,7 +81,6 @@ You can build your own customized Kuwa by following the step-by-step documents.
 * [Linux/Docker version](./docker/README.md)
 ### More Models and Applications
 With executors, Kuwa can orchestrate diverse multimodal models, remote services, applications, databases, bots, etc. You can check [Executor's README](./src/executor/README.md) for further customization and configuration.
->>>>>>> 700e613c0b7cc3b317d9199316524030a931ec2d
 
 ## Download
 
