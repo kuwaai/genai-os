@@ -2,7 +2,7 @@
 # set -x
 
 
-REBOOT_FLAG="~/.reboot_flag"
+REBOOT_FLAG="$HOME/.reboot_flag"
 NOW_PATH=$(pwd)
 
 install_docker() {
@@ -159,11 +159,14 @@ EOF
 }
 
 install_all() {
-        if [[ -f "$REBOOT_FLAG" || ! command -v nvidia-smi &> /dev/null ]]; then
+        if [[ -f "$REBOOT_FLAG" ]]; then
                 echo "System has been rebooted. Continuing installation."
                 rm -f "$REBOOT_FLAG"
                 install_cuda_toolkit
                 install_nvidia_container_toolkit
+        elif ! command -v nvidia-smi &> /dev/null; then
+                apt-get update
+                apt-get upgrade
         else
                 apt-get install curl
                 read -p "Do you want to install NVIDIA GPU drivers? [y/N]: " install_gpu
