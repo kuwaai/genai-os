@@ -161,9 +161,9 @@ EOF
 install_all() {
         if [[ -f "$REBOOT_FLAG" ]]; then
                 echo "System has been rebooted. Continuing installation."
-                rm -f "$REBOOT_FLAG"
                 install_cuda_toolkit
                 install_nvidia_container_toolkit
+                rm -f "$REBOOT_FLAG"
         elif ! command -v nvidia-smi &> /dev/null; then
                 apt-get update
                 apt-get upgrade
