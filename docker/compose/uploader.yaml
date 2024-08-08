@@ -1,5 +1,5 @@
 services:
-  file-manager-executor:
+  uploader-executor:
     build:
       context: ../../
       dockerfile: docker/executor/Dockerfile
@@ -8,7 +8,7 @@ services:
       CUSTOM_EXECUTOR_PATH: ./uploader/main.py
       EXECUTOR_ACCESS_CODE: uploader
       EXECUTOR_NAME: Uploader
-      EXECUTOR_IMAGE: file-manager.png # Refer to src/multi-chat/public/images
+      EXECUTOR_IMAGE: upload.png # Refer to src/multi-chat/public/images
     depends_on:
       - kernel
       - multi-chat

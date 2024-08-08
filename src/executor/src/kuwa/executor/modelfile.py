@@ -75,7 +75,7 @@ class Modelfile:
                     after_prompt += command['args']
                 elif command["name"] == "parameter" or command["name"] == "kuwaparam":
                     args = re.sub(r'#.*$', '', command['args']).strip()
-                    key, value = args.split(' ', 1)
+                    key, value = [x.strip("\"'") for x in args.split(' ', 1)]
                     parameters[key] = convert_value(value)
             except Exception as e:
                 logger.exception(f"Error in modelfile `{command}` with error: `{e}`")
