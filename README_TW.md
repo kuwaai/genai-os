@@ -61,8 +61,6 @@
 可參考安裝文件逐步進行手動安裝
 * [Windows可攜式版本](./windows/README_TW.md)
 * [Linux/Docker版本](./docker/README_TW.md)
-### 進階安裝
-具經驗的專業人士可參考 [建置文件](./BUILD_TW.md) 從頭逐步進行安裝。
 
 ### 模型架設與環境設定
 Kuwa透過Executor來支援多種模型架設及應用串接方式，安裝後您可能需要再下載模型或設定後才能發揮更多功能，請參考[Executor說明](./src/executor/README_TW.md)來進行進一步的設定。
