@@ -6,9 +6,9 @@ services:
     image: kuwa-executor
     environment:
       CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
-      EXECUTOR_ACCESS_CODE: doc-qa;web-qa
-      EXECUTOR_NAME: DocQA;WebQA
-      EXECUTOR_IMAGE: doc-qa.png;web-qa.png # Refer to src/multi-chat/public/images
+      EXECUTOR_ACCESS_CODE: doc-qa;web-qa;db-qa
+      EXECUTOR_NAME: DocQA;WebQA;DB QA
+      EXECUTOR_IMAGE: doc-qa.png;web-qa.png;db-qa.png # Refer to src/multi-chat/public/images
       TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
     depends_on:
       - kernel

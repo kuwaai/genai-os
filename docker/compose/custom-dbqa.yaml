@@ -1,13 +1,13 @@
 services:
-  dbqa-executor:
+  custom-dbqa-executor:
     build:
       context: ../../
       dockerfile: docker/executor/Dockerfile
     image: kuwa-executor
     environment:
       CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
-      EXECUTOR_ACCESS_CODE: db-qa
-      EXECUTOR_NAME: DB QA
+      EXECUTOR_ACCESS_CODE: db-qa:custom-db
+      EXECUTOR_NAME: DB QA (Custom DB)
       TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
     volumes: [
       "</path/to/vector-database>:/var/database/",

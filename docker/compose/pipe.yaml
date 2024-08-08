@@ -14,7 +14,8 @@ services:
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--log", "debug"
+      "--log", "debug",
+      "--ensure_executable"
     ]
     volumes: [
       "kuwa-root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.

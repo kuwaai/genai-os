@@ -11,7 +11,7 @@ confs=(
   "uploader"
   "token_counter"
   "gemini"
-  "docqa_webqa"
+  "docqa"
   "searchqa"
 )
 
