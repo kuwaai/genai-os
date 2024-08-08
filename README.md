@@ -48,15 +48,11 @@
 </p>
 
 ## Key Features
-
-* Multi-lingual turnkey solution for GenAI development and deployment on Linux and Windows
-
+* Multi-lingual turnkey solution for GenAI use, development and deployment on Windows, Linux and MacOS
 * Concurrent multi-chat, quoting, full prompt-list import/export/share, and more for users
-
-* Flexible orchestration of prompts x RAGs x bots x models x hardware/GPUs
-
-* Heterogeneous support from virtual hosts, laptops, PCs, and edge servers to cloud
-
+* Supporting multimodal models, popular RAG/agent tools, traditional applications, and local bot store  
+* Flexible orchestration of prompts x RAGs x multi-modal models x tools x bots x hardware/GPUs
+* Heterogeneous support from raspberry Pi, laptops, PCs, edge servers, and virtual hosts to cloud
 * Open-sourced, allowing developers to contribute and customize the system according to their needs
 
 ![screenshot](./src/multi-chat/public/images/demo.gif)
@@ -66,32 +62,16 @@
 
 [![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.tw/os/Intro)
 
-## Dependencies
-
-To run this application, please make sure the following packages are installed on your system:
-
-- Node.js v20.11.1 & npm
-- PHP 8.1 & php-fpm & Composer
-- Python 3.10 & pip
-- Nginx or Apache
-- Redis 6.0.20
-- CUDA
-- Git
-
-For Windows and Linux, please follow the steps below to set up and execute:
-
 ## Installation Guide
-If you wish to test out a quick demo version, we provide a [Portable Windows version](./windows/README.md) and a [Docker version](./docker/README.md), which have been tested in Windows 10 x64 and Ubuntu 22.04LTS environments.
+### Quick Installation
+Download the script or the executable file, run it, and follow its steps to have your own Kuwa!
+* **Windows**
 
-Alternatively, you can refer to the following steps to install the entire system on your host. Before proceeding, please ensure you have installed all the dependencies listed above.
-1. **Clone the project:**
-   ```sh
-   git clone https://github.com/kuwaai/genai-os.git
-   cd genai-os/src/multi-chat/
-   ```
+  Download and run the pre-built Windows executable from [Kuwa's latest releases](https://github.com/kuwaai/genai-os/releases)
 
-2. **Install dependencies:**
+* **Linux/Docker**
 
+<<<<<<< HEAD
    - For Linux:
      ```sh
      cp .env.dev .env
@@ -140,6 +120,18 @@ Alternatively, you can refer to the following steps to install the entire system
     - No model is provided by default. Please read [this README](./src/executor/README.md) to deploy some models.
     - The models do not appear automatically after deployment. The administrator must set the corresponding access_code on the website to access the model.
     - Please note that the Kernel must be started before deploying the model (you can check if you can connect to `127.0.0.1:9000` to confirm)
+=======
+  Download and run [build.sh](./docker/build.sh) , or invoke the following command to automatically install Docker, Cuda, and Kuwa
+  ```
+  curl -fsSL https://github.com/kuwaai/genai-os/tree/main/docker/build.sh | sh
+  ```
+###  Step-by-step Installation
+You can build your own customized Kuwa by following the step-by-step documents.
+* [Portable Windows version](./windows/README.md)
+* [Linux/Docker version](./docker/README.md)
+### More Models and Applications
+With executors, Kuwa can orchestrate diverse multimodal models, remote services, applications, databases, bots, etc. You can check [Executor's README](./src/executor/README.md) for further customization and configuration.
+>>>>>>> 700e613c0b7cc3b317d9199316524030a931ec2d
 
 ## Download
 
