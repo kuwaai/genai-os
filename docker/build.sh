@@ -2,7 +2,7 @@
 # set -x
 
 
-REBOOT_FLAG="$HOME/.reboot_flag"
+REBOOT_FLAG=".reboot_flag"
 NOW_PATH=$(pwd)
 
 install_docker() {
