@@ -50,9 +50,9 @@ def extract_text_from_quotes(text):
     """, text, re.DOTALL | re.VERBOSE)
 
     if match:
-        return match.group(2)
+        return match.group(2).strip()
     else:
-        return text
+        return text.strip()
 
 class ParameterDict(dict):
     def __missing__(self, key):
