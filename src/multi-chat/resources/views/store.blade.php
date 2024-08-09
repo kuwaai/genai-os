@@ -107,7 +107,8 @@
                     $group_bots = $group_bots->where('group_id', '=', request()->user()->group_id);
                 }
                 $group_bots = sortBots($group_bots);
-                $private_bots = sortBots($bots->where('visibility', '=', 3));
+                $private_bots = $bots->where('visibility', '=', 3)->where('owner_id', '=', request()->user()->id);
+                $private_bots = sortBots($private_bots);
             @endphp
 
             @if (request()->user()->hasPerm('Store_read_discover_system_bots') && $system_bots->count() > 0)
