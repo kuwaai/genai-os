@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import shlex
 from enum import Enum
 from .text_buffer import TextBuffer
 
@@ -39,8 +40,10 @@ class SubProcessHelper:
         Create a subprocess with optional input data.
         """
 
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
+        cmd = shlex.join(cmd)
+
+        process = await asyncio.create_subprocess_shell(
+            cmd,
             stdin=asyncio.subprocess.PIPE,  # Providing input from a stream
             stdout=asyncio.subprocess.PIPE, # Capturing stdout
             stderr=asyncio.subprocess.PIPE,  # Capturing stderr
