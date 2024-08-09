@@ -290,8 +290,8 @@
     }
 
     function importBotModelfile(modelfile){
-        console.debug(modelfile);
         modelfile = modelfile_parse(modelfile);
+        console.debug(modelfile);
         let get_bot_config = function (modelfile, k) {
                 modelfile = modelfile.map((inst) => `${inst['name'].toLowerCase()} ${inst['args']}`);
                 let config = modelfile.filter((inst) => inst.startsWith(k));
@@ -303,6 +303,7 @@
         let base_access_code = get_bot_config(modelfile, `${prefix} base`);
         let base = $(`#llm-list option[data-access-code='${base_access_code}']`).val() 
         $("#create_room input[name='llm_name']").val(base);
+        $("#create_room input[name='llm_name']").trigger("input");
         $("#create_room input[name='bot_name']").val(get_bot_config(modelfile, `${prefix} name`));
         $("#create_room input[name='bot_describe']").val(get_bot_config(modelfile, `${prefix} description`));
 

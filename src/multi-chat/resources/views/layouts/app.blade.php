@@ -75,8 +75,9 @@
                 line = line.trim();
 
                 // Array of command keywords
-                const commandKeywords = ['FROM', 'ADAPTER', 'LICENSE', 'TEMPLATE', 'SYSTEM', 'PARAMETER',
-                    'MESSAGE', 'BEFORE-PROMPT', 'AFTER-PROMPT', 'KUWABOT'
+                const commandKeywords = [
+                    'FROM', 'ADAPTER', 'LICENSE', 'TEMPLATE', 'SYSTEM', 'PARAMETER', 'MESSAGE',
+                    'BEFORE-PROMPT', 'AFTER-PROMPT', 'KUWABOT', 'KUWAPARAM', 'WELCOME'
                 ];
 
                 // Check if the line starts with a command keyword
