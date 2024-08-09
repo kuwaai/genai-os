@@ -68,10 +68,10 @@ Structure of sorting_methods:
 @if(count($sorting_methods) > 0)
 <script>
     <?php //Restoring default sorting method from local storage. ?>
-    $(toggleSortingOptions(
-        "{{ $id }}",
-        localStorage.getItem("kuwa-{{ $id }}-sort-by") ||
-        "{{$sorting_methods[0]['index_key']}}"
-    ));
+    $(window).on('load', function(){
+        const default_sorting_method = "{{$sorting_methods[0]['index_key']}}";
+        let sorting_method = localStorage.getItem("kuwa-{{ $id }}-sort-by") || default_sorting_method;
+        sortLists("{{ $id }}", sorting_method);
+    });
 </script>
 @endif
