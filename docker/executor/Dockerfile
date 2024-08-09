@@ -5,20 +5,27 @@ WORKDIR /usr/src/app
 RUN apt-get update &&\
     apt-get install -y cmake build-essential git
 
-# Install the dependency of executor
+# Install the dependency of each executor
 COPY docker/executor/requirements.txt ./requirements-docker.txt
 RUN pip install --no-cache-dir -r requirements-docker.txt
+
 COPY src/executor/requirements.txt ./
 RUN sed -i '/^\.[\/]*/d' ./requirements.txt &&\
-    sed -i '/torch.*/d' ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+    sed -i '/torch.*/d' ./requirements.txt &&\
+    pip install --no-cache-dir -r requirements.txt
+
 COPY src/executor/docqa/requirements.txt ./docqa/requirements.txt
 RUN pip install --no-cache-dir -r ./docqa/requirements.txt
+
 COPY src/executor/speech_recognition/requirements.txt ./speech_recognition/requirements.txt
 RUN apt-get install -y ffmpeg &&\
     pip install --no-cache-dir -r ./speech_recognition/requirements.txt
+
 COPY src/executor/image_generation/requirements.txt ./image_generation/requirements.txt
 RUN pip install --no-cache-dir -r ./image_generation/requirements.txt
+
+COPY src/executor/uploader/requirements.txt ./uploader/requirements.txt
+RUN pip install --no-cache-dir -r ./uploader/requirements.txt
 
 # Install the executor framework and client library
 COPY .git ../../.git

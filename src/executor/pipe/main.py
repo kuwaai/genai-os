@@ -27,12 +27,11 @@ class PipeExecutor(LLMExecutor):
         parser.add_argument('--argv', default="", help='Arguments.')
         parser.add_argument('--encoding', default="utf-8", help='The encoding of the standard I/O streams. Set to None indicating I/O raw bytes.')
         parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI. This value will pass to the subprocess.')
-        parser.add_argument('--ensure_executable', action='store_true', help='Change the program permission to executable.')
         parser.add_argument('--hide_stderr', action='store_true', help='Hide the stderr content in the executor response.')
         parser.add_argument('--extract_last_codeblock', action='store_true', help='Make sure the program only gets the code from inside the last code block.')
 
     def setup(self):
-        self.sub_process = None
+        logger.info(f"Path to find executables: {self.args.path}")
 
     def extract_code_from_markdown(self, markdown_text):
         """
@@ -96,12 +95,8 @@ class PipeExecutor(LLMExecutor):
         # Run a subprocess with stdin from the request.
         program = os.path.realpath(program)
         if not self.is_exe(program):
-            if self.args.ensure_executable:
-                st = os.stat(program)
-                os.chmod(program, st.st_mode | stat.S_IEXEC)
-            else:
-                yield "The program is not executable; please check its file permissions."
-                return
+            yield "The program is not executable; please check its file permissions."
+            return
         
         cmd = [program]+argv
         env = os.environ.copy()

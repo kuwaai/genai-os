@@ -15,10 +15,9 @@ services:
     command: [
       "--api_base_url", "http://web/",
       "--log", "debug",
-      "--ensure_executable"
     ]
     volumes: [
-      "kuwa-root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+      "kuwa-root:/var/kuwa/docker/root:ro", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
     ]
     extra_hosts:
       - "localhost:host-gateway"

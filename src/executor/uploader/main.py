@@ -6,6 +6,7 @@ import logging
 import json
 import shlex
 import requests
+import oschmod
 from textwrap import dedent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -30,7 +31,7 @@ class UploaderExecutor(LLMExecutor):
         parser.add_argument('--api_base_url', default="http://127.0.0.1/", help='The API base URL of Kuwa multi-chat WebUI. This value will pass to the subprocess.')
 
     def setup(self):
-        pass
+        logger.info(f"Root path: {self.args.root}")
 
     def download_file(self, url, save_path):
         """
@@ -91,6 +92,7 @@ class UploaderExecutor(LLMExecutor):
         dst_dir = modelfile.parameters["uploader_"].get("dst_dir", "/database")
         bot_template = modelfile.parameters["uploader_"].get("bot_template")
         succeed_message = modelfile.parameters["uploader_"].get("succeed_message", "File uploaded successfully.")
+        chmod = modelfile.parameters["uploader_"].get("chmod", None)
 
         url, history = extract_last_url(history)
         dst_path = os.path.abspath(os.path.join(self.args.root, "./"+dst_dir))
@@ -102,6 +104,8 @@ class UploaderExecutor(LLMExecutor):
             return
         
         file_name, file_path = self.download_file(url, dst_path)
+        if chmod is not None:
+            oschmod.set_mode(file_path, chmod)
         yield f"{succeed_message}\n"
 
         if bot_template is None:
