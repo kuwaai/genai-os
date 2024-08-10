@@ -89,6 +89,14 @@ start /b .\nginx.exe
 popd
 set "web_started=True"
 
+REM Import bots
+pushd ..\src\multi-chat
+for %%a in ("%KUWA_ROOT%\bootstrap\bot\*.*") do (
+    php artisan bot:import "%%~fa"
+)
+popd
+
+
 REM Loop to wait for commands
 :loop
 set userInput=

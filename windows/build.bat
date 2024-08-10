@@ -172,6 +172,9 @@ pip install --default-timeout=1000 -r requirements.txt
 pushd "docqa"
 pip install --default-timeout=1000 -r requirements.txt
 popd
+pushd "uploader"
+pip install --default-timeout=1000 -r requirements.txt
+popd
 popd
 pushd "..\src\toolchain"
 pip install --default-timeout=1000 -r requirements.txt 
@@ -181,4 +184,12 @@ REM Make sure the windows edition package are still the correct version
 pip install --default-timeout=1000 -r .\src\requirements.txt
 
 REM Download Embedding Model
-python ../src/executor/docqa/download_model.py
+python ..\src\executor\docqa\download_model.py
+
+REM Make Kuwa root
+mkdir "%KUWA_ROOT%\bin"
+mkdir "%KUWA_ROOT%\database"
+mkdir "%KUWA_ROOT%\custom"
+mkdir "%KUWA_ROOT%\bootstrap\bot"
+xcopy /s ..\src\bot "%KUWA_ROOT%\bootstrap\bot"
+xcopy /s ..\src\tools "%KUWA_ROOT%\bin"
