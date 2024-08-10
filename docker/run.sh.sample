@@ -11,6 +11,8 @@ confs=(
   "uploader"
   "token_counter"
   "gemini"
+  "chatgpt"
+  "dall-e"
   "docqa"
   "searchqa"
 )

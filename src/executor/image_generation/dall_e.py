@@ -148,7 +148,12 @@ class DalleExecutor(LLMExecutor):
             openai_token = self.api_key
             if not self.no_override_api_key:
                 openai_token = modelfile.parameters["_"].get("openai_token") or self.api_key
-                openai_token = openai_token.strip()
+            
+            if not openai_token or len(openai_token) == 0:
+                yield "[Please enter your OpenAI API Token in the user settings on the website in order to use the model.]"
+                return
+            
+            openai_token = openai_token.strip()
             
             url, history = extract_last_url(history)
             
