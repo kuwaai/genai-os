@@ -1,5 +1,5 @@
-pushd "C:\kuwa\GenAI OS\windows\executors\llama3_1"
-call ..\..\src\variables.bat
+pushd ..\..\src
+call variables.bat
 popd
 set EXECUTOR_ACCESS_CODE=llama3.1-8b-instruct
 pushd ..\..\..\src\multi-chat

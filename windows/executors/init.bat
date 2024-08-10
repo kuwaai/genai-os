@@ -342,8 +342,8 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 		set target_access_code=!EXECUTOR_ACCESS_CODE!
 	)
 	REM Save configuration to run.bat
-	echo pushd %cd%> run.bat
-	echo call ..\..\src\variables.bat>> run.bat
+	echo pushd ..\..\src> run.bat
+	echo call variables.bat>> run.bat
 	echo popd>> run.bat
 	echo set "EXECUTOR_ACCESS_CODE="doc_qa --exclude=web_qa"">> run.bat
 
@@ -376,8 +376,8 @@ if "!EXECUTOR_NAME!" == "docQA & webQA" (
 	echo popd>> run.bat
 ) else (
 	REM Save configuration to run.bat
-	echo pushd "%cd%"> run.bat
-	echo call ..\..\src\variables.bat>> run.bat
+	echo pushd ..\..\src> run.bat
+	echo call variables.bat>> run.bat
 	echo popd>> run.bat
 	echo set EXECUTOR_ACCESS_CODE=!EXECUTOR_ACCESS_CODE!>> run.bat
 
