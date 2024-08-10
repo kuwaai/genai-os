@@ -2,7 +2,7 @@
 @props(['llms' => null, 'DC' => null, 'result' => null])
 
 <div id="chatlist_drawer"
-    class="fixed sm:hidden top-0 left-0 z-40 h-screen p-4 overflow-hidden transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800"
+    class="fixed sm:hidden top-0 left-0 z-40 h-screen p-4 overflow-hidden transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800 overflow-y-auto scrollbar"
     tabindex="-1">
     <div class="flex flex-col h-full">
         <div class="mb-2">
