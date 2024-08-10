@@ -8,7 +8,12 @@ if "%1"=="quick" (
 )
 cd "%~dp0"
 if "%1"=="quick" (
-    goto function2
+	if "%2"=="" (
+		set option=2
+	) else (
+		set option=%2
+	)
+	goto quick_main
 )
 
 
@@ -17,37 +22,40 @@ set "names[1]=Whisper Model"
 set "names[2]=TAIDE Model"
 set "names[3]=Stable Diffusion Model"
 set "names[4]=Diarization Model"
+set "names[5]=llama3.1 Model"
 REM set "names[4]=Embedding Model"
 REM set "names[5]=GGUF Model"
 REM set "names[6]=HuggingFace Model"
-set "names[5]=Exit"
+set "names[6]=Exit"
 
 REM Define an array to store the model types and their names
 set "models[1]=whisper"
 set "models[2]=taide"
 set "models[3]=stable_diffusion"
 set "models[4]=diarization"
+set "models[5]=llama"
 REM set "models[4]=embedding_model"
 REM set "models[5]=gguf_model"
 REM set "models[6]=huggingface"
-set "models[5]=exit"
+set "models[6]=exit"
 :main
 cls
 echo Now in: "%cd%"
 
 echo Download Model:
 
-for %%a in (1 2 3 4 5) do (
+for %%a in (1 2 3 4 5 6) do (
     echo %%a - !names[%%a]!
-    if "%%a" == "4" (
+    if "%%a" == "5" (
         echo ------------
     )
 )
-set /p "option=Enter the option number (1-5): "
+set /p "option=Enter the option number (1-6): "
 if not defined models[%option%] (
     echo Invalid option. Please try again.
     goto main
 )
+:quick_main
 set "EXECUTOR_TYPE=!models[%option%]!"
 
 if "%option%"=="1" (
@@ -79,9 +87,6 @@ if "%option%"=="1" (
 		echo 更Ч拨
 	) else (
 		echo 盢ぃ穦更赣家
-	)
-	if "%1"=="quick" (
-		exit
 	)
     pause
 ) else if "%option%"=="3" (
@@ -122,8 +127,24 @@ if "%option%"=="1" (
 		echo 盢ぃ穦更赣家
 	)
     pause
-) else if "%option%"=="5" (
+)  else if "%option%"=="5" (
+    :function5
+    set userInput=n
+    set /p "userInput=璶更 Llama3.1-8B.Q4_K_M  GGUF 家盾 ( 4.7GB) [y/N] "
+    
+    if /I "!userInput!"=="y" (
+    	echo タ更家...
+    	curl -L -o "llama3_1/llama3_1-8b-q4_k_m.gguf" https://huggingface.co/chatpdflocal/llama3.1-8b-gguf/resolve/main/ggml-model-Q4_K_M.gguf
+		echo 更Ч拨
+	) else (
+		echo 盢ぃ穦更赣家
+	)
+    pause
+) else if "%option%"=="6" (
     exit
+)
+if "%1"=="quick" (
+	exit /b
 )
 
 goto main
