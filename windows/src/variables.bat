@@ -80,6 +80,9 @@ set "HF_HOME=%KUWA_CACHE%\huggingface"
 set "CACHE_PATH_ENV=%KUWA_CACHE%\selenium"
 set "PYANNOTE_CACHE=%KUWA_CACHE%\torch\pyannote"
 
+REM Kuwa env
+set "KUWA_ROOT=%~dp0..\root"
+
 REM Prepare migration file
 mkdir src\conf 2>nul
 if not exist "src\conf\migrations.txt" (
