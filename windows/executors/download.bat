@@ -144,7 +144,7 @@ if "%option%"=="1" (
     exit
 )
 if "%1"=="quick" (
-	exit /b
+	exit
 )
 
 goto main
