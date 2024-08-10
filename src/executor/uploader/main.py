@@ -87,6 +87,9 @@ class UploaderExecutor(LLMExecutor):
         logger.debug(json.dumps(result, indent=2))
 
         return result
+    
+    def escape_botfile(self, str):
+        return str.replace('\\', '\\\\')
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         dst_dir = modelfile.parameters["uploader_"].get("dst_dir", "/database")
@@ -112,8 +115,8 @@ class UploaderExecutor(LLMExecutor):
             logger.debug("No bot template specified. Skipped creating bot.")
             return
         
-        botfile = bot_template.replace("{{file_name}}", file_name)\
-                              .replace("{{file_path}}", file_path)
+        botfile = bot_template.replace("{{file_name}}", self.escape_botfile(file_name))\
+                              .replace("{{file_path}}", self.escape_botfile(file_path))
         botfile = bytes(botfile, "utf-8").decode("unicode_escape")
         botfile = self.parse_botfile(botfile)
         if botfile['metadata'].get('name') is None or botfile['metadata'].get('base') is None:
