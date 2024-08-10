@@ -50,7 +50,6 @@ VOLUME ${KUWA_ROOT}
 RUN mkdir -p ${KUWA_ROOT}/bin && \
     mkdir -p ${KUWA_ROOT}/database && \
     mkdir -p ${KUWA_ROOT}/custom
-RUN ln -s $(which python) /bin/python
 COPY src/tools ${KUWA_ROOT}/../../src/tools
 
 # Default parameters

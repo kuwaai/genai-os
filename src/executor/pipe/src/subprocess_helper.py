@@ -40,7 +40,9 @@ class SubProcessHelper:
         Create a subprocess with optional input data.
         """
 
-        cmd = shlex.join(cmd)
+        cmd = ' '.join([f'"{i}"' for i in cmd])
+
+        logger.debug(f'Cmd to shell: {cmd}')
 
         process = await asyncio.create_subprocess_shell(
             cmd,
