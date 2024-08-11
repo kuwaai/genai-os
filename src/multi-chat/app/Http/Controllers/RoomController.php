@@ -382,9 +382,8 @@ class RoomController extends Controller
         $storagePath = public_path('storage/' . $directory); // Adjusted path
         $filePathParts = pathinfo($request->file->getClientOriginalName());
         $fileName = sprintf(
-            "%s-%s%s",
+            "%s%s",
             $filePathParts["filename"],
-            time(),
             isset($filePathParts["extension"]) ? ("." . $filePathParts["extension"]) : ""
         );
         $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
