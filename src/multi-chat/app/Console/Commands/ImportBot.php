@@ -16,7 +16,7 @@ class ImportBot extends Command
      *
      * @var string
      */
-    protected $signature = 'bot:import {botfile} {--retry=10}';
+    protected $signature = 'bot:import {botfile} {--retry=7}';
 
     /**
      * The console command description.
@@ -34,26 +34,22 @@ class ImportBot extends Command
         $botfileContents = file_get_contents($botfilePath);
         $botfile = $this->parseBotfile($botfileContents);
         
-        $model = $this->findModel($botfile['base'], $this->option('retry'));
+        print('Importing bot "'.$botfile['name']. '" ...'."\n");
+
+        $model = $this->findModel($botfile['base'], $botfile['name'], $this->option('retry'));
         if (!$model) {
-            error_log("Model ".$botfile['base']." does not exist. Can not import the bot.");
+            error_log('The bot "'.$botfile['name'].'" cannot be imported because base executor "'.$botfile['base'].'" does not exist.');
             return;
         }
         $model_id = $model->id;
         $visibility = 0; // System bot
-        
-        $bot = Bots::where('name', '=', $botfile['name'])->first();
-        if ($bot) {
-            error_log('The bot "'.$botfile['name']. '" already exists. Skipped.'."\n");
-            return;
-        }
-
-        $bot = new Bots();
         $config = [];
         $botController = new BotController();
         $config['modelfile'] = $botController->modelfile_parse($botfile['modelfile']);
         $config['react_btn'] = ["feedback", "translate", "quote", "other"];
         $config = json_encode($config);
+
+        $bot = Bots::where([['name', '=', $botfile['name']], ['visibility', '=', 0]])->first() ?? new Bots();
         $bot->fill([
             'name' => $botfile['name'],
             'type' => 'prompt',
@@ -70,7 +66,7 @@ class ImportBot extends Command
         print('Bot "'.$botfile['name']. '" imported successfully.'."\n");
     
     }
-    private function findModel($access_code, $retry)
+    private function findModel($access_code, $bot_name, $retry)
     {
         $baseDelay = 0.1;
         $model = null;
@@ -85,7 +81,7 @@ class ImportBot extends Command
             $delay = $baseDelay * pow(2, $attempt);
 
             // Log the error and retry information
-            error_log("Model ".$access_code." not found. Retry in $delay seconds...");
+            error_log(sprintf('[%s] Base executor "%s" not found. Retry in %g seconds...', $bot_name, $access_code, $delay));
             sleep($delay);
         }
         return $model; 
