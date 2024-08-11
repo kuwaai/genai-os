@@ -22,11 +22,12 @@ set "names[1]=Whisper Model"
 set "names[2]=TAIDE Model"
 set "names[3]=Stable Diffusion Model"
 set "names[4]=Diarization Model"
-set "names[5]=llama3.1 Model"
+set "names[5]=Llama3.1 Model"
+set "names[6]=Gemma2 Model"
 REM set "names[4]=Embedding Model"
 REM set "names[5]=GGUF Model"
 REM set "names[6]=HuggingFace Model"
-set "names[6]=Exit"
+set "names[7]=Exit"
 
 REM Define an array to store the model types and their names
 set "models[1]=whisper"
@@ -34,23 +35,24 @@ set "models[2]=taide"
 set "models[3]=stable_diffusion"
 set "models[4]=diarization"
 set "models[5]=llama"
+set "models[6]=gemma"
 REM set "models[4]=embedding_model"
 REM set "models[5]=gguf_model"
 REM set "models[6]=huggingface"
-set "models[6]=exit"
+set "models[7]=exit"
 :main
 cls
 echo Now in: "%cd%"
 
 echo Download Model:
 
-for %%a in (1 2 3 4 5 6) do (
+for %%a in (1 2 3 4 5 6 7) do (
     echo %%a - !names[%%a]!
-    if "%%a" == "5" (
+    if "%%a" == "6" (
         echo ------------
     )
 )
-set /p "option=Enter the option number (1-6): "
+set /p "option=Enter the option number (1-7): "
 if not defined models[%option%] (
     echo Invalid option. Please try again.
     goto main
@@ -127,7 +129,7 @@ if "%option%"=="1" (
 		echo 盢ぃ穦更赣家
 	)
     pause
-)  else if "%option%"=="5" (
+) else if "%option%"=="5" (
     :function5
     set userInput=n
     set /p "userInput=璶更 Llama3.1-8B.Q4_K_M  GGUF 家盾 ( 4.7GB) [y/N] "
@@ -141,6 +143,19 @@ if "%option%"=="1" (
 	)
     pause
 ) else if "%option%"=="6" (
+    :function5
+    set userInput=n
+    set /p "userInput=璶更  gemma-2-2b-it-Q8_0  GGUF 家盾 ( 2.78GB) [y/N] "
+    
+    if /I "!userInput!"=="y" (
+    	echo タ更家...
+    	curl -L -o "gemma2/gemma-2-2b-it-Q8_0.gguf" https://huggingface.co/lmstudio-community/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q8_0.gguf
+		echo 更Ч拨
+	) else (
+		echo 盢ぃ穦更赣家
+	)
+    pause
+) else if "%option%"=="7" (
     exit
 )
 if "%1"=="quick" (
