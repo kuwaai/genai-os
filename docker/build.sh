@@ -149,7 +149,7 @@ install_kuwa() {
 
 fix() {
         cd executor
-        echo "llama-cpp-python @ https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.77/llama_cpp_python-0.2.77-cp310-cp310-linux_x86_64.whl" > requirements.txt
+        echo "llama-cpp-python @ https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.87/llama_cpp_python-0.2.87-cp310-cp310-linux_x86_64.whl" > requirements.txt
         cd ../../src/executor
         sed -i 's/==/ == /g' requirements.txt
         cd ../../docker/executor

@@ -5,7 +5,7 @@ import logging
 import time
 import json
 import pprint
-from typing import Optional
+from typing import Optional, List
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from llama_cpp import Llama
@@ -91,6 +91,10 @@ class ReflectiveLlama(Llama):
     """
     def __init__(self, *args, **kwargs):
         self.verbose = False
+    def tokenize(
+        self, text: bytes, add_bos: bool = True, special: bool = False
+    ) -> List[int]:
+        return text.decode('UTF-8')
     def create_completion(self, prompt, *args, **kwargs):
         t = int(time.time())
         return {
