@@ -33,12 +33,12 @@
 </p>
 
 ## 關鍵功能
-* 提供多語言生成式人工智慧的使用、開發與部署的整體解決方案，支援Windows、Linux及MacOS
+* 提供生成式人工智慧的使用、開發與部署的整體解決方案，支援多語言及Windows、Linux、MacOS
 * 提供多模型群聊、引用、劇本匯入、生成內容完整匯出、多樣分享等自主編導與指揮的友善使用功能 
-* 支援多模態模型，整合多項現有RAG/Agent開發工具，可串接傳統應用程式、自建Store應用商店
-* 可免寫程式，靈活組合「提示劇本x知識庫x模型x工具x腳本」等即可打造個人化強大的GenAI應用
+* 支援多模態模型，整合多項現有RAG/Agent開發工具，也可串接傳統應用程式、自建Store應用商店
+* 可免寫程式，藉由靈活組合「提示劇本x知識庫x模型x工具x腳本」即可打造個人化強大的GenAI應用
 * 支援單板電腦、筆記型電腦、個人電腦、虛擬主機、地端伺服器，以及公私或混合雲端等各種環境
-* 開放原始碼，允許開發人員貢獻並根據自己的需求打造自己的客製系統
+* 開放原始碼，允許開發人員或企業根據自己的需求打造自己的客製系統，快速對內或對外提供服務
 
 ![screenshot](./src/multi-chat/public/images/demo.gif)
 
@@ -53,7 +53,7 @@
 * **Windows**
 下載最新版本GenAI OS的[Windows版單一執行檔](https://github.com/kuwaai/genai-os/releases)
 * **Linux/Docker**
-可執行 sudo [build.sh](./docker/build.sh) 或在Linux下執行以下指令即可自動下載及安裝Docker、CUDA及Kuwa
+可下載 [build.sh](./docker/build.sh) 後執行 **sudo build.sh**，或在Linux下執行以下指令即可自動下載及安裝Docker、CUDA及Kuwa。安裝CUDA後需重開機，安裝完成前會設定管理者及資料庫密碼，全部安裝完成後會執行 run.sh 自動啟動Kuwa，預設用 admin@localhost 帳號登入。
   ```
   curl -fsSL https://raw.githubusercontent.com/kuwaai/genai-os/main/docker/build.sh | sudo sh
   ```
