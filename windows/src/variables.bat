@@ -1,6 +1,8 @@
 @echo off
 cd "%~dp0.."
 
+if "%KUWA_ENV_INIT%" neq "" (exit /b)
+
 call src\getproxy.bat
 
 REM Variables for RunHiddenConsole
@@ -112,4 +114,7 @@ if "%1"=="no_migrate" (
         )
     )
 )
+
+:: This variable prevents execute variable.bat too many times.
+set KUWA_ENV_INIT=1
 

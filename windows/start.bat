@@ -71,7 +71,7 @@ if not "!exclude_access_codes!"=="" (
 	popd
 )
 if defined web_started (
-    goto loop
+    goto skip_web
 )
 
 REM Start web
@@ -89,13 +89,9 @@ start /b .\nginx.exe
 popd
 set "web_started=True"
 
-REM Import bots
-pushd ..\src\multi-chat
-for %%a in ("%KUWA_ROOT%\bootstrap\bot\*.*") do (
-    php artisan bot:import "%%~fa"
-)
-popd
+:skip_web
 
+start /b src\import_bots.bat
 
 REM Loop to wait for commands
 :loop
