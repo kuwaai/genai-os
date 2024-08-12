@@ -159,7 +159,9 @@ echo Creating shortcut from %nginx_folder%/html to ../public...
 mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
 
 REM Install windows dependency
-pip install --default-timeout=1000 -r .\src\requirements.txt
+for /f "delims=" %%a in (.\src\requirements.txt) do (
+  pip install --default-timeout=1000 %%a
+)
 
 REM Download required pip packages
 pushd "..\src\kernel"
@@ -187,7 +189,9 @@ pip install --default-timeout=1000 -r requirements.txt
 popd
 
 REM Make sure the windows edition package are still the correct version
-pip install --default-timeout=1000 -r .\src\requirements.txt
+for /f "delims=" %%a in (.\src\requirements.txt) do (
+  pip install --default-timeout=1000 %%a
+)
 
 REM Download Embedding Model
 python ..\src\executor\docqa\download_model.py
