@@ -9,7 +9,7 @@ tiktoken
 
 # llama.cpp
 huggingface_hub
-llama-cpp-python == 0.2.87
+llama-cpp-python >= 0.2.77, == 0.2.87
 
 # Huggingface
 torch == 2.3.0
