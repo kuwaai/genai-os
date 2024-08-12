@@ -1,4 +1,4 @@
-# Documentation
+\# Documentation
 
 ## Getting Started
 
@@ -14,6 +14,7 @@
 
 * [Full Installation Guide](./docker_installation.md)
 * [Quick Installation](./docker_quick_installation.md)
+* [Model Setup](./docker_model_setup.md)
 
 ## Tutorial
 
