@@ -79,7 +79,7 @@ COPY src/bot ${KUWA_ROOT}/../../src/bot
 RUN mkdir -p ${KUWA_ROOT}/bootstrap/bot
 
 # Setup the entry point
-ENV KUWA_MULTI_CHAT_VERSION="0.3.2-docker3"
+ENV KUWA_MULTI_CHAT_VERSION="0.3.3-docker1"
 
 ENV no_proxy="kernel,web,localhost,127.0.0.0/8,::1,${no_proxy}"
 ENV NO_PROXY="kernel,web,localhost,127.0.0.0/8,::1,${NO_PROXY}"
