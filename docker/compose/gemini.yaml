@@ -6,7 +6,7 @@ services:
     image: kuwa-executor
     environment:
       EXECUTOR_TYPE: geminipro
-      EXECUTOR_ACCESS_CODE: gemini-pro
+      EXECUTOR_ACCESS_CODE: geminipro
       EXECUTOR_NAME: Gemini Pro
       EXECUTOR_IMAGE: gemini.png # Refer to src/multi-chat/public/images
     depends_on:
