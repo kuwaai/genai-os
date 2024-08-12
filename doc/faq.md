@@ -1,9 +1,3 @@
----
-title: Frequently Asked Questions
-description: FAQs about Kuwa GenAI OS
-hide_table_of_contents: false
----
-
 # Frequently Asked Questions
 
 ## System Features
@@ -84,4 +78,4 @@ A: Welcome to join our community!
 Feel free to set up your own and play around. If you feel there is room for improvement, you can directly submit a Pull Request to help us improve!
 
 4-2. What communities does Kuwa have?  
-A: Please refer to the "[Community](/community)" page on our official website.
+A: Please refer to the "[Community](./community.md)" page on our official website.
