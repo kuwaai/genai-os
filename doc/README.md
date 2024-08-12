@@ -12,7 +12,7 @@
 
 ## Linux (Docker)
 
-
+* [Full Installation Guide](./docker_installation(complete).md)
 
 ## Tutorial
 
