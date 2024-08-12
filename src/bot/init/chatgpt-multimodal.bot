@@ -1,0 +1,16 @@
+Subject: Exported bot "ChatGPT (Multimodal)"
+Content-Type: multipart/related; boundary="kuwano1yc"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwano1yc
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "ChatGPT (Multimodal)"
+KUWABOT description "This multimodal model understands and interacts with text and images."
+KUWABOT base "chatgpt"
+PARAMETER llm_model gpt-4o-mini
+PARAMETER llm_enable_multimodal true
+
+--kuwano1yc--

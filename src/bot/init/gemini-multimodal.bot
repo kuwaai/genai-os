@@ -1,0 +1,16 @@
+Subject: Exported bot "Gemini Pro (Multimodal)"
+Content-Type: multipart/related; boundary="kuwa28u89"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwa28u89
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "Gemini Pro (Multimodal)"
+KUWABOT description "This multimodal model understands and interacts with text, images, audio, and video."
+KUWABOT base "gemini-pro"
+PARAMETER llm_model gemini-1.5-flash
+PARAMETER llm_enable_multimodal true
+
+--kuwa28u89--
