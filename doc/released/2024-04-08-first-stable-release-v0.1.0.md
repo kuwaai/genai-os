@@ -31,4 +31,4 @@ Here are the main updates in this release:
 3. Fixed some minor bugs.
 4. Added more command-line tools for configuring the website.
 
-For migration from older versions to the new version, please refer to this [migration guide](./migrate-to-kuwa-os-v0.1.0.md).
+For migration from older versions to the new version, please refer to this [migration guide](./2024-04-08-migration-from-old-to-v0.1.0.md).
