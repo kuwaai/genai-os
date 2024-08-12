@@ -1,0 +1,17 @@
+Subject: Exported bot "中翻英"
+Content-Type: multipart/related; boundary="kuwagn1ch"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwagn1ch
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "中翻英"
+KUWABOT base "llama3.1-8b-instruct"
+SYSTEM "You are a reliable and helpful tool for translating user-provided document to English."
+BEFORE-PROMPT "<begin document>"
+AFTER-PROMPT """<end document>
+Translate the above document to English. Do not explain."""
+
+--kuwagn1ch--

@@ -1,0 +1,17 @@
+Subject: Exported bot "Painter (SD2)"
+Content-Type: multipart/related; boundary="kuwazx8e2"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwazx8e2
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "Painter (SD2)"
+KUWABOT description "Input a text or upload an image, then input how to modify it, to generate an image"
+KUWABOT base "tool/diffuser"
+PARAMETER model_name stabilityai/stable-diffusion-2
+PARAMETER imgen_num_inference_steps 50 # The number of denoising steps. More denoising steps usually lead to a higher quality image at the expense of slower inference
+# PARAMETER IMGEN_DENOISING_END 0.8 # WHAT % OF STEPS TO BE RUN ON EACH EXPERTS (80/20)
+
+--kuwazx8e2--

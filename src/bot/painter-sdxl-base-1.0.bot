@@ -1,0 +1,17 @@
+Subject: Exported bot "Painter (SDXL-base-1.0)"
+Content-Type: multipart/related; boundary="kuwa09k96"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwa09k96
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "Painter (SDXL-base-1.0)"
+KUWABOT description "Input a text or upload an image, then input how to modify it, to generate an image"
+KUWABOT base "tool/diffuser"
+PARAMETER model_name stabilityai/stable-diffusion-xl-base-1.0
+# PARAMETER IMGEN_NUM_INFERENCE_STEPS 40 # THE NUMBER OF DENOISING STEPS. MORE DENOISING STEPS USUALLY LEAD TO A HIGHER QUALITY IMAGE AT THE EXPENSE OF SLOWER INFERENCE
+# PARAMETER IMGEN_DENOISING_END 0.8 # WHAT % OF STEPS TO BE RUN ON EACH EXPERTS (80/20)
+
+--kuwa09k96--

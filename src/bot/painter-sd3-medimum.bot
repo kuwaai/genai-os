@@ -1,0 +1,17 @@
+Subject: Exported bot "Painter (SD3-medimum)"
+Content-Type: multipart/related; boundary="kuwa718cj"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwa718cj
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "Painter (SD3-medimum)"
+KUWABOT description "Input a text or upload an image, then input how to modify it, to generate an image"
+KUWABOT base "tool/diffuser"
+PARAMETER model_name stabilityai/stable-diffusion-3-medium-diffusers #stabilityai/stable-diffusion-2, stabilityai/sdxl-turbo
+PARAMETER imgen_num_inference_steps 28
+PARAMETER imgen_guidance_scale 7.0
+
+--kuwa718cj--

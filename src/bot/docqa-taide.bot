@@ -1,0 +1,18 @@
+Subject: Exported bot "DocumentQA (TAIDE)"
+Content-Type: multipart/related; boundary="kuwacivmk"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwacivmk
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "DocumentQA (TAIDE)"
+KUWABOT description "Upload a file or paste a URL for Q&A."
+KUWABOT base "doc-qa"
+PARAMETER generator_model taide
+PARAMETER generator_limit 7168
+PARAMETER retriever_mmr_k 14
+PARAMETER retriever_mmr_fetch_k 28
+
+--kuwacivmk--

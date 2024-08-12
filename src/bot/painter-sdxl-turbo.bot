@@ -1,0 +1,17 @@
+Subject: Exported bot "Painter (SDXL-turbo)"
+Content-Type: multipart/related; boundary="kuwak0spy"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwak0spy
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "Painter (SDXL-turbo)"
+KUWABOT description "Input a text or upload an image, then input how to modify it, to generate an image"
+KUWABOT base "tool/diffuser"
+PARAMETER model_name stabilityai/sdxl-turbo
+PARAMETER imgen_num_inference_steps 1
+PARAMETER imgen_guidance_scale 0.0
+
+--kuwak0spy--

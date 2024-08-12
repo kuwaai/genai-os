@@ -1,0 +1,14 @@
+Subject: Exported bot "English to Chinese"
+Content-Type: multipart/related; boundary="kuwa6taz5"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwa6taz5
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "English to Chinese"
+KUWABOT base "taide"
+BEFORE-PROMPT 翻譯成繁體中文。
+
+--kuwa6taz5--

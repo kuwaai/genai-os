@@ -1,0 +1,18 @@
+Subject: Exported bot "DocumentQA (Llama3.1)"
+Content-Type: multipart/related; boundary="kuwaxlgpl"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwaxlgpl
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "DocumentQA (Llama3.1)"
+KUWABOT description "Upload a file or paste a URL for Q&A."
+KUWABOT base "doc-qa"
+PARAMETER generator_model llama3.1-8b-instruct
+PARAMETER generator_limit 129024
+PARAMETER retriever_mmr_k 252
+PARAMETER retriever_mmr_fetch_k 504
+
+--kuwaxlgpl--
