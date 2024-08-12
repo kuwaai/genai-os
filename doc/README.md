@@ -31,11 +31,12 @@
 * [RAG Toolchain](../src/toolchain/README.md)
 * [Multi-chat](../src/multi-chat/README.md)
 * [Model Serving](../src/executor/README.md)
+* [Client Library](./tutorial/client_library.md)
 
 ## Resources
 
 * [FAQ](./faq.md)
 * [Troubleshooting Guide](./troubleshooting.md)
-* [Community]()
+* [Community](./community.md)
 * [Contribution Guidelines](./contribution_guidelines.md)
 * [Legal Information](./legal_information.md)
