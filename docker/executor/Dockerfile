@@ -14,6 +14,11 @@ RUN sed -i '/^\.[\/]*/d' ./requirements.txt &&\
     sed -i '/torch.*/d' ./requirements.txt &&\
     pip install --no-cache-dir -r requirements.txt
 
+# Dependency of llama-cpp-python == 0.2.87
+# Ref: https://github.com/abetlen/llama-cpp-python/issues/1628
+RUN apt-get install -y musl-dev && \
+    ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+
 COPY src/executor/docqa/requirements.txt ./docqa/requirements.txt
 RUN pip install --no-cache-dir -r ./docqa/requirements.txt
 
