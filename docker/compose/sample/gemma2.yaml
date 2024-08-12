@@ -1,0 +1,29 @@
+services:
+  gemma2-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      EXECUTOR_TYPE: llamacpp
+      EXECUTOR_ACCESS_CODE: gemma2-2b-instruct
+      EXECUTOR_NAME: Google Gemma2 2B Instruct
+      EXECUTOR_IMAGE: gemma.png # Refer to src/multi-chat/public/images
+      # HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
+    depends_on:
+      - kernel
+      - multi-chat
+    command: [
+      "--model_path", "hf://lmstudio-community/gemma-2-2b-it-GGUF?gemma-2-2b-it-Q8_0.gguf",
+      "--no_system_prompt", "--repeat_penalty", "1.0"
+      ]
+    restart: unless-stopped
+    volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+    networks: ["backend"]
