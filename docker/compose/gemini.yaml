@@ -14,4 +14,6 @@ services:
       - multi-chat
     command: ["--api_key", "<YOUR_GLOBAL_API_KEY_HERE>", "--log", "debug"]
     restart: unless-stopped
+    extra_hosts:
+      - "localhost:host-gateway"
     networks: ["backend"]

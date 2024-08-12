@@ -13,4 +13,6 @@ services:
       - kernel
     command: ["--temperature", "0.2"]
     restart: unless-stopped
+    extra_hosts:
+      - "localhost:host-gateway"
     networks: ["backend"]
