@@ -179,6 +179,9 @@ popd
 pushd "..\src\toolchain"
 pip install --default-timeout=1000 -r requirements.txt 
 popd
+pushd "..\src\tools"
+pip install --default-timeout=1000 -r requirements.txt 
+popd
 
 REM Make sure the windows edition package are still the correct version
 pip install --default-timeout=1000 -r .\src\requirements.txt
