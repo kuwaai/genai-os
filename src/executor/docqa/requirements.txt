@@ -8,6 +8,7 @@ bs4
 faiss-cpu
 chevron
 trafilatura
+lxml_html_clean
 requests
 selenium
 python-i18n[YAML]

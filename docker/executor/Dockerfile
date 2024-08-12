@@ -32,6 +32,9 @@ RUN pip install --no-cache-dir -r ./image_generation/requirements.txt
 COPY src/executor/uploader/requirements.txt ./uploader/requirements.txt
 RUN pip install --no-cache-dir -r ./uploader/requirements.txt
 
+COPY src/tools/requirements.txt ./tools/requirements.txt
+RUN pip install --no-cache-dir -r ./tools/requirements.txt
+
 # Install the executor framework and client library
 COPY .git ../../.git
 COPY src/executor/. .
