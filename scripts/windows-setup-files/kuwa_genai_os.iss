@@ -32,36 +32,40 @@ SolidCompression=yes
 WizardStyle=modern
 
 [Languages]
+; These translations were modified by Kuwa. It's available on GitHub at
+; https://github.com/kuwaai/issrc.
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "armenian"; MessagesFile: "compiler:Languages\Armenian.isl"
-Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
-Name: "bulgarian"; MessagesFile: "compiler:Languages\Bulgarian.isl"
-Name: "catalan"; MessagesFile: "compiler:Languages\Catalan.isl"
-Name: "corsican"; MessagesFile: "compiler:Languages\Corsican.isl"
-Name: "czech"; MessagesFile: "compiler:Languages\Czech.isl"
-Name: "danish"; MessagesFile: "compiler:Languages\Danish.isl"
-Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
-Name: "finnish"; MessagesFile: "compiler:Languages\Finnish.isl"
-Name: "french"; MessagesFile: "compiler:Languages\French.isl"
-Name: "german"; MessagesFile: "compiler:Languages\German.isl"
-Name: "hebrew"; MessagesFile: "compiler:Languages\Hebrew.isl"
-Name: "hungarian"; MessagesFile: "compiler:Languages\Hungarian.isl"
-Name: "icelandic"; MessagesFile: "compiler:Languages\Icelandic.isl"
-Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
-Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
-Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
-Name: "norwegian"; MessagesFile: "compiler:Languages\Norwegian.isl"
-Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
-Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl"
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
-Name: "slovak"; MessagesFile: "compiler:Languages\Slovak.isl"
-Name: "slovenian"; MessagesFile: "compiler:Languages\Slovenian.isl"
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
-Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
-Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
-; These two has to be download from https://jrsoftware.org/files/istrans/
 Name: "chinesetraditional"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+Name: "czech"; MessagesFile: "compiler:Languages\Czech.isl"
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"
+Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
+Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
+
+; Inno Setup supports several languages by default, but Kuwa currently lacks
+; translations for these languages. Contributions are welcome.
+; Name: "armenian"; MessagesFile: "compiler:Languages\Armenian.isl"
+; Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+; Name: "bulgarian"; MessagesFile: "compiler:Languages\Bulgarian.isl"
+; Name: "catalan"; MessagesFile: "compiler:Languages\Catalan.isl"
+; Name: "corsican"; MessagesFile: "compiler:Languages\Corsican.isl"
+; Name: "danish"; MessagesFile: "compiler:Languages\Danish.isl"
+; Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
+; Name: "finnish"; MessagesFile: "compiler:Languages\Finnish.isl"
+; Name: "hebrew"; MessagesFile: "compiler:Languages\Hebrew.isl"
+; Name: "hungarian"; MessagesFile: "compiler:Languages\Hungarian.isl"
+; Name: "icelandic"; MessagesFile: "compiler:Languages\Icelandic.isl"
+; Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
+; Name: "norwegian"; MessagesFile: "compiler:Languages\Norwegian.isl"
+; Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
+; Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl"
+; Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
+; Name: "slovak"; MessagesFile: "compiler:Languages\Slovak.isl"
+; Name: "slovenian"; MessagesFile: "compiler:Languages\Slovenian.isl"
+; Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+; Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
+; Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
 [Files]
 Source: "..\..\.git\*"; DestDir: "{app}\.git"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: users-full;

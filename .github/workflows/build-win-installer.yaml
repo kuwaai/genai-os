@@ -22,15 +22,39 @@ jobs:
 
       - name: Install extra language file of Inno Setup 6
         run: |
-          $baseUri = 'https://raw.github.com/jrsoftware/issrc/main/Files'
+          $baseUri = 'https://raw.github.com/kuwaai/issrc/main/Files/Languages'
           $downloadDir = "$env:ProgramFiles (x86)\Inno Setup 6\Languages"
           $files = @(
               @{
-                  Uri = "$baseUri/Languages/Unofficial/ChineseTraditional.isl"
+                  Uri = "$baseUri/../Default.isl"
+                  OutFile = "$downloadDir\..\Default.isl"
+              },
+              @{
+                  Uri = "$baseUri/Czech.isl"
+                  OutFile = "$downloadDir\Czech.isl"
+              },
+              @{
+                  Uri = "$baseUri/French.isl"
+                  OutFile = "$downloadDir\French.isl"
+              },
+              @{
+                  Uri = "$baseUri/German.isl"
+                  OutFile = "$downloadDir\German.isl"
+              },
+              @{
+                  Uri = "$baseUri/Japanese.isl"
+                  OutFile = "$downloadDir\Japanese.isl"
+              },
+              @{
+                  Uri = "$baseUri/Korean.isl"
+                  OutFile = "$downloadDir\Korean.isl"
+              },
+              @{
+                  Uri = "$baseUri/Unofficial/ChineseTraditional.isl"
                   OutFile = "$downloadDir\ChineseTraditional.isl"
               },
               @{
-                  Uri = "$baseUri/Languages/Unofficial/ChineseSimplified.isl"
+                  Uri = "$baseUri/Unofficial/ChineseSimplified.isl"
                   OutFile = "$downloadDir\ChineseSimplified.isl"
               }
           )
