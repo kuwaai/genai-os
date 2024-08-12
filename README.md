@@ -104,7 +104,7 @@ You can [download](https://github.com/kuwaai/genai-os/releases) the latest Kuwa 
 
 ## Support
 
-Our team currently has only two people. If you are interested in this project, you can help us develop it together and improve this open-source project. Please do not hesitate to contact us anytime if you are willing to help!
+If you are interested in this project, you can help us develop it together and improve this open-source project. Please do not hesitate to contact us anytime if you are willing to help!
 
 ## Packages & Applications
 
