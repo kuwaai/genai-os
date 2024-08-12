@@ -200,6 +200,8 @@ class ChatGptExecutor(LLMExecutor):
             openai_token = self.api_key
             if not self.no_override_api_key:
                 openai_token = modelfile.parameters["_"].get("openai_token") or self.api_key
+            enable_multimodal = modelfile.parameters["llm_"].get("enable_multimodal", self.args.multimodal)
+            model_name = modelfile.parameters["llm_"].get("model", self.model_name)
             
             # Parse and process modelfile
             override_system_prompt, messages = modelfile.override_system_prompt, modelfile.messages
@@ -207,8 +209,8 @@ class ChatGptExecutor(LLMExecutor):
 
             # Apply parsed modelfile data to Inference
             generation_config = merge_config(self.generation_config, modelfile.parameters["llm_"])
-            enable_multimodal = modelfile.parameters["llm_"].get("enable_multimodal", self.args.multimodal)
             generation_config.pop('enable_multimodal', None)
+            generation_config.pop('model', None)
             msg = messages + history
             if system_prompt is not None:
                 msg = [{"content": system_prompt, "role": "system"}] + msg
@@ -242,7 +244,7 @@ class ChatGptExecutor(LLMExecutor):
             self.proc = True
             logger.debug(f"msg: {msg}")
             response = await client.chat.completions.create(
-                model=self.model_name,
+                model=model_name,
                 messages=msg,
                 stream=True,
                 **generation_config

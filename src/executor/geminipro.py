@@ -194,6 +194,7 @@ class GeminiExecutor(LLMExecutor):
         try:
             google_token = modelfile.parameters["_"].get("google_token") or self.args.api_key
             enable_multimodal = modelfile.parameters["llm_"].get("enable_multimodal", self.args.multimodal)
+            model_name = modelfile.parameters["llm_"].get("model", self.model_name)
             file_store = GoogleFileStore(google_token)
 
             # Parse and process modelfile
@@ -211,7 +212,7 @@ class GeminiExecutor(LLMExecutor):
                 return
 
             genai.configure(api_key=google_token)
-            self.model = genai.GenerativeModel(self.model_name)
+            self.model = genai.GenerativeModel(model_name)
 
             # Trim the history to fit into the context window
             while await self.count_token(msg) > self.limit:
@@ -229,6 +230,7 @@ class GeminiExecutor(LLMExecutor):
             self.proc = True
             generation_config = merge_config(self.generation_config, modelfile.parameters["llm_"])
             generation_config.pop('enable_multimodal', None)
+            generation_config.pop('model', None)
             response = await chat.send_message_async(
                 quiz,
                 stream=True,
