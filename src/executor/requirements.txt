@@ -8,6 +8,7 @@ openai
 tiktoken
 
 # llama.cpp
+huggingface_hub
 llama-cpp-python == 0.2.87
 
 # Huggingface

@@ -8,6 +8,7 @@ import pprint
 from typing import Optional, List
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 import llama_cpp.llama_cpp as llama_cpp
 import llama_cpp.llama_chat_format as llama_chat_format
@@ -147,7 +148,7 @@ class LlamaCppExecutor(LLMExecutor):
 
     def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
-        model_group.add_argument('--model_path', default=self.model_path, help='Model path')
+        model_group.add_argument('--model_path', default=self.model_path, help='The "model path" parameter accepts either a local file path or a combination of a Hugging Face repository ID and filename in the format `hf://<hf-repo-id>?<filename>`.')
         model_group.add_argument('--visible_gpu', default=None, help='Specify the GPU IDs that this executor can use. Separate by comma.')
         model_group.add_argument('--ngl', type=int, default=0, help='Number of layers to offload to GPU. If -1, all layers are offloaded')
 
@@ -168,6 +169,21 @@ class LlamaCppExecutor(LLMExecutor):
             defaults=self.generation_config,
             desc_parser=LlamaCppDescParser()
         )
+    
+    def parse_model_path(self, model_path):
+        if os.path.isfile(self.model_path):
+            return self.model_path
+        regex = r"hf://([^?]+)\?(.*)"
+        match = re.match(regex, model_path)
+        if not match:
+            raise Exception("Invalid model_path format.")
+
+        repo_id = match.group(1)
+        filename = match.group(2)
+        model_path = hf_hub_download(repo_id=repo_id, filename=filename)
+        logger.debug(f"Downloaded model from HF. Path: {model_path}")
+
+        return model_path
 
     def setup(self):
         if self.args.visible_gpu:
@@ -176,6 +192,7 @@ class LlamaCppExecutor(LLMExecutor):
         self.model_path = self.args.model_path
         if not self.model_path:
             raise Exception("You need to configure a .gguf model path!")
+        self.model_path = self.parse_model_path(self.model_path)
 
         self.limit = self.args.limit
         self.no_system_prompt = self.args.no_system_prompt
