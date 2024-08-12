@@ -1,3 +1,4 @@
+import os
 import logging
 import torch
 import whisper_s2t
@@ -19,10 +20,13 @@ class WhisperS2tTranscriber:
     def load_model(self, name = None, backend = "CTranslate2", enable_word_ts:bool=False):
         if name is None: return None
         model_params = {"asr_options":{"word_timestamps": True}} if enable_word_ts else {}
-        model_path = whisper_s2t_download_model(
-            name,
-            cache_dir=HUGGINGFACE_HUB_CACHE,
-        )
+        if os.path.isdir(name):
+            model_path = name
+        else:
+            model_path = whisper_s2t_download_model(
+                name,
+                cache_dir=HUGGINGFACE_HUB_CACHE,
+            )
         device="cuda" if torch.cuda.is_available() else "cpu"
         compute_type="float16" if torch.cuda.is_available() else "int8"
         logger.info(f"Using device {device}")
