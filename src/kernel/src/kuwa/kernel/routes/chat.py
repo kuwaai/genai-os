@@ -41,7 +41,7 @@ def completions_backend(form: dict, headers: dict, dest:list):
 
     llm_name = form.get("name")
     try:
-        response = requests.post(dest[0], headers=headers, data=form, stream=True, timeout=120)
+        response = requests.post(dest[0], headers=headers, data=form, stream=True, timeout=5000) # must build.bat again
         def event_stream(dest, response):
             dest[1] = "BUSY"
             try:
