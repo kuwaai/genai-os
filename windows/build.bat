@@ -194,7 +194,7 @@ mkdir "%KUWA_ROOT%\bin"
 mkdir "%KUWA_ROOT%\database"
 mkdir "%KUWA_ROOT%\custom"
 mkdir "%KUWA_ROOT%\bootstrap\bot"
-xcopy /s ..\src\bot "%KUWA_ROOT%\bootstrap\bot"
+xcopy /s ..\src\bot\init "%KUWA_ROOT%\bootstrap\bot"
 xcopy /s ..\src\tools "%KUWA_ROOT%\bin"
 pushd "%KUWA_ROOT%\bin"
 for %%f in (*) do (
