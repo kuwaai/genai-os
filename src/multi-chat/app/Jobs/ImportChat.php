@@ -45,7 +45,9 @@ class ImportChat implements ShouldQueue
         $dispatchedids = [];
         foreach ($this->ids as $id) {
             $history = Histories::find($id);
-            $access_code = LLMs::find(Bots::find(Chats::find($history->chat_id)->bot_id)->model_id)->access_code;
+            $bot = Bots::find(Chats::find($history->chat_id)->bot_id);
+            $access_code = LLMs::find($bot->model_id)->access_code;
+            $modelfile = json_decode($bot->config ?? '')->modelfile ?? null;
             if (in_array($access_code, $dispatchedAccessCodes)) {
                 while (count($dispatchedAccessCodes) > 0) {
                     // Retrieve the data from Redis
@@ -80,7 +82,7 @@ class ImportChat implements ShouldQueue
                     ->limit(1);
             }
             $input = $input->get()->toJson();
-            RequestChat::dispatch($input, $access_code, $this->user_id, $id, App::getLocale());
+            RequestChat::dispatch($input, $access_code, $this->user_id, $id, App::getLocale(), null, $modelfile);
         }
     }
     public function failed(\Throwable $exception)
