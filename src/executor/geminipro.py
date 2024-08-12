@@ -17,7 +17,7 @@ import mimetypes
 import inspect
 
 from kuwa.executor import LLMExecutor, Modelfile
-from kuwa.executor.llm_executor import extract_last_url
+from kuwa.executor.llm_executor import extract_last_url, rectify_chat_history
 from kuwa.executor.util import expose_function_parameter, read_config, merge_config, DescriptionParser
 
 logger = logging.getLogger(__name__)
@@ -109,6 +109,7 @@ class GeminiExecutor(LLMExecutor):
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the user prompt')
         model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
         model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
+        model_group.add_argument('--multimodal', default=False, action='store_true', help='Activate multimodal functionalities.')
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for Google AI API. See https://ai.google.dev/api/python/google/generativeai/GenerationConfig')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
         self.generation_config = expose_function_parameter(
@@ -163,7 +164,7 @@ class GeminiExecutor(LLMExecutor):
 
         return mime_type, content
 
-    async def parse_messages(self, msgs:[dict], file_store:GoogleFileStore):
+    async def parse_messages(self, msgs:[dict], enable_multimodal:bool, file_store:GoogleFileStore):
         """
         Parse multi-modal messages from chat history.
         """
@@ -173,16 +174,18 @@ class GeminiExecutor(LLMExecutor):
                     "parts":[],
                     "role": {"user": "user", "assistant": "model"}[msg["role"]]
                 }
-            url, text = extract_last_url([msg])
-            mime_type, file_content = self.fetch_attachment(url)
-            new_msg["parts"].append({"text":text[0]["content"].encode("utf-8",'ignore').decode("utf-8")})
-            if file_content is not None:
-                new_msg["parts"].append({
-                    "file_data": {
-                        "mime_type": mime_type,
-                        "file_uri": (await file_store.upload_file(file_content, mime_type)).uri
-                    }
-                })
+            if enable_multimodal:
+                url, text = extract_last_url([msg])
+                mime_type, file_content = self.fetch_attachment(url)
+                new_msg["parts"].append({"text": text[0]["content"].encode("utf-8",'ignore').decode("utf-8")})
+                if file_content is not None:
+                    new_msg["parts"].append({
+                        "file_data": {
+                            "mime_type": mime_type,
+                            "file_uri": (await file_store.upload_file(file_content, mime_type)).uri
+                        }
+                    })
+            new_msg["parts"].append({"text": msg["content"].encode("utf-8",'ignore').decode("utf-8")})
             result.append(new_msg)
 
         return result 
@@ -190,6 +193,7 @@ class GeminiExecutor(LLMExecutor):
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
             google_token = modelfile.parameters["_"].get("google_token") or self.args.api_key
+            enable_multimodal = modelfile.parameters["llm_"].get("enable_multimodal", self.args.multimodal)
             file_store = GoogleFileStore(google_token)
 
             # Parse and process modelfile
@@ -198,7 +202,7 @@ class GeminiExecutor(LLMExecutor):
 
             # Apply parsed modelfile data to Inference
             raw_inputs = modelfile.messages + history
-            msg = await self.parse_messages(raw_inputs, file_store)
+            msg = await self.parse_messages(raw_inputs, enable_multimodal, file_store)
             msg[-1]["parts"][0]['text'] = modelfile.before_prompt + msg[-1]["parts"][0]['text'] + modelfile.after_prompt
             msg[0]["parts"][0]['text'] = override_system_prompt + msg[0]["parts"][0]['text']
             
@@ -223,6 +227,8 @@ class GeminiExecutor(LLMExecutor):
             logger.debug(f'msg: {msg}')
             chat = self.model.start_chat(history=history)
             self.proc = True
+            generation_config = merge_config(self.generation_config, modelfile.parameters["llm_"])
+            generation_config.pop('enable_multimodal', None)
             response = await chat.send_message_async(
                 quiz,
                 stream=True,
@@ -233,7 +239,7 @@ class GeminiExecutor(LLMExecutor):
                     "HARM_CATEGORY_SEXUALLY_EXPLICIT": "block_none"
                 },
                 generation_config=genai.GenerationConfig(
-                    **merge_config(self.generation_config, modelfile.parameters["llm_"])
+                    **generation_config
                 )
             )
             async for resp in response:

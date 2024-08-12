@@ -82,6 +82,7 @@ class ChatGptExecutor(LLMExecutor):
         model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
         model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
         model_group.add_argument('--no_override_api_key', default=False, action='store_true', help='Disable override the system API key with user API key.')
+        model_group.add_argument('--multimodal', default=False, action='store_true', help='Activate multimodal functionalities.')
 
         gen_group = parser.add_argument_group('Generation Options', 'Generation options for OpenAI API. See https://github.com/openai/openai-python/blob/main/src/openai/types/chat/completion_create_params.py')
         gen_group.add_argument('-c', '--generation_config', default=None, help='The generation configuration in YAML or JSON format. This can be overridden by other command-line arguments.')
@@ -206,12 +207,15 @@ class ChatGptExecutor(LLMExecutor):
 
             # Apply parsed modelfile data to Inference
             generation_config = merge_config(self.generation_config, modelfile.parameters["llm_"])
+            enable_multimodal = modelfile.parameters["llm_"].get("enable_multimodal", self.args.multimodal)
+            generation_config.pop('enable_multimodal', None)
             msg = messages + history
             if system_prompt is not None:
                 msg = [{"content": system_prompt, "role": "system"}] + msg
 
             msg[-1]['content'] = modelfile.before_prompt + msg[-1]['content'] + modelfile.after_prompt
-            msg = self.parse_images(msg)
+            if enable_multimodal:
+                msg = self.parse_images(msg)
             if not msg or len(msg) == 0:
                 yield "[No input message entered]"
                 return
