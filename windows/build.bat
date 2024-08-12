@@ -158,6 +158,9 @@ REM Make shortcut from nginx_folder/html to ../public
 echo Creating shortcut from %nginx_folder%/html to ../public...
 mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
 
+REM Install windows dependency
+pip install --default-timeout=1000 -r .\src\requirements.txt
+
 REM Download required pip packages
 pushd "..\src\kernel"
 pip install --default-timeout=1000 --force-reinstall .

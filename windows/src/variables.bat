@@ -53,7 +53,7 @@ set "xpdfreader_folder=%filename_XpdfReader:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_XpdfReader%") do set "version_XpdfReader=%%v"
 
 REM Variables for Antiword
-set "url_antiword=https://softpedia-secure-download.com/dl/38dcd67da529881c2013aa6a09267623/66a6587b/100136188/software/office/antiword-0_37-windows.zip"
+set "url_antiword=http://web.archive.org/web/20240812110344/https://softpedia-secure-download.com/dl/127df4c3450903e8d13e0d4784017069/66b9eb8d/100136188/software/office/antiword-0_37-windows.zip"
 for %%I in ("%url_antiword%") do set "filename_antiword=%%~nxI"
 set "antiword_folder=antiword"
 for /f "tokens=2 delims=-" %%v in ("%filename_antiword%") do set "version_antiword=%%v"
@@ -66,7 +66,7 @@ set "gitbash_folder=%filename_gitbash:~0,-7%"
 for /f "tokens=2 delims=-" %%v in ("%filename_gitbash%") do set "version_gitbash=%%v"
 
 REM Variables for FFmpeg
-set "url_ffmpeg=https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.1-essentials_build.zip"
+set "url_ffmpeg=https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
 for %%I in ("%url_ffmpeg%") do set "filename_ffmpeg=%%~nxI"
 set "ffmpeg_folder=%filename_ffmpeg:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_ffmpeg%") do set "version_ffmpeg=%%v"
