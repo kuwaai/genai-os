@@ -94,9 +94,10 @@ class PipeExecutor(LLMExecutor):
 
         # Run a subprocess with stdin from the request.
         program = os.path.realpath(program)
-        if not self.is_exe(program):
-            yield "The program is not executable; please check its file permissions."
-            return
+        # Checking permission will cause exception on windows
+        #if not self.is_exe(program):
+        #    yield "The program is not executable; please check its file permissions."
+        #    return
         
         cmd = [program]+argv
         env = os.environ.copy()

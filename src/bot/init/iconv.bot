@@ -10,8 +10,8 @@ KUWABOT version 0.3.3
 KUWABOT name "Iconv"
 KUWABOT description "Convert Simplified Chinese to Traditional Chinese"
 KUWABOT base "pipe"
-PARAMETER pipe_program iconv
-PARAMETER pipe_argv --config s2twp
+PARAMETER pipe_program python
+PARAMETER pipe_argv iconv.py --config s2twp
 
 --kuwa5ram9
 Content-Type: image/png
