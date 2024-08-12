@@ -1,11 +1,4 @@
----
-slug: painter-tutorial
-title: Stable Diffusion Image Generation Model Building Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.1]
----
-
-![](/blog-img/2024-06-24-painter/hand-drawn-apple.png)
+![](./img/2024-06-24-painter/hand-drawn-apple.png)
 
 Kuwa v0.3.1 adds Kuwa Painter based on the Stable Diffusion image generation model,  
 You can generate an image by inputting a text, or upload an image and generate an image with a text.
@@ -51,13 +44,13 @@ You can input a text and let Kuwa Painter generate an image for you. It is impor
 At this time, you can use the group chat and quoting functions of Kuwa to let other language models translate the user's Prompt first, and then ask the Stable Diffusion model to generate an image, which usually gives better results.  
 The first generated image in the figure below is based on the original Chinese User prompt (`電影風格畫面。擁有雄偉鹿角的雄鹿，在翠綠的森林裡安靜地低頭吃草。`), and the second image is the Prompt translated by TAIDE (`Film-inspired scene. A majestic stag with impressive antlers grazing serenely amidst a verdant forest.`) was used as the input to Stable Diffusion, and the quality difference between the two images is significant.
 
-![](/blog-img/2024-06-24-painter/zh-en-prompt.png)
+![](./img/2024-06-24-painter/zh-en-prompt.png)
 
 ### Image to Image
 
 You can also upload a sketch, and then describe what you want to draw, and Kuwa Painter will draw it for you.
 
-![](/blog-img/2024-06-24-painter/img2img.png)
+![](./img/2024-06-24-painter/img2img.png)
 
 ### Complete configuration instructions
 

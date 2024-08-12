@@ -1,11 +1,4 @@
----
-slug: vlm-tutorial
-title: Visual-Language Model Setup Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.1]
----
-
-![](/blog-img/2024-06-24-vlm/example.png)
+![](./img/2024-06-24-vlm/example.png)
 
 Kuwa v0.3.1 has preliminary support for commonly used visual language models (VLMs). In addition to text inputs, such models can also take images as input and respond to user instructions based on the content of the images. This tutorial will guide you through the initial setup and usage of VLMs.
 
@@ -55,4 +48,4 @@ services:
 
 You can upload an image and ask questions about it, or ask the model to identify the text on it.
 
-![](/blog-img/2024-06-24-vlm/example.png)
+![](./img/2024-06-24-vlm/example.png)

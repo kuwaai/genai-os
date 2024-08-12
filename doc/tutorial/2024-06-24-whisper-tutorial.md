@@ -1,10 +1,3 @@
----
-slug: whisper-tutorial
-title: Whisper Setup Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.1]
----
-
 Kuwa v0.3.1 adds Kuwa Speech Recognizer based on the Whisper speech recognition model, which can generate transcripts by uploading audio files, supporting timestamps and speaker labels.
 
 ## Known Issues and Limitations
@@ -59,19 +52,19 @@ The Docker compose configuration file for the Kuwa Speech Recognizer is located 
 
 ### Speech to Text
 You can upload an audio file to generate a transcript. The default recognition language is English.
-![](/blog-img/2024-06-24-whisper/transcribe-en.png)
+![](./img/2024-06-24-whisper/transcribe-en.png)
 
 Create a Bot and add the parameter `PARAMETER whisper_language zh` to generate transcripts in Chinese or other languages.
-![](/blog-img/2024-06-24-whisper/create-bot-zh.png)  
-![](/blog-img/2024-06-24-whisper/transcribe-zh.png)  
+![](./img/2024-06-24-whisper/create-bot-zh.png)  
+![](./img/2024-06-24-whisper/transcribe-zh.png)  
 
 The Whisper model for Chinese does not output punctuation marks by default. You can influence the model's output using the User prompt or System prompt.  
-![](/blog-img/2024-06-24-whisper/punctuation-prompt-zh.png)  
+![](./img/2024-06-24-whisper/punctuation-prompt-zh.png)  
 
 ### Transcript Timestamps
 Add the parameter `PARAMETER whisper_enable_timestamp True` to the Bot configuration file to enable timestamps for the transcript.
-![](/blog-img/2024-06-24-whisper/timestamp-modelfile-zh.png)  
-![](/blog-img/2024-06-24-whisper/timestamp-result-zh.png)  
+![](./img/2024-06-24-whisper/timestamp-modelfile-zh.png)  
+![](./img/2024-06-24-whisper/timestamp-result-zh.png)  
 
 :::info
 In the above example, the user enters "." just to access the previously uploaded audio file. Remember to select the chat mode as "Continuous Q&A".
@@ -79,13 +72,12 @@ In the above example, the user enters "." just to access the previously uploaded
 
 ### Speaker Diarization
 Similarly, add the parameter `PARAMETER whisper_enable_diarization True` to the Bot configuration file to enable speaker identification and labeling.
-![](/blog-img/2024-06-24-whisper/diarization-modelfile-zh.png)  
-![](/blog-img/2024-06-24-whisper/diarization-result-zh.png)  
+![](./img/2024-06-24-whisper/diarization-modelfile-zh.png)  
+![](./img/2024-06-24-whisper/diarization-result-zh.png)  
 
-:::info
-The command `/replace <pattern> <repl>` allows you to replace the recognition results using regular expressions. You can replace speaker names or repeatedly misidentified words.  
-The command `/speakers <n>` allows you to specify the number of speakers. The default is to detect automatically, but it may be biased. You can use this command to correct it.
-:::
+> [!Note] 
+> The command `/replace <pattern> <repl>` allows you to replace the recognition results using regular expressions. You can replace speaker names or repeatedly misidentified words.  
+> The command `/speakers <n>` allows you to specify the number of speakers. The default is to detect automatically, but it may be biased. You can use this command to correct it.
 
 ### Full Configuration Description
 The following parameters can be set for Bots. For a complete description, please refer to [ganai-os/src/executor/speech_recognition/README.md](https://github.com/kuwaai/genai-os/blob/main/src/executor/speech_recognition/README.md).

@@ -1,36 +1,28 @@
----
-slug: kuwa-os-v0.2.0-llama3-linux
-title: Kuwa v0.2.0 + Llama3 Setup (Linux, including Container version)
-authors: [iftnt]
-tags: [KuwaOS, v0.2.0-beta, v0.2.0-taide, Llama3]
-date: 2024-04-20 23:10:00
----
-
 ## Getting the Model
 
 ### Method 1: Applying for Access on HuggingFace
 
 1. Log in to HuggingFace and apply for access to the meta-llama/Meta-Llama-3-8B-Instruct model (approximately 1 hour review time)
-   ![](/blog-img/2024-04-20-llama3/hf-meta-llama3.png)
+   ![](./img/2024-04-20-llama3/hf-meta-llama3.png)
 2. If you see the "You have been granted access to this model" message, you have obtained the model access, and you can download the model
-   ![](/blog-img/2024-04-20-llama3/hf-meta-llama3-granted.png)
+   ![](./img/2024-04-20-llama3/hf-meta-llama3-granted.png)
 
 <!-- truncate -->
 
 3. If you need to use a model that requires login, you need to set up a HuggingFace token. If you are using a model that does not require login, you can skip this step
     Go to https://huggingface.co/settings/tokens?new_token=true  
-   ![](/blog-img/2024-04-20-llama3/hf-new-token.png)  
+   ![](./img/2024-04-20-llama3/hf-new-token.png)  
     Enter your desired name  
-   ![](/blog-img/2024-04-20-llama3/hf-new-token-name.png)  
+   ![](./img/2024-04-20-llama3/hf-new-token-name.png)  
     Then, keep this token safe (do not share it with anyone)  
-   ![](/blog-img/2024-04-20-llama3/hf-token.png)
+   ![](./img/2024-04-20-llama3/hf-token.png)
 
 ### Method 2: Direct Download from HuggingFace
 
 - If you don't want to log in to HuggingFace, you can find a third-party re-uploaded model (named Meta-Llama-3-8B-Instruct, no GGUF): 
     HuggingFace search: https://huggingface.co/models?search=Meta-Llama-3-8B-Instruct  
     For example, NousResearch/Meta-Llama-3-8B-Instruct, remember the name  
-   ![](/blog-img/2024-04-20-llama3/hf-nousresearch.png)
+   ![](./img/2024-04-20-llama3/hf-nousresearch.png)
 
 ## 2. Kuwa Settings
 
@@ -51,7 +43,7 @@ date: 2024-04-20 23:10:00
     ```
 
 2. After adding the Llama3 8B Instruct model settings in the web frontend, you can use it.
-    ![](/blog-img/2024-04-20-llama3/kuwa-model-config-en.png)
+    ![](./img/2024-04-20-llama3/kuwa-model-config-en.png)
 
 ### Method 2: Starting Executor using Docker
 
@@ -91,13 +83,13 @@ sudo docker compose -f compose.yaml <...> -f llama3.yaml up --build
 ```
 
 3. If the Executor runs successfully, you will see the following image.
-    ![](/blog-img/2024-04-20-llama3/kuwa-container-succeed.png)
+    ![](./img/2024-04-20-llama3/kuwa-container-succeed.png)
 
 ## 3. Kuwa Usage
 
 1. Wait for the model to download and then log in to Kuwa. You can start chatting with Llama3.
 2. Llama3 is set to prefer English, and you can use the "Translate this model's response" function to translate the model's response into Chinese.
-    ![](/blog-img/2024-04-20-llama3/kuwa-usage-1.png)  
-    ![](/blog-img/2024-04-20-llama3/kuwa-usage-2.png)  
+    ![](./img/2024-04-20-llama3/kuwa-usage-1.png)  
+    ![](./img/2024-04-20-llama3/kuwa-usage-2.png)  
 3. You can use the group chat function to compare the responses of Llama3, Llama2, and TAIDE-LX-7B-Chat.
-    ![](/blog-img/2024-04-20-llama3/kuwa-usage-3.png)  
+    ![](./img/2024-04-20-llama3/kuwa-usage-3.png)  

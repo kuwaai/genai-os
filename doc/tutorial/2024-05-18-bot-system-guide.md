@@ -1,20 +1,12 @@
----
-slug: bot-system-guide
-title: Bot Setup Tutorial
-authors: [taifu9920]
-tags: [KuwaOS, v0.3.0]
----
-
 In the latest 0.3.0 release, we have mainly added the Bot feature. Now you can create different Bots on the website, and this article will guide you step-by-step on how to set up your own Bot!
 
-
 First, you will see a Store section:\
-![](/blog-img/2024-05-18-bot-system-guide/store.png)\
+![](./img/2024-05-18-bot-system-guide/store.png)\
 
 With a button outlined in green, clicking it will open the Bot creation menu.\
-![](/blog-img/2024-05-18-bot-system-guide/bot-create-1.png)\
+![](./img/2024-05-18-bot-system-guide/bot-create-1.png)\
 Here, you have a simple interface to set common Bot parameters, such as system prompts, user pre-prompts, and user post-prompts. If you want to set more detailed information, you can also open the model configuration file:\
-![](/blog-img/2024-05-18-bot-system-guide/bot-create-2.png)\
+![](./img/2024-05-18-bot-system-guide/bot-create-2.png)\
 Although this part does not have an auxiliary interface, you can more freely set all parameters. Please refer to the [Ollama Modelfile](https://github.com/ollama/ollama/blob/main/docs/modelfile.md) for the format. Note that in the current 0.3.0 version, only some configuration parameters are supported. The following lists the relevant parameters and some example usages.
 
 * SYSTEM \<prompt>\

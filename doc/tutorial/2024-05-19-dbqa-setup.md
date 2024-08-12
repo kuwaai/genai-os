@@ -1,27 +1,20 @@
----
-slug: dbqa-setup
-title: DB QA/RAG Setup Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.0]
----
-
 v0.3.0 has added the RAG toolchain, which allows users to drag and drop their on-premises file folders to build their own vector database and do QnA. This article will guide you through how to use Kuwa's RAG toolchain to build your own vector database and related Bot.
 
 
 ## Windows Version Instruction
 1. Drag a single file or a file directory to the `Create VectorDB` shortcut on the desktop to open it with this script. If you don't have this shortcut, you can drag the file to `C:\kuwa\GenAI OS\windows\construct_rag.bat`  
-![](/blog-img/2024-05-19-dbqa-creation/drag_and_drop.png)  
+![](./img/2024-05-19-dbqa-creation/drag_and_drop.png)  
 
 <!-- truncate -->
 
 2. The script will automatically create a vector database and related Bot, and if the screen appears as shown in the attached picture, it means the creation is successful  
-![](/blog-img/2024-05-19-dbqa-creation/construct_rag.png)  
+![](./img/2024-05-19-dbqa-creation/construct_rag.png)  
 
 3. Restart Kuwa or return to the command line of Kuwa GenAI OS and enter the `reload` command to reload all Executors  
-![](/blog-img/2024-05-19-dbqa-creation/reload.png)  
+![](./img/2024-05-19-dbqa-creation/reload.png)  
 
 4. After reloading, you can see a Bot with the same name as the file directory, and you can start QnA for the on-premises database  
-![](/blog-img/2024-05-19-dbqa-creation/result.png)  
+![](./img/2024-05-19-dbqa-creation/result.png)  
 
 ## Docker Version Instruction
 1. Refer to the document [`genai-os/src/toolchain/README.md`](https://github.com/kuwaai/genai-os/blob/main/src/toolchain/README.md) to use the command to create vector database

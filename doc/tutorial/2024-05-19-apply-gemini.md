@@ -9,35 +9,35 @@ Even if the model is not downloaded on the client side, you can use Kuwa to conn
 
 ## Applying for a Gemini Pro API Key
 1. Visit [Google AI Studio - Get API key](https://aistudio.google.com/app/apikey) and click "Get API key"  
-   ![](/blog-img/2024-05-19-apply-gemini/api-key1.png)
+   ![](./img/2024-05-19-apply-gemini/api-key1.png)
 
 <!-- truncate -->
 
 2. Click "Create API key" to create a new key  
-   ![](/blog-img/2024-05-19-apply-gemini/api-key2.png)
+   ![](./img/2024-05-19-apply-gemini/api-key2.png)
 
 3. You can select an existing Google Cloud Project or create a new one  
-   ![](/blog-img/2024-05-19-apply-gemini/api-key3.png)
+   ![](./img/2024-05-19-apply-gemini/api-key3.png)
 
 4. Note down the API key. There are two ways to set it up later, personal or global API key, choose one  
-   ![](/blog-img/2024-05-19-apply-gemini/api-key4.png)
+   ![](./img/2024-05-19-apply-gemini/api-key4.png)
 
 ## Method 1: Set up Personal API Key
 Personal API key is only valid for the current Kuwa account and no one else can use your API key.
 
 1. Log in to your Kuwa account, and select "Settings" from the account menu in the top right corner.  
-   ![](/blog-img/2024-05-19-apply-gemini/setup-personal-key1.png)
+   ![](./img/2024-05-19-apply-gemini/setup-personal-key1.png)
 2. In the "API Management" section, fill in the Google API key you just applied for, and click "Update" to start using Gemini Pro.  
-   ![](/blog-img/2024-05-19-apply-gemini/setup-personal-key2.png)
+   ![](./img/2024-05-19-apply-gemini/setup-personal-key2.png)
 
 ## Method 2: Set Up Global API Key
 Global API key is suitable for organizations that have purchased Google Gemini services. It allows all website users to use Gemini Pro directly without setting up API keys.
 ### Windows Tutorial
 1. Run `C:\kuwa\GenAI OS\windows\executors\geminipro\init.bat`, and fill in the Google API key you just applied for.  
-   ![](/blog-img/2024-05-19-apply-gemini/setup-global-key-win.png)
+   ![](./img/2024-05-19-apply-gemini/setup-global-key-win.png)
 
 2. Restart Kuwa, or go back to the command line of Kuwa GenAI OS and input `reload` to reload all executors and start using Gemini Pro.  
-   ![](/blog-img/2024-05-19-apply-gemini/reload.png)  
+   ![](./img/2024-05-19-apply-gemini/reload.png)  
 
 ### Docker Tutorial
 1. Refer to `docker/compose/gemini.yaml` to create a Gemini Pro executor. Replace `<YOUR_GLOBAL_API_KEY_HERE>` with the Google API key you applied in the previous section.  

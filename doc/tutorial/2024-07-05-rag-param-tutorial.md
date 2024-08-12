@@ -1,10 +1,3 @@
----
-slug: rag-param-tutorial
-title: RAG Custom Parameters Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.1, v0.3.2]
----
-
 Kuwa's RAG application (DocQA/WebQA/DatabaseQA/SearchQA) supports customization of advanced parameters through the Bot's model file starting from version v0.3.1, allowing a single Executor to be virtualized into multiple RAG applications. Detailed parameter descriptions and examples are as follows.
 
 ## Parameter Description

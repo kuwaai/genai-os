@@ -1,10 +1,3 @@
----
-slug: tool-tutorial
-title: Tool Development Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.2]
----
-
 Kuwa is designed to support the connection of various non-LLM tools. The simplest tool can refer to `src/executor/debug.py`. The following is a content description.
 
 ```python

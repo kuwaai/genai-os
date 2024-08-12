@@ -1,23 +1,15 @@
----
-slug: cool-whisper-tutorial
-title: Cool-Whisper Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.2]
----
-
 National Taiwan University's Liang-Hsuan Tseng and NTU COOL team released the Cool-Whisper model last night (7/17), which is suitable for recognizing Taiwanese pronunciation Chinese or mixed Chinese-English audio files.  
 Kuwa can directly apply it by simply modifying the Modelfile.
 
-![](/blog-img/2024-07-18-cool-whisper/demo.png)
+![](./img/2024-07-18-cool-whisper/demo.png)
 
-:::info
+> [!Note] 
 The model was temporarily taken offline around 12:00 on 7/18 due to privacy concerns.  
 Friends who want to use this model can continue to follow its [HuggingFace Hub](https://huggingface.co/andybi7676/cool-whisper) and use it once it is re-released.
-:::
 
 ## Setup Steps
 
-1. Refer to the [Whisper setup tutorial](/blog/whisper-tutorial) to start the Whisper executor
+1. Refer to the [Whisper setup tutorial](./2024-06-24-whisper-tutorial.md) to start the Whisper executor
     - The Cool-Whisper model is approximately 1.5 GB in size and will occupy up to 10 GB of VRAM during execution
 
 2. Create a new bot named Cool-Whisper in the store, select Whisper as the base model, and fill in the following model settings file, focusing on the `PARAMETER whisper_model andybi7676/cool-whisper` parameter
@@ -60,10 +52,10 @@ Friends who want to use this model can continue to follow its [HuggingFace Hub](
     PARAMETER whisper_logprob_thold -1.0 #logprob_thold
     PARAMETER whisper_no_speech_thold 0.6 #no_speech_thold
     ```
-   ![](/blog-img/2024-07-18-cool-whisper/modelfile.png)
+   ![](./img/2024-07-18-cool-whisper/modelfile.png)
 
 3. You can now use the Cool-Whisper model for speech recognition. The following figure shows the use of Whisper and Cool-Whisper for recognizing mixed Chinese-English audio files, which can accurately recognize mixed Chinese-English scenarios
-![](/blog-img/2024-07-18-cool-whisper/demo.png)
+![](./img/2024-07-18-cool-whisper/demo.png)
 
 ## References
 
