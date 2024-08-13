@@ -66,7 +66,7 @@ After reboot, use the command `nvidia-smi` to check if nvidia-driver is installe
 
 possible result:
 
-![](./img/螢幕擷取畫面 2024-07-16 231028.png)
+![](./img/docker_installation_1.png)
 
 ### 3. (Optional) Install CUDA Toolkits
 
@@ -83,7 +83,7 @@ sudo apt install nvidia-cuda-toolkit
 # Check CUDA install
 nvcc --version
 ```
-![](./img/螢幕擷取畫面 2024-07-24 204307.png)
+![](./img/docker_installation_2.png)
 
 You can test CUDA on Pytorch:
 ```sh=
@@ -111,7 +111,7 @@ print(t.device) # should be CUDA
 
 expected result:
 
-![](./img/螢幕擷取畫面 2024-07-18 115645.png)
+![](./img/docker_installation_3.png)
 
 ### 4. (Optional) Install NVIDIA Container Toolkit
 
