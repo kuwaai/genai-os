@@ -2,8 +2,8 @@
 
 ## Getting Started
 
-* [Introduction](./introduction.md)
-* [Latest Released](./released/2024-07-05-release-v0.3.2.md)
+* [Introduction](https://kuwaai.tw/os/intro)
+* [Latest Release](./release/2024-08-12-release-v0.3.3.md)
 
 ## Windows
 
