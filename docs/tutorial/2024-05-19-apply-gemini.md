@@ -1,10 +1,3 @@
----
-slug: apply-gemini
-title: Gemini API Key Application Tutorial
-authors: [iftnt]
-tags: [KuwaOS, v0.3.0]
----
-
 Even if the model is not downloaded on the client side, you can use Kuwa to connect to the cloud model for chat and RAG applications. This article will guide you through the process of applying for Google's free Gemini Pro API key and configuring it in Kuwa.
 
 ## Applying for a Gemini Pro API Key
