@@ -84,24 +84,24 @@ Currently, it supports customization of the main logo of the application, the ho
 #### Main Logo of the Application
 - Component name: `application-logo.blade.php`
 
-![app-logo-1-zh-356fea558bc5a49f00a9df478b9e1571](https://hackmd.io/_uploads/HyVuFU_90.png, =49%x)
+![](./img/app-logo-1-zh-356fea558bc5a49f00a9df478b9e1571.png, =49%x)
 
-![app-logo-2-zh-e1865f0117e2b25d151153f7349fdbc1](https://hackmd.io/_uploads/S1tOF8_9A.png, =49%x)
+![](./img/app-logo-2-zh-e1865f0117e2b25d151153f7349fdbc1.png, =49%x)
 
 #### Large Logo of the Homepage and Maintenance Page
 - Component name: `logo.blade.php`  
 
-![logo-zh-51413939ea2b071f83910cea54b1c608](https://hackmd.io/_uploads/Syj8F8dc0.png)
+![](./img/logo-zh-51413939ea2b071f83910cea54b1c608.png)
 
 #### Main Content of the Homepage
 - Component name: `welcome_body.blade.php`
 
-![welcome-body-zh-ac34a0eb54fad6e5c682792fc44991a6](https://hackmd.io/_uploads/Hkkd38u50.png)
+![](./img/welcome-body-zh-ac34a0eb54fad6e5c682792fc44991a6.png)
 
 #### Footer Content of the Homepage
 - Component name: `welcome_footer.blade.php`
 
-![welcome-footer-zh-310bb3644ca609c871efaf0c165173d2](https://hackmd.io/_uploads/Sy6DTId90.png)
+![](./img/welcome-footer-zh-310bb3644ca609c871efaf0c165173d2.png)
 
 ## Kuwa Kernel
 Currently, the main configuration file for the Kernel is located under `genai-os/kernel/src/variable.py`.
