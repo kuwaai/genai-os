@@ -84,9 +84,9 @@ Currently, it supports customization of the main logo of the application, the ho
 #### Main Logo of the Application
 - Component name: `application-logo.blade.php`
 
-![](./img/app-logo-1-zh-356fea558bc5a49f00a9df478b9e1571.png, =49%x)
+![](./img/app-logo-1-zh-356fea558bc5a49f00a9df478b9e1571.png)
 
-![](./img/app-logo-2-zh-e1865f0117e2b25d151153f7349fdbc1.png, =49%x)
+![](./img/app-logo-2-zh-e1865f0117e2b25d151153f7349fdbc1.png)
 
 #### Large Logo of the Homepage and Maintenance Page
 - Component name: `logo.blade.php`  

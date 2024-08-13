@@ -65,7 +65,8 @@ If reboot is unsuccessful, hold down `shift` key, select `Advanced options for U
 After reboot, use the command `nvidia-smi` to check if nvidia-driver is installed successfully.
 
 possible result:
-![螢幕擷取畫面 2024-07-16 231028](https://hackmd.io/_uploads/Syd-1f6FA.png)
+
+![](./img/螢幕擷取畫面 2024-07-16 231028.png)
 
 ### 3. (Optional) Install CUDA Toolkits
 
@@ -82,7 +83,7 @@ sudo apt install nvidia-cuda-toolkit
 # Check CUDA install
 nvcc --version
 ```
-![螢幕擷取畫面 2024-07-24 204307](https://hackmd.io/_uploads/SyqeyGpF0.png)
+![](./img/螢幕擷取畫面 2024-07-24 204307.png)
 
 You can test CUDA on Pytorch:
 ```sh=
@@ -109,7 +110,8 @@ print(t.device) # should be CUDA
 ```
 
 expected result:
-![螢幕擷取畫面 2024-07-18 115645](https://hackmd.io/_uploads/SJL_oW6YA.png)
+
+![](./img/螢幕擷取畫面 2024-07-18 115645.png)
 
 ### 4. (Optional) Install NVIDIA Container Toolkit
 
