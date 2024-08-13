@@ -4,6 +4,7 @@
 
 * [Introduction](https://kuwaai.tw/os/intro)
 * [Latest Release](./release/2024-08-12-release-v0.3.3.md)
+* [Configuration](./configuration.md)
 
 ## Windows
 
