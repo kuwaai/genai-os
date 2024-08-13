@@ -26,10 +26,12 @@ cp gemini.yaml chatgpt.yaml
 Add `chatgpt` into `confs` array and execute `run.sh` again.
 
 `confs` array:
-![螢幕擷取畫面 2024-07-25 170624](https://hackmd.io/_uploads/HkP0CWat0.png =60%x)
+
+![](./img/docker_model_setup_1.png)
 
 chat room interface:
-![螢幕擷取畫面 2024-07-18 172203](https://hackmd.io/_uploads/B1t16WTtA.png)
+
+![](./img/docker_model_setup_2.png)
 
 ### 3. TAIDE
 
