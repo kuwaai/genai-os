@@ -1,3 +1,5 @@
+FORKED BY ERIC AND MICHAEL
+
 [正體中文 README_TW.md](./README_TW.md)
 
 <h1 align="center">
@@ -48,38 +50,49 @@
 </p>
 
 ## Key Features
-* Multi-lingual turnkey solution for GenAI use, development and deployment on Windows, Linux and MacOS
-* Concurrent multi-chat, quoting, full prompt-list import/export/share, and more for users
-* Supporting multimodal models, popular RAG/agent tools, traditional applications, and local bot store  
-* Flexible orchestration of prompts x RAGs x multi-modal models x tools x bots x hardware/GPUs
-* Heterogeneous support from raspberry Pi, laptops, PCs, edge servers, and virtual hosts to cloud
-* Open-sourced, allowing developers to contribute and customize the system according to their needs
+
+- Multi-lingual turnkey solution for GenAI use, development and deployment on Windows, Linux and MacOS
+- Concurrent multi-chat, quoting, full prompt-list import/export/share, and more for users
+- Supporting multimodal models, popular RAG/agent tools, traditional applications, and local bot store
+- Flexible orchestration of prompts x RAGs x multi-modal models x tools x bots x hardware/GPUs
+- Heterogeneous support from raspberry Pi, laptops, PCs, edge servers, and virtual hosts to cloud
+- Open-sourced, allowing developers to contribute and customize the system according to their needs
 
 ![screenshot](./src/multi-chat/public/images/demo.gif)
 
 ## Architecture
+
 > **Warning**: This a preliminary draft and may be subject to further changes.
 
 [![screenshot](./src/multi-chat/public/images/architecture.svg)](https://kuwaai.tw/os/Intro)
 
 ## Installation Guide
+
 ### Quick Installation
+
 Download the script or the executable file, run it, and follow its steps to have your own Kuwa!
-* **Windows**
+
+- **Windows**
 
   Download and run the pre-built Windows executable from [Kuwa's latest releases](https://github.com/kuwaai/genai-os/releases)
 
-* **Linux/Docker**
+- **Linux/Docker**
 
   Download and run sudo [build.sh](./docker/build.sh) , or invoke the following command to automatically install Docker, CUDA, and Kuwa. You may need to reboot after installing CUDA. Before finishing installation, you will be asked to set your administration passwords for your Kuwa and database. After installation, it will invoke run.sh to start the system and you can log in with admin@localhost. Enjoy!
+
   ```
   curl -fsSL https://raw.githubusercontent.com/kuwaai/genai-os/main/docker/build.sh | sudo sh
   ```
-###  Step-by-step Installation
+
+### Step-by-step Installation
+
 You can build your own customized Kuwa by following the step-by-step documents.
-* [Portable Windows version](./windows/README.md)
-* [Linux/Docker version](./docker/README.md)
+
+- [Portable Windows version](./windows/README.md)
+- [Linux/Docker version](./docker/README.md)
+
 ### More Models and Applications
+
 With executors, Kuwa can orchestrate diverse multimodal models, remote services, applications, databases, bots, etc. You can check [Executor's README](./src/executor/README.md) for further customization and configuration.
 
 ## Download
@@ -121,6 +134,7 @@ The following packages and applications are used in this project:
 - [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit)
 
 ## Acknowledgements
+
 We want to acknowledge NSTC's TAIDE project and the Taiwan AI Academy for their assistance in the early development of this project.
 <a href="https://www.nuk.edu.tw/"><img src="./src/multi-chat/public/images/logo_NUK.jpg" height="100px"></a>
 <a href="https://taide.tw/"><img src="./src/multi-chat/public/images/logo_taide.jpg" height="100px"></a>
@@ -128,6 +142,6 @@ We want to acknowledge NSTC's TAIDE project and the Taiwan AI Academy for their 
 <a href="https://www.narlabs.org.tw/"><img src="./src/multi-chat/public/images/logo_NARlabs.jpg" height="100px"></a>
 <a href="https://aiacademy.tw/"><img src="./src/multi-chat/public/images/logo_AIA.jpg" height="100px"></a>
 
-
 ## License
+
 [MIT](./LICENSE)
