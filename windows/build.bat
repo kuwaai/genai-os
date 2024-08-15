@@ -159,39 +159,39 @@ echo Creating shortcut from %nginx_folder%/html to ../public...
 mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
 
 REM Install windows dependency
-for /f "delims=" %%a in (.\src\requirements.txt) do (
-  pip install --default-timeout=1000 %%a
-)
+pushd ".\src"
+call :install-requirements-txt
+popd
 
 REM Download required pip packages
 pushd "..\src\kernel"
 pip install --default-timeout=1000 --force-reinstall .
-pip install --default-timeout=1000 -r requirements.txt 
+call :install-requirements-txt
 popd
 pushd "..\src\library\client"
 pip install --default-timeout=1000 --force-reinstall .
 popd
 pushd "..\src\executor"
 pip install --default-timeout=1000 --force-reinstall .
-pip install --default-timeout=1000 -r requirements.txt
+call :install-requirements-txt
 pushd "docqa"
-pip install --default-timeout=1000 -r requirements.txt
+call :install-requirements-txt
 popd
 pushd "uploader"
-pip install --default-timeout=1000 -r requirements.txt
+call :install-requirements-txt
 popd
 popd
 pushd "..\src\toolchain"
-pip install --default-timeout=1000 -r requirements.txt 
+call :install-requirements-txt
 popd
 pushd "..\src\tools"
-pip install --default-timeout=1000 -r requirements.txt 
+call :install-requirements-txt
 popd
 
 REM Make sure the windows edition package are still the correct version
-for /f "delims=" %%a in (.\src\requirements.txt) do (
-  pip install --default-timeout=1000 %%a
-)
+pushd ".\src"
+call :install-requirements-txt
+popd
 
 REM Download Embedding Model
 python ..\src\executor\docqa\download_model.py
@@ -209,3 +209,17 @@ for %%f in (*) do (
   icacls "%%f" /grant Everyone:RX
 )
 popd
+
+goto :eof
+
+:: Sub-Routines
+
+:: pip-install-requirements-txt sub-routine
+:: Install each dependency in requirements.txt under current working directory to
+:: prevent cascading failure.
+:install-requirements-txt
+for /f "tokens=*" %%a in ('findstr /v /r /c:"^#" requirements.txt') do (
+  echo Installing "%%a"...
+  pip install --default-timeout=1000 "%%a"
+)
+goto :eof
