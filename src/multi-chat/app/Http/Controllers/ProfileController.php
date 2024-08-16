@@ -353,7 +353,7 @@ class ProfileController extends Controller
         $backend_callback = function ($event, $message) use (&$history, &$llm, &$bot_output){
             
             if ($event == 'Error') {
-                throw new Exception($message);
+                throw new \Exception($message);
             }
 
             $bot_output .= $message;
@@ -401,7 +401,7 @@ class ProfileController extends Controller
             $bot_output = "";
             $backend_callback = function ($event, $message) use (&$history, &$llm, &$bot_output){
                 if ($event == 'Error') {
-                    throw new Exception($message);
+                    throw new \Exception($message);
                 }
 
                 $resp = [
@@ -505,7 +505,7 @@ class ProfileController extends Controller
     public function api_stream(Request $request)
     {
         if (config('app.API_Key') == null || config('app.API_Key') != $request->input('key')) {
-            throw new Exception("API key doesn't match app.API_Key.");
+            throw new \Exception("API key doesn't match app.API_Key.");
         }
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
@@ -525,7 +525,7 @@ class ProfileController extends Controller
                     ob_flush();
                     flush();
                 } elseif ($event == 'Error') {
-                    throw new Exception($message);
+                    throw new \Exception($message);
                 }
             };
             $this->read_backend_stream(
@@ -539,7 +539,7 @@ class ProfileController extends Controller
         });
         return $response;
     }
-    private function read_backend_stream($history_id, $user_id, $callback){
+    public static function read_backend_stream($history_id, $user_id, $callback){
         /**
          * Read from the backend redis message queue.
          * The new result will pass to the callback function.
