@@ -1,5 +1,5 @@
 services:
-  painter-executor:
+  dall-e-executor:
     build:
       context: ../../
       dockerfile: docker/executor/Dockerfile

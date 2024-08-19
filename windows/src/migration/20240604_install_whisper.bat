@@ -1,7 +1,7 @@
 REM This patch will install the dependency of the Whisper executor
 
 REM Variables for FFmpeg
-set "url_ffmpeg=https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+set "url_ffmpeg=https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.2-essentials_build.zip"
 for %%I in ("%url_ffmpeg%") do set "filename_ffmpeg=%%~nxI"
 set "ffmpeg_folder=%filename_ffmpeg:~0,-4%"
 for /f "tokens=2 delims=-" %%v in ("%filename_ffmpeg%") do set "version_ffmpeg=%%v"

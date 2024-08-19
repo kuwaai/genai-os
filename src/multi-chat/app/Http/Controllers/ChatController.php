@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\App;
 use App\Http\Requests\ChatRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ProfileController;
 use App\Models\APIHistories;
 use App\Models\Histories;
 use App\Jobs\RequestChat;
@@ -83,6 +84,11 @@ class ChatController extends Controller
         $history = new APIHistories();
         $history->fill(['input' => $tmp, 'output' => '* ...thinking... *', 'user_id' => Auth::user()->id]);
         $history->save();
+        
+        Redis::rpush('api_' . Auth::user()->id, $history->id);
+        Redis::expire('api_' . Auth::user()->id, 1200);
+        RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, App::getLocale(), 'api_' . $history->id);
+
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->headers->set('Cache-Control', 'no-cache');
@@ -90,52 +96,30 @@ class ChatController extends Controller
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close');
 
-        $response->setCallback(function () use ($history, $tmp, $access_code) {
-            $client = new Client(['timeout' => 300]);
-            Redis::rpush('api_' . Auth::user()->id, $history->id);
-            Redis::expire('api_' . Auth::user()->id, 1200);
-            RequestChat::dispatch($tmp, $access_code, Auth::user()->id, $history->id, App::getLocale(), 'api_' . $history->id);
-
-            $req = $client->get(route('api.stream'), [
-                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-                'query' => [
-                    'key' => config('app.API_Key'),
-                    'user_id' => Auth::user()->id,
-                    'history_id' => $history->id,
-                ],
-                'stream' => true,
-            ]);
-            $stream = $req->getBody();
-            $result = '';
-            $line = '';
-            while (!$stream->eof()) {
-                $char = $stream->read(1);
-
-                if ($char === "\n") {
-                    $line = trim($line);
-                    if (substr($line, 0, 5) === 'data:') {
-                        $jsonData = (object) json_decode(trim(substr($line, 5)));
-                        if ($jsonData !== null) {
-                            $tmp = mb_substr($jsonData->msg, mb_strlen($jsonData->msg, 'UTF-8') - 1, 1, 'UTF-8');
-                            $result .= $tmp;
-                            echo $tmp;
-                            ob_flush();
-                            flush();
-                        }
-                    } elseif (substr($line, 0, 6) === 'event:') {
-                        if (trim(substr($line, 5)) == 'end') {
-                            $client->disconnect();
-                            break;
-                        }
-                    }
-                    $line = '';
-                } else {
-                    $line .= $char;
+        $response->setCallback(function() use (&$history) {
+            $backend_callback = function ($event, $message){
+                if ($event == 'Ended') {
+                    echo "\n";
+                    ob_flush();
+                    flush();
+                } elseif ($event == 'New') {
+                    echo $message;
+                    ob_flush();
+                    flush();
+                } elseif ($event == 'Error') {
+                    throw new \Exception($message);
                 }
-            }
-            $history->fill(['output' => $result]);
-            $history->save();
+            };
+            ProfileController::read_backend_stream(
+                $history->id,
+                Auth::user()->id,
+                $backend_callback
+            );
+
+            ob_flush();
+            flush();
         });
+
         return $response;
     }
 

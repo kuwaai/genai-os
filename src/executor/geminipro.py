@@ -56,12 +56,13 @@ class GoogleFileStore:
             pass
 
         uploaded_file = None
-        with tempfile.NamedTemporaryFile(suffix=suffix) as f:
-            f.write(content)
-            f.flush()
-            uploaded_file = genai.upload_file(path=f.name, display_name=name)
-            logger.info(f"Uploaded file {name}")
-            f.close()
+        f = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
+        f.write(content)
+        f.flush()
+        uploaded_file = genai.upload_file(path=f.name, display_name=name)
+        logger.info(f"Uploaded file {name}")
+        f.close()
+        os.unlink(f.name)
         self.files[name] = uploaded_file
         await self.wait_file_active(uploaded_file)
         return uploaded_file
