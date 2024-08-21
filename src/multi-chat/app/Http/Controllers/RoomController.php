@@ -194,53 +194,53 @@ class RoomController extends Controller
                     $data = [];
                     $flag = false;
                     foreach ($historys as $message) {
-                        if ((isset($message->role) && is_string($message->role)) || !isset($message->role)) {
-                            if (((isset($message->role) && $message->role === 'user') || !isset($message->role)) && isset($message->content) && is_string($message->content) && trim($message->content) !== '') {
-                                if ($flag) {
-                                    $newMessage = (object) [
-                                        'role' => 'assistant',
-                                        'model' => '',
-                                        'chain' => $chainValue,
-                                        'content' => '',
-                                    ];
+                        $role = (isset($message->role) && is_string($message->role)) ? $message->role : null;
+                        $hasContent = isset($message->content) && is_string($message->content) && trim($message->content) !== '';
+                        if ($role === 'user' || ($role === null && $hasContent)) {
+                            if ($flag) {
+                                $newMessage = (object) [
+                                    'role' => 'assistant',
+                                    'model' => '',
+                                    'chain' => $chainValue,
+                                    'content' => '',
+                                ];
+                                if ($chainValue === true) {
+                                    $newMessage->chain = true;
+                                }
+                                foreach ($access_codes as $access_code) {
+                                    $newMessage->model = $access_code;
+
+                                    $data[] = clone $newMessage;
+                                }
+                            }
+                            $chainValue = isset($message->chain) ? (bool) $message->chain : (Session::get('chained') ?? true) == true;
+                            if (!isset($message->role)) {
+                                $message->role = 'user';
+                            }
+                            $data[] = $message;
+                            $flag = true;
+                        } elseif ($role === 'assistant') {
+                            $model = isset($message->model) && is_string($message->model) ? $message->model : null;
+                            $content = isset($message->content) && is_string($message->content) ? $message->content : '';
+                            $message->content = $content;
+                            $message->model = $model;
+                            if ($chainValue === true) {
+                                $message->chain = true;
+                            }
+                            if (is_null($model)) {
+                                $flag = false;
+                                foreach ($access_codes as $access_code) {
+                                    $newMessage = clone $message;
+                                    $newMessage->model = $access_code;
+
                                     if ($chainValue === true) {
                                         $newMessage->chain = true;
                                     }
-                                    foreach ($access_codes as $access_code) {
-                                        $newMessage->model = $access_code;
-
-                                        $data[] = clone $newMessage;
-                                    }
+                                    $data[] = $newMessage;
                                 }
-                                $chainValue = isset($message->chain) ? (bool) $message->chain : (Session::get('chained') ?? true) == true;
-                                if (!isset($message->role)) {
-                                    $message->role = 'user';
-                                }
+                            } elseif (in_array($model, $access_codes)) {
+                                $flag = false;
                                 $data[] = $message;
-                                $flag = true;
-                            } elseif ($message->role === 'assistant') {
-                                $model = isset($message->model) && is_string($message->model) ? $message->model : null;
-                                $content = isset($message->content) && is_string($message->content) ? $message->content : '';
-                                $message->content = $content;
-                                $message->model = $model;
-                                if ($chainValue === true) {
-                                    $message->chain = true;
-                                }
-                                if (is_null($model)) {
-                                    $flag = false;
-                                    foreach ($access_codes as $access_code) {
-                                        $newMessage = clone $message;
-                                        $newMessage->model = $access_code;
-
-                                        if ($chainValue === true) {
-                                            $newMessage->chain = true;
-                                        }
-                                        $data[] = $newMessage;
-                                    }
-                                } elseif (in_array($model, $access_codes)) {
-                                    $flag = false;
-                                    $data[] = $message;
-                                }
                             }
                         }
                     }
