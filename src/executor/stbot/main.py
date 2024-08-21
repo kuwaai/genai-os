@@ -31,7 +31,10 @@ class DummyExecutor(LLMExecutor):
     def setup(self):
         self.stop = False
         self.gemini = KuwaClient(
-            model='geminipro', auth_token=''
+            model='geminipro', auth_token='e1b789238f46166d85bef0865b657da097277757bdb1f1981453626a1f8a27c6'
+        )
+        self.taide = KuwaClient(
+            model = 'taide-4bit', auth_token='e1b789238f46166d85bef0865b657da097277757bdb1f1981453626a1f8a27c6'
         )
 
 
@@ -41,12 +44,13 @@ class DummyExecutor(LLMExecutor):
             self.setup()
             userinput = history[-1]['content'].strip()
             msg = [
-                {"role":"user", "content": f"Repeat {userinput} three times"}
+                {"role":"user", "content": f"請重複 {userinput} 三次"}
             ]
-            async for chunck in self.gemini.chat_complete(messages = msg):
+            async for chunck in self.taide.chat_complete(messages = msg):
                 yield chunck
                 if self.stop:
                     return
+                
         except Exception as e:
             logger.exception("Error occurs during generation.")
             yield str(e)
