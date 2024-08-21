@@ -31,10 +31,10 @@ class DummyExecutor(LLMExecutor):
     def setup(self):
         self.stop = False
         self.gemini = KuwaClient(
-            model='geminipro', auth_token='e1b789238f46166d85bef0865b657da097277757bdb1f1981453626a1f8a27c6'
+            model='geminipro', auth_token=''
         )
         self.taide = KuwaClient(
-            model = 'taide-4bit', auth_token='e1b789238f46166d85bef0865b657da097277757bdb1f1981453626a1f8a27c6'
+            model = 'taide-4bit', auth_token=''
         )
 
 
