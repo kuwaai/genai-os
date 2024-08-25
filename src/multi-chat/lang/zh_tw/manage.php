@@ -12,6 +12,7 @@ return [
     'button.cancel' => '取消',
     'button.close' => '關閉',
     'button.accept' => '我同意',
+    'button.export' => '匯出',
 
     //Tabs
     'tab.groups' => '群組',

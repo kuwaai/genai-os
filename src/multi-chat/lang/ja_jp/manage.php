@@ -12,6 +12,7 @@ return [
     'button.cancel' => 'キャンセル',
     'button.close' => '閉じる',
     'button.accept' => '同意する',
+    'button.export' => 'エクスポート',
 
     //Tabs
     'tab.groups' => 'グループ',

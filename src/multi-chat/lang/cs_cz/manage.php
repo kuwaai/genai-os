@@ -12,6 +12,7 @@ return [
     'button.cancel' => 'Zrušit',
     'button.close' => 'Zavřít',
     'button.accept' => 'Souhlasím',
+    'button.export' => 'Exportovat',
 
     //Tabs
     'tab.groups' => 'Skupiny',

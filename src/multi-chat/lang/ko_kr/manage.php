@@ -12,6 +12,7 @@ return [
     'button.cancel' => '취소',
     'button.close' => '닫기',
     'button.accept' => '동의',
+    'button.export' => '내보내기',
 
     //Tabs
     'tab.groups' => '그룹',
