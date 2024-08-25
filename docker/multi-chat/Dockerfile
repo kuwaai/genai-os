@@ -1,4 +1,4 @@
-FROM php:8.1-cli as build
+FROM php:8.1-cli AS build
 
 # Install nodejs and composer
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - &&\
