@@ -1,4 +1,7 @@
 @echo off
+chcp 65001 > NUL
+set PYTHONUTF8=1
+set PYTHONIOENCODING="utf8"
 cd "%~dp0"
 if "%1" equ "__start__" (shift & goto main)
 if not exist "logs" mkdir logs
