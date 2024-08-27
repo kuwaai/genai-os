@@ -1,4 +1,7 @@
 @echo off
+chcp 65001 > NUL
+set PYTHONUTF8=1
+set PYTHONIOENCODING="utf8"
 if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %* & exit)
 setlocal EnableDelayedExpansion
 
