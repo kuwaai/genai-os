@@ -129,6 +129,7 @@ class HuggingfaceExecutor(LLMExecutor):
         if not self.model_path:
             raise Exception("You need to configure a local or huggingface model path!")
 
+        self.limit = self.args.limit
         self.load_8bits = self.args.load_8bits
         self.trust_remote_code = self.args.trust_remote_code
         model_dtype = {}
@@ -243,6 +244,7 @@ class HuggingfaceExecutor(LLMExecutor):
         prompt_embedding = []
         while True:
             prompt_embedding = self.synthesis_prompt(prepended_messages + history, system_prompt, modelfile.template)
+            logger.debug(f"Length of prompt: {prompt_embedding.shape[1]}")
             if prompt_embedding.shape[1] <= self.limit: break
 
             history = rectify_chat_history(history[1:])
