@@ -154,8 +154,8 @@ class LlamaCppExecutor(LLMExecutor):
 
         model_group.add_argument('--limit', type=int, default=self.limit, help='The limit of the input tokens')
         model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
-        model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
-        model_group.add_argument('--context_window', default=self.context_window, help='The context window of the model')
+        model_group.add_argument('--no_system_prompt', type=bool, default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
+        model_group.add_argument('--context_window', type=int, default=self.context_window, help='The context window of the model')
         model_group.add_argument('--stop', default=[], nargs='*', help="Additional end-of-string keywords to stop generation.")
         model_group.add_argument('--override_chat_template', default=None,
             help='Override the default chat template provided by the model. See https://huggingface.co/docs/transformers/main/en/chat_templating')
