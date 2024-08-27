@@ -23,3 +23,9 @@ requests
 # ollama
 jinja2
 ollama
+
+# stbot
+langchain_community
+langchain
+chromadb
+pypdf
