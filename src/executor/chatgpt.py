@@ -104,7 +104,7 @@ class ChatGptExecutor(LLMExecutor):
         
         context_window = [self.args.context_window] if self.args.context_window is not None else \
                          [v for k, v in CONTEXT_WINDOW.items() if self.model_name in k]
-        if self.args.context_window == -1:
+        if self.args.context_window != -1:
             context_window.insert(0, self.args.context_window)
         if len(context_window) == 0:
             logging.warning(f"The context window length of model {self.model_name} not found. Set to minimal value.")
