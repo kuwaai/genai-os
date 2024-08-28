@@ -13,7 +13,7 @@ from openai import OpenAI
 
 logger = logging.getLogger(__name__)
 
-class DummyExecutor(LLMExecutor):
+class StbotExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
         self.PROMPT_TEMPLATE = """
@@ -25,6 +25,18 @@ class DummyExecutor(LLMExecutor):
 
             僅根據以上提供的內容回答問題：{question}
         """
+        self.MERGE_TEMPLATE = """
+            Information:
+            {first}
+            {second}
+            ---
+            With the given information, write a one paragraph summary with markdown format in Traditional Chinese. 
+            Please remember to use Traditional Chinese.
+        """
+        self.client = OpenAI(
+            base_url = 'http://localhost:11434/v1',
+            api_key='ollama', # required, but unused
+        )
 
     def extend_arguments(self, parser):
         parser.add_argument('--delay', type=int, default=0.02, help='Inter-token delay')
@@ -41,16 +53,11 @@ class DummyExecutor(LLMExecutor):
         db = Chroma(persist_directory=db_path, embedding_function=embedding_function)
         results = db.similarity_search_with_score(query_text, k=10)
 
-        context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+        context_text = "\n\n---\n\n".join([doc.page_content for doc in results])
         prompt_template = ChatPromptTemplate.from_template(self.PROMPT_TEMPLATE)
         prompt = prompt_template.format(context=context_text, question=query_text)
-        
-        client = OpenAI(
-            base_url = 'http://localhost:11434/v1',
-            api_key='ollama', # required, but unused
-        )
 
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="jcai/llama3-taide-lx-8b-chat-alpha1:Q4_K_M",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -61,26 +68,13 @@ class DummyExecutor(LLMExecutor):
         return response.choices[0].message.content
 
     async def merge(self, response_1, response_2):
-        PROMPT_TEMPLATE = """
-        Information:
-        {first}
-        {second}
-        ---
-        With the given information, write a one paragraph summary with markdown format in Traditional Chinese. 
-        Please remember to use Traditional Chinese.
-        """
-        prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+        prompt_template = ChatPromptTemplate.from_template(self.MERGE_TEMPLATE)
         prompt = prompt_template.format(first = response_1, second = response_2)
         
-        client = OpenAI(
-            base_url='http://localhost:11434/v1',
-            api_key='ollama',  # required, but unused
-        )
-        
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model = "llama3.1",
             messages = [
-                {"role": "system", "content": "You are a healpful assistant."},
+                {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
             ],
             stream = True
@@ -94,11 +88,11 @@ class DummyExecutor(LLMExecutor):
         try:
             self.setup()
             userinput = history[-1]['content'].strip()
-            
+            # summarized RAG
             summarized = self.query_rag(userinput, "./summary")
-            
+            # original RAG
             original = self.query_rag(userinput, "./original")
-
+            # merge two results
             async for chunk in self.merge(summarized, original):
                 yield chunk
                 if self.stop:
@@ -116,5 +110,5 @@ class DummyExecutor(LLMExecutor):
         return "Aborted"
 
 if __name__ == "__main__":
-    executor = DummyExecutor()
+    executor = StbotExecutor()
     executor.run()
