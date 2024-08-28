@@ -165,6 +165,7 @@ class ChatGptExecutor(LLMExecutor):
             if img is None:
                 return None
             buffered = io.BytesIO()
+            img = img.convert('RGB')
             img.save(buffered, format="JPEG")
             return 'data:image/jpeg;base64,' + base64.b64encode(buffered.getvalue()).decode("utf-8")
         
