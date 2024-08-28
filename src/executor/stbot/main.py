@@ -13,7 +13,7 @@ from openai import OpenAI
 
 logger = logging.getLogger(__name__)
 
-class DummyExecutor(LLMExecutor):
+class StbotExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
         self.PROMPT_TEMPLATE = """
@@ -110,5 +110,5 @@ class DummyExecutor(LLMExecutor):
         return "Aborted"
 
 if __name__ == "__main__":
-    executor = DummyExecutor()
+    executor = StbotExecutor()
     executor.run()
