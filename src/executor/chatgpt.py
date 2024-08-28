@@ -78,7 +78,7 @@ class ChatGptExecutor(LLMExecutor):
         model_group.add_argument('--api_key', default=None, help='The API key to access the service')
         model_group.add_argument('--base_url', default=self.openai_base_url, help='Alter the base URL to use third-party service.')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
-        model_group.add_argument('--context_window', type=int, default=None, help='Override the context window.')
+        model_group.add_argument('--context_window', type=int, default=-1, help='Override the context window.')
         model_group.add_argument('--system_prompt', default=self.system_prompt, help='The system prompt that is prepend to the chat history.')
         model_group.add_argument('--no_system_prompt', default=False, action='store_true', help='Disable the system prompt if the model doesn\'t support it.')
         model_group.add_argument('--no_override_api_key', default=False, action='store_true', help='Disable override the system API key with user API key.')
@@ -104,6 +104,8 @@ class ChatGptExecutor(LLMExecutor):
         
         context_window = [self.args.context_window] if self.args.context_window is not None else \
                          [v for k, v in CONTEXT_WINDOW.items() if self.model_name in k]
+        if self.args.context_window == -1:
+            context_window.insert(0, self.args.context_window)
         if len(context_window) == 0:
             logging.warning(f"The context window length of model {self.model_name} not found. Set to minimal value.")
             self.context_window = min(CONTEXT_WINDOW.values())
