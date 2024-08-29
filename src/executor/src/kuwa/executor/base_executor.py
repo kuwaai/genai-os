@@ -53,9 +53,6 @@ class BaseExecutor:
         self.app = FastAPI()
         self.parser = self._create_parser()
         self.extend_arguments(parser=self.parser)
-        self.args = self.parser.parse_args()
-        self._setup()
-        self.setup()
 
     def _create_parser(self):
         parser = argparse.ArgumentParser(
@@ -146,6 +143,9 @@ class BaseExecutor:
             )
 
     def run(self):
+        self.args = self.parser.parse_args()
+        self._setup()
+        self.setup()
         atexit.register(self._shut_down)
         self._start_server()
     
