@@ -110,11 +110,13 @@ class DocQaExecutor(LLMExecutor):
         )
         self.document_store_kwargs = dict(
             embedding_model = retriever_params.get("embedding_model", self.args.embedding_model),
-            mmr_k = retriever_params.get("mmr_k", self.args.mmr_k),
-            mmr_fetch_k = retriever_params.get("mmr_fetch_k", self.args.mmr_fetch_k),
             chunk_size = retriever_params.get("chunk_size", self.args.chunk_size),
             chunk_overlap = retriever_params.get("chunk_overlap", self.args.chunk_overlap)
         )
+        self.retriever_param = {
+            'k': retriever_params.get("mmr_k", self.args.mmr_k),
+            'fetch_k': retriever_params.get("mmr_fetch_k", self.args.mmr_fetch_k),
+        }
         self.crawler = Crawler(
             user_agent = crawler_params.get("user_agent", self.args.user_agent),
             max_depth = crawler_params.get("max_depth", self.args.max_depth)
@@ -158,6 +160,7 @@ class DocQaExecutor(LLMExecutor):
                 logger.exception("Error when constructing document store.")
                 yield i18n.t('docqa.error_fetching_document')
                 return
+        document_store.init_retriever(self.retriever_param)
 
         self.proc = True
         response_generator = self.docqa.process(

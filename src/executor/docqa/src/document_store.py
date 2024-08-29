@@ -24,8 +24,6 @@ class DocumentStore:
   def __init__(
     self,
     embedding_model = 'intfloat/multilingual-e5-small',
-    mmr_k = 6,
-    mmr_fetch_k = 12,
     chunk_size = 512,
     chunk_overlap = 128
     ):
@@ -37,13 +35,9 @@ class DocumentStore:
       - 'infgrad/stella-base-zh' // Chinese embedding model // Size: ~210MB
     """
     
-    self.mmr_param = {
-        'k': mmr_k,
-        'fetch_k': mmr_fetch_k
-    }
     # self.corase_k = 2
 
-    self.splitter = ParallelSplitter(chunk_size=512, chunk_overlap=128)
+    self.splitter = ParallelSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     self.embedding_model = embedding_model
     self.vector_store:FAISS = None
     self.fine_retriever:VectorStoreRetriever = None
@@ -82,16 +76,19 @@ class DocumentStore:
 
     # self.coarse_retriever = BM25Retriever.from_texts(chunks)
     # self.coarse_retriever.k = self.coarse_k
-    self.init_retriever()
     # self.ensemble_retriever =ensemble_retriever = EnsembleRetriever(
     #   retrievers=[self.coarse_retriever, self.fine_retriever],
     #   weights=[0.5, 0.5]
     # )
 
-  def init_retriever(self):
+  def init_retriever(
+    self,
+    retriever_param={'k': 6, 'fetch_k': 12}
+  ):
     self.fine_retriever = self.vector_store.as_retriever(
         search_type='mmr',
-        search_kwargs=self.mmr_param
+        search_kwargs=retriever_param
+        # search_kwargs=self.mmr_param
     )
 
   def save(self, path:str):
