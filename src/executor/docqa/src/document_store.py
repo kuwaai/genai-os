@@ -7,13 +7,13 @@ import tempfile
 import hashlib
 from pathlib import Path
 from langchain.docstore.document import Document
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.retrievers.bm25 import BM25Retriever
 from langchain.schema.vectorstore import VectorStoreRetriever
 from langchain.retrievers.ensemble import EnsembleRetriever
 
 from .parallel_splitter import ParallelSplitter
+from .embedding_model_manager import get_embedding_model_manager
 
 logger = logging.getLogger(__name__)
 
@@ -50,12 +50,15 @@ class DocumentStore:
     self.embeddings = None
     # self.coarse_retriever:BM25Retriever = None
     # self.ensemble_retriever:EnsembleRetriever = None
+
+  def __del__(self):
+    get_embedding_model_manager().release_model(caller_id=id(self))
   
   def load_embedding_model(self):
-    if not self.embeddings is None: return
-    logger.info('Loading embedding model...')
-    self.embeddings = HuggingFaceEmbeddings(model_name=self.embedding_model)
-    logger.info('Embedding model loaded.')
+    self.embeddings = get_embedding_model_manager().acquire_model(
+      caller_id=id(self),
+      model_name=self.embedding_model
+    )
 
   async def from_documents(self, docs: [Document]):
     
@@ -67,8 +70,7 @@ class DocumentStore:
     logger.info('Got {} chunks.'.format(len(chunks)))
 
     # Embedding
-    if self.embeddings == None:
-      await loop.run_in_executor(None, self.load_embedding_model)
+    await loop.run_in_executor(None, self.load_embedding_model)
     logger.info('Calculating embeddings...')
     self.vector_store = await loop.run_in_executor(
       None,

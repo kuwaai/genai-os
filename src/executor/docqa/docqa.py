@@ -24,6 +24,8 @@ from kuwa.client import KuwaClient
 
 from src.docqa import DocQa
 from src.document_store import DocumentStore
+from src.document_store_factory import DocumentStoreFactory
+from src.crawler import Crawler
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +46,8 @@ class DocQaExecutor(LLMExecutor):
         crawler_group = parser.add_argument_group('Crawler Options')
         crawler_group.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
                                             help='The user agent string when issuing the crawler.')
+        crawler_group.add_argument('--max_depth', type=int, default=1,
+                                            help='How depth should the crawler go. Set to value greater than 1 to enable recursive crawling.')
 
         retriever_group = parser.add_argument_group('Retriever Options')
         retriever_group.add_argument('--database', default=None, type=str, help='The path the the pre-built database.')
@@ -70,21 +74,28 @@ class DocQaExecutor(LLMExecutor):
         if self.args.visible_gpu:
             os.environ["CUDA_VISIBLE_DEVICES"] = self.args.visible_gpu
 
-        self._app_setup()
+        self.document_store_factory = DocumentStoreFactory(
+            ttl_sec = self.args.vector_db_ttl_sec
+        )
 
-    def _app_setup(self, params:ParameterDict=ParameterDict()):
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(self._app_setup())
+        loop.run_until_complete(task)
+        
+
+    async def _app_setup(self, params:ParameterDict=ParameterDict()):
         general_params = params["_"]
         crawler_params = params["crawler_"]
         retriever_params = params["retriever_"]
         generator_params = params["generator_"]
         display_params = params["display_"]
         
-        lang = general_params.get("lang", self.args.lang)
-        lang = lang if lang in os.listdir("lang/") else "en"
-        i18n.load_path.append(f'lang/{lang}/')
+        self.lang = general_params.get("lang", self.args.lang)
+        self.lang = self.lang if self.lang in os.listdir("lang/") else "en"
+        i18n.load_path.append(f'lang/{self.lang}/')
         i18n.config.set("error_on_missing_translation", True)
         i18n.config.set("fallback", "en")
-        i18n.config.set("locale", lang)
+        i18n.config.set("locale", self.lang)
 
         # [TODO] Fetch pre-built DB from web
         self.pre_built_db = retriever_params.get("database", self.args.database)
@@ -97,52 +108,86 @@ class DocQaExecutor(LLMExecutor):
             auth_token=general_params.get("user_token", self.args.api_key),
             limit=generator_params.get("limit", self.args.limit)
         )
-        self.document_store = DocumentStore(
+        self.document_store_kwargs = dict(
             embedding_model = retriever_params.get("embedding_model", self.args.embedding_model),
             mmr_k = retriever_params.get("mmr_k", self.args.mmr_k),
             mmr_fetch_k = retriever_params.get("mmr_fetch_k", self.args.mmr_fetch_k),
             chunk_size = retriever_params.get("chunk_size", self.args.chunk_size),
             chunk_overlap = retriever_params.get("chunk_overlap", self.args.chunk_overlap)
         )
+        self.crawler = Crawler(
+            user_agent = crawler_params.get("user_agent", self.args.user_agent),
+            max_depth = crawler_params.get("max_depth", self.args.max_depth)
+        )
+        self.document_store_factory.set_crawler(self.crawler)
         self.docqa = DocQa(
-            document_store = self.document_store,
-            vector_db = self.pre_built_db,
-            vector_db_ttl_sec = retriever_params.get("ttl_sec", self.args.vector_db_ttl_sec),
             llm = self.llm,
-            lang = lang,
+            lang = self.lang,
             with_ref = self.with_ref,
             display_ref_content = self.display_ref_content,
-            user_agent=crawler_params.get("user_agent", self.args.user_agent)
         )
         self.proc = False
-        
-        if self.pre_built_db is None:
-            self.document_store.load_embedding_model()
 
-        gc.collect()
+        # Pre-warm
+        if self.pre_built_db is not None:
+            document_store = await self.document_store_factory.load_document_store(self.pre_built_db)
+
+    async def pre_load_db(self, db_path):
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, document_store.load_embedding_model)
+        return document_store
+
+    async def doc_qa(
+        self,
+        urls: [str],
+        chat_history: [dict],
+        modelfile:Modelfile,
+    ):
+        auth_token = modelfile.parameters["_"]["user_token"] or self.args.api_key
+        document_store = None
+        docs = None
+        if self.pre_built_db is not None:
+            document_store = await self.document_store_factory.load_document_store(self.pre_built_db)
+        else:
+            try:
+                document_store, docs = await self.document_store_factory.construct_document_store(
+                    urls = urls,
+                    document_store_kwargs = self.document_store_kwargs
+                )
+            except Exception:
+                logger.exception("Error when constructing document store.")
+                yield i18n.t('docqa.error_fetching_document')
+                return
+
+        self.proc = True
+        response_generator = self.docqa.process(
+            document_store=document_store,
+            docs=docs,
+            chat_history=chat_history,
+            auth_token=auth_token,
+            modelfile=modelfile,
+        )
+        
+        async for reply in response_generator:
+            if not self.proc:
+                await response_generator.aclose()
+            yield reply
 
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
-        self._app_setup(params=modelfile.parameters)
-
-        auth_token = modelfile.parameters["_"]["user_token"] or self.args.api_key
-        lang = modelfile.parameters["_"].get("lang", self.args.lang)
-        url = None
+        await self._app_setup(params=modelfile.parameters)
 
         try:
-            if self.pre_built_db == None:
+            url = None
+            if self.pre_built_db is None:
                 url, history = extract_last_url(history)
-                if url == None : raise NoUrlException(i18n.t('docqa.no_url_exception'))
-
-            self.proc = True
-            response_generator = self.docqa.process(
-                urls=[url],
-                chat_history=history,
-                auth_token=auth_token,
+                if url is None: raise NoUrlException(i18n.t('docqa.no_url_exception'))
+            response_generator = self.doc_qa(
+                urls = [url],
+                chat_history = history,
                 modelfile=modelfile,
             )
+            
             async for reply in response_generator:
-                if not self.proc:
-                    await response_generator.aclose()
                 yield reply
 
         except NoUrlException as e:
@@ -151,7 +196,8 @@ class DocQaExecutor(LLMExecutor):
         except Exception as e:
             await asyncio.sleep(2) # To prevent SSE error of web page.
             logger.exception('Unexpected error')
-            yield i18n.t("docqa.default_exception_msg")
+            yield i18n.t("docqa.default_exception_msg")+'\n'
+            yield str(e)
         finally:
             logger.info("Done")
 
