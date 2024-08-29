@@ -1,5 +1,5 @@
 en:
-  no_url_exception: No URL found.
+  no_url_exception: No URL found. Please switch to "Multi-turn" mode.
   default_exception_msg: An error occurred, please try again or contact the administrator.
   summary_prompt: "Please provide a summary of this article:"
   error_fetching_document: An error occurred while trying to fetch the document. Please make sure the submitted document exists and is publicly available.

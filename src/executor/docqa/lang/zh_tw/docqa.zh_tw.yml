@@ -1,5 +1,5 @@
 zh_tw:
-  no_url_exception: 找不到URL。
+  no_url_exception: 找不到URL。請切換到「連貫問答」模式。
   default_exception_msg: 發生錯誤，請再試一次或是聯絡管理員。
   summary_prompt: 請提供這篇文章的摘要
   error_fetching_document: 獲取文件時發生錯誤，請確認所提供文件存在且可被公開存取。
