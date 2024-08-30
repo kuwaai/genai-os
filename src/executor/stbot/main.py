@@ -53,7 +53,7 @@ class StbotExecutor(LLMExecutor):
         db = Chroma(persist_directory=db_path, embedding_function=embedding_function)
         results = db.similarity_search_with_score(query_text, k=10)
 
-        context_text = "\n\n---\n\n".join([doc.page_content for doc in results])
+        context_text = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
         prompt_template = ChatPromptTemplate.from_template(self.PROMPT_TEMPLATE)
         prompt = prompt_template.format(context=context_text, question=query_text)
 
