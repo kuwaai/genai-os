@@ -5,16 +5,6 @@ import random
 
 # =============================================================================
 def translateHint(userInput: str, translation: str) -> str:
-    # prompt = f"""
-    # Task: Give a corresponding between the Chinese word and the English vocabulary. I will give you two texts in Chinese and English, you need to give me the corresponding between the Chinese word and the English vocabulary.
-    # ---
-    # Chinese Text:
-    # {userInput}
-    # ---
-    # English Translation:
-    # {translation}
-    # ---
-    # """
     prompt = f"""
     你的任務: 我會給你兩段文本，一段是中文，一段是英文，你需要給我中文單詞與英文單詞之間的對應。像是你在中文文本看到"蘋果"，你需要告訴我"蘋果"對應到英文的"apple"。先列出中文文本中的重要單詞，再從英文文本中找出對應的英文單詞，並確保對應正確無誤。
     ---
@@ -104,23 +94,6 @@ def info(expandOut: str) -> str:
     四、(Your output)
     If necessary, you may include a fifth paragraph or more.
     """
-    chiPrompt = f"""
-    你的角色是一名公文起草人員，請根據以下的提示，產生一份公文說明:
-    你必須使用繁體中文書寫。
-    請用以下的範例產生說明(用---分隔)
-    
-    依照以上的範例以及以下的文章內容產生說明
-    文章內容:
-    {expandOut}
-    
-    輸出格式為:
-    說明: (記得要換行)
-    一、(你的輸出)
-    二、(你的輸出)
-    三、(你的輸出)
-    四、(你的輸出)
-    若有需要，可以加入第五段，或是更多段落。
-    """
     return prompt
 # =============================================================================
 # default model: TAIDE
@@ -142,11 +115,10 @@ def officialize(topic: str, info: str) -> str:
                 shots.append(f.read())
         return shots
     
-    todayYear = date.today().year - 1911
     shots = getFewShot()
     prompt = f"""
     角色設定: 你是一位「公文用語專家」，專門負責將接收到的「文本」依照正式公文的要求進行改寫。
-    任務內容: 請根據文本，將其轉換為正式的公文用語。請注意格式、用詞、結構和內容的正確性，確保公文的專業性和嚴謹性。生成的公文必須包含以下要素: 主旨、說明，若需要擬辦事項、附註等，請依照文本內容的需要進行添加。請確保公文的格式正確，用詞專業，內容完整。除了格式以外，最重要的是用字遣詞，語氣上必須使用正式、專業的公文用語。請參考以下的範例的「格式」、「語氣」進行改寫。
+    任務內容: 請根據文本，將其轉換為正式的公文用語。請注意格式、用詞、結構和內容的正確性，確保公文的專業性和嚴謹性。生成的公文必須包含以下要素: 主旨、說明，若需要擬辦事項、附註等，請依照文本內容的需要進行添加。請確保公文的格式正確，用詞專業，內容完整。除了格式以外，最重要的是用字遣詞，語氣上必須使用正式、專業的公文用語。請參考以下的範例的「格式」、「語氣」、「用字」進行改寫。
     ---
     範例一:
     {shots[0]}
@@ -157,7 +129,7 @@ def officialize(topic: str, info: str) -> str:
     範例三:
     {shots[2]}
     ---
-    文本:
+    請將下面的內容轉換為正式的台灣公文用語:
     {topic}\n{info}
     ---
     """

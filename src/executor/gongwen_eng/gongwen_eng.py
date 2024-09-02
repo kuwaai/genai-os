@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-
 import os
 import sys
-import asyncio
 import logging
-import json
-import multiprocessing
 
-from typing import Generator, Iterable
+
 from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.client import KuwaClient
 from kuwa.executor.modelfile import ParameterDict
@@ -28,20 +24,28 @@ class GongwenExecutor(LLMExecutor):
         Override this method to add custom command-line arguments.
         """
         parser.add_argument('--delay', type=float, default=0.02, help='Inter-token delay')
+        generator_group = parser.add_argument_group('Generator Options')
+        generator_group.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
+        generator_group.add_argument('--model', default=None, help='The model name (access code) on Kuwa multi-chat WebUI')
 
     def setup(self):
         self.stop = False
         logger.setLevel(logging.DEBUG)
+        
+        self._app_setup()
+    def _app_setup(self, params:ParameterDict=ParameterDict()):
+        general_params = params["_"]
+        generator_params = params["generator_"]
+
         self.taide = KuwaClient(
                 model = 'taide',
-                auth_token = 'b3e973e080448338754a46be9feccf7f3eab3d57c3d2ed099d5645b125e8efe1'
+                auth_token = general_params.get("user_token", self.args.api_key)
             )
 
         self.llama3_1 = KuwaClient(
             model = 'llama3.1-8b-instruct',
-            auth_token = 'b3e973e080448338754a46be9feccf7f3eab3d57c3d2ed099d5645b125e8efe1'
+            auth_token = general_params.get("user_token", self.args.api_key)
         )
-    def _app_setup(self, params:ParameterDict=ParameterDict()):
         pass
 
     async def callForResponse(self, inputMsg, client):
@@ -125,14 +129,6 @@ class GongwenExecutor(LLMExecutor):
         #     self.expandChi += response
         #     yield response
 
-    async def parrellelTask(self): #parrelly call tasks {topic and info}
-        async def handleGenerator(generator: Generator):
-            async for response in generator:
-                if self.stop:
-                    await generator.aclose()
-                yield response
-        await asyncio.gather(self.taskTopic(), self.taskInfo())
-
     async def taskTopic(self, expandText, translationHint, llm): # default: llama3.1
         stageName = "# 主旨產生"
         yield f"\n{stageName}\n"
@@ -148,14 +144,14 @@ class GongwenExecutor(LLMExecutor):
         yield "\n\n"
 
         # Translate the main topic to Chinese
-        addiPrompt = f"""你現在正在翻譯「主旨」內容，請排除其他無用資訊，專心翻譯「主旨」的部分並且也只輸出「主旨」即可，輸出格式為: 主旨: \"中文主旨\"。
+        addiPrompt = f"""你現在正在翻譯「主旨」內容，請排除其他無用資訊，專心翻譯「主旨」的部分並且也只輸出「主旨」即可，輸出格式為: 主旨: 中文主旨。
         翻譯時請參考以下的提示，確保翻譯的準確性、通順性，並且保留原文的意思。避免直譯，力求成語地道、文意通順且必須使用台灣用語。
         翻譯提示:
         ---
         {translationHint}
         ---"""
         self.mainTopic = ""
-        async for response in self.taskEngToChi(mainTopicEng, addiPrompt=addiPrompt, llm=llm):
+        async for response in self.taskEngToChi(mainTopicEng, addiPrompt=addiPrompt, llm=self.taide):
             self.mainTopic += response
             yield response
 
@@ -181,7 +177,7 @@ class GongwenExecutor(LLMExecutor):
         {translationHint}
         ---"""
         self.info = ""
-        async for response in self.taskEngToChi(infoEng, addiPrompt=addiPrompt, llm=llm):
+        async for response in self.taskEngToChi(infoEng, addiPrompt=addiPrompt, llm=self.taide):
             self.info += response
             yield response
     
@@ -196,9 +192,6 @@ class GongwenExecutor(LLMExecutor):
         offiVer = ""
         generator = self.callForResponse(messages, llm)
         async for response in generator:
-            if self.stop:
-                await generator.aclose()
-                
             offiVer += response
             yield response
         
@@ -208,7 +201,8 @@ class GongwenExecutor(LLMExecutor):
             
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         try:
-            self.setup()
+            self.stop = False
+            self._app_setup(params=modelfile.parameters)
 
             logger.info('\033[92mGongwen Start!\033[0m')
 
@@ -224,12 +218,16 @@ class GongwenExecutor(LLMExecutor):
                 yield "沒事就不要找我啦，討厭 >///<"
                 return
             
-            elif self.chse in [str(_) for _ in range(1, 6+1)]:
+            elif self.chse in [str(_) for _ in range(1, 5+1)]: # if choice in 1~5
+                if userInput in [str(_) for _ in range(1, 5+1)]:
+                    yield f"""你已經選擇過功能{self.chse}。
+                    若要重新選擇，請先輸入<font color='gray'>'/n'</font>取消服務。""".replace("\t", "")
+                    return
                 self.chse = int(self.chse)
                 with open(f"chse_user{userId}.txt", "w") as f:
                     f.write('fin')
             
-            elif userInput not in [str(_) for _ in range(1, 6+1)]:
+            elif userInput not in [str(_) for _ in range(1, 5+1)]: # if choice not in 1~5
                 yield """《公文產生--English Version》
                 請輸入1-5選擇功能:
                 1 - 執行所有步驟 *(改寫、產生主旨、產生說明、用語轉換)*
@@ -262,49 +260,54 @@ class GongwenExecutor(LLMExecutor):
             if userInput == "/n":
                 yield "好的，已經取消服務。"
                 return
-            # ================== 以下為主要流程 ==================
-            task_map = {  # 1: 整個流程, 2: 改寫, 3: 產生主旨, 4: 產生說明, 5: 公文化
+            # ================== Main Process ================== #
+            task_map = {  # 1: Whole Process, 2: expand content only, 3: mainTopic only, 4: info only, 5: officialize only
                 1: [lambda: self.taskChiToEng(userInput, llm=self.llama3_1),
-                    lambda: self.taskTransHint(userInput=userInput, userEng=self.userEng, llm=self.llama3_1),
+                    lambda: self.taskTransHint(userInput=userInput, userEng=self.userEng, llm=self.taide),
                     lambda: self.taskExpand(userInput=self.userEng,   translationHint=self.translationHint, llm=self.llama3_1),
                     lambda: self.taskTopic(expandText=self.expandEng, translationHint=self.translationHint, llm=self.llama3_1), 
                     lambda: self.taskInfo (expandText=self.expandEng, translationHint=self.translationHint, llm=self.llama3_1), 
                     lambda: self.taskOfficialize(info=self.info, mainTopic=self.mainTopic, llm=self.taide)], 
-                2: [lambda: self.taskChiToEng(userInput), lambda: self.taskExpand(self.userEng)],                                                                               
+                2: [lambda: self.taskChiToEng(userInput, llm=self.llama3_1),
+                    lambda: self.taskTransHint(userInput=userInput, userEng=self.userEng, llm=self.taide),
+                    lambda: self.taskExpand(userInput=self.userEng,   translationHint=self.translationHint, llm=self.llama3_1)],                                                                               
                 3: [lambda: self.taskTopic(expandText=self.expandEng, translationHint="No corresponding", llm=self.llama3_1)],                                                                                         
                 4: [lambda: self.taskInfo (expandText=self.expandEng, translationHint="No corresponding", llm=self.llama3_1)],                                                                                            
-                5: [lambda: self.taskOfficialize()],
-                6: [lambda: self.taskChiToEng(userInput, llm=self.llama3_1),
-                    lambda: self.taskTransHint(userInput=userInput, userEng=self.userEng, llm=self.llama3_1)]          # for testing                                                               
+                5: [lambda: self.taskOfficialize(info=self.info, mainTopic=self.mainTopic, llm=self.taide)],                                                          
             }
 
-            # 把userInput作為中間產物傳入
-            if self.chse == 3: # 只產生主旨
+            # adjest the input for single task
+            if self.chse == 3: # Main Topic only
                 self.expandEng = ""
                 if self.isMostlyEng(userInput):
                     self.expandEng = userInput
                 else:
                     yield "正在將您的輸入轉換為英文"
-                    async for response in self.taskChiToEng(userInput):
+                    async for response in self.taskChiToEng(userInput, llm=self.llama3_1):
                         self.expandEng += response
-            elif self.chse == 4:# 只產生說明
+            elif self.chse == 4:# Info only
                 self.expandEng = ""
                 if self.isMostlyEng(userInput):
                     self.expandEng = userInput
                 else:
                     yield "正在將您的輸入轉換為英文"
-                    async for response in self.taskChiToEng(userInput):
+                    async for response in self.taskChiToEng(userInput, llm=self.llama3_1):
                         self.expandEng += response
-
-            elif self.chse == 5:
+            elif self.chse == 5: # Officialize only
                 self.mainTopic = userInput
                 self.info = ""
             elif self.chse == 6:
-                self.expandOut = userInput
+                self.expandEng = ""
+                if self.isMostlyEng(userInput):
+                    self.expandEng = userInput
+                else:
+                    yield "正在將您的輸入轉換為英文"
+                    async for response in self.taskChiToEng(userInput, llm=self.llama3_1):
+                        self.expandEng += response
 
             
-            for task in task_map[self.chse]:
-                async for response in task():
+            for task in task_map[self.chse]: # Task selection
+                async for response in task(): # Iterate the tasks
                     if self.stop:
                         yield "<font color='red'>"
                         yield "\n\n# 您已經中斷生成\n\n"
