@@ -20,6 +20,7 @@ class KuwaClient:
         """
         A heuristic method to estimate the tokens
         """
+        logger.debug(f"Estimated prompt tokens: {len(str(chat_history))}; Model input limit: {self.limit}")
         return len(str(chat_history)) > self.limit
 
     async def get_available_llm(self):

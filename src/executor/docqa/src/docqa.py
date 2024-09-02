@@ -159,7 +159,7 @@ class DocQa: #DatabaseQA actually
     # Generate
     llm_input = self.generate_llm_input(task, llm_question, related_docs, override_prompt=override_qa_prompt)
     logger.info("Related documents: {}".format(related_docs))
-    logger.info('LLM input: {}'.format(llm_input))
+    logger.info('LLM input ({} chars): {}'.format(len(llm_input), llm_input))
     # result = ''
     generator = self.llm.chat_complete(
       auth_token=auth_token,
