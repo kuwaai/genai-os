@@ -1,0 +1,24 @@
+services:
+  docqa-executor:
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    image: kuwa-executor
+    environment:
+      CUSTOM_EXECUTOR_PATH: ./stbot/main.py
+      EXECUTOR_ACCESS_CODE: stbot
+      EXECUTOR_NAME: stbot
+      EXECUTOR_IMAGE: stbot.jpg # Refer to src/multi-chat/public/images
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
+    depends_on:
+      - kernel
+      - multi-chat
+    command: ["--log", "debug"]
+    volumes: [
+        "kuwa-root:/var/kuwa/docker/root:rw", # The root of Kuwa filesystem hierarchy to store user-uploaded data during runtime.
+        "~/.cache/huggingface:/root/.cache/huggingface",
+      ]
+    extra_hosts:
+      - "localhost:host-gateway"
+    restart: unless-stopped
+    networks: ["backend", "frontend"]

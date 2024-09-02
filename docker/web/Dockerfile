@@ -7,5 +7,5 @@ WORKDIR /app
 RUN rm -rf /etc/nginx/templates
 COPY docker/web/templates /etc/nginx/templates
 
-COPY --from=kuwa-multi-chat:latest /app/public /app/public
+COPY --from=kuwaai/multi-chat:latest /app/public /app/public
 RUN chown -R nginx:nginx /app
