@@ -174,3 +174,10 @@ sudo ./run.sh
 ```
 
 By default, Kuwa will be deployed on `http://localhost`.
+
+### 6. (Optional) Building Docker Images from Source Code
+Beginning with v0.3.4, the default behavior is to download pre-built Kuwa Docker Images from Docker Hub. If you want to build the images from source code, make sure the `.git` directory is present in the `genai-os` directory. Then, you can use the following command to create the Kuwa images:
+```sh=
+sudo ./run.sh build
+```
+Running this command will create the `kuwaai/model-executor`, `kuwaai/multi-chat`, `kuwaai/kernel`, and `kuwaai/multi-chat-web` images.

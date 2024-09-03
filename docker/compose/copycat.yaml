@@ -1,15 +1,13 @@
 services:
   copycat-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: debug
       EXECUTOR_ACCESS_CODE: tool/copycat
       EXECUTOR_NAME: CopyCat
       EXECUTOR_IMAGE: copy.png # Refer to src/multi-chat/public/images
     depends_on:
+      - executor-builder
       - kernel
     command: ["--delay", "0.02"]
     restart: unless-stopped

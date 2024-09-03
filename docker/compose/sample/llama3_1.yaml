@@ -1,9 +1,6 @@
 services:
   llama3_1-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: llamacpp
       EXECUTOR_ACCESS_CODE: llama3.1-8b-instruct
@@ -11,6 +8,7 @@ services:
       EXECUTOR_IMAGE: llama3_1.png # Refer to src/multi-chat/public/images
       # HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: [

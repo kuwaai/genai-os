@@ -1,9 +1,6 @@
 services:
   gemma2-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: llamacpp
       EXECUTOR_ACCESS_CODE: gemma2-2b-instruct
@@ -11,11 +8,12 @@ services:
       EXECUTOR_IMAGE: gemma.png # Refer to src/multi-chat/public/images
       # HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: [
       "--model_path", "hf://lmstudio-community/gemma-2-2b-it-GGUF?gemma-2-2b-it-Q8_0.gguf",
-      "--no_system_prompt", "--repeat_penalty", "1.0"
+      "--no_system_prompt", "--repeat_penalty", "1.0", "--ngl", "-1"
       ]
     restart: unless-stopped
     volumes: ["~/.cache/huggingface:/root/.cache/huggingface"]

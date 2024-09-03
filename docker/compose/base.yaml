@@ -1,10 +1,10 @@
 name: kuwa
 services:
   web:
+    image: kuwaai/multi-chat-web
     build:
       context: ../../
       dockerfile: docker/web/Dockerfile
-    image: kuwa-multi-chat-web
     restart: unless-stopped
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
@@ -17,10 +17,10 @@ services:
       timeout: 10s
   
   multi-chat:
+    image: kuwaai/multi-chat
     build:
       context: ../../
       dockerfile: docker/multi-chat/Dockerfile
-    image: kuwa-multi-chat
     restart: unless-stopped
     init: true
     depends_on:
@@ -50,10 +50,10 @@ services:
     networks: ["frontend", "backend"]
 
   kernel:
+    image: kuwaai/kernel
     build:
       context: ../../
       dockerfile: docker/kernel/Dockerfile
-    image: kuwa-kernel
     restart: unless-stopped
     networks: ["backend"]
 
@@ -62,6 +62,14 @@ services:
     restart: always
     networks:
       - backend
+
+  executor-builder:
+    image: kuwaai/model-executor
+    build:
+      context: ../../
+      dockerfile: docker/executor/Dockerfile
+    entrypoint: /bin/bash -c
+    command: ["echo Image builds completed."]
 
 volumes:
   multi-chat-storage: {}

@@ -19,16 +19,14 @@ Refer to the following Docker compose settings:
 ```yaml
 services:
   llava-v1.6-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: huggingface
       EXECUTOR_ACCESS_CODE: llava-v1.6-7b
       EXECUTOR_NAME: LLaVA v1.6 7B
       # HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: ["--model_path", "llava-hf/llava-v1.6-mistral-7b-hf", "--log", "debug"]

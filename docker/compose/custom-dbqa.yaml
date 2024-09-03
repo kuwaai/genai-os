@@ -1,9 +1,6 @@
 services:
   custom-dbqa-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
       EXECUTOR_ACCESS_CODE: db-qa:custom-db
@@ -15,6 +12,7 @@ services:
       "~/.cache/huggingface:/root/.cache/huggingface"
     ]
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: [

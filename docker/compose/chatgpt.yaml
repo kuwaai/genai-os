@@ -1,15 +1,13 @@
 services:
   chatgpt-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: chatgpt
       EXECUTOR_ACCESS_CODE: chatgpt
       EXECUTOR_NAME: ChatGPT
       EXECUTOR_IMAGE: chatgpt.png # Refer to src/multi-chat/public/images
     depends_on:
+      - executor-builder
       - kernel
     command: ["--temperature", "0.2"]
     restart: unless-stopped

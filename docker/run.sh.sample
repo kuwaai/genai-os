@@ -25,7 +25,7 @@ done
 # Join the elements with white space
 joined_confs=$(echo "${new_confs[@]}" | tr ' ' '\n' | paste -sd' ' -)
 
-subcommand="${@:-up --build --remove-orphans}"
+subcommand="${@:-up --remove-orphans}"
 command="docker compose --env-file ./.env ${joined_confs} ${subcommand}"
 
 echo "Command: ${command}"
