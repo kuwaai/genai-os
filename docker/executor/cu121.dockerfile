@@ -1,4 +1,6 @@
-FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
+ARG PYTORCH_IMAGE="2.3.1-cuda12.1-cudnn8-runtime"
+# ARG ${PYTORCH_IMAGE}="pytorch/pytorch:2.4.0-cuda12.4-cudnn9-runtime"
+FROM pytorch/pytorch:${PYTORCH_IMAGE}
 
 WORKDIR /usr/src/app
 
