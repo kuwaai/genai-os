@@ -13,6 +13,61 @@ from src.subprocess_helper import SubProcessHelper, StreamName
 
 logger = logging.getLogger(__name__)
 
+def extract_code_from_markdown(markdown_text):
+    """
+    Extracts code from markdown code blocks using the provided regular expression.
+
+    Args:
+        markdown_text: The markdown text to extract code from.
+
+    Returns:
+        A list of dictionaries, where each dictionary represents a code block
+        and contains the following keys:
+        - 'language': The language of the code block (if specified), otherwise None.
+        - 'code': The code within the code block.
+    """
+
+    regex = r"```(?P<language>[^`\r\n]*)[\r\n]+(?P<code>.+?)```"
+    matches = re.findall(regex, markdown_text, re.DOTALL)
+
+    code_blocks = []
+    for match in matches:
+        code_block = {
+            'language': match[0].strip() if match[1].strip() else None,
+            'code': match[1].strip()
+        }
+        code_blocks.append(code_block)
+
+    return code_blocks
+
+def extract_arguments(user_input):
+    """
+    Extracts user-defined arguments from a user prompt.
+
+    Args:
+        user_input: The user prompt string.
+
+    Returns:
+        A tuple containing:
+        - The extracted arguments as a string.
+        - The remaining user prompt after argument extraction.
+    """
+
+    # Find the first line of the user prompt that starts with '/'
+    match = re.search(r'^/arg(\s.*)$', user_input, re.MULTILINE)
+
+    if match:
+        # Extract the arguments from the first line
+        arguments = match.group(1).strip()
+        # Remove the arguments line from the user prompt
+        user_prompt = user_input.replace(match.group(0), '', 1).strip()
+        return arguments, user_prompt
+    else:
+        return '', user_input
+
+def is_exe(fpath):
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
 class PipeExecutor(LLMExecutor):
     def __init__(self):
         super().__init__()
@@ -33,36 +88,6 @@ class PipeExecutor(LLMExecutor):
     def setup(self):
         logger.info(f"Path to find executables: {self.args.path}")
 
-    def extract_code_from_markdown(self, markdown_text):
-        """
-        Extracts code from markdown code blocks using the provided regular expression.
-
-        Args:
-            markdown_text: The markdown text to extract code from.
-
-        Returns:
-            A list of dictionaries, where each dictionary represents a code block
-            and contains the following keys:
-            - 'language': The language of the code block (if specified), otherwise None.
-            - 'code': The code within the code block.
-        """
-
-        regex = r"```(?P<language>[^`\r\n]*)[\r\n]+(?P<code>.+?)```"
-        matches = re.findall(regex, markdown_text, re.DOTALL)
-
-        code_blocks = []
-        for match in matches:
-            code_block = {
-                'language': match[0].strip() if match[1].strip() else None,
-                'code': match[1].strip()
-            }
-            code_blocks.append(code_block)
-
-        return code_blocks
-    
-    def is_exe(self, fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         # Read configurations from modelfile.
         pipe_config = modelfile.parameters["pipe_"]
@@ -75,11 +100,13 @@ class PipeExecutor(LLMExecutor):
 
         # Initialize the context and helper of the subprocess
         last_user_prompt = history[-1]['content']
+        user_argv, last_user_prompt = extract_arguments(last_user_prompt)
         sub_proc_input = last_user_prompt
         if extract_last_codeblock:
-            codeblocks = self.extract_code_from_markdown(last_user_prompt)
+            codeblocks = extract_code_from_markdown(last_user_prompt)
             logger.debug(codeblocks)
             sub_proc_input = codeblocks[-1]['code']+'\n' if len(codeblocks) > 0 else last_user_prompt
+        argv = argv.replace("{{user-args}}", user_argv)
         argv = shlex.split(argv)
         output_queue = asyncio.Queue()
         helper = SubProcessHelper(encoding=encoding)
@@ -95,7 +122,7 @@ class PipeExecutor(LLMExecutor):
         # Run a subprocess with stdin from the request.
         program = os.path.realpath(program)
         # Checking permission will cause exception on windows
-        #if not self.is_exe(program):
+        #if not is_exe(program):
         #    yield "The program is not executable; please check its file permissions."
         #    return
         
