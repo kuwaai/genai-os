@@ -16,7 +16,7 @@ import pathlib
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from typing import Generator
-from urllib.parse import urljoin, quote_plus
+from urllib.parse import urljoin
 from kuwa.executor import LLMExecutor, Modelfile
 from kuwa.executor.modelfile import ParameterDict
 from kuwa.executor.llm_executor import extract_last_url
@@ -44,7 +44,6 @@ class DocQaExecutor(LLMExecutor):
         parser.add_argument('--lang', default="en", help='The language code to internationalize the aplication. See \'lang/\'')
 
         crawler_group = parser.add_argument_group('Crawler Options')
-        crawler_group.add_argument('--url_template', default=None, help='The URL template. Use "{{}}" placeholder for user prompt.')
         crawler_group.add_argument('--user_agent', default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
                                             help='The user agent string when issuing the crawler.')
         crawler_group.add_argument('--max_depth', type=int, default=1,
@@ -98,7 +97,6 @@ class DocQaExecutor(LLMExecutor):
         i18n.config.set("fallback", "en")
         i18n.config.set("locale", self.lang)
 
-        self.url_template = crawler_params.get("url_template", self.args.url_template)
         self.pre_built_db = retriever_params.get("database", self.args.database)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
         self.display_ref_content = not display_params.get("hide_ref_content", self.args.hide_ref_content)
@@ -177,14 +175,6 @@ class DocQaExecutor(LLMExecutor):
                 await response_generator.aclose()
             yield reply
     
-    def generate_url_from_query(self, history: list[dict]):
-        if self.url_template is None:
-            return None
-        last_user_prompt = history[-1]['content']
-        query = quote_plus(last_user_prompt)
-        url = self.url_template.replace("{{}}", query)
-        return url, [{'role': 'user', 'content': ''}]
-
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         await self._app_setup(params=modelfile.parameters)
 
@@ -192,8 +182,6 @@ class DocQaExecutor(LLMExecutor):
             url = None
             if self.pre_built_db is None:
                 url, history = extract_last_url(history)
-                if url is None:
-                    url, history = self.generate_url_from_query(history)
                 if url is None:
                     raise NoUrlException(i18n.t('docqa.no_url_exception'))
             response_generator = self.doc_qa(
