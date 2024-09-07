@@ -12,6 +12,7 @@ services:
       - kernel
       - multi-chat
     command: [
+      "--log", "debug",
       "--api_base_url", "http://web/",
       "--model", "gemini-pro",
       "--google_api_key", "<YOUR_GOOGLE_API_KEY>",

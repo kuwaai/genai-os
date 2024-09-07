@@ -2,18 +2,16 @@
 # -#- coding: UTF-8 -*-
 
 import os
-import re
-import gc
 import sys
 import logging
 import asyncio
 import functools
 import itertools
 import requests
-import json
 import i18n
 from typing import Generator
 from urllib.parse import quote_plus
+from bs4 import BeautifulSoup
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from kuwa.executor import LLMExecutor, Modelfile
@@ -21,6 +19,7 @@ from kuwa.executor.modelfile import ParameterDict
 from kuwa.client import KuwaClient
 
 from docqa import DocQaExecutor, NoUrlException
+from src.crawler import Crawler
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +48,29 @@ async def google_search(query, api_key, cse_id):
     
     finally:
         return urls
+
+async def extract_links(url, user_agent=None):
+    loop = asyncio.get_running_loop()
+    resp = await loop.run_in_executor(
+        None, functools.partial(requests.get, url)
+    )
+    crawler = Crawler(max_depth=1, user_agent=user_agent, clean=False)
+    docs = await crawler.fetch_documents(url)
+    if len(docs) == 0:
+        raise RuntimeError(f"Error occurs while requesting \"{url}\"")
+    
+    content = docs[0].page_content
+    mime_type = docs[0].metadata['content-type'].split(';', 1)[0]
+    
+    urls = []
+    match mime_type.lower():
+        case "text/html":
+            soup = BeautifulSoup(content, "html.parser")
+            urls = [link.get("href") for link in soup.findAll('a') if link.get("href") is not None]
+        case _:
+            raise NotImplementedError(f"Extract links from type '{mime_type}' is not implemented.")
+
+    return urls
 
 class SearchQaExecutor(LLMExecutor):
     doc_qa: DocQaExecutor
@@ -142,10 +164,11 @@ class SearchQaExecutor(LLMExecutor):
             else:
                 urls = [self.generate_url_from_query(template=self.engine_url, query=query)]
                 if self.extract_url:
-                    pass
-                    # [TODO] Scrap the URLs from the generated URL
-
+                    urls = await extract_links(url=urls[0], user_agent=self.user_agent)
+            
+            logger.debug(f"All URLs: {urls}")
             urls = urls[min(len(urls)-1, self.num_skip_url):]
+            logger.debug(f"Filtered URLs: {urls}")
             urls_reachable = await asyncio.gather(*[self.is_url_reachable(url) for url in urls])
             logger.debug(f"URL reachability: {list(zip(urls, urls_reachable))}")
             urls = list(itertools.compress(urls, urls_reachable))
@@ -167,7 +190,7 @@ class SearchQaExecutor(LLMExecutor):
 
             if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
 
-            history[-1]['content'] += ' '.join(urls)
+            history[-1]['content'] += ' ' + ' '.join(urls)
         
             self.proc = True
             response_generator = self.doc_qa.llm_compute(
