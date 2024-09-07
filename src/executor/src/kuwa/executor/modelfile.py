@@ -50,7 +50,7 @@ def extract_text_from_quotes(text):
     """, text, re.DOTALL | re.VERBOSE)
 
     if match:
-        return match.group(2).strip()
+        return match.group(2)
     else:
         return text.strip()
 
