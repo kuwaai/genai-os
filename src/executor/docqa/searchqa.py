@@ -183,20 +183,19 @@ class SearchQaExecutor(LLMExecutor):
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         await self._app_setup(params=modelfile.parameters)
         auth_token = modelfile.parameters["_"]["user_token"] or self.args.api_key
-
-        try:
         
+        try:
             urls, history = await self.search_url(history, modelfile)
 
             if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
 
-            history[-1]['content'] += ' ' + ' '.join(urls)
-        
             self.proc = True
-            response_generator = self.doc_qa.llm_compute(
-                history=history,
-                modelfile=modelfile
+            response_generator = self.doc_qa.doc_qa(
+                urls = urls,
+                chat_history = history,
+                modelfile=modelfile,
             )
+            
             async for reply in response_generator:
                 if not self.proc:
                     await response_generator.aclose()
