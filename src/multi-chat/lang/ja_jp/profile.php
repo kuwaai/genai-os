@@ -33,6 +33,7 @@ return [
     'label.taide_api' => 'Kuwaキー',
     'label.openai_api' => 'OpenAI APIキー',
     'label.google_api' => 'Google APIキー',
+    'label.third_party_api' => 'サードパーティ API キー (例: Gorq、Cerebras)',
     'label.stay_secure' => '外部キーの利用には十分にご注意ください！',
 
     //Delete Account

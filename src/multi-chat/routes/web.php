@@ -119,6 +119,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::middleware(AdminMiddleware::class . ':Profile_update_external_api_token')
                             ->patch('/google/api', [ProfileController::class, 'google_update'])
                             ->name('profile.google.api.update');
+                        Route::middleware(AdminMiddleware::class . ':Profile_update_external_api_token')
+                            ->patch('/third-party/api', [ProfileController::class, 'third_party_update'])
+                            ->name('profile.third_party.api.update');
 
                         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
                         Route::middleware(AdminMiddleware::class . ':Profile_delete_account')

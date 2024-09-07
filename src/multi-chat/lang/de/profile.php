@@ -33,6 +33,7 @@ return [
     'label.taide_api' => 'Kuwa-API-Schlüssel',
     'label.openai_api' => 'OpenAI-API-Schlüssel',
     'label.google_api' => 'Google-API-Schlüssel',
+    'label.third_party_api' => 'API-Schlüssel von Drittanbietern (z. B. Gorq, Cerebras)',
     'label.stay_secure' => 'Seien Sie vorsichtig mit externen Schlüsseln!',
 
     //Delete Account

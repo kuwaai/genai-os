@@ -9,7 +9,7 @@ services:
     depends_on:
       - executor-builder
       - kernel
-    command: []
+    command: ['--log', 'debug']
     restart: unless-stopped
     networks: ["backend"]
     # deploy:
