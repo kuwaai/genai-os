@@ -100,6 +100,7 @@ class PipeExecutor(LLMExecutor):
 
         # Initialize the context and helper of the subprocess
         last_user_prompt = history[-1]['content']
+        last_user_prompt = modelfile.before_prompt + last_user_prompt + modelfile.after_prompt
         user_argv, last_user_prompt = extract_arguments(last_user_prompt)
         sub_proc_input = last_user_prompt
         if extract_last_codeblock:
