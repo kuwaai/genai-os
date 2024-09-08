@@ -1,0 +1,28 @@
+services:
+  taide-8b-nchc-executor:
+    image: kuwaai/model-executor
+    environment:
+      EXECUTOR_TYPE: chatgpt
+      EXECUTOR_ACCESS_CODE: taide-8b
+      EXECUTOR_NAME: TAIDE API
+      EXECUTOR_IMAGE: TAIDE.png # Refer to src/multi-chat/public/images
+    depends_on:
+      - executor-builder
+      - kernel
+    command: [
+      "--log", "debug",
+      "--base_url", "https://td.nchc.org.tw/api/v1/",
+      "--model", "Llama3-TAIDE-LX-8B-Chat-Alpha1-SG", # Use the Llama3-TAIDE-LX-8B-Chat-Alpha1-SG model
+      "--system_prompt", "你是一個來自台灣的AI助理，你的名字是TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。", # TAIDE's default system prompt`
+
+      # Method 1: System-wise API key
+      # "--no_override_api_key", # Disable override the system API key with user API key.
+      # "--api_key", "YOUR_API_KEY", # Input the API key that you have applied for
+
+      # Method 2: Per-user API key
+      "--use_third_party_api_key", # Use the "Third-Party API Keys" from from user setting in Multi-Chat.
+    ]
+    restart: unless-stopped
+    extra_hosts:
+      - "localhost:host-gateway"
+    networks: ["backend"]
