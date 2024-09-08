@@ -64,6 +64,7 @@ class ChatGptExecutor(LLMExecutor):
     model_name: str = "gpt-4o"
     no_system_prompt: bool = False
     openai_base_url: str = "https://api.openai.com/v1"
+    use_third_party_api_key: bool = False
     context_window: int = 0
     system_prompt: str = None
     generation_config: dict = {
@@ -76,6 +77,7 @@ class ChatGptExecutor(LLMExecutor):
     def extend_arguments(self, parser):
         model_group = parser.add_argument_group('Model Options')
         model_group.add_argument('--api_key', default=None, help='The API key to access the service')
+        model_group.add_argument('--use_third_party_api_key', default=False, action='store_true', help='Use the "Third-Party API Keys" instead of "OpenAI API Key" from Multi-Chat.')
         model_group.add_argument('--base_url', default=self.openai_base_url, help='Alter the base URL to use third-party service.')
         model_group.add_argument('--model', default=self.model_name, help='Model name. See https://platform.openai.com/docs/models/overview')
         model_group.add_argument('--context_window', default=None, help='Override the context window.')
@@ -95,6 +97,7 @@ class ChatGptExecutor(LLMExecutor):
 
     def setup(self):
         self.model_name = self.args.model
+        self.use_third_party_api_key = self.args.use_third_party_api_key
         self.openai_base_url = self.args.base_url
         self.system_prompt = self.args.system_prompt if not self.args.no_system_prompt else None
         self.api_key = self.args.api_key
@@ -200,7 +203,8 @@ class ChatGptExecutor(LLMExecutor):
         try:
             openai_token = self.api_key
             if not self.no_override_api_key:
-                openai_token = modelfile.parameters["_"].get("openai_token") or self.api_key
+                token_name = "openai_token" if not self.use_third_party_api_key else "third_party_token"
+                openai_token = modelfile.parameters["_"].get(token_name) or self.api_key
             enable_multimodal = modelfile.parameters["llm_"].get("enable_multimodal", self.args.multimodal)
             model_name = modelfile.parameters["llm_"].get("model", self.model_name)
             
