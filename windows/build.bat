@@ -206,6 +206,7 @@ mkdir "%KUWA_ROOT%\custom"
 mkdir "%KUWA_ROOT%\bootstrap\bot"
 xcopy /s ..\src\bot\init "%KUWA_ROOT%\bootstrap\bot"
 xcopy /s ..\src\tools "%KUWA_ROOT%\bin"
+rd /S /Q "%KUWA_ROOT%\bin\test"
 pushd "%KUWA_ROOT%\bin"
 for %%f in (*) do (
   attrib +r "%%f"

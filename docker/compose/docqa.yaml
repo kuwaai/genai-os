@@ -1,9 +1,6 @@
 services:
   docqa-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       CUSTOM_EXECUTOR_PATH: ./docqa/docqa.py
       EXECUTOR_ACCESS_CODE: doc-qa;web-qa;db-qa
@@ -11,6 +8,7 @@ services:
       EXECUTOR_IMAGE: doc-qa.png;web-qa.png;db-qa.png # Refer to src/multi-chat/public/images
       TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: [

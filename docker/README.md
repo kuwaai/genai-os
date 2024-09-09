@@ -130,12 +130,12 @@ By default, the Docker version will not display any error messages on the Multi-
 ./run.sh
 ```
 
-### 2. Run Multiple Executors
-The settings for each Executor are already written in the corresponding YAML files (gemini.yaml, chatgpt.yaml, huggingface.yaml, llamacpp.yaml), please refer to these configuration files and extend them according to your needs.  
-You may need to refer to the [Executor documentation](../src/executor/README.md).  
-Once the configuration files are complete, you can use the following command to start the entire system
+### 2. Running Multiple Executors
+Each Executor's setting is written in the corresponding YAML file under the `docker/compose` directory (gemini.yaml, chatgpt.yaml, huggingface.yaml, llamacpp.yaml, ...). Please reference these files and expand them according to your needs. You may need to consult the [Executor documentation](../src/executor/README_TW.md).
+
+Add the required YAML settings file to the `confs` array in `./run.sh`. After setting up the files, you can initiate the entire system using the following command:
 ```sh
-docker compose -f compose.yaml -f pgsql.yaml -f <executor1 configuration file> -f <executor2 configuration file...> up --build
+./run.sh
 ```
 
 ### 3. Force Upgrade
@@ -144,3 +144,11 @@ Please make sure the system is running, then use the following command to force 
 ```sh
 docker exec -it kuwa-multi-chat-1 docker-entrypoint force-upgrade
 ```
+
+### 4. Building Docker Images from Source Code
+Beginning with v0.3.4, the default behavior is to download pre-built Kuwa Docker Images from Docker Hub. If you want to build the images from source code, make sure the `.git` directory is present in the `genai-os` directory. Then, you can use the following command to create the Kuwa images:
+```sh
+cd docker
+./run.sh build
+```
+Running this command will create the `kuwaai/model-executor`, `kuwaai/multi-chat`, `kuwaai/kernel`, and `kuwaai/multi-chat-web` images.

@@ -1,9 +1,6 @@
 services:
   hf-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: huggingface
       EXECUTOR_ACCESS_CODE: gemma-7b-it
@@ -12,6 +9,7 @@ services:
       HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
       TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0}
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: ["--model_path", "google/gemma-7b-it", "--no_system_prompt"]

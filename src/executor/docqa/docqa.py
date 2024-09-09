@@ -97,7 +97,6 @@ class DocQaExecutor(LLMExecutor):
         i18n.config.set("fallback", "en")
         i18n.config.set("locale", self.lang)
 
-        # [TODO] Fetch pre-built DB from web
         self.pre_built_db = retriever_params.get("database", self.args.database)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
         self.display_ref_content = not display_params.get("hide_ref_content", self.args.hide_ref_content)
@@ -175,7 +174,7 @@ class DocQaExecutor(LLMExecutor):
             if not self.proc:
                 await response_generator.aclose()
             yield reply
-
+    
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         await self._app_setup(params=modelfile.parameters)
 
@@ -183,7 +182,8 @@ class DocQaExecutor(LLMExecutor):
             url = None
             if self.pre_built_db is None:
                 url, history = extract_last_url(history)
-                if url is None: raise NoUrlException(i18n.t('docqa.no_url_exception'))
+                if url is None:
+                    raise NoUrlException(i18n.t('docqa.no_url_exception'))
             response_generator = self.doc_qa(
                 urls = [url],
                 chat_history = history,

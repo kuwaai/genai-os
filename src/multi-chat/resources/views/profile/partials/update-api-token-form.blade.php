@@ -81,6 +81,30 @@
                 @endif
             </div>
         </form>
+        <form method="post" action="{{ route('profile.third_party.api.update') }}" class="mt-6 space-y-6"
+            autocomplete="off">
+            @csrf
+            @method('patch')
+
+            <div>
+                <x-input-label for="openai_token" :value="__('profile.label.third_party_api')" />
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    {{ __('profile.label.stay_secure') }}
+                </p>
+                <x-text-input type="password" id="third_party_token" name="third_party_token" class="mt-1 block w-full"
+                    placeholder="{{ $user->third_party_token ? '************************' : '' }}" />
+                <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            </div>
+
+            <div class="flex items-center gap-4">
+                <x-primary-button>{{ __('profile.button.update') }}</x-primary-button>
+
+                @if (session('status') === 'third-party-token-updated')
+                    <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                @endif
+            </div>
+        </form>
     @endif
     @if (Auth::user()->hasPerm('Profile_read_api_token'))
         <script>

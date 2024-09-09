@@ -1,15 +1,13 @@
 services:
   gemini-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: geminipro
       EXECUTOR_ACCESS_CODE: geminipro
       EXECUTOR_NAME: Gemini Pro
       EXECUTOR_IMAGE: gemini.png # Refer to src/multi-chat/public/images
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: ["--api_key", "<YOUR_GLOBAL_API_KEY_HERE>", "--log", "debug"]

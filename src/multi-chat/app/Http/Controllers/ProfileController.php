@@ -263,6 +263,16 @@ class ProfileController extends Controller
             ->save();
         return Redirect::route('profile.edit')->with('status', 'google-token-updated');
     }
+    
+    public function third_party_update(Request $request)
+    {
+        $request
+            ->user()
+            ->fill(['third_party_token' => $request->input('third_party_token')])
+            ->save();
+        return Redirect::route('profile.edit')->with('status', 'third-party-token-updated');
+    }
+
 
     /**
      * Renew the user's API Token.

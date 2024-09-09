@@ -33,6 +33,7 @@ return [
     'label.taide_api' => '타이드 키',
     'label.openai_api' => 'OpenAI API 키',
     'label.google_api' => 'Google API 키',
+    'label.third_party_api' => '타사 API 키(예: Gorq, Cerebras)',
     'label.stay_secure' => '외부 키 사용량에 주의하세요!',
 
     //Delete Account

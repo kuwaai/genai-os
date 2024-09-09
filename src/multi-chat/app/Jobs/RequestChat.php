@@ -19,7 +19,7 @@ use Carbon\Carbon;
 class RequestChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $input, $access_code, $msgtime, $history_id, $user_id, $channel, $lang, $openai_token, $google_token, $user_token, $modelfile;
+    private $input, $access_code, $msgtime, $history_id, $user_id, $channel, $lang, $openai_token, $google_token, $third_party_token, $user_token, $modelfile;
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
     public static $agent_version = 'v1.0';
@@ -56,6 +56,7 @@ class RequestChat implements ShouldQueue
         $user = User::find($user_id);
         $this->openai_token = $user->openai_token;
         $this->google_token = $user->google_token;
+        $this->third_party_token = $user->third_party_token;
         if ($user->tokens()->where('name', 'API_Token')->count() != 1) {
             $user->tokens()->where('name', 'API_Token')->delete();
             $user->createToken('API_Token', ['access_api']);
@@ -181,6 +182,7 @@ class RequestChat implements ShouldQueue
                             'history_id' => $this->history_id * ($this->channel == $this->history_id ? 1 : -1),
                             'openai_token' => $this->openai_token,
                             'google_token' => $this->google_token,
+                            'third_party_token' => $this->third_party_token,
                             'user_token' => $this->user_token,
                             'modelfile' => $this->modelfile
                         ],

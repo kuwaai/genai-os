@@ -1,15 +1,13 @@
 services:
   pipe-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       CUSTOM_EXECUTOR_PATH: ./pipe/main.py
       EXECUTOR_ACCESS_CODE: pipe
       EXECUTOR_NAME: Pipe
       EXECUTOR_IMAGE: pipe.png # Refer to src/multi-chat/public/images
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: [

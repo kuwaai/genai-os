@@ -31,7 +31,8 @@ class User extends Authenticatable implements MustVerifyEmail, LdapAuthenticatab
         'domain',
         'detail',
         'require_change_password',
-        'google_token'
+        'google_token',
+        'third_party_token'
     ];
 
     /**

@@ -1,9 +1,6 @@
 services:
   searchqa-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       CUSTOM_EXECUTOR_PATH: ./docqa/searchqa.py
       EXECUTOR_ACCESS_CODE: search-qa
@@ -11,9 +8,11 @@ services:
       EXECUTOR_IMAGE: search-qa.png # Refer to src/multi-chat/public/images
       TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-0} # For embedding model
     depends_on:
+      - executor-builder
       - kernel
       - multi-chat
     command: [
+      "--log", "debug",
       "--api_base_url", "http://web/",
       "--model", "gemini-pro",
       "--google_api_key", "<YOUR_GOOGLE_API_KEY>",

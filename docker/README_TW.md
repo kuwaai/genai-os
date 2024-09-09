@@ -118,7 +118,7 @@ sudo docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 > Ubuntu APT 中的 `docker-compose` 套件為 Docker Compose V1，無法使用，請參考前面章節安裝新版 Docker Compose
 
 使用以下腳本啟動基礎 Kuwa GenAI OS 系統，包含 Gemini-Pro Executor, Document QA, WebQA, Search QA
-可以透過更改 `./run.sh` 中的 `confs` 陣列內容調整要啟動的元件，元件設定都在 `compose` 目錄中
+可以透過更改 `./run.sh` 中的 `confs` 陣列內容調整要啟動的元件，元件設定都在 `docker/compose` 目錄中
 ```sh
 ./run.sh
 ```
@@ -133,11 +133,12 @@ Docker 版本預設不會在 Multi-Chat 網頁前端顯示任何錯誤訊息，�
 ```
 
 ### 2. 執行多個 Executor
-每種 Executor 的設定都已寫在對應的 YAML 檔案中 (gemini.yaml, chatgpt.yaml, huggingface.yaml, llamacpp.yaml)，請參考這些設定檔按照您的需求擴充。  
+每種 Executor 的設定都已寫在 `docker/compose` 目錄下對應的 YAML 檔案中 (gemini.yaml, chatgpt.yaml, huggingface.yaml, llamacpp.yaml, ...)，請參考這些設定檔按照您的需求擴充。  
 您可能需要參考 [Executor 說明文件](../src/executor/README_TW.md)。  
+並將所需的 YAML 設定檔新增至 `./run.sh` 中的 `confs` 陣列中。
 完成設定檔後可使用以下指令啟動整個系統
 ```sh
-docker compose -f compose.yaml -f pgsql.yaml -f <executor1設定檔> -f <executor2設定檔...> up --build
+./run.sh
 ```
 
 ### 3. 強制更新
@@ -146,3 +147,12 @@ docker compose -f compose.yaml -f pgsql.yaml -f <executor1設定檔> -f <executo
 ```sh
 docker exec -it kuwa-multi-chat-1 docker-entrypoint force-upgrade
 ```
+
+### 4. 從原始碼建置 Docker Images
+自 v0.3.4 起，預設會從 Docker Hub 下載預先建置好的 Kuwa Docker Image，  
+若您想從原始碼建立映像，請確保您的 `genai-os` 目錄下已包含 `.git` 目錄。接著，可使用以下指令建立 Kuwa 映像：
+```sh
+cd docker
+./run.sh build
+```
+執行此指令會建立 `kuwaai/model-executor`、`kuwaai/multi-chat`、`kuwaai/kernel`、以及 `kuwaai/multi-chat-web` 等四個映像。

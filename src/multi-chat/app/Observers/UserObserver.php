@@ -19,7 +19,7 @@ class UserObserver
         ];
 
         // Remove unwanted attributes
-        $attributesToIgnore = ['updated_at', 'openai_token', 'password', 'id', 'created_at', 'google_token'];
+        $attributesToIgnore = ['updated_at', 'openai_token', 'password', 'id', 'created_at', 'google_token', 'third_party_token'];
         $attributes = array_diff_key($user->getAttributes(), array_flip($attributesToIgnore));
 
         if (!empty($attributes)) {
@@ -61,6 +61,9 @@ class UserObserver
             } elseif ($attribute === 'google_token') {
                 $ExternalTokenChanged = true;
                 continue; // Skip logging the actual google_token change
+            } elseif ($attribute === 'third_party_token') {
+                $ExternalTokenChanged = true;
+                continue; // Skip logging the actual third_party_token change
             }
 
             // Check if the attribute exists in original values before accessing it

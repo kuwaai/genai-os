@@ -33,6 +33,7 @@ return [
     'label.taide_api' => 'Kuwa klíč',
     'label.openai_api' => 'OpenAI API klíč',
     'label.google_api' => 'Google API klíč',
+    'label.third_party_api' => 'Klíče API třetích stran (např. Gorq, Cerebras)',
     'label.stay_secure' => 'Vždy sledujte využití Vašich externích klíčů!',
 
     //Smazání účtu

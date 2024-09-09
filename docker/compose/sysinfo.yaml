@@ -1,17 +1,15 @@
 services:
   sysinfo-executor:
-    build:
-      context: ../../
-      dockerfile: docker/executor/Dockerfile
-    image: kuwa-executor
+    image: kuwaai/model-executor
     environment:
       EXECUTOR_TYPE: sysinfo
       EXECUTOR_ACCESS_CODE: tool/sysinfo
       EXECUTOR_NAME: System Info
       EXECUTOR_IMAGE: info.png # Refer to src/multi-chat/public/images
     depends_on:
+      - executor-builder
       - kernel
-    command: []
+    command: ['--log', 'debug']
     restart: unless-stopped
     networks: ["backend"]
     # deploy:
