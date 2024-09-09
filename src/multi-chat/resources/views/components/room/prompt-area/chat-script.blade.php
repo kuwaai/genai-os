@@ -16,9 +16,9 @@
     use App\Models\SystemSetting;
 
     $verify_uploaded_file = !request()->user()->hasPerm('Room_update_ignore_upload_constraint');
-    if (!$verify_uploaded_file){
+    if (!$verify_uploaded_file) {
         $upload_max_size_mb = PHP_INT_MAX;
-        $upload_allowed_extensions = "*";
+        $upload_allowed_extensions = '*';
         $upload_max_file_count = -1;
     } else {
         $upload_max_size_mb = SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
@@ -27,11 +27,11 @@
     }
 @endphp
 <script>
-@if (session('errorString'))
-    showErrorMsg("{{session('errorString')}}")
-@endif
+    @if (session('errorString'))
+        showErrorMsg("{{ session('errorString') }}")
+    @endif
 
-    function showErrorMsg(msg){
+    function showErrorMsg(msg) {
         $("#error_alert >span").text(msg)
         $("#error_alert").fadeIn();
         $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
@@ -42,6 +42,7 @@
             $("#upload_btn").toggleClass("bg-green-500 hover:bg-green-600 bg-red-600 hover:bg-red-700")
         }, 3000);
     }
+
     function uploadcheck() {
         if (!$("#upload")[0].files || $("#upload")[0].files[0].length <= 0) return;
         if ({{ $upload_max_file_count == '0' ? 'true' : 'false' }}) {
@@ -49,16 +50,16 @@
             return;
         }
 
-        if ($("#upload")[0].files[0].size > {{ $upload_max_size_mb * (2 ** 20)}}){
+        if ($("#upload")[0].files[0].size > {{ $upload_max_size_mb * 2 ** 20 }}) {
             showErrorMsg("{{ __('chat.hint.upload_file_too_large') }}");
             return;
-        } 
-        @if ($upload_allowed_extensions === "*")
-        file_regex = /.*/;
+        }
+        @if ($upload_allowed_extensions === '*')
+            file_regex = /.*/;
         @else
-        file_regex = /\.({{ str_replace(',', '|', $upload_allowed_extensions) }})$/;
+            file_regex = /\.({{ str_replace(',', '|', $upload_allowed_extensions) }})$/;
         @endif
-        if (!$("#upload")[0].files[0].name.match(file_regex)){
+        if (!$("#upload")[0].files[0].name.match(file_regex)) {
             showErrorMsg("{{ __('chat.hint.upload_not_allowed_ext') }}");
             return;
         }
@@ -100,11 +101,15 @@
             } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
                 tmp = ""
                 for (var i in quoted) {
-                    @if(App::environment('arena') || $llms->count() == 1 || quoted.length == 1)
+                    @if (App::environment('arena') || $llms->count() == 1)
                         tmp += `"""${histories[quoted[i][1]]}"""\n`
                     @else
-                        tmp +=
-                            `${$("#llm_" + quoted[i][0] + "_chat").text().trim()}:"""${histories[quoted[i][1]]}"""\n`
+                        if (quoted.length == 1) {
+                            tmp += `"""${histories[quoted[i][1]]}"""\n`
+                        } else {
+                            tmp +=
+                                `${$("#llm_" + quoted[i][0] + "_chat").text().trim()}:"""${histories[quoted[i][1]]}"""\n`
+                        }
                     @endenv
                 }
                 tmp = tmp.trim()
