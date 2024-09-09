@@ -100,7 +100,7 @@
             } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
                 tmp = ""
                 for (var i in quoted) {
-                    @if(App::environment('arena') || $llms->count() == 1)
+                    @if(App::environment('arena') || $llms->count() == 1 || quoted.length == 1)
                         tmp += `"""${histories[quoted[i][1]]}"""\n`
                     @else
                         tmp +=

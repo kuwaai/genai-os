@@ -57,7 +57,7 @@
             @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
                 <x-store.modal.create-bot :result="$result" />
             @endif
-            <x-store.modal.bot-detail />
+            <x-store.modal.bot-detail :result="$result" />
             @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
                 <div class="create-bot-btn pt-4 my-2 mx-auto w-[150px] h-[50px] flex" data-modal-target="create-bot-modal"
                     data-modal-toggle="create-bot-modal">
@@ -65,10 +65,12 @@
                         class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-300 transition duration-300 rounded-l-lg overflow-hidden">
                         <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
                     </button>
-                    <label for="upload_bot_modelfile" class="bg-green-500 hover:bg-green-600 h-12 text-white font-bold py-3 px-4 rounded-r-lg  flex items-center justify-center transition duration-300">
+                    <label for="upload_bot_modelfile"
+                        class="bg-green-500 hover:bg-green-600 h-12 text-white font-bold py-3 px-4 rounded-r-lg  flex items-center justify-center transition duration-300">
                         <i class="fas fa-file-import"></i>
                     </label>
-                    <input type="file" accept=".bot" class="hidden" id="upload_bot_modelfile" onchange="importBot($(this)[0].files)"/>
+                    <input type="file" accept=".bot" class="hidden" id="upload_bot_modelfile"
+                        onchange="importBot($(this)[0].files)" />
                 </div>
             @endif
             @php
@@ -84,7 +86,8 @@
                         ->groupBy('order')
                         ->map(function ($subSet) {
                             return $subSet->sortByDesc('created_at'); // Assuming 'created_at' is the timestamp field
-                        })->collapse();
+                        })
+                        ->collapse();
 
                     // Filter the remaining bots and randomize them
                     $otherBots = $bots
@@ -94,8 +97,9 @@
                         ->sortBy('order')
                         ->groupBy('order')
                         ->map(function ($subSet) {
-                            return $subSet->sortByDesc('created_at'); 
-                        })->collapse();
+                            return $subSet->sortByDesc('created_at');
+                        })
+                        ->collapse();
 
                     // Merge the sorted user bots with the randomized other bots
                     return $userBots->merge($otherBots)->values();
@@ -138,27 +142,6 @@
         </div>
     </div>
     <script>
-        function change_bot_image(bot_image_elem, user_upload_elem, new_base_bot_name) {
-            /**
-             * Dynamically updates the bot's displayed image based on user interaction.
-             *
-             * Image selection priority:
-             * 1. User-uploaded image (highest)
-             * 2. Base bot image (if the bot image hasn't been changed)
-             * 3. Original image (lowest)
-             */
-            const [user_uploaded_image] = $(user_upload_elem)[0].files;
-            const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
-            let bot_image_uri = $(bot_image_elem).attr("src");
-            if (user_uploaded_image) {
-                bot_image_uri = URL.createObjectURL(user_uploaded_image);
-            } else if (follow_base_bot && new_base_bot_name) {
-                const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
-                bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
-            }
-            $(bot_image_elem).attr("src", bot_image_uri);
-        }
- 
         $(document).ready(function() {
             var div = $('.bot-showcase')[0];
             if (div) {

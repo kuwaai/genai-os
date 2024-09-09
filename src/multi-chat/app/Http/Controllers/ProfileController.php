@@ -44,7 +44,40 @@ class ProfileController extends Controller
             'user' => $request->user(),
         ]);
     }
+    public function api_upload_file(Request $request)
+    {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            if (User::find($user->id)->hasPerm('Room_update_upload_file')) {
+                $controller = new RoomController();
+                $upload_result = $controller->upload_file($request);
+                if ($upload_result['succeed']){
+                    return response()->json(['status' => 'success', 'result' => $upload_result['url']], 200, [], JSON_UNESCAPED_UNICODE);
+                }else{
+                    return response()->json(['status' => 'failed', 'result' => $upload_result['msg']], 422, [], JSON_UNESCAPED_UNICODE);
+                }
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
 
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
     public static function isIPInCIDRList($ipAddress, $cidrList)
     {
         $ipVersion = filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 4 : (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 6 : null);

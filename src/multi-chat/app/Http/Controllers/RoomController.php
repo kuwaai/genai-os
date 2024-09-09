@@ -19,6 +19,7 @@ use App\Models\Chats;
 use GuzzleHttp\Client;
 use App\Models\LLMs;
 use App\Models\Bots;
+use App\Models\User;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Arr;
@@ -43,7 +44,7 @@ class RoomController extends Controller
     {
         $chat = ChatRoom::find($request->route('room_id'));
         if ($chat && $chat->user_id == Auth::user()->id) {
-            $html = view('room.export')->with('hide_header',true)->with('no_bot_img',true)->with('same_direction',true)->render();
+            $html = view('room.export')->with('hide_header', true)->with('no_bot_img', true)->with('same_direction', true)->render();
 
             // Set headers for Word document
             return response($html)
@@ -86,7 +87,7 @@ class RoomController extends Controller
     public function home(Request $request)
     {
         // The selected bots are stored in the 'llms' session data.
-        if ($request->session()->exists('llms')){
+        if ($request->session()->exists('llms')) {
             return view('room');
         } else {
             return view('room.home');
@@ -194,7 +195,7 @@ class RoomController extends Controller
                     $data = [];
                     $flag = false;
                     foreach ($historys as $message) {
-                        $role = (isset($message->role) && is_string($message->role)) ? $message->role : null;
+                        $role = isset($message->role) && is_string($message->role) ? $message->role : null;
                         $hasContent = isset($message->content) && is_string($message->content) && trim($message->content) !== '';
                         if ($role === 'user' || ($role === null && $hasContent)) {
                             if ($flag) {
@@ -334,9 +335,9 @@ class RoomController extends Controller
             ];
         }
         $verify_uploaded_file = !request()->user()->hasPerm('Room_update_ignore_upload_constraint');
-        if (!$verify_uploaded_file){
+        if (!$verify_uploaded_file) {
             $max_file_size_mb = PHP_INT_MAX;
-            $allowed_file_exts = "*";
+            $allowed_file_exts = '*';
             $upload_max_file_count = -1;
         } else {
             $max_file_size_mb = \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
@@ -351,41 +352,34 @@ class RoomController extends Controller
             return [
                 'succeed' => false,
                 'url' => null,
-                'msg' => __("chat.hint.upload_disabled_by_admin"),
+                'msg' => __('chat.hint.upload_disabled_by_admin'),
             ];
         }
 
-        Log::channel('analyze')->Debug("max_file_size_kb:". $max_file_size_kb);
-        Log::channel('analyze')->Debug("allowed_file_exts:". $allowed_file_exts);
-        $file_validation_rule = [
-            'file',
-            'max:' . $max_file_size_kb,
-        ];
-        if ($allowed_file_exts !== "*"){
+        Log::channel('analyze')->Debug('max_file_size_kb:' . $max_file_size_kb);
+        Log::channel('analyze')->Debug('allowed_file_exts:' . $allowed_file_exts);
+        $file_validation_rule = ['file', 'max:' . $max_file_size_kb];
+        if ($allowed_file_exts !== '*') {
             array_push($file_validation_rule, 'mimes:' . $allowed_file_exts);
         }
         $validator = Validator::make($request->all(), [
-            'file' => $file_validation_rule
+            'file' => $file_validation_rule,
         ]);
 
         if ($validator->fails()) {
-            $errorString = implode(",",$validator->messages()->all());
-            Log::channel('analyze')->Debug("validation failed:\n". $errorString);
+            $errorString = implode(',', $validator->messages()->all());
+            Log::channel('analyze')->Debug("validation failed:\n" . $errorString);
             return [
                 'succeed' => false,
                 'url' => null,
                 'msg' => $errorString,
             ];
         }
- 
+
         $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
         $storagePath = public_path('storage/' . $directory); // Adjusted path
         $filePathParts = pathinfo($request->file->getClientOriginalName());
-        $fileName = sprintf(
-            "%s%s",
-            $filePathParts["filename"],
-            isset($filePathParts["extension"]) ? ("." . $filePathParts["extension"]) : ""
-        );
+        $fileName = sprintf('%s%s', $filePathParts['filename'], isset($filePathParts['extension']) ? '.' . $filePathParts['extension'] : '');
         $filePath = $request->file('file')->storeAs($directory, $fileName, 'public'); // Use 'public' disk
 
         $files = File::files($storagePath);
@@ -402,7 +396,6 @@ class RoomController extends Controller
             }
         }
 
-        //Create a chat and send that url into the llm
         $url = url('storage/' . $directory . '/' . rawurlencode($fileName));
         return [
             'succeed' => true,
@@ -410,6 +403,117 @@ class RoomController extends Controller
             'msg' => 'Succeed.',
         ];
     }
+    public function api_create_room(Request $request)
+    {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            if (User::find($user->id)->hasPerm('Room_update_new_chat')) {
+                $this->new($request);
+
+                if (session('room_id') != null) {
+                    return response()->json(['status' => 'success', 'result' => session('room_id')], 200, [], JSON_UNESCAPED_UNICODE);
+                } else {
+                    return response()->json(['status' => 'failed', 'result'=>'Model not founded'], 404, [], JSON_UNESCAPED_UNICODE);
+                }
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
+
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
+    public function api_read_rooms(Request $request)
+    {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            if (User::find($user->id)->hasPerm('tab_Room')) {
+                $DCs = ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
+                    ->where('chats.user_id', $user->id)
+                    ->select('chatrooms.*', DB::raw('count(chats.id) as counts'))
+                    ->groupBy('chatrooms.id');
+
+                // Fetch the ordered identifiers based on `llm_id` for each database
+                $DCs->select('chatrooms.id', 'name', 'chatrooms.created_at', 'chatrooms.updated_at')->selectSub(function ($query) {
+                    if (config('database.default') == 'sqlite') {
+                        $query->from('chats')->selectRaw("group_concat(bot_id, ',') as identifier")->whereColumn('roomID', 'chatrooms.id')->orderBy('bot_id');
+                    } elseif (config('database.default') == 'mysql') {
+                        $query->from('chats')->selectRaw('group_concat(bot_id order by bot_id separator \',\') as identifier')->whereColumn('roomID', 'chatrooms.id');
+                    } elseif (config('database.default') == 'pgsql') {
+                        $query->from('chats')->selectRaw('string_agg(bot_id::text, \',\' order by bot_id) as identifier')->whereColumn('roomID', 'chatrooms.id');
+                    }
+                }, 'identifier');
+                return response()->json(['status' => 'success', 'result' => $DCs->get()->groupby('identifier')->toarray()], 200, [], JSON_UNESCAPED_UNICODE);
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
+
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
+    public function api_delete_message(Request $request)
+    {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            if (User::find($user->id)->hasPerm('Room_delete_room_message')) {
+                $this->new($request);
+                if (session('room_id') != null) {
+                    return response()->json(['status' => 'success', 'result' => session('room_id')], 200, [], JSON_UNESCAPED_UNICODE);
+                } else {
+                    return response()->json(['status' => 'failed'], 200, [], JSON_UNESCAPED_UNICODE);
+                }
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
+
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
     function getWebPageTitle($url)
     {
         // Try to fetch the HTML content of the URL
@@ -473,7 +577,7 @@ class RoomController extends Controller
                 $upload_result = $this->upload_file($request);
                 if ($upload_result['succeed']) {
                     $input = $upload_result['url'] . "\n" . $input;
-                }else{
+                } else {
                     return redirect()
                         ->route('room.home')
                         ->with('errorString', $upload_result['msg']);
@@ -487,23 +591,21 @@ class RoomController extends Controller
                 $chatname = rawurldecode($raw_chat_title);
             }
 
-            $Room = new ChatRoom();
+            $Room = ChatRoom::find($this->create_room($request));
             $Room->fill(['name' => $chatname, 'user_id' => Auth::user()->id]);
             $Room->save();
             $ct = date('Y-m-d H:i:s');
             $dct = date('Y-m-d H:i:s', strtotime($ct . ' +1 second'));
-            foreach ($llms as $llm) {
-                $chat = new Chats();
-                $chat->fill(['name' => 'Room Chat', 'bot_id' => $llm, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
-                $chat->save();
-                if (in_array($llm, $selectedLLMs)) {
+            $chats = Chats::where('roomID', $Room->id)->get();
+            foreach ($chats as $chat) {
+                if (in_array($chat->bot_id, $selectedLLMs)) {
                     $history = new Histories();
                     $history->fill(['msg' => $input, 'chat_id' => $chat->id, 'isbot' => false, 'created_at' => $ct, 'updated_at' => $ct]);
                     $history->save();
                     $history = new Histories();
                     $history->fill(['msg' => '* ...thinking... *', 'chat_id' => $chat->id, 'isbot' => true, 'created_at' => $dct, 'updated_at' => $dct]);
                     $history->save();
-                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, App::getLocale(), null, json_decode(Bots::find($llm)->config ?? '')->modelfile ?? null);
+                    RequestChat::dispatch(json_encode([['msg' => $input, 'isbot' => false]]), LLMs::findOrFail(Bots::findOrFail($chat->bot_id)->model_id)->access_code, Auth::user()->id, $history->id, App::getLocale(), null, json_decode(Bots::find($chat->bot_id)->config ?? '')->modelfile ?? null);
                     Redis::rpush('usertask_' . Auth::user()->id, $history->id);
                     Redis::expire('usertask_' . Auth::user()->id, 1200);
                 }
@@ -514,6 +616,19 @@ class RoomController extends Controller
             ->with('selLLMs', $selectedLLMs)
             ->with('mode_track', request()->input('mode_track'));
     }
+    
+    public function create_room(Request $request){
+        $llms = $request->input('llm');
+        $Room = new ChatRoom();
+        $Room->fill(['name' => __('room.header.new_room'), 'user_id' => Auth::user()->id]);
+        $Room->save();
+        foreach ($llms as $llm) {
+            $chat = new Chats();
+            $chat->fill(['name' => 'Room Chat', 'bot_id' => $llm, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
+            $chat->save();
+        }
+        return $Room->id;
+    }
 
     public function new(Request $request): RedirectResponse
     {
@@ -522,15 +637,15 @@ class RoomController extends Controller
             return redirect()->route('room.home');
         }
         $result = Bots::wherein(
-                'model_id',
-                DB::table('group_permissions')
-                    ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
-                    ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
-                    ->where('group_permissions.group_id', Auth::user()->group_id)
-                    ->where('permissions.name', 'like', 'model_%')
-                    ->get()
-                    ->pluck('model_id'),
-            )
+            'model_id',
+            DB::table('group_permissions')
+                ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                ->where('group_permissions.group_id', Auth::user()->group_id)
+                ->where('permissions.name', 'like', 'model_%')
+                ->get()
+                ->pluck('model_id'),
+        )
             ->pluck('bots.id')
             ->toarray();
 
@@ -539,25 +654,53 @@ class RoomController extends Controller
                 return Redirect::route('room.home');
             }
         }
-
         return redirect()->route('room.home')->with('llms', $llms);
     }
+    public function api_delete_room(Request $request)
+    {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            if (User::find($user->id)->hasPerm('Room_delete_chatroom')) {
+                $this->delete($request);
+                return response()->json(['status' => session('success') ? 'success' : 'failed'], 200, [], JSON_UNESCAPED_UNICODE);
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
 
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
     public function delete(Request $request): RedirectResponse
     {
-        try {
-            $ids = [];
-            $chats = ChatRoom::findOrFail($request->input('id'));
-            foreach (Chats::where('roomID', '=', $chats->id)->get() as $chat) {
-                $ids[] = $chat->bot_id;
-                Histories::where('chat_id', '=', $chat->id)->delete();
+        $ids = [];
+        $chats = ChatRoom::find($request->input('id'));
+        if ($chats) {
+            if ($chats->user_id == Auth::user()->id) {
+                foreach (Chats::where('roomID', '=', $chats->id)->get() as $chat) {
+                    $ids[] = $chat->bot_id;
+                    Histories::where('chat_id', '=', $chat->id)->delete();
+                }
+                Chats::where('roomID', '=', $chats->id)->delete();
+                $chats->delete();
+                return redirect()->route('room.home')->with('llms', $ids)->with('success', true);
             }
-            Chats::where('roomID', '=', $chats->id)->delete();
-            $chats->delete();
-        } catch (ModelNotFoundException $e) {
-            Log::error('Chat not found: ' . $request->input('id'));
         }
-        return redirect()->route('room.home')->with('llms', $ids);
+        return redirect()->route('room.home')->with('success', false);
     }
 
     public function edit(Request $request): RedirectResponse
@@ -581,7 +724,7 @@ class RoomController extends Controller
             $upload_result = $this->upload_file($request);
             if ($upload_result['succeed']) {
                 $input = $upload_result['url'] . "\n" . $input;
-            }else{
+            } else {
                 return redirect()
                     ->route('room.chat', $roomId)
                     ->with('errorString', $upload_result['msg'])

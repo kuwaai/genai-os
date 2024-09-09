@@ -1,8 +1,7 @@
 <x-app-layout>
-    @include('includes/sorted-bots')
     @php
-        $bots = getSortedBots();
-        $sorting_methods = getBotSortingMethods();
+        $bots = App\Models\Bots::getSortedBots();
+        $sorting_methods = App\Models\Bots::getBotSortingMethods();
     @endphp
     @env('arena')
     @php

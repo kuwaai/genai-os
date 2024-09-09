@@ -1,8 +1,22 @@
 <x-app-layout>
-    @include('includes/sorted-bots')
     @php
-        $bots = getSortedBots();
-        $sorting_methods = getBotSortingMethods();
+        $bots = App\Models\Bots::getSortedBots();
+        $sorting_methods = App\Models\Bots::getBotSortingMethods();
+        $result = DB::table(function ($query) {
+            $query
+                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
+                ->from('group_permissions')
+                ->join('permissions', 'perm_id', '=', 'permissions.id')
+                ->where('group_id', Auth()->user()->group_id)
+                ->where('name', 'like', 'model_%')
+                ->get();
+        }, 'tmp')
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->select('tmp.*', 'llms.*')
+            ->where('llms.enabled', true)
+            ->orderby('llms.order')
+            ->orderby('llms.created_at')
+            ->get();
     @endphp
     @env('arena')
     @php
@@ -10,7 +24,7 @@
     @endphp
     @endenv
     <x-chat.functions />
-
+    <x-store.modal.bot-detail :result="$result" />
     @if (request()->user()->hasPerm('Room_delete_chatroom'))
         <x-room.modal.delete_confirm />
     @endif
@@ -68,12 +82,17 @@
                         ->join('llms', function ($join) {
                             $join->on('llms.id', '=', 'bots.model_id');
                         })
+                        ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
+                        ->where('llms.enabled', '=', true)
                         ->select(
                             'llms.*',
                             'bots.*',
                             DB::raw('COALESCE(bots.description, llms.description) as description'),
                             DB::raw('COALESCE(bots.config, llms.config) as config'),
-                            DB::raw('COALESCE(bots.image, llms.image) as image'),
+                            'bots.image as image',
+                            'llms.image as base_image',
+                            'llms.name as llm_name',
+                            'users.group_id',
                         )
                         ->orderby('bots.id')
                         ->get();
@@ -82,12 +101,16 @@
                         ->Join('llms', function ($join) {
                             $join->on('llms.id', '=', 'bots.model_id');
                         })
+                        ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
                         ->select(
                             'llms.*',
                             'bots.*',
                             DB::raw('COALESCE(bots.description, llms.description) as description'),
                             DB::raw('COALESCE(bots.config, llms.config) as config'),
-                            DB::raw('COALESCE(bots.image, llms.image) as image'),
+                            'bots.image as image',
+                            'llms.image as base_image',
+                            'llms.name as llm_name',
+                            'users.group_id',
                         )
                         ->orderby('bots.id')
                         ->get();
@@ -98,12 +121,16 @@
                     ->Join('llms', function ($join) {
                         $join->on('llms.id', '=', 'bots.model_id');
                     })
+                    ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
                     ->select(
                         'llms.*',
                         'bots.*',
                         DB::raw('COALESCE(bots.description, llms.description) as description'),
                         DB::raw('COALESCE(bots.config, llms.config) as config'),
-                        DB::raw('COALESCE(bots.image, llms.image) as image'),
+                        'bots.image as image',
+                        'llms.image as base_image',
+                        'llms.name as llm_name',
+                        'users.group_id',
                     )
                     ->orderby('bots.id')
                     ->get();
@@ -194,14 +221,13 @@
                 <div class="flex justify-end">
                     <x-sorted-list.control-menu :$sorting_methods />
                 </div>
-                
-                <div class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar"> 
-                    @foreach($bots as $bot)
-                        <x-sorted-list.item html_tag="form" :$sorting_methods :record="$bot"
-                            method="post"
+
+                <div
+                    class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
+                    @foreach ($bots as $bot)
+                        <x-sorted-list.item html_tag="form" :$sorting_methods :record="$bot" method="post"
                             class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
-                            action="{{ route('room.new') }}"
-                        >
+                            action="{{ route('room.new') }}">
                             @csrf
                             <button class="h-full w-full flex flex-col items-center justify-start">
                                 <img class="rounded-full mx-auto bg-black" width="50px" height="50px"
@@ -364,7 +390,7 @@
                     @if (count($llms) == 1)
                         <div class="text-black dark:text-white p-2 mb-auto">
                             <img id="llm_img" class="rounded-full mx-auto bg-black" width="100px" height="100px"
-                                src="{{ $llms[0]->image ? asset(Storage::url($llms[0]->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                src="{{ $llms[0]->image ?? $llms[0]->base_image ? asset(Storage::url($llms[0]->image ?? $llms[0]->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                             <p class="text-center text-sm line-clamp-4 py-1">{{ $llms[0]->name }}</p>
                             @if ($llms[0]->description)
                                 <p

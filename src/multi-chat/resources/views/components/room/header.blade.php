@@ -41,15 +41,32 @@
                     </div>
                 @endforeach
             @elseif(!$readonly)
-                @foreach ($llms as $chat)
-                    <div @env('arena') @else onclick="$('#prompt_area input[name=\'chatsTo[]\']').prop('disabled',true); $('#prompt_area .sends span').addClass('bg-red-500 hover:bg-red-600').removeClass('bg-green-500 hover:bg-green-600');$('span[data-tooltip-target=llm_{{ $chat->id }}_toggle]').removeClass('bg-red-500 hover:bg-red-600').addClass('bg-green-500 hover:bg-green-600');$('#chatsTo_{{ $chat->id }}').prop('disabled',false);$('#prompt_area').submit()" @endenv
-                        class="@env('arena')  @else cursor-pointer @endenv mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                        <img data-tooltip-target="llm_{{ $chat->id }}_chat" data-tooltip-placement="top"
+                @foreach ($llms as $bot)
+                    @env('arena')
+                    @else
+                        @php
+                            $bot_image_name = $bot->image ?? $bot->base_image;
+                            $bot_image_uri = asset($bot_image_name ? Storage::url($bot_image_name) : '/' . config('app.LLM_DEFAULT_IMG'));
+                            $bot_arr = $bot->toArray();
+                            unset($bot_arr['base_image']);
+                            $bot_arr = array_merge(
+                                $bot_arr,
+                                [
+                                    'image' => $bot_image_uri,
+                                    'follow_base_bot_image' => is_null($bot->image)
+                                ]
+                            );
+                            $bot_json = json_encode($bot_arr);
+                            $readonly = (request()->user()->id == $bot->owner_id || request()->user()->hasPerm('tab_Manage')) ? 'false' : 'true';
+                        @endphp
+                    @endenv
+                    <div @env('arena') @else onclick="detail_update({{ $bot_json }}, {{ $readonly }})" data-modal-target="detail-modal" data-modal-toggle="detail-modal" @endenv class="@env('arena') @else cursor-pointer @endenv mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                        <img data-tooltip-target="llm_{{ $bot->id }}_chat" data-tooltip-placement="top"
                             class="h-full w-full"
-                            src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                        <div id="llm_{{ $chat->id }}_chat" role="tooltip"
+                            src="{{ $bot->image ?? $bot->base_image ? asset(Storage::url($bot->image ?? $bot->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                        <div id="llm_{{ $bot->id }}_chat" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                            {{ $chat->name }}
+                            {{ $bot->name }}
                             <div class="tooltip-arrow" data-popper-arrow></div>
                         </div>
                     </div>

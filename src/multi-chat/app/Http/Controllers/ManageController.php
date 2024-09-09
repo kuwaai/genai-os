@@ -234,7 +234,7 @@ class ManageController extends Controller
     {
         $result = DB::table('personal_access_tokens')
             ->join('users', 'tokenable_id', '=', 'users.id')
-            ->select('tokenable_id', 'users.id', 'users.name', 'openai_token')
+            ->select('tokenable_id', 'users.id', 'users.name')
             ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
             ->first();
         if ($result) {
@@ -247,7 +247,56 @@ class ManageController extends Controller
                     return response()->json(['status' => 'error', 'message' => json_decode($validator->errors())], 422, [], JSON_UNESCAPED_UNICODE);
                 }
                 $this->llm_create($request);
-                return response()->json(['status' => 'success', 'last_llm_id'=>session('last_llm_id')], 200, [], JSON_UNESCAPED_UNICODE);
+                return response()->json(['status' => 'success', 'last_llm_id' => session('last_llm_id')], 200, [], JSON_UNESCAPED_UNICODE);
+            } else {
+                $errorResponse = [
+                    'status' => 'error',
+                    'message' => 'You have no permission to use Chat API',
+                ];
+
+                return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            $errorResponse = [
+                'status' => 'error',
+                'message' => 'Authentication failed',
+            ];
+
+            return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function api_read_models(Request $request)
+    {
+        $result = DB::table('personal_access_tokens')
+            ->join('users', 'tokenable_id', '=', 'users.id')
+            ->select('tokenable_id', 'users.id', 'users.name', 'group_id')
+            ->where('token', str_replace('Bearer ', '', $request->header('Authorization')))
+            ->first();
+        if ($result) {
+            $user = $result;
+            if (User::find($user->id)->hasPerm('tab_Manage')) {
+                return response()->json(
+                    [
+                        'status' => 'success',
+                        'result' => LLMs::wherein(
+                            'id',
+                            DB::table('group_permissions')
+                                ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
+                                ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
+                                ->where('group_permissions.group_id', $user->group_id)
+                                ->where('permissions.name', 'like', 'model_%')
+                                ->get()
+                                ->pluck('model_id'),
+                        )
+                            ->orderby('id')
+                            ->get()
+                            ->toarray(),
+                    ],
+                    200,
+                    [],
+                    JSON_UNESCAPED_UNICODE,
+                );
             } else {
                 $errorResponse = [
                     'status' => 'error',
@@ -280,7 +329,7 @@ class ManageController extends Controller
         if ($file = $request->file('image')) {
             $validated['image'] = $file->store('public/images');
         }
-        if (is_null($validated['order'])) {
+        if (isset($validated['order']) && is_null($validated['order'])) {
             unset($validated['order']);
         }
         $validated['config'] = [];

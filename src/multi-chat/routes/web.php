@@ -54,9 +54,30 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         Route::get('/api_stream', [ProfileController::class, 'api_stream'])->name('api.stream');
 
         # User API routes
-        Route::prefix('api/user/create')->group(function () {
-            Route::post('/base_model', [ManageController::class, 'api_create_base_model'])->name('api.user.create.base_model');
-            Route::post('/bot', [BotController::class, 'api_create_bot'])->name('api.user.create.bot');
+        Route::prefix('api/user')->group(function () {
+            Route::prefix('upload')->group(function () {
+                Route::post('/file', [ProfileController::class, 'api_upload_file'])->name('api.user.upload.file');
+            });
+
+            Route::prefix('create')->group(function () {
+                Route::post('/base_model', [ManageController::class, 'api_create_base_model'])->name('api.user.create.base_model');
+                Route::post('/bot', [BotController::class, 'api_create_bot'])->name('api.user.create.bot');
+                Route::post('/room', [RoomController::class, 'api_create_room'])->name('api.user.create.room');
+            });
+
+            Route::prefix('read')->group(function () {
+                Route::get('/rooms', [RoomController::class, 'api_read_rooms'])->name('api.user.read.rooms');
+                Route::get('/messages', [RoomController::class, 'api_read_messages'])->name('api.user.read.messages');
+                Route::get('/models', [ManageController::class, 'api_read_models'])->name('api.user.read.models');
+                Route::get('/bots', [BotController::class, 'api_read_bots'])->name('api.user.read.bots');
+            });
+
+            Route::prefix('delete')->group(function () {
+                Route::prefix('room')->group(function () {
+                    Route::delete('/', [RoomController::class, 'api_delete_room'])->name('api.user.delete.room');
+                    Route::delete('/message', [RoomController::class, 'api_delete_message'])->name('api.user.delete.message');
+                });
+            });
         });
 
         # Admin routes, require admin permission

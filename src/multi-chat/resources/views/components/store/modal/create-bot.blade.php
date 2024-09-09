@@ -25,8 +25,8 @@
                 </h3>
             </div>
             <!-- Modal body -->
-            <form method="post" action="{{ route('store.create') }}" class="p-6" id="create_room" enctype="multipart/form-data"
-                onsubmit="return checkForm2()">
+            <form method="post" action="{{ route('store.create') }}" class="p-6" id="create_room"
+                enctype="multipart/form-data" onsubmit="return checkCreateBotForm()">
                 @csrf
                 <ul class="flex flex-wrap flex-col -mx-3 mb-2 items-center">
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
@@ -36,10 +36,11 @@
                                     <div class="w-full px-3 flex flex-col items-center">
                                         <label for="create-bot_image">
                                             <img id="llm_img" class="rounded-full m-auto bg-black" width="50px"
-                                                height="50px" src="{{ asset('/'. config('app.LLM_DEFAULT_IMG')) }}">
+                                                height="50px" src="{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}">
                                         </label>
-                                        <input id="create-bot_image" name="bot_image" onchange="change_bot_image('#llm_img', '#create-bot_image')"
-                                               type="file" accept="image/*" style="display:none">
+                                        <input id="create-bot_image" name="bot_image"
+                                            onchange="change_bot_image('#llm_img', '#create-bot_image')" type="file"
+                                            accept="image/*" style="display:none">
                                     </div>
                                 </div>
                             </div>
@@ -65,7 +66,9 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 0 ? $('#visibility').text('" . __('store.button.system') . "') : 1",
+                                                        "this.value == 0 ? $('#visibility').text('" .
+                                                        __('store.button.system') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ];
                                             }
@@ -77,7 +80,9 @@
                                                     'value' => '1',
                                                     'checked' => true,
                                                     'onchange' =>
-                                                        "this.value == 1 ? $('#visibility').text('" . __('store.button.community') . "') : 1",
+                                                        "this.value == 1 ? $('#visibility').text('" .
+                                                        __('store.button.community') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ];
                                             }
@@ -93,7 +98,9 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 2 ? $('#visibility').text('" . __('store.button.groups') . "') : 1",
+                                                        "this.value == 2 ? $('#visibility').text('" .
+                                                        __('store.button.groups') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ];
                                             }
@@ -109,7 +116,9 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 3 ? $('#visibility').text('" . __('store.button.private') . "') : 1",
+                                                        "this.value == 3 ? $('#visibility').text('" .
+                                                        __('store.button.private') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ];
                                             }
@@ -164,13 +173,16 @@
                                     oninput="change_bot_image('#llm_img', '#create-bot_image', $(this).val())"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="{{ __('store.bot.base_model.label') }}">
-                                <datalist id="llm-list">
-                                    @foreach ($result as $LLM)
-                                        <option
-                                            src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
-                                            value="{{ $LLM->name }}" data-access-code="{{ $LLM->access_code }}"></option>
-                                    @endforeach
-                                </datalist>
+                                @once
+                                    <datalist id="llm-list">
+                                        @foreach ($result as $LLM)
+                                            <option
+                                                src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
+                                                value="{{ $LLM->name }}" data-access-code="{{ $LLM->access_code }}">
+                                            </option>
+                                        @endforeach
+                                    </datalist>
+                                @endonce
                             </div>
                             <div class="w-full mt-2">
                                 <div class="w-full">
@@ -270,7 +282,7 @@
 </div>
 
 <script>
-    function checkForm2() {
+    function checkCreateBotForm() {
         if ($("#create_room input[name='llm_name']").val() && $("#create_room input[name='bot_name']").val()) {
             $('#create-bot-modal textarea[name=modelfile]').val(modelfile_to_string(modelfile_parse(ace.edit(
                     'bot-modelfile-editor')
@@ -289,19 +301,19 @@
         return false;
     }
 
-    function importBotModelfile(modelfile){
+    function importBotModelfile(modelfile) {
         modelfile = modelfile_parse(modelfile);
         console.debug(modelfile);
-        let get_bot_config = function (modelfile, k) {
-                modelfile = modelfile.map((inst) => `${inst['name'].toLowerCase()} ${inst['args']}`);
-                let config = modelfile.filter((inst) => inst.startsWith(k));
-                if (config.length ==0) return '';
-                value = config[config.length - 1].replace(k, '').trim().replace(/^"(.+)"$/,'$1');
-                return value;
-            }
+        let get_bot_config = function(modelfile, k) {
+            modelfile = modelfile.map((inst) => `${inst['name'].toLowerCase()} ${inst['args']}`);
+            let config = modelfile.filter((inst) => inst.startsWith(k));
+            if (config.length == 0) return '';
+            value = config[config.length - 1].replace(k, '').trim().replace(/^"(.+)"$/, '$1');
+            return value;
+        }
         const prefix = 'kuwabot'
         let base_access_code = get_bot_config(modelfile, `${prefix} base`);
-        let base = $(`#llm-list option[data-access-code='${base_access_code}']`).val() 
+        let base = $(`#llm-list option[data-access-code='${base_access_code}']`).val()
         $("#create_room input[name='llm_name']").val(base);
         $("#create_room input[name='llm_name']").trigger("input");
         $("#create_room input[name='bot_name']").val(get_bot_config(modelfile, `${prefix} name`));
@@ -313,19 +325,21 @@
         $('#bot-modelfile-editor textarea').trigger("change");
     }
 
-    function importBotAvatar(content_type, base64_data){
-        
-        function dataUrl2File(content_type, base64_data){
+    function importBotAvatar(content_type, base64_data) {
+
+        function dataUrl2File(content_type, base64_data) {
 
             const byte_string = atob(base64_data);
-            
+
             // write the bytes of the string to an ArrayBuffer
             let buffer = new ArrayBuffer(byte_string.length);
             let buffer_uint8_view = new Uint8Array(buffer);
             for (var i = 0; i < byte_string.length; i++) {
                 buffer_uint8_view[i] = byte_string.charCodeAt(i);
             }
-            return new File([buffer], {type: content_type});
+            return new File([buffer], {
+                type: content_type
+            });
         }
 
         const avatar_file = dataUrl2File(content_type, base64_data);
@@ -339,25 +353,25 @@
         input.dispatchEvent(event);
     }
 
-    function importBot(files){
+    function importBot(files) {
         const reader = new FileReader()
-        const getMimeHeader = (x) => x.substr(0, x.indexOf('\r\n\r\n')); 
-        const getMimeBody = (x) => x.substr(x.indexOf('\r\n\r\n') + 1); 
-        const handleFileLoad = function(e){
+        const getMimeHeader = (x) => x.substr(0, x.indexOf('\r\n\r\n'));
+        const getMimeBody = (x) => x.substr(x.indexOf('\r\n\r\n') + 1);
+        const handleFileLoad = function(e) {
             let header = getMimeHeader(e.target.result);
             let body = getMimeBody(e.target.result);
-            header=new Headers(header.split('\r\n').map((x)=>x.split(': ')));
+            header = new Headers(header.split('\r\n').map((x) => x.split(': ')));
             console.debug("Header:", header, "Body: ", body);
             const parser = new MultipartRelatedParser(header.get('Content-Type'));
             const parts = parser.read(new TextEncoder().encode(body));
             console.debug(parts);
-            if (parts.length == 0){
+            if (parts.length == 0) {
                 console.warn("Wrong botfile format.");
                 return;
             }
 
             let modelfile = new TextDecoder().decode(parts[0].data);
-            let avatar_part = parts.filter((x)=>x.headers["Content-Location"] === "/bot-avatar");
+            let avatar_part = parts.filter((x) => x.headers["Content-Location"] === "/bot-avatar");
 
             importBotModelfile(modelfile);
 
@@ -368,7 +382,7 @@
                 importBotAvatar(avatar_type, avatar_base64_data)
             }
 
-            
+
             $(".create-bot-btn").click();
         }
 
@@ -408,4 +422,26 @@
             }
         }
     });
+    @once
+    function change_bot_image(bot_image_elem, user_upload_elem, new_base_bot_name) {
+            /**
+             * Dynamically updates the bot's displayed image based on user interaction.
+             *
+             * Image selection priority:
+             * 1. User-uploaded image (highest)
+             * 2. Base bot image (if the bot image hasn't been changed)
+             * 3. Original image (lowest)
+             */
+            const [user_uploaded_image] = $(user_upload_elem)[0].files;
+            const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
+            let bot_image_uri = $(bot_image_elem).attr("src");
+            if (user_uploaded_image) {
+                bot_image_uri = URL.createObjectURL(user_uploaded_image);
+            } else if (follow_base_bot && new_base_bot_name) {
+                const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
+                bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
+            }
+            $(bot_image_elem).attr("src", bot_image_uri);
+        }
+    @endonce
 </script>

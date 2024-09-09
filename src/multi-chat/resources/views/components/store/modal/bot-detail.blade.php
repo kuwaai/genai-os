@@ -1,3 +1,4 @@
+@props(['result'])
 <div id="detail-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
     class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-4xl max-h-full">
@@ -41,7 +42,7 @@
             </div>
             <!-- Modal body -->
             <form method="post" action="{{ route('store.update') }}" class="p-6" id="update_bot" enctype="multipart/form-data"
-                onsubmit="return checkForm()">
+                onsubmit="return checkUpdateBotForm()">
                 @csrf
                 @method('patch')
                 <input name="id" hidden>
@@ -174,6 +175,16 @@
                                     oninput="change_bot_image('#llm_img2', '#update-bot_image', $(this).val())"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="{{ __('store.bot.base_model.label') }}">
+                                    @once
+                                    <datalist id="llm-list">
+                                        @foreach ($result as $LLM)
+                                            <option
+                                                src="{{ $LLM->image ? asset(Storage::url($LLM->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}"
+                                                value="{{ $LLM->name }}" data-access-code="{{ $LLM->access_code }}">
+                                            </option>
+                                        @endforeach
+                                    </datalist>
+                                @endonce
                             </div>
                             <div class="w-full">
                                 <label for="bot_name2"
@@ -383,7 +394,7 @@
         ace.edit('modelfile-editor').gotoLine(0);
     }
 
-    function checkForm() {
+    function checkUpdateBotForm() {
         if ($("#update_bot input[name='llm_name']").val() && $("#update_bot input[name='bot_name']").val()) {
             $('#detail-modal textarea[name=modelfile]').val(modelfile_to_string(modelfile_parse(ace.edit(
                     'modelfile-editor')
@@ -530,4 +541,26 @@
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         editor.setTheme("ace/theme/monokai");
     }
+    @once
+    function change_bot_image(bot_image_elem, user_upload_elem, new_base_bot_name) {
+            /**
+             * Dynamically updates the bot's displayed image based on user interaction.
+             *
+             * Image selection priority:
+             * 1. User-uploaded image (highest)
+             * 2. Base bot image (if the bot image hasn't been changed)
+             * 3. Original image (lowest)
+             */
+            const [user_uploaded_image] = $(user_upload_elem)[0].files;
+            const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
+            let bot_image_uri = $(bot_image_elem).attr("src");
+            if (user_uploaded_image) {
+                bot_image_uri = URL.createObjectURL(user_uploaded_image);
+            } else if (follow_base_bot && new_base_bot_name) {
+                const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
+                bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
+            }
+            $(bot_image_elem).attr("src", bot_image_uri);
+        }
+    @endonce
 </script>

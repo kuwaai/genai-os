@@ -27,11 +27,11 @@
     @if ($history->isbot)
         @if (in_array('quote', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_react_message'))
-                <div id="{{ $history->id }}_react_quote" role="tooltip"
-                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('chat.react_btn.quote') }}
-                    <div class="tooltip-arrow" data-popper-arrow></div>
-                </div>
+            <div id="{{ $history->id }}_react_quote" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                {{ __('chat.react_btn.quote') }}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
             <button data-tooltip-target="{{ $history->id }}_react_quote" data-tooltip-placement="top"
                 onclick="quote({{ $history->bot_id }}, {{ $history->id }}, this)"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg">
@@ -48,11 +48,11 @@
         @endif
         @if (in_array('feedback', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_feedback'))
-                <div id="{{ $history->id }}_react_like" role="tooltip"
-                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('chat.react_btn.like') }}
-                    <div class="tooltip-arrow" data-popper-arrow></div>
-                </div>
+            <div id="{{ $history->id }}_react_like" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                {{ __('chat.react_btn.like') }}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
             <button data-tooltip-target="{{ $history->id }}_react_like" data-tooltip-placement="top"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg {{ $history->nice === true ? 'text-green-600' : 'text-black' }}"
                 @if (request()->user()->hasPerm('Room_update_detail_feedback')) data-modal-target="feedback" data-modal-toggle="feedback" @endif
@@ -89,11 +89,11 @@
         @endif
         @if (in_array('translate', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_react_message'))
-                <div id="{{ $history->id }}_react_translate" role="tooltip"
-                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('chat.react_btn.translate') }}
-                    <div class="tooltip-arrow" data-popper-arrow></div>
-                </div>
+            <div id="{{ $history->id }}_react_translate" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                {{ __('chat.react_btn.translate') }}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
             <button data-tooltip-target="{{ $history->id }}_react_translate" data-tooltip-placement="top"
                 onclick="translates(this, {{ $history->id }}, null)"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg translates">
@@ -127,18 +127,16 @@
         @endif
         @if (in_array('other', json_decode($history->config)->react_btn ?? []) &&
                 request()->user()->hasPerm('Room_update_react_message'))
-                <!--<div id="{{ $history->id }}_react_safetyGuard" role="tooltip"
-                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                    {{ __('chat.react_btn.safety_guard') }}
-                    <div class="tooltip-arrow" data-popper-arrow></div>
-                </div>
-            <button data-tooltip-target="{{ $history->id }}_react_safetyGuard" data-tooltip-placement="top"
-                onclick="translates(this, {{ $history->id }}, 'safety-guard')"
+                <!--
+            <div id="{{ $history->id }}_react_delete" role="tooltip"
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                {{ __('chat.react_btn.delete') }}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+            <button data-tooltip-target="{{ $history->id }}_react_delete" data-tooltip-placement="top"
+                onclick="delete_msg({{$history->id}})"
                 class="flex text-black hover:bg-gray-400 p-2 h-[32px] w-[32px] justify-center items-center rounded-lg translates">
-                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512">
-                    <path
-                        d="M256 0c4.6 0 9.2 1 13.4 2.9L457.7 82.8c22 9.3 38.4 31 38.3 57.2c-.5 99.2-41.3 280.7-213.6 363.2c-16.7 8-36.1 8-52.8 0C57.3 420.7 16.5 239.2 16 140c-.1-26.2 16.3-47.9 38.3-57.2L242.7 2.9C246.8 1 251.4 0 256 0zm0 66.8V444.8C394 378 431.1 230.1 432 141.4L256 66.8l0 0z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1 -32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1 -32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1 -32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.7 23.7 0 0 0 -21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0 -16-16z"/></svg>
                 <svg aria-hidden="true"
                     class="hidden inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-400 fill-blue-800 w-[16px] h-[16px]"
                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
