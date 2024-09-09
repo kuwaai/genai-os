@@ -95,20 +95,6 @@ class KuwaClient {
         return response;
     }
 
-    async deleteRoomMessage(msg_id) {
-        const url = `${this.baseUrl}/api/user/delete/room/message`;
-        const headers = {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.authToken}`,
-        };
-        const requestBody = {
-            id: msg_id
-        };
-
-        const response = await this._makeRequest(url, "DELETE", headers, JSON.stringify(requestBody));
-        return response;
-    }
-
     async createBot(llmAccessCode, botName, options = {}) {
         const url = `${this.baseUrl}/api/user/create/bot`;
         const headers = {

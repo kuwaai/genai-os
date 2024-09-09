@@ -67,7 +67,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
 
             Route::prefix('read')->group(function () {
                 Route::get('/rooms', [RoomController::class, 'api_read_rooms'])->name('api.user.read.rooms');
-                Route::get('/messages', [RoomController::class, 'api_read_messages'])->name('api.user.read.messages');
                 Route::get('/models', [ManageController::class, 'api_read_models'])->name('api.user.read.models');
                 Route::get('/bots', [BotController::class, 'api_read_bots'])->name('api.user.read.bots');
             });
@@ -75,7 +74,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
             Route::prefix('delete')->group(function () {
                 Route::prefix('room')->group(function () {
                     Route::delete('/', [RoomController::class, 'api_delete_room'])->name('api.user.delete.room');
-                    Route::delete('/message', [RoomController::class, 'api_delete_message'])->name('api.user.delete.message');
                 });
             });
         });
