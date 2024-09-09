@@ -107,4 +107,55 @@ asyncio.run(main())
 
 This example first creates a new base model and then uses the `create_bot` method to create a new bot that utilizes the newly created base model.
 
+### Doing web action by Kuwa Token
+```python
+from kuwa.client import KuwaClient, ModelOperations, BotOperations, RoomOperations, FileOperations
+client = KuwaClient(base_url="http://localhost/", auth_token='YOUR_TOKEN_HERE')
+
+# Operation methods
+models = ModelOperations(base_url=client.base_url, auth_token=client.auth_token)
+bots = BotOperations(base_url=client.base_url, auth_token=client.auth_token)
+rooms = RoomOperations(base_url=client.base_url, auth_token=client.auth_token)
+files = FileOperations(base_url=client.base_url, auth_token=client.auth_token)
+
+# Create a base model
+response = models.create_base_model(name="My BaseModel", access_code="abc123")
+print(response)
+base_model_id = response["last_llm_id"]
+# Create two bots
+response = bots.create_bot(llm_access_code="abc123", bot_name="My Bot 1")
+print(response)
+bot_1 = response["last_bot_id"]
+response = bots.create_bot(llm_access_code="abc123", bot_name="My Bot 2")
+print(response)
+bot_2 = response["last_bot_id"]
+
+# List base models
+response = models.list_base_models()
+print(response)
+
+# List bots
+response = bots.list_bots()
+print(response)
+
+# List rooms
+response = rooms.list_rooms()
+print(response)
+
+# Create a room with bot IDs
+bot_ids = [int(i) for i in [bot_1, bot_2]]
+response = rooms.create_room(bot_ids=bot_ids)
+print(response)
+
+# Delete a room by its ID
+room_id = response["result"]
+response = rooms.delete_room(room_id=int(room_id))
+print(response)
+
+# Upload a file
+file_path = "test_file.txt"
+response = files.upload_file(file_path=file_path)
+print(response)
+```
+
 These examples showcase the basic usage of the Kuwa Client Library. For more advanced features and detailed documentation, please refer to the official documentation.

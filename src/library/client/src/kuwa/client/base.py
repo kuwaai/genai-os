@@ -16,6 +16,15 @@ class KuwaClient:
         self.auth_token = auth_token if auth_token is not None else os.environ.get("KUWA_API_KEY", None)
         self.limit = limit
 
+    def _request(self, endpoint, method="GET", json=None, files=None):
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json" if json else None,
+        }
+        response = requests.request(method, f"{self.base_url}/{endpoint}", headers=headers, json=json, files=files)
+        response.raise_for_status()
+        return response.json()
+
     def is_too_long(self, chat_history: [dict]):
         """
         A heuristic method to estimate the tokens
