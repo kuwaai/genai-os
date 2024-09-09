@@ -413,13 +413,9 @@ class RoomController extends Controller
         if ($result) {
             $user = $result;
             if (User::find($user->id)->hasPerm('Room_update_new_chat')) {
-                $this->new($request);
-
-                if (session('room_id') != null) {
-                    return response()->json(['status' => 'success', 'result' => session('room_id')], 200, [], JSON_UNESCAPED_UNICODE);
-                } else {
-                    return response()->json(['status' => 'failed', 'result'=>'Model not founded'], 404, [], JSON_UNESCAPED_UNICODE);
-                }
+                Auth::setUser(User::find($user->id));
+                $room_id = $this->create_room($request);
+                return response()->json(['status' => 'success', 'result' => $room_id], 200, [], JSON_UNESCAPED_UNICODE);
             } else {
                 $errorResponse = [
                     'status' => 'error',
@@ -490,6 +486,7 @@ class RoomController extends Controller
         if ($result) {
             $user = $result;
             if (User::find($user->id)->hasPerm('Room_delete_room_message')) {
+                Auth::setUser(User::find($user->id));
                 $this->new($request);
                 if (session('room_id') != null) {
                     return response()->json(['status' => 'success', 'result' => session('room_id')], 200, [], JSON_UNESCAPED_UNICODE);
@@ -666,6 +663,7 @@ class RoomController extends Controller
         if ($result) {
             $user = $result;
             if (User::find($user->id)->hasPerm('Room_delete_chatroom')) {
+                Auth::setUser(User::find($user->id));
                 $this->delete($request);
                 return response()->json(['status' => session('success') ? 'success' : 'failed'], 200, [], JSON_UNESCAPED_UNICODE);
             } else {
@@ -685,7 +683,7 @@ class RoomController extends Controller
             return response()->json($errorResponse, 401, [], JSON_UNESCAPED_UNICODE);
         }
     }
-    public function delete(Request $request): RedirectResponse
+    public function delete(Request $request)
     {
         $ids = [];
         $chats = ChatRoom::find($request->input('id'));

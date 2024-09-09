@@ -13,6 +13,7 @@ use App\Models\GroupPermissions;
 use App\Models\LLMs;
 use App\Models\Logs;
 use App\Models\Permissions;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -239,6 +240,7 @@ class ManageController extends Controller
             ->first();
         if ($result) {
             $user = $result;
+            Auth::setUser(User::find($user->id));
             if (User::find($user->id)->hasPerm('tab_Manage')) {
                 $rules = (new LLMCreateRequest())->rules();
                 $validator = Validator::make($request->all(), $rules);
