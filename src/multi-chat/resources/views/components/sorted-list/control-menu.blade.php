@@ -19,7 +19,7 @@ Structure of sorting_methods:
 
 <x-dropdown {{ $attributes->merge(['align' => 'right', 'width' => '48']) }}>
     <x-slot name="trigger">
-        <button onclick="$(this).find('.fa-chevron-up').toggleClass('rotate-180')"
+        <button onclick="event.preventDefault();$(this).find('.fa-chevron-up').toggleClass('rotate-180')"
             class="{{ $btn_class }} inline-flex items-center focus:outline-none transition ease-in-out duration-150">
             <div>{{__('room.button.sort_by')}}</div>
 
