@@ -11,7 +11,7 @@ services:
       - kernel
       - multi-chat
     command: [
-      "--api_base_url", "http://web/",
+      "--api_base_url", "http://${DOMAIN_NAME}/",
       "--log", "debug",
     ]
     volumes: [
