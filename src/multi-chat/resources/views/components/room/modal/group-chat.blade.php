@@ -31,13 +31,13 @@
                 id="create_room" onsubmit="return checkForm()">
                 @csrf
                 <div class="flex justify-between">
-                    <p class="inline-block text-sm font-normal text-gray-500 dark:text-gray-400" style="line-height: 1.5rem;">
+                    <p class="inline-block text-sm font-normal text-gray-500 dark:text-gray-400"
+                        style="line-height: 1.5rem;">
                         {{ __('room.modal.label') }}
                     </p>
-                
+
                     <x-sorted-list.control-menu :$sorting_methods
-                     btn_class="rounded-md text-sm font-normal text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100"
-                    />
+                        btn_class="rounded-md text-sm font-normal text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100" />
                 </div>
                 <ul class="my-4 space-y-3 overflow-auto scrollbar flex-1">
                     @foreach ($result as $LLM)
@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
                             </label>
-                        </x-sorted.list.item>
+                            </x-sorted.list.item>
                     @endforeach
                 </ul>
                 <div>
