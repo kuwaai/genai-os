@@ -385,7 +385,15 @@ class BotController extends Controller
                 $bot->save();
             }
         }
-        return redirect()->route('store.home');
+        if ($referer = request()->input('referer')) {
+            if (str_ends_with($referer, 'room')) {
+                return redirect()->route('room.home')->with('llms', request()->input('selected_bots'));
+            }
+            return redirect()->to($referer);
+        } else {
+            return redirect()->route('store.home');
+        }
+        
     }
     public function delete(Request $request): RedirectResponse
     {
