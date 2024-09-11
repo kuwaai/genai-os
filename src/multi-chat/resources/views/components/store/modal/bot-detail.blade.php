@@ -243,6 +243,10 @@
                         @endif
                     </div>
                 </ul>
+                <input name="referer" value="{{ url()->current() }}" hidden>
+                @foreach(session('llms') ?? [] as $bot_id)
+                <input name="selected_bots[]" value="{{ $bot_id }}" hidden>
+                @endforeach
             </form>
         </div>
     </div>

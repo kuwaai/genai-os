@@ -11,7 +11,7 @@
                     <div class="h-full w-full">
                         <img data-tooltip-target="{{ $extra }}llm_{{ $llm->id }}_list"
                             data-tooltip-placement="top" class="h-full w-full"
-                            src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                            src="{{ $llm->image ?? $llm->base_image ? asset(Storage::url($llm->image ?? $llm->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                     </div>
                     <div id="{{ $extra }}llm_{{ $llm->id }}_list" role="tooltip"
                         access_code="{{ $llm->access_code }}"
@@ -48,8 +48,7 @@
         <div class="overflow-y-auto scrollbar flex-1">
             @if ($DC)
                 @foreach ($DC->sortbydesc('created_at') as $dc)
-                    <div
-                        class="overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
+                    <div class="overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
                         <a class="menu-btn text-gray-700 dark:text-white w-full flex justify-center items-center overflow-hidden {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                             href="{{ route('room.chat', $dc->id) }}">
                             <p
@@ -102,7 +101,7 @@
                         <div class="h-full w-full"><img
                                 data-tooltip-target="{{ $extra }}llm_{{ $chat->bot_id }}_list"
                                 data-tooltip-placement="top" class="h-full w-full"
-                                src="{{ $chat->image ? asset(Storage::url($chat->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                src="{{ $chat->image ?? $chat->base_image ? asset(Storage::url($chat->image ?? $chat->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                         </div>
                         <div id="{{ $extra }}llm_{{ $chat->id }}_list" role="tooltip"
                             access_code="{{ $chat->access_code }}"
@@ -114,7 +113,8 @@
                 @endforeach
 
                 @if (count($llms) == 1)
-                    <span class="text-center w-full line-clamp-1 text-black dark:text-white">{{ $llms[0]->name }}</span>
+                    <span
+                        class="text-center w-full line-clamp-1 text-black dark:text-white">{{ $llms[0]->name }}</span>
                 @endif
             </div>
             @if (request()->user()->hasPerm('Room_update_new_chat'))
@@ -137,9 +137,8 @@
                 <hr class="mx-2 mb-1 border-black dark:border-white">
             @endif
             <div class="overflow-y-auto scrollbar flex-1">
-                @foreach ($DC->sortbydesc('created_at')  as $dc)
-                    <div
-                        class="overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
+                @foreach ($DC->sortbydesc('created_at') as $dc)
+                    <div class="overflow-hidden rounded-lg flex dark:hover:bg-gray-700 hover:bg-gray-200">
                         <a class="menu-btn text-gray-700 dark:text-white w-full flex justify-center items-center overflow-hidden {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                             href="{{ route('room.chat', $dc->id) }}">
                             <p

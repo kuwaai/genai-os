@@ -42,34 +42,54 @@
                 @endforeach
             @elseif(!$readonly)
                 @foreach ($llms as $bot)
-                    @env('arena')
-                    @else
+                    @if (!App::environment('arena') && request()->user()->hasPerm('tab_Store'))
                         @php
                             $bot_image_name = $bot->image ?? $bot->base_image;
-                            $bot_image_uri = asset($bot_image_name ? Storage::url($bot_image_name) : '/' . config('app.LLM_DEFAULT_IMG'));
+                            $bot_image_uri = asset(
+                                $bot_image_name ? Storage::url($bot_image_name) : '/' . config('app.LLM_DEFAULT_IMG'),
+                            );
                             $bot_arr = $bot->toArray();
                             unset($bot_arr['base_image']);
-                            $bot_arr = array_merge(
-                                $bot_arr,
-                                [
-                                    'image' => $bot_image_uri,
-                                    'follow_base_bot_image' => is_null($bot->image)
-                                ]
-                            );
+                            $bot_arr = array_merge($bot_arr, [
+                                'image' => $bot_image_uri,
+                                'follow_base_bot_image' => is_null($bot->image),
+                            ]);
+                            if (!request()->user()->hasPerm('Store_read_any_modelfile')) {
+                                if ($bot_arr["owner_id"] != Auth::user()->id) {
+                                    $bot_arr["config"] = '';
+                                }
+                            }
                             $bot_json = json_encode($bot_arr);
-                            $readonly = (request()->user()->id == $bot->owner_id || request()->user()->hasPerm('tab_Manage')) ? 'false' : 'true';
+                            $readonly =
+                                request()->user()->id == $bot->owner_id || request()->user()->hasPerm('tab_Manage')
+                                    ? 'false'
+                                    : 'true';
                         @endphp
-                    @endenv
-                    <div @env('arena') @else onclick="detail_update({{ $bot_json }}, {{ $readonly }})" data-modal-target="detail-modal" data-modal-toggle="detail-modal" @endenv class="@env('arena') @else cursor-pointer @endenv mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                        <img data-tooltip-target="llm_{{ $bot->id }}_chat" data-tooltip-placement="top"
-                            class="h-full w-full"
-                            src="{{ $bot->image ?? $bot->base_image ? asset(Storage::url($bot->image ?? $bot->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                        <div id="llm_{{ $bot->id }}_chat" role="tooltip"
-                            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                            {{ $bot->name }}
-                            <div class="tooltip-arrow" data-popper-arrow></div>
+                        <div onclick="detail_update({{ $bot_json }}, {{ $readonly }})"
+                            data-modal-target="detail-modal" data-modal-toggle="detail-modal"
+                            class="cursor-pointer mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                            <img data-tooltip-target="llm_{{ $bot->id }}_chat" data-tooltip-placement="top"
+                                class="h-full w-full"
+                                src="{{ $bot->image ?? $bot->base_image ? asset(Storage::url($bot->image ?? $bot->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                            <div id="llm_{{ $bot->id }}_chat" role="tooltip"
+                                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                                {{ $bot->name }}
+                                <div class="tooltip-arrow" data-popper-arrow></div>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <div
+                            class="mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                            <img data-tooltip-target="llm_{{ $bot->id }}_chat" data-tooltip-placement="top"
+                                class="h-full w-full"
+                                src="{{ $bot->image ?? $bot->base_image ? asset(Storage::url($bot->image ?? $bot->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                            <div id="llm_{{ $bot->id }}_chat" role="tooltip"
+                                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                                {{ $bot->name }}
+                                <div class="tooltip-arrow" data-popper-arrow></div>
+                            </div>
+                        </div>
+                    @endif
                 @endforeach
             @endif
         </div>
@@ -78,8 +98,9 @@
         <nav x-data="{ open: false }">
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
-                    <button class="p-3 text-black hover:text-black dark:text-white hover:text-gray-300"><svg width="24" height="24"
-                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md">
+                    <button class="p-3 text-black hover:text-black dark:text-white hover:text-gray-300"><svg
+                            width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" class="icon-md">
                             <path fill-rule="evenodd" clip-rule="evenodd"
                                 d="M3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12ZM10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12ZM17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12Z"
                                 fill="currentColor"></path>
@@ -197,7 +218,7 @@
                     var model = $("#" + $.escapeSelector($(element).children("div").children("img").data(
                             "tooltip-target")))
                         .attr("access_code");
-                        console.log($(element).children("div").children("img"))
+                    console.log($(element).children("div").children("img"))
                     if (model == undefined) model = "";
                     row = `assistant	${model}	${msgText}	${chained}\n`;
                 } else {
