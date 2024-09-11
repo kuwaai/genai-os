@@ -8,6 +8,7 @@ Content-Type: application/vnd.kuwabot;
 #!
 KUWABOT version 0.3.3
 KUWABOT name "SearchQA (google)"
+KUWABOT description "This bot can access and process information from the internet using Google Search. It can then provide a concise summary of the results it finds."
 KUWABOT base "search-qa"
 PARAMETER search_engine_url "https://www.google.com/search?q={{}}"
 PARAMETER search_extract_url True
