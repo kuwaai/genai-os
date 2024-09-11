@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 @endforeach
-            @elseif(!$readonly)
+            @else
                 @foreach ($llms as $bot)
                     @if (!App::environment('arena') && request()->user()->hasPerm('tab_Store'))
                         @php
@@ -55,17 +55,13 @@
                                 'follow_base_bot_image' => is_null($bot->image),
                             ]);
                             if (!request()->user()->hasPerm('Store_read_any_modelfile')) {
-                                if ($bot_arr["owner_id"] != Auth::user()->id) {
-                                    $bot_arr["config"] = '';
+                                if ($bot_arr['owner_id'] != Auth::user()->id) {
+                                    $bot_arr['config'] = '';
                                 }
                             }
                             $bot_json = json_encode($bot_arr);
-                            $readonly =
-                                request()->user()->id == $bot->owner_id || request()->user()->hasPerm('tab_Manage')
-                                    ? 'false'
-                                    : 'true';
                         @endphp
-                        <div onclick="detail_update({{ $bot_json }}, {{ $readonly }})"
+                        <div onclick="detail_update({{ $bot_json }}, {{ request()->user()->id == $bot->owner_id || request()->user()->hasPerm('tab_Manage') ? 'false' : 'true' }})"
                             data-modal-target="detail-modal" data-modal-toggle="detail-modal"
                             class="cursor-pointer mx-1 flex-shrink-0 h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
                             <img data-tooltip-target="llm_{{ $bot->id }}_chat" data-tooltip-placement="top"
