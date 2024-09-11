@@ -147,24 +147,24 @@ install_kuwa() {
         done
 }
 
-fix() {
-        cd executor
-        echo "llama-cpp-python @ https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.87/llama_cpp_python-0.2.87-cp310-cp310-linux_x86_64.whl" > requirements.txt
-        cd ../../src/executor
-        sed -i 's/==/ == /g' requirements.txt
-        cd ../../docker/executor
-        local LINES_TO_ADD=$(cat << 'EOF'
-        COPY docker/executor/requirements.txt ./requirements-docker.txt
-EOF
-        )
-        sed -i "8a${LINES_TO_ADD}" "Dockerfile"
-        LINES_TO_ADD=$(cat << 'EOF'
-        RUN pip install --no-cache-dir -r requirements-docker.txt
-EOF
-        )
-        sed -i "9a${LINES_TO_ADD}" "Dockerfile"
-        cd ..
-}
+# fix() {
+#         cd executor
+#         echo "llama-cpp-python @ https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.87/llama_cpp_python-0.2.87-cp310-cp310-linux_x86_64.whl" > requirements.txt
+#         cd ../../src/executor
+#         sed -i 's/==/ == /g' requirements.txt
+#         cd ../../docker/executor
+#         local LINES_TO_ADD=$(cat << 'EOF'
+#         COPY docker/executor/requirements.txt ./requirements-docker.txt
+# EOF
+#         )
+#         sed -i "8a${LINES_TO_ADD}" "Dockerfile"
+#         LINES_TO_ADD=$(cat << 'EOF'
+#         RUN pip install --no-cache-dir -r requirements-docker.txt
+# EOF
+#         )
+#         sed -i "9a${LINES_TO_ADD}" "Dockerfile"
+#         cd ..
+# }
 
 install_all() {
         if [[ -f "$REBOOT_FLAG" ]]; then
@@ -184,7 +184,7 @@ install_all() {
         fi
         install_docker
         install_kuwa
-        fix
+        # fix
         #cd "$PATH/genai-os/docker"
         cp run.sh.sample run.sh
         ./run.sh

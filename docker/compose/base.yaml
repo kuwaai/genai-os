@@ -68,6 +68,9 @@ services:
     build:
       context: ../../
       dockerfile: docker/executor/Dockerfile
+      platforms:
+        - "linux/amd64"
+        # - "linux/arm64"
     entrypoint: /bin/bash -c
     command: ["echo Image builds completed."]
 

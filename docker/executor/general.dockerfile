@@ -5,19 +5,16 @@ WORKDIR /usr/src/app
 RUN apt-get update &&\
     apt-get install -y cmake build-essential git
 
-# Install the dependency of each executor
-COPY docker/executor/requirements.txt ./requirements-docker.txt
-RUN pip install --no-cache-dir -r requirements-docker.txt
+# Install llama-cpp-python == 0.2.87
+# Ref: https://github.com/abetlen/llama-cpp-python/issues/1628
+RUN apt-get install -y musl-dev && \
+    ln -s /usr/lib/$(uname -m)-linux-musl/libc.so /lib/libc.musl-$(uname -m).so.1 &&\
+    pip install --no-cache-dir "llama-cpp-python @ https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.87/llama_cpp_python-0.2.87-cp310-cp310-linux_$(uname -m).whl"
 
 COPY src/executor/requirements.txt ./
 RUN sed -i '/^\.[\/]*/d' ./requirements.txt &&\
     sed -i '/torch.*/d' ./requirements.txt &&\
     pip install --no-cache-dir -r requirements.txt
-
-# Dependency of llama-cpp-python == 0.2.87
-# Ref: https://github.com/abetlen/llama-cpp-python/issues/1628
-RUN apt-get install -y musl-dev && \
-    ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
 # Dependency of ChromeDriver
 RUN apt-get install -y libnss3-dev
