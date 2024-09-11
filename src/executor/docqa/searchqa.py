@@ -156,7 +156,7 @@ class SearchQaExecutor(LLMExecutor):
             before = parsed_modelfile.before_prompt,
             user=latest_user_msg,
             params=self.advanced_search_params,
-            after_prompt = parsed_modelfile.after_prompt
+            after = parsed_modelfile.after_prompt
         )
         logger.debug(f'Query: {query}')
 
