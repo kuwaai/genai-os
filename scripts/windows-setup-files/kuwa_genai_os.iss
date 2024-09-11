@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Kuwa GenAI OS"
-#define MyAppVersion "v0.3.3"
+#define MyAppVersion "v0.3.4"
 #define MyAppPublisher "Kuwa AI"
 #define MyAppURL "https://kuwaai.tw/os/intro"
 #define MyAppIcon "..\..\src\multi-chat\public\images\kuwa-logo.ico"
