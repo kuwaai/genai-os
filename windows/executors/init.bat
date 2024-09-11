@@ -19,7 +19,7 @@ for %%e in ("%cd%.") do set "current_folder=%%~nxe"
 
 REM Define an array to store the model types and their names
 set "names[1]=ChatGPT"
-set "names[2]=Gemini Pro"
+set "names[2]=Gemini"
 set "names[3]=GGUF Model"
 set "names[4]=HuggingFace Model"
 set "names[5]=Ollama"

@@ -100,7 +100,7 @@ const requestData = {
     messages: [
         { role: "user", content: "請自我介紹" } // Requesting a self-introduction
     ],
-    model: "geminipro" // Using the Gemini Pro model
+    model: "geminipro" // Using the Gemini model
 };
 
 // API endpoint for the request

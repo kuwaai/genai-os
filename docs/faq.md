@@ -21,10 +21,10 @@ A: Currently, the system building part leans more towards developers. If you enc
 A: The Kuwa system has been used in the [TAIDE Exhibition Platform](https://chat.td.nchc.org.tw/), [National University of Kaohsiung Generative AI Service Platform](https://chat.nuk.edu.tw/), and other specific application platforms to provide services. If you adopt Kuwa GenAI OS, please let us know.
 
 1-7. Can this system be used without a GPU?
-A: Yes, for the model part, you can connect to the cloud (such as ChatGPT API; Gemini Pro API) or run the model on a GPU (such as NVIDIA CUDA) or CPU (such as LLaMA.cpp) locally.
+A: Yes, for the model part, you can connect to the cloud (such as ChatGPT API; Gemini API) or run the model on a GPU (such as NVIDIA CUDA) or CPU (such as LLaMA.cpp) locally.
 
 1-8. Does Kuwa GenAI OS only support on-premises models?
-A: In addition to on-premises models, it can also integrate cloud models such as OpenAI GPT3.5/4, Google Gemini Pro, etc.
+A: In addition to on-premises models, it can also integrate cloud models such as OpenAI GPT3.5/4, Google Gemini, etc.
 
 1-9. Is this TAIDE model open source?
 A: No, the Kuwa system was developed with the support of the Taiwan's Trusted AI Dialogue Engine (TAIDE) project, but it does not currently include the TAIDE model itself. In the future, when the TAIDE model is made public, it can be directly integrated into the Kuwa system.

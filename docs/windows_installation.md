@@ -9,7 +9,7 @@ Please follow the steps below to install:
 - If you want to load models on GPU, please install [CUDA](https://developer.nvidia.com/cuda-toolkit) first.
 
 ### Quick Installation
-- Gemini Pro and ChatGPT are enabled by default. If you need to run the gguf model, please drop it in the path: executors\llamacpp.
+- Gemini and ChatGPT are enabled by default. If you need to run the gguf model, please drop it in the path: executors\llamacpp.
 - The process will create an admin account. If you need a new one, please refer to the first item in [FAQs](#faq).
 ```bat
 git clone https://github.com/kuwaai/genai-os.git
@@ -48,7 +48,7 @@ cd genai-os/windows
    - **Therefore, please develop the habit of entering `stop` when executing `start.bat` to close the program.**
 
 6. **Set up models:**
-   - By default, ChatGPT and Gemini Pro are preset when the program is just started. Both models are connected to the API, so you need to apply for the corresponding API Key. If you want to start your own model or connect to other APIs, you need to set up executors. However, since this part is extensive, please refer to the tutorial guide [here](./executors/README.md).
+   - By default, ChatGPT and Gemini are preset when the program is just started. Both models are connected to the API, so you need to apply for the corresponding API Key. If you want to start your own model or connect to other APIs, you need to set up executors. However, since this part is extensive, please refer to the tutorial guide [here](./executors/README.md).
 
 ## FAQ
 

@@ -25,7 +25,7 @@
 3. 輸入OpenAI API Token。若不想設定全域Token，可留空白直接按Enter跳過。
 4. 輸入額外參數(請參照[該份教學](../../src/executor/README_TW.md)的kuwa-executor指令參數，如不確定該填什麼，請留空直接Enter調過)。
 
-### Gemini Pro
+### Gemini
 1. 進入`geminipro`資料夾。
 2. 執行`init.bat`檔案。
 3. 輸入Google API Token。若不想設定全域Token，可留空白直接按Enter跳過。

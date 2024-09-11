@@ -25,7 +25,7 @@ By default, these models will only be available to users with Manage Tab permiss
 3. Enter the OpenAI API Token. If you do not want to set a global token, you can leave it blank and press Enter to skip.
 4. Enter additional parameters (please refer to the [tutorial](../src/executor/README.md) for the kuwa-executor command parameters. If you are not sure what to fill in, leave it blank and press Enter to skip)
 
-### Gemini Pro
+### Gemini
 1. Enter the `geminipro` folder.
 2. Execute the `init.bat` file.
 3. Enter the Google API Token. If you do not want to set a global token, you can leave it blank and press Enter to skip.

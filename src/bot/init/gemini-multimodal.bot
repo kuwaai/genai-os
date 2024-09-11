@@ -1,4 +1,4 @@
-Subject: Exported bot "Gemini Pro (Multimodal)"
+Subject: Exported bot "Geminiltimodal)"
 Content-Type: multipart/related; boundary="kuwa28u89"; type=application/vnd.kuwabot
 Content-Transfer-Encoding: quoted-printable
 
@@ -7,7 +7,7 @@ Content-Type: application/vnd.kuwabot;
 
 #!
 KUWABOT version 0.3.3
-KUWABOT name "Gemini Pro (Multimodal)"
+KUWABOT name "Gemini (Multimodal)"
 KUWABOT description "This multimodal model understands and interacts with text, images, audio, and video."
 KUWABOT base "geminipro"
 PARAMETER llm_model gemini-1.5-flash

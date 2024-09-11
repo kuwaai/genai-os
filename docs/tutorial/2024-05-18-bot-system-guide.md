@@ -121,6 +121,6 @@ MESSAGE user It rained heavily today.
 MESSAGE assistant Noted, it was a torrential rain today.
 ```
 
-Please note that not all models support these parameters. For example, the current Gemini Pro API does not support templates. The system prompt part is supported as a before-prompt.
+Please note that not all models support these parameters. For example, the current Gemini API does not support templates. The system prompt part is supported as a before-prompt.
 
 Additionally, ChatGPT does not support template settings. The effectiveness of these settings depends on the model's training. If the training for system prompts is insufficient, it may be challenging to influence the model's behavior using the system prompt alone. You can try to influence the model output using MESSAGE or Before/After prompt instead.
