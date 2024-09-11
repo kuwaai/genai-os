@@ -8,7 +8,11 @@ construct_storage() {
     mkdir -p storage/framework/cache
     mkdir -p storage/app/public
     mkdir -p storage/app/secret
+    mkdir -p storage/app/public/images
     touch storage/database.sqlite
+}
+
+ensure_web_permission() {
     chown -R www-data:www-data storage
 }
 
@@ -99,6 +103,7 @@ import_default_bots() {
     if [ -f "$botfile" ]; then
         php artisan bot:import "$botfile"
     fi
+    ensure_web_permission
     done
 }
 
@@ -121,20 +126,22 @@ upgrade() {
 
     echo ${KUWA_MULTI_CHAT_VERSION} > ${VERSION_FILE}
     printf "Successfully upgraded Kuwa Multi-Chat and it's database to version ${KUWA_MULTI_CHAT_VERSION}\n"
+    # Ready to accept registration request from executors
+    php-fpm &
     
     echo "Try to seeding the database."
     seed_kernel || true
     seed_admin || true
 
     echo "Try to import default bots."
-    php-fpm &
     import_default_bots
-    kill php-fpm
+    kill %1
 }
 
 #=========================================
 
 construct_storage
+ensure_web_permission
 load_db_password
 load_app_key
 load_api_key
