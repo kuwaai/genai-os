@@ -3,7 +3,7 @@ import sys
 import unittest
 import requests_mock
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-from ffmpeg import download_file
+from media_conv import download_file
 
 
 class TestDownloadFile(unittest.TestCase):
