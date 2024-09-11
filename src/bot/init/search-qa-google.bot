@@ -1,0 +1,19 @@
+Subject: Exported bot "SearchQA (google)"
+Date: Wed, 11 Sep 2024 13:13:46 +0800
+Content-Type: multipart/related; boundary="kuwaayc4c"; type=application/vnd.kuwabot
+Content-Transfer-Encoding: quoted-printable
+
+--kuwaayc4c
+Content-Type: application/vnd.kuwabot;
+
+#!
+KUWABOT version 0.3.3
+KUWABOT name "SearchQA (google)"
+KUWABOT base "search-qa"
+PARAMETER search_engine_url "https://www.google.com/search?q={{}}"
+PARAMETER search_extract_url True
+PARAMETER search_num_skip_url 11
+PARAMETER generator_model "geminipro"
+PARAMETER display_hide_ref_content True
+
+--kuwaayc4c--
