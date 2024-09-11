@@ -46,7 +46,7 @@ class ThreadSafeCacheable:
         self.done = True
         return self.result
       else:
-        yield from asyncio.sleep(0.005)
+        yield from asyncio.sleep(0.005).__await__()
 
 def cacheable(f):
     def wrapped(*args, **kwargs):
