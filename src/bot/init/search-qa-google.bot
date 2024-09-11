@@ -11,7 +11,7 @@ KUWABOT name "SearchQA (google)"
 KUWABOT description "This bot can access and process information from the internet using Google Search. It can then provide a concise summary of the results it finds."
 KUWABOT base "search-qa"
 PARAMETER search_engine_url "https://www.google.com/search?q={{}}"
-PARAMETER search_extract_url True
+PARAMETER search_no_extract_url False
 PARAMETER search_num_skip_url 11
 PARAMETER generator_model "geminipro"
 PARAMETER display_hide_ref_content True

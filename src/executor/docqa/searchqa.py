@@ -87,9 +87,9 @@ class SearchQaExecutor(LLMExecutor):
         search_group.add_argument('--google_cse_id', default=None, help='The ID of Google Custom Search Engine.')
         search_group.add_argument('--advanced_search_params', default='-site:youtube.com -site:facebook.com -site:instagram.com -site:twitter.com -site:threads.net -site:play.google.com -site:apps.apple.com -site:www.messenger.com', help='Advanced search parameters')
         search_group.add_argument('--num_url', default=3, type=int, help='Search results reference before RAG.')
-        search_group.add_argument('--num_skip_url', default=0, type=int, help='The offset of the URLs from the searching result.')
-        search_group.add_argument('--engine_url', default=None, help='The URL template of third party search engine. Use "{{}}" placeholder for user prompt.')
-        search_group.add_argument('--extract_url', action='store_true', help='Whether should SearchQA extract URLs from the third party search engine.')
+        search_group.add_argument('--num_skip_url', default=11, type=int, help='The offset of the URLs from the searching result.')
+        search_group.add_argument('--engine_url', default="https://www.google.com/search?q={{}}", help='The URL template of third party search engine. Use "{{}}" placeholder for user prompt.')
+        search_group.add_argument('--no_extract_url', action='store_true', help='Whether should SearchQA extract URLs from the third party search engine.')
         
     def setup(self):
         self.doc_qa.args = self.args
@@ -116,7 +116,7 @@ class SearchQaExecutor(LLMExecutor):
         self.num_url = search_params.get("num_url", self.args.num_url)
         self.num_skip_url = search_params.get("num_skip_url", self.args.num_skip_url)
         self.engine_url = search_params.get("engine_url", self.args.engine_url)
-        self.extract_url = search_params.get("extract_url", self.args.extract_url)
+        self.no_extract_url = search_params.get("no_extract_url", self.args.no_extract_url)
     
     def generate_url_from_query(self, template, query):
         if self.engine_url is None:
@@ -164,11 +164,11 @@ class SearchQaExecutor(LLMExecutor):
 
         try:
 
-            if self.engine_url is None:
+            if not self.google_api_key and not self.searching_engine_id:
                 urls = await google_search(query=query, api_key=self.google_api_key, cse_id=self.searching_engine_id)
             else:
                 urls = [self.generate_url_from_query(template=self.engine_url, query=query)]
-                if self.extract_url:
+                if not self.no_extract_url:
                     urls = await extract_links(url=urls[0], user_agent=self.user_agent)
             
             logger.debug(f"All URLs: {urls}")
