@@ -94,7 +94,7 @@ class GoogleFileStore:
 
 class GeminiExecutor(LLMExecutor):
 
-    model_name: str = "gemini-1.5-pro"
+    model_name: str = "gemini-1.5-flash"
     system_prompt: str = ""
     no_system_prompt: bool = False
     limit: int = 30720
