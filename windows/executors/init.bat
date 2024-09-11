@@ -19,7 +19,7 @@ for %%e in ("%cd%.") do set "current_folder=%%~nxe"
 
 REM Define an array to store the model types and their names
 set "names[1]=ChatGPT"
-set "names[2]=Gemini"
+set "names[2]=Gemini Pro"
 set "names[3]=GGUF Model"
 set "names[4]=HuggingFace Model"
 set "names[5]=Ollama"
@@ -125,9 +125,12 @@ if "taide"=="!current_folder!" (
 	set "worker_path=searchqa.py"
 	set "working_dir=..\..\..\src\executor\docqa\"
 
-	REM not quick
+	REM no api key in quick mode
 	if "%1" == "quick" (
-		exit /b 0
+		set "google_api_key="
+		set "google_cse_id="
+		set "advanced_search_params="
+		goto skip_selection	
 	)
 
 	:input_google_api_key
