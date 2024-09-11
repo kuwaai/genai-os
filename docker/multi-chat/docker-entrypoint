@@ -125,9 +125,11 @@ upgrade() {
     echo "Try to seeding the database."
     seed_kernel || true
     seed_admin || true
-    
+
     echo "Try to import default bots."
+    php-fpm &
     import_default_bots
+    kill php-fpm
 }
 
 #=========================================
