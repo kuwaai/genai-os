@@ -3,7 +3,7 @@ import json
 import fire
 import requests
 
-def invoke_model(prompt, model="gemini-pro", base_url="https://chatdev.gai.tw"):
+def invoke_model(prompt, model="geminipro", base_url="https://chatdev.gai.tw"):
 
     url = f"{base_url}/v1.0/chat/completions"
     auth_token = os.environ["KUWA_AUTH_TOKEN"]

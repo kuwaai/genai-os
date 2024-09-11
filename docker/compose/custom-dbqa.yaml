@@ -17,7 +17,7 @@ services:
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--model", "gemini-pro",
+      "--model", "geminipro",
       "--database", "/var/database/",
       "--log", "debug"
       ]

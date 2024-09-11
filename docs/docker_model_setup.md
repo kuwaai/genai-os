@@ -16,7 +16,7 @@ cp gemini.yaml chatgpt.yaml
 
 * line 2: change `gemini-executor` to `chatgpt-executor`
 * line 8: change `geminipro` to `chatgpt`
-* line 9: change `gemini-pro` to `gpt-4-turbo` or other non-repeated code
+* line 9: change `geminipro` to `gpt-4-turbo` or other non-repeated code
 * line 10: change `Gemini Pro` to `OpenAI GPT-4` or other name that will be shown as Kuwa web server chatroom name
 * line 11: change `gemini.png` to `chatgpt.png`
 * line 15: change `command: ["--api_key", ……` to `command: ["--model", "gpt-4-turbo","--api_key", "<FILL IN YOUR API key>"`
@@ -80,7 +80,7 @@ cp gemini.yaml ollama-<name>.yaml
  
 * line 2: change `gemini-executor` to `ollama-<name>-executor`
 * line 8: change `geminipro` to `chatgpt`
-* line 9: change `gemini-pro` to `<access code>`, recommended a non-repeated model version name
+* line 9: change `geminipro` to `<access code>`, recommended a non-repeated model version name
 * line 10: change `Gemini Pro` to `<the code that will be shown in chat room interface>`
 * line 15: change `command: ["--api_key", ……` to `["--model", "<model name>", "--base_url", "http://host.docker.internal:11434/v1", "--api_key", "ollama"]`
 
@@ -104,7 +104,7 @@ cp gemini.yaml lmstudio-<name>.yaml
  
 * line 2: change `gemini-executor` to `lmstudio-<name>-executor`
 * line 8: change `geminipro` to `chatgpt`
-* line 9: change `gemini-pro` to `<access code>`, recommended a non-repeated model version name
+* line 9: change `geminipro` to `<access code>`, recommended a non-repeated model version name
 * line 10: change `Gemini Pro` to `<the code that will be shown in chat room interface>`
 * line 15: change `command: ["--api_key", ……` to `["--model", "<model name>", "--base_url", "http://host.docker.internal:11434/v1", "--api_key", "lm-studio"]`
 

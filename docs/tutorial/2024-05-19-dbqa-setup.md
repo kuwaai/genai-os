@@ -40,7 +40,7 @@ v0.3.0 has added the RAG toolchain, which allows users to drag and drop their on
          - multi-chat
        command: [
          "--api_base_url", "http://web/",
-         "--model", "gemini-pro"
+         "--model", "geminipro"
          "--database", "/var/database"
          ]
        restart: unless-stopped

@@ -44,7 +44,7 @@ Global API key is suitable for organizations that have purchased Google Gemini s
        image: kuwa-executor
        environment:
          EXECUTOR_TYPE: geminipro
-         EXECUTOR_ACCESS_CODE: gemini-pro
+         EXECUTOR_ACCESS_CODE: geminipro
          EXECUTOR_NAME: Gemini Pro
        depends_on:
          - kernel

@@ -13,7 +13,7 @@ services:
       - multi-chat
     command: [
       "--api_base_url", "http://web/",
-      "--model", "gemini-pro",
+      "--model", "geminipro",
       "--log", "debug"
       ]
     volumes: [

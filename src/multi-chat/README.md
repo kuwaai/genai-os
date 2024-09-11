@@ -79,7 +79,7 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_
     "messages": [
         { "role": "user", "content": "請自我介紹" }
     ],
-    "model": "gemini-pro"
+    "model": "geminipro"
 }' http://127.0.0.1/v1.0/chat/completions
 ```
 
@@ -88,7 +88,7 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_
 For Windows you need to escape these characters, here's how to do it:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"role\": \"user\", \"content\": \"請自我介紹\" }],\"model\": \"gemini-pro\"}" http://127.0.0.1/v1.0/chat/completions
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AUTH_TOKEN" -d "{\"messages\": [{ \"role\": \"user\", \"content\": \"請自我介紹\" }],\"model\": \"geminipro\"}" http://127.0.0.1/v1.0/chat/completions
 ```
 
 ### Using JavaScript
@@ -100,7 +100,7 @@ const requestData = {
     messages: [
         { role: "user", content: "請自我介紹" } // Requesting a self-introduction
     ],
-    model: "gemini-pro" // Using the Gemini Pro model
+    model: "geminipro" // Using the Gemini Pro model
 };
 
 // API endpoint for the request
@@ -188,7 +188,7 @@ request_data = {
     "messages": [
         { "role": "user", "content": "請自我介紹" }
     ],
-    "model": "gemini-pro"
+    "model": "geminipro"
 }
 
 # Perform the HTTP request using the requests library.
@@ -235,7 +235,7 @@ Once you make a successful request to our API, you will receive multiple streami
     ],
     "created": 1705602791,
     "id": "chatcmpl-xxxxx",
-    "model": "gemini-pro",
+    "model": "geminipro",
     "object": "chat.completion",
     "usage": []
 }
@@ -250,7 +250,7 @@ Once you make a successful request to our API, you will receive multiple streami
     ],
     "created": 1705602791,
     "id": "chatcmpl-xxxxx",
-    "model": "gemini-pro",
+    "model": "geminipro",
     "object": "chat.completion",
     "usage": []
 }
@@ -265,7 +265,7 @@ Once you make a successful request to our API, you will receive multiple streami
     ],
     "created": 1705602791,
     "id": "chatcmpl-xxxxx",
-    "model": "gemini-pro",
+    "model": "geminipro",
     "object": "chat.completion",
     "usage": []
 }
@@ -280,7 +280,7 @@ Once you make a successful request to our API, you will receive multiple streami
     ],
     "created": 1705602791,
     "id": "chatcmpl-xxxxx",
-    "model": "gemini-pro",
+    "model": "geminipro",
     "object": "chat.completion",
     "usage": []
 }

@@ -24,12 +24,12 @@ from kuwa.client import KuwaClient
 client = KuwaClient(
     base_url="http://localhost",
     kernel_base_url="http://localhost:9000",
-    model="gemini-pro",
+    model="geminipro",
     auth_token="YOUR_API_TOKEN_HERE"
 )
 ```
 
-This code snippet imports the `KuwaClient` and creates an instance configured to connect to a local Kuwa GenAI OS instance using the "gemini-pro" model. Remember to replace `"YOUR_API_TOKEN_HERE"` with your actual API token.
+This code snippet imports the `KuwaClient` and creates an instance configured to connect to a local Kuwa GenAI OS instance using the "geminipro" model. Remember to replace `"YOUR_API_TOKEN_HERE"` with your actual API token.
 
 ### Using the Chat API
 
