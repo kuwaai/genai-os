@@ -358,7 +358,9 @@ class BotController extends Controller
             if ($request->input('react_btn')) {
                 $config['react_btn'] = $request->input('react_btn');
             }
-            $visibility = $request->input('visibility');
+            if ($request->input('visibility') != null) {
+                $visibility = $request->input('visibility');
+            }
             $permissions = [
                 0 => 'tab_Manage',
                 1 => 'Store_create_community_bot',
@@ -371,9 +373,7 @@ class BotController extends Controller
                 if ($request->input('bot_name')) {
                     $bot->name = $request->input('bot_name');
                 }
-                if ($request->input('bot_describe')) {
-                    $bot->description = $request->input('bot_describe');
-                }
+                $bot->description = $request->input('bot_describe') ?? "";
                 if ($file = $request->file('bot_image')) {
                     if ($bot->image) {
                         Storage::delete($bot->image);
@@ -393,7 +393,6 @@ class BotController extends Controller
         } else {
             return redirect()->route('store.home');
         }
-        
     }
     public function delete(Request $request): RedirectResponse
     {
