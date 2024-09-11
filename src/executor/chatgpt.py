@@ -228,7 +228,10 @@ class ChatGptExecutor(LLMExecutor):
                 return
             
             if not openai_token or len(openai_token) == 0:
-                yield "[Please enter your OpenAI API Token in the user settings on the website in order to use the model.]"
+                if self.args.use_third_party_api_key:
+                    yield "[Please enter your Custom Third-Party API Token in the user settings on the website in order to use the model.]"
+                else:
+                    yield "[Please enter your OpenAI API Token in the user settings on the website in order to use the model.]"
                 return
 
             # Trim the history to fit into the context window
