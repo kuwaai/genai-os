@@ -117,11 +117,11 @@ if "taide"=="!current_folder!" (
 	echo Init SearchQA
 	echo EXECUTOR_TYPE=custom
 	echo EXECUTOR_NAME=SearchQA
-	echo EXECUTOR_ACCESS_CODE=search_qa
+	echo EXECUTOR_ACCESS_CODE=search-qa
 	
 	set "EXECUTOR_TYPE=custom"
 	set "EXECUTOR_NAME=SearchQA"
-	set "EXECUTOR_ACCESS_CODE=search_qa"
+	set "EXECUTOR_ACCESS_CODE=search-qa"
 	set "worker_path=searchqa.py"
 	set "working_dir=..\..\..\src\executor\docqa\"
 
