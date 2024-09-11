@@ -66,7 +66,7 @@ This article will provide you steps on how to implement SearchQA.
          - multi-chat
        command: [
          "--api_base_url", "http://web/",
-         "--model", "gemini-pro",
+         "--model", "geminipro",
          "--google_api_key", "<YOUR_GOOGLE_API_KEY>",
          "--google_cse_id", "<YOUR_GOOGLE_CUSTOM_SEARCH_ENGINE_ID>",
          #"--restricted_sites", "example.tw;example.com"

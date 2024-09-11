@@ -13,6 +13,7 @@ confs=(
   "gemini"
   "chatgpt"
   "dall-e"
+  "llama3.1-70b-groq"
   "docqa"
   "searchqa"
 )

@@ -33,7 +33,7 @@ return [
     'label.taide_api' => 'Kuwa密钥',
     'label.openai_api' => 'OpenAI API密钥',
     'label.google_api' => 'Google API密钥',
-    'label.third_party_api' => '第三方 API 密钥（例如：Gorq、Cerebras）',
+    'label.third_party_api' => '自定义第三方 API 密钥（例如：Groq、Cerebras）',
     'label.stay_secure' => '请多留意您的外部密钥用量！',
 
     //Delete Account

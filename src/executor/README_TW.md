@@ -74,7 +74,7 @@ kuwa-executor huggingface --model_path <PATH_TO_MODEL_FOLDER/HUGGINGFACE_MODEL_N
 
 **3. 串接雲端模型**
 
-您也可以使用 API 金鑰連接到 Gemini Pro 或 ChatGPT這類的雲端模型。
+您也可以使用 API 金鑰連接到 Gemini 或 ChatGPT這類的雲端模型。
 
 - 使用以下指令來啟動executor，api_key為全域的預設key，可不填。
 
@@ -83,7 +83,7 @@ kuwa-executor huggingface --model_path <PATH_TO_MODEL_FOLDER/HUGGINGFACE_MODEL_N
   kuwa-executor chatgpt --api_key <YOUR_API_KEY> --model <gpt-3.5-turbo/gpt-4/gpt-4-32k/...>
   ```
 
-- 預設情況下，這兩個會使用 `gemini-pro` 和 `chatgpt` 作為access_code來架設模型。若要調整架設的access_code，請使用 `--access_code <您想要的訪問碼>`。
+- 預設情況下，這兩個會使用 `geminipro` 和 `chatgpt` 作為access_code來架設模型。若要調整架設的access_code，請使用 `--access_code <您想要的訪問碼>`。
 
 ### 進階使用
 

@@ -9,7 +9,7 @@
 - 如要在GPU上載入模型，請先安裝好[CUDA](https://developer.nvidia.com/cuda-toolkit)。
 
 ### 快速安裝
-- 預設會啟用Gemini Pro與ChatGPT兩個模型，如需連帶執行gguf模型可提前先丟至executors\llamacpp路徑下。
+- 預設會啟用Gemini與ChatGPT兩個模型，如需連帶執行gguf模型可提前先丟至executors\llamacpp路徑下。
 - 過程會創建管理者權限帳號，如需重新創建，請參照[常見問題](#常見問題)第一項。
 ```bat
 git clone https://github.com/kuwaai/genai-os.git
@@ -48,7 +48,7 @@ cd genai-os/windows
    - **因此請在執行`start.bat`時養成習慣輸入`stop`的方式來關閉該程式。**
 
 6. **設定模型：**
-   - 剛啟動該程式的狀態下預設有ChatGPT、Gemini Pro，兩種模型皆為串接API，因此需要申請對應的API Key，如果您想啟動自己的模型，或串接其他的API，則需要設定executors，但這部分由於篇幅龐大，請參考[該處](./executors/README_TW.md)的教學指南。
+   - 剛啟動該程式的狀態下預設有ChatGPT、Gemini，兩種模型皆為串接API，因此需要申請對應的API Key，如果您想啟動自己的模型，或串接其他的API，則需要設定executors，但這部分由於篇幅龐大，請參考[該處](./executors/README_TW.md)的教學指南。
 
 ## 常見問題
 

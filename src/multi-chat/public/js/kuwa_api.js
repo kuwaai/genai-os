@@ -208,7 +208,7 @@ const client = new KuwaClient("YOUR_API_TOKEN_HERE","http://localhost");
 const messages = [{ role: "user", content: "hi" }];
 (async () => {
     try {
-        for await (const chunk of client.chatCompleteAsync("gemini-pro",messages)) {
+        for await (const chunk of client.chatCompleteAsync("geminipro",messages)) {
             console.log(chunk);
         }
     } catch (error) {
@@ -218,7 +218,7 @@ const messages = [{ role: "user", content: "hi" }];
 
 -- Non-Streaming --
 const messages = [{ role: "user", content: "hi" }];
-const result = client.chatComplete("gemini-pro",messages);
+const result = client.chatComplete("geminipro",messages);
 console.log(result);
 console.log(result.choices[0].message.content)
 

@@ -605,8 +605,8 @@ class ProfileController extends Controller
                 [$event, $msg] = explode(' ', $message, 2);
                 if ($event == 'New') {
                     $msg = json_decode($msg, false, JSON_INVALID_UTF8_IGNORE)->msg;
-                    $callback($event, $msg);
                 }
+                $callback($event, $msg);
                 if ($event == 'Ended') {
                     // Terminate the subscribe loop
                     $client->disconnect();

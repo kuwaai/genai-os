@@ -5,7 +5,7 @@ services:
       EXECUTOR_TYPE: llamacpp
       EXECUTOR_ACCESS_CODE: llama3.1-8b-instruct
       EXECUTOR_NAME: Meta LLaMA3.1 8B Instruct
-      EXECUTOR_IMAGE: llama3_1.png # Refer to src/multi-chat/public/images
+      EXECUTOR_IMAGE: llama3_1.jpeg # Refer to src/multi-chat/public/images
       # HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     depends_on:
       - executor-builder

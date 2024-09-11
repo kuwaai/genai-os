@@ -72,7 +72,7 @@ kuwa-executor huggingface --model_path <PATH_TO_MODEL_FOLDER/HUGGINGFACE_MODEL_N
 
 **3. Connect to Cloud Model**
 
-You can use API Keys to connect to cloud models such as Gemini Pro or ChatGPT.
+You can use API Keys to connect to cloud models such as Gemini or ChatGPT.
 
 - Start the executor with the following commands. The `api_key` is optional and will default to the global value.
 
@@ -81,7 +81,7 @@ You can use API Keys to connect to cloud models such as Gemini Pro or ChatGPT.
   kuwa-executor chatgpt --api_key <YOUR_API_KEY> --model <gpt-3.5-turbo/gpt-4/gpt-4-32k/...>
   ```
 
-- By default, these will set up the executor with `gemini-pro` and `chatgpt` as the `access_code` respectively. If you'd like to adjust the `access_code` the executor is setup with, you can use `--access_code <your_desired_access_code>`.
+- By default, these will set up the executor with `geminipro` and `chatgpt` as the `access_code` respectively. If you'd like to adjust the `access_code` the executor is setup with, you can use `--access_code <your_desired_access_code>`.
 
 ### Advanced Usage
 

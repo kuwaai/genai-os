@@ -49,7 +49,7 @@ if __name__ == '__main__':
     )
     parser.add_argument("--base-url", default=os.environ.get('KUWA_API_BASE_URL', 'http://localhost/v1.0/'), help="The custom base URL for the Kuwa API.")
     parser.add_argument("--api-key", default=os.environ.get('KUWA_API_KEY'), help="The API token for authentication with Kuwa.")
-    parser.add_argument("--model", default="gemini-pro", help="The custom base URL for the Kuwa API.")
+    parser.add_argument("--model", default="geminipro", help="The custom base URL for the Kuwa API.")
     parser.add_argument("--log", type=str, default="INFO", help="the log level. (INFO, DEBUG, ...)")
     args = parser.parse_args()
 

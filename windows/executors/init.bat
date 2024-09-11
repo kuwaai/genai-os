@@ -117,17 +117,20 @@ if "taide"=="!current_folder!" (
 	echo Init SearchQA
 	echo EXECUTOR_TYPE=custom
 	echo EXECUTOR_NAME=SearchQA
-	echo EXECUTOR_ACCESS_CODE=search_qa
+	echo EXECUTOR_ACCESS_CODE=search-qa
 	
 	set "EXECUTOR_TYPE=custom"
 	set "EXECUTOR_NAME=SearchQA"
-	set "EXECUTOR_ACCESS_CODE=search_qa"
+	set "EXECUTOR_ACCESS_CODE=search-qa"
 	set "worker_path=searchqa.py"
 	set "working_dir=..\..\..\src\executor\docqa\"
 
-	REM not quick
+	REM no api key in quick mode
 	if "%1" == "quick" (
-		exit /b 0
+		set "google_api_key="
+		set "google_cse_id="
+		set "advanced_search_params="
+		goto skip_selection	
 	)
 
 	:input_google_api_key

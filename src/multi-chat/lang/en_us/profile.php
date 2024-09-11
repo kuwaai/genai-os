@@ -33,7 +33,7 @@ return [
     'label.taide_api' => 'Kuwa API Key',
     'label.openai_api' => 'OpenAI API Key',
     'label.google_api' => 'Google API Key',
-    'label.third_party_api' => 'Third-Party API Keys (e.g., Gorq, Cerebras)',
+    'label.third_party_api' => 'Custom Third-Party API Keys (e.g., Groq, Cerebras)',
     'label.stay_secure' => 'Please be careful about your external API usage!',
 
     //Delete Account

@@ -33,7 +33,7 @@ return [
     'label.taide_api' => 'Clé Kuwa',
     'label.openai_api' => 'Clé API OpenAI',
     'label.google_api' => 'Clé API Google',
-    'label.third_party_api' => 'Clés API tierces (par exemple, Gorq, Cerebras)',
+    'label.third_party_api' => 'Clés API tierces personnalisées (par exemple, Groq, Cerebras)',
     'label.stay_secure' => 'Faites attention à l\'utilisation de vos clés externes !',
 
     //Supprimer le compte

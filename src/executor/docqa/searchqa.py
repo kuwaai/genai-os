@@ -152,7 +152,12 @@ class SearchQaExecutor(LLMExecutor):
         latest_user_record = next(filter(lambda x: x["role"] == "user", reversed(chat_history)))
         latest_user_msg = latest_user_record["content"]
 
-        query = "{user} {params}".format(user=latest_user_msg, params=self.advanced_search_params)
+        query = "{before} {user} {params} {after}".format(
+            before = parsed_modelfile.before_prompt,
+            user=latest_user_msg,
+            params=self.advanced_search_params,
+            after = parsed_modelfile.after_prompt
+        )
         logger.debug(f'Query: {query}')
 
         urls = []

@@ -12,7 +12,7 @@ https://developer.nvidia.com/cuda-downloads
 
 Kuwa系統還在持續開發及改善，難免會發生不穩。本系統生成的內容僅供參考，不擔保其正確性，仍需使用者再行查證；請勿將不適的對話內容公開，以免帶來不預期的困擾。
 
-此客製化系統亦支援串接OpenAI ChatGPT及Google Gemini Pro，使用前請先依說明設定好全系統使用或個人使用的API Keys。
+此客製化系統亦支援串接OpenAI ChatGPT及Google Gemini，使用前請先依說明設定好全系統使用或個人使用的API Keys。
 
 如遇到問題，歡迎到Kuwa的開源社群詢問。更進一步的資訊參見： https://kuwaai.tw/
 

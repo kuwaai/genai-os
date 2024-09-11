@@ -121,6 +121,7 @@ if not exist "packages\%python_folder%\Scripts\pip.exe" (
 	popd
 ) else (
     echo pip already installed, skipping installing.
+    python -m pip install --upgrade pip
 )
 
 REM Check if .env file exists
@@ -214,6 +215,7 @@ for %%f in (*) do (
 )
 popd
 
+echo Installation is complete. Please wait for any other open Command Prompts to exit. You may need to manually close them if they don't close automatically.
 goto :eof
 
 :: Sub-Routines

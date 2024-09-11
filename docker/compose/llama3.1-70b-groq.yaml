@@ -1,0 +1,28 @@
+services:
+  llama3.1-70b-groq-executor:
+    image: kuwaai/model-executor
+    environment:
+      EXECUTOR_TYPE: chatgpt
+      EXECUTOR_ACCESS_CODE: llama3.1-70b
+      EXECUTOR_NAME: Llama3.1 70B (Groq API)
+      EXECUTOR_IMAGE: llama3_1.jpeg # Refer to src/multi-chat/public/images
+    depends_on:
+      - executor-builder
+      - kernel
+    command: [
+      "--log", "debug",
+      "--base_url", "https://api.groq.com/openai/v1/",
+      "--model", "llama-3.1-70b-versatile",
+      "--context_window", "131072",
+
+      # Method 1: System-wise API key
+      # "--no_override_api_key", # Disable override the system API key with user API key.
+      # "--api_key", "YOUR_API_KEY", # Input the API key that you have applied for
+
+      # Method 2: Per-user API key
+      "--use_third_party_api_key", # Use the "Third-Party API Keys" from from user setting in Multi-Chat.
+    ]
+    restart: unless-stopped
+    extra_hosts:
+      - "localhost:host-gateway"
+    networks: ["backend"]
