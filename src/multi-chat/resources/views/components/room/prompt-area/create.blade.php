@@ -46,7 +46,7 @@
                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                         </div>
                                         <img
-                                            src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                            src="{{ $llm->image ?? $llm->base_image ? asset(Storage::url($llm->image ?? $llm->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                                         @endenv
                                     </div>
                                 </span>
@@ -71,7 +71,7 @@
                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                         </div>
                                         <img
-                                            src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                            src="{{ $llm->image ?? $llm->base_image ? asset(Storage::url($llm->image ?? $llm->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
                                         @endenv
                                     </div>
                                 </span>
