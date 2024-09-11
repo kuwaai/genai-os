@@ -19,6 +19,9 @@ RUN sed -i '/^\.[\/]*/d' ./requirements.txt &&\
 RUN apt-get install -y musl-dev && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
+# Dependency of ChromeDriver
+RUN apt-get install -y libnss3-dev
+
 COPY src/executor/docqa/requirements.txt ./docqa/requirements.txt
 RUN pip install --no-cache-dir -r ./docqa/requirements.txt
 
