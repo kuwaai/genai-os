@@ -192,7 +192,8 @@ class SearchQaExecutor(LLMExecutor):
         try:
             urls, history = await self.search_url(history, modelfile)
 
-            if len(urls) == 0: raise NoUrlException(i18n.t("searchqa.search_unreachable"))
+            if len(urls) == 0 and not self.doc_qa.allow_failback:
+                raise NoUrlException(i18n.t("searchqa.search_unreachable"))
 
             self.proc = True
             response_generator = self.doc_qa.doc_qa(

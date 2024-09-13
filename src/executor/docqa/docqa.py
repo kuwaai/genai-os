@@ -29,6 +29,25 @@ from src.crawler import Crawler
 
 logger = logging.getLogger(__name__)
 
+def split_cmd_history(history: [dict], cmd_regex):
+    history = history.copy()
+    cmds = []
+    new_history = []
+
+    for record in history:
+        if record['role'] == 'user':
+            prompt = record['content']
+            cmd = [re.match(r, prompt) for r in cmd_regex]
+            cmd = list(filter(None, cmd))
+            for c in cmd:
+                prompt = prompt.replace(c[0], '')
+            cmds.extend([c.groups()[1:] for c in cmd])
+            record['content'] = prompt
+        new_history.append(record)
+
+    logger.debug(f"Commands: {cmds}; History: {new_history}")
+    return cmds, new_history
+
 class NoUrlException(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -36,6 +55,8 @@ class NoUrlException(Exception):
         return self.msg
 
 class DocQaExecutor(LLMExecutor):
+    cmd_regex = [r"(/(retriever)\s+(on|off))"]
+
     def __init__(self):
         super().__init__()
         
@@ -63,6 +84,7 @@ class DocQaExecutor(LLMExecutor):
         generator_group.add_argument('--api_key', default=None, help='The API authentication token of Kuwa multi-chat WebUI')
         generator_group.add_argument('--limit', default=3072, type=int, help='The limit of the LLM\'s context window')
         generator_group.add_argument('--model', default=None, help='The model name (access code) on Kuwa multi-chat WebUI')
+        generator_group.add_argument('--no_failback', action='store_true', help='Disable the failback mechanism.')
         
         display_group = parser.add_argument_group('Display Options')
         display_group.add_argument('--hide_ref', action="store_true", help="Do not show the reference at the end.")
@@ -98,6 +120,7 @@ class DocQaExecutor(LLMExecutor):
         i18n.config.set("locale", self.lang)
 
         self.pre_built_db = retriever_params.get("database", self.args.database)
+        self.allow_failback = generator_params.get("failback", not self.args.no_failback)
         self.with_ref = not display_params.get("hide_ref", self.args.hide_ref)
         self.display_ref_content = not display_params.get("hide_ref_content", self.args.hide_ref_content)
         self.llm = KuwaClient(
@@ -138,7 +161,7 @@ class DocQaExecutor(LLMExecutor):
         await loop.run_in_executor(None, document_store.load_embedding_model)
         return document_store
 
-    async def doc_qa(
+    async def _dbqa_and_docqa(
         self,
         urls: [str],
         chat_history: [dict],
@@ -175,6 +198,57 @@ class DocQaExecutor(LLMExecutor):
                 await response_generator.aclose()
             yield reply
     
+    async def _failback_to_generator(self, chat_history: [dict], modelfile:Modelfile):
+        _, history = split_cmd_history(chat_history, self.cmd_regex)
+        
+        logger.debug(f"History: {history}")
+        response_generator = self.llm.chat_complete(messages=history)
+
+        self.proc = True
+        async for reply in response_generator:
+            if not self.proc:
+                await response_generator.aclose()
+            yield reply
+
+    def is_rag_session_ended(self, history: [dict], url):
+        history = history.copy()
+        cmd_prefix = "retriever"
+        session_activated = url is not None
+        cmds, history = split_cmd_history(history=history, cmd_regex=self.cmd_regex)
+        cmds = filter(lambda x: x[0] == cmd_prefix, cmds)
+        for cmd in cmds:
+            if cmd[1] == "on":
+                session_activated = True
+            elif cmd[1] == "off":
+                session_activated = False
+        
+        return not session_activated
+    
+    async def doc_qa(
+        self,
+        urls: [str],
+        chat_history: [dict],
+        modelfile:Modelfile,
+    ):
+        should_failback = self.pre_built_db is None and all([l is None for l in urls])
+        rag_session_ended = self.is_rag_session_ended(chat_history, urls)
+        logger.debug(f"Should failback: {should_failback}; RAG session ended: {rag_session_ended}; Allow failback: {self.allow_failback}")
+        if (rag_session_ended or should_failback) and self.allow_failback:
+            response_generator = self._failback_to_generator(
+                chat_history = chat_history,
+                modelfile = modelfile
+            )
+        else:
+            _, chat_history = split_cmd_history(history=chat_history, cmd_regex=self.cmd_regex)
+            response_generator = self._dbqa_and_docqa(
+                urls = urls,
+                chat_history = chat_history,
+                modelfile = modelfile,
+            )
+        
+        async for reply in response_generator:
+            yield reply
+    
     async def llm_compute(self, history: list[dict], modelfile:Modelfile):
         await self._app_setup(params=modelfile.parameters)
 
@@ -182,12 +256,12 @@ class DocQaExecutor(LLMExecutor):
             url = None
             if self.pre_built_db is None:
                 url, history = extract_last_url(history)
-                if url is None:
+                if url is None and not self.allow_failback:
                     raise NoUrlException(i18n.t('docqa.no_url_exception'))
             response_generator = self.doc_qa(
                 urls = [url],
                 chat_history = history,
-                modelfile=modelfile,
+                modelfile = modelfile,
             )
             
             async for reply in response_generator:
