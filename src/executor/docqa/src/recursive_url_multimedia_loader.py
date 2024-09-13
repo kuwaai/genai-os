@@ -240,7 +240,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
                 raw_content = response.text
             else:
                 raw_content = response.content
-            if self.check_response_status and 400 <= response.status_code <= 599:
+            if self.check_response_status and 400 <= response.status_code <= 599 and response.status_code != 403:
                 raise HTTPError(url, response.status_code, response.reason, None, None)
         except (HTTPError, Exception) as e:
             logger.warning(
@@ -321,7 +321,7 @@ class RecursiveUrlMultimediaLoader(BaseLoader):
                     raw_content = await response.text(errors='ignore')
                 else:
                     raw_content = await response.read()
-                if self.check_response_status and 400 <= response.status <= 599:
+                if self.check_response_status and 400 <= response.status <= 599 and response.status != 403:
                     raise HTTPError(url, response.status, response.reason, None, None)
         except (aiohttp.client_exceptions.InvalidURL, HTTPError, Exception) as e:
             logger.warning(
