@@ -36,7 +36,7 @@ def to_openai_chat_format(history: list[dict]):
     history = [
         {
             "role": "assistant" if i["isbot"] else "user",
-            "content": i["msg"]
+            "content": i["msg"] if i["msg"] is not None else ""
         }
         for i in history
     ]
