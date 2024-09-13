@@ -55,7 +55,7 @@ class NoUrlException(Exception):
         return self.msg
 
 class DocQaExecutor(LLMExecutor):
-    cmd_regex = [r"(/(retriever)\s+(on|off))"]
+    cmd_regex = [r"(/(rag)\s+(on|off))"]
 
     def __init__(self):
         super().__init__()
@@ -212,7 +212,7 @@ class DocQaExecutor(LLMExecutor):
 
     def is_rag_session_ended(self, history: [dict], url):
         history = history.copy()
-        cmd_prefix = "retriever"
+        cmd_prefix = "rag"
         session_activated = url is not None
         cmds, history = split_cmd_history(history=history, cmd_regex=self.cmd_regex)
         cmds = filter(lambda x: x[0] == cmd_prefix, cmds)
