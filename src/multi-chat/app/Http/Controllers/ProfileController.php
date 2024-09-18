@@ -398,8 +398,9 @@ class ProfileController extends Controller
             if ($event == 'Error') {
                 throw new \Exception($message);
             }
-
-            $bot_output .= $message;
+            if ($event == 'New') {
+                $bot_output .= $message;
+            }
             $history->fill(['output' => $bot_output]);
             $history->save();
         };
