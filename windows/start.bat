@@ -79,6 +79,11 @@ if defined web_started (
 
 REM Start web
 start http://127.0.0.1
+REM Remake public/storage
+pushd "%~dp0..\src\multi-chat"
+rmdir /Q /S "public\storage"
+call php artisan storage:link
+popd
 
 REM Start Nginx and PHP-FPM
 pushd packages\%php_folder%
@@ -86,21 +91,16 @@ set PHP_FCGI_MAX_REQUESTS=0
 set PHP_FCGI_CHILDREN=20
 start /b RunHiddenConsole.exe php-cgi.exe -b 127.0.0.1:9123
 popd
-pushd "packages\%nginx_folder%"
-
-REM Remake public/storage
-pushd "%~dp0..\src\multi-chat"
-rmdir /Q /S "public\storage"
-call php artisan storage:link
-popd
 
 REM Remove folder nginx_folder/html
 echo Removing folder %nginx_folder%/html...
-rmdir /Q /S "html"
+rmdir /Q /S "packages\%nginx_folder%\html"
 
 REM Make shortcut from nginx_folder/html to multi-chat/public
 echo Creating shortcut from %nginx_folder%/html to ../public...
-mklink /j "html" "%~dp0..\src\multi-chat\public"
+mklink /j "packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
+
+pushd "packages\%nginx_folder%"
 
 echo "Nginx started!"
 start /b .\nginx.exe
