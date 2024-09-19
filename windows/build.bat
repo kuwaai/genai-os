@@ -154,14 +154,6 @@ call php artisan config:cache
 call php artisan config:clear
 popd
 
-REM Remove folder nginx_folder/html
-echo Removing folder %nginx_folder%/html...
-rmdir /Q /S "packages\%nginx_folder%\html"
-
-REM Make shortcut from nginx_folder/html to ../public
-echo Creating shortcut from %nginx_folder%/html to ../public...
-mklink /j "%~dp0packages\%nginx_folder%\html" "%~dp0..\src\multi-chat\public"
-
 REM Install windows dependency
 pushd ".\src"
 call :install-requirements-txt
