@@ -78,7 +78,15 @@
 
     <div class="mt-auto">
         <ul class="pagination">
-            {{ $logs->onEachSide(3)->links('components.pagination', ["query"=>['tab' => 'logs']]) }}
+            {{ $logs->onEachSide(3)->links('components.pagination', ["query"=>[
+                'tab' => 'logs',
+                'start_date' =>session('start_date')
+                'end_date' =>session('end_date')
+                'action' =>session('action')
+                'description' =>session('description')
+                'user_id' =>session('user_id')
+                'ip_address' =>session('ip_address')
+             ]]) }}
         </ul>
     </div>
 
