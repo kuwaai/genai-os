@@ -8,17 +8,21 @@
         "@tailwindcss/forms": "^0.5.2",
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.19",
-        "axios": "^1.7.5",
-        "laravel-vite-plugin": "^0.7.2",
+        "axios": "^1.7.7",
+        "laravel-vite-plugin": "^1.0.5",
         "postcss": "^8.4.38",
         "tailwindcss": "^3.1.0",
-        "vite": "^4.5.3"
+        "vite": "^5.4.7"
     },
     "dependencies": {
         "Carbon": "^0.3.6",
         "dotenv": "^16.3.1",
-        "multipart-related": "github:jo/multipart-related#v2.0.0",
+        "multipart-related": "https://github.com/jo/multipart-related.git#v2.0.0",
         "socket.io": "^4.7.0",
         "socketio-auth": "^0.1.1"
+    },
+    "type": "module",
+    "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "^4.22.4"
     }
 }
