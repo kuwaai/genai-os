@@ -25,6 +25,8 @@ return [
         "fr_fr" => "Français (France)",
         "ko_kr" => "한국어 (대한민국)",
     ],
+    'DEFAULT_GROUP' => env("DEFAULT_GROUP", null),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

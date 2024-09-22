@@ -62,7 +62,8 @@ class RegisteredUserController extends Controller
                 'password' => Hash::make($request->password),
             ]);
             
-            $defaultGroup = env('DEFAULT_GROUP');
+            $defaultGroup = config('app.DEFAULT_GROUP');
+
             $inviteToken = $request->invite_token ?? $defaultGroup;
             
             $group = Groups::where('invite_token', '=', $inviteToken)->first();
