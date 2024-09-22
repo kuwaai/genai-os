@@ -30,29 +30,29 @@
         <div class="grid grid-cols-6 gap-4">
             <div class="flex flex-col">
                 <label for="start_date">{{__("dashboard.filter.StartDate")}}</label>
-                <input class="text-black" type="datetime-local" id="start_date" name="start_date">
+                <input class="text-black" type="datetime-local" id="start_date" name="start_date" value="{{session('start_date')}}">
             </div>
             <div class="flex flex-col">
                 <label for="end_date">{{__("dashboard.filter.EndDate")}}</label>
-                <input class="text-black" type="datetime-local" id="end_date" name="end_date">
+                <input class="text-black" type="datetime-local" id="end_date" name="end_date" value="{{session('end_date')}}">
             </div>
     
             <div class="flex flex-col">
                 <label for="action">{{__("dashboard.filter.Action")}}</label>
-                <input class="text-black" type="text" id="action" name="action" autocomplete="off">
+                <input class="text-black" type="text" id="action" name="action" autocomplete="off" value="{{session('action')}}">
             </div>
             <div class="flex flex-col">
                 <label for="description">{{__("dashboard.filter.Description")}}</label>
-                <input class="text-black" type="text" id="description" name="description" autocomplete="off">
+                <input class="text-black" type="text" id="description" name="description" autocomplete="off" value="{{session('description')}}">
             </div>
             <div class="flex flex-col">
                 <label for="user_id">{{__("dashboard.filter.UserID")}}</label>
-                <input class="text-black" type="text" id="user_id" name="user_id" autocomplete="off">
+                <input class="text-black" type="text" id="user_id" name="user_id" autocomplete="off" value="{{session('user_id')}}">
             </div>
     
             <div class="flex flex-col">
                 <label for="ip_address">{{__("dashboard.filter.IPAddress")}}</label>
-                <input class="text-black" type="text" id="ip_address" name="ip_address" autocomplete="off">
+                <input class="text-black" type="text" id="ip_address" name="ip_address" autocomplete="off" value="{{session('ip_address')}}">
             </div>
         </div>
 
