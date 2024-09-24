@@ -167,6 +167,10 @@ if "taide"=="!current_folder!" (
 	set "working_dir=..\..\..\src\executor\speech_recognition\"
 	goto continue
 ) else if "painter" == "!current_folder!" (
+	REM Do not initialize painter in quick mode
+	if "%1" == "quick" (
+		exit /b 0
+	)
 	echo Init Painter
 	echo EXECUTOR_TYPE=custom
 	echo EXECUTOR_NAME=Painter
