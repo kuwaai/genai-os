@@ -44,6 +44,7 @@ class StableDiffusionExecutor(LLMExecutor):
         Override this method to add custom command-line arguments.
         """
         model_group = parser.add_argument_group('Model Options')
+        model_group.add_argument('--preload', action='store_true', help='Pre-load the model at executor startup.')
         model_group.add_argument('--model', type=str, default=self.model_name, help='The name of the stable diffusion model to use.')
         model_group.add_argument('--n_cache', type=int, default=self.n_cache, help='How many models to cache.')
         
@@ -56,7 +57,8 @@ class StableDiffusionExecutor(LLMExecutor):
         self.show_progress = self.args.show_progress
         self.stop = False
         setattr(self, "load_pipe", lru_cache(maxsize=self.n_cache)(self._load_pipe))
-        self.load_pipe(task=Task.TEXT2IMG, model_name=self.model_name)
+        if self.args.preload:
+            self.load_pipe(task=Task.TEXT2IMG, model_name=self.model_name)
 
     def _load_pipe(self, task:Task, model_name:str):
         logger.info(f"Loading model {model_name}")
