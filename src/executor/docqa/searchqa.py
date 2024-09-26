@@ -164,7 +164,7 @@ class SearchQaExecutor(LLMExecutor):
 
         try:
 
-            if not self.google_api_key and not self.searching_engine_id:
+            if self.google_api_key and self.searching_engine_id:
                 urls = await google_search(query=query, api_key=self.google_api_key, cse_id=self.searching_engine_id)
             else:
                 urls = [self.generate_url_from_query(template=self.engine_url, query=query)]
