@@ -181,12 +181,12 @@
                                                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                                                 style="box-shadow:none;" disabled> <label
                                                                 for="create_checkbox_{{ $sub_perm->id }}"
-                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.perm.' . $sub_perm->name) }}</label>
+                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('perm.' . $sub_perm->name) }}</label>
                                                         </div>
                                                         <div id="create_checkbox_{{ $sub_perm->id }}_tooltip"
                                                             role="tooltip"
                                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                                            {{ __('manage.perm.' . $sub_perm->name . '.describe') }}
+                                                            {{ __('perm_describe.' . $sub_perm->name) }}
                                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                                         </div>
                                                     @endforeach
@@ -389,13 +389,13 @@
                                                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                                                 style="box-shadow:none;" disabled>
                                                             <label for="edit_checkbox_{{ $sub_perm->id }}"
-                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.perm.' . $sub_perm->name) }}</label>
+                                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('perm.' . $sub_perm->name) }}</label>
 
                                                         </div>
                                                         <div id="edit_checkbox_{{ $sub_perm->id }}_tooltip"
                                                             role="tooltip"
                                                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                                            {{ __('manage.perm.' . $sub_perm->name . '.describe') }}
+                                                            {{ __('perm_describe.' . $sub_perm->name) }}
                                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                                         </div>
                                                     @endforeach
