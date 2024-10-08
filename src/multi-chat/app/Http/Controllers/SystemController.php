@@ -127,7 +127,6 @@ class SystemController extends Controller
 
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
     }
-    use Symfony\Component\Process\Process;
 
     public function updateWeb(Request $request)
     {
