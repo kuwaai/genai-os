@@ -131,35 +131,38 @@ class SystemController extends Controller
     {
         try {
             // Ensure the working directory is the root of the Laravel project
-            $projectRoot = base_path(); // Laravel root path
-
+            $projectRoot = base_path();  // Laravel root path
+    
             // List of commands to run
-            $commands = ['git stash', 'git pull'];
-
+            $commands = [
+                'git stash',
+                'git pull',
+            ];
+    
             $output = '';
-
+    
             // Run git commands first
             foreach ($commands as $command) {
                 $process = Process::fromShellCommandline($command, $projectRoot);
-                $process->setTimeout(null); // No timeout
-
+                $process->setTimeout(null);  // No timeout
+    
                 // Start process
-                $process->run(function ($type, $buffer) use (&$output) {
+                $process->run(function ($type, $buffer) use (&$output, $projectRoot) {
                     // Detect if git pull is prompting for a password
                     if (strpos($buffer, 'password') !== false) {
                         $output .= "\nPassword prompt detected. Cancelling job...\n";
                         echo json_encode(['status' => 'error', 'output' => $output]);
-                        exit(); // Exit to stop further command execution
+                        exit; // Exit to stop further command execution
                     }
-
+    
                     // Detect dubious ownership error
                     if (strpos($buffer, 'dubious ownership') !== false) {
                         $output .= "\nError: Dubious ownership detected. Please run:\n";
                         $output .= "git config --global --add safe.directory {$projectRoot}\n";
                         echo json_encode(['status' => 'error', 'output' => $output]);
-                        exit(); // Exit to stop further command execution
+                        exit; // Exit to stop further command execution
                     }
-
+    
                     // Append output
                     $output .= $buffer;
                     // Send the output progressively to the client
@@ -167,19 +170,19 @@ class SystemController extends Controller
                     ob_flush();
                     flush();
                 });
-
+    
                 // If the process fails, return the error message
                 if (!$process->isSuccessful()) {
                     $output .= "\nError executing command: $command\n";
                     return response()->json(['status' => 'error', 'output' => $output]);
                 }
             }
-
+    
             // After successful git commands, execute the respective script
             $isWindows = stripos(PHP_OS, 'WIN') === 0;
             $scriptPath = $isWindows ? 'executables/bat/production_update.bat' : 'executables/sh/production_update.sh';
             $scriptDir = dirname($scriptPath); // Get the directory for the script
-
+    
             // If on Linux, set execute permissions
             if (!$isWindows) {
                 // Change to the script directory and set execute permissions
@@ -190,18 +193,18 @@ class SystemController extends Controller
                     ob_flush();
                     flush();
                 });
-
+    
                 // Check for successful chmod execution
                 if (!$chmodProcess->isSuccessful()) {
                     $output .= "\nError making the script executable.\n";
                     return response()->json(['status' => 'error', 'output' => $output]);
                 }
             }
-
+    
             // Change to the script directory and execute the script
             $process = Process::fromShellCommandline("cd $scriptDir && " . basename($scriptPath), $projectRoot);
-            $process->setTimeout(null); // No timeout
-
+            $process->setTimeout(null);  // No timeout
+            
             $process->run(function ($type, $buffer) use (&$output) {
                 // Append output from the script
                 $output .= $buffer;
@@ -210,13 +213,13 @@ class SystemController extends Controller
                 ob_flush();
                 flush();
             });
-
+    
             // Check for successful script execution
             if (!$process->isSuccessful()) {
                 $output .= "\nError executing the script.\n";
                 return response()->json(['status' => 'error', 'output' => $output]);
             }
-
+    
             return response()->json(['status' => 'success', 'output' => $output]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);

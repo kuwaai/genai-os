@@ -171,6 +171,18 @@
                     onclick="submitSettings(true);">
                     {{ __('manage.button.yes') }}
                 </button>
+                <!-- Modal for showing progress -->
+                <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+                    <div class="flex items-center justify-center min-h-screen">
+                        <div class="bg-white rounded-lg p-6 shadow-lg max-w-3xl w-full">
+                            <h2 class="text-xl font-bold mb-4">Command Execution Progress</h2>
+                            <pre id="commandOutput" class="bg-gray-100 p-4 rounded-lg text-sm h-96 overflow-auto"></pre>
+                            <button id="closeModal" class="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">Close</button>
+                        </div>
+                    </div>
+                </div>
+        
+                <div id="status" class="mt-4"></div>
                 <button data-modal-hide="confirm-modal" type="button"
                     class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
                     {{ __('manage.button.no') }}
