@@ -6,6 +6,7 @@ import socket
 import time
 import logging
 import atexit
+import signal
 import asyncio
 from urllib.parse import urljoin
 from typing import Optional
@@ -124,7 +125,15 @@ class BaseExecutor:
                 headers = {'Content-Type': 'text/event-stream; charset=utf-8'}
             )
             return resp
-        
+        @self.app.get("/shutdown")
+        async def shutdown(request: Request):
+            """
+            Gracefully shut down the server.
+            """
+            logger.info("Shutdown requested")
+            signal.raise_signal(signal.SIGINT)
+            return JSONResponse({"msg": "Shutting down..."}, status_code=200)
+
         @self.app.get("/health")
         async def health_check():
             return Response(status_code=204)
