@@ -133,7 +133,7 @@ class SystemController extends Controller
         // Set headers for SSE
         header('Content-Type: text/event-stream');
         header('Cache-Control: no-cache');
-    
+
         try {
             // Ensure the working directory is the root of the Laravel project
             $projectRoot = base_path(); // Laravel root path
@@ -141,19 +141,21 @@ class SystemController extends Controller
             $isWindows = stripos(PHP_OS, 'WIN') === 0;
             $scriptPath = $isWindows ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';
             $scriptDir = dirname($scriptPath); // Get the directory for the script
-    
+
             // Change to the script directory first
             chdir(base_path() . $scriptDir); // Change the working directory
-    
+
             // List of commands to run
             $commands = ['git stash', 'git pull'];
-    
+
             // Run git commands first
             foreach ($commands as $command) {
                 $process = Process::fromShellCommandline($command);
-                $process->setEnv('PATH', '/usr/local/bin:/usr/bin:/bin');
+                $process->setEnv([
+                    'PATH' => '/usr/local/bin:/usr/bin:/bin',
+                ]);
                 $process->setTimeout(null); // No timeout
-    
+
                 // Start process
                 $process->run(function ($type, $buffer) use ($projectRoot) {
                     // Send error messages if specific output is detected
@@ -163,20 +165,20 @@ class SystemController extends Controller
                         flush();
                         exit(); // Exit to stop further command execution
                     }
-    
+
                     if (strpos($buffer, 'dubious ownership') !== false) {
                         echo 'data: ' . json_encode(['status' => 'error', 'output' => "Dubious ownership detected. Please run: git config --global --add safe.directory {$projectRoot}"]) . "\n\n";
                         ob_flush();
                         flush();
                         exit(); // Exit to stop further command execution
                     }
-    
+
                     // Send output to the client in SSE format
                     echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
                     ob_flush();
                     flush();
                 });
-    
+
                 // Check for successful command execution
                 if (!$process->isSuccessful()) {
                     echo 'data: ' . json_encode(['status' => 'error', 'output' => "Error executing command: $command"]) . "\n\n";
@@ -185,17 +187,20 @@ class SystemController extends Controller
                     exit();
                 }
             }
-    
+
             // Make the script executable
             if (!$isWindows) {
-                $chmodProcess = Process::fromShellCommandline("chmod +x " . basename($scriptPath));
-                $chmodProcess->setEnv('PATH', '/usr/local/bin:/usr/bin:/bin');
+                $chmodProcess = Process::fromShellCommandline('chmod +x ' . basename($scriptPath));
+
+                $process->setEnv([
+                    'PATH' => '/usr/local/bin:/usr/bin:/bin',
+                ]);
                 $chmodProcess->run(function ($type, $buffer) {
                     echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
                     ob_flush();
                     flush();
                 });
-    
+
                 if (!$chmodProcess->isSuccessful()) {
                     echo 'data: ' . json_encode(['status' => 'error', 'output' => 'Error making the script executable.']) . "\n\n";
                     ob_flush();
@@ -203,19 +208,24 @@ class SystemController extends Controller
                     exit();
                 }
             }
-    
+
             // After successful git commands and chmod, execute the respective script
             $process = Process::fromShellCommandline('./' . basename($scriptPath));
-            $process->setEnv('PATH', '/usr/local/bin:/usr/bin:/bin');
+
+            if (!$isWindows) {
+                $process->setEnv([
+                    'PATH' => '/usr/local/bin:/usr/bin:/bin',
+                ]);
+            }
             $process->setTimeout(null); // No timeout
-    
+
             $process->run(function ($type, $buffer) {
                 // Send output from the script
                 echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
                 ob_flush();
                 flush();
             });
-    
+
             // Check for successful script execution
             if (!$process->isSuccessful()) {
                 echo 'data: ' . json_encode(['status' => 'error', 'output' => 'Error executing the script.']) . "\n\n";
@@ -223,7 +233,7 @@ class SystemController extends Controller
                 flush();
                 exit();
             }
-    
+
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
             flush();
@@ -233,5 +243,4 @@ class SystemController extends Controller
             flush();
         }
     }
-    
 }
