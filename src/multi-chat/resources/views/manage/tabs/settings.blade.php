@@ -134,7 +134,7 @@
             <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
                 <div class="flex items-center justify-center min-h-screen">
                     <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
-                        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Command Execution Progress
+                        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{__('manage.header.updateWeb')}}
                         </h2>
                         <div id="commandOutput"
                             class="bg-gray-100 scrollbar-y-auto scrollbar dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-x-hidden text-gray-900 dark:text-gray-200 
@@ -142,7 +142,7 @@
                         </div>
                         <div id="closeModal"
                             class="mt-4 cursor-pointer inline-block bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">
-                            Close
+                            {{__('manage.button.close')}}
                         </div>
                     </div>
                 </div>

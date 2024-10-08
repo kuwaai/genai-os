@@ -14,12 +14,14 @@ return [
     'button.accept' => '我同意',
     'button.export' => '匯出',
     'button.updateWeb' => '更新網站',
+    'button.shutdown' => '關機',
 
     //Tabs
     'tab.groups' => '群組',
     'tab.users' => '使用者',
     'tab.llms' => '模型',
     'tab.settings' => '系統設定',
+    'tab.kernel' => '核心',
 
     //Groups
     'button.new_group' => '新增群組',
@@ -98,6 +100,7 @@ return [
 
     //setting
     'header.settings' => '系統設定',
+    'header.updateWeb' => '網站更新進度',
     'label.settings' => '所有關於系統的設定都可在此調整',
     'label.agent_API' => 'Agent API連線位置',
     'label.allow_register' => '允許註冊',
@@ -112,4 +115,16 @@ return [
     'label.upload_max_size_mb' => '上傳檔案大小限制(MB)',
     'label.upload_allowed_extensions' => '允許上傳的副檔名 (* 表示任意副檔名)',
     'label.upload_max_file_count' => '上傳檔案總數限制 (-1 表示不限制數量)',
+
+    //kernel
+    'label.ready' => '就緒',
+    'label.busy' => '忙碌',
+    'label.ip' => 'IP位置',
+    'label.port' => 'Port位置',
+    'label.status' => '使用狀態',
+    'label.historyid' => '紀錄ID',
+    'label.userid' => '使用者ID',
+    'button.new_executor' => '新增執行器',
+    'label.edit_executor' => '編輯執行器',
+    'label.create_executor' => '新增執行器',
 ];

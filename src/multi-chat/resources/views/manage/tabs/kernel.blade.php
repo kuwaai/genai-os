@@ -6,58 +6,57 @@
     <ul id="access-code-list"></ul>
     <div class="mb-6">
         <button id="create-record-btn"
-            class="bg-green-500 text-white px-4 py-2 rounded dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700">Create
-            New Record</button>
+            class="bg-green-500 text-white px-4 py-2 rounded dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700">{{ __('manage.button.new_executor') }}</button>
     </div>
 </div>
 
 <div id="record-modal" class="fixed inset-0 z-50 hidden bg-gray-800 bg-opacity-75 flex items-center justify-center">
     <div class="bg-white rounded shadow-lg p-4 w-1/3 dark:bg-gray-800 dark:text-white">
-        <h2 id="modal-title" class="text-xl font-semibold mb-4">Create New Record</h2>
+        <h2 id="modal-title" class="text-xl font-semibold mb-4"></h2>
         <form id="record-form" class="space-y-2">
             <input type="hidden" name="original_access_code" id="modal-access-code">
             <div>
-                <label for="modal-ip" class="block">IP:</label>
+                <label for="modal-ip" class="block">{{__('manage.label.ip')}}</label>
                 <input type="text" name="ip" id="modal-ip"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-port" class="block">Port:</label>
+                <label for="modal-port" class="block">{{__('manage.label.status')}}</label>
                 <input type="text" name="port" id="modal-port"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-status" class="block">Status:</label>
+                <label for="modal-status" class="block">{{__('manage.label.status')}}</label>
                 <select name="status" id="modal-status"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
-                    <option value="READY">READY</option>
-                    <option value="BUSY">BUSY</option>
+                    <option value="READY">{{__('manage.label.ready')}}</option>
+                    <option value="BUSY">{{__('manage.label.busy')}}</option>
                 </select>
             </div>
             <div>
-                <label for="modal-history-id" class="block">History ID:</label>
+                <label for="modal-history-id" class="block">{{__('manage.label.historyid')}}</label>
                 <input type="text" name="history_id" id="modal-history-id" value='-1'
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-user-id" class="block">User ID:</label>
+                <label for="modal-user-id" class="block">{{__('manage.label.userid')}}</label>
                 <input type="text" name="user_id" id="modal-user-id" value='-1'
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div class="flex justify-between">
                 <button type="button" class="bg-gray-300 text-black rounded px-4 py-2"
-                    id="modal-cancel-btn">Cancel</button>
-                <button type="submit" class="bg-blue-500 text-white rounded px-4 py-2">Save</button>
+                    id="modal-cancel-btn">{{__('manage.button.cancel')}}</button>
+                <button type="submit" class="bg-blue-500 text-white rounded px-4 py-2">{{__('manage.button.save')}}</button>
             </div>
         </form>
         <div class="mt-4 flex justify-between">
-            <button id="shutdown-btn" class="bg-red-500 text-white px-4 py-2 rounded hidden">Shutdown</button>
-            <button id="delete-btn" class="bg-red-600 text-white px-4 py-2 rounded hidden">Delete</button>
+            <button id="shutdown-btn" class="bg-red-500 text-white px-4 py-2 rounded hidden">{{__('manage.button.shutdown')}}</button>
+            <button id="delete-btn" class="bg-red-600 text-white px-4 py-2 rounded hidden">{{__('manage.button.delete')}}</button>
         </div>
     </div>
 
@@ -86,10 +85,10 @@
     <div class="text-sm">
         <span class="font-semibold">${access_code}</span>
         <div class="flex justify-between">
-            <span class="text-green-500 font-semibold">Ready: <span class="ready-count">0</span></span>
+            <span class="text-green-500 font-semibold">{{__('manage.label.ready')}}: <span class="ready-count">0</span></span>
         </div>
         <div class="flex justify-between">
-            <span class="text-red-500 font-semibold">Busy: <span class="busy-count">0</span></span>
+            <span class="text-red-500 font-semibold">{{__('manage.label.busy')}}: <span class="busy-count">0</span></span>
         </div>
     </div>
     <ul class="ml-4 space-y-2 flex-1 border-l-2 pl-2 border-green-500 py-2"></ul>
@@ -122,10 +121,10 @@
         <div class="text-sm w-[100px]">
             <span class="font-semibold">${ip}</span>
             <div class="flex justify-between">
-                <span class="text-green-500 font-semibold">Ready: <span class="ip-ready-count">0</span></span>
+                <span class="text-green-500 font-semibold">{{__('manage.label.ready')}}: <span class="ip-ready-count">0</span></span>
             </div>
             <div class="flex justify-between">
-                <span class="text-red-500 font-semibold">Busy: <span class="ip-busy-count">0</span></span>
+                <span class="text-red-500 font-semibold">{{__('manage.label.busy')}}: <span class="ip-busy-count">0</span></span>
             </div>
         </div>
         <div class="flex flex-1 overflow-hidden flex-wrap"></div>
@@ -167,7 +166,7 @@
                 $('#modal-status').val(status);
                 $('#modal-history-id').val(history_id);
                 $('#modal-user-id').val(user_id);
-                $('#modal-title').text('Edit Executor');
+                $('#modal-title').text('{{ __('manage.label.edit_executor') }}');
                 $('#shutdown-btn').removeClass('hidden');
                 $('#delete-btn').removeClass('hidden');
                 $('#record-modal').removeClass('hidden');
@@ -196,7 +195,7 @@
             });
 
             $('#create-record-btn').on('click', function() {
-                $('#modal-title').text('Create New Record');
+                $('#modal-title').text('{{ __('manage.label.create_executor') }}');
                 $('#shutdown-btn').addClass('hidden');
                 $('#delete-btn').addClass('hidden');
                 $('#record-modal').removeClass('hidden');
