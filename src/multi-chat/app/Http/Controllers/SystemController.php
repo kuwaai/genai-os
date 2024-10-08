@@ -137,13 +137,6 @@ class SystemController extends Controller
         try {
             // Ensure the working directory is the root of the Laravel project
             $projectRoot = base_path(); // Laravel root path
-    
-            echo 'data: ' . json_encode(['status' => 'error', 'output' => shell_exec('npm -v && node -v')]) . "\n\n";
-            ob_flush();
-            flush();
-            echo 'data: ' . json_encode(['status' => 'error', 'output' => shell_exec('whoami')]) . "\n\n";
-            ob_flush();
-            flush();
             // Determine the script path based on the operating system
             $isWindows = stripos(PHP_OS, 'WIN') === 0;
             $scriptPath = $isWindows ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';
@@ -158,6 +151,7 @@ class SystemController extends Controller
             // Run git commands first
             foreach ($commands as $command) {
                 $process = Process::fromShellCommandline($command);
+                $process->setEnv('PATH', '/usr/local/bin:/usr/bin:/bin');
                 $process->setTimeout(null); // No timeout
     
                 // Start process
@@ -195,6 +189,7 @@ class SystemController extends Controller
             // Make the script executable
             if (!$isWindows) {
                 $chmodProcess = Process::fromShellCommandline("chmod +x " . basename($scriptPath));
+                $chmodProcess->setEnv('PATH', '/usr/local/bin:/usr/bin:/bin');
                 $chmodProcess->run(function ($type, $buffer) {
                     echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
                     ob_flush();
@@ -211,6 +206,7 @@ class SystemController extends Controller
     
             // After successful git commands and chmod, execute the respective script
             $process = Process::fromShellCommandline('./' . basename($scriptPath));
+            $process->setEnv('PATH', '/usr/local/bin:/usr/bin:/bin');
             $process->setTimeout(null); // No timeout
     
             $process->run(function ($type, $buffer) {

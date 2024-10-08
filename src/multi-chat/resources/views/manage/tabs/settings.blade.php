@@ -128,7 +128,7 @@
 
             <div class="my-2">
                 <div id="updateWebBtn"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center cursor-pointer">
+                    class="bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center cursor-pointer">
                     {{ __('manage.button.updateWeb') }}</div>
             </div>
             <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
