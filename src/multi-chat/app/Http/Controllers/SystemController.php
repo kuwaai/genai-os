@@ -146,7 +146,7 @@ class SystemController extends Controller
             chdir(base_path() . $scriptDir); // Change the working directory
 
             // List of commands to run
-            $commands = ['git stash','git pull'];
+            $commands = ['git stash', 'git pull'];
 
             // Run git commands first
             foreach ($commands as $command) {
@@ -186,7 +186,7 @@ class SystemController extends Controller
             }
 
             // After successful git commands, execute the respective script
-            $process = Process::fromShellCommandline(basename($scriptPath));
+            $process = Process::fromShellCommandline('./' . basename($scriptPath));
             $process->setTimeout(null); // No timeout
 
             $process->run(function ($type, $buffer) {
