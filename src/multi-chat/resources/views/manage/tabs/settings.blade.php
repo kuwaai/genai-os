@@ -127,8 +127,8 @@
             </div>
 
             <div class="my-2">
-                <button id="updateWebBtn"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center">{{ __('manage.button.updateWeb') }}</button>
+                <div id="updateWebBtn"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center cursor-pointer">{{ __('manage.button.updateWeb') }}</div>
             </div>
             <div class="my-2"><a
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
