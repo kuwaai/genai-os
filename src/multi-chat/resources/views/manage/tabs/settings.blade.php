@@ -131,16 +131,19 @@
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center cursor-pointer">
                     {{ __('manage.button.updateWeb') }}</div>
             </div>
-            <!-- Modal for showing progress -->
             <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
                 <div class="flex items-center justify-center min-h-screen">
                     <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
                         <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Command Execution Progress
                         </h2>
-                        <pre id="commandOutput"
-                            class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-auto text-gray-900 dark:text-gray-200"></pre>
+                        <div id="commandOutput"
+                            class="bg-gray-100 scrollbar-y-auto scrollbar dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-x-hidden text-gray-900 dark:text-gray-200 
+                                    whitespace-normal">
+                        </div>
                         <button id="closeModal"
-                            class="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">Close</button>
+                            class="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">
+                            Close
+                        </button>
                     </div>
                 </div>
             </div>
@@ -216,7 +219,6 @@
 
     function submitSettings(confirmed) {
         let form = $(".setting-form");
-        // Truly submit the data.
         if (form.data("confirmed") || false) {
             return;
         }
@@ -233,41 +235,36 @@
         }
 
         if (confirm_needed && !confirmed) {
-            // Display the confirm modal
             event.preventDefault();
             $("#confirm-modal").find(".message").html(messages.join("<br>"));
             $(".show-confirm-modal").click();
         } else {
-            // Submit the form again with confirmed attribute.
             form.data("confirmed", true);
             form.submit();
         }
     }
     $('#updateWebBtn').click(function() {
-        $('#commandOutput').text(''); // Clear previous output
-        $('#outputModal').removeClass('hidden'); // Show modal
+        $('#commandOutput').empty();
+        $('#outputModal').removeClass('hidden');
 
-        // Create a new EventSource instance
         const eventSource = new EventSource("{{ route('manage.setting.updateWeb') }}");
 
         eventSource.onmessage = function(event) {
             const response = JSON.parse(event.data);
-            $('#commandOutput').append(response.output + '\n'); // Append the output to the command output
+            $('#commandOutput').append('<pre>' + response.output + '</pre>');
         };
 
         eventSource.onerror = function(event) {
-            $('#commandOutput').append('Web update failed');
-            eventSource.close(); // Close the connection on error
+            $('#commandOutput').append('<pre>Web update failed</pre>');
+            eventSource.close();
         };
 
-        // Close the modal and stop listening for events when the close button is clicked
         $('#closeModal').click(function() {
             $('#outputModal').addClass('hidden');
-            eventSource.close(); // Close the EventSource connection
+            eventSource.close();
         });
     });
 
-    // Close the modal
     $('#closeModal').click(function() {
         $('#outputModal').addClass('hidden');
     });
