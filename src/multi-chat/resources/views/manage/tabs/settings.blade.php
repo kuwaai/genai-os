@@ -1,6 +1,6 @@
 <div class="flex flex-1 h-full mx-auto flex-col scrollbar overflow-y-auto">
-    <form class="setting-form" method="post" action="{{ route('manage.setting.update') }}" onsubmit="submitSettings(false);"
-        class="space-y-6 flex-1 m-4 border-2 border-gray-500 rounded p-2">
+    <form class="setting-form" method="post" action="{{ route('manage.setting.update') }}"
+        onsubmit="submitSettings(false);" class="space-y-6 flex-1 m-4 border-2 border-gray-500 rounded p-2">
         <header class="flex">
             @csrf
             @method('patch')
@@ -76,7 +76,8 @@
                 <div class="flex items-center">
                     <x-text-input id="warning_footer" name="warning_footer" type="text"
                         class="mr-2 mb-1 block w-full"
-                        value="{{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value }}" autocomplete="off" />
+                        value="{{ \App\Models\SystemSetting::where('key', 'warning_footer')->first()->value }}"
+                        autocomplete="off" />
                 </div>
             </div>
             <div>
@@ -84,7 +85,8 @@
                 <div class="flex items-center">
                     <x-text-input id="upload_max_size_mb" name="upload_max_size_mb" type="text"
                         class="mr-2 mb-1 block w-full"
-                        value="{{ \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value }}" autocomplete="off" />
+                        value="{{ \App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value }}"
+                        autocomplete="off" />
                 </div>
             </div>
             <div>
@@ -92,20 +94,22 @@
                 <div class="flex items-center">
                     <x-text-input id="upload_allowed_extensions" name="upload_allowed_extensions" type="text"
                         class="mr-2 mb-1 block w-full"
-                        value="{{ \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value }}" autocomplete="off" />
+                        value="{{ \App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()->value }}"
+                        autocomplete="off" />
                 </div>
             </div>
             <div>
                 <x-input-label for="upload_max_file_count" :value="__('manage.label.upload_max_file_count')" />
                 <div class="flex items-center">
                     @php
-                        $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
+                        $upload_max_file_count = \App\Models\SystemSetting::where(
+                            'key',
+                            'upload_max_file_count',
+                        )->first()->value;
                     @endphp
                     <x-text-input id="upload_max_file_count" name="upload_max_file_count" type="text"
-                        class="mr-2 mb-1 block w-full"
-                        value="{{ $upload_max_file_count }}"
-                        data-original-value="{{ $upload_max_file_count }}"
-                        autocomplete="off" />
+                        class="mr-2 mb-1 block w-full" value="{{ $upload_max_file_count }}"
+                        data-original-value="{{ $upload_max_file_count }}" autocomplete="off" />
                 </div>
             </div>
 
@@ -122,6 +126,9 @@
                 @endif
             </div>
 
+            <div class="my-2"><a id="updateWebBtn"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
+                href="{{ route('manage.setting.updateWeb') }}">{{ __('manage.button.updateWeb') }}</a></div>
             <div class="my-2"><a
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
                     href="{{ route('manage.setting.resetRedis') }}">{{ __('manage.button.reset_redis') }}</a></div>
@@ -157,16 +164,14 @@
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <h3 class="message mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    </h3>
+                </h3>
                 <button data-modal-hide="confirm-modal" type="button"
                     class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
-                    onclick="submitSettings(true);"
-                >
+                    onclick="submitSettings(true);">
                     {{ __('manage.button.yes') }}
                 </button>
                 <button data-modal-hide="confirm-modal" type="button"
-                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                >
+                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
                     {{ __('manage.button.no') }}
                 </button>
             </div>
@@ -196,7 +201,7 @@
     function submitSettings(confirmed) {
         let form = $(".setting-form");
         // Truly submit the data.
-        if(form.data("confirmed") || false){
+        if (form.data("confirmed") || false) {
             return;
         }
 
@@ -206,12 +211,12 @@
         let orig_max_file_cnt = $("#upload_max_file_count").data("original-value");
         let parse_int = (x) => parseInt(x) || 0;
         let parse_max_file_cnt = (x) => parse_int(x) == -1 ? Number.MAX_SAFE_INTEGER : parse_int(x);
-        if (parse_max_file_cnt(cur_max_file_cnt) < parse_max_file_cnt(orig_max_file_cnt)){
+        if (parse_max_file_cnt(cur_max_file_cnt) < parse_max_file_cnt(orig_max_file_cnt)) {
             messages.push("{{ __('manage.modal.confirm_setting_modal.shrink_max_upload_file_count') }}");
             confirm_needed = true;
         }
 
-        if (confirm_needed && !confirmed){
+        if (confirm_needed && !confirmed) {
             // Display the confirm modal
             event.preventDefault();
             $("#confirm-modal").find(".message").html(messages.join("<br>"));
@@ -222,4 +227,37 @@
             form.submit();
         }
     }
+    $('#updateWebBtn').click(function() {
+        $('#commandOutput').text('');  // Clear previous output
+        $('#outputModal').removeClass('hidden');  // Show modal
+        
+        $.ajax({
+            url: "{{ route('manage.setting.updateWeb') }}",
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            xhrFields: {
+                onprogress: function(e) {
+                    var newOutput = e.currentTarget.response;
+                    $('#commandOutput').text(newOutput);  // Update the modal with real-time output
+                }
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#commandOutput').append('\nCompleted successfully!');
+                } else {
+                    $('#commandOutput').append('\nError: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                $('#commandOutput').append('\nAn error occurred while executing the commands.');
+            }
+        });
+    });
+
+    // Close the modal
+    $('#closeModal').click(function() {
+        $('#outputModal').addClass('hidden');
+    });
 </script>

@@ -8,6 +8,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ManageController;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KernelController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LanguageMiddleware;
 use App\Http\Middleware\AuthCheck;
@@ -45,7 +46,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
     })->name('errors.ipnotallowed');
 
     Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
-    
+
     Route::middleware('ipCheck')->group(function () {
         # This will auth the user token that is used to connect.
         Route::post('/v1.0/chat/completions', [ProfileController::class, 'api_auth']);
@@ -243,6 +244,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::prefix('setting')
                             ->group(function () {
                                 Route::get('/resetRedis', [SystemController::class, 'ResetRedis'])->name('manage.setting.resetRedis');
+                                Route::get('/updateWeb', [SystemController::class, 'updateWeb'])->name('manage.setting.updateWeb');
                                 Route::patch('/update', [SystemController::class, 'update'])->name('manage.setting.update');
                             })
                             ->name('manage.user');
@@ -255,7 +257,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                                 Route::patch('/update', [ManageController::class, 'llm_update'])->name('manage.llms.update');
                             })
                             ->name('manage.llms');
-
+                            
                         Route::post('/tab', [ManageController::class, 'tab'])->name('manage.tab');
                     });
             });

@@ -9,6 +9,7 @@ use App\Models\SystemSetting;
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
+use Symfony\Component\Process\Process;
 
 class SystemController extends Controller
 {
@@ -78,7 +79,7 @@ class SystemController extends Controller
         $model = SystemSetting::where('key', 'warning_footer')->first();
         $model->value = $request->input('warning_footer') ?? '';
         $model->save();
-        
+
         $model = SystemSetting::where('key', 'upload_max_size_mb')->first();
         $model->value = strval(intval($request->input('upload_max_size_mb') ?? '0'));
         $model->save();
@@ -107,23 +108,83 @@ class SystemController extends Controller
 
     public function ResetRedis(Request $request)
     {
-        foreach (Redis::keys("usertask_*") as $key){
-            $user_id = explode("usertask_", $key, 2);
+        foreach (Redis::keys('usertask_*') as $key) {
+            $user_id = explode('usertask_', $key, 2);
             if (count($user_id) > 1) {
-                Redis::del("usertask_" . $user_id[1]);
+                Redis::del('usertask_' . $user_id[1]);
             } else {
-                Redis::del("usertask_" . $user_id);
+                Redis::del('usertask_' . $user_id);
             }
         }
-        foreach (Redis::keys("api_*") as $key){
-            $user_id = explode("api_", $key, 2);
+        foreach (Redis::keys('api_*') as $key) {
+            $user_id = explode('api_', $key, 2);
             if (count($user_id) > 1) {
-                Redis::del("api_" . $user_id[1]);
+                Redis::del('api_' . $user_id[1]);
             } else {
-                Redis::del("api_" . $user_id);
+                Redis::del('api_' . $user_id);
             }
         }
-        
+
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
+    }
+    public function updateWeb(Request $request)
+    {
+        try {
+            // Ensure the working directory is the root of the Laravel project
+            $projectRoot = base_path(); // Laravel root path
+
+            // List of commands to run
+            $commands = [
+                'git stash',
+                'git pull', // If password prompt detected, job will be canceled
+                'composer install --no-dev --optimize-autoloader --no-interaction',
+                'php artisan key:generate --force',
+                'php artisan db:seed --class=InitSeeder --force',
+                'php artisan migrate --force',
+                'rmdir /Q /S public\storage',
+                'php artisan storage:link',
+                'npm audit fix',
+                'npm install',
+                'npm audit fix',
+                'npm ci --no-audit --no-progress',
+                'php artisan route:cache',
+                'php artisan view:cache',
+                'php artisan optimize',
+                'npm run build',
+                'php artisan config:cache',
+            ];
+
+            $output = '';
+            foreach ($commands as $command) {
+                $process = Process::fromShellCommandline($command, $projectRoot);
+                $process->setTimeout(null); // No timeout
+
+                // Start process
+                $process->run(function ($type, $buffer) use (&$output) {
+                    // Detect if git pull is prompting for a password
+                    if (strpos($buffer, 'password') !== false) {
+                        $output .= "\nPassword prompt detected. Cancelling job...\n";
+                        return response()->json(['status' => 'error', 'output' => $output]);
+                    }
+
+                    // Append output
+                    $output .= $buffer;
+                    // Send the output progressively to the client
+                    echo json_encode(['status' => 'progress', 'output' => $output]);
+                    ob_flush();
+                    flush();
+                });
+
+                // If the process fails, return the error message
+                if (!$process->isSuccessful()) {
+                    $output .= "\nError executing command: $command\n";
+                    return response()->json(['status' => 'error', 'output' => $output]);
+                }
+            }
+
+            return response()->json(['status' => 'success', 'output' => $output]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
 }
