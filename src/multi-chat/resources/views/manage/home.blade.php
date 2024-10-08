@@ -39,6 +39,12 @@
                                             id="settings-tab" data-tabs-target="#settings" type="button" role="tab"
                                             aria-controls="settings" aria-selected="{{session('last_tab') == 'settings' ? 'true' : 'false'}}">{{__('manage.tab.settings')}}</button>
                                     </li>
+                                    <li class="mr-2" role="presentation">
+                                        <button
+                                            class="inline-block p-4 border-b-2 rounded-t-lg"
+                                            id="kernel-tab" data-tabs-target="#kernel" type="button" role="tab"
+                                            aria-controls="kernel" aria-selected="{{session('last_tab') == 'kernel' ? 'true' : 'false'}}">{{__('manage.tab.kernel')}}</button>
+                                    </li>
                                 </ul>
                             </div>
                             <div id="Contents" class="flex flex-1 overflow-hidden">
@@ -57,6 +63,10 @@
                                 <div class="{{session('last_tab') == 'settings' ? '' : 'hidden'}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="settings"
                                     role="tabpanel" aria-labelledby="settings-tab">
                                     @include('manage.tabs.settings')
+                                </div>
+                                <div class="{{session('last_tab') == 'kernel' ? '' : 'hidden'}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="kernel"
+                                    role="tabpanel" aria-labelledby="kernel-tab">
+                                    @include('manage.tabs.kernel')
                                 </div>
                             </div>
                         </div>

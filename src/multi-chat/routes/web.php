@@ -257,7 +257,19 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                                 Route::patch('/update', [ManageController::class, 'llm_update'])->name('manage.llms.update');
                             })
                             ->name('manage.llms');
-                            
+
+                        # Admin routes for Kernel data management
+                        Route::prefix('kernel')
+                            ->group(function () {
+                                Route::get('/fetch-data', [KernelController::class, 'fetchData'])->name('manage.kernel.fetchData');
+                                Route::post('/update-data', [KernelController::class, 'updateData'])->name('manage.kernel.updateData');
+                                Route::post('/delete-data', [KernelController::class, 'deleteData'])->name('manage.kernel.deleteData');
+                                Route::post('/shutdown', [KernelController::class, 'shutdown'])->name('manage.kernel.shutdown');
+                                Route::post('/update-field', [KernelController::class, 'updateField'])->name('manage.kernel.updateField');
+                                Route::post('/create-data', [KernelController::class, 'createData'])->name('manage.kernel.createData'); // New route for creating data
+                            })
+                            ->name('manage.kernel');
+
                         Route::post('/tab', [ManageController::class, 'tab'])->name('manage.tab');
                     });
             });
