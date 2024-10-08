@@ -138,6 +138,12 @@ class SystemController extends Controller
             // Ensure the working directory is the root of the Laravel project
             $projectRoot = base_path(); // Laravel root path
     
+            echo 'data: ' . json_encode(['status' => 'error', 'output' => shell_exec('npm -v && node -v')]) . "\n\n";
+            ob_flush();
+            flush();
+            echo 'data: ' . json_encode(['status' => 'error', 'output' => shell_exec('whoami')]) . "\n\n";
+            ob_flush();
+            flush();
             // Determine the script path based on the operating system
             $isWindows = stripos(PHP_OS, 'WIN') === 0;
             $scriptPath = $isWindows ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';

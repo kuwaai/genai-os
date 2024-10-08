@@ -148,7 +148,7 @@
                 </div>
             </div>
             <div class="my-2"><a
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
+                    class="bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
                     href="{{ route('manage.setting.resetRedis') }}">{{ __('manage.button.reset_redis') }}</a></div>
             @if (session('last_action') === 'resetRedis' && session('status') === 'success')
                 <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
@@ -254,14 +254,13 @@
 
             // Create a new <pre> element
             const preElement = $('<pre class="whitespace-normal"></pre>').text(response
-            .output); // Set the text
+                .output); // Set the text
 
             // Append the <pre> element to #commandOutput
             $('#commandOutput').append(preElement);
         };
 
         eventSource.onerror = function(event) {
-            $('#commandOutput').append('<pre>Web update failed</pre>');
             eventSource.close();
         };
 
