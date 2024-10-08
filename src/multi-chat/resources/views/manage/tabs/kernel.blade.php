@@ -239,7 +239,7 @@
                 });
             });
 
-            setInterval(fetchData, 60000);
+            setInterval(fetchData, 3000);
         });
     </script>
 </div>
