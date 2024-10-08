@@ -131,40 +131,36 @@ class SystemController extends Controller
     {
         try {
             // Ensure the working directory is the root of the Laravel project
-            $projectRoot = base_path(); // Laravel root path
+            $projectRoot = base_path();  // Laravel root path
 
             // List of commands to run
             $commands = [
                 'git stash',
-                'git pull', // If password prompt detected, job will be canceled
-                'composer install --no-dev --optimize-autoloader --no-interaction',
-                'php artisan key:generate --force',
-                'php artisan db:seed --class=InitSeeder --force',
-                'php artisan migrate --force',
-                'rmdir /Q /S public\storage',
-                'php artisan storage:link',
-                'npm audit fix',
-                'npm install',
-                'npm audit fix',
-                'npm ci --no-audit --no-progress',
-                'php artisan route:cache',
-                'php artisan view:cache',
-                'php artisan optimize',
-                'npm run build',
-                'php artisan config:cache',
+                'git pull',
             ];
 
             $output = '';
+
+            // Run git commands first
             foreach ($commands as $command) {
                 $process = Process::fromShellCommandline($command, $projectRoot);
-                $process->setTimeout(null); // No timeout
+                $process->setTimeout(null);  // No timeout
 
                 // Start process
                 $process->run(function ($type, $buffer) use (&$output) {
                     // Detect if git pull is prompting for a password
                     if (strpos($buffer, 'password') !== false) {
                         $output .= "\nPassword prompt detected. Cancelling job...\n";
-                        return response()->json(['status' => 'error', 'output' => $output]);
+                        echo json_encode(['status' => 'error', 'output' => $output]);
+                        exit; // Exit to stop further command execution
+                    }
+
+                    // Detect dubious ownership error
+                    if (strpos($buffer, 'dubious ownership') !== false) {
+                        $output .= "\nError: Dubious ownership detected. Please run:\n";
+                        $output .= "git config --global --add safe.directory {$projectRoot}\n";
+                        echo json_encode(['status' => 'error', 'output' => $output]);
+                        exit; // Exit to stop further command execution
                     }
 
                     // Append output
@@ -180,6 +176,29 @@ class SystemController extends Controller
                     $output .= "\nError executing command: $command\n";
                     return response()->json(['status' => 'error', 'output' => $output]);
                 }
+            }
+
+            // After successful git commands, execute the respective script
+            $isWindows = stripos(PHP_OS, 'WIN') === 0;
+            $scriptPath = $isWindows ? 'executables/bat' : 'executables/sh';
+
+            // Change to the script directory and execute the script
+            $process = Process::fromShellCommandline("cd $scriptPath && ./production_update." . ($isWindows ? 'bat' : 'sh'), $projectRoot);
+            $process->setTimeout(null);  // No timeout
+            
+            $process->run(function ($type, $buffer) use (&$output) {
+                // Append output from the script
+                $output .= $buffer;
+                // Send the output progressively to the client
+                echo json_encode(['status' => 'progress', 'output' => $output]);
+                ob_flush();
+                flush();
+            });
+
+            // Check for successful script execution
+            if (!$process->isSuccessful()) {
+                $output .= "\nError executing the script.\n";
+                return response()->json(['status' => 'error', 'output' => $output]);
             }
 
             return response()->json(['status' => 'success', 'output' => $output]);

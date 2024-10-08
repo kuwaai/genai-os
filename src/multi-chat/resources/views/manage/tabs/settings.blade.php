@@ -126,9 +126,10 @@
                 @endif
             </div>
 
-            <div class="my-2"><a id="updateWebBtn"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
-                href="{{ route('manage.setting.updateWeb') }}">{{ __('manage.button.updateWeb') }}</a></div>
+            <div class="my-2">
+                <button id="updateWebBtn"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center">{{ __('manage.button.updateWeb') }}</button>
+            </div>
             <div class="my-2"><a
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
                     href="{{ route('manage.setting.resetRedis') }}">{{ __('manage.button.reset_redis') }}</a></div>
@@ -228,9 +229,9 @@
         }
     }
     $('#updateWebBtn').click(function() {
-        $('#commandOutput').text('');  // Clear previous output
-        $('#outputModal').removeClass('hidden');  // Show modal
-        
+        $('#commandOutput').text(''); // Clear previous output
+        $('#outputModal').removeClass('hidden'); // Show modal
+
         $.ajax({
             url: "{{ route('manage.setting.updateWeb') }}",
             type: 'POST',
@@ -240,7 +241,7 @@
             xhrFields: {
                 onprogress: function(e) {
                     var newOutput = e.currentTarget.response;
-                    $('#commandOutput').text(newOutput);  // Update the modal with real-time output
+                    $('#commandOutput').text(newOutput); // Update the modal with real-time output
                 }
             },
             success: function(response) {
