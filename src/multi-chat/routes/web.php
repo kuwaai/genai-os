@@ -244,7 +244,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::prefix('setting')
                             ->group(function () {
                                 Route::get('/resetRedis', [SystemController::class, 'ResetRedis'])->name('manage.setting.resetRedis');
-                                Route::post('/updateWeb', [SystemController::class, 'updateWeb'])->name('manage.setting.updateWeb');
+                                Route::get('/updateWeb', [SystemController::class, 'updateWeb'])->name('manage.setting.updateWeb');
                                 Route::patch('/update', [SystemController::class, 'update'])->name('manage.setting.update');
                             })
                             ->name('manage.user');

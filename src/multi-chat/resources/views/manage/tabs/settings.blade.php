@@ -134,9 +134,11 @@
             <!-- Modal for showing progress -->
             <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
                 <div class="flex items-center justify-center min-h-screen">
-                    <div class="bg-white rounded-lg p-6 shadow-lg max-w-3xl w-full">
-                        <h2 class="text-xl font-bold mb-4">Command Execution Progress</h2>
-                        <pre id="commandOutput" class="bg-gray-100 p-4 rounded-lg text-sm h-96 overflow-auto"></pre>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
+                        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Command Execution Progress
+                        </h2>
+                        <pre id="commandOutput"
+                            class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-auto text-gray-900 dark:text-gray-200"></pre>
                         <button id="closeModal"
                             class="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">Close</button>
                     </div>
@@ -245,42 +247,23 @@
         $('#commandOutput').text(''); // Clear previous output
         $('#outputModal').removeClass('hidden'); // Show modal
 
-        // Initiate the AJAX request
-        $.ajax({
-            url: "{{ route('manage.setting.updateWeb') }}",
-            type: 'POST', // Change to POST
-            data: {
-                _token: '{{ csrf_token() }}' // Include the CSRF token
-            },
-            xhrFields: {
-                onprogress: function(e) {
-                    // Append new output to existing output
-                    var newOutput = e.currentTarget.responseText;
-                    $('#commandOutput').text(newOutput); // Update the modal with real-time output
-                }
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    $('#commandOutput').append('\nCompleted successfully!');
-                    setTimeout(function() {
-                        $('#outputModal').addClass(
-                        'hidden'); // Automatically close modal after a few seconds
-                    }, 3000);
-                } else {
-                    $('#commandOutput').append('\nError: ' + response.message);
-                }
-            },
-            error: function(xhr) {
-                // Handle different status codes
-                if (xhr.status === 500) {
-                    $('#commandOutput').append('\nServer error occurred.');
-                } else if (xhr.status === 404) {
-                    $('#commandOutput').append('\nEndpoint not found.');
-                } else {
-                    $('#commandOutput').append(
-                        '\nAn error occurred while executing the commands: ' + xhr.responseText);
-                }
-            }
+        // Create a new EventSource instance
+        const eventSource = new EventSource("{{ route('manage.setting.updateWeb') }}");
+
+        eventSource.onmessage = function(event) {
+            const response = JSON.parse(event.data);
+            $('#commandOutput').append(response.output + '\n'); // Append the output to the command output
+        };
+
+        eventSource.onerror = function(event) {
+            $('#commandOutput').append('Web update failed');
+            eventSource.close(); // Close the connection on error
+        };
+
+        // Close the modal and stop listening for events when the close button is clicked
+        $('#closeModal').click(function() {
+            $('#outputModal').addClass('hidden');
+            eventSource.close(); // Close the EventSource connection
         });
     });
 
