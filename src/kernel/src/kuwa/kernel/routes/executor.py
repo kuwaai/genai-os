@@ -73,3 +73,46 @@ def debug():
 @executor.route("/list", methods=["GET"])
 def list_executor():
     return jsonify(list(data.keys()))
+
+@executor.route("/shutdown", methods=["POST"])
+def shutdown_executor():
+    try:
+        request_data = request.get_json()
+        url = request_data['url']
+        shutdown_url = f"{url}/shutdown"
+        
+        # Call the shutdown endpoint
+        response = requests.post(shutdown_url)
+
+        if response.status_code == 200:
+            return jsonify({"status": "success", "message": "Shutdown triggered successfully"}), 200
+        else:
+            return jsonify({"status": "error", "message": "Failed to trigger shutdown"}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@executor.route("/read", methods=["GET"])
+def read_executor():
+    access_code = request.args.get('access_code', None)
+    if access_code:
+        if access_code in data:
+            return jsonify({access_code: data[access_code]}), 200
+        else:
+            return jsonify({"status": "error", "message": "Access code not found"}), 404
+    return jsonify(data), 200
+
+@executor.route("/update", methods=["POST"])
+def update_executor():
+    try:
+        request_data = request.get_json()
+        access_code = request_data['access_code']
+        address = request_data['address']
+        new_data = request_data['data']
+
+        if access_code in data and address in data[access_code]:
+            data[access_code][address] = new_data
+            return jsonify({"status": "success", "message": "Record updated successfully"}), 200
+        else:
+            return jsonify({"status": "error", "message": "Record not found"}), 404
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
