@@ -131,20 +131,17 @@ class SystemController extends Controller
     {
         try {
             // Ensure the working directory is the root of the Laravel project
-            $projectRoot = base_path();  // Laravel root path
+            $projectRoot = base_path(); // Laravel root path
 
             // List of commands to run
-            $commands = [
-                'git stash',
-                'git pull',
-            ];
+            $commands = ['git stash', 'git pull'];
 
             $output = '';
 
             // Run git commands first
             foreach ($commands as $command) {
                 $process = Process::fromShellCommandline($command, $projectRoot);
-                $process->setTimeout(null);  // No timeout
+                $process->setTimeout(null); // No timeout
 
                 // Start process
                 $process->run(function ($type, $buffer) use (&$output) {
@@ -152,7 +149,7 @@ class SystemController extends Controller
                     if (strpos($buffer, 'password') !== false) {
                         $output .= "\nPassword prompt detected. Cancelling job...\n";
                         echo json_encode(['status' => 'error', 'output' => $output]);
-                        exit; // Exit to stop further command execution
+                        exit(); // Exit to stop further command execution
                     }
 
                     // Detect dubious ownership error
@@ -160,7 +157,7 @@ class SystemController extends Controller
                         $output .= "\nError: Dubious ownership detected. Please run:\n";
                         $output .= "git config --global --add safe.directory {$projectRoot}\n";
                         echo json_encode(['status' => 'error', 'output' => $output]);
-                        exit; // Exit to stop further command execution
+                        exit(); // Exit to stop further command execution
                     }
 
                     // Append output
@@ -180,12 +177,31 @@ class SystemController extends Controller
 
             // After successful git commands, execute the respective script
             $isWindows = stripos(PHP_OS, 'WIN') === 0;
-            $scriptPath = $isWindows ? 'executables/bat' : 'executables/sh';
+            $scriptPath = $isWindows ? 'executables/bat/production_update.bat' : 'executables/sh/production_update.sh';
+            $scriptDir = dirname($scriptPath); // Get the directory for the script
+
+            // If on Linux, set execute permissions
+            if (!$isWindows) {
+                // Change to the script directory and set execute permissions
+                $chmodProcess = Process::fromShellCommandline("chmod +x $scriptPath", $projectRoot);
+                $chmodProcess->run(function ($type, $buffer) use (&$output) {
+                    $output .= $buffer;
+                    echo json_encode(['status' => 'progress', 'output' => $output]);
+                    ob_flush();
+                    flush();
+                });
+
+                // Check for successful chmod execution
+                if (!$chmodProcess->isSuccessful()) {
+                    $output .= "\nError making the script executable.\n";
+                    return response()->json(['status' => 'error', 'output' => $output]);
+                }
+            }
 
             // Change to the script directory and execute the script
-            $process = Process::fromShellCommandline("cd $scriptPath && ./production_update." . ($isWindows ? 'bat' : 'sh'), $projectRoot);
-            $process->setTimeout(null);  // No timeout
-            
+            $process = Process::fromShellCommandline("cd $scriptDir && " . basename($scriptPath), $projectRoot);
+            $process->setTimeout(null); // No timeout
+
             $process->run(function ($type, $buffer) use (&$output) {
                 // Append output from the script
                 $output .= $buffer;
