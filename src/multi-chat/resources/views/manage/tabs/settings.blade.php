@@ -234,10 +234,7 @@
 
         $.ajax({
             url: "{{ route('manage.setting.updateWeb') }}",
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}'
-            },
+            type: 'GET',
             xhrFields: {
                 onprogress: function(e) {
                     var newOutput = e.currentTarget.response;
