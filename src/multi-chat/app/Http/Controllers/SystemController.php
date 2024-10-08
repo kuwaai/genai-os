@@ -146,7 +146,7 @@ class SystemController extends Controller
             chdir(base_path() . $scriptDir); // Change the working directory
 
             // List of commands to run
-            $commands = ['git ','git pull'];
+            $commands = ['git stash','git pull'];
 
             // Run git commands first
             foreach ($commands as $command) {
