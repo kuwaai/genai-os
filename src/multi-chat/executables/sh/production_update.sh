@@ -1,5 +1,4 @@
 cd ../..
-sudo apt install php-pgsql php-xml php php-curl php-ldap php-redis composer redis php-sqlite3 php-gd php-zip -y
 composer install --no-dev --optimize-autoloader --no-interaction
 php artisan key:generate --force
 php artisan db:seed --class=InitSeeder --force
