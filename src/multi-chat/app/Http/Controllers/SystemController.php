@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
+use App\Http\Controllers\RedisController;
 use App\Models\SystemSetting;
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
@@ -108,20 +109,10 @@ class SystemController extends Controller
 
     public function ResetRedis(Request $request)
     {
-        foreach (Redis::keys('usertask_*') as $key) {
-            $user_id = explode('usertask_', $key, 2);
-            if (count($user_id) > 1) {
-                Redis::del('usertask_' . $user_id[1]);
-            } else {
-                Redis::del('usertask_' . $user_id);
-            }
-        }
-        foreach (Redis::keys('api_*') as $key) {
-            $user_id = explode('api_', $key, 2);
-            if (count($user_id) > 1) {
-                Redis::del('api_' . $user_id[1]);
-            } else {
-                Redis::del('api_' . $user_id);
+        foreach (['usertask_', 'api_'] as $prefix) {
+            foreach (Redis::keys("{$prefix}*") as $key) {
+                $cleanKey = RedisController::cleanRedisKey($key, $prefix);
+                Redis::del($cleanKey);
             }
         }
 
