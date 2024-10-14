@@ -42,10 +42,25 @@ class WorkerController extends Controller
 
     public function get()
     {
-        $cmd = PHP_OS_FAMILY === 'Windows' ? 'tasklist /FI "IMAGENAME eq php.exe" /FO CSV' : 'ps aux | grep "php artisan queue:work" | grep -v grep';
+        // Define the project root directory.
+        $projectRoot = base_path();
+        $artisanFile = $projectRoot . '/artisan';
 
-        $processes = shell_exec($cmd);
-        $count = PHP_OS_FAMILY === 'Windows' ? max(0, count(explode("\n", $processes)) - 2) : count(explode("\n", trim($processes)));
+        if (PHP_OS_FAMILY === 'Windows') {
+            // Use tasklist to get the processes.
+            $cmd = 'tasklist /FI "IMAGENAME eq php.exe" /FO CSV';
+            $processes = shell_exec($cmd);
+
+            // Subtract 2 to account for headers or irrelevant processes.
+            $count = max(0, count(explode("\n", $processes)) - 2);
+        } else {
+            // Use lsof to find PHP processes accessing the artisan file.
+            $cmd = "lsof -t '$artisanFile' | xargs ps -p | grep 'php' | grep -v grep";
+            $processes = shell_exec($cmd);
+
+            // Count the number of lines in the output.
+            $count = count(array_filter(explode("\n", trim($processes))));
+        }
 
         return response()->json(['worker_count' => $count]);
     }
