@@ -9,6 +9,7 @@ use App\Http\Controllers\ManageController;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KernelController;
+use App\Http\Controllers\WorkerController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LanguageMiddleware;
 use App\Http\Middleware\AuthCheck;
@@ -258,7 +259,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                             })
                             ->name('manage.llms');
 
-                        # Admin routes for Kernel data management
                         Route::prefix('kernel')
                             ->group(function () {
                                 Route::get('/fetch-data', [KernelController::class, 'fetchData'])->name('manage.kernel.fetchData');
@@ -266,9 +266,16 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                                 Route::post('/delete-data', [KernelController::class, 'deleteData'])->name('manage.kernel.deleteData');
                                 Route::post('/shutdown', [KernelController::class, 'shutdown'])->name('manage.kernel.shutdown');
                                 Route::post('/update-field', [KernelController::class, 'updateField'])->name('manage.kernel.updateField');
-                                Route::post('/create-data', [KernelController::class, 'createData'])->name('manage.kernel.createData'); // New route for creating data
                             })
                             ->name('manage.kernel');
+
+                        Route::prefix('workers')
+                            ->group(function () {
+                                Route::post('/start', [WorkerController::class, 'start'])->name('manage.workers.start');
+                                Route::post('/stop', [WorkerController::class, 'stop'])->name('manage.workers.stop');
+                                Route::get('/get', [WorkerController::class, 'get'])->name('manage.workers.get');
+                            })
+                            ->name('manage.workers');
 
                         Route::post('/tab', [ManageController::class, 'tab'])->name('manage.tab');
                     });
