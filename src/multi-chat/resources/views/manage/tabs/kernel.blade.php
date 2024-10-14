@@ -69,26 +69,25 @@
     </div>
 
     <script>
-        $(document).ready(function() {
-            function fetchData() {
-                $.get('{{ route('manage.kernel.fetchData') }}', function(data) {
-                    $('#loading-spinner').addClass('hidden');
-                    if (data.error) {
-                        $('#error-message').text(data.error).removeClass('hidden');
-                    } else {
-                        renderAccessCodes(data);
-                    }
-                });
-            }
+        function fetchData() {
+            $.get('{{ route('manage.kernel.fetchData') }}', function(data) {
+                $('#loading-spinner').addClass('hidden');
+                if (data.error) {
+                    $('#error-message').text(data.error).removeClass('hidden');
+                } else {
+                    renderAccessCodes(data);
+                }
+            });
+        }
 
-            function renderAccessCodes(data) {
-                $('#access-code-list').empty();
+        function renderAccessCodes(data) {
+            $('#access-code-list').empty();
 
-                $.each(data, function(access_code, connections) {
-                    let busyCount = 0;
-                    let readyCount = 0;
+            $.each(data, function(access_code, connections) {
+                let busyCount = 0;
+                let readyCount = 0;
 
-                    const accessCodeItem = $(`
+                const accessCodeItem = $(`
 <li class="bg-gray-100 dark:bg-gray-800 rounded shadow px-2 py-1 flex items-center">
     <div class="text-sm">
         <span class="font-semibold">${access_code}</span>
@@ -103,28 +102,28 @@
 </li>
 `);
 
-                    const ipList = accessCodeItem.find('ul');
+                const ipList = accessCodeItem.find('ul');
 
-                    $.each(connections, function(index, connection) {
-                        const [url, status, history_id, user_id] = connection;
-                        const ip = url.split('/')[2].split(':')[0];
-                        const port = url.split(':')[2].split('/')[0];
+                $.each(connections, function(index, connection) {
+                    const [url, status, history_id, user_id] = connection;
+                    const ip = url.split('/')[2].split(':')[0];
+                    const port = url.split(':')[2].split('/')[0];
 
-                        // Count "BUSY" and "READY" statuses
-                        if (status === "BUSY") {
-                            busyCount++;
-                        } else if (status === "READY") {
-                            readyCount++;
-                        }
+                    // Count "BUSY" and "READY" statuses
+                    if (status === "BUSY") {
+                        busyCount++;
+                    } else if (status === "READY") {
+                        readyCount++;
+                    }
 
-                        const statusClass = status === 'BUSY' ? 'bg-red-500 hover:bg-red-700' :
-                            'bg-green-500 hover:bg-green-700';
-                        const portButton =
-                            `<button class="${statusClass} text-white px-2 py-1 m-1 rounded edit-port-btn transition duration-200" data-endpoint="${url}" data-status="${status}" data-history-id="${history_id}" data-user-id="${user_id}" data-access-code="${access_code}">:${port}${new URL(url).pathname}, ${history_id}, ${user_id}</button>`;
+                    const statusClass = status === 'BUSY' ? 'bg-red-500 hover:bg-red-700' :
+                        'bg-green-500 hover:bg-green-700';
+                    const portButton =
+                        `<button class="${statusClass} text-white px-2 py-1 m-1 rounded edit-port-btn transition duration-200" data-endpoint="${url}" data-status="${status}" data-history-id="${history_id}" data-user-id="${user_id}" data-access-code="${access_code}">:${port}${new URL(url).pathname}, ${history_id}, ${user_id}</button>`;
 
-                        let ipItem = ipList.find(`li[data-ip="${ip}"]`);
-                        if (ipItem.length === 0) {
-                            ipItem = $(`
+                    let ipItem = ipList.find(`li[data-ip="${ip}"]`);
+                    if (ipItem.length === 0) {
+                        ipItem = $(`
     <li data-ip="${ip}" class="dark:text-white flex flex-1 border-l-2 border-green-500 pl-2 items-center">
         <div class="text-sm w-[100px]">
             <span class="font-semibold">${ip}</span>
@@ -138,131 +137,127 @@
         <div class="flex flex-1 overflow-hidden flex-wrap"></div>
     </li>
 `);
-                            ipList.append(ipItem);
-                        }
-                        ipItem.find('div:last').append(portButton);
+                        ipList.append(ipItem);
+                    }
+                    ipItem.find('div:last').append(portButton);
 
-                        // Update individual IP ready/busy counts
-                        if (status === "BUSY") {
-                            ipItem.find('.ip-busy-count').text(parseInt(ipItem.find(
-                                '.ip-busy-count').text()) + 1);
-                        } else if (status === "READY") {
-                            ipItem.find('.ip-ready-count').text(parseInt(ipItem.find(
-                                '.ip-ready-count').text()) + 1);
-                        }
-                    });
-
-                    // Update ready and busy counts for the access code
-                    accessCodeItem.find('.ready-count').text(readyCount);
-                    accessCodeItem.find('.busy-count').text(busyCount);
-
-                    $('#access-code-list').append(accessCodeItem);
-                });
-            }
-
-
-            fetchData();
-
-            $(document).on('click', '.edit-port-btn', function() {
-                const access_code = $(this).data("access-code");
-                const history_id = $(this).data('history-id');
-                const user_id = $(this).data('user-id');
-                const endpoint = $(this).data('endpoint');
-                const status = $(this).data('status');
-                $('#original-access-code').val(access_code);
-                $('#original-endpoint').val(endpoint);
-                $('#original-status').val(status);
-                $('#original-history-id').val(history_id);
-                $('#original-user-id').val(user_id);
-
-                $('#modal-access-code').val(access_code)
-                $('#modal-endpoint').val(endpoint);
-                $('#modal-status').val(status);
-                $('#modal-history-id').val(history_id);
-                $('#modal-user-id').val(user_id);
-                $('#modal-title').text('{{ __('manage.label.edit_executor') }}');
-                $('#shutdown-btn').removeClass('hidden');
-                $('#delete-btn').removeClass('hidden');
-                $('#record-modal').removeClass('hidden');
-            });
-
-            $('#modal-cancel-btn').on('click', function() {
-                $('#record-modal').addClass('hidden');
-            });
-
-            $('#record-form').on('submit', function(e) {
-                e.preventDefault();
-                const formData = $(this).serialize();
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('manage.kernel.updateData') }}',
-                    data: formData,
-                    success: function() {
-                        fetchData();
-                        $('#record-modal').addClass('hidden');
-                    },
-                    error: function(xhr) {
-                        const error = xhr.responseJSON?.message || 'An error occurred.';
-                        $('#error-message').text(error).removeClass('hidden');
+                    // Update individual IP ready/busy counts
+                    if (status === "BUSY") {
+                        ipItem.find('.ip-busy-count').text(parseInt(ipItem.find(
+                            '.ip-busy-count').text()) + 1);
+                    } else if (status === "READY") {
+                        ipItem.find('.ip-ready-count').text(parseInt(ipItem.find(
+                            '.ip-ready-count').text()) + 1);
                     }
                 });
-            });
 
-            $('#create-record-btn').on('click', function() {
-                $('#modal-title').text('{{ __('manage.label.create_executor') }}');
-                $('#shutdown-btn').addClass('hidden');
-                $('#delete-btn').addClass('hidden');
-                $('#record-modal').removeClass('hidden');
-                $('#record-form')[0].reset();
-            });
+                // Update ready and busy counts for the access code
+                accessCodeItem.find('.ready-count').text(readyCount);
+                accessCodeItem.find('.busy-count').text(busyCount);
 
-            $('#shutdown-btn').on('click', function() {
-                const endpoint = $('#modal-endpoint').val();
-                const access_Code = $('#modal-access-code').val();
-                const history_id = $('#modal-history-id').val();
-                const status = $('#modal-status').val();
-                const user_id = $('#modal-user-id').val();
-                const url = `{{ route('manage.kernel.shutdown') }}`;
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        access_code: access_Code,
-                        endpoint: endpoint,
-                        status: status,
-                        history_id: history_id,
-                        user_id: user_id,
-                    },
-                    success: function() {
-                        fetchData();
-                        $('#record-modal').addClass('hidden');
-                    },
-                    error: function(xhr) {
-                        const error = xhr.responseJSON?.message || 'An error occurred.';
-                        $('#error-message').text(error).removeClass('hidden');
-                    }
-                });
+                $('#access-code-list').append(accessCodeItem);
             });
+        }
 
-            $('#delete-btn').on('click', function() {
-                const formData = $('#record-form').serialize();
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('manage.kernel.deleteData') }}',
-                    data: formData,
-                    success: function() {
-                        fetchData();
-                        $('#record-modal').addClass('hidden');
-                    },
-                    error: function(xhr) {
-                        const error = xhr.responseJSON?.message || 'An error occurred.';
-                        $('#error-message').text(error).removeClass('hidden');
-                    }
-                });
+
+
+        $(document).on('click', '.edit-port-btn', function() {
+            const access_code = $(this).data("access-code");
+            const history_id = $(this).data('history-id');
+            const user_id = $(this).data('user-id');
+            const endpoint = $(this).data('endpoint');
+            const status = $(this).data('status');
+            $('#original-access-code').val(access_code);
+            $('#original-endpoint').val(endpoint);
+            $('#original-status').val(status);
+            $('#original-history-id').val(history_id);
+            $('#original-user-id').val(user_id);
+
+            $('#modal-access-code').val(access_code)
+            $('#modal-endpoint').val(endpoint);
+            $('#modal-status').val(status);
+            $('#modal-history-id').val(history_id);
+            $('#modal-user-id').val(user_id);
+            $('#modal-title').text('{{ __('manage.label.edit_executor') }}');
+            $('#shutdown-btn').removeClass('hidden');
+            $('#delete-btn').removeClass('hidden');
+            $('#record-modal').removeClass('hidden');
+        });
+
+        $('#modal-cancel-btn').on('click', function() {
+            $('#record-modal').addClass('hidden');
+        });
+
+        $('#record-form').on('submit', function(e) {
+            e.preventDefault();
+            const formData = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('manage.kernel.updateData') }}',
+                data: formData,
+                success: function() {
+                    fetchData();
+                    $('#record-modal').addClass('hidden');
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON?.message || 'An error occurred.';
+                    $('#error-message').text(error).removeClass('hidden');
+                }
             });
+        });
 
-            setInterval(fetchData, 3000);
+        $('#create-record-btn').on('click', function() {
+            $('#modal-title').text('{{ __('manage.label.create_executor') }}');
+            $('#shutdown-btn').addClass('hidden');
+            $('#delete-btn').addClass('hidden');
+            $('#record-modal').removeClass('hidden');
+            $('#record-form')[0].reset();
+        });
+
+        $('#shutdown-btn').on('click', function() {
+            const endpoint = $('#modal-endpoint').val();
+            const access_Code = $('#modal-access-code').val();
+            const history_id = $('#modal-history-id').val();
+            const status = $('#modal-status').val();
+            const user_id = $('#modal-user-id').val();
+            const url = `{{ route('manage.kernel.shutdown') }}`;
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    access_code: access_Code,
+                    endpoint: endpoint,
+                    status: status,
+                    history_id: history_id,
+                    user_id: user_id,
+                },
+                success: function() {
+                    fetchData();
+                    $('#record-modal').addClass('hidden');
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON?.message || 'An error occurred.';
+                    $('#error-message').text(error).removeClass('hidden');
+                }
+            });
+        });
+
+        $('#delete-btn').on('click', function() {
+            const formData = $('#record-form').serialize();
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('manage.kernel.deleteData') }}',
+                data: formData,
+                success: function() {
+                    fetchData();
+                    $('#record-modal').addClass('hidden');
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON?.message || 'An error occurred.';
+                    $('#error-message').text(error).removeClass('hidden');
+                }
+            });
         });
     </script>
 </div>

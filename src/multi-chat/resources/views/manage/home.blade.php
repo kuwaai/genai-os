@@ -4,7 +4,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-full">
                 <div class="p-6 text-gray-900 dark:text-gray-100 h-full">
                     <script>
-                        $groups = {}
+                        $groups = {};
                     </script>
                     <section class="flex flex-col h-full overflow-hidden">
                         <header>
@@ -19,63 +19,63 @@
                                     <li class="mr-2" role="presentation">
                                         <button class="inline-block p-4 border-b-2 rounded-t-lg" id="groups-tab"
                                             data-tabs-target="#groups" type="button" role="tab"
-                                            aria-controls="groups" aria-selected="{{session('last_tab') ? 'false' : 'true'}}">{{__('manage.tab.groups')}}</button>
+                                            aria-controls="groups"
+                                            aria-selected="{{ session('last_tab') ? 'false' : 'true' }}">{{ __('manage.tab.groups') }}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
-                                        <button
-                                            class="inline-block p-4 border-b-2 rounded-t-lg"
-                                            id="users-tab" data-tabs-target="#users" type="button" role="tab"
-                                            aria-controls="users" aria-selected="{{session('last_tab') == 'users' ? 'true' : 'false'}}">{{__('manage.tab.users')}}</button>
+                                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="users-tab"
+                                            data-tabs-target="#users" type="button" role="tab"
+                                            aria-controls="users"
+                                            aria-selected="{{ session('last_tab') == 'users' ? 'true' : 'false' }}">{{ __('manage.tab.users') }}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
-                                        <button
-                                            class="inline-block p-4 border-b-2 rounded-t-lg"
-                                            id="llms-tab" data-tabs-target="#llms" type="button" role="tab"
-                                            aria-controls="llms" aria-selected="{{session('last_tab') == 'llms' ? 'true' : 'false'}}">{{__('manage.tab.llms')}}</button>
+                                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="llms-tab"
+                                            data-tabs-target="#llms" type="button" role="tab" aria-controls="llms"
+                                            aria-selected="{{ session('last_tab') == 'llms' ? 'true' : 'false' }}">{{ __('manage.tab.llms') }}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
-                                        <button
-                                            class="inline-block p-4 border-b-2 rounded-t-lg"
-                                            id="settings-tab" data-tabs-target="#settings" type="button" role="tab"
-                                            aria-controls="settings" aria-selected="{{session('last_tab') == 'settings' ? 'true' : 'false'}}">{{__('manage.tab.settings')}}</button>
+                                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="settings-tab"
+                                            data-tabs-target="#settings" type="button" role="tab"
+                                            aria-controls="settings"
+                                            aria-selected="{{ session('last_tab') == 'settings' ? 'true' : 'false' }}">{{ __('manage.tab.settings') }}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
-                                        <button
-                                            class="inline-block p-4 border-b-2 rounded-t-lg"
-                                            id="kernel-tab" data-tabs-target="#kernel" type="button" role="tab"
-                                            aria-controls="kernel" aria-selected="{{session('last_tab') == 'kernel' ? 'true' : 'false'}}">{{__('manage.tab.kernel')}}</button>
+                                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="kernel-tab"
+                                            data-tabs-target="#kernel" type="button" role="tab"
+                                            aria-controls="kernel"
+                                            aria-selected="{{ session('last_tab') == 'kernel' ? 'true' : 'false' }}">{{ __('manage.tab.kernel') }}</button>
                                     </li>
                                     <li class="mr-2" role="presentation">
-                                        <button
-                                            class="inline-block p-4 border-b-2 rounded-t-lg"
-                                            id="workers-tab" data-tabs-target="#workers" type="button" role="tab"
-                                            aria-controls="workers" aria-selected="{{session('last_tab') == 'workers' ? 'true' : 'false'}}">{{__('manage.tab.workers')}}</button>
+                                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="workers-tab"
+                                            data-tabs-target="#workers" type="button" role="tab"
+                                            aria-controls="workers"
+                                            aria-selected="{{ session('last_tab') == 'workers' ? 'true' : 'false' }}">{{ __('manage.tab.workers') }}</button>
                                     </li>
                                 </ul>
                             </div>
                             <div id="Contents" class="flex flex-1 overflow-hidden">
-                                <div class="{{session('last_tab') ? 'hidden' : ''}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="groups" role="tabpanel"
-                                    aria-labelledby="groups-tab">
+                                <div class="{{ session('last_tab') ? 'hidden' : '' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                    id="groups" role="tabpanel" aria-labelledby="groups-tab">
                                     @include('manage.tabs.groups')
                                 </div>
-                                <div class="{{session('last_tab') == 'users' ? '' : 'hidden'}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="users"
-                                    role="tabpanel" aria-labelledby="users-tab">
+                                <div class="{{ session('last_tab') == 'users' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                    id="users" role="tabpanel" aria-labelledby="users-tab">
                                     @include('manage.tabs.users')
                                 </div>
-                                <div class="{{session('last_tab') == 'llms' ? '' : 'hidden'}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="llms"
-                                    role="tabpanel" aria-labelledby="llms-tab">
+                                <div class="{{ session('last_tab') == 'llms' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                    id="llms" role="tabpanel" aria-labelledby="llms-tab">
                                     @include('manage.tabs.llms')
                                 </div>
-                                <div class="{{session('last_tab') == 'settings' ? '' : 'hidden'}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="settings"
-                                    role="tabpanel" aria-labelledby="settings-tab">
+                                <div class="{{ session('last_tab') == 'settings' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                    id="settings" role="tabpanel" aria-labelledby="settings-tab">
                                     @include('manage.tabs.settings')
                                 </div>
-                                <div class="{{session('last_tab') == 'kernel' ? '' : 'hidden'}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="kernel"
-                                    role="tabpanel" aria-labelledby="kernel-tab">
+                                <div class="{{ session('last_tab') == 'kernel' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                    id="kernel" role="tabpanel" aria-labelledby="kernel-tab">
                                     @include('manage.tabs.kernel')
                                 </div>
-                                <div class="{{session('last_tab') == 'workers' ? '' : 'hidden'}} bg-gray-50 flex flex-1 dark:bg-gray-800" id="workers"
-                                    role="tabpanel" aria-labelledby="workers-tab">
+                                <div class="{{ session('last_tab') == 'workers' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
+                                    id="workers" role="tabpanel" aria-labelledby="workers-tab">
                                     @include('manage.tabs.workers')
                                 </div>
                             </div>
@@ -85,4 +85,57 @@
             </div>
         </div>
     </div>
+    <script>
+        // Function to execute when a tab becomes active
+        function onTabActivated(tabId) {
+            console.log("Activated tab: " + tabId);
+
+            if (tabId === "workers-tab") {
+                // Start intervals for workers-tab
+                workerCountInterval = setInterval(fetchWorkerCount, 6000);
+                fetchWorkerCount();
+                lastRefreshInterval = setInterval(updateLastRefreshTime, 1000);
+            } else if (tabId === "kernel-tab") {
+                // Start intervals for kernel-tab
+                fetchDataInterval = setInterval(fetchData, 3000);
+                fetchData();
+            }
+        }
+
+        // Function to execute when a tab is deactivated
+        function onTabDeactivated(tabId) {
+            console.log("Deactivated tab: " + tabId);
+
+            if (tabId === "workers-tab") {
+                // Clear intervals for workers-tab
+                clearInterval(workerCountInterval);
+                clearInterval(lastRefreshInterval);
+            } else if (tabId === "kernel-tab") {
+                // Clear interval for kernel-tab
+                clearInterval(fetchDataInterval);
+            }
+        }
+
+        // Track the current active tab
+        let currentTabId = $(".text-sm.font-medium button[aria-selected='true']").attr('id');
+
+        // Bind events to each tab button
+        $("ul[data-tabs-toggle] button").on("click", function() {
+            const newTabId = $(this).attr("id");
+
+            // Check if the clicked tab is different from the currently active tab
+            if (currentTabId !== newTabId) {
+                // Execute the deactivation function for the previous tab
+                if (currentTabId) {
+                    onTabDeactivated(currentTabId);
+                }
+
+                // Update the current tab ID
+                currentTabId = newTabId;
+
+                // Execute the activation function for the new tab
+                onTabActivated(currentTabId);
+            }
+        });
+    </script>
 </x-app-layout>

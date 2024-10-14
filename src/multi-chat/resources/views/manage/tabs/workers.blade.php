@@ -49,113 +49,107 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        const cooldownDuration = 2000;
-        let canSubmit = true,
-            lastFetchTime = null;
+    const cooldownDuration = 2000;
+    let canSubmit = true,
+        lastFetchTime = null;
 
-        function fetchWorkerCount() {
-            $.ajax({
-                url: '{{ route('manage.workers.get') }}',
-                method: 'GET',
-                success: function(response) {
-                    $('#worker-count').text('{{ __('manage.label.current_worker_count') }}: ' +
-                        response.worker_count).data('current', response.worker_count);
-                    lastFetchTime = Date.now();
-                    updateLastRefreshTime();
-                },
-                error: function() {
-                    $('#worker-count').text(
+    function fetchWorkerCount() {
+        $.ajax({
+            url: '{{ route('manage.workers.get') }}',
+            method: 'GET',
+            success: function(response) {
+                $('#worker-count').text('{{ __('manage.label.current_worker_count') }}: ' +
+                    response.worker_count).data('current', response.worker_count);
+                lastFetchTime = Date.now();
+                updateLastRefreshTime();
+            },
+            error: function() {
+                $('#worker-count').text(
                     '{{ __('manage.label.error_fetching_worker_count') }}');
-                }
-            });
-        }
-
-        function updateLastRefreshTime() {
-            if (lastFetchTime) {
-                $('#last-refresh-time').text('{{ __('manage.label.last_refresh_time') }}: ' + Math.floor((Date
-                    .now() - lastFetchTime) / 1000) + ' {{ __('manage.label.seconds_ago') }}');
             }
-        }
-
-        function appendMessage(message, isSuccess) {
-            const messageDiv = $('<div></div>').text(message).addClass(
-                'mb-2 text-center p-2 rounded-lg border-2').css({
-                'background-color': isSuccess ? '#d4edda' : '#f8d7da',
-                'color': isSuccess ? '#155724' : '#721c24',
-                'border-color': isSuccess ? '#c3e6cb' : '#f5c6cb'
-            }).prependTo('#result-message').hide().fadeIn();
-            setTimeout(() => messageDiv.fadeOut(400, () => messageDiv.remove()), 5000);
-        }
-
-        $('#start-workers-button').click(() => $('#start-workers-modal').removeClass('hidden'));
-        $('#stop-workers-button').click(() => $('#stop-workers-modal').removeClass('hidden'));
-        $('#cancel-start-workers, #cancel-stop-workers').click(() => $(
-            '#start-workers-modal, #stop-workers-modal').addClass('hidden'));
-
-        $('#confirm-start-workers').click(function() {
-            if (!canSubmit) return;
-            const count = parseInt($('#modal-worker-count-input').val()),
-                currentCount = $('#worker-count').data('current') || 0;
-            if (count > 0) {
-                $.ajax({
-                    url: '{{ route('manage.workers.start') }}',
-                    method: 'POST',
-                    data: {
-                        '_token': '{{ csrf_token() }}',
-                        count
-                    },
-                    beforeSend: function() {
-                        $('#start-workers-button').addClass('opacity-50 cursor-not-allowed')
-                            .prop('disabled', true);
-                        $('#start-icon').removeClass('fa-play').addClass(
-                            'fa-spinner fa-spin');
-                        $('#start-workers-modal').addClass('hidden');
-                        canSubmit = false;
-                    },
-                    success: response => appendMessage(response.message, true),
-                    error: xhr => appendMessage('{{ __('manage.label.error') }}: ' + xhr
-                        .responseText, false),
-                    complete: function() {
-                        $('#start-workers-button').removeClass(
-                            'opacity-50 cursor-not-allowed').prop('disabled', false);
-                        $('#start-icon').removeClass('fa-spinner fa-spin').addClass(
-                            'fa-play');
-                        setTimeout(() => canSubmit = true, cooldownDuration);
-                    }
-                });
-            } else appendMessage('{{ __('manage.label.valid_worker_count') }}', false);
         });
+    }
 
-        $('#confirm-stop-workers').click(function() {
-            if (!canSubmit) return;
+    function updateLastRefreshTime() {
+        if (lastFetchTime) {
+            $('#last-refresh-time').text('{{ __('manage.label.last_refresh_time') }}: ' + Math.floor((Date
+                .now() - lastFetchTime) / 1000) + ' {{ __('manage.label.seconds_ago') }}');
+        }
+    }
+
+    function appendMessage(message, isSuccess) {
+        const messageDiv = $('<div></div>').text(message).addClass(
+            'mb-2 text-center p-2 rounded-lg border-2').css({
+            'background-color': isSuccess ? '#d4edda' : '#f8d7da',
+            'color': isSuccess ? '#155724' : '#721c24',
+            'border-color': isSuccess ? '#c3e6cb' : '#f5c6cb'
+        }).prependTo('#result-message').hide().fadeIn();
+        setTimeout(() => messageDiv.fadeOut(400, () => messageDiv.remove()), 5000);
+    }
+
+    $('#start-workers-button').click(() => $('#start-workers-modal').removeClass('hidden'));
+    $('#stop-workers-button').click(() => $('#stop-workers-modal').removeClass('hidden'));
+    $('#cancel-start-workers, #cancel-stop-workers').click(() => $(
+        '#start-workers-modal, #stop-workers-modal').addClass('hidden'));
+
+    $('#confirm-start-workers').click(function() {
+        if (!canSubmit) return;
+        const count = parseInt($('#modal-worker-count-input').val()),
+            currentCount = $('#worker-count').data('current') || 0;
+        if (count > 0) {
             $.ajax({
-                url: '{{ route('manage.workers.stop') }}',
+                url: '{{ route('manage.workers.start') }}',
                 method: 'POST',
                 data: {
-                    '_token': '{{ csrf_token() }}'
+                    '_token': '{{ csrf_token() }}',
+                    count
                 },
                 beforeSend: function() {
-                    $('#stop-workers-button').addClass('opacity-50 cursor-not-allowed')
+                    $('#start-workers-button').addClass('opacity-50 cursor-not-allowed')
                         .prop('disabled', true);
-                    $('#stop-icon').removeClass('fa-stop').addClass('fa-spinner fa-spin');
-                    $('#stop-workers-modal').addClass('hidden');
+                    $('#start-icon').removeClass('fa-play').addClass(
+                        'fa-spinner fa-spin');
+                    $('#start-workers-modal').addClass('hidden');
                     canSubmit = false;
                 },
                 success: response => appendMessage(response.message, true),
                 error: xhr => appendMessage('{{ __('manage.label.error') }}: ' + xhr
                     .responseText, false),
                 complete: function() {
-                    $('#stop-workers-button').removeClass('opacity-50 cursor-not-allowed')
-                        .prop('disabled', false);
-                    $('#stop-icon').removeClass('fa-spinner fa-spin').addClass('fa-stop');
+                    $('#start-workers-button').removeClass(
+                        'opacity-50 cursor-not-allowed').prop('disabled', false);
+                    $('#start-icon').removeClass('fa-spinner fa-spin').addClass(
+                        'fa-play');
                     setTimeout(() => canSubmit = true, cooldownDuration);
                 }
             });
-        });
+        } else appendMessage('{{ __('manage.label.valid_worker_count') }}', false);
+    });
 
-        setInterval(fetchWorkerCount, 6000);
-        fetchWorkerCount();
-        setInterval(updateLastRefreshTime, 1000);
+    $('#confirm-stop-workers').click(function() {
+        if (!canSubmit) return;
+        $.ajax({
+            url: '{{ route('manage.workers.stop') }}',
+            method: 'POST',
+            data: {
+                '_token': '{{ csrf_token() }}'
+            },
+            beforeSend: function() {
+                $('#stop-workers-button').addClass('opacity-50 cursor-not-allowed')
+                    .prop('disabled', true);
+                $('#stop-icon').removeClass('fa-stop').addClass('fa-spinner fa-spin');
+                $('#stop-workers-modal').addClass('hidden');
+                canSubmit = false;
+            },
+            success: response => appendMessage(response.message, true),
+            error: xhr => appendMessage('{{ __('manage.label.error') }}: ' + xhr
+                .responseText, false),
+            complete: function() {
+                $('#stop-workers-button').removeClass('opacity-50 cursor-not-allowed')
+                    .prop('disabled', false);
+                $('#stop-icon').removeClass('fa-spinner fa-spin').addClass('fa-stop');
+                setTimeout(() => canSubmit = true, cooldownDuration);
+            }
+        });
     });
 </script>
