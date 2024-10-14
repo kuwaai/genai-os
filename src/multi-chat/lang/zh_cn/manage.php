@@ -14,12 +14,15 @@ return [
     'button.accept' => '我同意',
     'button.export' => '导出',
     'button.updateWeb' => '更新网站',
+    'button.shutdown' => '关机',
 
     //Tabs
     'tab.groups' => '群组',
     'tab.users' => '用户',
     'tab.llms' => '模型',
     'tab.settings' => '系统设置',
+    'tab.kernel' => '核心',
+    'tab.workers' => '任务处理器',
 
     //Groups
     'button.new_group' => '新增群组',
@@ -36,8 +39,8 @@ return [
     'label.delete' => '删除',
     'label.update' => '更新',
     'label.create' => '新增',
-    'label.llm_permission.disabled' => '模型使用权限（已停用模型）',
-    'label.llm_permission.enabled' => '模型使用权限（已启用模型）',
+    'label.llm_permission.disabled' => '模型使用权限(已停用模型)',
+    'label.llm_permission.enabled' => '模型使用权限(已启用模型)',
     'header.edit_group' => '编辑群组',
     'hint.group_updated' => '群组更新成功！',
     'hint.group_created' => '群组创建成功！',
@@ -52,7 +55,7 @@ return [
     'label.fuzzy_search' => '使用名称或邮箱搜索用户',
     'label.create_user' => '创建一个用户的配置文件',
 
-    'create_user.header' => '创建一个新的账户',
+    'create_user.header' => '创建一个新的账号',
     'create_user.joined_group' => '加入的群组',
     'label.members' => '个成员',
     'label.other_users' => '无群组成员',
@@ -91,25 +94,62 @@ return [
     'label.access_code' => '存取代码',
     'placeholder.link' => '该模型的外部相关链接',
     'header.update_model' => '编辑模型配置文件',
-    'label.description' => '叙述',
+    'label.description' => '描述',
     'modal.update_model.header' => '您确定要更新这个语言模型配置文件吗',
     'modal.delete_model.header' => '您确定要删除这个语言模型配置文件吗',
     'modal.confirm_setting_modal.shrink_max_upload_file_count' => '降低上传文件总数限制会删除超出的用户文件，您确定吗?',
 
     //setting
     'header.settings' => '系统设置',
+    'header.updateWeb' => '网站更新进度',
     'label.settings' => '所有关于系统的设置都可在此调整',
-    'label.agent_API' => 'Agent API 连接位置',
+    'label.agent_API' => 'Agent API连接位置',
     'label.allow_register' => '允许注册',
-    'button.reset_redis' => '重置 Redis 缓存',
+    'button.reset_redis' => '重置Redis缓存',
     'hint.saved' => '已保存',
-    'hint.redis_cache_cleared' => 'Redis 缓存已清除',
+    'hint.redis_cache_cleared' => 'Redis缓存已清除',
     'label.need_invite' => '注册必需有邀请码',
     'label.footer_warning' => '对话底部警告',
     'label.safety_guard_API' => '安全过滤连接位置',
     'label.anno' => '系统公告',
     'label.tos' => '服务条款',
     'label.upload_max_size_mb' => '上传文件大小限制(MB)',
-    'label.upload_allowed_extensions' => '允许上传的副檔名 (* 表示任意副檔名)',
+    'label.upload_allowed_extensions' => '允许上传的副档名 (* 表示任意副档名)',
     'label.upload_max_file_count' => '上传文件总数限制 (-1 表示不限制数量)',
+
+    //kernel
+    'label.ready' => '就绪',
+    'label.busy' => '忙碌',
+    'label.accesscode' => '存取代码',
+    'label.endpoint' => '连接接口',
+    'label.status' => '使用状态',
+    'label.historyid' => '记录ID',
+    'label.userid' => '用户ID',
+    'button.new_executor' => '新增执行器',
+    'label.edit_executor' => '编辑执行器',
+    'label.create_executor' => '新增执行器',
+
+    //Workers
+    'label.failed' => '操作失败。请再试一次。',
+    'label.loading' => '加载中...',
+    'label.last_refresh' => '最后刷新时间：:time',
+    'label.current_worker_count' => '当前任务处理器数量',
+    'label.error_fetching_worker_count' => '获取任务处理器数量时出错。',
+    'label.last_refresh_time' => '最后刷新',
+    'label.seconds_ago' => '秒前',
+    'label.error' => '错误',
+    'label.valid_worker_count' => '请输入有效的任务处理器数量。',
+
+    // Buttons
+    'button.start' => '启动任务处理器',
+    'button.stop' => '停止所有任务处理器',
+    'button.confirm' => '确认',
+    'button.cancel' => '取消',
+
+    // Modal Titles
+    'modal.start.title' => '启动任务处理器',
+    'modal.start.label' => '任务处理器数量：',
+
+    'modal.stop.title' => '停止所有任务处理器',
+    'modal.stop.confirm' => '您确定要停止所有任务处理器吗？',
 ];

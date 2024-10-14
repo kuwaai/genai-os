@@ -22,6 +22,7 @@ return [
     'tab.llms' => '模型',
     'tab.settings' => '系統設定',
     'tab.kernel' => '核心',
+    'tab.workers' => '任務處理器',
 
     //Groups
     'button.new_group' => '新增群組',
@@ -119,12 +120,36 @@ return [
     //kernel
     'label.ready' => '就緒',
     'label.busy' => '忙碌',
-    'label.ip' => 'IP位置',
-    'label.port' => 'Port位置',
+    'label.accesscode' => '存取代碼',
+    'label.endpoint' => '連線接口',
     'label.status' => '使用狀態',
     'label.historyid' => '紀錄ID',
     'label.userid' => '使用者ID',
     'button.new_executor' => '新增執行器',
     'label.edit_executor' => '編輯執行器',
     'label.create_executor' => '新增執行器',
+
+    //Workers
+    'label.failed' => '操作失敗。請再試一次。',
+    'label.loading' => '加載中...',
+    'label.last_refresh' => '最後刷新時間：:time',
+    'label.current_worker_count' => '當前任務處理器數量',
+    'label.error_fetching_worker_count' => '獲取任務處理器數量時出錯。',
+    'label.last_refresh_time' => '最後刷新',
+    'label.seconds_ago' => '秒前',
+    'label.error' => '錯誤',
+    'label.valid_worker_count' => '請輸入有效的任務處理器數量。',
+
+    // Buttons
+    'button.start' => '啟動任務處理器',
+    'button.stop' => '停止所有任務處理器',
+    'button.confirm' => '確認',
+    'button.cancel' => '取消',
+
+    // Modal Titles
+    'modal.start.title' => '啟動任務處理器',
+    'modal.start.label' => '任務處理器數量：',
+
+    'modal.stop.title' => '停止所有任務處理器',
+    'modal.stop.confirm' => '您確定要停止所有任務處理器嗎？',
 ];
