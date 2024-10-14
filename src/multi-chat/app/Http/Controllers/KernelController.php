@@ -38,7 +38,6 @@ class KernelController extends Controller
     {
         $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/update';
         $response = Http::post($apiUrl, $request->all());
-
         return $response->successful() ? response()->json(['status' => 'success']) : response()->json(['error' => 'Failed to update data'], 500);
     }
 
@@ -46,15 +45,13 @@ class KernelController extends Controller
     {
         $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/delete';
         $response = Http::post($apiUrl, $request->all());
-
         return $response->successful() ? response()->json(['status' => 'success']) : response()->json(['error' => 'Failed to delete data'], 500);
     }
 
     public function shutdown(Request $request)
     {
         $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/shutdown';
-        $response = Http::post($apiUrl, ['url' => $request->url]);
-
+        $response = Http::post($apiUrl, $request->all());
         return $response->successful() ? response()->json(['status' => 'success']) : response()->json(['error' => 'Failed to shutdown address'], 500);
     }
 

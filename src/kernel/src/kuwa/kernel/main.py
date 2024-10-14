@@ -51,7 +51,7 @@ def main():
     app.register_blueprint(chat, url_prefix=f'/{KUWA_KERNEL_API_VERSION}/chat')
     logger.info("Route list:\n{}\n".format('\n'.join([str(i) for i in app.url_map.iter_rules()])))
     logger.info("Server started")
-    app.run(port=args.port, host=args.host, threaded=True)
+    app.run(port=args.port, host=args.host, threaded=True, debug=True)
     #Stopped, saving to file
     save_variable_to_file(record_file, data)
 

@@ -1,5 +1,6 @@
-import logging
+import logging, requests
 import json
+from urllib.parse import urlparse
 from flask import Blueprint, request, json, redirect, url_for, jsonify
 from ..variable import *
 from ..functions import save_variable_to_file, endpoint_formatter, get_base_url, load_records
@@ -78,18 +79,25 @@ def list_executor():
 def shutdown_executor():
     try:
         request_data = request.get_json()
-        url = request_data['url']
-        shutdown_url = f"{url}/shutdown"
-        
-        # Call the shutdown endpoint
-        response = requests.post(shutdown_url)
+        access_code = request_data['access_code']
+        endpoint = request_data['endpoint']
+        status = request_data['status']
+        history_id = request_data['history_id']
+        user_id = request_data['user_id']
+        base_url = urlparse(request_data['endpoint'])
+        record = find_and_pop_record(access_code, endpoint, status, int(history_id), int(user_id))
+        if record:
+            response = requests.get(f"{base_url.scheme}://{base_url.netloc}/shutdown", timeout=10)
 
-        if response.status_code == 200:
-            return jsonify({"status": "success", "message": "Shutdown triggered successfully"}), 200
-        else:
-            return jsonify({"status": "error", "message": "Failed to trigger shutdown"}), 500
+            if response.status_code == 200:
+                return jsonify({"status": "success", "message": "Shutdown triggered successfully"}), 200
+            return jsonify({"status": "error", "message": f"Failed to trigger shutdown: {response.status_code}"}), 500
+        return jsonify({"status": "error", "message": f"No records founded"}), 404
+    except requests.Timeout:
+        return jsonify({"status": "error", "message": "Request to shutdown timed out"}), 500
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 @executor.route("/read", methods=["GET"])
 def read_executor():
@@ -101,16 +109,52 @@ def read_executor():
             return jsonify({"status": "error", "message": "Access code not found"}), 404
     return jsonify(data), 200
 
+def find_and_pop_record(access_code, endpoint, status, history_id, user_id, pop=False):
+    """
+    Find the first record in the data for the given access code and endpoint.
+    If pop is True, delete the record from the data before returning it.
+    """
+    if access_code in data:
+        for index, record in enumerate(data[access_code]):
+            if record == [endpoint, status, history_id, user_id]:
+                # Found the record
+                if pop:
+                    # Delete the record if pop is True
+                    return data[access_code].pop(index)  # This deletes the record and returns it
+                return record  # Just return the record without deleting
+    return None  # Return None if no record was found
+
+
 @executor.route("/update", methods=["POST"])
 def update_executor():
     try:
         request_data = request.get_json()
-        access_code = request_data['access_code']
-        address = request_data['address']
-        new_data = request_data['data']
+        
+        original_access_code = request_data['original_access_code']
+        original_endpoint = request_data['original_endpoint']
+        original_status = request_data['original_status']
+        original_history_id = request_data['original_history_id']
+        original_user_id = request_data['original_user_id']
+        
+        new_access_code = request_data['access_code']
+        new_endpoint = request_data['endpoint']
+        new_status = request_data['status']
+        new_history_id = request_data['history_id']
+        new_user_id = request_data['user_id']
 
-        if access_code in data and address in data[access_code]:
-            data[access_code][address] = new_data
+        # Find and optionally delete the original record
+        original_record = find_and_pop_record(original_access_code, original_endpoint, original_status, int(original_history_id), int(original_user_id), pop=True)
+
+        # If record was found and deleted
+        if original_record is not None:
+            # If the new access code doesn't exist, create it
+            if new_access_code not in data:
+                data[new_access_code] = []
+
+            # Insert the new record into the correct access code
+            new_record = [new_endpoint, new_status, int(new_history_id), int(new_user_id)]
+            data[new_access_code].append(new_record)
+
             return jsonify({"status": "success", "message": "Record updated successfully"}), 200
         else:
             return jsonify({"status": "error", "message": "Record not found"}), 404

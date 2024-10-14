@@ -11,52 +11,60 @@
 </div>
 
 <div id="record-modal" class="fixed inset-0 z-50 hidden bg-gray-800 bg-opacity-75 flex items-center justify-center">
-    <div class="bg-white rounded shadow-lg p-4 w-1/3 dark:bg-gray-800 dark:text-white">
+    <div class="bg-white rounded shadow-lg p-4 w-2/3 dark:bg-gray-800 dark:text-white">
         <h2 id="modal-title" class="text-xl font-semibold mb-4"></h2>
         <form id="record-form" class="space-y-2">
-            <input type="hidden" name="original_access_code" id="modal-access-code">
+            @csrf
+            <input type="hidden" name="original_access_code" id="original-access-code">
+            <input type="hidden" name="original_endpoint" id="original-endpoint">
+            <input type="hidden" name="original_status" id="original-status">
+            <input type="hidden" name="original_history_id" id="original-history-id">
+            <input type="hidden" name="original_user_id" id="original-user-id">
             <div>
-                <label for="modal-ip" class="block">{{__('manage.label.ip')}}</label>
-                <input type="text" name="ip" id="modal-ip"
+                <label for="modal-access-code" class="block">{{ __('manage.label.accesscode') }}</label>
+                <input type="text" name="access_code" id="modal-access-code"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-port" class="block">{{__('manage.label.status')}}</label>
-                <input type="text" name="port" id="modal-port"
+                <label for="modal-endpoint" class="block">{{ __('manage.label.endpoint') }}</label>
+                <input type="text" name="endpoint" id="modal-endpoint"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-status" class="block">{{__('manage.label.status')}}</label>
+                <label for="modal-status" class="block">{{ __('manage.label.status') }}</label>
                 <select name="status" id="modal-status"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
-                    <option value="READY">{{__('manage.label.ready')}}</option>
-                    <option value="BUSY">{{__('manage.label.busy')}}</option>
+                    <option value="READY">{{ __('manage.label.ready') }}</option>
+                    <option value="BUSY">{{ __('manage.label.busy') }}</option>
                 </select>
             </div>
             <div>
-                <label for="modal-history-id" class="block">{{__('manage.label.historyid')}}</label>
+                <label for="modal-history-id" class="block">{{ __('manage.label.historyid') }}</label>
                 <input type="text" name="history_id" id="modal-history-id" value='-1'
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-user-id" class="block">{{__('manage.label.userid')}}</label>
+                <label for="modal-user-id" class="block">{{ __('manage.label.userid') }}</label>
                 <input type="text" name="user_id" id="modal-user-id" value='-1'
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div class="flex justify-between">
                 <button type="button" class="bg-gray-300 text-black rounded px-4 py-2"
-                    id="modal-cancel-btn">{{__('manage.button.cancel')}}</button>
-                <button type="submit" class="bg-blue-500 text-white rounded px-4 py-2">{{__('manage.button.save')}}</button>
+                    id="modal-cancel-btn">{{ __('manage.button.cancel') }}</button>
+                <button type="submit"
+                    class="bg-blue-500 text-white rounded px-4 py-2">{{ __('manage.button.save') }}</button>
             </div>
         </form>
         <div class="mt-4 flex justify-between">
-            <button id="shutdown-btn" class="bg-red-500 text-white px-4 py-2 rounded hidden">{{__('manage.button.shutdown')}}</button>
-            <button id="delete-btn" class="bg-red-600 text-white px-4 py-2 rounded hidden">{{__('manage.button.delete')}}</button>
+            <button id="shutdown-btn"
+                class="bg-red-500 text-white px-4 py-2 rounded hidden">{{ __('manage.button.shutdown') }}</button>
+            <button id="delete-btn"
+                class="bg-red-600 text-white px-4 py-2 rounded hidden">{{ __('manage.button.delete') }}</button>
         </div>
     </div>
 
@@ -85,10 +93,10 @@
     <div class="text-sm">
         <span class="font-semibold">${access_code}</span>
         <div class="flex justify-between">
-            <span class="text-green-500 font-semibold">{{__('manage.label.ready')}}: <span class="ready-count">0</span></span>
+            <span class="text-green-500 font-semibold">{{ __('manage.label.ready') }}: <span class="ready-count">0</span></span>
         </div>
         <div class="flex justify-between">
-            <span class="text-red-500 font-semibold">{{__('manage.label.busy')}}: <span class="busy-count">0</span></span>
+            <span class="text-red-500 font-semibold">{{ __('manage.label.busy') }}: <span class="busy-count">0</span></span>
         </div>
     </div>
     <ul class="ml-4 space-y-2 flex-1 border-l-2 pl-2 border-green-500 py-2"></ul>
@@ -112,7 +120,7 @@
                         const statusClass = status === 'BUSY' ? 'bg-red-500 hover:bg-red-700' :
                             'bg-green-500 hover:bg-green-700';
                         const portButton =
-                            `<button class="${statusClass} text-white px-2 py-1 m-1 rounded edit-port-btn transition duration-200" data-ip="${ip}" data-port="${port}" data-status="${status}" data-history-id="${history_id}" data-user-id="${user_id}">${port}</button>`;
+                            `<button class="${statusClass} text-white px-2 py-1 m-1 rounded edit-port-btn transition duration-200" data-endpoint="${url}" data-status="${status}" data-history-id="${history_id}" data-user-id="${user_id}" data-access-code="${access_code}">:${port}${new URL(url).pathname}, ${history_id}, ${user_id}</button>`;
 
                         let ipItem = ipList.find(`li[data-ip="${ip}"]`);
                         if (ipItem.length === 0) {
@@ -121,10 +129,10 @@
         <div class="text-sm w-[100px]">
             <span class="font-semibold">${ip}</span>
             <div class="flex justify-between">
-                <span class="text-green-500 font-semibold">{{__('manage.label.ready')}}: <span class="ip-ready-count">0</span></span>
+                <span class="text-green-500 font-semibold">{{ __('manage.label.ready') }}: <span class="ip-ready-count">0</span></span>
             </div>
             <div class="flex justify-between">
-                <span class="text-red-500 font-semibold">{{__('manage.label.busy')}}: <span class="ip-busy-count">0</span></span>
+                <span class="text-red-500 font-semibold">{{ __('manage.label.busy') }}: <span class="ip-busy-count">0</span></span>
             </div>
         </div>
         <div class="flex flex-1 overflow-hidden flex-wrap"></div>
@@ -156,13 +164,19 @@
             fetchData();
 
             $(document).on('click', '.edit-port-btn', function() {
-                const ip = $(this).data('ip');
+                const access_code = $(this).data("access-code");
                 const history_id = $(this).data('history-id');
                 const user_id = $(this).data('user-id');
-                const port = $(this).data('port');
+                const endpoint = $(this).data('endpoint');
                 const status = $(this).data('status');
-                $('#modal-ip').val(ip);
-                $('#modal-port').val(port);
+                $('#original-access-code').val(access_code);
+                $('#original-endpoint').val(endpoint);
+                $('#original-status').val(status);
+                $('#original-history-id').val(history_id);
+                $('#original-user-id').val(user_id);
+
+                $('#modal-access-code').val(access_code)
+                $('#modal-endpoint').val(endpoint);
                 $('#modal-status').val(status);
                 $('#modal-history-id').val(history_id);
                 $('#modal-user-id').val(user_id);
@@ -203,13 +217,22 @@
             });
 
             $('#shutdown-btn').on('click', function() {
-                const ip = $('#modal-ip').val();
+                const endpoint = $('#modal-endpoint').val();
+                const access_Code = $('#modal-access-code').val();
+                const history_id = $('#modal-history-id').val();
+                const status = $('#modal-status').val();
+                const user_id = $('#modal-user-id').val();
                 const url = `{{ route('manage.kernel.shutdown') }}`;
                 $.ajax({
                     type: 'POST',
                     url: url,
                     data: {
-                        url: ip
+                        _token: '{{ csrf_token() }}',
+                        access_code: access_Code,
+                        endpoint: endpoint,
+                        status: status,
+                        history_id: history_id,
+                        user_id: user_id,
                     },
                     success: function() {
                         fetchData();

@@ -266,6 +266,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                                 Route::post('/delete-data', [KernelController::class, 'deleteData'])->name('manage.kernel.deleteData');
                                 Route::post('/shutdown', [KernelController::class, 'shutdown'])->name('manage.kernel.shutdown');
                                 Route::post('/update-field', [KernelController::class, 'updateField'])->name('manage.kernel.updateField');
+                                Route::post('/create-data', [KernelController::class, 'createData'])->name('manage.kernel.createData');
                             })
                             ->name('manage.kernel');
 
