@@ -107,6 +107,7 @@ class SystemController extends Controller
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'update')->with('status', $result);
     }
 
+
     public function ResetRedis(Request $request)
     {
         foreach (['usertask_', 'api_'] as $prefix) {
@@ -118,112 +119,66 @@ class SystemController extends Controller
 
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
     }
-
-    public function updateWeb(Request $request)
+    public function checkUpdate(Request $request)
     {
-        // Set headers for SSE
-        header('Content-Type: text/event-stream');
-        header('Cache-Control: no-cache');
-
         try {
-            // Ensure the working directory is the root of the Laravel project
-            $projectRoot = base_path(); // Laravel root path
-            // Determine the script path based on the operating system
-            $isWindows = stripos(PHP_OS, 'WIN') === 0;
-            $scriptPath = $isWindows ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';
-            $scriptDir = dirname($scriptPath); // Get the directory for the script
+            chdir(base_path()); // Change to Laravel root path
 
-            // Change to the script directory first
-            chdir(base_path() . $scriptDir); // Change the working directory
+            $process = Process::fromShellCommandline('git fetch && git status');
 
-            // List of commands to run
-            $commands = ['git stash', 'git pull'];
+            $gitSshCommand = SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value ?? '';
 
-            // Run git commands first
-            foreach ($commands as $command) {
-                $process = Process::fromShellCommandline($command);
-                $process->setEnv([
-                    'PATH' => '/usr/local/bin:/usr/bin:/bin',
-                ]);
-                $process->setTimeout(null); // No timeout
+            $env = [
+                'PATH' => '/usr/local/bin:/usr/bin:/bin',
+            ];
 
-                // Start process
-                $process->run(function ($type, $buffer) use ($projectRoot) {
-                    // Send error messages if specific output is detected
-                    if (strpos($buffer, 'password') !== false) {
-                        echo 'data: ' . json_encode(['status' => 'error', 'output' => 'Password prompt detected. Cancelling job...']) . "\n\n";
-                        ob_flush();
-                        flush();
-                        exit(); // Exit to stop further command execution
-                    }
-
-                    if (strpos($buffer, 'dubious ownership') !== false) {
-                        echo 'data: ' . json_encode(['status' => 'error', 'output' => "Dubious ownership detected. Please run: git config --global --add safe.directory {$projectRoot}"]) . "\n\n";
-                        ob_flush();
-                        flush();
-                        exit(); // Exit to stop further command execution
-                    }
-
-                    // Send output to the client in SSE format
-                    echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
-                    ob_flush();
-                    flush();
-                });
-
-                // Check for successful command execution
-                if (!$process->isSuccessful()) {
-                    echo 'data: ' . json_encode(['status' => 'error', 'output' => "Error executing command: $command"]) . "\n\n";
-                    ob_flush();
-                    flush();
-                    exit();
-                }
+            if (!empty($gitSshCommand)) {
+                $env['GIT_SSH_COMMAND'] = $gitSshCommand;
             }
 
-            // Make the script executable
-            if (!$isWindows) {
-                $chmodProcess = Process::fromShellCommandline('chmod +x ' . basename($scriptPath));
-
-                $process->setEnv([
-                    'PATH' => '/usr/local/bin:/usr/bin:/bin',
-                ]);
-                $chmodProcess->run(function ($type, $buffer) {
-                    echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
-                    ob_flush();
-                    flush();
-                });
-
-                if (!$chmodProcess->isSuccessful()) {
-                    echo 'data: ' . json_encode(['status' => 'error', 'output' => 'Error making the script executable.']) . "\n\n";
-                    ob_flush();
-                    flush();
-                    exit();
-                }
-            }
-
-            // After successful git commands and chmod, execute the respective script
-            $process = Process::fromShellCommandline('./' . basename($scriptPath));
-
-            if (!$isWindows) {
-                $process->setEnv([
-                    'PATH' => '/usr/local/bin:/usr/bin:/bin',
-                ]);
-            }
+            $process->setEnv($env);
             $process->setTimeout(null); // No timeout
 
             $process->run(function ($type, $buffer) {
-                // Send output from the script
                 echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
                 ob_flush();
                 flush();
             });
 
-            // Check for successful script execution
             if (!$process->isSuccessful()) {
-                echo 'data: ' . json_encode(['status' => 'error', 'output' => 'Error executing the script.']) . "\n\n";
-                ob_flush();
-                flush();
-                exit();
+                return response()->json(['status' => 'error', 'output' => 'Error checking for updates.']);
             }
+
+            $output = $process->getOutput();
+            $status = strpos($output, 'Your branch is up to date') !== false ? 'up-to-date' : 'update-available';
+            $message = $status === 'up-to-date' ? 'Your branch is up to date.' : 'New updates are available.';
+
+            return response()->json(['status' => $status, 'output' => $message]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'output' => $e->getMessage()]);
+        }
+    }
+
+    public function updateWeb(Request $request)
+    {
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+
+        try {
+            $projectRoot = base_path();
+            $scriptPath = stripos(PHP_OS, 'WIN') === 0 ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';
+            chdir($projectRoot . dirname($scriptPath)); // Change to script directory
+
+            foreach (['git stash', 'git pull'] as $command) {
+                $this->runCommand($command, $projectRoot);
+            }
+
+            // Make the script executable if not Windows
+            if (stripos(PHP_OS, 'WIN') === false) {
+                $this->makeExecutable(basename($scriptPath));
+            }
+
+            $this->runCommand('./' . basename($scriptPath));
 
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
@@ -233,5 +188,71 @@ class SystemController extends Controller
             ob_flush();
             flush();
         }
+    }
+
+    private function runCommand(string $command, string $projectRoot)
+    {
+        $gitSshCommand = SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value ?? '';
+
+        $env = [
+            'PATH' => '/usr/local/bin:/usr/bin:/bin',
+        ];
+
+        if (!empty($gitSshCommand)) {
+            $env['GIT_SSH_COMMAND'] = $gitSshCommand;
+        }
+
+        $process = Process::fromShellCommandline($command);
+        $process->setEnv($env);
+        $process->setTimeout(null); // No timeout
+
+        $process->run(function ($type, $buffer) use ($projectRoot) {
+            $this->handleOutput($buffer, $projectRoot);
+        });
+
+        if (!$process->isSuccessful()) {
+            echo 'data: ' . json_encode(['status' => 'error', 'output' => "Error executing command: $command"]) . "\n\n";
+            ob_flush();
+            flush();
+            exit();
+        }
+    }
+
+    private function handleOutput(string $buffer, string $projectRoot)
+    {
+        if (strpos($buffer, 'password') !== false) {
+            $this->sendError('Password prompt detected. Cancelling job...');
+        } elseif (strpos($buffer, 'dubious ownership') !== false) {
+            $this->sendError("Dubious ownership detected. Please run: git config --global --add safe.directory {$projectRoot}");
+        } else {
+            echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
+            ob_flush();
+            flush();
+        }
+    }
+
+    private function makeExecutable(string $scriptName)
+    {
+        $process = Process::fromShellCommandline("chmod +x $scriptName");
+        $process->run(function ($type, $buffer) {
+            echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
+            ob_flush();
+            flush();
+        });
+
+        if (!$process->isSuccessful()) {
+            echo 'data: ' . json_encode(['status' => 'error', 'output' => 'Error making the script executable.']) . "\n\n";
+            ob_flush();
+            flush();
+            exit();
+        }
+    }
+
+    private function sendError(string $message)
+    {
+        echo 'data: ' . json_encode(['status' => 'error', 'output' => $message]) . "\n\n";
+        ob_flush();
+        flush();
+        exit();
     }
 }
