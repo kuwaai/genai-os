@@ -1,4 +1,50 @@
-<div class="flex flex-col flex-1 h-full mx-auto overflow-y-auto scrollbar">
+<div class="flex flex-col flex-1 h-full mx-auto overflow-y-auto scrollbar p-2">
+    <form class="kernel-form" method="post" action="{{ route('manage.setting.update') }}" class="space-y-6 flex-1 m-4 border-2 border-gray-500 rounded p-2">
+        <header class="flex">
+            @csrf
+            @method('patch')
+            <input name='tab' value='kernel' hidden/>
+            <div>
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                    {{ __('manage.header.settings') }}
+
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    {{ __('manage.label.settings') }}
+                </p>
+            </div>
+            <button type="submit" class="px-4 py-2 rounded bg-green-500 hover:bg-green-700 ml-auto text-white"><i
+                    class="fas fa-save"></i></button>
+        </header>
+    <div>
+        <x-input-label for="kernel_location" :value="__('manage.label.kernel_location')" />
+        <div class="flex items-center">
+            <x-text-input id="kernel_location" name="kernel_location" type="text"
+                class="mr-2 mb-1 block w-full"
+                value="{{ \App\Models\SystemSetting::where('key', 'kernel_location')->first()->value }}"
+                autocomplete="off" />
+        </div>
+    </div>
+    <div>
+        <x-input-label for="safety_guard_location" :value="__('manage.label.safety_guard_API')" />
+        <div class="flex items-center">
+            <x-text-input id="safety_guard_location" name="safety_guard_location" type="text"
+                class="mr-2 mb-1 block w-full"
+                value="{{ \App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value }}"
+                autocomplete="off" />
+        </div>
+    </div>
+    <div>
+        <x-input-label for="updateweb_git_ssh_command" :value="__('manage.label.updateweb_git_ssh_command')" />
+        <div class="flex items-center">
+            <x-text-input id="updateweb_git_ssh_command" name="updateweb_git_ssh_command" type="text"
+                class="mr-2 mb-1 block w-full"
+                value="{{ \App\Models\SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value }}"
+                autocomplete="off" />
+        </div>
+    </div>
+    </form>
     <div id="error-message" class="hidden text-red-500 dark:text-red-400"></div>
     <div id="loading-spinner" class="flex justify-center items-center py-8">
         <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

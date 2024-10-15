@@ -14,99 +14,66 @@ use Symfony\Component\Process\Process;
 
 class SystemController extends Controller
 {
-    public function update(Request $request): RedirectResponse
+    public static function updateSystemSetting($key, $value)
     {
-        function extractBaseUrl($url)
-        {
-            $parsedUrl = parse_url($url);
-
-            // Check if the URL has a scheme (http, https)
-            if (isset($parsedUrl['scheme'])) {
-                $baseUrl = $parsedUrl['scheme'] . '://';
-            } else {
-                $baseUrl = '';
-            }
-
-            // Check if the URL has a host (domain)
-            if (isset($parsedUrl['host'])) {
-                $baseUrl .= $parsedUrl['host'];
-
-                // Include port if present
-                if (isset($parsedUrl['port'])) {
-                    $baseUrl .= ':' . $parsedUrl['port'];
-                }
-            }
-
-            return $baseUrl;
-        }
-        $result = 'success';
-        $model = SystemSetting::where('key', 'agent_location')->first();
-        $model->value = extractBaseUrl($request->input('agent_location'));
-        $model->save();
-        $model = SystemSetting::where('key', 'safety_guard_location')->first();
-        $model->value = extractBaseUrl($request->input('safety_guard_location'));
-        $model->save();
-
-        if ($request->input('allow_register') == 'allow') {
-            if (in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')])) {
-                $request->merge(['allow_register' => null]);
-                $result = 'smtp_not_configured';
-            }
-        }
-
-        if ($request->input('register_need_invite') == 'allow') {
-            if (in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')])) {
-                $request->merge(['register_need_invite' => null]);
-                $result = 'smtp_not_configured';
-            }
-        }
-        $model = SystemSetting::where('key', 'allowRegister')->first();
-        $model->value = $request->input('allow_register') == 'allow' ? 'true' : 'false';
-        $model->save();
-
-        $model = SystemSetting::where('key', 'register_need_invite')->first();
-        $model->value = $request->input('register_need_invite') == 'allow' ? 'true' : 'false';
-        $model->save();
-
-        $model = SystemSetting::where('key', 'announcement')->first();
-        $oldanno = $model->value;
-        $model->value = $request->input('announcement') ?? '';
-        $model->save();
-
-        if ($oldanno != $model->value) {
-            User::query()->update(['announced' => false]);
-        }
-
-        $model = SystemSetting::where('key', 'warning_footer')->first();
-        $model->value = $request->input('warning_footer') ?? '';
-        $model->save();
-
-        $model = SystemSetting::where('key', 'upload_max_size_mb')->first();
-        $model->value = strval(intval($request->input('upload_max_size_mb') ?? '0'));
-        $model->save();
-
-        $model = SystemSetting::where('key', 'upload_allowed_extensions')->first();
-        $upload_allowed_extensions = array_filter(explode(',', $request->input('upload_allowed_extensions') ?? ''));
-        $upload_allowed_extensions = array_map(fn($v): string => trim($v), $upload_allowed_extensions);
-        $model->value = implode(',', $upload_allowed_extensions);
-        $model->save();
-
-        $model = SystemSetting::where('key', 'upload_max_file_count')->first();
-        $model->value = strval(intval($request->input('upload_max_file_count') ?? '-1'));
-        $model->save();
-
-        $model = SystemSetting::where('key', 'tos')->first();
-        $oldtos = $model->value;
-        $model->value = $request->input('tos') ?? '';
-        $model->save();
-
-        if ($oldtos != $model->value) {
-            User::query()->update(['term_accepted' => false]);
-        }
-
-        return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'update')->with('status', $result);
+        SystemSetting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
     }
 
+    public function update(Request $request): RedirectResponse
+    {
+        $extractBaseUrl = fn($url) => $url ? parse_url($url, PHP_URL_SCHEME) . '://' . parse_url($url, PHP_URL_HOST) . (parse_url($url, PHP_URL_PORT) ? ':' . parse_url($url, PHP_URL_PORT) : '') : '';
+
+        if ($request->input('tab') === 'kernel') {
+            foreach (
+                [
+                    'kernel_location' => $extractBaseUrl($request->input('kernel_location') ?? 'http://localhost:9000'),
+                    'safety_guard_location' => $extractBaseUrl($request->input('safety_guard_location')),
+                ]
+                as $key => $location
+            ) {
+                $this->updateSystemSetting($key, $location);
+            }
+            $this->updateSystemSetting('updateweb_git_ssh_command', $request->input('updateweb_git_ssh_command'));
+            $result = 'success';
+        } elseif ($request->input('tab') === 'settings') {
+            $smtpConfigured = !in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')]);
+
+            foreach (['allow_register', 'register_need_invite'] as $key) {
+                $this->updateSystemSetting($key, $request->input($key) === 'allow' && $smtpConfigured ? 'true' : 'false');
+            }
+
+            $result = $smtpConfigured ? 'success' : 'smtp_not_configured';
+
+            // Update announcement
+            $announcement = $request->input('announcement');
+            $currentAnnouncement = SystemSetting::where('key', 'announcement')->value('value');
+            if ($currentAnnouncement !== $announcement) {
+                $this->updateSystemSetting('announcement', $announcement);
+                User::query()->update(['announced' => false]);
+            }
+
+            $this->updateSystemSetting('warning_footer', $request->input('warning_footer'));
+
+            foreach (['upload_max_size_mb', 'upload_max_file_count'] as $key) {
+                $value = ((string) intval($request->input($key))) ?? '10';
+                if ($value === '0' && $request->input($key) !== '0') {
+                    $value = '10';
+                }
+                $this->updateSystemSetting($key, $value);
+            }
+
+            $uploadExtensions = $request->input('upload_allowed_extensions') ? implode(',', array_map('trim', explode(',', $request->input('upload_allowed_extensions')))) : 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpeg,jpg,gif,png,avif,webp,bmp,ico,cur,tiff,tif,zip,mp3,wav,mp4';
+            $this->updateSystemSetting('upload_allowed_extensions', $uploadExtensions);
+            $tos = $request->input('tos');
+            $currentTos = SystemSetting::where('key', 'tos')->value('value');
+            if ($currentTos !== $tos) {
+                $this->updateSystemSetting('tos', $tos);
+                User::query()->update(['term_accepted' => false]);
+            }
+        }
+
+        return Redirect::route('manage.home')->with(['last_tab' => $request->input('tab'), 'last_action' => 'update', 'status' => $result]);
+    }
 
     public function ResetRedis(Request $request)
     {
