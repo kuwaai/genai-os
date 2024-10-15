@@ -10,7 +10,7 @@ class KernelController extends Controller
 {
     public function fetchData()
     {
-        $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/read';
+        $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/worker/read';
         $response = Http::get($apiUrl);
         if ($response->successful()) {
             $data = $response->json();
@@ -22,7 +22,7 @@ class KernelController extends Controller
 
     public function updateField(Request $request)
     {
-        $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/update';
+        $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/worker/update';
         $data = [
             'access_code' => $request->input('access_code'),
             'url' => $request->input('url'),
@@ -36,21 +36,21 @@ class KernelController extends Controller
 
     public function updateData(Request $request)
     {
-        $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/update';
+        $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/worker/update';
         $response = Http::post($apiUrl, $request->all());
         return $response->successful() ? response()->json(['status' => 'success']) : response()->json(['error' => 'Failed to update data'], 500);
     }
 
     public function deleteData(Request $request)
     {
-        $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/delete';
+        $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/worker/delete';
         $response = Http::post($apiUrl, $request->all());
         return $response->successful() ? response()->json(['status' => 'success']) : response()->json(['error' => 'Failed to delete data'], 500);
     }
 
     public function shutdown(Request $request)
     {
-        $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/shutdown';
+        $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/worker/shutdown';
         $response = Http::post($apiUrl, $request->all());
         return $response->successful() ? response()->json(['status' => 'success']) : response()->json(['error' => 'Failed to shutdown address'], 500);
     }
@@ -58,7 +58,7 @@ class KernelController extends Controller
     // New method to create data
     public function createData(Request $request)
     {
-        $apiUrl = SystemSetting::where('key', 'agent_location')->first()->value . '/v1.0/worker/create'; // Ensure this endpoint supports creating
+        $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/worker/create'; // Ensure this endpoint supports creating
         $data = [
             'access_code' => $request->input('access_code'),
             'url' => $request->input('url'),

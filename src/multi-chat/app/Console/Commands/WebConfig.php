@@ -23,7 +23,7 @@ class WebConfig extends Command
         $updates = [];
 
         if ($kernelEndpoint !== null && $kernelEndpoint !== 'null') {
-            $updates['agent_location'] = $kernelEndpoint;
+            $updates['kernel_location'] = $kernelEndpoint;
         }
 
         if ($safetyGuardEndpoint !== null && $safetyGuardEndpoint !== 'null') {

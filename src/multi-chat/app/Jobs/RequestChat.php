@@ -98,9 +98,9 @@ class RequestChat implements ShouldQueue
         $start = microtime(true);
         $tmp = '';
         try {
-            $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
+            $kernel_location = \App\Models\SystemSetting::where('key', 'kernel_location')->first()->value;
             $client = new Client(['timeout' => 300]);
-            $response = $client->post($agent_location . '/' . self::$agent_version . '/worker/schedule', [
+            $response = $client->post($kernel_location . '/' . self::$agent_version . '/worker/schedule', [
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
                 'form_params' => [
                     'name' => $this->access_code,
@@ -173,7 +173,7 @@ class RequestChat implements ShouldQueue
                             $taide_flag = false;
                         }
                     }
-                    $response = $client->post($agent_location . '/' . self::$agent_version . '/chat/completions', [
+                    $response = $client->post($kernel_location . '/' . self::$agent_version . '/chat/completions', [
                         'headers' => ['Content-Type' => 'application/x-www-form-urlencoded', 'Accept-Language' => $this->lang],
                         'form_params' => [
                             'input' => $this->input,

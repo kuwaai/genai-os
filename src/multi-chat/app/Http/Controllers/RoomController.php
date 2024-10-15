@@ -74,8 +74,8 @@ class RoomController extends Controller
             ->pluck('id')
             ->toArray();
         $client = new Client(['timeout' => 300]);
-        $agent_location = \App\Models\SystemSetting::where('key', 'agent_location')->first()->value;
-        $response = $client->post($agent_location . '/' . RequestChat::$agent_version . '/chat/abort', [
+        $kernel_location = \App\Models\SystemSetting::where('key', 'kernel_location')->first()->value;
+        $response = $client->post($kernel_location . '/' . RequestChat::$agent_version . '/chat/abort', [
             'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
             'form_params' => [
                 'history_id' => json_encode($list),
