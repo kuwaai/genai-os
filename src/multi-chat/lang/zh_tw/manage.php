@@ -108,6 +108,7 @@ return [
     'hint.saved' => '已儲存',
     'hint.redis_cache_cleared' => 'Redis快取已清除',
     'label.updateweb_git_ssh_command' =>'環境變數GIT_SSH_COMMAND',
+    'label.updateweb_path' => '環境變數PATH',
     'label.need_invite' => '註冊必需有邀請碼',
     'label.footer_warning' => '對話底部警告',
     'label.anno' => '系統公告',
