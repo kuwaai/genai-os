@@ -89,14 +89,18 @@ class SystemController extends Controller
     public function checkUpdate(Request $request)
     {
         try {
-            chdir(base_path()); // Change to Laravel root path
+            chdir(base_path());
 
             $process = Process::fromShellCommandline('git fetch && git status');
 
             $gitSshCommand = SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value ?? '';
 
+            $customPath = SystemSetting::where('key', 'updateweb_path')->value('value');
+
+            $defaultPath = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? getenv('PATH') : getenv('PATH');
+
             $env = [
-                'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value'),
+                'PATH' => !empty($customPath) ? $customPath : $defaultPath,
             ];
 
             if (!empty($gitSshCommand)) {
@@ -104,7 +108,7 @@ class SystemController extends Controller
             }
 
             $process->setEnv($env);
-            $process->setTimeout(null); // No timeout
+            $process->setTimeout(null);
 
             $process->run(function ($type, $buffer) {
                 echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
@@ -134,13 +138,16 @@ class SystemController extends Controller
         try {
             $projectRoot = base_path();
             $scriptPath = stripos(PHP_OS, 'WIN') === 0 ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';
-            chdir($projectRoot . dirname($scriptPath)); // Change to script directory
+            chdir($projectRoot . dirname($scriptPath));
+
+            echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Current dir: ' . getcwd()]) . "\n\n";
+            ob_flush();
+            flush();
 
             foreach (['git stash', 'git pull'] as $command) {
                 $this->runCommand($command, $projectRoot);
             }
 
-            // Make the script executable if not Windows
             if (stripos(PHP_OS, 'WIN') === false) {
                 $this->makeExecutable(basename($scriptPath));
             }
@@ -161,8 +168,12 @@ class SystemController extends Controller
     {
         $gitSshCommand = SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value ?? '';
 
+        $customPath = SystemSetting::where('key', 'updateweb_path')->value('value');
+
+        $defaultPath = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? getenv('PATH') : getenv('PATH');
+
         $env = [
-            'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value'),
+            'PATH' => !empty($customPath) ? $customPath : $defaultPath,
         ];
 
         if (!empty($gitSshCommand)) {
@@ -187,10 +198,8 @@ class SystemController extends Controller
 
     private function handleOutput(string $buffer, string $projectRoot)
     {
-        // Attempt to detect and convert the encoding
         $encoding = mb_detect_encoding($buffer, ['UTF-8', 'BIG5', 'ISO-8859-1', 'Windows-1252'], true);
 
-        // Convert to UTF-8 if it's not already
         if ($encoding !== false && $encoding !== 'UTF-8') {
             $buffer = mb_convert_encoding($buffer, 'UTF-8', $encoding);
         }
@@ -200,7 +209,6 @@ class SystemController extends Controller
         } elseif (strpos($buffer, 'dubious ownership') !== false) {
             $this->sendError("Dubious ownership detected. Please run: git config --global --add safe.directory {$projectRoot}");
         } else {
-            // Encode the output in JSON format after converting to UTF-8
             echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
             ob_flush();
             flush();
