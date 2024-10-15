@@ -53,7 +53,7 @@
                             class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_in') }}</a>
 
                         @if (Route::has('register') &&
-                                \App\Models\SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists())
+                                \App\Models\SystemSetting::where('key', 'allow_register')->where('value', 'true')->exists())
                             <a href="{{ route('register') }}"
                                 class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:rounded-sm focus:outline-red-500">{{ __('login.button.sign_up') }}</a>
                         @endif

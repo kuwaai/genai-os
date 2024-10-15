@@ -24,7 +24,7 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
-        if (SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists()) {
+        if (SystemSetting::where('key', 'allow_register')->where('value', 'true')->exists()) {
             return view('auth.register');
         }
         return redirect()->intended('/');
@@ -37,7 +37,7 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (SystemSetting::where('key', 'allowRegister')->where('value', 'true')->exists()) {
+        if (SystemSetting::where('key', 'allow_register')->where('value', 'true')->exists()) {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class, new AllowedEmailDomain()],
