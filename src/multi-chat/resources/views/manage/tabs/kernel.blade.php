@@ -35,15 +35,6 @@
                 autocomplete="off" />
         </div>
     </div>
-    <div>
-        <x-input-label for="updateweb_git_ssh_command" :value="__('manage.label.updateweb_git_ssh_command')" />
-        <div class="flex items-center">
-            <x-text-input id="updateweb_git_ssh_command" name="updateweb_git_ssh_command" type="text"
-                class="mr-2 mb-1 block w-full"
-                value="{{ \App\Models\SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value }}"
-                autocomplete="off" />
-        </div>
-    </div>
     </form>
     <div id="error-message" class="hidden text-red-500 dark:text-red-400"></div>
     <div id="loading-spinner" class="flex justify-center items-center py-8">

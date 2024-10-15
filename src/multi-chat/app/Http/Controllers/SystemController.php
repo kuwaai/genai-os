@@ -33,7 +33,6 @@ class SystemController extends Controller
             ) {
                 $this->updateSystemSetting($key, $location);
             }
-            $this->updateSystemSetting('updateweb_git_ssh_command', $request->input('updateweb_git_ssh_command'));
             $result = 'success';
         } elseif ($request->input('tab') === 'settings') {
             $smtpConfigured = !in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')]);
@@ -48,11 +47,8 @@ class SystemController extends Controller
             $announcement = $request->input('announcement');
             $currentAnnouncement = SystemSetting::where('key', 'announcement')->value('value');
             if ($currentAnnouncement !== $announcement) {
-                $this->updateSystemSetting('announcement', $announcement);
                 User::query()->update(['announced' => false]);
             }
-
-            $this->updateSystemSetting('warning_footer', $request->input('warning_footer'));
 
             foreach (['upload_max_size_mb', 'upload_max_file_count'] as $key) {
                 $value = ((string) intval($request->input($key))) ?? '10';
@@ -62,14 +58,18 @@ class SystemController extends Controller
                 $this->updateSystemSetting($key, $value);
             }
 
-            $uploadExtensions = $request->input('upload_allowed_extensions') ? implode(',', array_map('trim', explode(',', $request->input('upload_allowed_extensions')))) : 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpeg,jpg,gif,png,avif,webp,bmp,ico,cur,tiff,tif,zip,mp3,wav,mp4';
-            $this->updateSystemSetting('upload_allowed_extensions', $uploadExtensions);
             $tos = $request->input('tos');
             $currentTos = SystemSetting::where('key', 'tos')->value('value');
             if ($currentTos !== $tos) {
-                $this->updateSystemSetting('tos', $tos);
                 User::query()->update(['term_accepted' => false]);
             }
+            $uploadExtensions = $request->input('upload_allowed_extensions') ? implode(',', array_map('trim', explode(',', $request->input('upload_allowed_extensions')))) : 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpeg,jpg,gif,png,avif,webp,bmp,ico,cur,tiff,tif,zip,mp3,wav,mp4';
+            $this->updateSystemSetting('upload_allowed_extensions', $uploadExtensions);
+            $this->updateSystemSetting('updateweb_git_ssh_command', $request->input('updateweb_git_ssh_command'));
+            $this->updateSystemSetting('updateweb_path', $request->input('updateweb_path'));
+            $this->updateSystemSetting('warning_footer', $request->input('warning_footer'));
+            $this->updateSystemSetting('announcement', $announcement);
+            $this->updateSystemSetting('tos', $tos);
         }
 
         return Redirect::route('manage.home')->with(['last_tab' => $request->input('tab'), 'last_action' => 'update', 'status' => $result]);
@@ -96,7 +96,7 @@ class SystemController extends Controller
             $gitSshCommand = SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value ?? '';
 
             $env = [
-                'PATH' => '/usr/local/bin:/usr/bin:/bin',
+                'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value'),
             ];
 
             if (!empty($gitSshCommand)) {
@@ -162,7 +162,7 @@ class SystemController extends Controller
         $gitSshCommand = SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value ?? '';
 
         $env = [
-            'PATH' => '/usr/local/bin:/usr/bin:/bin',
+            'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value'),
         ];
 
         if (!empty($gitSshCommand)) {
@@ -171,7 +171,7 @@ class SystemController extends Controller
 
         $process = Process::fromShellCommandline($command);
         $process->setEnv($env);
-        $process->setTimeout(null); // No timeout
+        $process->setTimeout(null);
 
         $process->run(function ($type, $buffer) use ($projectRoot) {
             $this->handleOutput($buffer, $projectRoot);
@@ -187,11 +187,20 @@ class SystemController extends Controller
 
     private function handleOutput(string $buffer, string $projectRoot)
     {
+        // Attempt to detect and convert the encoding
+        $encoding = mb_detect_encoding($buffer, ['UTF-8', 'BIG5', 'ISO-8859-1', 'Windows-1252'], true);
+
+        // Convert to UTF-8 if it's not already
+        if ($encoding !== false && $encoding !== 'UTF-8') {
+            $buffer = mb_convert_encoding($buffer, 'UTF-8', $encoding);
+        }
+
         if (strpos($buffer, 'password') !== false) {
             $this->sendError('Password prompt detected. Cancelling job...');
         } elseif (strpos($buffer, 'dubious ownership') !== false) {
             $this->sendError("Dubious ownership detected. Please run: git config --global --add safe.directory {$projectRoot}");
         } else {
+            // Encode the output in JSON format after converting to UTF-8
             echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
             ob_flush();
             flush();

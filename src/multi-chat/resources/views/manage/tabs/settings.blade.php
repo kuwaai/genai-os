@@ -95,6 +95,24 @@
                         data-original-value="{{ $upload_max_file_count }}" autocomplete="off" />
                 </div>
             </div>
+            <div>
+                <x-input-label for="updateweb_git_ssh_command" :value="__('manage.label.updateweb_git_ssh_command')" />
+                <div class="flex items-center">
+                    <x-text-input id="updateweb_git_ssh_command" name="updateweb_git_ssh_command" type="text"
+                        class="mr-2 mb-1 block w-full"
+                        value="{{ \App\Models\SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value }}"
+                        autocomplete="off" />
+                </div>
+            </div>
+            <div>
+                <x-input-label for="updateweb_path" :value="__('manage.label.updateweb_path')" />
+                <div class="flex items-center">
+                    <x-text-input id="updateweb_path" name="updateweb_path" type="text"
+                        class="mr-2 mb-1 block w-full"
+                        value="{{ \App\Models\SystemSetting::where('key', 'updateweb_path')->first()->value }}"
+                        autocomplete="off" />
+                </div>
+            </div>
 
             <div class="flex items-center gap-4">
                 @if (session('last_action') === 'update' && session('status') === 'success')
