@@ -17,7 +17,7 @@ return new class extends Migration
         $setting = new SystemSetting();
         $setting->fill([
             'key' => $this->field,
-            'value' => "/usr/local/bin:/usr/bin:/bin",
+            'value' => "",
         ]);
         $setting->save();
     }
