@@ -8,23 +8,23 @@ return [
     'button.create' => '생성',
     'button.save' => '저장',
     'button.yes' => '예, 확실합니다',
-    'button.no' => '아니오, 취소',
+    'button.no' => '아니요, 취소',
     'button.cancel' => '취소',
     'button.close' => '닫기',
     'button.accept' => '동의합니다',
     'button.export' => '내보내기',
-    'button.updateWeb' => '웹사이트 업데이트',
+    'button.updateWeb' => '웹 업데이트',
     'button.shutdown' => '종료',
 
-    // 탭
+    //Tabs
     'tab.groups' => '그룹',
     'tab.users' => '사용자',
     'tab.llms' => '모델',
-    'tab.settings' => '시스템 설정',
-    'tab.kernel' => '핵심',
+    'tab.settings' => '웹 설정',
+    'tab.kernel' => '커널',
     'tab.workers' => '작업 처리기',
 
-    // 그룹
+    //Groups
     'button.new_group' => '새 그룹 추가',
     'header.create_group' => '새 그룹 생성',
     'label.tab_permissions' => '페이지 권한',
@@ -34,7 +34,7 @@ return [
     'placeholder.invite_code' => '초대 코드',
     'label.describe' => '소개',
     'placeholder.group_name' => '그룹 이름',
-    'placeholder.group_detail' => '그룹 주석',
+    'placeholder.group_detail' => '그룹 설명',
     'label.read' => '읽기',
     'label.delete' => '삭제',
     'label.update' => '업데이트',
@@ -46,22 +46,22 @@ return [
     'hint.group_created' => '그룹이 성공적으로 생성되었습니다!',
     'modal.delete_group.header' => '이 그룹을 삭제하시겠습니까?',
 
-    // 사용자
+    //Users
     'header.menu' => '주 메뉴',
     'header.group_selector' => '그룹 선택기',
-    'header.fuzzy_search' => '모호 검색기',
+    'header.fuzzy_search' => '퍼지 검색기',
     'header.create_user' => '사용자 생성',
     'label.group_selector' => '그룹에서 사용자를 필터링합니다.',
     'label.fuzzy_search' => '이름 또는 이메일로 사용자를 검색합니다.',
-    'label.create_user' => '사용자 프로필 생성',
+    'label.create_user' => '사용자 프로필을 생성합니다.',
 
     'create_user.header' => '새 계정 생성',
     'create_user.joined_group' => '가입한 그룹',
-    'label.members' => '명의 회원',
-    'label.other_users' => '그룹 회원이 아닙니다.',
+    'label.members' => '명의 멤버',
+    'label.other_users' => '그룹 멤버가 아닌 사용자',
     'button.return_group_list' => '그룹 목록으로 돌아가기',
     'placeholder.search_user' => '이메일 또는 이름 검색',
-    'hint.enter_to_search' => 'Enter 키를 눌러 검색합니다.',
+    'hint.enter_to_search' => 'Enter 키를 눌러 검색',
 
     'group_selector.header' => '사용자 편집',
     'placeholder.email' => '사용자 이메일',
@@ -79,7 +79,7 @@ return [
     'label.created_at' => '생성됨',
     'label.updated_at' => '업데이트됨',
 
-    // LLM
+    //LLMs
     'button.new_model' => '새 모델 추가',
     'label.enabled_models' => '활성화된 모델',
     'label.disabled_models' => '비활성화된 모델',
@@ -89,35 +89,36 @@ return [
     'label.model_name' => '모델 이름',
     'label.order' => '표시 순서',
     'label.link' => '외부 링크',
-    'placeholder.description' => '이 모델에 대한 관련 소개',
+    'placeholder.description' => '이 모델에 대한 설명',
     'label.version' => '버전',
     'label.access_code' => '액세스 코드',
-    'placeholder.link' => '이 모델의 외부 관련 링크',
+    'placeholder.link' => '모델의 외부 관련 링크',
     'header.update_model' => '모델 프로필 편집',
     'label.description' => '설명',
     'modal.update_model.header' => '이 언어 모델 프로필을 업데이트하시겠습니까?',
     'modal.delete_model.header' => '이 언어 모델 프로필을 삭제하시겠습니까?',
-    'modal.confirm_setting_modal.shrink_max_upload_file_count' => '업로드 파일 총 수 제한을 줄이면 초과된 사용자 파일이 삭제됩니다. 계속하시겠습니까?',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => '업로드 파일 수 제한을 줄이면 초과하는 사용자 파일이 삭제됩니다. 계속하시겠습니까?',
 
-    // 설정
-    'header.settings' => '시스템 설정',
-    'header.updateWeb' => '웹사이트 업데이트 진행률',
-    'label.settings' => '시스템에 대한 모든 설정을 여기서 조정할 수 있습니다.',
-    'label.agent_API' => 'Agent API 연결 위치',
+    //setting
+    'header.settings' => '웹 설정',
+    'header.updateWeb' => '웹 업데이트 진행 상황',
+    'label.settings' => '웹에 대한 모든 설정은 여기에서 조정할 수 있습니다.',
     'label.allow_register' => '등록 허용',
     'button.reset_redis' => 'Redis 캐시 재설정',
     'hint.saved' => '저장되었습니다.',
     'hint.redis_cache_cleared' => 'Redis 캐시가 지워졌습니다.',
-    'label.need_invite' => '등록에는 초대 코드가 필요합니다.',
-    'label.footer_warning' => '대화 하단 경고',
-    'label.safety_guard_API' => '안전 필터 연결 위치',
+    'label.updateweb_git_ssh_command' =>'환경 변수 GIT_SSH_COMMAND',
+    'label.need_invite' => '등록하려면 초대 코드가 필요합니다.',
+    'label.footer_warning' => '대화 상자 하단 경고',
     'label.anno' => '시스템 공지',
     'label.tos' => '서비스 약관',
     'label.upload_max_size_mb' => '업로드 파일 크기 제한(MB)',
-    'label.upload_allowed_extensions' => '허용된 업로드 파일 확장자(*는 모든 확장자를 나타냅니다)',
-    'label.upload_max_file_count' => '업로드 파일 총 수 제한(-1은 제한 없음을 나타냅니다)',
+    'label.upload_allowed_extensions' => '허용된 업로드 파일 확장자 (*는 모든 확장자를 의미합니다)',
+    'label.upload_max_file_count' => '업로드 파일 총 수 제한 (-1은 제한 없음을 의미합니다)',
 
-    // 핵심
+    //kernel
+    'label.kernel_location' => '커널 연결 위치',
+    'label.safety_guard_API' => '안전 가드 연결 위치',
     'label.ready' => '준비됨',
     'label.busy' => '바쁨',
     'label.accesscode' => '액세스 코드',
@@ -127,29 +128,26 @@ return [
     'label.userid' => '사용자 ID',
     'button.new_executor' => '새 실행기 추가',
     'label.edit_executor' => '실행기 편집',
-    'label.create_executor' => '새 실행기 생성',
+    'label.create_executor' => '실행기 추가',
 
-    // 작업 처리기
-    'label.failed' => '작업에 실패했습니다. 다시 시도하십시오.',
+    //Workers
+    'label.failed' => '작업 실패. 다시 시도하십시오.',
     'label.loading' => '로드 중...',
     'label.last_refresh' => '마지막 새로고침 시간: :time',
     'label.current_worker_count' => '현재 작업 처리기 수',
-    'label.error_fetching_worker_count' => '작업 처리기 수를 가져오는 중 오류가 발생했습니다.',
+    'label.error_fetching_worker_count' => '작업 처리기 수를 가져오는 중 오류 발생.',
     'label.last_refresh_time' => '마지막 새로고침',
     'label.seconds_ago' => '초 전',
     'label.error' => '오류',
-    'label.valid_worker_count' => '올바른 작업 처리기 수를 입력하십시오.',
+    'label.valid_worker_count' => '유효한 작업 처리기 수를 입력하십시오.',
 
-    // 버튼
     'button.start' => '작업 처리기 시작',
     'button.stop' => '모든 작업 처리기 중지',
     'button.confirm' => '확인',
     'button.cancel' => '취소',
 
-    // 모달 제목
     'modal.start.title' => '작업 처리기 시작',
     'modal.start.label' => '작업 처리기 수:',
-
     'modal.stop.title' => '모든 작업 처리기 중지',
     'modal.stop.confirm' => '모든 작업 처리기를 중지하시겠습니까?',
 ];

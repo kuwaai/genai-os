@@ -20,7 +20,7 @@ return [
     'tab.groups' => '群組',
     'tab.users' => '使用者',
     'tab.llms' => '模型',
-    'tab.settings' => '系統設定',
+    'tab.settings' => '網站設定',
     'tab.kernel' => '核心',
     'tab.workers' => '任務處理器',
 
@@ -100,17 +100,16 @@ return [
     'modal.confirm_setting_modal.shrink_max_upload_file_count' => '降低上傳檔案總數限制會刪除超出的使用者檔案，您確定嗎?',
 
     //setting
-    'header.settings' => '系統設定',
+    'header.settings' => '網站設定',
     'header.updateWeb' => '網站更新進度',
-    'label.settings' => '所有關於系統的設定都可在此調整',
-    'label.agent_API' => 'Agent API連線位置',
+    'label.settings' => '所有關於網站的設定都可在此調整',
     'label.allow_register' => '允許註冊',
     'button.reset_redis' => '重設Redis快取',
     'hint.saved' => '已儲存',
     'hint.redis_cache_cleared' => 'Redis快取已清除',
+    'label.updateweb_git_ssh_command' =>'環境變數GIT_SSH_COMMAND',
     'label.need_invite' => '註冊必需有邀請碼',
     'label.footer_warning' => '對話底部警告',
-    'label.safety_guard_API' => '安全過濾連線位置',
     'label.anno' => '系統公告',
     'label.tos' => '服務條款',
     'label.upload_max_size_mb' => '上傳檔案大小限制(MB)',
@@ -118,6 +117,8 @@ return [
     'label.upload_max_file_count' => '上傳檔案總數限制 (-1 表示不限制數量)',
 
     //kernel
+    'label.kernel_location' => '核心連線位置',
+    'label.safety_guard_API' => '安全過濾連線位置',
     'label.ready' => '就緒',
     'label.busy' => '忙碌',
     'label.accesscode' => '存取代碼',
@@ -140,16 +141,13 @@ return [
     'label.error' => '錯誤',
     'label.valid_worker_count' => '請輸入有效的任務處理器數量。',
 
-    // Buttons
     'button.start' => '啟動任務處理器',
     'button.stop' => '停止所有任務處理器',
     'button.confirm' => '確認',
     'button.cancel' => '取消',
 
-    // Modal Titles
     'modal.start.title' => '啟動任務處理器',
     'modal.start.label' => '任務處理器數量：',
-
     'modal.stop.title' => '停止所有任務處理器',
     'modal.stop.confirm' => '您確定要停止所有任務處理器嗎？',
 ];
