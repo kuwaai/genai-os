@@ -22,7 +22,7 @@ class WorkerController extends Controller
     }
 
     // Function to start a specified number of workers
-    public function startWorkers(int $count)
+    public function startWorkers(int $count = 10)
     {
         $artisanPath = base_path('artisan');
         $logFileBase = base_path('storage/logs/worker.log');

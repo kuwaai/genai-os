@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\RedisController;
+use App\Http\Controllers\WorkerController;
 use App\Models\SystemSetting;
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
@@ -113,7 +114,9 @@ class SystemController extends Controller
                 $this->makeExecutable(basename($scriptPath));
             }
             $this->runCommand((stripos(PHP_OS, 'WIN') === 0 ? '' : './') . basename($scriptPath), $projectRoot);
-
+            $workerController = new WorkerController();
+            $workerController->stopWorkers();
+            $workerController->startWorkers();
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
             flush();
