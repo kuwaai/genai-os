@@ -3,7 +3,7 @@ from kuwa.client import KuwaClient
 import asyncio
 
 # Configure the list of specific files to read
-files_to_read = ["perm_describe.php","perm.php","manage.php"]
+files_to_read = ["manage.php"]
 
 # Configure the list of target languages
 languages = ["cs_cz", "de", "en_us", "fr_fr","ja_jp", "ko_kr", "zh_cn"]  # Add more languages as needed

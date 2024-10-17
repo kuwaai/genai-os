@@ -15,6 +15,7 @@ return [
     'button.export' => '匯出',
     'button.updateWeb' => '更新網站',
     'button.shutdown' => '關機',
+    'button.refresh' => '重新整理',
 
     //Tabs
     'tab.groups' => '群組',
@@ -143,6 +144,10 @@ return [
     'label.seconds_ago' => '秒前',
     'label.error' => '錯誤',
     'label.valid_worker_count' => '請輸入有效的任務處理器數量。',
+    'label.worker_started' => '任務處理器啟動成功',
+    'label.worker_start_failed' => '任務處理器啟動失敗：',
+    'label.no_workers' => '沒有已啟動的任務處理器',
+    'label.worker_stopped' => '任務處理器已停止',
 
     'button.start' => '啟動任務處理器',
     'button.stop' => '停止所有任務處理器',

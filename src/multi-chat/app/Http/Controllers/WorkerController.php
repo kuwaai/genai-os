@@ -29,9 +29,7 @@ class WorkerController extends Controller
 
         for ($i = 0; $i < $count; $i++) {
             $logFile = $this->generateLogFileName($logFileBase);
-            $command = PHP_OS_FAMILY === 'Windows' 
-                ? "start /B php {$artisanPath} queue:work >> {$logFile} 2>&1" 
-                : "php {$artisanPath} queue:work >> {$logFile} 2>&1 &";
+            $command = PHP_OS_FAMILY === 'Windows' ? "start /B php {$artisanPath} queue:work >> {$logFile} 2>&1" : "php {$artisanPath} queue:work >> {$logFile} 2>&1 &";
 
             try {
                 Process::fromShellCommandline($command)->start();
@@ -40,11 +38,11 @@ class WorkerController extends Controller
                     usleep(100000);
                 }
             } catch (\Exception $e) {
-                return response()->json(['message' => 'Worker failed to start: ' . $e->getMessage()], 500);
+                return response()->json(['message' => __("manage.label.worker_start_failed") . $e->getMessage()], 500);
             }
         }
 
-        return response()->json(['message' => 'Workers started successfully.']);
+        return response()->json(['message' => __("manage.label.worker_started")]);
     }
 
     // Function to stop all workers and merge log files
@@ -66,7 +64,7 @@ class WorkerController extends Controller
             $logFiles = glob($logDirectory . 'worker.log.*');
 
             if (empty($logFiles)) {
-                return response()->json(['message' => 'No workers opened.']);
+                return response()->json(['message' =>  __("manage.label.no_workers")]);
             }
 
             // Open merged log file for appending, create if not exists
@@ -84,7 +82,7 @@ class WorkerController extends Controller
             \Log::error('Log merge error: ' . $e->getMessage());
         }
 
-        return response()->json(['message' => 'All workers stopped and logs merged.']);
+        return response()->json(['message' => __("manage.label.worker_stopped")]);
     }
 
     // Function to generate a unique log file name
