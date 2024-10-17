@@ -88,8 +88,6 @@
     <script>
         // Function to execute when a tab becomes active
         function onTabActivated(tabId) {
-            console.log("Activated tab: " + tabId);
-
             if (tabId === "workers-tab") {
                 // Start intervals for workers-tab
                 workerCountInterval = setInterval(fetchWorkerCount, 6000);
@@ -104,8 +102,6 @@
 
         // Function to execute when a tab is deactivated
         function onTabDeactivated(tabId) {
-            console.log("Deactivated tab: " + tabId);
-
             if (tabId === "workers-tab") {
                 // Clear intervals for workers-tab
                 clearInterval(workerCountInterval);
