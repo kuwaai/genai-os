@@ -320,7 +320,6 @@
                 </div>
             </div>
         </div>
-        
     @endif
     <script>
         @if (Auth::user()->hasPerm('tab_Manage'))
@@ -339,29 +338,23 @@
 
                 const eventSource = new EventSource("{{ route('manage.setting.updateWeb') }}");
                 let lastMessage = '';
-                let isError = false;
 
                 eventSource.onmessage = function(event) {
                     const response = JSON.parse(event.data);
 
-                    // Store the latest output message
                     lastMessage = response.output;
 
-                    // Append each message as it arrives (no styling yet)
                     const preElement = $('<pre class="whitespace-normal"></pre>').text(response.output);
                     $('#commandOutput').append(preElement);
                 };
 
                 eventSource.onerror = function(event) {
-                    isError = true;
                     eventSource.close();
 
-                    // Render the last message in red due to an error
                     paintLastMessage();
                 };
 
                 eventSource.onclose = function() {
-                    // Render the last message in green if closed normally
                     if (!isError) {
                         paintLastMessage();
                     }
@@ -370,11 +363,12 @@
                 function paintLastMessage() {
                     const preElement = $('<pre class="whitespace-normal"></pre>').text(lastMessage);
 
-                    if (isError) {
+                    if (lastMessage !== 'Update completed successfully!') {
                         preElement.addClass('text-red-500');
                     } else {
                         preElement.addClass('text-green-500');
                     }
+                    $('#commandOutput pre:last').remove();
                     $('#commandOutput').append(preElement);
                     $("#refreshPage").removeClass('hidden');
                 }
