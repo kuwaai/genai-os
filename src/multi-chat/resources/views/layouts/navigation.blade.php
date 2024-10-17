@@ -140,7 +140,7 @@
                     @endphp
                     <div
                         class="flex justify-center items-center min-h-screen updateBtn {{ $updateAvailable ? '' : 'hidden' }}">
-                        <button id="updateAvailableBtn" data-tooltip-target="tooltip-default" type="button"
+                        <button id="updateAvailableBtn" data-tooltip-target="tooltip-default" type="button" onclick='updateWeb()'
                             class="text-green-500 hover:text-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg p-2 flex items-center transition-transform transform hover:scale-110">
                             <i class="fa fa-download text-2xl"></i>
                         </button>

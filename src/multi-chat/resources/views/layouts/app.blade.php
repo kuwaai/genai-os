@@ -281,7 +281,83 @@
             {{ $slot }}
         </main>
     </div>
+    @if (Auth::user()->hasPerm('tab_Manage'))
+        <div id="confirmUpdateModal" class="hidden fixed z-20 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-md w-full">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                        {{ __('manage.header.confirmUpdate') }}
+                    </h2>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                        {{ __('manage.label.reloginWarning') }}
+                    </p>
+                    <div class="flex justify-end">
+                        <div id="cancelUpdate"
+                            class="mr-2 cursor-pointer inline-block bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 focus:outline-none">
+                            {{ __('manage.button.cancel') }}
+                        </div>
+                        <div id="confirmUpdate"
+                            class="cursor-pointer inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none">
+                            {{ __('manage.button.confirm') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                        {{ __('manage.header.updateWeb') }}
+                    </h2>
+                    <div id="commandOutput"
+                        class="bg-gray-100 scrollbar-y-auto scrollbar dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-x-hidden text-gray-900 dark:text-gray-200 whitespace-normal">
+                    </div>
+                    <div id="closeModal"
+                        class="mt-4 cursor-pointer inline-block bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">
+                        {{ __('manage.button.close') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
     <script>
+        @if (Auth::user()->hasPerm('tab_Manage'))
+            function updateWeb() {
+                $('#confirmUpdateModal').removeClass('hidden');
+            }
+
+            $('#cancelUpdate').click(function() {
+                $('#confirmUpdateModal').addClass('hidden');
+            });
+
+            $('#confirmUpdate').click(function() {
+                $('#confirmUpdateModal').addClass('hidden');
+                $('#commandOutput').empty();
+                $('#outputModal').removeClass('hidden');
+
+                const eventSource = new EventSource("{{ route('manage.setting.updateWeb') }}");
+
+                eventSource.onmessage = function(event) {
+                    const response = JSON.parse(event.data);
+
+                    const preElement = $('<pre class="whitespace-normal"></pre>').text(response.output);
+
+                    $('#commandOutput').append(preElement);
+                };
+
+                eventSource.onerror = function(event) {
+                    eventSource.close();
+                };
+
+                $('#closeModal').click(function() {
+                    $('#outputModal').addClass('hidden');
+                    eventSource.close();
+                });
+            });
+        @endif
+
         function markdown(node) {
             $(node).html(marked.parse(DOMPurify.sanitize(node[0], {
                 ALLOWED_TAGS: [],
