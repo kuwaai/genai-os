@@ -247,7 +247,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                                 Route::get('/resetRedis', [SystemController::class, 'ResetRedis'])->name('manage.setting.resetRedis');
                                 Route::get('/updateWeb', [SystemController::class, 'updateWeb'])->name('manage.setting.updateWeb');
                                 Route::post('/sendUpdateInput', [SystemController::class, 'sendUpdateInput'])->name('manage.setting.sendUpdateInput');
-                                Route::get('/checkUpdate', [SystemController::class, 'checkUpdate'])->name('manage.setting.checkUpdate');
+                                Route::post('/checkUpdate', [SystemController::class, 'checkUpdate'])->name('manage.setting.checkUpdate');
                                 Route::patch('/update', [SystemController::class, 'update'])->name('manage.setting.update');
                             })
                             ->name('manage.user');

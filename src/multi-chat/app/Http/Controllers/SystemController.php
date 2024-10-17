@@ -19,6 +19,10 @@ class SystemController extends Controller
         SystemSetting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
     }
 
+    public function checkUpdate(Request $request){
+        return SystemSetting::checkUpdate(true);
+    }
+
     public function update(Request $request): RedirectResponse
     {
         $extractBaseUrl = fn($url) => $url ? parse_url($url, PHP_URL_SCHEME) . '://' . parse_url($url, PHP_URL_HOST) . (parse_url($url, PHP_URL_PORT) ? ':' . parse_url($url, PHP_URL_PORT) : '') : '';
@@ -85,49 +89,6 @@ class SystemController extends Controller
         }
 
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
-    }
-    public function checkUpdate(Request $request)
-    {
-        try {
-            chdir(base_path());
-
-            $process = Process::fromShellCommandline('git fetch && git status');
-
-            $gitSshCommand = SystemSetting::where('key', 'updateweb_git_ssh_command')->first()->value ?? '';
-
-            $customPath = SystemSetting::where('key', 'updateweb_path')->value('value');
-
-            $defaultPath = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? getenv('PATH') : getenv('PATH');
-
-            $env = [
-                'PATH' => !empty($customPath) ? $customPath : $defaultPath,
-            ];
-
-            if (!empty($gitSshCommand)) {
-                $env['GIT_SSH_COMMAND'] = $gitSshCommand;
-            }
-
-            $process->setEnv($env);
-            $process->setTimeout(null);
-
-            $process->run(function ($type, $buffer) {
-                echo 'data: ' . json_encode(['status' => 'progress', 'output' => trim($buffer)]) . "\n\n";
-                ob_flush();
-                flush();
-            });
-
-            if (!$process->isSuccessful()) {
-                return response()->json(['status' => 'error', 'output' => 'Error checking for updates.']);
-            }
-
-            $output = $process->getOutput();
-            $status = strpos($output, 'Your branch is up to date') !== false ? 'up-to-date' : 'update-available';
-            $message = $status === 'up-to-date' ? 'Your branch is up to date.' : 'New updates are available.';
-
-            return response()->json(['status' => $status, 'output' => $message]);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'output' => $e->getMessage()]);
-        }
     }
 
     public function updateWeb(Request $request)
