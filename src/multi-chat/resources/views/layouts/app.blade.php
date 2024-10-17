@@ -304,7 +304,6 @@
                 </div>
             </div>
         </div>
-
         <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
             <div class="flex items-center justify-center min-h-screen">
                 <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
@@ -314,13 +313,14 @@
                     <div id="commandOutput"
                         class="bg-gray-100 scrollbar-y-auto scrollbar dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-x-hidden text-gray-900 dark:text-gray-200 whitespace-normal">
                     </div>
-                    <div id="closeModal"
-                        class="mt-4 cursor-pointer inline-block bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">
-                        {{ __('manage.button.close') }}
+                    <div id="refreshPage" onclick='location.reload()'
+                        class="mt-4 cursor-pointer hidden inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none">
+                        {{ __('manage.button.refresh') }}
                     </div>
                 </div>
             </div>
         </div>
+        
     @endif
     <script>
         @if (Auth::user()->hasPerm('tab_Manage'))
@@ -338,18 +338,45 @@
                 $('#outputModal').removeClass('hidden');
 
                 const eventSource = new EventSource("{{ route('manage.setting.updateWeb') }}");
+                let lastMessage = '';
+                let isError = false;
 
                 eventSource.onmessage = function(event) {
                     const response = JSON.parse(event.data);
 
-                    const preElement = $('<pre class="whitespace-normal"></pre>').text(response.output);
+                    // Store the latest output message
+                    lastMessage = response.output;
 
+                    // Append each message as it arrives (no styling yet)
+                    const preElement = $('<pre class="whitespace-normal"></pre>').text(response.output);
                     $('#commandOutput').append(preElement);
                 };
 
                 eventSource.onerror = function(event) {
+                    isError = true;
                     eventSource.close();
+
+                    // Render the last message in red due to an error
+                    paintLastMessage();
                 };
+
+                eventSource.onclose = function() {
+                    // Render the last message in green if closed normally
+                    if (!isError) {
+                        paintLastMessage();
+                    }
+                };
+
+                function paintLastMessage() {
+                    const preElement = $('<pre class="whitespace-normal"></pre>').text(lastMessage);
+
+                    if (isError) {
+                        preElement.addClass('text-red-500');
+                    } else {
+                        preElement.addClass('text-green-500');
+                    }
+                    refreshPage.removeClass('hidden');
+                }
 
                 $('#closeModal').click(function() {
                     $('#outputModal').addClass('hidden');
