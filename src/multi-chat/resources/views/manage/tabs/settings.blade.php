@@ -4,7 +4,7 @@
         <header class="flex">
             @csrf
             @method('patch')
-            <input name='tab' value='settings' hidden/>
+            <input name='tab' value='settings' hidden />
             <div>
                 <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                     {{ __('manage.header.settings') }}
@@ -130,24 +130,89 @@
             <div class="my-2">
                 <div id="updateWebBtn"
                     class="bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center cursor-pointer">
-                    {{ __('manage.button.updateWeb') }}</div>
+                    {{ __('manage.button.updateWeb') }}
+                </div>
             </div>
-            <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
+            
+            <!-- Confirmation Modal -->
+            <div id="confirmUpdateModal" class="hidden fixed z-20 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
                 <div class="flex items-center justify-center min-h-screen">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
-                        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{__('manage.header.updateWeb')}}
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-md w-full">
+                        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                            {{ __('manage.header.confirmUpdate') }}
                         </h2>
-                        <div id="commandOutput"
-                            class="bg-gray-100 scrollbar-y-auto scrollbar dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-x-hidden text-gray-900 dark:text-gray-200 
-                                    whitespace-normal">
-                        </div>
-                        <div id="closeModal"
-                            class="mt-4 cursor-pointer inline-block bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">
-                            {{__('manage.button.close')}}
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            {{ __('manage.label.reloginWarning') }}
+                        </p>
+                        <div class="flex justify-end">
+                            <div id="cancelUpdate"
+                                class="mr-2 cursor-pointer inline-block bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 focus:outline-none">
+                                {{ __('manage.button.cancel') }}
+                            </div>
+                            <div id="confirmUpdate"
+                                class="cursor-pointer inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none">
+                                {{ __('manage.button.confirm') }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Output Modal -->
+            <div id="outputModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-800 bg-opacity-75">
+                <div class="flex items-center justify-center min-h-screen">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
+                        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                            {{ __('manage.header.updateWeb') }}
+                        </h2>
+                        <div id="commandOutput"
+                            class="bg-gray-100 scrollbar-y-auto scrollbar dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-x-hidden text-gray-900 dark:text-gray-200 whitespace-normal">
+                        </div>
+                        <div id="closeModal"
+                            class="mt-4 cursor-pointer inline-block bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 focus:outline-none">
+                            {{ __('manage.button.close') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+                $('#updateWebBtn').click(function() {
+                    $('#confirmUpdateModal').removeClass('hidden');
+                });
+            
+                $('#cancelUpdate').click(function() {
+                    $('#confirmUpdateModal').addClass('hidden');
+                });
+            
+                $('#confirmUpdate').click(function() {
+                    $('#confirmUpdateModal').addClass('hidden');
+                    $('#commandOutput').empty();
+                    $('#outputModal').removeClass('hidden');
+            
+                    const eventSource = new EventSource("{{ route('manage.setting.updateWeb') }}");
+            
+                    eventSource.onmessage = function(event) {
+                        const response = JSON.parse(event.data);
+            
+                        // Create a new <pre> element
+                        const preElement = $('<pre class="whitespace-normal"></pre>').text(response.output);
+            
+                        // Append the <pre> element to #commandOutput
+                        $('#commandOutput').append(preElement);
+                    };
+            
+                    eventSource.onerror = function(event) {
+                        eventSource.close();
+                    };
+            
+                    $('#closeModal').click(function() {
+                        $('#outputModal').addClass('hidden');
+                        eventSource.close();
+                    });
+                });
+            </script>
+            
             <div class="my-2"><a
                     class="bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
                     href="{{ route('manage.setting.resetRedis') }}">{{ __('manage.button.reset_redis') }}</a></div>
@@ -244,33 +309,6 @@
             form.submit();
         }
     }
-    $('#updateWebBtn').click(function() {
-        $('#commandOutput').empty();
-        $('#outputModal').removeClass('hidden');
-
-        const eventSource = new EventSource("{{ route('manage.setting.updateWeb') }}");
-
-        eventSource.onmessage = function(event) {
-            const response = JSON.parse(event.data);
-
-            // Create a new <pre> element
-            const preElement = $('<pre class="whitespace-normal"></pre>').text(response
-                .output); // Set the text
-
-            // Append the <pre> element to #commandOutput
-            $('#commandOutput').append(preElement);
-        };
-
-        eventSource.onerror = function(event) {
-            eventSource.close();
-        };
-
-        $('#closeModal').click(function() {
-            $('#outputModal').addClass('hidden');
-            eventSource.close();
-        });
-    });
-
     $('#closeModal').click(function() {
         $('#outputModal').addClass('hidden');
     });
