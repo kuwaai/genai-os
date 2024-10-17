@@ -375,7 +375,8 @@
                     } else {
                         preElement.addClass('text-green-500');
                     }
-                    refreshPage.removeClass('hidden');
+                    $('#commandOutput').append(preElement);
+                    $("#refreshPage").removeClass('hidden');
                 }
 
                 $('#closeModal').click(function() {
