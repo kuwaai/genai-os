@@ -5,9 +5,9 @@
 @endphp
 
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="csrf-token" content="{{ csrf_token() }}"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -123,7 +123,8 @@
                     }
                 } else {
                     // If the line does not start with a command keyword, append it to the current command's arguments
-                    if (currentCommand.name.startsWith('#') || currentCommand.args.length > 6 && currentCommand.args.endsWith('"""') && currentCommand.args
+                    if (currentCommand.name.startsWith('#') || currentCommand.args.length > 6 && currentCommand.args
+                        .endsWith('"""') && currentCommand.args
                         .startsWith('"""')) {
                         commands.push(currentCommand);
                         // Start a new command
@@ -167,17 +168,23 @@
                 if (!item) {
                     return ""
                 }
-                let {name, args} = item;
+                let {
+                    name,
+                    args
+                } = item;
                 name = name.trim().toUpperCase()
                 args = args.trim()
-                if (singleArgCmdKeywords.includes(name) && args.includes('\n')){
+                if (singleArgCmdKeywords.includes(name) && args.includes('\n')) {
                     const multi_line_quote = '"""'
                     if (!args.startsWith(multi_line_quote)) {
                         args = multi_line_quote + args;
                     }
                     if (args.substring(multi_line_quote.length).indexOf(multi_line_quote) === -1) {
                         let comment_regexp = new RegExp('(?<non_comment>[^#]*)(?<comment>#.*)?', 's');
-                        let {non_comment, comment} = comment_regexp.exec(args).groups;
+                        let {
+                            non_comment,
+                            comment
+                        } = comment_regexp.exec(args).groups;
                         comment ??= '';
                         args = non_comment + multi_line_quote + comment;
                     }
@@ -346,7 +353,7 @@ xmlns="http://www.w3.org/2000/svg">
             });
         }
 
-        @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
+        @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
             $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
                 backdrop: 'static',
                 closable: true,
@@ -359,6 +366,8 @@ xmlns="http://www.w3.org/2000/svg">
                     });
                 }
             });
+        @endif
+        @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
             $modal2 = new Modal(document.getElementById('tos_modal'), {
                 backdrop: 'static',
                 closable: true,
@@ -374,28 +383,13 @@ xmlns="http://www.w3.org/2000/svg">
                     });
                 }
             });
-        @elseif (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
-            $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
-                backdrop: 'static',
-                closable: true,
-                onHide: () => {
-                    $.get("{{ route('announcement') }}")
-                    $modal1 = new Modal(document.getElementById('system_announcement_modal'), {
-                        backdrop: 'static',
-                        closable: true,
-                        onHide: () => {}
-                    });
-                }
-            });
         @endif
-
-
         @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '' && !Auth::user()->term_accepted)
             $modal2.show();
-        @elseif (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' && !Auth::user()->announced)
+        @endif
+        @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '' && !Auth::user()->announced)
             $modal1.show();
         @endif
-
 
         markdown($("#system_announcement_modal .content"))
         markdown($("#tos_modal .content"))
