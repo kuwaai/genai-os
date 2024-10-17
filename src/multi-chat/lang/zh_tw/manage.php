@@ -102,6 +102,8 @@ return [
     //setting
     'header.settings' => '網站設定',
     'header.updateWeb' => '網站更新進度',
+    'header.confirmUpdate' => '是否確定更新網站',
+    'label.reloginWarning' => '網站更新後將會需要重新登入，所有Worker都將重啟，確定要更新該網站嗎',
     'label.settings' => '所有關於網站的設定都可在此調整',
     'label.allow_register' => '允許註冊',
     'button.reset_redis' => '重設Redis快取',
