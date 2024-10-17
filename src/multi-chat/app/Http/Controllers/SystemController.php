@@ -110,12 +110,12 @@ class SystemController extends Controller
                 $this->runCommand($command, $projectRoot);
             }
 
+            $workerController = new WorkerController();
+            $workerController->stopWorkers();
             if (stripos(PHP_OS, 'WIN') === false) {
                 $this->makeExecutable(basename($scriptPath));
             }
             $this->runCommand((stripos(PHP_OS, 'WIN') === 0 ? '' : './') . basename($scriptPath), $projectRoot);
-            $workerController = new WorkerController();
-            $workerController->stopWorkers();
             $workerController->startWorkers();
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
