@@ -117,6 +117,7 @@ class SystemController extends Controller
             }
             $this->runCommand((stripos(PHP_OS, 'WIN') === 0 ? '' : './') . basename($scriptPath), $projectRoot);
             $workerController->startWorkers();
+            \App\Models\SystemSetting::checkUpdate(true);
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
             flush();
