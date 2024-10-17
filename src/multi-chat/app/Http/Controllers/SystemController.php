@@ -151,8 +151,7 @@ class SystemController extends Controller
             if (stripos(PHP_OS, 'WIN') === false) {
                 $this->makeExecutable(basename($scriptPath));
             }
-
-            $this->runCommand('./' . basename($scriptPath));
+            $this->runCommand((stripos(PHP_OS, 'WIN') === 0 ? './' : '') . basename($scriptPath), $projectRoot);
 
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
