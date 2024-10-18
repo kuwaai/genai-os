@@ -72,6 +72,23 @@ async def extract_links(url, user_agent=None):
 
     return urls
 
+def deduplicate_ordered(input_list):
+    """Deduplicates elements in a list while preserving their relative order.
+
+    Args:
+        input_list: The list to deduplicate.
+
+    Returns:
+        A new list with duplicate elements removed, preserving order.
+    """
+    seen = set()
+    result = []
+    for item in input_list:
+        if item in seen: continue
+        seen.add(item)
+        result.append(item)
+    return result
+
 class SearchQaExecutor(LLMExecutor):
     doc_qa: DocQaExecutor
 
@@ -172,6 +189,8 @@ class SearchQaExecutor(LLMExecutor):
             logger.debug(f"All URLs: {urls}")
             urls = urls[min(len(urls)-1, self.num_skip_url):]
             logger.debug(f"Filtered URLs: {urls}")
+            urls = deduplicate_ordered(urls)
+            logger.debug(f"Deduplicated URLs: {urls}")
             urls_reachable = await asyncio.gather(*[self.is_url_reachable(url) for url in urls])
             logger.debug(f"URL reachability: {list(zip(urls, urls_reachable))}")
             urls = list(itertools.compress(urls, urls_reachable))
