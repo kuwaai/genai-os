@@ -495,7 +495,7 @@
 
         let boundary= "kuwa"+(Math.random() + 1).toString(36).slice(-5);
         let botfile = [
-            `Subject: Exported bot "${name}"`,
+            `Subject: Exported bot "${encodeURIComponent(name)}"`,
             `Date: ${formatDate()}`,
             `Content-Type: multipart/related; boundary="${boundary}"; type=application/vnd.kuwabot`,
             "Content-Transfer-Encoding: quoted-printable",

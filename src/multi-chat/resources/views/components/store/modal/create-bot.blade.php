@@ -355,7 +355,8 @@
 
     function importBot(files) {
         const reader = new FileReader()
-        const getMimeHeader = (x) => x.substr(0, x.indexOf('\r\n\r\n'));
+        const encodeNonAscii = (x) => x.replace(/[^\x00-\x7F]/g, encodeURIComponent);
+        const getMimeHeader = (x) => encodeNonAscii(x.substr(0, x.indexOf('\r\n\r\n')));
         const getMimeBody = (x) => x.substr(x.indexOf('\r\n\r\n') + 1);
         const handleFileLoad = function(e) {
             let header = getMimeHeader(e.target.result);
