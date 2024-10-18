@@ -1,6 +1,6 @@
 cd ../..
 call composer install --no-dev --optimize-autoloader --no-interaction
-call php artisan key:generate --force
+call php artisan key:generate
 call php artisan db:seed --class=InitSeeder --force
 call php artisan migrate --force
 rmdir /Q /S public\storage

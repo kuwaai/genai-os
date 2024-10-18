@@ -1,6 +1,6 @@
 cd ../..
 composer install --no-dev --optimize-autoloader --no-interaction
-php artisan key:generate --force
+php artisan key:generate
 php artisan db:seed --class=InitSeeder --force
 php artisan migrate --force
 rm public/storage
