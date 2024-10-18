@@ -5,9 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\SystemSetting;
 
-return new class extends Migration
-{
-    public $field = "updateweb_path";
+return new class extends Migration {
+    public $field = 'updateweb_path';
 
     /**
      * Run the migrations.
@@ -17,7 +16,7 @@ return new class extends Migration
         $setting = new SystemSetting();
         $setting->fill([
             'key' => $this->field,
-            'value' => "",
+            'value' => PHP_OS_FAMILY === 'Windows' ? '' : '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin',
         ]);
         $setting->save();
     }
