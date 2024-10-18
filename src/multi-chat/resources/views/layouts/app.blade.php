@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ asset('css/font_awesome..all.min.css') }}" />
     <link href="{{ asset('css/highlight_default.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/dracula.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet" />
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -27,6 +28,7 @@
     <script src="{{ asset('js/highlight.min.js') }}"></script>
     <script src="{{ asset('js/purify.min.js') }}"></script>
     <script src="{{ asset('js/ace/ace.js') }}"></script>
+    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 
     <script>
         function chain_toggle() {
@@ -197,6 +199,14 @@
 </head>
 
 <body class="font-sans antialiased h-full">
+    <script id="remove-once" type="text/javascript">
+        const client = new KuwaClient("{{ Auth::user()->tokens()->where('name', 'API_Token')->first()->token ?? '' }}",
+            "{{ url('/') }}");
+            
+        $(document).ready(function() {
+            $('#remove-once').remove();
+        });
+    </script>
     @if (Auth::user()->term_accepted)
         <div data-modal-target="tos_modal"></div>
     @endif

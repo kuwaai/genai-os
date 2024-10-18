@@ -8,7 +8,7 @@ return [
     'Profile_delete_account' => 'アカウントの削除',
     'Profile_read_api_token' => 'サイトAPIキーの読み取り',
     'Profile_update_api_token' => 'サイトAPIキーの更新',
-    'Room_update_detail_feedback' => '詳細フィードバック',
+    'Room_update_detail_feedback' => '詳細なフィードバック',
     'Room_read_access_to_api' => 'サイトAPIの使用',
     'Room_update_send_message' => 'メッセージの送信',
     'Room_update_new_chat' => '新しいチャットの作成',
@@ -16,7 +16,7 @@ return [
     'Room_delete_chatroom' => 'チャットルームの削除',
     'Room_read_export_chat' => 'チャットのエクスポート',
     'Room_update_import_chat' => 'チャットのインポート',
-    'Room_update_react_message' => '追加の操作ボタン',
+    'Room_update_react_message' => '追加操作ボタン',
     'Room_update_ignore_upload_constraint' => 'アップロード制限の無視',
     'Dashboard_read_statistics' => '統計情報',
     'Dashboard_read_blacklist' => 'ブラックリスト',
@@ -34,4 +34,7 @@ return [
     'Store_read_discover_private_bots' => '自作ボットへのアクセス',
     'Store_read_discover_group_bots' => 'グループボットへのアクセス',
     'Store_read_any_modelfile' => '任意のmodelfileへのアクセス',
+    'Cloud_read_my_files' => 'ファイルの読み取り',
+    'Cloud_update_upload_files' => 'ファイルのアップロード',
+    'Cloud_delete_my_files' => 'ファイルの削除'
 ];

@@ -29,9 +29,12 @@ return [
     'Store_create_group_bot' => '그룹 봇',
     'Store_update_modify_bot' => '봇 수정',
     'Store_delete_delete_bot' => '봇 삭제',
-    'Store_read_discover_community_bots' => '커뮤니티 봇 액세스',
-    'Store_read_discover_system_bots' => '시스템 봇 액세스',
-    'Store_read_discover_private_bots' => '개인 봇 액세스',
-    'Store_read_discover_group_bots' => '그룹 봇 액세스',
-    'Store_read_any_modelfile' => '모든 modelfile 액세스',
+    'Store_read_discover_community_bots' => '커뮤니티 봇 접근',
+    'Store_read_discover_system_bots' => '시스템 봇 접근',
+    'Store_read_discover_private_bots' => '개인 봇 접근',
+    'Store_read_discover_group_bots' => '그룹 봇 접근',
+    'Store_read_any_modelfile' => '모든 modelfile 접근',
+    'Cloud_read_my_files' => '파일 읽기',
+    'Cloud_update_upload_files' => '파일 업로드',
+    'Cloud_delete_my_files' => '파일 삭제'
 ];

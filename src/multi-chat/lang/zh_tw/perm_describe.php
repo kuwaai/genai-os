@@ -34,4 +34,7 @@ return [
     'Store_read_discover_private_bots' => '讀取自建Bot所需的權限',
     'Store_read_discover_group_bots' => '讀取群組Bot所需的權限',
     'Store_read_any_modelfile' => '讀取任意modelfile所需的權限',
+    'Cloud_read_my_files' => '讀取個人目錄檔案所需的權限',
+    'Cloud_update_upload_files' => '上傳檔案至個人目錄所需的權限',
+    'Cloud_delete_my_files' => '刪除個人目錄檔案所需的權限'
 ];

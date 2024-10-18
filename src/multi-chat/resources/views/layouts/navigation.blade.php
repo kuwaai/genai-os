@@ -39,6 +39,13 @@
                         </x-nav-link>
                     </div>
                 @endif
+                @if (Auth::user()->hasPerm('tab_Cloud'))
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link :href="route('cloud.home')" :active="request()->routeIs('cloud.*')">
+                            {{ __('cloud.route') }}
+                        </x-nav-link>
+                    </div>
+                @endif
             </div>
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
@@ -268,6 +275,11 @@
             @if (Auth::user()->hasPerm('tab_Manage'))
                 <x-responsive-nav-link :href="route('manage.home')" :active="request()->routeIs('manage.*')">
                     {{ __('manage.route') }}
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->hasPerm('tab_Cloud'))
+                <x-responsive-nav-link :href="route('cloud.home')" :active="request()->routeIs('cloud.*')">
+                    {{ __('cloud.route') }}
                 </x-responsive-nav-link>
             @endif
         </div>

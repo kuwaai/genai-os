@@ -54,6 +54,29 @@ class KuwaClient {
         const response = await this._makeRequest(url, "GET", headers);
         return response;
     }
+    async listCloud(path = '') {
+        const url = `${this.baseUrl}/api/user/read/cloud${path}`;
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`,
+        };
+
+        const response = await this._makeRequest(url, "GET", headers);
+        return response;
+    }
+    async createUsers(users) {
+        const url = `${this.baseUrl}/api/user/create/user`;
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`,
+        };
+        const requestBody = {
+            users: users.map(userInstance => userInstance.getUser())
+        };
+
+        const response = await this._makeRequest(url, "POST", headers, JSON.stringify(requestBody));
+        return response;
+    }
     async createRoom(bot_ids) {
         const url = `${this.baseUrl}/api/user/create/room`;
         const headers = {
@@ -92,6 +115,16 @@ class KuwaClient {
         };
 
         const response = await this._makeRequest(url, "DELETE", headers, JSON.stringify(requestBody));
+        return response;
+    }
+    async deleteCloud(path = '') {
+        const url = `${this.baseUrl}/api/user/delete/cloud${path}`;
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`,
+        };
+
+        const response = await this._makeRequest(url, "DELETE", headers);
         return response;
     }
 
@@ -198,6 +231,23 @@ class KuwaClient {
     }
 }
 
+class KuwaUser {
+    constructor(name, email, password, group = "", detail = "", require_change_password = false) {
+        this.user = {
+            name,
+            email,
+            password,
+            group,
+            detail,
+            require_change_password:require_change_password!=false
+        };
+    }
+
+    getUser() {
+        return this.user;
+    }
+}
+
 /*
 Kuwa Chat complete example
 
@@ -277,4 +327,16 @@ uploadButton.addEventListener('click', () => {
     }
 });
 
+-- Create user --
+client.createUsers([new KuwaUser('User','User@gmail.com','Debug')])
+    .then(response => console.log(response))
+    .catch(error => console.error('Error:', error));
+-- List cloud --
+client.listCloud()
+    .then(response => console.log(response))
+    .catch(error => console.error('Error:', error));
+-- Delete cloud file --
+client.deleteCloud('hi.txt')
+    .then(response => console.log(response))
+    .catch(error => console.error('Error:', error));
 */

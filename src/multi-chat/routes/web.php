@@ -8,6 +8,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ManageController;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CloudController;
 use App\Http\Controllers\KernelController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Middleware\AdminMiddleware;
@@ -71,9 +72,15 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/rooms', [RoomController::class, 'api_read_rooms'])->name('api.user.read.rooms');
                 Route::get('/models', [ManageController::class, 'api_read_models'])->name('api.user.read.models');
                 Route::get('/bots', [BotController::class, 'api_read_bots'])->name('api.user.read.bots');
+                Route::get('/cloud/{user_id?}/{folder?}', [CloudController::class, 'api_read_cloud'])
+                    ->where('folder', '.*')
+                    ->name('api.user.read.cloud');
             });
 
             Route::prefix('delete')->group(function () {
+                Route::delete('/cloud/{user_id?}/{folder?}', [CloudController::class, 'api_delete_cloud'])
+                    ->where('folder', '.*')
+                    ->name('api.user.delete.cloud');
                 Route::prefix('room')->group(function () {
                     Route::delete('/', [RoomController::class, 'api_delete_room'])->name('api.user.delete.room');
                 });
@@ -218,6 +225,12 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                             ->name('store.delete');
                     })
                     ->name('store');
+                #---Cloud
+                Route::middleware(AdminMiddleware::class . ':tab_Cloud')
+                    ->prefix('cloud')
+                    ->group(function () {
+                        Route::get('/', [CloudController::class, 'home'])->name('cloud.home');
+                    });
                 #---Manage
                 Route::middleware(AdminMiddleware::class . ':tab_Manage')
                     ->prefix('manage')
