@@ -18,16 +18,24 @@
         function generatePathHtml(parent, path) {
             parent.empty();
             const parts = path.split('/').filter(Boolean);
-            const HomePerm = {{ Auth::user()->hasPerm('tab_Manage') ? 'true' : 'false' }}
+            const HomePerm = {{ Auth::user()->hasPerm('tab_Manage') ? 'true' : 'false' }};
             const classes = "text-blue-500 hover:underline cursor-pointer pr-2";
+            const userId = {{ Auth::user()->id }};
             const $ul = $('<ul class="flex cloud-path"></ul>').append(
-                `<li><span class="${HomePerm ? classes : ''}">/</span></li>`);
+                `<li><span class="${HomePerm ? classes : ''}">/</span></li>`
+            );
 
             let currentPath = '';
-            parts.forEach(part => {
-                currentPath += `/${part}/`;
+
+            parts.forEach((part, index) => {
+                // Replace user's ID with their name if the path is /homes/{user_id}/
+                const adjustedPart = (parts[0] === 'homes' && index === 1 && part === String(userId)) ?
+                    '{{ Auth::user()->name }}' :
+                    part;
+
+                currentPath += `/${adjustedPart}/`;
                 const partPath = currentPath;
-                const $partLi = $(`<li><span class="${classes}">${part}/</span></li>`);
+                const $partLi = $(`<li><span class="${classes}">${adjustedPart}/</span></li>`);
                 $partLi.on('click', () => updatePath(partPath));
                 $ul.append($partLi);
             });
