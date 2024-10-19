@@ -99,6 +99,7 @@
                 const title = obj.prop('title');
                 const isdir = obj.data('isdir');
                 const publicUrl = `{{ Storage::url('root') }}${url}`;
+
                 if (isdir) {
                     client.listCloud(url)
                         .then(response => populateFileList(response))
@@ -106,28 +107,72 @@
                 } else {
                     const extension = url.split('.').pop().toLowerCase();
                     let content;
+                    const $contentWrapper = $('<div class="w-full h-full"></div>'); // Create a wrapper for the content
 
-                    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'tiff'].includes(extension)) {
-                        content = `<img src='${publicUrl}' class='w-full h-full object-fill' alt='${title}'>`;
-                    } else if (['mp3', 'wav', 'ogg'].includes(extension)) {
-                        content = `
-    <div class='flex flex-col items-center justify-center w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md'>
-        <audio controls autoplay class='w-full'>
-            <source src='${publicUrl}' type='audio/${extension}'>
-            Your browser does not support the audio tag.
-        </audio>
-        <span class='mt-2 text-gray-800 dark:text-gray-200'>${title}</span>
-    </div>`;
-                    } else if (extension === 'mp4') {
-                        content = `
-    <video controls autoplay class='w-full h-full object-fill'>
-        <source src='${publicUrl}' type='video/mp4'>
-        Your browser does not support the video tag.
-    </video>`;
-                    } else if (extension === 'pdf') {
-                        content = `<iframe src='${publicUrl}' class='w-full h-full' frameborder='0'></iframe>`;
-                    } else if (['html', 'htm'].includes(extension)) {
-                        content = `<iframe src='${publicUrl}' class='w-full h-full' frameborder='0'></iframe>`;
+                    if ([
+                            'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'tiff', 'tif', 'ico', 'heic', 'img', 'dds'
+                        ].includes(extension)) {
+                        const $img = $('<img>', {
+                            class: 'w-full h-full object-fill',
+                            alt: title
+                        }).attr('src', publicUrl);
+                        $contentWrapper.append($img);
+                    } else if ([
+                            'mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a', 'wma'
+                        ].includes(extension)) {
+                        const $audio = $('<audio>', {
+                            controls: true,
+                            autoplay: true,
+                            class: 'w-full'
+                        }).append(
+                            $('<source>').attr('src', publicUrl).attr('type', `audio/${extension}`)
+                        );
+                        const $audioContainer = $('<div>', {
+                                class: 'flex flex-col items-center justify-center w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md'
+                            }).append($audio)
+                            .append($('<span>', {
+                                class: 'mt-2 text-gray-800 dark:text-gray-200',
+                                text: title
+                            }));
+                        $contentWrapper.append($audioContainer);
+                    } else if ([
+                            'mp4', 'webm', 'ogv', 'mkv', 'mov', 'avi', '3gp'
+                        ].includes(extension)) {
+                        const $video = $('<video>', {
+                            controls: true,
+                            autoplay: true,
+                            class: 'w-full h-full object-fill'
+                        }).append(
+                            $('<source>').attr('src', publicUrl).attr('type', `video/${extension}`)
+                        );
+                        $contentWrapper.append($video);
+                    } else if (extension === 'pdf' || ['html', 'htm'].includes(extension)) {
+                        const $iframe = $('<iframe>', {
+                            src: publicUrl,
+                            class: 'w-full h-full',
+                            frameborder: 0
+                        });
+                        $contentWrapper.append($iframe);
+                    } else if ([
+                            'txt', 'json', 'log', 'sql', 'csv', 'xml', 'ini', 'md', 'conf', 'config', 'yml', 'yaml', 'sh',
+                            'bash', 'bat',
+                            'c', 'cpp', 'h', 'java', 'py', 'js', 'ts', 'php', 'rb', 'go', 'cs', 'swift', 'rs', 'kt',
+                            'scala', 'rst', 'adoc',
+                            'env', 'properties', 'manifest', 'plist', 'tex'
+                        ].includes(extension)) {
+                        // Fetch the content of the text file and display it
+                        fetch(publicUrl)
+                            .then(response => response.text())
+                            .then(text => {
+                                const $pre = $('<pre>', {
+                                    class: 'w-full h-full p-4 overflow-auto bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200',
+                                    text: text
+                                });
+                                $contentWrapper.append($pre);
+                                createWindow(title, $contentWrapper.html());
+                            })
+                            .catch(error => console.error('Error fetching text file:', error));
+                        return;
                     } else {
                         showConfirmationModal(
                             '{{ __('cloud.header.cannot_preview') }}',
@@ -142,7 +187,7 @@
                         return;
                     }
 
-                    createWindow(title, content);
+                    createWindow(title, $contentWrapper.html());
                 }
             }
             $(document).on('click', '#file-list > div', function() {
