@@ -54,7 +54,7 @@ class ProfileController extends Controller
         if ($result) {
             $user = $result;
             Auth::setUser(User::find($user->id));
-            if (User::find($user->id)->hasPerm('Room_update_upload_file')) {
+            if (User::find($user->id)->hasPerm('Cloud_update_upload_files')) {
                 $controller = new RoomController();
                 $upload_result = $controller->upload_file($request);
                 if ($upload_result['succeed']){
