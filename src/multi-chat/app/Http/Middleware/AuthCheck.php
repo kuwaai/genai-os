@@ -20,6 +20,12 @@ class AuthCheck
             $request->user()->tokens()->where('name', 'API_Token')->delete();
             $request->user()->createToken('API_Token', ['access_api']);
         }
+        // Create user dir if not exist
+        $user_dir = 'root/homes' . '/' . auth()->id();
+        if (!Storage::disk('public')->exists($user_dir)) {
+            Storage::disk('public')->makeDirectory($user_dir);
+        }
+
         if ($request->user()) {
             // Force change password
             if ($request->user()->require_change_password) {
