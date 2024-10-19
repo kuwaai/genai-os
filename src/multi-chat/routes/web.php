@@ -47,6 +47,14 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
         return view('errors.IPNotAllowed');
     })->name('errors.ipnotallowed');
 
+    Route::get('/storage/pdfs/{any}', function ($any) {
+        return redirect("/storage/homes/{$any}");
+    })->where('any', '.*');
+
+    Route::get('/storage/homes/{any}', function ($any) {
+        return redirect("/storage/root/homes/{$any}");
+    })->where('any', '.*');
+
     Route::post('/api/register', [ProfileController::class, 'api_register'])->name('api.register');
 
     Route::middleware('ipCheck')->group(function () {

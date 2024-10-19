@@ -63,8 +63,8 @@ class CloudController extends Controller
                         $user_id = $authUserId;
                     }
                 }
-                $base_dir = 'homes';
-                $user_dir = $base_dir . '/' . $authUserId;
+                $base_dir = 'root';
+                $user_dir = $base_dir . '/homes/' . $authUserId;
                 $query_path = '/';
                 if ($user_id) {
                     $query_path .= $user_id . '/';
@@ -87,8 +87,7 @@ class CloudController extends Controller
                     ];
                 }
 
-                $user_dir_usedSpace = collect(Storage::disk('public')->allFiles($user_dir))->sum(fn($file) => Storage::disk('public')->size($file));
-                return response()->json(['status' => 'success', 'result' => compact('query_path', 'explorer', 'user_dir_usedSpace')], 200, [], JSON_UNESCAPED_UNICODE);
+                return response()->json(['status' => 'success', 'result' => compact('query_path', 'explorer')], 200, [], JSON_UNESCAPED_UNICODE);
             } else {
                 $errorResponse = [
                     'status' => 'error',
@@ -136,7 +135,7 @@ class CloudController extends Controller
                         JSON_UNESCAPED_UNICODE,
                     );
                 }
-                $pathToDelete = 'homes/' . $user_id . '/' . ($folder ?? '');
+                $pathToDelete = '/root/' . $user_id . '/' . ($folder ?? '');
                 if (Storage::disk('public')->exists($pathToDelete)) {
                     $isDirectory = !empty(Storage::disk('public')->directories(dirname($pathToDelete)));
 

@@ -376,7 +376,7 @@ class RoomController extends Controller
             ];
         }
 
-        $directory = 'pdfs/' . $request->user()->id; // Directory relative to 'public/storage/'
+        $directory = '/root/homes/' . $request->user()->id; // Directory relative to 'public/storage/'
         $storagePath = public_path('storage/' . $directory); // Adjusted path
         $filePathParts = pathinfo($request->file->getClientOriginalName());
         $fileName = sprintf('%s%s', $filePathParts['filename'], isset($filePathParts['extension']) ? '.' . $filePathParts['extension'] : '');

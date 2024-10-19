@@ -19,16 +19,15 @@
             parent.empty();
             const parts = path.split('/').filter(Boolean);
             const HomePerm = {{ Auth::user()->hasPerm('tab_Manage') ? 'true' : 'false' }}
-            const classes = "text-blue-500 hover:underline cursor-pointer";
-            const $ul = $('<ul class="flex space-x-2 cloud-path"></ul>').append(
-                `<li><span class="${HomePerm ? classes : ''}">{{ __('cloud.label.homes') }}</span></li>`);
+            const classes = "text-blue-500 hover:underline cursor-pointer pr-2";
+            const $ul = $('<ul class="flex cloud-path"></ul>').append(
+                `<li><span class="${HomePerm ? classes : ''}">/</span></li>`);
 
             let currentPath = '';
             parts.forEach(part => {
-                $ul.append('<li><span>/</span></li>');
                 currentPath += `/${part}/`;
                 const partPath = currentPath;
-                const $partLi = $(`<li><span class="${classes}">${part}</span></li>`);
+                const $partLi = $(`<li><span class="${classes}">${part}/</span></li>`);
                 $partLi.on('click', () => updatePath(partPath));
                 $ul.append($partLi);
             });
@@ -99,7 +98,7 @@
                 const url = obj.data('url');
                 const title = obj.prop('title');
                 const isdir = obj.data('isdir');
-                const publicUrl = `{{ Storage::url('homes/') }}/${url}`;
+                const publicUrl = `{{ Storage::url('root') }}${url}`;
                 if (isdir) {
                     client.listCloud(url)
                         .then(response => populateFileList(response))
@@ -159,7 +158,7 @@
             $('#open-file-tab').on('click', function() {
                 const url = selectedFile.data('url');
                 const baseUrl = window.location.origin;
-                const fullUrl = baseUrl + '/storage/homes' + url;
+                const fullUrl = baseUrl + '/storage/root' + url;
                 window.open(fullUrl, '_blank')
                 contextMenu.hide();
             });
@@ -167,7 +166,7 @@
                 const fileUrl = selectedFile.data('url');
                 const baseUrl = window.location.origin;
 
-                const fullUrl = baseUrl + '/storage/homes' + fileUrl;
+                const fullUrl = baseUrl + '/storage/root' + fileUrl;
 
                 var textArea = document.createElement("textarea");
                 textArea.value = fullUrl;
@@ -330,7 +329,7 @@
             });
 
         }
-        updatePath('/' + {{ Auth::user()->id }});
+        updatePath('/homes/' + {{ Auth::user()->id }});
     </script>
     <div class="py-2 h-full">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-full">
