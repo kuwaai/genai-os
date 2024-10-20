@@ -51,7 +51,8 @@ class CloudController extends Controller
     }
     function pathToString($pathArray)
     {
-        return '/' . implode('/', $pathArray);
+        $result = '/' . implode('/', array_filter($pathArray)) . '/';
+        return ($result === '//') ? '/' : $result;
     }
     public function api_read_cloud(Request $request, $paths = null)
     {
@@ -72,7 +73,7 @@ class CloudController extends Controller
                     }
                 }
 
-                $query_path = $this->pathToString($path) . '/';
+                $query_path = $this->pathToString($path);
                 $files = Storage::disk('public')->Files('root' . $query_path);
                 $directories = array_map(fn($dir) => rtrim($dir, '/') . '/', Storage::disk('public')->directories('root' . $query_path));
                 $items = array_merge($directories, $files);
@@ -80,9 +81,18 @@ class CloudController extends Controller
                 $explorer = [];
                 foreach ($items as $item) {
                     $path = Storage::disk('public')->path($item);
-                    $resolvedPath = readlink($path);
-
-                    $isSymbolicLink = $resolvedPath && $resolvedPath !== $path;
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                        $resolvedPath = readlink($path);
+                        $isSymbolicLink = $resolvedPath && $resolvedPath !== $path;
+                    } else {
+                        if (is_link($path)) {
+                            $resolvedPath = readlink($path);
+                            $isSymbolicLink = true;
+                        } else {
+                            $resolvedPath = false;
+                            $isSymbolicLink = false;
+                        }
+                    }
 
                     $isDirectory = str_ends_with($item, '/') || ($isSymbolicLink && is_dir($resolvedPath)) || is_dir($path);
 
@@ -133,7 +143,7 @@ class CloudController extends Controller
                 $authUserId = auth()->id();
                 $path = $this->resolvePath($paths);
                 $user_dir = $this->resolvePath('/homes/' . $authUserId);
-                if (!$request->user()->hasPerm('tab_Manage') && ((($path[0] ?? null) != 'homes') || (($path[1] ?? null) != $authUserId))) {
+                if (!$request->user()->hasPerm('tab_Manage') && (($path[0] ?? null) != 'homes' || ($path[1] ?? null) != $authUserId)) {
                     return response()->json(
                         [
                             'status' => 'error',
@@ -144,7 +154,7 @@ class CloudController extends Controller
                         JSON_UNESCAPED_UNICODE,
                     );
                 }
-                $pathToDelete = '/root' . $this->pathToString($path) . '/';
+                $pathToDelete = '/root' . $this->pathToString($path);
                 if (Storage::disk('public')->exists($pathToDelete)) {
                     $isDirectory = !empty(Storage::disk('public')->directories(dirname($pathToDelete)));
 
