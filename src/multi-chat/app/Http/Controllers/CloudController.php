@@ -52,7 +52,7 @@ class CloudController extends Controller
     function pathToString($pathArray)
     {
         $result = '/' . implode('/', array_filter($pathArray)) . '/';
-        return ($result === '//') ? '/' : $result;
+        return $result === '//' ? '/' : $result;
     }
     public function api_read_cloud(Request $request, $paths = null)
     {
@@ -74,19 +74,32 @@ class CloudController extends Controller
                 }
 
                 $query_path = $this->pathToString($path);
-                $files = Storage::disk('public')->Files('root' . $query_path);
-                $directories = array_map(fn($dir) => rtrim($dir, '/') . '/', Storage::disk('public')->directories('root' . $query_path));
+                $fullPath = storage_path('app/public/root' . $query_path);
+
+                $contents = scandir($fullPath);
+
+                $files = array_filter($contents, function ($item) use ($fullPath) {
+                    return is_file($fullPath . '/' . $item);
+                });
+
+                $directories = array_filter($contents, function ($item) use ($fullPath) {
+                    return is_dir($fullPath . '/' . $item) && !in_array($item, ['.', '..']);
+                });
+
+                $directories = array_map(fn($dir) => rtrim($dir, '/') . '/', $directories);
+
                 $items = array_merge($directories, $files);
 
                 $explorer = [];
                 foreach ($items as $item) {
-                    $path = Storage::disk('public')->path($item);
+                    $itemPath = $fullPath . '/' . $item;
+
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                        $resolvedPath = readlink($path);
-                        $isSymbolicLink = $resolvedPath && $resolvedPath !== $path;
+                        $resolvedPath = readlink($itemPath);
+                        $isSymbolicLink = $resolvedPath && $resolvedPath !== $itemPath;
                     } else {
-                        if (is_link($path)) {
-                            $resolvedPath = readlink($path);
+                        if (is_link($itemPath)) {
+                            $resolvedPath = readlink($itemPath);
                             $isSymbolicLink = true;
                         } else {
                             $resolvedPath = false;
@@ -94,7 +107,7 @@ class CloudController extends Controller
                         }
                     }
 
-                    $isDirectory = str_ends_with($item, '/') || ($isSymbolicLink && is_dir($resolvedPath)) || is_dir($path);
+                    $isDirectory = str_ends_with($item, '/') || ($isSymbolicLink && is_dir($resolvedPath)) || is_dir($itemPath);
 
                     $extension = $isDirectory ? '/' : pathinfo($item, PATHINFO_EXTENSION);
 
