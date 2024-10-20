@@ -80,14 +80,14 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                 Route::get('/rooms', [RoomController::class, 'api_read_rooms'])->name('api.user.read.rooms');
                 Route::get('/models', [ManageController::class, 'api_read_models'])->name('api.user.read.models');
                 Route::get('/bots', [BotController::class, 'api_read_bots'])->name('api.user.read.bots');
-                Route::get('/cloud/{user_id?}/{folder?}', [CloudController::class, 'api_read_cloud'])
+                Route::get('/cloud/{folder?}', [CloudController::class, 'api_read_cloud'])
                     ->where('folder', '.*')
                     ->name('api.user.read.cloud');
             });
 
             Route::prefix('delete')->group(function () {
-                Route::delete('/cloud/{user_id?}/{folder?}', [CloudController::class, 'api_delete_cloud'])
-                    ->where('folder', '.*')
+                Route::delete('/cloud/{path?}', [CloudController::class, 'api_delete_cloud'])
+                    ->where('path', '.*')
                     ->name('api.user.delete.cloud');
                 Route::prefix('room')->group(function () {
                     Route::delete('/', [RoomController::class, 'api_delete_room'])->name('api.user.delete.room');

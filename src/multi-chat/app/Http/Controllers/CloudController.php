@@ -45,8 +45,15 @@ class CloudController extends Controller
     {
         return view('cloud');
     }
-
-    public function api_read_cloud(Request $request, $user_id = null, $paths = null)
+    function resolvePath($path)
+    {
+        return array_values(array_filter(explode('/', trim($path, '/'))));
+    }
+    function pathToString($pathArray)
+    {
+        return '/' . implode('/', $pathArray);
+    }
+    public function api_read_cloud(Request $request, $paths = null)
     {
         $result = DB::table('personal_access_tokens')
             ->join('users', 'tokenable_id', '=', 'users.id')
@@ -57,29 +64,30 @@ class CloudController extends Controller
             $user = $result;
             if (User::find($user->id)->hasPerm('tab_Cloud')) {
                 $authUserId = auth()->id();
+                $path = $this->resolvePath($paths);
+                $user_dir = $this->resolvePath('/homes/' . $authUserId);
                 if (!$request->user()->hasPerm('tab_Manage')) {
-                    if ($paths !== null || $user_id === null || intval($user_id) !== $authUserId) {
-                        $paths = null;
-                        $user_id = $authUserId;
+                    if (($path[0] ?? null) != 'homes' || ($path[1] ?? null) != $authUserId) {
+                        $path = $user_dir;
                     }
                 }
-                $base_dir = 'root';
-                $user_dir = $base_dir . '/homes/' . $authUserId;
-                $query_path = '/';
-                if ($user_id) {
-                    $query_path .= $user_id . '/';
-                }
-                if ($paths) {
-                    $query_path .= $paths . '/';
-                }
-                $files = Storage::disk('public')->Files($base_dir . $query_path);
-                $directories = array_map(fn($dir) => rtrim($dir, '/') . '/', Storage::disk('public')->directories($base_dir . $query_path));
+
+                $query_path = $this->pathToString($path) . '/';
+                $files = Storage::disk('public')->Files('root' . $query_path);
+                $directories = array_map(fn($dir) => rtrim($dir, '/') . '/', Storage::disk('public')->directories('root' . $query_path));
                 $items = array_merge($directories, $files);
 
                 $explorer = [];
                 foreach ($items as $item) {
-                    $isDirectory = str_ends_with($item, '/');
+                    $path = Storage::disk('public')->path($item);
+                    $resolvedPath = readlink($path);
+
+                    $isSymbolicLink = $resolvedPath && $resolvedPath !== $path;
+
+                    $isDirectory = str_ends_with($item, '/') || ($isSymbolicLink && is_dir($resolvedPath)) || is_dir($path);
+
                     $extension = $isDirectory ? '/' : pathinfo($item, PATHINFO_EXTENSION);
+
                     $explorer[] = [
                         'name' => basename($item),
                         'is_directory' => $isDirectory,
@@ -110,7 +118,7 @@ class CloudController extends Controller
     {
         return view('cloud');
     }
-    public function api_delete_cloud(Request $request, $user_id = null, $folder = null)
+    public function api_delete_cloud(Request $request, $paths = null)
     {
         $result = DB::table('personal_access_tokens')
             ->join('users', 'tokenable_id', '=', 'users.id')
@@ -123,8 +131,9 @@ class CloudController extends Controller
 
             if (User::find($user->id)->hasPerm('tab_Cloud')) {
                 $authUserId = auth()->id();
-
-                if (!$request->user()->hasPerm('tab_Manage') && intval($user_id) !== $authUserId) {
+                $path = $this->resolvePath($paths);
+                $user_dir = $this->resolvePath('/homes/' . $authUserId);
+                if (!$request->user()->hasPerm('tab_Manage') && ((($path[0] ?? null) != 'homes') || (($path[1] ?? null) != $authUserId))) {
                     return response()->json(
                         [
                             'status' => 'error',
@@ -135,7 +144,7 @@ class CloudController extends Controller
                         JSON_UNESCAPED_UNICODE,
                     );
                 }
-                $pathToDelete = '/root/' . $user_id . '/' . ($folder ?? '');
+                $pathToDelete = '/root' . $this->pathToString($path) . '/';
                 if (Storage::disk('public')->exists($pathToDelete)) {
                     $isDirectory = !empty(Storage::disk('public')->directories(dirname($pathToDelete)));
 
