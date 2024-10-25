@@ -58,7 +58,7 @@
                             'smtp_not_configured' => [
                                 'status' => 'smtp_not_configured',
                                 'message' => __('manage.hint.smtp_not_configured'),
-                                'type' => 'red',
+                                'type' => 'blue',
                             ],
                         ],
                         'resetRedis' => [
