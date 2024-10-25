@@ -13,7 +13,7 @@ return [
     'button.close' => '關閉',
     'button.accept' => '我同意',
     'button.export' => '匯出',
-    'button.updateWeb' => '更新網站',
+    'button.updateWeb' => '強制更新網站系統',
     'button.shutdown' => '關機',
     'button.refresh' => '重新整理',
 
@@ -21,7 +21,7 @@ return [
     'tab.groups' => '群組',
     'tab.users' => '使用者',
     'tab.llms' => '模型',
-    'tab.settings' => '網站設定',
+    'tab.settings' => '設定',
     'tab.kernel' => '核心',
     'tab.workers' => '任務處理器',
 
@@ -101,14 +101,21 @@ return [
     'modal.confirm_setting_modal.shrink_max_upload_file_count' => '降低上傳檔案總數限制會刪除超出的使用者檔案，您確定嗎?',
 
     //setting
-    'header.settings' => '網站設定',
-    'header.updateWeb' => '網站更新進度',
+    'header.setting.ui' => '使用者介面',
+    'header.setting.storage' => '儲存空間',
+    'header.setting.env' => '執行環境',
+    'header.setting.debug' => '除錯',
+    'header.updateWeb' => '系統更新進度',
     'header.confirmUpdate' => '是否確定更新網站',
+    'header.setting.kernel' => '核心',
+    'label.kernel_location' => '核心連線位置',
+    'label.safety_guard_API' => '安全過濾連線位置',
     'label.reloginWarning' => '網站更新會暫時將所有Worker重啟，並在更新完畢後重新啟動10個Worker，確定要開始進行更新了嗎？',
     'label.settings' => '所有關於網站的設定都可在此調整',
     'label.allow_register' => '允許註冊',
     'button.reset_redis' => '重設Redis快取',
     'hint.saved' => '已儲存',
+    'hint.smtp_not_configured' => '沒有設定SMTP連線方式！將不會啟用信箱驗證功能',
     'hint.redis_cache_cleared' => 'Redis快取已清除',
     'label.updateweb_git_ssh_command' =>'環境變數GIT_SSH_COMMAND',
     'label.updateweb_path' => '環境變數PATH',
@@ -121,8 +128,6 @@ return [
     'label.upload_max_file_count' => '上傳檔案總數限制 (-1 表示不限制數量)',
 
     //kernel
-    'label.kernel_location' => '核心連線位置',
-    'label.safety_guard_API' => '安全過濾連線位置',
     'label.ready' => '就緒',
     'label.busy' => '忙碌',
     'label.accesscode' => '存取代碼',

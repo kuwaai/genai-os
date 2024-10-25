@@ -20,7 +20,8 @@ class SystemController extends Controller
         SystemSetting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
     }
 
-    public function checkUpdate(Request $request){
+    public function checkUpdate(Request $request)
+    {
         return SystemSetting::checkUpdate(true);
     }
 
@@ -28,54 +29,50 @@ class SystemController extends Controller
     {
         $extractBaseUrl = fn($url) => $url ? parse_url($url, PHP_URL_SCHEME) . '://' . parse_url($url, PHP_URL_HOST) . (parse_url($url, PHP_URL_PORT) ? ':' . parse_url($url, PHP_URL_PORT) : '') : '';
 
-        if ($request->input('tab') === 'kernel') {
-            foreach (
-                [
-                    'kernel_location' => $extractBaseUrl($request->input('kernel_location') ?? 'http://localhost:9000'),
-                    'safety_guard_location' => $extractBaseUrl($request->input('safety_guard_location')),
-                ]
-                as $key => $location
-            ) {
-                $this->updateSystemSetting($key, $location);
-            }
-            $result = 'success';
-        } elseif ($request->input('tab') === 'settings') {
-            $smtpConfigured = !in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')]);
+        $smtpConfigured = !in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')]);
 
-            foreach (['allow_register', 'register_need_invite'] as $key) {
-                $this->updateSystemSetting($key, $request->input($key) === 'allow' && $smtpConfigured ? 'true' : 'false');
-            }
-
-            $result = $smtpConfigured ? 'success' : 'smtp_not_configured';
-
-            // Update announcement
-            $announcement = $request->input('announcement');
-            $currentAnnouncement = SystemSetting::where('key', 'announcement')->value('value');
-            if ($currentAnnouncement !== $announcement) {
-                User::query()->update(['announced' => false]);
-            }
-
-            foreach (['upload_max_size_mb', 'upload_max_file_count'] as $key) {
-                $value = ((string) intval($request->input($key))) ?? '10';
-                if ($value === '0' && $request->input($key) !== '0') {
-                    $value = '10';
-                }
-                $this->updateSystemSetting($key, $value);
-            }
-
-            $tos = $request->input('tos');
-            $currentTos = SystemSetting::where('key', 'tos')->value('value');
-            if ($currentTos !== $tos) {
-                User::query()->update(['term_accepted' => false]);
-            }
-            $uploadExtensions = $request->input('upload_allowed_extensions') ? implode(',', array_map('trim', explode(',', $request->input('upload_allowed_extensions')))) : 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpeg,jpg,gif,png,avif,webp,bmp,ico,cur,tiff,tif,zip,mp3,wav,mp4';
-            $this->updateSystemSetting('upload_allowed_extensions', $uploadExtensions);
-            $this->updateSystemSetting('updateweb_git_ssh_command', $request->input('updateweb_git_ssh_command'));
-            $this->updateSystemSetting('updateweb_path', $request->input('updateweb_path'));
-            $this->updateSystemSetting('warning_footer', $request->input('warning_footer'));
-            $this->updateSystemSetting('announcement', $announcement);
-            $this->updateSystemSetting('tos', $tos);
+        foreach (['allow_register', 'register_need_invite'] as $key) {
+            $this->updateSystemSetting($key, $request->input($key) === 'allow' && $smtpConfigured ? 'true' : 'false');
         }
+        foreach (
+            [
+                'kernel_location' => $extractBaseUrl($request->input('kernel_location') ?? 'http://localhost:9000'),
+                'safety_guard_location' => $extractBaseUrl($request->input('safety_guard_location')),
+            ]
+            as $key => $location
+        ) {
+            $this->updateSystemSetting($key, $location);
+        }
+
+        $result = $smtpConfigured ? 'success' : 'smtp_not_configured';
+
+        // Update announcement
+        $announcement = $request->input('announcement');
+        $currentAnnouncement = SystemSetting::where('key', 'announcement')->value('value');
+        if ($currentAnnouncement !== $announcement) {
+            User::query()->update(['announced' => false]);
+        }
+
+        foreach (['upload_max_size_mb', 'upload_max_file_count'] as $key) {
+            $value = ((string) intval($request->input($key))) ?? '10';
+            if ($value === '0' && $request->input($key) !== '0') {
+                $value = '10';
+            }
+            $this->updateSystemSetting($key, $value);
+        }
+
+        $tos = $request->input('tos');
+        $currentTos = SystemSetting::where('key', 'tos')->value('value');
+        if ($currentTos !== $tos) {
+            User::query()->update(['term_accepted' => false]);
+        }
+        $uploadExtensions = $request->input('upload_allowed_extensions') ? implode(',', array_map('trim', explode(',', $request->input('upload_allowed_extensions')))) : 'pdf,doc,docx,odt,ppt,pptx,odp,xlsx,xls,ods,eml,txt,md,csv,json,jpeg,jpg,gif,png,avif,webp,bmp,ico,cur,tiff,tif,zip,mp3,wav,mp4';
+        $this->updateSystemSetting('upload_allowed_extensions', $uploadExtensions);
+        $this->updateSystemSetting('updateweb_git_ssh_command', $request->input('updateweb_git_ssh_command'));
+        $this->updateSystemSetting('updateweb_path', $request->input('updateweb_path'));
+        $this->updateSystemSetting('warning_footer', $request->input('warning_footer'));
+        $this->updateSystemSetting('announcement', $announcement);
+        $this->updateSystemSetting('tos', $tos);
 
         return Redirect::route('manage.home')->with(['last_tab' => $request->input('tab'), 'last_action' => 'update', 'status' => $result]);
     }
