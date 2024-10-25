@@ -1,5 +1,6 @@
 import os
 
+download_jobs = {}
 data = {}
 record_file = "records.pickle"
 

@@ -1,7 +1,9 @@
 import logging, requests
-import json
+import json, threading
+import time, os, subprocess
+from datetime import datetime
 from urllib.parse import urlparse
-from flask import Blueprint, request, json, redirect, url_for, jsonify
+from flask import Blueprint, request, json, redirect, url_for, jsonify, Response, stream_with_context
 from ..variable import *
 from ..functions import save_variable_to_file, endpoint_formatter, get_base_url, load_records
 executor = Blueprint('executor', __name__)
@@ -98,15 +100,8 @@ def shutdown_executor():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
 @executor.route("/read", methods=["GET"])
 def read_executor():
-    access_code = request.args.get('access_code', None)
-    if access_code:
-        if access_code in data:
-            return jsonify({access_code: data[access_code]}), 200
-        else:
-            return jsonify({"status": "error", "message": "Access code not found"}), 404
     return jsonify(data), 200
 
 def find_and_pop_record(access_code, endpoint, status, history_id, user_id, pop=False):
