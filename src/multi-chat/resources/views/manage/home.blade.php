@@ -94,9 +94,14 @@
             } else if (tabId === "kernel-tab") {
                 fetchDataInterval = setInterval(fetchData, 3000);
                 fetchData();
-            } else if (tabId === 'setting-tab') {
-                adjustTextareaRows($("#announcement"))
-                adjustTextareaRows($("#tos"))
+            } else if (tabId === 'settings-tab') {
+                setTimeout(function() {
+                    adjustTextareaRows($("#announcement"));
+                }, 100);
+
+                setTimeout(function() {
+                    adjustTextareaRows($("#tos"));
+                }, 100);
             }
         }
 
