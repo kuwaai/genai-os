@@ -29,8 +29,6 @@ class SystemController extends Controller
     {
         $extractBaseUrl = fn($url) => $url ? parse_url($url, PHP_URL_SCHEME) . '://' . parse_url($url, PHP_URL_HOST) . (parse_url($url, PHP_URL_PORT) ? ':' . parse_url($url, PHP_URL_PORT) : '') : '';
 
-        $smtpConfigured = !in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')]);
-
         foreach (['allow_register', 'register_need_invite'] as $key) {
             $this->updateSystemSetting($key, $request->input($key) === 'allow' ? 'true' : 'false');
         }
@@ -44,7 +42,7 @@ class SystemController extends Controller
             $this->updateSystemSetting($key, $location);
         }
 
-        $result = $smtpConfigured ? 'success' : 'smtp_not_configured';
+        $result = SystemSetting::smtpConfigured() ? 'success' : 'smtp_not_configured';
 
         // Update announcement
         $announcement = $request->input('announcement');

@@ -73,4 +73,11 @@ class SystemSetting extends Model
 
         return $buffer;
     }
+
+    static function smtpConfigured()
+    {
+        $smtpConfig = [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')];
+
+        return count(array_filter($smtpConfig)) === count($smtpConfig);
+    }
 }
