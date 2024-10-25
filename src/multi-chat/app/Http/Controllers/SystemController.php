@@ -32,7 +32,7 @@ class SystemController extends Controller
         $smtpConfigured = !in_array(null, [config('app.MAIL_MAILER'), config('app.MAIL_HOST'), config('app.MAIL_PORT'), config('app.MAIL_USERNAME'), config('app.MAIL_PASSWORD'), config('app.MAIL_ENCRYPTION'), config('app.MAIL_FROM_ADDRESS'), config('app.MAIL_FROM_NAME')]);
 
         foreach (['allow_register', 'register_need_invite'] as $key) {
-            $this->updateSystemSetting($key, $request->input($key) === 'allow' && $smtpConfigured ? 'true' : 'false');
+            $this->updateSystemSetting($key, $request->input($key) === 'allow' ? 'true' : 'false');
         }
         foreach (
             [
