@@ -94,27 +94,27 @@ class KernelController extends Controller
             return response()->json(['error' => 'Failed to fetch data'], 500);
         }
     }
-    
+
     public function storage_download(Request $request)
     {
         $modelName = $request->input('model_name');
         $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
         $apiUrl = "{$baseUrl}/v1.0/model/download?model_name={$modelName}";
-    
+
         // Create a new StreamedResponse
         $response = new StreamedResponse(function () use ($apiUrl) {
             // Use Guzzle or any HTTP client to fetch the streaming response
             $client = new \GuzzleHttp\Client();
-    
+
             // Make a streaming request to the external API
             $apiResponse = $client->get($apiUrl, [
                 'stream' => true, // Enable streaming
             ]);
-    
+
             // Check if the response is successful
             if ($apiResponse->getStatusCode() === 200) {
                 $body = $apiResponse->getBody();
-    
+
                 // Stream the response body directly
                 while (!$body->eof()) {
                     // Read and output chunks of data
@@ -123,33 +123,60 @@ class KernelController extends Controller
                 }
             } else {
                 // Handle errors accordingly
-                echo "Error: " . $apiResponse->getStatusCode() . "\n";
+                echo 'Error: ' . $apiResponse->getStatusCode() . "\n";
                 flush();
             }
         });
-    
+
         // Set headers for text streaming
         $response->headers->set('Content-Type', 'text/plain'); // Set to plain text
         $response->headers->set('Cache-Control', 'no-cache');
         $response->headers->set('X-Accel-Buffering', 'no'); // Disable buffering for Nginx
         $response->headers->set('charset', 'utf-8');
         $response->headers->set('Connection', 'close'); // Close connection after response
-    
+
         return $response; // Return the streamed response
     }
-    
+
     public function storage_abort(Request $request)
     {
         $modelName = $request->input('model_name');
         $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
         $apiUrl = "{$baseUrl}/v1.0/model/abort";
-    
+
         $response = Http::post($apiUrl, [
             'model_name' => $modelName,
         ]);
+
+        return $response->successful() ? response()->json($response->json()) : response()->json(['error' => 'Failed to fetch data'], 500);
+    }
+    public function storage_hf_login(Request $request)
+    {
+        $token = $request->input('token');
     
-        return $response->successful()
-            ? response()->json($response->json())
+        $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
+        $apiUrl = "{$baseUrl}/v1.0/model/hf_login";
+    
+        if (!$token) {
+            $response = Http::get($apiUrl);
+        } else {
+            $response = Http::post($apiUrl, [
+                'token' => $token,
+            ]);
+        }
+    
+        return $response->successful() 
+            ? response()->json($response->json()) 
             : response()->json(['error' => 'Failed to fetch data'], 500);
+    }
+    
+    public function storage_hf_logout(Request $request)
+    {
+        $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
+        $apiUrl = "{$baseUrl}/v1.0/model/hf_logout";
+
+        $response = Http::post($apiUrl);
+
+        return $response->successful() ? response()->json($response->json()) : response()->json(['error' => 'Failed to fetch data'], 500);
     }
 }

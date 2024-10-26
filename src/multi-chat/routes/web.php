@@ -300,6 +300,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                                     Route::get('/jobs', [KernelController::class, 'storage_job'])->name('manage.kernel.storage.jobs');
                                     Route::get('/download', [KernelController::class, 'storage_download'])->name('manage.kernel.storage.download');
                                     Route::post('/abort', [KernelController::class, 'storage_abort'])->name('manage.kernel.storage.abort');
+                                    Route::post('/remove', [KernelController::class, 'storage_remove'])->name('manage.kernel.storage.remove');
+                                    Route::post('/hf_login', [KernelController::class, 'storage_hf_login'])->name('manage.kernel.storage.hf_login');
+                                    Route::post('/hf_logout', [KernelController::class, 'storage_hf_logout'])->name('manage.kernel.storage.hf_logout');
                                 });
                             });
 
