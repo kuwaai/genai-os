@@ -166,3 +166,70 @@ def list_download_jobs():
         for model_name, details in download_jobs.items()
     ]
     return jsonify({"active_jobs": active_jobs}), 200
+    
+@model.route("/hf_login", methods=["GET", "POST"])
+def hf_login():
+    if request.method == "GET":
+        try:
+            # Use the huggingface-cli whoami command to check the current user
+            command = ["huggingface-cli", "whoami"]
+            result = subprocess.run(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+            if result.returncode == 0:
+                username = result.stdout.strip()
+                return jsonify({"logged_in": True, "username": username}), 200
+            else:
+                error_message = result.stderr.strip()
+                return jsonify({"logged_in": False, "error": error_message}), 401
+
+        except Exception as e:
+            return jsonify({"logged_in": False, "error": str(e)}), 500
+
+    # POST method to log in
+    token = request.json.get("token")
+    if not token:
+        return jsonify({"error": "Token is required."}), 400
+
+    try:
+        command = ["huggingface-cli", "login", "--token", token]
+        result = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        if result.returncode == 0:
+            return jsonify({"logged_in": True, "message": "Logged in successfully."}), 200
+        else:
+            error_message = result.stderr.strip()
+            return jsonify({"logged_in": False, "error": error_message}), 401
+
+    except Exception as e:
+        return jsonify({"logged_in": False, "error": str(e)}), 500
+
+@model.route("/hf_logout", methods=["POST"])
+def hf_logout():
+    try:
+        # Use the huggingface-cli logout command
+        command = ["huggingface-cli", "logout"]
+        result = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        if result.returncode == 0:
+            return jsonify({"logged_out": True, "message": "Logged out successfully."}), 200
+        else:
+            error_message = result.stderr.strip()
+            return jsonify({"logged_out": False, "error": error_message}), 401
+
+    except Exception as e:
+        return jsonify({"logged_out": False, "error": str(e)}), 500
