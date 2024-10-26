@@ -27,9 +27,9 @@
                 </a>
             </li>
             <li>
-                <a href="#debug-settings"
+                <a href="#other-feature"
                     class="block p-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md transition duration-200 ease-in-out hover:bg-gray-300 dark:hover:bg-gray-600">
-                    {{ __('manage.header.setting.debug') }}
+                    {{ __('manage.header.setting.other') }}
                 </a>
             </li>
         </ul>
@@ -247,13 +247,17 @@
             </div>
 
             <!-- Debug Settings -->
-            <div class="p-3" id="debug-settings">
+            <div class="p-3" id="other-feature">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    {{ __('manage.header.setting.debug') }}
+                    {{ __('manage.header.setting.other') }}
                 </h3>
                 <div class="my-2"><a
                         class="bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
                         href="{{ route('manage.setting.resetRedis') }}">{{ __('manage.button.reset_redis') }}</a>
+                </div>
+                <div class="my-2"><a
+                        class="bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center"
+                        href="{{ route('manage.setup') }}">{{ __('manage.button.setup_page') }}</a>
                 </div>
             </div>
             <div class="h-[400px]"></div>

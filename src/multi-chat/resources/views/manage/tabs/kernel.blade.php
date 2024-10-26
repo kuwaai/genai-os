@@ -1,14 +1,34 @@
-<div class="flex flex-col flex-1 h-full mx-auto overflow-y-auto scrollbar p-2">
-    <div id="error-message" class="hidden text-red-500 dark:text-red-400"></div>
-    <div id="loading-spinner" class="flex justify-center items-center py-8">
-        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+<div class="flex flex-1">
+    <!-- Navigator Sidebar -->
+    <div class="w-1/4 bg-gray-100 dark:bg-gray-800 pl-4 pt-4 overflow-y-auto">
+        <ul class="space-y-2">
+            <li>
+                <a href="#ui-settings"
+                    class="block p-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md transition duration-200 ease-in-out hover:bg-gray-300 dark:hover:bg-gray-600">
+                    {{ __('Records') }}
+                </a>
+            </li>
+            <li>
+                <a href="#storage-settings"
+                    class="block p-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md transition duration-200 ease-in-out hover:bg-gray-300 dark:hover:bg-gray-600">
+                    {{ __('Model Storage') }}
+                </a>
+            </li>
+        </ul>
     </div>
-    <ul id="access-code-list"></ul>
-    <div class="mb-6">
-        <button id="create-record-btn"
-            class="bg-green-500 text-white px-4 py-2 rounded dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700">{{ __('manage.button.new_executor') }}</button>
+    <div class="flex flex-1 h-full mx-auto flex-col scrollbar overflow-y-auto p-2">
+        <div id="error-message" class="hidden text-red-500 dark:text-red-400"></div>
+        <div id="loading-spinner" class="flex justify-center items-center py-8">
+            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <ul id="access-code-list"></ul>
+        <div class="mb-6">
+            <button id="create-record-btn"
+                class="bg-green-500 text-white px-4 py-2 rounded dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700">{{ __('manage.button.new_executor') }}</button>
+        </div>
     </div>
 </div>
+
 
 <div id="record-modal" class="fixed inset-0 z-50 hidden bg-gray-800 bg-opacity-75 flex items-center justify-center">
     <div class="bg-white rounded shadow-lg p-4 w-2/3 dark:bg-gray-800 dark:text-white">

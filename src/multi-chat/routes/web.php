@@ -246,6 +246,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::get('/', function () {
                             return view('manage.home');
                         })->name('manage.home');
+                        Route::get('/setup', function () {
+                            return view('manage.setup');
+                        })->name('manage.setup');
                         Route::prefix('group')
                             ->group(function () {
                                 Route::post('/create', [ManageController::class, 'group_create'])->name('manage.group.create');
