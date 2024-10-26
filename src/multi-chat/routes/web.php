@@ -287,14 +287,21 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
 
                         Route::prefix('kernel')
                             ->group(function () {
-                                Route::get('/fetch-data', [KernelController::class, 'fetchData'])->name('manage.kernel.fetchData');
-                                Route::post('/update-data', [KernelController::class, 'updateData'])->name('manage.kernel.updateData');
-                                Route::post('/delete-data', [KernelController::class, 'deleteData'])->name('manage.kernel.deleteData');
-                                Route::post('/shutdown', [KernelController::class, 'shutdown'])->name('manage.kernel.shutdown');
-                                Route::post('/update-field', [KernelController::class, 'updateField'])->name('manage.kernel.updateField');
-                                Route::post('/create-data', [KernelController::class, 'createData'])->name('manage.kernel.createData');
-                            })
-                            ->name('manage.kernel');
+                                Route::prefix('record')->group(function () {
+                                    Route::get('/fetch-data', [KernelController::class, 'fetchData'])->name('manage.kernel.record.fetchData');
+                                    Route::post('/update-data', [KernelController::class, 'updateData'])->name('manage.kernel.record.updateData');
+                                    Route::post('/delete-data', [KernelController::class, 'deleteData'])->name('manage.kernel.record.deleteData');
+                                    Route::post('/shutdown', [KernelController::class, 'shutdown'])->name('manage.kernel.record.shutdown');
+                                    Route::post('/update-field', [KernelController::class, 'updateField'])->name('manage.kernel.record.updateField');
+                                    Route::post('/create-data', [KernelController::class, 'createData'])->name('manage.kernel.record.createData');
+                                });
+                                Route::prefix('storage')->group(function () {
+                                    Route::get('/', [KernelController::class, 'storage'])->name('manage.kernel.storage');
+                                    Route::get('/jobs', [KernelController::class, 'storage_job'])->name('manage.kernel.storage.jobs');
+                                    Route::get('/download', [KernelController::class, 'storage_download'])->name('manage.kernel.storage.download');
+                                    Route::post('/abort', [KernelController::class, 'storage_abort'])->name('manage.kernel.storage.abort');
+                                });
+                            });
 
                         Route::prefix('workers')
                             ->group(function () {

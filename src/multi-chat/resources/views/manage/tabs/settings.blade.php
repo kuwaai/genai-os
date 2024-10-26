@@ -1,6 +1,6 @@
 <div class="flex flex-1">
     <!-- Navigator Sidebar -->
-    <div class="w-1/4 bg-gray-100 dark:bg-gray-800 pl-4 pt-4 overflow-y-auto">
+    <div class="bg-gray-100 dark:bg-gray-800 pl-4 pt-4 overflow-y-auto">
         <ul class="space-y-2">
             <li>
                 <a href="#ui-settings"
@@ -196,7 +196,8 @@
                 <div>
                     <x-input-label for="kernel_location" :value="__('manage.label.kernel_location')" />
                     <div class="flex items-center">
-                        <x-text-input id="kernel_location" name="kernel_location" type="text" class="mr-2 mb-1 block w-full"
+                        <x-text-input id="kernel_location" name="kernel_location" type="text"
+                            class="mr-2 mb-1 block w-full"
                             value="{{ \App\Models\SystemSetting::where('key', 'kernel_location')->first()->value }}"
                             autocomplete="off" />
                     </div>
@@ -324,7 +325,7 @@
     function submitSettings(confirmed) {
         let form = $(".setting-form");
         if (form.data("confirmed")) {
-            return; 
+            return;
         }
 
         let confirm_needed = false;

@@ -13,7 +13,7 @@
                             </h2>
                         </header>
                         <div class="flex-1 flex overflow-hidden flex-col border-gray-700 rounded border-2">
-                            <div class="border-b border-gray-200 dark:border-gray-700">
+                            <div class="border-b border-gray-200 dark:border-gray-700" id='manage_tab'>
                                 <ul class="flex flex-wrap -mb-px text-sm font-medium text-center"
                                     data-tabs-toggle="#Contents" role="tablist">
                                     <li class="mr-2" role="presentation">
@@ -93,7 +93,11 @@
                 lastRefreshInterval = setInterval(updateLastRefreshTime, 1000);
             } else if (tabId === "kernel-tab") {
                 fetchDataInterval = setInterval(fetchData, 3000);
+                fetchStorageDataInterval = setInterval(fetchStorageData, 5000);
+                fetchJobsDataInterval = setInterval(fetchJobsData, 1000);
                 fetchData();
+                fetchStorageData();
+                fetchJobsData();
             } else if (tabId === 'settings-tab') {
                 setTimeout(function() {
                     adjustTextareaRows($("#announcement"));
@@ -117,11 +121,17 @@
                 if (typeof fetchDataInterval !== 'undefined') {
                     clearInterval(fetchDataInterval);
                 }
+                if (typeof fetchStorageDataInterval !== 'undefined') {
+                    clearInterval(fetchStorageDataInterval);
+                }
+                if (typeof fetchJobsDataInterval !== 'undefined') {
+                    clearInterval(fetchJobsDataInterval);
+                }
             }
         }
         let currentTabId = $(".text-sm.font-medium button[aria-selected='true']").attr('id');
 
-        $("ul[data-tabs-toggle] button").on("click", function() {
+        $("#manage_tab ul[data-tabs-toggle] button").on("click", function() {
             const newTabId = $(this).attr("id");
 
             if (currentTabId !== newTabId) {
