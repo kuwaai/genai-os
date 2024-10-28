@@ -33,30 +33,26 @@ class WorkerController extends Controller
 
             try {
                 Process::fromShellCommandline($command)->start();
-                // Wait until the log file is created as an indication that the worker started
                 while (!file_exists($logFile)) {
                     usleep(100000);
                 }
             } catch (\Exception $e) {
-                return response()->json(['message' => __("manage.label.worker_start_failed") . $e->getMessage()], 500);
+                return response()->json(['message' => __('manage.label.worker_start_failed') . $e->getMessage()], 500);
             }
         }
 
-        return response()->json(['message' => __("manage.label.worker_started")]);
+        return response()->json(['message' => __('manage.label.worker_started')]);
     }
 
     // Function to stop all workers and merge log files
     public function stopWorkers()
     {
-        // Signal all queue workers to restart, effectively stopping them
         Artisan::call('queue:restart');
 
-        // Wait up to 5 seconds for all workers to terminate
         for ($elapsedTime = 0; $elapsedTime < 10 && $this->get()->getData()->worker_count > 0; $elapsedTime++) {
             usleep(500000);
         }
 
-        // Merge worker logs into a single file
         $logDirectory = base_path('storage/logs/');
         $mergedLogFile = $logDirectory . 'workers.log';
 
@@ -64,17 +60,16 @@ class WorkerController extends Controller
             $logFiles = glob($logDirectory . 'worker.log.*');
 
             if (empty($logFiles)) {
-                return response()->json(['message' =>  __("manage.label.no_workers")]);
+                return response()->json(['message' => __('manage.label.no_workers')]);
             }
 
-            // Open merged log file for appending, create if not exists
             $mergedFileHandle = fopen($mergedLogFile, 'a') ?: touch($mergedLogFile);
 
             foreach ($logFiles as $logFile) {
                 if (filesize($logFile) > 0) {
                     fwrite($mergedFileHandle, file_get_contents($logFile));
                 }
-                unlink($logFile); // Remove the individual worker log file after merging
+                unlink($logFile); 
             }
 
             fclose($mergedFileHandle);
@@ -82,7 +77,7 @@ class WorkerController extends Controller
             \Log::error('Log merge error: ' . $e->getMessage());
         }
 
-        return response()->json(['message' => __("manage.label.worker_stopped")]);
+        return response()->json(['message' => __('manage.label.worker_stopped')]);
     }
 
     // Function to generate a unique log file name
@@ -98,30 +93,33 @@ class WorkerController extends Controller
     // Get the number of active worker processes
     public function get()
     {
-        // Define the project root directory.
         $projectRoot = base_path();
         $artisanFile = $projectRoot . '/artisan';
 
         if (PHP_OS_FAMILY === 'Windows') {
-            // Use tasklist to get the processes.
             $cmd = 'tasklist /FI "IMAGENAME eq php.exe" /FO CSV';
             $processes = shell_exec($cmd);
 
-            // Subtract 2 to account for headers or irrelevant processes.
             $count = max(0, count(explode("\n", $processes)) - 2);
         } else {
-            // Use lsof to find PHP processes accessing the artisan file.
             $cmd = "lsof -t '$artisanFile' | xargs ps -p | grep 'php' | grep -v grep";
             $processes = shell_exec($cmd);
 
-            // Count the number of lines in the output.
+            if (empty(trim($processes))) {
+                $cmd = "ps aux | grep 'php' | grep '$artisanFile' | grep -v grep";
+                $processes = shell_exec($cmd);
+            }
+
             $count = count(array_filter(explode("\n", trim($processes))));
+        }
+
+        if ($count === 0) {
+            return response()->json(['error' => 'Failed to fetch active worker processes'], 500);
         }
 
         return response()->json(['worker_count' => $count]);
     }
 
-    // Clean Redis keys (no changes here)
     public static function cleanRedisKey($key, $pattern)
     {
         return strpos($key, $pattern) !== false ? substr($key, strpos($key, $pattern)) : $key;
