@@ -48,7 +48,7 @@ class WorkerController extends Controller
     public function stopWorkers()
     {
         Artisan::call('queue:restart');
-
+        
         for ($elapsedTime = 0; $elapsedTime < 10 && $this->get()->getData()->worker_count > 0; $elapsedTime++) {
             usleep(500000);
         }
@@ -111,10 +111,6 @@ class WorkerController extends Controller
             }
 
             $count = count(array_filter(explode("\n", trim($processes))));
-        }
-
-        if ($count === 0) {
-            return response()->json(['error' => 'Failed to fetch active worker processes'], 500);
         }
 
         return response()->json(['worker_count' => $count]);
