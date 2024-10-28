@@ -50,20 +50,23 @@
         <!-- Huggingface Tab Panel -->
         <div class="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden" id="huggingface" role="tabpanel"
             aria-labelledby="huggingface-tab">
-            <div class="flex flex-col p-6 bg-gray-800 rounded-lg shadow-lg">
+            <div class="h-full p-6 bg-gray-800 rounded-lg overflow-hidden">
                 <!-- User Authentication Section -->
-                <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                    <div class="flex flex-col space-y-4">
-                        <!-- First Row: Username -->
+                <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md h-full flex flex-col">
+                    <div class="flex flex-col space-y-4" id='hf_status'>
                         <div class="hidden">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-2xl font-semibold text-gray-900 dark:text-white" id="userGreeting">Guest
                                 </h2>
-                                <button id="logoutButton" onclick="handleLogout()"
-                                    class="bg-red-600 text-white py-2 px-4 rounded-md transition duration-200 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600">Logout</button>
+                                <button id="logoutButton"
+                                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-md dark:bg-red-700 dark:hover:bg-red-800 flex items-center"
+                                    onclick="handleLogoutButtonClick()">
+                                    <i id="stop-icon-logout" class="fa fa-spinner fa-spin hidden text-lg mr-2"
+                                        aria-hidden="true"></i>
+                                    <span id="logoutText">Logout</span>
+                                </button>
                             </div>
-    
-                            <!-- Second Row: Organization Badges -->
+
                             <div id="orgBadges" class="flex space-x-2">
                                 <span class="badge bg-blue-200 text-blue-800 rounded-full px-3 py-1">Org 1</span>
                                 <span class="badge bg-green-200 text-green-800 rounded-full px-3 py-1">Org 2</span>
@@ -71,22 +74,123 @@
                             </div>
                         </div>
 
-                        <!-- Third Row: Token Input Area -->
-                        <div class="flex items-center space-x-2 w-full">
+                        <div class="flex items-center w-full">
                             <input type="text" id="token" placeholder="Enter your token"
-                                class="border border-gray-300 rounded-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
-                            <button id="loginButton" onclick="handleLogin($(this).prev().val(), ()=>{$(this).parent().parent().find('>div').toggleClass('hidden')})"
-                                class="bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">Login</button>
+                                class="border border-gray-300 rounded-l-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
+                            <button id="loginButton"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-6 rounded-r-md shadow-md dark:bg-blue-700 dark:hover:bg-blue-800 flex items-center h-12"
+                                onclick="handleLoginButtonClick()">
+                                <i id="stop-icon-login" class="fa fa-spinner fa-spin hidden text-lg mr-2"
+                                    aria-hidden="true"></i>
+                                <span id="loginText">Login</span>
+                            </button>
                         </div>
                     </div>
 
+
+                    <script>
+                        checkLoginStatus(formatUsername);
+
+                        function formatUsername(data) {
+                            if (!data.logged_in) return;
+
+                            const {
+                                username
+                            } = data;
+                            const [name, orgsString] = username.split('[1morgs: [0m');
+                            const orgs = (orgsString || '').trim().split(',').filter(Boolean);
+
+                            $('#hf_status > div').toggleClass('hidden');
+                            $('#userGreeting').text(name.trim());
+                            $('#orgBadges').empty().append(
+                                orgs.map(org =>
+                                    `<span class="badge bg-blue-200 text-blue-800 rounded-full px-3 py-1">${org.trim()}</span>`).join(
+                                    '')
+                            );
+                        }
+
+                        function performRequest(url, data = {}, onSuccess, onError) {
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    ...data
+                                },
+                                success: onSuccess,
+                                error: onError
+                            });
+                        }
+
+                        function checkLoginStatus(onSuccess, onError) {
+                            const url = "{{ route('manage.kernel.storage.hf_login') }}";
+                            performRequest(url, {}, onSuccess, onError);
+                        }
+
+                        function handleLogin(userToken, onSuccess, onError) {
+                            const url = "{{ route('manage.kernel.storage.hf_login') }}";
+                            performRequest(url, {
+                                token: userToken
+                            }, onSuccess, onError);
+                        }
+
+                        function handleLogout(onSuccess, onError) {
+                            const url = "{{ route('manage.kernel.storage.hf_logout') }}";
+                            performRequest(url, {}, onSuccess, onError);
+                        }
+
+                        function toggleButtonState(button, isLoading) {
+                            button.prop('disabled', isLoading).toggleClass('cursor-not-allowed opacity-50', isLoading);
+                            button.find('#stop-icon-logout, #stop-icon-login').toggleClass('hidden', !isLoading);
+                            button.find('#logoutText, #loginText').toggleClass('opacity-50', isLoading);
+                        }
+
+                        function handleLogoutButtonClick() {
+                            const button = $('#logoutButton');
+                            toggleButtonState(button, true);
+
+                            handleLogout(() => {
+                                toggleButtonState(button, false);
+                                $('#hf_status > div').toggleClass('hidden');
+                            }, (error) => {
+                                console.error(error);
+                                toggleButtonState(button, false);
+                            });
+                        }
+
+                        function handleLoginButtonClick() {
+                            const button = $('#loginButton');
+                            toggleButtonState(button, true);
+
+                            handleLogin($('#token').val(), (data) => {
+                                if (data.logged_in) {
+                                    checkLoginStatus((userData) => {
+                                        toggleButtonState(button, false);
+                                        formatUsername(userData);
+                                    });
+                                } else {
+                                    toggleButtonState(button, false);
+                                }
+                            }, (error) => {
+                                console.error(error);
+                                toggleButtonState(button, false);
+                            });
+                        }
+                    </script>
                     <!-- Search Section -->
                     <div class="flex-grow mt-4">
-                        <input id="searchInput" type="text" placeholder="Search for models..."
-                            class="border border-gray-300 rounded-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
-                        <button id="searchButton"
-                            class="bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 mt-2">Search</button>
+                        <div class="flex items-center w-full">
+                            <input id="searchInput" type="text" placeholder="Search for models..."
+                                class="border border-gray-300 rounded-l-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
+                            <button id="searchButton"
+                                class="bg-blue-600 text-white py-2 px-4 rounded-r-md transition duration-200 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 h-12 flex items-center">
+                                Search
+                            </button>
+                        </div>
                     </div>
+                    <div id="message" class="mt-4 text-gray-300 hidden"></div>
+        
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6 overflow-y-auto scrollbar overflow-x-hidden h-full" id="results"></div>
                 </div>
             </div>
 
@@ -106,55 +210,121 @@
             </div>
 
             <script>
-                checkLoginStatus()
-                function performRequest(url, data = {}, onSuccess, onError) {
-                    $.ajax({
-                        type: 'POST',
-                        url: url,
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            ...data
-                        },
-                        success: onSuccess,
-                        error: onError
+                const apiUrl = "https://huggingface.co/api/models";
+                $(document).ready(function() {
+                    $('#searchButton').click(() => {
+                        const searchTerm = $('#searchInput').val().trim();
+                        if (searchTerm) fetchModels(searchTerm);
+                    });
+                    $('#searchInput').keypress(e => {
+                        if (e.which === 13) $('#searchButton').click();
+                    });
+                    $('#closeModal').click(() => $('#modelModal').addClass('hidden'));
+                    $(window).click(event => {
+                        if ($(event.target).is('#modelModal')) $('#modelModal').addClass('hidden');
+                    });
+
+                    $('#downloadButton').click(() => {
+                        const modelName = $('#modalTitle').text().trim();
+                        if ($('#gatedIndicator').is(':visible')) {
+                            $('#loginMessage').text(
+                                `Access to model ${modelName} is restricted. You must have access to it and be authenticated to access it. Please log in.`
+                            );
+                            $('#loginModal').removeClass('hidden');
+                            return;
+                        }
+                        const url = "{{ route('manage.kernel.storage.download') }}?model_name=" +
+                            encodeURIComponent(modelName);
+                        $('#responseText').removeClass('hidden').text('Downloading...');
+                        fetch(url)
+                            .then(response => {
+                                if (!response.ok) throw new Error(
+                                    `Error: ${response.status} - ${response.statusText}`);
+                                const reader = response.body.getReader(),
+                                    decoder = new TextDecoder("utf-8");
+                                (function push() {
+                                    return reader.read().then(({
+                                        done,
+                                        value
+                                    }) => {
+                                        if (done) {
+                                            $('#responseText').append('<br/>Download complete.');
+                                            return;
+                                        }
+                                        $('#responseText').append(decoder.decode(value, {
+                                            stream: true
+                                        }));
+                                        push();
+                                    });
+                                })();
+                            })
+                            .catch(error => {
+                                $('#responseText').append('<br/>Error: ' + error.message);
+                            });
+                    });
+
+                    $('#closeLoginModal').click(() => $('#loginModal').addClass('hidden'));
+                });
+
+                function fetchModels(searchTerm) {
+                    const params = new URLSearchParams({
+                        filter: searchTerm,
+                        sort: 'downloads',
+                        limit: 10
+                    });
+                    fetch(`${apiUrl}?${params.toString()}`)
+                        .then(response => response.json())
+                        .then(data => displayResults(data))
+                        .catch(error => console.error('Error fetching models:', error));
+                }
+
+                function fetchModelFiles(modelId) {
+                    $('#modalFiles').empty();
+                    $('#responseText').addClass('hidden');
+                    fetch(`${apiUrl}/${modelId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            $('#modalTitle').text(modelId);
+                            $('#gatedIndicator').toggleClass('hidden', !data.gated);
+                            data.siblings.forEach(file => {
+                                $('#modalFiles').append(
+                                    `<li class="flex justify-between items-center text-gray-800 dark:text-gray-200"><span class="font-medium">${file.rfilename}</span></li>`
+                                );
+                            });
+                            $('#modelModal').removeClass('hidden');
+                        })
+                        .catch(error => console.error('Error fetching model files:', error));
+                }
+
+                function displayResults(models) {
+                    const resultsGrid = $('#results');
+                    resultsGrid.empty();
+                    if (models.length === 0) {
+                        resultsGrid.append('<div class="col-span-full text-red-500">No models found.</div>');
+                        return;
+                    }
+                    models.forEach(model => {
+                        resultsGrid.append(`
+                        <div class="border my-2 ml-2 mr-4 rounded-lg shadow-md bg-white dark:bg-gray-800 p-4 transition transform hover:scale-105 relative cursor-pointer" onclick="fetchModelFiles('${model.modelId}')">
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100" title="${model.modelId}" style="word-wrap: break-word;">${model.modelId}</h2>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>Downloads:</strong> ${model.downloads.toLocaleString()}</p>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>Likes:</strong> ${model.likes.toLocaleString()}</p>
+                            <button class="view-tags-button bg-blue-500 text-white py-1 px-2 rounded mt-2 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600">View Tags</button>
+                            <div class="tags hidden mt-2 flex flex-wrap">${model.tags.map(tag => `<span class="bg-blue-100 text-blue-600 text-xs font-medium mr-1 mb-1 px-2.5 py-0.5 rounded-full dark:bg-blue-700 dark:text-blue-300">${tag}</span>`).join('')}</div>
+                        </div>
+                    `);
+                    });
+                    $('.view-tags-button').click(function(event) {
+                        event.stopPropagation();
+                        const tagsDiv = $(this).next('.tags');
+                        tagsDiv.toggleClass('hidden');
+                        $(this).text(tagsDiv.hasClass('hidden') ? 'View Tags' : 'Hide Tags');
                     });
                 }
-
-                function checkLoginStatus(onSuccess, onError) {
-                    const url = "{{ route('manage.kernel.storage.hf_login') }}";
-                    performRequest(url, {}, onSuccess, onError);
-                }
-
-                function handleLogin(userToken, onSuccess, onError) {
-                    const url = "{{ route('manage.kernel.storage.hf_login') }}";
-                    performRequest(url, {
-                        token: userToken
-                    }, onSuccess, onError);
-                }
-
-                function handleLogout(onSuccess, onError) {
-                    const url = "{{ route('manage.kernel.storage.hf_logout') }}";
-                    performRequest(url, {}, onSuccess, onError);
-                }
-
-                function formatUsername(username, badgeContainer, greetingElement) {
-                    const [name, orgsString] = username.split('orgs:');
-                    const orgs = (orgsString || '').trim().split(',').filter(Boolean);
-
-                    greetingElement.text(name.trim());
-                    badgeContainer.empty().append(
-                        orgs.map(org => `<span class="badge">${org.trim()}</span>`).join('')
-                    );
-                }
             </script>
-
-
-            <div id="message" class="mt-4 text-gray-300 hidden"></div>
-            <div id="orgBadges" class="mt-2 flex flex-wrap"></div> <!-- Badge container -->
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6" id="results"></div>
         </div>
-        <div id="modelModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
+        <div id="modelModal"
+            class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
             <div
                 class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2 max-h-[80vh] overflow-y-auto">
                 <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white" id="modalTitle"></h3>
@@ -192,145 +362,29 @@
             </div>
         </div>
 
-        <script>
-            const apiUrl = "https://huggingface.co/api/models";
-            $(document).ready(function() {
-                $('#searchButton').click(() => {
-                    const searchTerm = $('#searchInput').val().trim();
-                    if (searchTerm) fetchModels(searchTerm);
-                });
-                $('#searchInput').keypress(e => {
-                    if (e.which === 13) $('#searchButton').click();
-                });
-                $('#closeModal').click(() => $('#modelModal').addClass('hidden'));
-                $(window).click(event => {
-                    if ($(event.target).is('#modelModal')) $('#modelModal').addClass('hidden');
-                });
+        <!-- Storage Tab Panel -->
+        <div class="hidden flex-1 bg-gray-50 dark:bg-gray-800 overflow-x-hidden overflow-y-auto scrollbar p-6"
+            id="storage" role="tabpanel" aria-labelledby="storage-tab">
+            <div id="alert-container"></div>
 
-                $('#downloadButton').click(() => {
-                    const modelName = $('#modalTitle').text().trim();
-                    if ($('#gatedIndicator').is(':visible')) {
-                        $('#loginMessage').text(
-                            `Access to model ${modelName} is restricted. You must have access to it and be authenticated to access it. Please log in.`
-                        );
-                        $('#loginModal').removeClass('hidden');
-                        return;
-                    }
-                    const url = "{{ route('manage.kernel.storage.download') }}?model_name=" +
-                        encodeURIComponent(modelName);
-                    $('#responseText').removeClass('hidden').text('Downloading...');
-                    fetch(url)
-                        .then(response => {
-                            if (!response.ok) throw new Error(
-                                `Error: ${response.status} - ${response.statusText}`);
-                            const reader = response.body.getReader(),
-                                decoder = new TextDecoder("utf-8");
-                            (function push() {
-                                return reader.read().then(({
-                                    done,
-                                    value
-                                }) => {
-                                    if (done) {
-                                        $('#responseText').append('<br/>Download complete.');
-                                        return;
-                                    }
-                                    $('#responseText').append(decoder.decode(value, {
-                                        stream: true
-                                    }));
-                                    push();
-                                });
-                            })();
-                        })
-                        .catch(error => {
-                            $('#responseText').append('<br/>Error: ' + error.message);
-                        });
-                });
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Storage Models</h2>
+                <ul id="storage-list"
+                    class="list-disc pl-5 space-y-2 max-h-32 overflow-y-auto text-gray-900 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md p-3 shadow-md">
+                    <!-- Storage models will be populated here -->
+                </ul>
+            </div>
 
-                $('#closeLoginModal').click(() => $('#loginModal').addClass('hidden'));
-            });
-
-            function fetchModels(searchTerm) {
-                const params = new URLSearchParams({
-                    filter: searchTerm,
-                    sort: 'downloads',
-                    limit: 10
-                });
-                fetch(`${apiUrl}?${params.toString()}`)
-                    .then(response => response.json())
-                    .then(data => displayResults(data))
-                    .catch(error => console.error('Error fetching models:', error));
-            }
-
-            function fetchModelFiles(modelId) {
-                $('#modalFiles').empty();
-                $('#responseText').addClass('hidden');
-                fetch(`${apiUrl}/${modelId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        $('#modalTitle').text(modelId);
-                        $('#gatedIndicator').toggleClass('hidden', !data.gated);
-                        data.siblings.forEach(file => {
-                            $('#modalFiles').append(
-                                `<li class="flex justify-between items-center text-gray-800 dark:text-gray-200"><span class="font-medium">${file.rfilename}</span></li>`
-                            );
-                        });
-                        $('#modelModal').removeClass('hidden');
-                    })
-                    .catch(error => console.error('Error fetching model files:', error));
-            }
-
-            function displayResults(models) {
-                const resultsGrid = $('#results');
-                resultsGrid.empty();
-                if (models.length === 0) {
-                    resultsGrid.append('<div class="col-span-full text-red-500">No models found.</div>');
-                    return;
-                }
-                models.forEach(model => {
-                    resultsGrid.append(`
-                    <div class="border rounded-lg shadow-md bg-white dark:bg-gray-800 p-4 transition transform hover:scale-105 relative cursor-pointer" onclick="fetchModelFiles('${model.modelId}')">
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100" title="${model.modelId}" style="word-wrap: break-word;">${model.modelId}</h2>
-                        <p class="text-gray-700 dark:text-gray-300"><strong>Downloads:</strong> ${model.downloads.toLocaleString()}</p>
-                        <p class="text-gray-700 dark:text-gray-300"><strong>Likes:</strong> ${model.likes.toLocaleString()}</p>
-                        <button class="view-tags-button bg-blue-500 text-white py-1 px-2 rounded mt-2 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600">View Tags</button>
-                        <div class="tags hidden mt-2 flex flex-wrap">${model.tags.map(tag => `<span class="bg-blue-100 text-blue-600 text-xs font-medium mr-1 mb-1 px-2.5 py-0.5 rounded-full dark:bg-blue-700 dark:text-blue-300">${tag}</span>`).join('')}</div>
-                    </div>
-                `);
-                });
-                $('.view-tags-button').click(function(event) {
-                    event.stopPropagation();
-                    const tagsDiv = $(this).next('.tags');
-                    tagsDiv.toggleClass('hidden');
-                    $(this).text(tagsDiv.hasClass('hidden') ? 'View Tags' : 'Hide Tags');
-                });
-            }
-        </script>
-    </div>
-
-
-    <!-- Storage Tab Panel -->
-    <div class="hidden flex-1 bg-gray-50 dark:bg-gray-800 overflow-x-hidden overflow-y-auto scrollbar p-6"
-        id="storage" role="tabpanel" aria-labelledby="storage-tab">
-        <div id="alert-container"></div>
-
-        <div class="mb-6">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Storage Models</h2>
-            <ul id="storage-list"
-                class="list-disc pl-5 space-y-2 max-h-32 overflow-y-auto text-gray-900 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md p-3 shadow-md">
-                <!-- Storage models will be populated here -->
-            </ul>
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Active Jobs</h2>
+                <ul id="jobs-list"
+                    class="list-disc pl-5 space-y-2 max-h-32 overflow-y-auto text-gray-900 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md p-3 shadow-md">
+                    <!-- Jobs will be populated here -->
+                </ul>
+            </div>
         </div>
 
-        <div>
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Active Jobs</h2>
-            <ul id="jobs-list"
-                class="list-disc pl-5 space-y-2 max-h-32 overflow-y-auto text-gray-900 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md p-3 shadow-md">
-                <!-- Jobs will be populated here -->
-            </ul>
-        </div>
     </div>
-
-</div>
 </div>
 
 <div id="record-modal" class="fixed inset-0 z-50 hidden bg-gray-800 bg-opacity-75 flex items-center justify-center">

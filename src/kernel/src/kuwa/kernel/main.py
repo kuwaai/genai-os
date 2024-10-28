@@ -53,7 +53,7 @@ def main():
     app.register_blueprint(model, url_prefix=f'/{KUWA_KERNEL_API_VERSION}/model')
     logger.info("Route list:\n{}\n".format('\n'.join([str(i) for i in app.url_map.iter_rules()])))
     logger.info("Server started")
-    app.run(port=args.port, host=args.host, threaded=True, debug=True)
+    app.run(port=args.port, host=args.host, threaded=True)
     for model_name in list(download_jobs.keys()):
         job_details = download_jobs[model_name]
         job_details['stop_event'].set()
