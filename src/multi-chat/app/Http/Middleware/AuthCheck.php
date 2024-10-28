@@ -4,8 +4,10 @@ namespace App\Http\Middleware;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\App;
 use Illuminate\Http\Request;
+use App\Jobs\CheckUpdate;
 use Closure;
 
 class AuthCheck
@@ -31,7 +33,11 @@ class AuthCheck
             if ($request->user()->require_change_password) {
                 return redirect()->route('change_password');
             }
+            if ($request->user()->hasPerm('tab_Manage')) {
+                Redis::throttle('check_update')->block(0)->allow(1)->every(10)->then(fn() => CheckUpdate::dispatch(), fn() => null);
+            }
         }
+
         return $next($request);
     }
 }

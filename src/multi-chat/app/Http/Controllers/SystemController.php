@@ -9,6 +9,7 @@ use App\Http\Controllers\RedisController;
 use App\Http\Controllers\WorkerController;
 use App\Models\SystemSetting;
 use App\Models\User;
+use App\Jobs\CheckUpdate;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\Process\Process;
@@ -20,9 +21,13 @@ class SystemController extends Controller
         SystemSetting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
     }
 
-    public function checkUpdate(Request $request)
+    public static function checkUpdate(Request $request)
     {
-        return SystemSetting::checkUpdate(true);
+        if ($request && $request->input('forced')) {
+            CheckUpdate::dispatch(true);
+        }
+        
+        return SystemSetting::where('key', 'cache_update_check')->select('value', 'updated_at')->get()->first()->toarray();
     }
 
     public function update(Request $request): RedirectResponse
