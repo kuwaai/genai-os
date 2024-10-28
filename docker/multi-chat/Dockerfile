@@ -58,7 +58,7 @@ RUN pear config-set http_proxy "${https_proxy:-${HTTPS_PROXY}}" &&\
     docker-php-ext-enable redis
 
 # Install tools to check service status
-RUN apt-get install -y netcat-openbsd wget &&\
+RUN apt-get install -y procps netcat-openbsd wget &&\
     wget -O /usr/local/bin/php-fpm-healthcheck \
       https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck &&\
     chmod +x /usr/local/bin/php-fpm-healthcheck
