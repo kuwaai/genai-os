@@ -70,6 +70,6 @@ return [
         storage_path('app/public/root/custom') => resource_path('views/components/custom'),
         storage_path('app/public/root/database') => base_path('../../docker/root/database'),
         storage_path('app/public/root/bin') => base_path('../../docker/root/bin'),
-        storage_path('app/public/root/bot') => base_path('../../docker/root/bootstrap\bot'),
+        storage_path('app/public/root/bot') => base_path('../../docker/root/bootstrap/bot'),
     ],
 ];
