@@ -109,6 +109,10 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
             if ($localCommit === $upstreamCommit) {
                 $status = 'no-update';
+            } elseif ($localCommit === $baseCommit) {
+                $status = 'update-available';
+            } elseif ($upstreamCommit === $baseCommit) {
+                $status = 'no-update';
             } else {
                 $status = 'update-available';
             }
