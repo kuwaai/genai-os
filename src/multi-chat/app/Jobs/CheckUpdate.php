@@ -40,43 +40,43 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
     {
         try {
             $checkUpdateScript = base_path('app/Console/check-update.php');
-    
+
             if (File::exists($checkUpdateScript)) {
                 $process = new Process(['php', $checkUpdateScript]);
                 $process->setTimeout(null);
                 $process->run();
-    
+
                 if (!$process->isSuccessful()) {
                     $errorMessage = $process->getErrorOutput();
                     $errorMessage = $this->parseMessage($errorMessage);
                     SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
                     return;
                 }
-    
+
                 $output = $process->getOutput();
                 SystemSetting::where('key', 'cache_update_check')->update(['value' => $output]);
                 return;
             }
-    
+
             chdir(base_path());
             $env = [
                 'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value') ?: getenv('PATH'),
                 'GIT_SSH_COMMAND' => SystemSetting::where('key', 'updateweb_git_ssh_command')->value('value') ?? '',
             ];
-    
+
             $updateProcess = Process::fromShellCommandline('git remote update')->setEnv($env)->setTimeout(null);
             $updateProcess->run();
-    
+
             if (!$updateProcess->isSuccessful()) {
                 $errorMessage = $updateProcess->getErrorOutput();
                 $errorMessage = $this->parseMessage($errorMessage);
                 SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
                 return;
             }
-    
+
             $localCommitProcess = Process::fromShellCommandline('git rev-parse @')->setEnv($env)->setTimeout(null);
             $localCommitProcess->run();
-    
+
             if (!$localCommitProcess->isSuccessful()) {
                 $errorMessage = $localCommitProcess->getErrorOutput();
                 $errorMessage = $this->parseMessage($errorMessage);
@@ -84,10 +84,10 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
                 return;
             }
             $localCommit = trim($localCommitProcess->getOutput());
-    
+
             $upstreamCommitProcess = Process::fromShellCommandline('git rev-parse @{u}')->setEnv($env)->setTimeout(null);
             $upstreamCommitProcess->run();
-    
+
             if (!$upstreamCommitProcess->isSuccessful()) {
                 $errorMessage = $upstreamCommitProcess->getErrorOutput();
                 $errorMessage = $this->parseMessage($errorMessage);
@@ -95,10 +95,10 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
                 return;
             }
             $upstreamCommit = trim($upstreamCommitProcess->getOutput());
-    
+
             $baseCommitProcess = Process::fromShellCommandline('git merge-base @ @{u}')->setEnv($env)->setTimeout(null);
             $baseCommitProcess->run();
-    
+
             if (!$baseCommitProcess->isSuccessful()) {
                 $errorMessage = $baseCommitProcess->getErrorOutput();
                 $errorMessage = $this->parseMessage($errorMessage);
@@ -106,27 +106,21 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
                 return;
             }
             $baseCommit = trim($baseCommitProcess->getOutput());
-    
-            if ($localCommit === $baseCommit) {
-                $status = 'update-available';
+
+            if ($localCommit === $upstreamCommit) {
+                $status = 'no-update';
             } else {
-                if ($localCommit === $upstreamCommit) {
-                    $status = 'no-update';
-                } else {
-                    $status = 'update-available';
-                }
+                $status = 'update-available';
             }
-    
             SystemSetting::where('key', 'cache_update_check')->update(['value' => $status]);
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
             $errorMessage = $this->parseMessage($errorMessage);
             SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
         }
-    
+
         return;
     }
-    
 
     private function parseMessage($buffer)
     {
