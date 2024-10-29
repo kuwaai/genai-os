@@ -156,6 +156,41 @@
     <span class="sr-only">Loading...</span>
 </div>
 
+<div id="modelModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
+    <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2 max-h-[80vh] overflow-y-auto">
+        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white" id="modalTitle"></h3>
+        <div id="gatedIndicator" class="hidden mb-2 text-yellow-600 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 2v4m0 4v8m0 0H8m4 0h4m-2-18a2 2 0 012 2v2a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2h8z" />
+            </svg>
+            This model is gated. Please log in to access it.
+        </div>
+        <h4 class="font-semibold mb-1 text-gray-900 dark:text-white">Files:</h4>
+        <ul id="modalFiles" class="list-disc list-inside mb-4 space-y-2 max-h-40 overflow-y-auto scrollbar">
+        </ul>
+        <button id="downloadButton"
+            class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 mb-2">Download
+            Model</button>
+        <button id="closeModal"
+            class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 mb-4">Close</button>
+        <div id="responseText" class="hidden text-gray-800 dark:text-white mt-2 overflow-y-auto max-h-32 scrollbar">
+        </div>
+    </div>
+</div> <!-- Login Modal for Gated Models -->
+<div id="loginModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2">
+        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Access Restricted</h3>
+        <p class="text-gray-700 dark:text-gray-300" id="loginMessage"></p>
+        <button id="closeLoginModal"
+            class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 mt-4">
+            Close
+        </button>
+    </div>
+</div>
+
 <script>
     const apiUrl = "https://huggingface.co/api/models";
     $(document).ready(function() {
@@ -269,37 +304,3 @@
         });
     }
 </script>
-<div id="modelModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
-    <div
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2 max-h-[80vh] overflow-y-auto">
-        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white" id="modalTitle"></h3>
-        <div id="gatedIndicator" class="hidden mb-2 text-yellow-600 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 2v4m0 4v8m0 0H8m4 0h4m-2-18a2 2 0 012 2v2a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2h8z" />
-            </svg>
-            This model is gated. Please log in to access it.
-        </div>
-        <h4 class="font-semibold mb-1 text-gray-900 dark:text-white">Files:</h4>
-        <ul id="modalFiles" class="list-disc list-inside mb-4 space-y-2 max-h-40 overflow-y-auto scrollbar">
-        </ul>
-        <button id="downloadButton"
-            class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 mb-2">Download
-            Model</button>
-        <button id="closeModal"
-            class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 mb-4">Close</button>
-        <div id="responseText" class="hidden text-gray-800 dark:text-white mt-2 overflow-y-auto max-h-32 scrollbar">
-        </div>
-    </div>
-</div> <!-- Login Modal for Gated Models -->
-<div id="loginModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2">
-        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Access Restricted</h3>
-        <p class="text-gray-700 dark:text-gray-300" id="loginMessage"></p>
-        <button id="closeLoginModal"
-            class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 mt-4">
-            Close
-        </button>
-    </div>
-</div>
