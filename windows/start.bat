@@ -21,14 +21,9 @@ del dump.rdb
 start /b "" "redis-server.exe" redis.conf
 popd
 
-REM Define number of Redis workers
+REM Define number of workers
 set numWorkers=10
-
-REM Redis workers
-for /l %%i in (1,1,%numWorkers%) do (
-	echo Started a model worker
-    start /b packages\%php_folder%\php.exe ..\src\multi-chat\artisan queue:work --verbose --timeout=6000
-)
+start php artisan worker:start %numWorkers%
 
 :launch_kernel_and_executors
 REM Kernel
