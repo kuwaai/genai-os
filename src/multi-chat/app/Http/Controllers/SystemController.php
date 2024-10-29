@@ -10,6 +10,7 @@ use App\Http\Controllers\WorkerController;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Jobs\CheckUpdate;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\Process\Process;
@@ -91,13 +92,31 @@ class SystemController extends Controller
 
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
     }
-
+    
     public function updateProject(Request $request)
     {
         header('Content-Type: text/event-stream');
         header('Cache-Control: no-cache');
-
+    
         try {
+            $updateScript = base_path('app/Console/update-project.php');
+    
+            if (File::exists($updateScript)) {
+                $process = new Process(['php', $updateScript]);
+                $process->setTimeout(null);
+                $process->start();
+    
+                foreach ($process as $type => $data) {
+                    if ($process::OUT === $type) {
+                        echo 'data: ' . json_encode(['status' => 'success', 'output' => $data]) . "\n\n";
+                    } else {
+                        echo 'data: ' . json_encode(['status' => 'error', 'output' => $data]) . "\n\n";
+                    }
+                    ob_flush();
+                    flush();
+                }
+                return;
+            }
             $projectRoot = base_path();
             $scriptPath = stripos(PHP_OS, 'WIN') === 0 ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';
             chdir($projectRoot . dirname($scriptPath));
