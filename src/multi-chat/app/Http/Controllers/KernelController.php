@@ -169,6 +169,18 @@ class KernelController extends Controller
             ? response()->json($response->json()) 
             : response()->json(['error' => 'Failed to fetch data'], 500);
     }
+    public function storage_remove(Request $request)
+    {
+        $folder_name = $request->input('folder_name');
+    
+        $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
+        $apiUrl = "{$baseUrl}/v1.0/model/remove";
+    
+        $response = Http::post($apiUrl, [
+            'folder_name' => $folder_name,
+        ]);
+        return response()->json($response->json());
+    }
     
     public function storage_hf_logout(Request $request)
     {

@@ -17,16 +17,51 @@
 </div>
 
 <script>
+    // Function to remove a model by name
+    function removeModel(folder_name) {
+        return $.ajax({
+            url: "{{ route('manage.kernel.storage.remove') }}",
+            type: 'POST',
+            data: {
+                folder_name: folder_name,
+                _token: "{{ csrf_token() }}"
+            }
+        });
+    }
+
+    // Function to fetch and display storage data with a remove button
     function fetchStorageData() {
         $.getJSON('{{ route('manage.kernel.storage') }}', function(data) {
             $('#storage-list').empty(); // Clear previous data
             if (data.models && data.models.length > 0) {
                 data.models.forEach(function(model) {
+                    // Parse the model name
+                    let parsedModel = parseModelName(model);
+
                     $('#storage-list').append(`
-                    <li class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow">
-                        ${model}
+                    <li class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow flex justify-between items-center">
+                        <span>${parsedModel}</span>
+                        <button class="remove-btn bg-red-500 text-white py-1 px-2 rounded" data-model="${model}">
+                            Remove
+                        </button>
                     </li>
                 `);
+                });
+
+                // Attach click event to each remove button after appending
+                $('.remove-btn').on('click', function() {
+                    let modelName = $(this).data('model');
+
+                    // Call removeModel and handle response
+                    removeModel(modelName)
+                        .done(function(response) {
+                            alert('Model removed successfully');
+                            fetchStorageData(); // Refresh list after removal
+                        })
+                        .fail(function(xhr) {
+                            console.error('Failed to remove model:', xhr.responseJSON);
+                            alert('Failed to remove model');
+                        });
                 });
             } else {
                 $('#storage-list').append(
@@ -39,6 +74,21 @@
             );
         });
     }
+
+    // Function to parse the model name
+    function parseModelName(model) {
+        // Split the model string on '--'
+        const parts = model.split('--');
+
+        // Return the formatted model name if parts length is as expected
+        if (parts.length === 3) {
+            return `${parts[1]}/${parts[2]}`;
+        }
+
+        // If the format is not as expected, return the original model name
+        return model;
+    }
+
 
     function fetchJobsData() {
         $.getJSON('{{ route('manage.kernel.storage.jobs') }}', function(data) {

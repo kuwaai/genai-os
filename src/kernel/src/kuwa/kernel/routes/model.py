@@ -76,26 +76,26 @@ def stop_download():
 
 @model.route("/remove", methods=["POST"])
 def remove_model():
-    model_name = request.json.get("model_name")
-    if not model_name:
-        return jsonify({"error": "model_name parameter is required"}), 400
+    folder_name = request.json.get("folder_name")
+    if not folder_name:
+        return jsonify({"error": "folder_name parameter is required"}), 400
 
-    base_model_dir = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "hub", "models--" + model_name.replace("/", "--"))
+    base_model_dir = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "hub",  folder_name)
     
     # Check if the model directory exists
     if not os.path.exists(base_model_dir):
-        return jsonify({"error": f"Model '{model_name}' does not exist."}), 404
+        return jsonify({"error": f"Model '{folder_name}' does not exist."}), 404
     
     try:
         shutil.rmtree(base_model_dir)
         # Clean up any associated locks
-        lock_dir = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "hub", ".locks", "models--" + model_name.replace("/", "--"))
+        lock_dir = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "hub", ".locks", folder_name)
         if os.path.exists(lock_dir):
             shutil.rmtree(lock_dir)
         
-        return jsonify({"message": f"Model '{model_name}' has been removed successfully."}), 200
+        return jsonify({"message": f"Model '{folder_name}' has been removed successfully."}), 200
     except Exception as e:
-        return jsonify({"error": f"Failed to remove model '{model_name}': {str(e)}"}), 500
+        return jsonify({"error": f"Failed to remove model '{folder_name}': {str(e)}"}), 500
 
 @model.route("/", methods=["GET"])
 def list_models():
