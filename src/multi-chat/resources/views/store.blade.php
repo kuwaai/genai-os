@@ -116,38 +116,29 @@
             @endphp
 
             @if (request()->user()->hasPerm('Store_read_discover_system_bots') && $system_bots->count() > 0)
-                <div class="w-full p-4">
+                <div class="w-full p-2">
                     <p class="mb-2">{{ __('store.label.system_bots') }}</p>
                     <x-store.bot-showcase :bots="$system_bots" :extra="'offical_bots-'" />
                 </div>
             @endif
             @if (request()->user()->hasPerm('Store_read_discover_private_bots') && $private_bots->count() > 0)
-                <div class="w-full p-4">
+                <div class="w-full p-2">
                     <p class="mb-2">{{ __('store.label.private') }}</p>
                     <x-store.bot-showcase :bots="$private_bots" :extra="'my_bots-'" />
                 </div>
             @endif
             @if (request()->user()->hasPerm('Store_read_discover_group_bots') && $group_bots->count() > 0)
-                <div class="w-full p-4">
+                <div class="w-full p-2">
                     <p class="mb-2">{{ __('store.label.groups_bots') }}</p>
                     <x-store.bot-showcase :bots="$group_bots" :extra="'group_bots-'" />
                 </div>
             @endif
             @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $community_bots->count() > 0)
-                <div class="w-full p-4">
+                <div class="w-full p-2">
                     <p class="mb-2">{{ __('store.label.community_bots') }}</p>
                     <x-store.bot-showcase :bots="$community_bots" :extra="'community_bots-'" />
                 </div>
             @endif
         </div>
     </div>
-    <script>
-        $(document).ready(function() {
-            var div = $('.bot-showcase')[0];
-            if (div) {
-                $(div).prev().toggle(div.scrollLeft > 0);
-                $(div).next().toggle(div.scrollLeft + $(div).width() < div.scrollWidth);
-            }
-        });
-    </script>
 </x-app-layout>
