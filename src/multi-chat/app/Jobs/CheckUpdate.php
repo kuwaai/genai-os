@@ -35,75 +35,87 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
     {
         $this->ignore = $ignore;
     }
-    
+
     public function handle()
     {
         try {
-            // Define the path to the check-update.php script
             $checkUpdateScript = base_path('app/Console/check-update.php');
     
-            // Check if check-update.php exists
             if (File::exists($checkUpdateScript)) {
-                // Run the PHP script as an external process
                 $process = new Process(['php', $checkUpdateScript]);
                 $process->setTimeout(null);
                 $process->run();
     
-                // Check if the process was successful
                 if (!$process->isSuccessful()) {
-                    // Capture and save any error output from the process
                     $errorMessage = $process->getErrorOutput();
                     $errorMessage = $this->parseMessage($errorMessage);
                     SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
                     return;
                 }
     
-                // Capture and save the output from the process
                 $output = $process->getOutput();
                 SystemSetting::where('key', 'cache_update_check')->update(['value' => $output]);
                 return;
             }
     
-            // Proceed with the existing git operations if check-update.php does not exist
             chdir(base_path());
             $env = [
                 'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value') ?: getenv('PATH'),
                 'GIT_SSH_COMMAND' => SystemSetting::where('key', 'updateweb_git_ssh_command')->value('value') ?? '',
             ];
     
-            $fetchProcess = Process::fromShellCommandline('git fetch --all')->setEnv($env)->setTimeout(null);
-            $fetchProcess->run();
-            if (!$fetchProcess->isSuccessful()) {
-                $errorMessage = $fetchProcess->getErrorOutput();
+            $updateProcess = Process::fromShellCommandline('git remote update')->setEnv($env)->setTimeout(null);
+            $updateProcess->run();
+    
+            if (!$updateProcess->isSuccessful()) {
+                $errorMessage = $updateProcess->getErrorOutput();
                 $errorMessage = $this->parseMessage($errorMessage);
                 SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
                 return;
             }
     
-            $statusProcess = Process::fromShellCommandline('git status')->setEnv($env)->setTimeout(null);
-            $statusProcess->run();
-            if (!$statusProcess->isSuccessful()) {
-                $errorMessage = $statusProcess->getErrorOutput();
+            $localCommitProcess = Process::fromShellCommandline('git rev-parse @')->setEnv($env)->setTimeout(null);
+            $localCommitProcess->run();
+    
+            if (!$localCommitProcess->isSuccessful()) {
+                $errorMessage = $localCommitProcess->getErrorOutput();
                 $errorMessage = $this->parseMessage($errorMessage);
                 SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
                 return;
             }
+            $localCommit = trim($localCommitProcess->getOutput());
     
-            $output = $statusProcess->getOutput();
-            $isAhead = strpos($output, 'Your branch is ahead of') !== false;
-            $isBehind = strpos($output, 'Your branch is behind') !== false;
+            $upstreamCommitProcess = Process::fromShellCommandline('git rev-parse @{u}')->setEnv($env)->setTimeout(null);
+            $upstreamCommitProcess->run();
     
-            $status = $isAhead && $isBehind 
-                ? 'both-ahead-behind' 
-                : ($isAhead 
-                    ? 'no-update' 
-                    : ($isBehind 
-                        ? 'update-available' 
-                        : (strpos($output, 'Your branch is up to date') !== false 
-                            ? 'up-to-date' 
-                            : (strpos($output, 'Changes not staged for commit') !== false || strpos($output, 'Untracked files') !== false 
-                                ? 'no-update' 
-                                : 'Unknown'))));
+            if (!$upstreamCommitProcess->isSuccessful()) {
+                $errorMessage = $upstreamCommitProcess->getErrorOutput();
+                $errorMessage = $this->parseMessage($errorMessage);
+                SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
+                return;
+            }
+            $upstreamCommit = trim($upstreamCommitProcess->getOutput());
+    
+            $baseCommitProcess = Process::fromShellCommandline('git merge-base @ @{u}')->setEnv($env)->setTimeout(null);
+            $baseCommitProcess->run();
+    
+            if (!$baseCommitProcess->isSuccessful()) {
+                $errorMessage = $baseCommitProcess->getErrorOutput();
+                $errorMessage = $this->parseMessage($errorMessage);
+                SystemSetting::where('key', 'cache_update_check')->update(['value' => $errorMessage]);
+                return;
+            }
+            $baseCommit = trim($baseCommitProcess->getOutput());
+    
+            if ($localCommit === $baseCommit) {
+                $status = 'update-available';
+            } else {
+                if ($localCommit === $upstreamCommit) {
+                    $status = 'no-update';
+                } else {
+                    $status = 'update-available';
+                }
+            }
     
             SystemSetting::where('key', 'cache_update_check')->update(['value' => $status]);
         } catch (\Exception $e) {
