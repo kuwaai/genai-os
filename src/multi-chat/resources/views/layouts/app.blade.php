@@ -308,7 +308,7 @@
                         </div>
                         <div id="confirmUpdate"
                             class="cursor-pointer inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none">
-                            {{ __('kernel.button.confirm') }}
+                            {{ __('manage.button.confirm') }}
                         </div>
                     </div>
                 </div>

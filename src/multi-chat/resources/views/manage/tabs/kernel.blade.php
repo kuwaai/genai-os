@@ -41,7 +41,7 @@
                 <div class="mt-3">
                     <button id="create-record-btn"
                         class="bg-green-500 text-white px-4 py-2 rounded-md transition-all duration-300 ease-in-out hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700">
-                        {{ __('kernel.button.new_executor') }}
+                        {{ __('workers.button.new_executor') }}
                     </button>
                 </div>
             </div>

@@ -37,11 +37,11 @@ class WorkerController extends Controller
                     usleep(100000);
                 }
             } catch (\Exception $e) {
-                return response()->json(['message' => __('kernel.label.worker_start_failed') . $e->getMessage()], 500);
+                return response()->json(['message' => __('workers.label.worker_start_failed') . $e->getMessage()], 500);
             }
         }
 
-        return response()->json(['message' => __('kernel.label.worker_started')]);
+        return response()->json(['message' => __('workers.label.worker_started')]);
     }
 
     // Function to stop all workers and merge log files
@@ -60,7 +60,7 @@ class WorkerController extends Controller
             $logFiles = glob($logDirectory . 'worker.log.*');
 
             if (empty($logFiles)) {
-                return response()->json(['message' => __('kernel.label.no_workers')]);
+                return response()->json(['message' => __('workers.label.no_workers')]);
             }
 
             $mergedFileHandle = fopen($mergedLogFile, 'a') ?: touch($mergedLogFile);
@@ -77,7 +77,7 @@ class WorkerController extends Controller
             \Log::error('Log merge error: ' . $e->getMessage());
         }
 
-        return response()->json(['message' => __('kernel.label.worker_stopped')]);
+        return response()->json(['message' => __('workers.label.worker_stopped')]);
     }
 
     // Function to generate a unique log file name

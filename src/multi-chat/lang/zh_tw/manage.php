@@ -3,6 +3,7 @@
 return [
     'route' => '管理',
     'interface.header' => '管理員管理介面',
+    //Buttons
     'button.delete' => '刪除',
     'button.update' => '更新',
     'button.create' => '建立',
@@ -17,6 +18,7 @@ return [
     'button.setup_page' => 'Kuwa快速設定',
     'button.shutdown' => '關機',
     'button.refresh' => '重新整理',
+    'button.confirm' => '確認',
 
     //Tabs
     'tab.groups' => '群組',
