@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="{{ session('last_tab') == 'kernel' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
                                     id="kernel" role="tabpanel" aria-labelledby="kernel-tab">
-                                    @include('manage.tabs.kernel')
+                                    @include('manage.tabs.kernel.home')
                                 </div>
                                 <div class="{{ session('last_tab') == 'workers' ? '' : 'hidden' }} bg-gray-50 flex flex-1 dark:bg-gray-800"
                                     id="workers" role="tabpanel" aria-labelledby="workers-tab">
