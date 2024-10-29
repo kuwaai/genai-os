@@ -92,7 +92,7 @@ class SystemController extends Controller
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
     }
 
-    public function updateWeb(Request $request)
+    public function updateProject(Request $request)
     {
         header('Content-Type: text/event-stream');
         header('Cache-Control: no-cache');
@@ -117,7 +117,7 @@ class SystemController extends Controller
             }
             $this->runCommand((stripos(PHP_OS, 'WIN') === 0 ? '' : './') . basename($scriptPath), $projectRoot);
             $workerController->startWorkers();
-            \App\Models\SystemSetting::checkUpdate(true);
+            CheckUpdate::dispatch(true);
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
             flush();
