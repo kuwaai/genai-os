@@ -7,8 +7,8 @@ use App\Models\SystemSetting;
 
 class WebConfig extends Command
 {
-    protected $signature = 'web:config {--kernel_endpoint=null : The new kernel endpoint URL} {--safety_guard_endpoint=null : The new Safety Guard endpoint URL}';
-    protected $description = 'Quickly update the kernel and Safety Guard endpoint URLs';
+    protected $signature = 'web:config {--settings= : Key-value pairs to update, formatted as key=value, separated by commas}';
+    protected $description = 'Quickly update system settings based on key-value pairs';
 
     public function __construct()
     {
@@ -19,7 +19,7 @@ class WebConfig extends Command
     {
         $settingsInput = $this->option('settings');
 
-        if (!$settingsInput) {
+        if (empty($settingsInput)) {
             $this->error("No settings provided. Use the --settings option with key-value pairs.");
             return;
         }
@@ -28,27 +28,21 @@ class WebConfig extends Command
         $settingsArray = explode(',', $settingsInput);
 
         foreach ($settingsArray as $setting) {
-            list($key, $value) = explode('=', $setting);
+            // Ensure that the setting has a key and a value
+            if (strpos($setting, '=') === false) {
+                $this->warn("Invalid setting format '$setting'. Use key=value format.");
+                continue;
+            }
+
+            list($key, $value) = explode('=', $setting, 2);
             $key = trim($key);
             $value = trim($value);
 
-            if (in_array($key, ['kernel_location', 'safety_guard_location'])) {
-                $updates[$key] = $value;
-            } else {
-                $this->warn("Invalid key '$key' provided. Allowed keys are: kernel_location, safety_guard_location.");
-            }
-        }
-
-        if (empty($updates)) {
-            $this->info("Nothing changed or no valid updates.");
-            return;
-        }
-
-        foreach ($updates as $key => $value) {
-            $setting = SystemSetting::where('key', $key)->first();
-            if ($setting) {
-                $setting->fill(['value' => $value]);
-                $setting->save();
+            // Check if the setting exists in the database
+            $existingSetting = SystemSetting::where('key', $key)->first();
+            if ($existingSetting) {
+                $existingSetting->value = $value; // Assign the new value
+                $existingSetting->save();
                 $this->info("$key updated to $value successfully.");
             } else {
                 $this->warn("Setting '$key' not found.");
