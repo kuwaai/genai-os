@@ -34,7 +34,7 @@ class AuthCheck
                 return redirect()->route('change_password');
             }
             if ($request->user()->hasPerm('tab_Manage')) {
-                Redis::throttle('check_update')->block(0)->allow(1)->every(10)->then(fn() => CheckUpdate::dispatch(), fn() => null);
+                Redis::throttle('check_update')->block(0)->allow(1)->every(300)->then(fn() => CheckUpdate::dispatch(), fn() => null);
             }
         }
 
