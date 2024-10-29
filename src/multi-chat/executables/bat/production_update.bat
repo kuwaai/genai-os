@@ -4,10 +4,10 @@ call php artisan key:generate
 call php artisan db:seed --class=InitSeeder --force
 call php artisan migrate --force
 rmdir /Q /S public\storage
-rmdir /Q /S storage/app/public/root/custom
-rmdir /Q /S storage/app/public/root/database
-rmdir /Q /S storage/app/public/root/bin
-rmdir /Q /S storage/app/public/root/bot
+rmdir /Q /S storage\app\public\root\custom
+rmdir /Q /S storage\app\public\root\database
+rmdir /Q /S storage\app\public\root\bin
+rmdir /Q /S storage\app\public\root\bot
 call php artisan storage:link
 call npm audit fix
 call npm install
