@@ -250,7 +250,7 @@
 
     function fetchModels(searchTerm) {
         const params = new URLSearchParams({
-            filter: searchTerm,
+            search: searchTerm,
             sort: 'downloads',
             limit: 10
         });
