@@ -17,30 +17,41 @@ class WebConfig extends Command
 
     public function handle()
     {
-        $kernelEndpoint = $this->option('kernel_endpoint');
-        $safetyGuardEndpoint = $this->option('safety_guard_endpoint');
+        $settingsInput = $this->option('settings');
 
-        $updates = [];
-
-        if ($kernelEndpoint !== null && $kernelEndpoint !== 'null') {
-            $updates['kernel_location'] = $kernelEndpoint;
+        if (!$settingsInput) {
+            $this->error("No settings provided. Use the --settings option with key-value pairs.");
+            return;
         }
 
-        if ($safetyGuardEndpoint !== null && $safetyGuardEndpoint !== 'null') {
-            $updates['safety_guard_location'] = $safetyGuardEndpoint;
+        $updates = [];
+        $settingsArray = explode(',', $settingsInput);
+
+        foreach ($settingsArray as $setting) {
+            list($key, $value) = explode('=', $setting);
+            $key = trim($key);
+            $value = trim($value);
+
+            if (in_array($key, ['kernel_location', 'safety_guard_location'])) {
+                $updates[$key] = $value;
+            } else {
+                $this->warn("Invalid key '$key' provided. Allowed keys are: kernel_location, safety_guard_location.");
+            }
         }
 
         if (empty($updates)) {
-            $this->info("Nothing changed");
+            $this->info("Nothing changed or no valid updates.");
             return;
         }
 
         foreach ($updates as $key => $value) {
-            $setting = SystemSetting::where('key', "$key")->first();
+            $setting = SystemSetting::where('key', $key)->first();
             if ($setting) {
-                $setting->fill(["value" => $value]);
+                $setting->fill(['value' => $value]);
                 $setting->save();
                 $this->info("$key updated to $value successfully.");
+            } else {
+                $this->warn("Setting '$key' not found.");
             }
         }
     }
