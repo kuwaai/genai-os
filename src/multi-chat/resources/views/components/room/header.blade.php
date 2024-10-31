@@ -201,7 +201,7 @@
                 "messages": chatMessages
             }, null, 4))
             //Tab Separate Values
-            var csvContent = "role	model	content	chain\n"; // Define CSV header
+            var tsvContent = "role	model	content	chain\n"; // Define CSV header
 
             $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
                 var historyId = $(element).prop("id").replace("history_", "");
@@ -221,9 +221,9 @@
                     row = `user		${msgText}	\n`;
                 }
 
-                csvContent += row; // Add row to CSV content
+                tsvContent += row; // Add row to CSV content
             });
-            $("#export_tsv").val(csvContent)
+            $("#export_tsv").val(tsvContent)
         }
     </script>
 @endif
