@@ -136,6 +136,7 @@ class SystemController extends Controller
             }
             $this->runCommand((stripos(PHP_OS, 'WIN') === 0 ? '' : './') . basename($scriptPath), $projectRoot);
             $workerController->startWorkers();
+            SystemSetting::where('key', 'cache_update_check')->update(['value' => 'no-update']);
             CheckUpdate::dispatch(true);
             echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Update completed successfully!']) . "\n\n";
             ob_flush();
