@@ -115,7 +115,7 @@
                 <div id="BotContents" class="flex flex-1 overflow-hidden px-4 mb-2">
                     <!-- System Bots Tab Content -->
                     @if (request()->user()->hasPerm('Store_read_discover_system_bots') && $system_bots->count() > 0)
-                        <div class="{{ session('last_bot_tab') ? 'hidden' : '' }} bg-gray-100 dark:bg-gray-600 flex flex-1"
+                        <div class="{{ session('last_bot_tab') ? 'hidden' : '' }} flex flex-1"
                             id="system" role="tabpanel" aria-labelledby="system-tab">
                             <x-store.bot-showcase :bots="$system_bots" :extra="'official_bots-'" />
                         </div>
@@ -123,7 +123,7 @@
 
                     <!-- Private Bots Tab Content -->
                     @if (request()->user()->hasPerm('Store_read_discover_private_bots') && $private_bots->count() > 0)
-                        <div class="{{ session('last_bot_tab') == 'private' ? '' : 'hidden' }} bg-gray-100 dark:bg-gray-600 flex flex-1"
+                        <div class="{{ session('last_bot_tab') == 'private' ? '' : 'hidden' }} flex flex-1"
                             id="private" role="tabpanel" aria-labelledby="private-tab">
                             <x-store.bot-showcase :bots="$private_bots" :extra="'my_bots-'" />
                         </div>
@@ -131,7 +131,7 @@
 
                     <!-- Group Bots Tab Content -->
                     @if (request()->user()->hasPerm('Store_read_discover_group_bots') && $group_bots->count() > 0)
-                        <div class="{{ session('last_bot_tab') == 'group' ? '' : 'hidden' }} bg-gray-100 dark:bg-gray-600 flex flex-1"
+                        <div class="{{ session('last_bot_tab') == 'group' ? '' : 'hidden' }} flex flex-1"
                             id="group" role="tabpanel" aria-labelledby="group-tab">
                             <x-store.bot-showcase :bots="$group_bots" :extra="'group_bots-'" />
                         </div>
@@ -139,7 +139,7 @@
 
                     <!-- Community Bots Tab Content -->
                     @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $community_bots->count() > 0)
-                        <div class="{{ session('last_bot_tab') == 'community' ? '' : 'hidden' }} bg-gray-100 dark:bg-gray-600 flex flex-1"
+                        <div class="{{ session('last_bot_tab') == 'community' ? '' : 'hidden' }} flex flex-1"
                             id="community" role="tabpanel" aria-labelledby="community-tab">
                             <x-store.bot-showcase :bots="$community_bots" :extra="'community_bots-'" />
                         </div>

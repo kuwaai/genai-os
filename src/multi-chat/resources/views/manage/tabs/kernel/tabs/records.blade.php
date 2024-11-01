@@ -1,4 +1,4 @@
-<div class="flex flex-1 h-full mx-auto flex-col p-2 bg-gray-600 overflow-y-auto">
+<div class="flex flex-1 h-full mx-auto flex-col p-2 overflow-y-auto">
     <div id="error-message" class="hidden text-red-500 dark:text-red-400"></div>
     <div id="loading-spinner" class="flex justify-center items-center py-8">
         <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin">

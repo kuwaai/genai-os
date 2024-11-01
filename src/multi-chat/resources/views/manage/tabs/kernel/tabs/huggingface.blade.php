@@ -1,4 +1,4 @@
-<div class="h-full p-6 bg-gray-800 rounded-lg overflow-hidden">
+<div class="h-full p-6 rounded-lg overflow-hidden">
     <!-- User Authentication Section -->
     <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md h-full flex flex-col">
         <div class="flex flex-col space-y-4" id='hf_status'>

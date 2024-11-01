@@ -304,23 +304,25 @@
     </div>
 </div>
 <script>
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
+    $('a[href^="#"]').on('click', function(e) {
+        e.preventDefault();
 
-            const targetElement = document.querySelector(this.getAttribute('href'));
-            targetElement.scrollIntoView({
-                behavior: 'smooth'
-            });
+        const targetElement = $(this.getAttribute('href'))[0]; // Get the DOM element from the jQuery object
 
-            targetElement.classList.add('bg-gray-600', 'transition', 'duration-500', 'ease-in-out',
-                'ring-2', 'ring-gray-400');
-
-            setTimeout(() => {
-                targetElement.classList.remove('bg-gray-600', 'ring-2', 'ring-gray-400');
-            }, 500);
+        // Use scrollIntoView for smooth scrolling
+        targetElement.scrollIntoView({
+            behavior: 'smooth'
         });
+
+        // Add classes for styling
+        $(targetElement).addClass('bg-gray-200 dark:bg-gray-600 transition duration-500 ease-in-out ring-2 ring-gray-400');
+
+        // Remove classes after a timeout
+        setTimeout(() => {
+            $(targetElement).removeClass('bg-gray-200 dark:bg-gray-600 ring-2 ring-gray-400');
+        }, 500);
     });
+
 
     function submitSettings(confirmed) {
         let form = $(".setting-form");
