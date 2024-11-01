@@ -203,18 +203,33 @@
                             <span
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $label }}</span>
                             <div
-                                class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
-                                    <div
-                                        class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                        <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
-                                            value="{{ $LLM->id }}" name="permissions[]"
+                                class="mt-4 pb-2 flex flex-col justicfy-center px-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                <div style="margin-top:-0.875rem;"
+                                    class="bg-gray-100 dark:bg-gray-500 pr-2 mr-auto disabled:text-gray-700 ">
+                                    <label for="edit_quickCheck_models_enabled">
+                                        <span
+                                            class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ __('manage.label.selectAll') }}
+                                        </span>
+                                        <input type="checkbox" id="edit_quickCheck_models_enabled"
+                                            onclick='$(this).closest("div").next().find("input").prop("checked",this.checked)'
                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                             style="box-shadow:none;">
-                                        <label for="create_checkbox_{{ $LLM->id }}"
-                                            class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
-                                    </div>
-                                @endforeach
+                                    </label>
+                                </div>
+                                <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+                                    @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
+                                        <div
+                                            class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                            <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
+                                                value="{{ $LLM->id }}" name="permissions[]"
+                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                                style="box-shadow:none;">
+                                            <label for="create_checkbox_{{ $LLM->id }}"
+                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -391,18 +406,33 @@
                             <span
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $label }}</span>
                             <div
-                                class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
-                                    <div
-                                        class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                        <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
-                                            value="{{ $LLM->id }}" name="permissions[]"
+                                class="mt-4 pb-2 flex flex-col justicfy-center px-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                <div style="margin-top:-0.875rem;"
+                                    class="bg-gray-100 dark:bg-gray-500 pr-2 mr-auto disabled:text-gray-700 ">
+                                    <label for="edit_quickCheck_models_enabled">
+                                        <span
+                                            class="w-full my-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ __('manage.label.selectAll') }}
+                                        </span>
+                                        <input type="checkbox" id="edit_quickCheck_models_enabled"
+                                            onclick='$(this).closest("div").next().find("input").prop("checked",this.checked)'
                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
                                             style="box-shadow:none;">
-                                        <label for="edit_checkbox_{{ $LLM->id }}"
-                                            class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
-                                    </div>
-                                @endforeach
+                                    </label>
+                                </div>
+                                <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+                                    @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
+                                        <div
+                                            class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                            <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
+                                                value="{{ $LLM->id }}" name="permissions[]"
+                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                                style="box-shadow:none;">
+                                            <label for="edit_checkbox_{{ $LLM->id }}"
+                                                class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         @endforeach
                     </div>

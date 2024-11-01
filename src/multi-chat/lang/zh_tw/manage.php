@@ -35,6 +35,7 @@ return [
     'label.invite_code' => '邀請碼',
     'label.group_name' => '名稱',
     'label.invite_code' => '邀請碼',
+    'label.selectAll' => '全選',
     'placeholder.invite_code' => '邀請碼',
     'label.describe' => '介紹',
     'placeholder.group_name' => '群組名稱',
