@@ -80,7 +80,7 @@
                 <div class="w-full">
                     <ul class="flex w-full text-sm font-medium text-center" data-tabs-toggle="#BotContents"
                         role="tablist">
-                        @if (request()->user()->hasPerm('Store_read_discover_system_bots') && $system_bots->count() > 0)
+                        @if (request()->user()->hasPerm('Store_read_discover_system_bots'))
                             <li class="flex-1" role="presentation">
                                 <button class="w-full p-4 text-gray-700 dark:text-gray-200 bg-transparent"
                                     id="system-tab" data-tabs-target="#system" type="button" role="tab"
@@ -90,7 +90,7 @@
                                 </button>
                             </li>
                         @endif
-                        @if (request()->user()->hasPerm('Store_read_discover_private_bots') && $private_bots->count() > 0)
+                        @if (request()->user()->hasPerm('Store_read_discover_private_bots'))
                             <li class="flex-1" role="presentation">
                                 <button class="w-full p-4 text-gray-700 dark:text-gray-200 bg-transparent"
                                     id="private-tab" data-tabs-target="#private" type="button" role="tab"
@@ -100,7 +100,7 @@
                                 </button>
                             </li>
                         @endif
-                        @if (request()->user()->hasPerm('Store_read_discover_group_bots') && $group_bots->count() > 0)
+                        @if (request()->user()->hasPerm('Store_read_discover_group_bots'))
                             <li class="flex-1" role="presentation">
                                 <button class="w-full p-4 text-gray-700 dark:text-gray-200 bg-transparent"
                                     id="group-tab" data-tabs-target="#group" type="button" role="tab"
@@ -110,7 +110,7 @@
                                 </button>
                             </li>
                         @endif
-                        @if (request()->user()->hasPerm('Store_read_discover_community_bots') && $community_bots->count() > 0)
+                        @if (request()->user()->hasPerm('Store_read_discover_community_bots'))
                             <li class="flex-1" role="presentation">
                                 <button class="w-full p-4 text-gray-700 dark:text-gray-200 bg-transparent"
                                     id="community-tab" data-tabs-target="#community" type="button" role="tab"
@@ -129,7 +129,7 @@
                         <div class="{{ session('last_bot_tab') ? 'hidden' : '' }} flex flex-1" id="system"
                             role="tabpanel" aria-labelledby="system-tab">
                             @if ($system_bots->count() > 0)
-                            <x-store.bot-showcase :bots="$system_bots" :extra="'official_bots-'" />
+                                <x-store.bot-showcase :bots="$system_bots" :extra="'official_bots-'" />
                             @endif
                         </div>
                     @endif
@@ -138,8 +138,8 @@
                     @if (request()->user()->hasPerm('Store_read_discover_private_bots'))
                         <div class="{{ session('last_bot_tab') == 'private' ? '' : 'hidden' }} flex flex-1"
                             id="private" role="tabpanel" aria-labelledby="private-tab">
-                            @if($private_bots->count() > 0)
-                            <x-store.bot-showcase :bots="$private_bots" :extra="'my_bots-'" />
+                            @if ($private_bots->count() > 0)
+                                <x-store.bot-showcase :bots="$private_bots" :extra="'my_bots-'" />
                             @endif
                         </div>
                     @endif
@@ -148,8 +148,8 @@
                     @if (request()->user()->hasPerm('Store_read_discover_group_bots'))
                         <div class="{{ session('last_bot_tab') == 'group' ? '' : 'hidden' }} flex flex-1"
                             id="group" role="tabpanel" aria-labelledby="group-tab">
-                            @if($group_bots->count() > 0)
-                            <x-store.bot-showcase :bots="$group_bots" :extra="'group_bots-'" />
+                            @if ($group_bots->count() > 0)
+                                <x-store.bot-showcase :bots="$group_bots" :extra="'group_bots-'" />
                             @endif
                         </div>
                     @endif
@@ -158,8 +158,8 @@
                     @if (request()->user()->hasPerm('Store_read_discover_community_bots'))
                         <div class="{{ session('last_bot_tab') == 'community' ? '' : 'hidden' }} flex flex-1"
                             id="community" role="tabpanel" aria-labelledby="community-tab">
-                            @if($community_bots->count() > 0)
-                            <x-store.bot-showcase :bots="$community_bots" :extra="'community_bots-'" />
+                            @if ($community_bots->count() > 0)
+                                <x-store.bot-showcase :bots="$community_bots" :extra="'community_bots-'" />
                             @endif
                         </div>
                     @endif
