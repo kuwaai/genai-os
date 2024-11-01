@@ -87,17 +87,15 @@
                 class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-auto overflow-y-auto scrollbar">
                 @foreach ($bots as $bot)
                     <x-sorted-list.item html_tag="form" :$sorting_methods :record="$bot" method="post"
-                        class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
+                        class="text-black dark:text-white h-[110px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
                         action="{{ route('room.new') }}">
                         @csrf
                         <button class="h-full w-full flex flex-col items-center justify-start">
-                            <img class="rounded-full mx-auto bg-black" width="50px" height="50px"
-                                src="{{ $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                            <div class="relative w-[50px] h-[50px]">
+                                <img class="rounded-full mx-auto bg-black w-full h-full overflow-hidden"
+                                    src="{{ $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                            </div>
                             <p class="text-sm line-clamp-2">{{ $bot->name }}</p>
-                            @if ($bot->description)
-                                <p class="text-gray-500 dark:text-gray-300 line-clamp-1 max-w-full text-xs">
-                                    {{ $bot->description }}</p>
-                            @endif
                             <input name="llm[]" value="{{ $bot->id }}" style="display:none;">
                         </button>
                     </x-sorted-list.item>
