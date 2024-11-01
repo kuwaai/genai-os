@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\RedisController;
 use App\Http\Controllers\WorkerController;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -27,7 +26,7 @@ class SystemController extends Controller
         if ($request && $request->input('forced')) {
             CheckUpdate::dispatch(true);
         }
-        
+
         return SystemSetting::where('key', 'cache_update_check')->select('value', 'updated_at')->get()->first()->toarray();
     }
 
@@ -85,27 +84,27 @@ class SystemController extends Controller
     {
         foreach (['usertask_', 'api_'] as $prefix) {
             foreach (Redis::keys("{$prefix}*") as $key) {
-                $cleanKey = RedisController::cleanRedisKey($key, $prefix);
+                $cleanKey = WorkerController::cleanRedisKey($key, $prefix);
                 Redis::del($cleanKey);
             }
         }
 
         return Redirect::route('manage.home')->with('last_tab', 'settings')->with('last_action', 'resetRedis')->with('status', 'success');
     }
-    
+
     public function updateProject(Request $request)
     {
         header('Content-Type: text/event-stream');
         header('Cache-Control: no-cache');
-    
+
         try {
             $updateScript = base_path('app/Console/update-project.php');
-    
+
             if (File::exists($updateScript)) {
                 $process = new Process(['php', $updateScript]);
                 $process->setTimeout(null);
                 $process->start();
-    
+
                 foreach ($process as $type => $data) {
                     if ($process::OUT === $type) {
                         echo 'data: ' . json_encode(['status' => 'success', 'output' => $data]) . "\n\n";
