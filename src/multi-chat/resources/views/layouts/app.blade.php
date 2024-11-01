@@ -202,7 +202,7 @@
     <script id="remove-once" type="text/javascript">
         const client = new KuwaClient("{{ Auth::user()->tokens()->where('name', 'API_Token')->first()->token ?? '' }}",
             "{{ url('/') }}");
-            
+
         $(document).ready(function() {
             $('#remove-once').remove();
         });
@@ -389,6 +389,28 @@
                 });
             });
         @endif
+
+        function chatroom_filter(filter, container) {
+            container.find('> div').toggle(!filter);
+
+            if (filter) {
+                container.find('> div').each(function() {
+                    const group = $(this);
+                    const match = group.find('>form >button > div, > div > div > a > p')
+                        .filter((_, chat) => $(chat).text().toLowerCase().trim().includes(filter.toLowerCase()))
+                        .length > 0;
+                    group.toggle(match);
+                });
+            }
+        }
+
+        function search_chat(filter, container) {
+            container.find('>div:last() >div').each(function() {
+                $(this).toggle(!filter || $(this).find('a > p').text().toLowerCase().includes(filter
+            .toLowerCase()));
+            });
+        }
+
 
         function markdown(node) {
             $(node).html(marked.parse(DOMPurify.sanitize(node[0], {
