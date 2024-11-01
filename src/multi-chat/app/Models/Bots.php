@@ -17,18 +17,17 @@ class Bots extends Model
 
     static function getBots($group_id, $enabled = true)
     {
-        return DB::table(function ($query) use ($group_id) {
-            $query->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')->from('group_permissions')->join('permissions', 'perm_id', '=', 'permissions.id')->where('group_id', $group_id)->where('name', 'like', 'model_%')->get();
-        }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-            ->select('tmp.*', 'llms.*')
-            ->where('llms.enabled', $enabled)
-            ->orderby('llms.order')
-            ->orderby('llms.created_at')
+        return self::Join('llms', function ($join) {
+            $join->on('llms.id', '=', 'bots.model_id');
+        })
+            ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
+            ->wherein('bots.model_id', DB::table('group_permissions')->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')->where('group_permissions.group_id', $group_id)->where('permissions.name', 'like', 'model_%')->get()->pluck('model_id'))
+            ->where('llms.enabled', '=', $enabled)
+            ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), 'bots.image as image', 'llms.image as base_image', 'llms.name as llm_name', 'users.group_id')
             ->get();
     }
 
-    static function getBotIdName($enabled=true)
+    static function getBotIdName($enabled = true)
     {
         return DB::table(function ($query) {
             $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');

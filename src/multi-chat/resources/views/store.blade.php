@@ -4,33 +4,8 @@
             class="flex flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-lg overflow-y-auto scrollbar text-gray-700 dark:text-white">
 
             @php
-                $result = App\Models\Bots::getBots(Auth()->user()->group_id);
-                $bots = App\Models\Bots::Join('llms', function ($join) {
-                    $join->on('llms.id', '=', 'bots.model_id');
-                })
-                    ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
-                    ->wherein(
-                        'bots.model_id',
-                        DB::table('group_permissions')
-                            ->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')
-                            ->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')
-                            ->where('group_permissions.group_id', Auth::user()->group_id)
-                            ->where('permissions.name', 'like', 'model_%')
-                            ->get()
-                            ->pluck('model_id'),
-                    )
-                    ->where('llms.enabled', '=', true)
-                    ->select(
-                        'llms.*',
-                        'bots.*',
-                        DB::raw('COALESCE(bots.description, llms.description) as description'),
-                        DB::raw('COALESCE(bots.config, llms.config) as config'),
-                        'bots.image as image',
-                        'llms.image as base_image',
-                        'llms.name as llm_name',
-                        'users.group_id',
-                    )
-                    ->get();
+                $result = App\Models\LLMs::getLLMs(Auth()->user()->group_id);
+                $bots = App\Models\Bots::getBots(Auth()->user()->group_id);
                 if (!request()->user()->hasPerm('Store_read_any_modelfile')) {
                     $bots = $bots->map(function ($item) {
                         if ($item->owner_id != Auth::user()->id) {
@@ -39,27 +14,6 @@
                         return $item;
                     });
                 }
-            @endphp
-            @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
-                <x-store.modal.create-bot :result="$result" />
-            @endif
-            <x-store.modal.bot-detail :result="$result" />
-            @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
-                <div class="create-bot-btn pt-4 my-2 mx-auto w-[150px] h-[50px] flex" data-modal-target="create-bot-modal"
-                    data-modal-toggle="create-bot-modal">
-                    <button
-                        class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-300 transition duration-300 rounded-l-lg overflow-hidden">
-                        <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
-                    </button>
-                    <label for="upload_bot_modelfile"
-                        class="bg-green-500 hover:bg-green-600 h-12 text-white font-bold py-3 px-4 rounded-r-lg  flex items-center justify-center transition duration-300">
-                        <i class="fas fa-file-import"></i>
-                    </label>
-                    <input type="file" accept=".bot" class="hidden" id="upload_bot_modelfile"
-                        onchange="importBot($(this)[0].files)" />
-                </div>
-            @endif
-            @php
                 function sortBots($bots)
                 {
                     $userId = request()->user()->id;
@@ -90,6 +44,27 @@
                     // Merge the sorted user bots with the randomized other bots
                     return $userBots->merge($otherBots)->values();
                 }
+            @endphp
+            @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
+                <x-store.modal.create-bot :result="$result" />
+            @endif
+            <x-store.modal.bot-detail :result="$result" />
+            @if (request()->user()->hasPerm(['tab_Manage', 'Store_create_community_bot', 'Store_create_group_bot', 'Store_create_private_bot']))
+                <div class="create-bot-btn pt-4 my-2 mx-auto w-[150px] h-[50px] flex" data-modal-target="create-bot-modal"
+                    data-modal-toggle="create-bot-modal">
+                    <button
+                        class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-700 border border-green-500 border-1 hover:bg-gray-300 transition duration-300 rounded-l-lg overflow-hidden">
+                        <p class="flex-1 text-center text-green-500">{{ __('store.button.create') }}</p>
+                    </button>
+                    <label for="upload_bot_modelfile"
+                        class="bg-green-500 hover:bg-green-600 h-12 text-white font-bold py-3 px-4 rounded-r-lg  flex items-center justify-center transition duration-300">
+                        <i class="fas fa-file-import"></i>
+                    </label>
+                    <input type="file" accept=".bot" class="hidden" id="upload_bot_modelfile"
+                        onchange="importBot($(this)[0].files)" />
+                </div>
+            @endif
+            @php
                 $system_bots = sortBots($bots->where('visibility', '=', 0));
                 $community_bots = sortBots($bots->where('visibility', '=', 1));
                 $group_bots = $bots->where('visibility', '=', 2);

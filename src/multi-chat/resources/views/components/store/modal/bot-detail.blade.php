@@ -41,12 +41,11 @@
                 </button>
             </div>
             <!-- Modal body -->
-            <form method="post" action="{{ route('store.update') }}" class="p-6" id="update_bot" enctype="multipart/form-data"
-                onsubmit="return checkUpdateBotForm()">
+            <form method="post" action="{{ route('store.update') }}" class="p-6" id="update_bot"
+                enctype="multipart/form-data" onsubmit="return checkUpdateBotForm()">
                 @csrf
                 @method('patch')
                 <input name="id" hidden>
-                <input name='last_bot_tab' hidden>
                 <ul class="flex flex-wrap flex-col -mx-3 mb-2 items-center">
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full md:w-1/3 mb-2">
@@ -57,8 +56,9 @@
                                             <img id="llm_img2" class="rounded-full m-auto bg-black" width="50px"
                                                 height="50px">
                                         </label>
-                                        <input id="update-bot_image" name="bot_image" onchange="change_bot_image('#llm_img2', '#update-bot_image')"
-                                               type="file" accept="image/*" style="display:none">
+                                        <input id="update-bot_image" name="bot_image"
+                                            onchange="change_bot_image('#llm_img2', '#update-bot_image')" type="file"
+                                            accept="image/*" style="display:none">
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +83,9 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 0 ? $('#visibility2').text('" . __('store.button.system') . "') : 1",
+                                                        "this.value == 0 ? $('#visibility2').text('" .
+                                                        __('store.button.system') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                                 [
@@ -93,7 +95,9 @@
                                                     'value' => '1',
                                                     'checked' => true,
                                                     'onchange' =>
-                                                        "this.value == 1 ?$('#visibility2').text('" . __('store.button.community') . "') : 1",
+                                                        "this.value == 1 ?$('#visibility2').text('" .
+                                                        __('store.button.community') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                                 [
@@ -107,7 +111,9 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 2 ? $('#visibility2').text('" . __('store.button.groups') . "') : 1",
+                                                        "this.value == 2 ? $('#visibility2').text('" .
+                                                        __('store.button.groups') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                                 [
@@ -121,7 +127,9 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 3 ? $('#visibility2').text('" . __('store.button.private') . "') : 1",
+                                                        "this.value == 3 ? $('#visibility2').text('" .
+                                                        __('store.button.private') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                             ];
@@ -172,11 +180,12 @@
                                     for="llm_name2">
                                     {{ __('store.bot.base_model') }}
                                 </label>
-                                <input id="llm_name2" type="text" list="llm-list" name="llm_name" autocomplete="off"
+                                <input id="llm_name2" type="text" list="llm-list" name="llm_name"
+                                    autocomplete="off"
                                     oninput="change_bot_image('#llm_img2', '#update-bot_image', $(this).val())"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="{{ __('store.bot.base_model.label') }}">
-                                    @once
+                                @once
                                     <datalist id="llm-list">
                                         @foreach ($result as $LLM)
                                             <option
@@ -231,8 +240,7 @@
                         @endif
                         <button type="button" id="export_bot"
                             class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
-                            onclick="exportBot()"
-                        >
+                            onclick="exportBot()">
                             {{ __('manage.button.export') }}
                         </button>
                         @if (request()->user()->hasPerm('Store_delete_delete_bot'))
@@ -245,8 +253,8 @@
                     </div>
                 </ul>
                 <input name="referer" value="{{ url()->current() }}" hidden>
-                @foreach(session('llms') ?? [] as $bot_id)
-                <input name="selected_bots[]" value="{{ $bot_id }}" hidden>
+                @foreach (session('llms') ?? [] as $bot_id)
+                    <input name="selected_bots[]" value="{{ $bot_id }}" hidden>
                 @endforeach
             </form>
         </div>
@@ -329,7 +337,7 @@
         </div>
     </div>
 </div>
-<script> 
+<script>
     function detail_update(data, readonly) {
         $("#save_bot").hide()
         $("#delete_bot").hide()
@@ -416,20 +424,18 @@
         return false;
     }
 
-    function saveTextAsFile(textToWrite, fileNameToSaveAs)
-    {
-        var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'}); 
+    function saveTextAsFile(textToWrite, fileNameToSaveAs) {
+        var textFileAsBlob = new Blob([textToWrite], {
+            type: 'text/plain'
+        });
         var downloadLink = document.createElement("a");
         downloadLink.download = fileNameToSaveAs;
         downloadLink.innerHTML = "Download File";
-        if (window.webkitURL != null)
-        {
+        if (window.webkitURL != null) {
             // Chrome allows the link to be clicked
             // without actually adding it to the DOM.
             downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
-        }
-        else
-        {
+        } else {
             // Firefox requires the link to be added to the DOM
             // before it can be clicked.
             downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
@@ -440,16 +446,30 @@
 
         downloadLink.click();
     }
+
     function formatDate() {
         const date = new Date();
 
-        const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' });
-        const day = date.toLocaleString('en-US', { day: '2-digit' });
-        const month = date.toLocaleString('en-US', { month: 'short' });
+        const dayOfWeek = date.toLocaleString('en-US', {
+            weekday: 'short'
+        });
+        const day = date.toLocaleString('en-US', {
+            day: '2-digit'
+        });
+        const month = date.toLocaleString('en-US', {
+            month: 'short'
+        });
         const year = date.getFullYear();
-        const hours = date.toLocaleString('en-US', { hour: '2-digit', hour12: false });
-        const minutes = date.toLocaleString('en-US', { minute: '2-digit' });
-        const seconds = date.toLocaleString('en-US', { second: '2-digit' });
+        const hours = date.toLocaleString('en-US', {
+            hour: '2-digit',
+            hour12: false
+        });
+        const minutes = date.toLocaleString('en-US', {
+            minute: '2-digit'
+        });
+        const seconds = date.toLocaleString('en-US', {
+            second: '2-digit'
+        });
 
         // Get timezone offset in hours and minutes
         const timezoneOffset = -date.getTimezoneOffset();
@@ -466,20 +486,22 @@
         const blob = await response.blob();
         return new Promise((onSuccess, onError) => {
             try {
-            const reader = new FileReader() ;
-            reader.onload = function(){ onSuccess(this.result) } ;
-            reader.readAsDataURL(blob) ;
-            } catch(e) {
-            onError(e);
+                const reader = new FileReader();
+                reader.onload = function() {
+                    onSuccess(this.result)
+                };
+                reader.readAsDataURL(blob);
+            } catch (e) {
+                onError(e);
             }
         });
     }
 
-    async function exportBot(){
+    async function exportBot() {
         let name = $("#bot_name2").val();
-        let description = $("#bot_describe2").val() ;
+        let description = $("#bot_describe2").val();
         let base_name = $("#llm_name2").val();
-        let base = $(`#llm-list option[value='${base_name}']`).data('access-code') 
+        let base = $(`#llm-list option[value='${base_name}']`).data('access-code')
         let modelfile = ace.edit('modelfile-editor').getValue();
         let follow_base_bot = $("#detail-modal img").data("follow-base-bot");
 
@@ -488,12 +510,12 @@
         modelfile = modelfile.replace(new RegExp(`^${prefix}.*`, "gm"), '');
         modelfile = modelfile.replace(new RegExp(`^${shebang}.*`), '');
         modelfile = `${shebang}\n` + `${prefix} version 0.3.3\n` +
-                    (name ? `${prefix} name "${name}"\n` : "") + 
-                    (description ? `${prefix} description "${description}"\n` : "") + 
-                    (base ? `${prefix} base "${base}"\n` : "") + 
-                    modelfile
+            (name ? `${prefix} name "${name}"\n` : "") +
+            (description ? `${prefix} description "${description}"\n` : "") +
+            (base ? `${prefix} base "${base}"\n` : "") +
+            modelfile
 
-        let boundary= "kuwa"+(Math.random() + 1).toString(36).slice(-5);
+        let boundary = "kuwa" + (Math.random() + 1).toString(36).slice(-5);
         let botfile = [
             `Subject: Exported bot "${encodeURIComponent(name)}"`,
             `Date: ${formatDate()}`,
@@ -522,7 +544,7 @@
             );
         }
         botfile.push(`--${boundary}--`);
-                    
+
         saveTextAsFile(botfile.join('\r\n'), `bot-${name.replace(/\s+/g, '_')}.bot`);
     }
 
@@ -546,25 +568,26 @@
         editor.setTheme("ace/theme/monokai");
     }
     @once
+
     function change_bot_image(bot_image_elem, user_upload_elem, new_base_bot_name) {
-            /**
-             * Dynamically updates the bot's displayed image based on user interaction.
-             *
-             * Image selection priority:
-             * 1. User-uploaded image (highest)
-             * 2. Base bot image (if the bot image hasn't been changed)
-             * 3. Original image (lowest)
-             */
-            const [user_uploaded_image] = $(user_upload_elem)[0].files;
-            const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
-            let bot_image_uri = $(bot_image_elem).attr("src");
-            if (user_uploaded_image) {
-                bot_image_uri = URL.createObjectURL(user_uploaded_image);
-            } else if (follow_base_bot && new_base_bot_name) {
-                const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
-                bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
-            }
-            $(bot_image_elem).attr("src", bot_image_uri);
+        /**
+         * Dynamically updates the bot's displayed image based on user interaction.
+         *
+         * Image selection priority:
+         * 1. User-uploaded image (highest)
+         * 2. Base bot image (if the bot image hasn't been changed)
+         * 3. Original image (lowest)
+         */
+        const [user_uploaded_image] = $(user_upload_elem)[0].files;
+        const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
+        let bot_image_uri = $(bot_image_elem).attr("src");
+        if (user_uploaded_image) {
+            bot_image_uri = URL.createObjectURL(user_uploaded_image);
+        } else if (follow_base_bot && new_base_bot_name) {
+            const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
+            bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
         }
+        $(bot_image_elem).attr("src", bot_image_uri);
+    }
     @endonce
 </script>

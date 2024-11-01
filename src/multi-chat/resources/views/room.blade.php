@@ -2,7 +2,7 @@
     @php
         $bots = App\Models\Bots::getSortedBots();
         $sorting_methods = App\Models\Bots::getBotSortingMethods();
-        $result = App\Models\Bots::getBots(Auth()->user()->group_id);
+        $result = App\Models\LLMs::getLLMs(Auth()->user()->group_id);
     @endphp
     @env('arena')
     @php
