@@ -19,4 +19,5 @@ return [
     'sort_by.name' => '按名稱排序 (a-z)',
     'sort_by.name_desc' => '按名稱排序 (z-a)',
     'sort_by.model' => '按模型順序排序',
+    'label.search_chat'=>'搜尋聊天室',
 ];
