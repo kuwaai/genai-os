@@ -2,21 +2,7 @@
     @php
         $bots = App\Models\Bots::getSortedBots();
         $sorting_methods = App\Models\Bots::getBotSortingMethods();
-        $result = DB::table(function ($query) {
-            $query
-                ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                ->from('group_permissions')
-                ->join('permissions', 'perm_id', '=', 'permissions.id')
-                ->where('group_id', Auth()->user()->group_id)
-                ->where('name', 'like', 'model_%')
-                ->get();
-        }, 'tmp')
-            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-            ->select('tmp.*', 'llms.*')
-            ->where('llms.enabled', true)
-            ->orderby('llms.order')
-            ->orderby('llms.created_at')
-            ->get();
+        $result = App\Models\Bots::getBots(Auth()->user()->group_id);
     @endphp
     @env('arena')
     @php
@@ -43,34 +29,7 @@
             @endif
         @endif
         @php
-            $DC = App\Models\ChatRoom::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')
-                ->where('chats.user_id', Auth::user()->id)
-                ->select('chatrooms.*', DB::raw('count(chats.id) as counts'))
-                ->groupBy('chatrooms.id');
-
-            // Fetch the ordered identifiers based on `bot_id` for each database
-            $DC = $DC->selectSub(function ($query) {
-                if (config('database.default') == 'sqlite') {
-                    $query
-                        ->from('chats')
-                        ->selectRaw("group_concat(bot_id, ',') as identifier")
-                        ->whereColumn('roomID', 'chatrooms.id')
-                        ->orderByRaw('bot_id');
-                } elseif (config('database.default') == 'mysql') {
-                    $query
-                        ->from('chats')
-                        ->selectRaw('group_concat(bot_id separator \',\' order by bot_id) as identifier')
-                        ->whereColumn('roomID', 'chatrooms.id');
-                } elseif (config('database.default') == 'pgsql') {
-                    $query
-                        ->from('chats')
-                        ->selectRaw('string_agg(bot_id::text, \',\' order by bot_id) as identifier')
-                        ->whereColumn('roomID', 'chatrooms.id');
-                }
-            }, 'identifier');
-
-            // Get the final result and group by the ordered identifiers
-            $DC = $DC->get()->groupBy('identifier');
+            $DC = App\Models\ChatRoom::getChatRoomsWithIdentifiers(Auth::user()->id);
 
             try {
                 if (!session('llms')) {
@@ -78,62 +37,13 @@
                         ->where('id', '=', request()->route('room_id'))
                         ->first()['identifier'];
                     $DC = $DC[$identifier];
-                    $llms = App\Models\Bots::whereIn('bots.id', array_map('intval', explode(',', $identifier)))
-                        ->join('llms', function ($join) {
-                            $join->on('llms.id', '=', 'bots.model_id');
-                        })
-                        ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
-                        ->where('llms.enabled', '=', true)
-                        ->select(
-                            'llms.*',
-                            'bots.*',
-                            DB::raw('COALESCE(bots.description, llms.description) as description'),
-                            DB::raw('COALESCE(bots.config, llms.config) as config'),
-                            'bots.image as image',
-                            'llms.image as base_image',
-                            'llms.name as llm_name',
-                            'users.group_id',
-                        )
-                        ->orderby('bots.id')
-                        ->get();
+                    $llms = App\Models\Bots::getBotsFromIds(explode(',', $identifier));
                 } else {
-                    $llms = App\Models\Bots::whereIn('bots.id', session('llms'))
-                        ->Join('llms', function ($join) {
-                            $join->on('llms.id', '=', 'bots.model_id');
-                        })
-                        ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
-                        ->select(
-                            'llms.*',
-                            'bots.*',
-                            DB::raw('COALESCE(bots.description, llms.description) as description'),
-                            DB::raw('COALESCE(bots.config, llms.config) as config'),
-                            'bots.image as image',
-                            'llms.image as base_image',
-                            'llms.name as llm_name',
-                            'users.group_id',
-                        )
-                        ->orderby('bots.id')
-                        ->get();
+                    $llms = App\Models\Bots::getBotsFromIds(session('llms'));
                     $DC = $DC[implode(',', $llms->pluck('id')->toArray())];
                 }
             } catch (Exception $e) {
-                $llms = App\Models\Bots::whereIn('bots.id', session('llms'))
-                    ->Join('llms', function ($join) {
-                        $join->on('llms.id', '=', 'bots.model_id');
-                    })
-                    ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
-                    ->select(
-                        'llms.*',
-                        'bots.*',
-                        DB::raw('COALESCE(bots.description, llms.description) as description'),
-                        DB::raw('COALESCE(bots.config, llms.config) as config'),
-                        'bots.image as image',
-                        'llms.image as base_image',
-                        'llms.name as llm_name',
-                        'users.group_id',
-                    )
-                    ->orderby('bots.id')
-                    ->get();
+                $llms = App\Models\Bots::getBotsFromIds(session('llms'));
                 $DC = null;
             }
         @endphp
@@ -257,88 +167,10 @@
                     @if (!session('llms'))
                         @php
                             $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-
-                            $roomId = request()->route('room_id');
-
-                            $roomId = Illuminate\Support\Facades\Request::route('room_id');
-
-                            $botChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
-                                ->leftJoin('feedback', 'history_id', '=', 'histories.id')
-                                ->join('bots', 'bots.id', '=', 'chats.bot_id')
-                                ->Join('llms', function ($join) {
-                                    $join->on('llms.id', '=', 'bots.model_id');
-                                })
-                                ->where('isbot', true)
-                                ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
-                                ->select(
-                                    'histories.chained as chained',
-                                    'chats.id as chat_id',
-                                    'histories.id as id',
-                                    'chats.bot_id as bot_id',
-                                    'histories.created_at as created_at',
-                                    'histories.msg as msg',
-                                    'histories.isbot as isbot',
-                                    DB::raw('COALESCE(bots.description, llms.description) as description'),
-                                    DB::raw('COALESCE(bots.config, llms.config) as config'),
-                                    DB::raw('COALESCE(bots.image, llms.image) as image'),
-                                    DB::raw('COALESCE(bots.name, llms.name) as name'),
-                                    'feedback.nice',
-                                    'feedback.detail',
-                                    'feedback.flags',
-                                    'access_code',
-                                );
-
-                            $nonBotChats = App\Models\Chats::join('histories', 'chats.id', '=', 'histories.chat_id')
-                                ->leftjoin('bots', 'bots.id', '=', 'chats.bot_id')
-                                ->Join('llms', function ($join) {
-                                    $join->on('llms.id', '=', 'bots.model_id');
-                                })
-                                ->where('isbot', false)
-                                ->whereIn('chats.id', App\Models\Chats::where('roomID', $roomId)->pluck('id'))
-                                ->select(
-                                    'histories.chained as chained',
-                                    'chats.id as chat_id',
-                                    'histories.id as id',
-                                    'chats.bot_id as bot_id',
-                                    'histories.created_at as created_at',
-                                    'histories.msg as msg',
-                                    'histories.isbot as isbot',
-                                    DB::raw('COALESCE(bots.description, llms.description) as description'),
-                                    DB::raw('COALESCE(bots.config, llms.config) as config'),
-                                    DB::raw('COALESCE(bots.image, llms.image) as image'),
-                                    DB::raw('COALESCE(bots.name, llms.name) as name'),
-                                    DB::raw('NULL as nice'),
-                                    DB::raw('NULL as detail'),
-                                    DB::raw('NULL as flags'),
-                                    'access_code',
-                                );
-
-                            $mergedChats = $botChats
-                                ->union($nonBotChats)
-                                ->get()
-                                ->sortBy(function ($chat) {
-                                    return [$chat->created_at, $chat->id, $chat->bot_id, -$chat->history_id];
-                                });
-                            $mergedMessages = [];
-                            // Filter and merge the chats based on the condition
-                            $filteredChats = $mergedChats->filter(function ($chat) use (&$mergedMessages) {
-                                if (!$chat->isbot && !in_array($chat->msg, $mergedMessages)) {
-                                    // Add the message to the merged messages array
-                                    $mergedMessages[] = $chat->msg;
-                                    return true; // Keep this chat in the final result
-                                } elseif ($chat->isbot) {
-                                    $mergedMessages = [];
-                                    return true; // Keep bot chats in the final result
-                                }
-                                return false; // Exclude duplicate non-bot chats
-                            });
-
-                            // Sort the filtered chats
-                            $mergedChats = $filteredChats->sortBy(function ($chat) {
-                                return [$chat->created_at, $chat->bot_id, -$chat->id];
-                            });
-                            $refers = $mergedChats->where('isbot', '=', true);
+                            $mergedChats = \App\Models\Chatroom::getMergedChats(request()->route('room_id'));
+                            $refers = $mergedChats->where('isbot', true);
                         @endphp
+
                         @env('arena')
                         @php
                             $output = collect();

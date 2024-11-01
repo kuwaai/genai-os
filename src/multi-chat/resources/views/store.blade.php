@@ -4,21 +4,7 @@
             class="flex flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-lg overflow-y-auto scrollbar text-gray-700 dark:text-white">
 
             @php
-                $result = DB::table(function ($query) {
-                    $query
-                        ->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')
-                        ->from('group_permissions')
-                        ->join('permissions', 'perm_id', '=', 'permissions.id')
-                        ->where('group_id', Auth()->user()->group_id)
-                        ->where('name', 'like', 'model_%')
-                        ->get();
-                }, 'tmp')
-                    ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
-                    ->select('tmp.*', 'llms.*')
-                    ->where('llms.enabled', true)
-                    ->orderby('llms.order')
-                    ->orderby('llms.created_at')
-                    ->get();
+                $result = App\Models\Bots::getBots(Auth()->user()->group_id);
                 $bots = App\Models\Bots::Join('llms', function ($join) {
                     $join->on('llms.id', '=', 'bots.model_id');
                 })

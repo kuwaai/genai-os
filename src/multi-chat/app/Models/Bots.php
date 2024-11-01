@@ -15,6 +15,43 @@ class Bots extends Model
     protected $table = 'bots';
     protected $fillable = ['image', 'name', 'type', 'visibility', 'model_id', 'owner_id', 'description', 'config'];
 
+    static function getBots($group_id, $enabled = true)
+    {
+        return DB::table(function ($query) use ($group_id) {
+            $query->select(DB::raw('substring(name, 7) as model_id'), 'perm_id')->from('group_permissions')->join('permissions', 'perm_id', '=', 'permissions.id')->where('group_id', $group_id)->where('name', 'like', 'model_%')->get();
+        }, 'tmp')
+            ->join('llms', 'llms.id', '=', DB::raw('CAST(tmp.model_id AS BIGINT)'))
+            ->select('tmp.*', 'llms.*')
+            ->where('llms.enabled', $enabled)
+            ->orderby('llms.order')
+            ->orderby('llms.created_at')
+            ->get();
+    }
+
+    static function getBotIdName($enabled=true)
+    {
+        return DB::table(function ($query) {
+            $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
+        }, 'p')
+            ->join('llms', DB::raw('CAST(llms.id AS ' . (config('database.default') == 'mysql' ? 'CHAR' : 'TEXT') . ')'), '=', 'p.model_id')
+            ->where('enabled', '=', $enabled)
+            ->select('p.id as id', 'llms.name as name')
+            ->orderby('created_at', 'desc')
+            ->get();
+    }
+
+    static function getBotsFromIds($ids)
+    {
+        return Bots::whereIn('bots.id', array_map('intval', $ids))
+            ->join('llms', function ($join) {
+                $join->on('llms.id', '=', 'bots.model_id');
+            })
+            ->leftJoin('users', 'users.id', '=', 'bots.owner_id')
+            ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), 'bots.image as image', 'llms.image as base_image', 'llms.name as llm_name', 'users.group_id')
+            ->orderBy('bots.id')
+            ->get();
+    }
+
     static function sortBotsByDate($bots)
     {
         /*

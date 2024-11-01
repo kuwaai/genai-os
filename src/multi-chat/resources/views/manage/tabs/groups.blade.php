@@ -198,48 +198,27 @@
                             </div>
                         @endforeach
                     </div>
-                <div class="w-full mb-3 mt-2">
-                    <span
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.enabled') }}</span>
-                    <div
-                        class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                        @foreach (DB::table(function ($query) {
-        $query->select(DB::raw('substring(name, 7) as model_id, id'))
-        ->from('permissions')->where('name', 'like', 'model_%');
-    }, 'p')
-    ->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'p.model_id')->where('enabled', '=', true)
-    ->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
+                    <div class="w-full mb-3 mt-2">
+                        @foreach ([true => __('manage.label.llm_permission.enabled'), false => __('manage.label.llm_permission.disabled')] as $isEnabled => $label)
+                            <span
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $label }}</span>
                             <div
-                                class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
-                                    value="{{ $LLM->id }}" name="permissions[]"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-                                    style="box-shadow:none;"> <label for="create_checkbox_{{ $LLM->id }}"
-                                    class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
+                                class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
+                                    <div
+                                        class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                        <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
+                                            value="{{ $LLM->id }}" name="permissions[]"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                            style="box-shadow:none;">
+                                        <label for="create_checkbox_{{ $LLM->id }}"
+                                            class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
+                                    </div>
+                                @endforeach
                             </div>
                         @endforeach
                     </div>
                 </div>
-                <div class="w-full mb-3">
-                    <span
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.disabled') }}</span>
-                    <div
-                        class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                        @foreach (DB::table(function ($query) {
-        $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
-    }, 'p')->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'p.model_id')->where('enabled', '=', false)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
-                            <div
-                                class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
-                                    value="{{ $LLM->id }}" name="permissions[]"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-                                    style="box-shadow:none;"> <label for="create_checkbox_{{ $LLM->id }}"
-                                    class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
             </div>
         </form>
         <form class="flex flex-col w-full h-full" style="display:none;" id="edit_group_form" method="post"
@@ -351,7 +330,7 @@
                                     </p>
                                 </div>
                                 <div style="display:none;">
-                                    @foreach (['Create','Update', 'Read', 'Delete'] as $action)
+                                    @foreach (['Create', 'Update', 'Read', 'Delete'] as $action)
                                         @php
                                             $sub_perms = App\Models\Permissions::where(
                                                 'name',
@@ -408,42 +387,24 @@
                         @endforeach
                     </div>
                     <div class="w-full mb-3 mt-2">
-                        <span
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.enabled') }}</span>
-                        <div
-                            class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                            @foreach (DB::table(function ($query) {
-        $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
-    }, 'p')->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'p.model_id')->where('enabled', '=', true)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
-                                <div
-                                    class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                    <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
-                                        value="{{ $LLM->id }}" name="permissions[]"
-                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-                                        style="box-shadow:none;"> <label for="edit_checkbox_{{ $LLM->id }}"
-                                        class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div class="w-full mb-3">
-                        <span
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('manage.label.llm_permission.disabled') }}</span>
-                        <div
-                            class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                            @foreach (DB::table(function ($query) {
-        $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
-    }, 'p')->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'p.model_id')->where('enabled', '=', false)->select('p.id as id', 'llms.name as name')->orderby('created_at', 'desc')->get() as $LLM)
-                                <div
-                                    class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
-                                    <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
-                                        value="{{ $LLM->id }}" name="permissions[]"
-                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-                                        style="box-shadow:none;"> <label for="edit_checkbox_{{ $LLM->id }}"
-                                        class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
-                                </div>
-                            @endforeach
-                        </div>
+                        @foreach ([true => __('manage.label.llm_permission.enabled'), false => __('manage.label.llm_permission.disabled')] as $isEnabled => $label)
+                            <span
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $label }}</span>
+                            <div
+                                class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-2 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
+                                    <div
+                                        class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
+                                        <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
+                                            value="{{ $LLM->id }}" name="permissions[]"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                                            style="box-shadow:none;">
+                                        <label for="edit_checkbox_{{ $LLM->id }}"
+                                            class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-white">{{ $LLM->name }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

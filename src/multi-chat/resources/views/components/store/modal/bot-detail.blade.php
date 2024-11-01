@@ -46,6 +46,7 @@
                 @csrf
                 @method('patch')
                 <input name="id" hidden>
+                <input name='last_bot_tab' hidden>
                 <ul class="flex flex-wrap flex-col -mx-3 mb-2 items-center">
                     <div class="w-full px-3 mt-2 flex justify-center items-center flex-wrap md:flex-nowrap">
                         <div class="w-full md:w-1/3 mb-2">
@@ -330,7 +331,6 @@
 </div>
 <script> 
     function detail_update(data, readonly) {
-        console.debug(data);
         $("#save_bot").hide()
         $("#delete_bot").hide()
         if (!readonly) {
