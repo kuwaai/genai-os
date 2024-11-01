@@ -23,7 +23,7 @@
     <div class="flex h-full max-w-7xl mx-auto py-2">
         <div
             class="bg-white dark:bg-gray-800 text-white w-64 hidden sm:flex flex-shrink-0 relative rounded-l-lg overflow-hidden">
-            <div class="p-3 flex flex-1 flex-col h-full">
+            <div class="p-3 flex flex-1 flex-col w-full h-full">
                 @if ($bots->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
