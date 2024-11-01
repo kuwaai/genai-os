@@ -27,18 +27,6 @@ class Bots extends Model
             ->get();
     }
 
-    static function getBotIdName($enabled = true)
-    {
-        return DB::table(function ($query) {
-            $query->select(DB::raw('substring(name, 7) as model_id, id'))->from('permissions')->where('name', 'like', 'model_%');
-        }, 'p')
-            ->join('llms', DB::raw('CAST(llms.id AS ' . (config('database.default') == 'mysql' ? 'CHAR' : 'TEXT') . ')'), '=', 'p.model_id')
-            ->where('enabled', '=', $enabled)
-            ->select('p.id as id', 'llms.name as name')
-            ->orderby('created_at', 'desc')
-            ->get();
-    }
-
     static function getBotsFromIds($ids)
     {
         return Bots::whereIn('bots.id', array_map('intval', $ids))

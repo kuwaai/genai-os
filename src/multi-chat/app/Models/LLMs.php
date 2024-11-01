@@ -11,7 +11,15 @@ class LLMs extends Model
     use HasFactory;
     protected $table = 'llms';
     protected $fillable = ['image', 'name', "access_code", "order", 'enabled', "description", "config"];
-    
+    static function getModelPermIds()
+    {
+        return DB::table(function ($query) {
+            $query->select(DB::raw('substring(name, 7) as model_id, id'))
+            ->from('permissions')->where('name', 'like', 'model_%');
+        }, 'p')
+        ->join('llms', DB::raw('CAST(llms.id AS '. (config('database.default') == "mysql" ? 'CHAR' : 'TEXT') .')'), '=', 'p.model_id')
+        ->select('p.id as id', 'llms.name as name');
+    }
     static function getLLMs($group_id, $enabled = true)
     {
         return DB::table(function ($query) use ($group_id) {

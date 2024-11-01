@@ -1,3 +1,6 @@
+@php
+    $models = fn() => App\Models\LLMs::getModelPermIds()->orderby('created_at', 'desc');
+@endphp
 <div id="delete_group_modal" tabindex="-1"
     class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-md max-h-full">
@@ -218,7 +221,7 @@
                                     </label>
                                 </div>
                                 <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
-                                    @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
+                                    @foreach ($models()->where('enabled', '=', $isEnabled)->get() as $LLM)
                                         <div
                                             class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                                             <input id="create_checkbox_{{ $LLM->id }}" type="checkbox"
@@ -421,7 +424,7 @@
                                     </label>
                                 </div>
                                 <div class="grid gap-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
-                                    @foreach (App\Models\Bots::getBotIdName($isEnabled) as $LLM)
+                                    @foreach ($models()->where('enabled', '=', $isEnabled)->get() as $LLM)
                                         <div
                                             class="flex items-center pl-4 border border-gray-500 dark:border-gray-200 rounded-lg dark:border-white">
                                             <input id="edit_checkbox_{{ $LLM->id }}" type="checkbox"
