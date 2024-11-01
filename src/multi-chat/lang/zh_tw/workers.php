@@ -6,7 +6,7 @@ return [
     'button.start' => '啟動任務處理器',
     'button.stop' => '停止所有任務處理器',
     'button.confirm' => '確認',
-    'button.cancel' => '確認',
+    'button.cancel' => '取消',
 
     //Workers
     'label.loading' => '加載中...',
