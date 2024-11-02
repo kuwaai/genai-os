@@ -23,7 +23,7 @@ popd
 
 pushd "..\src\multi-chat\"
 REM Configure PATH for web
-start php artisan web:config --settings="updateweb_path=%~dp0%gitbash_folder%"
+start php artisan web:config --settings="updateweb_path=%PATH%"
 REM Define number of workers
 set numWorkers=10
 start php artisan worker:start %numWorkers%
