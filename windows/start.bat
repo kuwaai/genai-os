@@ -21,12 +21,12 @@ del dump.rdb
 start /b "" "redis-server.exe" redis.conf
 popd
 
+pushd "..\src\multi-chat\"
+REM Configure PATH for web
+start php artisan web:config --settings="updateweb_path=%~dp0%gitbash_folder%"
 REM Define number of workers
 set numWorkers=10
-pushd "..\src\multi-chat\"
 start php artisan worker:start %numWorkers%
-REM Configure PATH
-start php artisan web:config --settings="updateweb_path=%~dp0%gitbash_folder%"
 popd
 
 :launch_kernel_and_executors

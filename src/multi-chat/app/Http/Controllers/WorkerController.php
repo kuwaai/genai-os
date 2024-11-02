@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Process\Process;
@@ -31,8 +32,13 @@ class WorkerController extends Controller
             $logFile = $this->generateLogFileName($logFileBase);
             $command = PHP_OS_FAMILY === 'Windows' ? "start /B php {$artisanPath} queue:work >> {$logFile} 2>&1" : "php {$artisanPath} queue:work >> {$logFile} 2>&1 &";
 
+            $env = [
+                'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value') ?: getenv('PATH'),
+                'GIT_SSH_COMMAND' => SystemSetting::where('key', 'updateweb_git_ssh_command')->value('value') ?? '',
+            ];
             try {
-                Process::fromShellCommandline($command)->start();
+                $worker = Process::fromShellCommandline($command)->setEnv($env)->setTimeout(null);
+                $worker->run();
                 while (!file_exists($logFile)) {
                     usleep(100000);
                 }

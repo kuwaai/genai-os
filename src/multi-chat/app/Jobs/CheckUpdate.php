@@ -41,8 +41,13 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
         try {
             $checkUpdateScript = base_path('app/Console/check-update.php');
 
+            $env = [
+                'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value') ?: getenv('PATH'),
+                'GIT_SSH_COMMAND' => SystemSetting::where('key', 'updateweb_git_ssh_command')->value('value') ?? '',
+            ];
+
             if (File::exists($checkUpdateScript)) {
-                $process = new Process(['php', $checkUpdateScript]);
+                $process = Process::fromShellCommandline('php ' . $checkUpdateScript)->setEnv($env)->setTimeout(null);
                 $process->setTimeout(null);
                 $process->run();
 
