@@ -22,11 +22,13 @@ start /b "" "redis-server.exe" redis.conf
 popd
 
 pushd "..\src\multi-chat\"
+REM Remove web cache
+rmdir /S /Q storage\framework\cache
 REM Configure PATH for web
-start php artisan web:config --settings="updateweb_path=%PATH%"
+start /b php artisan web:config --settings="updateweb_path=%PATH%"
 REM Define number of workers
 set numWorkers=10
-start php artisan worker:start %numWorkers%
+start /b php artisan worker:start %numWorkers%
 popd
 
 :launch_kernel_and_executors
