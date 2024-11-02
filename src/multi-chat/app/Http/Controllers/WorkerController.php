@@ -30,7 +30,7 @@ class WorkerController extends Controller
 
         for ($i = 0; $i < $count; $i++) {
             $logFile = $this->generateLogFileName($logFileBase);
-            $command = PHP_OS_FAMILY === 'Windows' ? "start /B php {$artisanPath} queue:work >> {$logFile} 2>&1" : "php {$artisanPath} queue:work >> {$logFile} 2>&1 &";
+            $command = PHP_OS_FAMILY === 'Windows' ? "start /B php \"{$artisanPath}\" queue:work >> \"{$logFile}\"" : "php {$artisanPath} queue:work >> {$logFile} 2>&1 &";
 
             $env = [
                 'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value') ?: getenv('PATH'),

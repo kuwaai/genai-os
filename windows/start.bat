@@ -81,6 +81,10 @@ start http://127.0.0.1
 REM Remake public/storage
 pushd "%~dp0..\src\multi-chat"
 rmdir /Q /S "public\storage"
+rmdir /Q /S "storage\app\public\root\custom"
+rmdir /Q /S "storage\app\public\root\database"
+rmdir /Q /S "storage\app\public\root\bin"
+rmdir /Q /S "storage\app\public\root\bot"
 call php artisan storage:link
 popd
 
