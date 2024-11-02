@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'Gestion des API',
     'label.api_manage' => 'Gérez vos clés API, ne les divulguez à personne !',
-    'label.taide_api' => 'Clé Kuwa',
+    'label.kuwa_api' => 'Clé Kuwa',
     'label.openai_api' => 'Clé API OpenAI',
     'label.google_api' => 'Clé API Google',
     'label.third_party_api' => 'Clés API tierces personnalisées (par exemple, Groq, Cerebras)',

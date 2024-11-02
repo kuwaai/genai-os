@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API管理',
     'label.api_manage' => '管理您的API密钥，切勿让别人知道！',
-    'label.taide_api' => 'Kuwa密钥',
+    'label.kuwa_api' => 'Kuwa密钥',
     'label.openai_api' => 'OpenAI API密钥',
     'label.google_api' => 'Google API密钥',
     'label.third_party_api' => '自定义第三方 API 密钥（例如：Groq、Cerebras）',

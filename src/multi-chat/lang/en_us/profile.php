@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API Management',
     'label.api_manage' => 'Manage your API Key, don\'t let other people know about it!',
-    'label.taide_api' => 'Kuwa API Key',
+    'label.kuwa_api' => 'Kuwa API Key',
     'label.openai_api' => 'OpenAI API Key',
     'label.google_api' => 'Google API Key',
     'label.third_party_api' => 'Custom Third-Party API Keys (e.g., Groq, Cerebras)',

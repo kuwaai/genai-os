@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API 관리',
     'label.api_manage' => 'API 키를 관리하세요. 다른 사람에게 공개하지 마세요!',
-    'label.taide_api' => '타이드 키',
+    'label.kuwa_api' => '타이드 키',
     'label.openai_api' => 'OpenAI API 키',
     'label.google_api' => 'Google API 키',
     'label.third_party_api' => '사용자 지정 타사 API 키 (예: Groq, Cerebras)',

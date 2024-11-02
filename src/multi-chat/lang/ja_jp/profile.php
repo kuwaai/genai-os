@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API管理',
     'label.api_manage' => 'あなたのAPIキーを管理してください。他人に知らせないでください！',
-    'label.taide_api' => 'Kuwaキー',
+    'label.kuwa_api' => 'Kuwaキー',
     'label.openai_api' => 'OpenAI APIキー',
     'label.google_api' => 'Google APIキー',
     'label.third_party_api' => 'カスタムサードパーティ API キー (例: Groq、Cerebras)',

@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'API-Verwaltung',
     'label.api_manage' => 'Verwalten Sie Ihren API-Schlüssel. Geben Sie diesen niemals weiter!',
-    'label.taide_api' => 'Kuwa-API-Schlüssel',
+    'label.kuwa_api' => 'Kuwa-API-Schlüssel',
     'label.openai_api' => 'OpenAI-API-Schlüssel',
     'label.google_api' => 'Google-API-Schlüssel',
     'label.third_party_api' => 'Benutzerdefinierte API-Schlüssel von Drittanbietern (z. B. Groq, Cerebras)',

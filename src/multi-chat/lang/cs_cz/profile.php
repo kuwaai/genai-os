@@ -30,7 +30,7 @@ return [
     //API
     'header.api_manage' => 'Správa API',
     'label.api_manage' => 'Spravujte své API klíče, nikdy je nesdílejte s nikým!',
-    'label.taide_api' => 'Kuwa klíč',
+    'label.kuwa_api' => 'Kuwa klíč',
     'label.openai_api' => 'OpenAI API klíč',
     'label.google_api' => 'Google API klíč',
     'label.third_party_api' => 'Vlastní klíče API třetích stran (např. Groq, Cerebras)',

@@ -25,7 +25,7 @@ return [
     'tab.users' => '使用者',
     'tab.llms' => '模型',
     'tab.settings' => '設定',
-    'tab.kernel' => '核心',
+    'tab.kernel' => '系統',
     'tab.workers' => '任務處理器',
 
     //Groups

@@ -26,9 +26,9 @@ return new class extends Migration {
                 'Profile_update_email' => 'Permission to update email',
                 'Profile_update_password' => 'Permission to update password',
                 'Profile_update_openai_token' => 'Permission to update OpenAI Token',
-                'Profile_read_api_token' => 'Permission to read TAIDE Chat API token',
+                'Profile_read_api_token' => 'Permission to read Kuwa Chat API token',
                 'Profile_delete_account' => 'Permission to delete their account',
-                'Profile_update_api_token' => 'Permission to update TAIDE Chat API token',
+                'Profile_update_api_token' => 'Permission to update Kuwa Chat API token',
             ];
     
             foreach ($permissions as $name => $describe) {
