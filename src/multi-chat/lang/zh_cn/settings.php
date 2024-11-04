@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'button.confirm' => '確認',
+    'button.cancel' => '取消',
+    'button.refresh' => '重新整理',
     'button.save' => '儲存',
     'button.close' => '關閉',
     'button.accept' => '我同意',

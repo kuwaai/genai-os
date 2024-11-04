@@ -4,7 +4,7 @@ import asyncio
 from tqdm.asyncio import tqdm
 
 # Configure the list of specific files to read; if empty, it will read all files in the source directory
-files_to_read = ['room.php', 'executors.php']  # Leave empty to read all files in zh_tw
+files_to_read = ['settings.php']  # Leave empty to read all files in zh_tw
 
 # Configure the list of target languages
 languages = ["cs_cz", "de", "en_us", "fr_fr", "ja_jp", "ko_kr", "zh_cn"]
