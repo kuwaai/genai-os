@@ -91,13 +91,14 @@
 
                 // Create the access code item with counts
                 const accessCodeItem = $('<li>', {
-                    class: 'px-2 py-1 flex items-center'
+                    class: 'px-2 py-1 flex items-start'
                 }).append(
                     $('<div>', {
-                        class: 'text-sm'
+                        class: 'text-sm w-[100px] overflow-hidden',
+                        style: 'word-wrap:break-word'
                     }).append(
                         $('<span>', {
-                            class: 'font-semibold',
+                            class: 'font-semibold line-clamp-4',
                             text: access_code
                         }),
                         createCountDisplay('Ready', 'green', 'ready-count', 0),
@@ -153,7 +154,7 @@
                             'data-history-id': history_id,
                             'data-user-id': user_id,
                             'data-access-code': access_code,
-                            text: `:${port}${new URL(url).pathname}, ${history_id}, ${user_id}`
+                            text: `:${port}${new URL(url).pathname}`
                         })
                     ).closest('li').find(countClass).text((i, val) => +val + 1);
                 });
