@@ -15,6 +15,16 @@ REM Include variables from separate file
 call src\variables.bat
 cd "%~dp0"
 
+SET filePath=packages\composer.bat
+
+REM Check if the file exists
+IF NOT EXIST "%filePath%" (
+    REM Make executable file for Windows
+    echo :: in case DelayedExpansion is on and a path contains ! > "%filePath%"
+    echo setlocal DISABLEDELAYEDEXPANSION >> "%filePath%"
+    echo php "%%~dp0composer.phar" %%* >> "%filePath%"
+)
+
 REM Redis Server
 pushd packages\%redis_folder%
 del dump.rdb
