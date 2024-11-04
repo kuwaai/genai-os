@@ -95,6 +95,11 @@ if not exist "packages\%php_folder%\ext\php_redis.dll" (
 REM Download composer.phar if not exists
 if not exist "packages\composer.phar" (
     curl -o packages\composer.phar https://getcomposer.org/download/latest-stable/composer.phar
+    REM Make executable file for Windows
+    echo @echo OFF > packages\composer.bat
+    echo :: in case DelayedExpansion is on and a path contains ! >> packages\composer.bat
+    echo setlocal DISABLEDELAYEDEXPANSION >> packages\composer.bat
+    echo php "%%~dp0composer.phar" %%* >> packages\composer.bat
 ) else (
     echo Composer already exists, skipping download.
 )
