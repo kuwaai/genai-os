@@ -1,15 +1,15 @@
 <?php
 
 return [
-    'interface.header' => 'Dashboard-Verwaltungsoberfläche',
+    'interface.header' => 'Dashboard Management Interface',
     'route' => 'Dashboard',
 
-    'tab.statistics' => 'Statistik',
+    'tab.statistics' => 'Statistiken',
     'tab.blacklist' => 'Schwarze Liste',
-    'tab.feedbacks' => 'Feedback',
-    'tab.logs' => 'Systemprotokoll',
+    'tab.feedbacks' => 'Feedbacks',
+    'tab.logs' => 'Systemprotokolle',
     'tab.safetyguard' => 'Sicherheitsfilter',
-    'tab.inspect' => 'Nachrichten-Explorer',
+    'tab.inspect' => 'Nachrichtenbrowser',
 
     //Tab_logs
     'colName.Action' => 'Aktion:',
@@ -26,46 +26,46 @@ return [
     'filter.IPAddress' => 'IP-Adresse:',
 
     //Tab_feedback
-    'hint.PasteRawDataHere' => 'Füge die zu konvertierenden Rohdaten ein oder ziehe eine Datei hierher.',
-    "hint.wip_option"=>"In Arbeit, derzeit keine Optionen",
+    'hint.PasteRawDataHere' => 'Bitte fügen Sie die zu konvertierenden Rohdaten hier ein. Sie können auch Dateien hierher ziehen.',
+    "hint.wip_option"=>"Noch in Arbeit, derzeit keine Optionen verfügbar",
     'header.ActiveModels' => 'Aktivierte Modelle',
     'header.InactiveModels' => 'Deaktivierte Modelle',
-    'header.ModelFilter' => 'Modelle filtern:',
+    'header.ModelFilter' => 'Modellfilter:',
     'header.ExportSetting' => 'Exporteinstellungen:',
 
-    'button.ExportAndDownload' => 'Exportieren und herunterladen',
+    'button.ExportAndDownload' => 'Exportieren und Herunterladen',
     'button.LoadFile' => 'Datei laden',
-    'button.ConvertAndDownload' => 'Konvertieren und herunterladen',
-    'msg.MustHave1Model' => 'Du musst mindestens ein Modell für den Export auswählen',
+    'button.ConvertAndDownload' => 'Konvertieren und Herunterladen',
+    'msg.MustHave1Model' => 'Sie müssen mindestens ein Modell zum Exportieren auswählen.',
     'msg.InvalidJSONFormat' => 'Ungültiges JSON-Format',
 
     //Tab_SafetyGuard
-    "hint.safety_guard_offline"=>"Das Sicherheitsfiltersystem ist offline",
+    "hint.safety_guard_offline"=>"Sicherheitsfiltersystem ist offline",
     'header.create_rule' => 'Filterregel erstellen',
     'header.update_rule' => 'Filterregel aktualisieren',
-    'rule.filter.keyword' => 'Schlüsselwortregel',
-    'rule.filter.embedding' => 'Einbettungregel',
+    'rule.filter.keyword' => 'Keyword-Regel',
+    'rule.filter.embedding' => 'Embedding-Regel',
 
     'action.overwrite' => 'Vom System überschreiben',
-    'action.block' => 'Blockieren, optional warnen',
-    'action.warn' => 'Nur warnen',
+    'action.block' => 'Blockieren, Warnung optional',
+    'action.warn' => 'Nur Warnung',
     'action.none' => 'Keine Aktion',
 
-    'msg.SomethingWentWrong' => 'Da ist etwas schief gelaufen...',
-    'msg.choose_target' => 'Bitte wähle ein Modell',
-    'msg.create_rule' => 'Bist du sicher, dass du diese Regel erstellen willst?',
-    'msg.delete_rule' => 'Bist du sicher, dass du diese Regel löschen willst?',
-    'msg.update_rule' => 'Bist du sicher, dass du diese Regel aktualisieren willst?',
+    'msg.SomethingWentWrong' => 'Etwas ist schiefgelaufen...',
+    'msg.choose_target' => 'Bitte wählen Sie ein Modell aus',
+    'msg.create_rule' => 'Sind Sie sicher, dass Sie diese Regel erstellen möchten?',
+    'msg.delete_rule' => 'Sind Sie sicher, dass Sie diese Regel löschen möchten?',
+    'msg.update_rule' => 'Sind Sie sicher, dass Sie diese Regel aktualisieren möchten?',
 
     'rule.name' => 'Regelname',
     'rule.description' => 'Regelbeschreibung',
-    'rule.target' => 'Modell für Regel festlegen',
+    'rule.target' => 'Modell, auf das die Regel angewendet werden soll',
     'rule.action' => 'Regelaktion',
     'rule.warning' => 'Warnmeldung (optional)',
-    'rule.filter.input' => 'Eingangsfilter',
+    'rule.filter.input' => 'Eingabefilter',
     'rule.filter.output' => 'Ausgabefilter',
 
-    'button.create_rule' => 'Regel erstellen',
+    'button.create_rule' => 'Regel hinzufügen',
     'button.create' => 'Erstellen',
     'button.cancel' => 'Abbrechen',
     'button.delete' => 'Löschen',

@@ -1,7 +1,7 @@
 <div id="alert-container"></div>
 
 <div class="mb-6">
-    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Storage Models</h2>
+    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{{__('storage.label.stored_models')}}</h2>
     <ul id="storage-list"
         class="list-disc pl-5 space-y-2 max-h-[300px] overflow-y-auto text-gray-900 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md p-3 shadow-md">
         <!-- Storage models will be populated here -->
@@ -9,7 +9,7 @@
 </div>
 
 <div>
-    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Active Jobs</h2>
+    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{{__('storage.label.running_download_jobs')}}</h2>
     <ul id="jobs-list"
         class="list-disc pl-5 space-y-2 max-h-32 overflow-y-auto text-gray-900 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md p-3 shadow-md">
         <!-- Jobs will be populated here -->
@@ -65,12 +65,12 @@
                 });
             } else {
                 $('#storage-list').append(
-                    '<li class="text-gray-500 dark:text-gray-400">No models available</li>'
+                    '<li class="text-gray-500 dark:text-gray-400">{{__('storage.label.no_models_available')}}</li>'
                 );
             }
         }).fail(function() {
             $('#storage-list').append(
-                '<li class="text-red-500 dark:text-red-400">Error fetching storage data</li>'
+                '<li class="text-red-500 dark:text-red-400">{{__('storage.label.error_fetch_storage_data')}}</li>'
             );
         });
     }
@@ -119,10 +119,10 @@
                 `);
                 });
             } else {
-                $('#jobs-list').append('<li class="text-gray-500 dark:text-gray-400">No active jobs</li>');
+                $('#jobs-list').append('<li class="text-gray-500 dark:text-gray-400">{{__('storage.label.no_active_jobs')}}</li>');
             }
         }).fail(function() {
-            $('#jobs-list').append('<li class="text-red-500 dark:text-red-400">Error fetching jobs data</li>');
+            $('#jobs-list').append('<li class="text-red-500 dark:text-red-400">{{__('storage.label.error_fetch_jobs_data')}}</li>');
         });
     }
 

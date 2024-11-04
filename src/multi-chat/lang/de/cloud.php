@@ -1,13 +1,13 @@
 <?php
 
 return [
-    'interface.header' => 'Cloud-Dateiverwaltung',
+    'interface.header' => 'Cloud-Datei-Management',
     'route' => 'Cloud-Dateien',
 
     'header.confirm_delete' => 'Datei löschen bestätigen',
-    'header.cannot_preview' => 'Datei kann nicht angezeigt werden',
+    'header.cannot_preview' => 'Datei kann nicht in der Vorschau angezeigt werden',
     'button.open' => 'Öffnen',
-    'button.open_tab' => 'In neuem Tab öffnen',
+    'button.open_tab' => 'Im Tab öffnen',
     'button.copy_link' => 'Link kopieren',
     'button.rename' => 'Umbenennen',
     'button.delete' => 'Löschen',
@@ -15,12 +15,12 @@ return [
     'button.delete' => 'Löschen',
     'button.preview' => 'In neuem Tab öffnen',
 
-    'label.homes' => 'Home-Verzeichnis',
-    'label.no_files' => 'Keine Dateien in diesem Verzeichnis vorhanden.',
+    'label.homes' => 'Homeverzeichnis',
+    'label.no_files' => 'Im Verzeichnis befinden sich keine Dateien',
     'label.used' => 'Verwendet',
     'label.total_space' => 'Gesamtspeicherplatz',
-    'label.homes' => 'Home-Verzeichnis',
+    'label.homes' => 'Homeverzeichnis',
     'label.about_to_delete' => 'Datei wird gelöscht',
-    'label.delete_warning' => 'Dieser Vorgang kann nicht rückgängig gemacht werden!',
-    'label.cannot_preview' => 'Es tut uns leid, wir können diese Datei derzeit nicht direkt anzeigen. Wenn Sie fortfahren, wird die Datei in einem neuen Tab geöffnet, dies kann jedoch eine automatische Download-Aktion auslösen. Bitte beachten Sie, dass Sie keine ausführbaren Dateien oder Installationsdateien von unbekannten Quellen ausführen sollten.',
+    'label.delete_warning' => 'Diese Aktion kann nicht rückgängig gemacht werden!',
+    'label.cannot_preview' => 'Es tut uns leid, derzeit können wir diese Datei nicht direkt in der Vorschau anzeigen. Durch Fortsetzen dieser Aktion wird die Datei in einem neuen Tab geöffnet, was jedoch zu einem automatischen Download führen kann. Denken Sie daran, dass Sie keine unbekannten ausführbaren Dateien oder Installationsdateien ausführen sollten.',
 ];

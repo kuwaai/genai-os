@@ -8,7 +8,7 @@
     <div class="mt-3">
         <button id="create-record-btn"
             class="bg-green-500 text-white px-4 py-2 rounded-md transition-all duration-300 ease-in-out hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700">
-            {{ __('workers.button.new_executor') }}
+            {{ __('executors.button.new_executor') }}
         </button>
     </div>
 </div>
@@ -23,50 +23,50 @@
             <input type="hidden" name="original_history_id" id="original-history-id">
             <input type="hidden" name="original_user_id" id="original-user-id">
             <div>
-                <label for="modal-access-code" class="block">{{ __('kernel.label.accesscode') }}</label>
+                <label for="modal-access-code" class="block">{{ __('executors.label.accesscode') }}</label>
                 <input type="text" name="access_code" id="modal-access-code"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-endpoint" class="block">{{ __('kernel.label.endpoint') }}</label>
+                <label for="modal-endpoint" class="block">{{ __('executors.label.endpoint') }}</label>
                 <input type="text" name="endpoint" id="modal-endpoint"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-status" class="block">{{ __('kernel.label.status') }}</label>
+                <label for="modal-status" class="block">{{ __('executors.label.status') }}</label>
                 <select name="status" id="modal-status"
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
-                    <option value="READY">{{ __('kernel.label.ready') }}</option>
-                    <option value="BUSY">{{ __('kernel.label.busy') }}</option>
+                    <option value="READY">{{ __('executors.label.ready') }}</option>
+                    <option value="BUSY">{{ __('executors.label.busy') }}</option>
                 </select>
             </div>
             <div>
-                <label for="modal-history-id" class="block">{{ __('kernel.label.historyid') }}</label>
+                <label for="modal-history-id" class="block">{{ __('executors.label.historyid') }}</label>
                 <input type="text" name="history_id" id="modal-history-id" value='-1'
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div>
-                <label for="modal-user-id" class="block">{{ __('kernel.label.userid') }}</label>
+                <label for="modal-user-id" class="block">{{ __('executors.label.userid') }}</label>
                 <input type="text" name="user_id" id="modal-user-id" value='-1'
                     class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-full px-3 py-2"
                     required>
             </div>
             <div class="flex justify-between">
                 <button type="button" class="bg-gray-300 text-black rounded px-4 py-2"
-                    id="modal-cancel-btn">{{ __('kernel.button.cancel') }}</button>
+                    id="modal-cancel-btn">{{ __('executors.button.cancel') }}</button>
                 <button type="submit"
-                    class="bg-blue-500 text-white rounded px-4 py-2">{{ __('manage.button.save') }}</button>
+                    class="bg-blue-500 text-white rounded px-4 py-2">{{ __('executors.button.save') }}</button>
             </div>
         </form>
         <div class="mt-4 flex justify-between">
             <button id="shutdown-btn"
-                class="bg-red-500 text-white px-4 py-2 rounded hidden">{{ __('manage.button.shutdown') }}</button>
+                class="bg-red-500 text-white px-4 py-2 rounded hidden">{{ __('executors.button.shutdown') }}</button>
             <button id="delete-btn"
-                class="bg-red-600 text-white px-4 py-2 rounded hidden">{{ __('manage.button.delete') }}</button>
+                class="bg-red-600 text-white px-4 py-2 rounded hidden">{{ __('executors.button.delete') }}</button>
         </div>
     </div>
 
@@ -101,8 +101,8 @@
                             class: 'font-semibold line-clamp-4',
                             text: access_code
                         }),
-                        createCountDisplay('Ready', 'green', 'ready-count', 0),
-                        createCountDisplay('Busy', 'red', 'busy-count', 0)
+                        createCountDisplay('{{ __('executors.label.ready') }}', 'green', 'ready-count', 0),
+                        createCountDisplay('{{ __('executors.label.busy') }}', 'red', 'busy-count', 0)
                     ),
                     $('<ul>', {
                         class: 'ml-4 space-y-2 flex-1 border-l-2 pl-2 border-green-500 py-2'
@@ -135,8 +135,8 @@
                                         class: 'font-semibold',
                                         text: ip
                                     }),
-                                    createCountDisplay('Ready', 'green', 'ip-ready-count', 0),
-                                    createCountDisplay('Busy', 'red', 'ip-busy-count', 0)
+                                    createCountDisplay('{{ __('executors.label.ready') }}', 'green', 'ip-ready-count', 0),
+                                    createCountDisplay('{{ __('executors.label.busy') }}', 'red', 'ip-busy-count', 0)
                                 ),
                                 $('<div>', {
                                     class: 'flex flex-1 overflow-hidden flex-wrap'
@@ -205,7 +205,7 @@
             $('#modal-status').val(status);
             $('#modal-history-id').val(history_id);
             $('#modal-user-id').val(user_id);
-            $('#modal-title').text('{{ __('kernel.label.edit_executor') }}');
+            $('#modal-title').text('{{ __('executors.label.edit_executor') }}');
             $('#shutdown-btn').removeClass('hidden');
             $('#delete-btn').removeClass('hidden');
             $('#record-modal').removeClass('hidden');
@@ -234,7 +234,7 @@
         });
 
         $('#create-record-btn').on('click', function() {
-            $('#modal-title').text('{{ __('kernel.label.create_executor') }}');
+            $('#modal-title').text('{{ __('executors.label.create_executor') }}');
             $('#shutdown-btn').addClass('hidden');
             $('#delete-btn').addClass('hidden');
             $('#record-modal').removeClass('hidden');

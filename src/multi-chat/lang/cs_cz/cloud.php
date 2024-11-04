@@ -1,11 +1,11 @@
 <?php
 
 return [
-    'interface.header' => 'Správa cloudových souborů',
-    'route' => 'Cloudové soubory',
+    'interface.header' => 'Správa souborů v cloudu',
+    'route' => 'Soubory v cloudu',
 
     'header.confirm_delete' => 'Potvrďte smazání souboru',
-    'header.cannot_preview' => 'Soubor nelze zobrazit náhledem',
+    'header.cannot_preview' => 'Nelze zobrazit náhled souboru',
     'button.open' => 'Otevřít',
     'button.open_tab' => 'Otevřít v nové záložce',
     'button.copy_link' => 'Kopírovat odkaz',
@@ -15,12 +15,12 @@ return [
     'button.delete' => 'Smazat',
     'button.preview' => 'Otevřít v nové záložce',
 
-    'label.homes' => 'Domovský adresář',
-    'label.no_files' => 'V adresáři nejsou žádné soubory',
+    'label.homes' => 'Domovská složka',
+    'label.no_files' => 'V této složce nejsou žádné soubory',
     'label.used' => 'Použito',
     'label.total_space' => 'Celkový prostor',
-    'label.homes' => 'Domovský adresář',
-    'label.about_to_delete' => 'Chystáte se smazat soubor',
-    'label.delete_warning' => 'Tato akce je nevratná!',
-    'label.cannot_preview' => 'Omlouváme se, tento soubor nelze zobrazit náhledem. Pokračování v této akci otevře soubor v nové záložce, ale pravděpodobně se spustí automatické stahování. Pamatujte, že byste neměli spouštět neznámé spustitelné soubory nebo instalační soubory.',
+    'label.homes' => 'Domovská složka',
+    'label.about_to_delete' => 'Brzy dojde k smazání souboru',
+    'label.delete_warning' => 'Tato akce nelze vrátit zpět!',
+    'label.cannot_preview' => 'Omlouváme se, v současné době nelze zobrazit náhled tohoto souboru. Pokračování v této akci otevře soubor v nové záložce, ale pravděpodobně se spustí automatické stahování. Nezapomeňte, že nesmíte spouštět neznámé soubory, které se dají spustit, nebo instalační soubory.',
 ];

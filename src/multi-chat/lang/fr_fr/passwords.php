@@ -2,21 +2,10 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are the default lines which match reasons
-    | that are given by the password broker for a password update attempt
-    | has failed, such as for an invalid token or invalid new password.
-    |
-    */
-
     'reset' => 'Votre mot de passe a été réinitialisé.',
-    'sent' => 'Nous vous avons envoyé un e-mail contenant le lien de réinitialisation du mot de passe.',
-    'throttled' => 'Veuillez essayer à nouveau dans quelques instants.',
-    'token' => 'Ce jeton de réinitialisation du mot de passe n\'est pas valide.',
-    'user' => "Aucun utilisateur n'a été trouvé avec cette adresse e-mail.",
+    'sent' => 'Nous avons envoyé un lien de réinitialisation de mot de passe à votre adresse e-mail.',
+    'throttled' => 'Veuillez réessayer plus tard.',
+    'token' => 'Ce jeton de réinitialisation de mot de passe est invalide.',
+    'user' => 'Aucun utilisateur avec cette adresse e-mail n\'a été trouvé.',    
 
 ];

@@ -9,7 +9,7 @@ return [
     'button.open' => '열기',
     'button.open_tab' => '새 탭에서 열기',
     'button.copy_link' => '링크 복사',
-    'button.rename' => '이름 바꾸기',
+    'button.rename' => '이름 변경',
     'button.delete' => '삭제',
     'button.cancel' => '취소',
     'button.delete' => '삭제',
@@ -22,5 +22,5 @@ return [
     'label.homes' => '홈 디렉토리',
     'label.about_to_delete' => '파일 삭제 예정',
     'label.delete_warning' => '이 작업은 되돌릴 수 없습니다!',
-    'label.cannot_preview' => '죄송합니다. 현재 이 파일을 바로 미리 볼 수 없습니다. 이 작업을 계속하면 파일이 새 탭에서 열리지만 자동 다운로드가 발생할 수 있습니다. 알 수 없는 출처의 실행 파일이나 설치 파일은 실행하지 마세요.',
+    'label.cannot_preview' => '죄송합니다. 현재 이 파일을 직접 미리 볼 수 없습니다. 계속 진행하면 새 탭에서 파일이 열리지만 자동 다운로드가 발생할 수 있습니다. 출처가 불분명한 실행 파일이나 설치 파일을 실행하지 마세요.',
 ];

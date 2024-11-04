@@ -4,32 +4,28 @@
         <div class="flex flex-col space-y-4" id='hf_status'>
             <div class="hidden">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white" id="userGreeting">Guest
-                    </h2>
+                    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white" id="userGreeting"></h2>
                     <button id="logoutButton"
                         class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-md dark:bg-red-700 dark:hover:bg-red-800 flex items-center"
                         onclick="handleLogoutButtonClick()">
                         <i id="stop-icon-logout" class="fa fa-spinner fa-spin hidden text-lg mr-2"
                             aria-hidden="true"></i>
-                        <span id="logoutText">Logout</span>
+                        <span id="logoutText">{{__('hub.button.logout')}}</span>
                     </button>
                 </div>
 
                 <div id="orgBadges" class="flex space-x-2">
-                    <span class="badge bg-blue-200 text-blue-800 rounded-full px-3 py-1">Org 1</span>
-                    <span class="badge bg-green-200 text-green-800 rounded-full px-3 py-1">Org 2</span>
-                    <span class="badge bg-yellow-200 text-yellow-800 rounded-full px-3 py-1">Org 3</span>
                 </div>
             </div>
 
             <div class="flex items-center w-full">
-                <input type="text" id="token" placeholder="Enter your token"
+                <input type="text" id="token" placeholder="{{__('hub.label.enter_your_token')}}"
                     class="border border-gray-300 rounded-l-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
                 <button id="loginButton"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-6 rounded-r-md shadow-md dark:bg-blue-700 dark:hover:bg-blue-800 flex items-center h-12"
                     onclick="handleLoginButtonClick()">
                     <i id="stop-icon-login" class="fa fa-spinner fa-spin hidden text-lg mr-2" aria-hidden="true"></i>
-                    <span id="loginText">Login</span>
+                    <span id="loginText">{{__('hub.button.login')}}</span>
                 </button>
             </div>
         </div>
@@ -127,11 +123,11 @@
         <!-- Search Section -->
         <div class="flex-grow mt-4">
             <div class="flex items-center w-full">
-                <input id="searchInput" type="text" placeholder="Search for models..."
+                <input id="searchInput" type="text" placeholder="{{__('hub.label.search_for_model')}}"
                     class="border border-gray-300 rounded-l-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
                 <button id="searchButton"
                     class="bg-blue-600 text-white py-2 px-4 rounded-r-md transition duration-200 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 h-12 flex items-center">
-                    Search
+                    {{__('hub.button.search')}}
                 </button>
             </div>
         </div>
