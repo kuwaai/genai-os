@@ -107,13 +107,13 @@
                     @if (!session('llms') && request()->user()->hasPerm('Room_read_export_chat'))
                         <x-dropdown-link onclick="event.preventDefault();export_chat()" href="#"
                             data-modal-target="exportModal" data-modal-toggle="exportModal">
-                            {{ __('chat.modal.export.header') }}
+                            {{ __('chat.header.export') }}
                         </x-dropdown-link>
                     @endif
                     @if (request()->user()->hasPerm('Room_update_import_chat'))
                         <x-dropdown-link href="#" onclick="event.preventDefault();"
                             data-modal-target="importModal" data-modal-toggle="importModal">
-                            {{ __('chat.modal.import.header') }}
+                            {{ __('chat.header.import') }}
                         </x-dropdown-link>
                     @endif
                     @if (!session('llms'))

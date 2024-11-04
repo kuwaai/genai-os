@@ -27,14 +27,14 @@
                 @if ($bots->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        {!! __('chat.hint.no_llms') !!}
+                        {!! __('chat.placeholder.no_llms') !!}
                     </div>
                 @else
                     <h2 class="block sm:hidden text-xl text-center text-black dark:text-white">
                         {{ __('room.route') }}
                     </h2>
                     <p class="block sm:hidden text-center text-black dark:text-white">
-                        {{ __('chat.hint.select_a_chatroom') }}</p>
+                        {{ __('chat.placeholder.select_a_chatroom') }}</p>
                     <div class="mb-2">
                         <div class="border border-black dark:border-white border-1 rounded-lg flex overflow-hidden">
                             @if (request()->user()->hasPerm('Room_update_new_chat'))

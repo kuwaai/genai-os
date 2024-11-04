@@ -83,7 +83,7 @@
             <div class="flex w-full">
                 <button type="button" onclick="chain_toggle()" id="chain_btn"
                     class="whitespace-nowrap h-full mr-2 text-white {{ \Session::get('chained') ?? true ? 'bg-green-500 hover:bg-green-600' : 'bg-red-600 hover:bg-red-700' }} px-2 py-1 rounded">{{ \Session::get('chained') ?? true ? __('chat.button.chained') : __('chat.button.unchain') }}</button>
-                <textarea tabindex="0" data-id="root" placeholder="{{ __('chat.prompt_area.hint') }}" rows="1" max-rows="5"
+                <textarea tabindex="0" data-id="root" placeholder="{{ __('chat.hint.prompt_area') }}" rows="1" max-rows="5"
                     oninput="adjustTextareaRows(this)" id="chat_input" name="input" readonly
                     class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                 <div class="ml-auto right-[12px] relative bottom-[4px] flex justify-end items-end">

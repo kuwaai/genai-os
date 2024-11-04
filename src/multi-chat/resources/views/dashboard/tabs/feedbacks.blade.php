@@ -56,7 +56,7 @@
             <form class="flex-1 flex flex-col" method="post" action="{{ route('dashboard.feedback') }}"
                 onsubmit="return validateForm2()">
                 @csrf
-                <textarea id="feedback_rawdata" name="rawdata" placeholder="{{ __('dashboard.hint.PasteRawDataHere') }}"
+                <textarea id="feedback_rawdata" name="rawdata" placeholder="{{ __('dashboard.placeholder.PasteRawDataHere') }}"
                     class="bg-gray-300 border-gray-300 flex-1 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mr-2 block w-full resize-none">{{ session('rawdata') ?? '' }}</textarea>
                 <div class="flex justify-center items-center my-1 space-x-2">
                     <label for="import_file_input"

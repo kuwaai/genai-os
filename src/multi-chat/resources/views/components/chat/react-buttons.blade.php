@@ -4,7 +4,7 @@
     style="{{ $showOnFinished ? 'display:none;' : '' }}">
     <div id="{{ $history->id }}_react_copy" role="tooltip"
         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-        {{ __('chat.react_btn.copy') }}
+        {{ __('chat.button.copy') }}
         <div class="tooltip-arrow" data-popper-arrow></div>
     </div>
     <button
@@ -29,7 +29,7 @@
                 request()->user()->hasPerm('Room_update_react_message'))
             <div id="{{ $history->id }}_react_quote" role="tooltip"
                 class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                {{ __('chat.react_btn.quote') }}
+                {{ __('chat.button.quote') }}
                 <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
             <button data-tooltip-target="{{ $history->id }}_react_quote" data-tooltip-placement="top"
@@ -50,7 +50,7 @@
                 request()->user()->hasPerm('Room_update_feedback'))
             <div id="{{ $history->id }}_react_like" role="tooltip"
                 class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                {{ __('chat.react_btn.like') }}
+                {{ __('chat.button.like') }}
                 <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
             <button data-tooltip-target="{{ $history->id }}_react_like" data-tooltip-placement="top"
@@ -69,7 +69,7 @@
             </button>
             <div id="{{ $history->id }}_react_dislike" role="tooltip"
                 class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                {{ __('chat.react_btn.dislike') }}
+                {{ __('chat.button.dislike') }}
                 <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
             <button data-tooltip-target="{{ $history->id }}_react_dislike" data-tooltip-placement="top"
@@ -91,7 +91,7 @@
                 request()->user()->hasPerm('Room_update_react_message'))
             <div id="{{ $history->id }}_react_translate" role="tooltip"
                 class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                {{ __('chat.react_btn.translate') }}
+                {{ __('chat.button.translate') }}
                 <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
             <button data-tooltip-target="{{ $history->id }}_react_translate" data-tooltip-placement="top"
@@ -130,7 +130,7 @@
                 <!--
             <div id="{{ $history->id }}_react_delete" role="tooltip"
                 class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
-                {{ __('chat.react_btn.delete') }}
+                {{ __('chat.button.delete') }}
                 <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
             <button data-tooltip-target="{{ $history->id }}_react_delete" data-tooltip-placement="top"

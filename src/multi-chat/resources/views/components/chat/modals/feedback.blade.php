@@ -31,7 +31,7 @@
                     </svg>
                 </div>
                 <h3 class="text-xl my-auto font-semibold text-gray-900 dark:text-white">
-                    {{ __('chat.modal.feedback.header') }}
+                    {{ __('chat.header.feedback') }}
                 </h3>
                 <button type="button"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -63,7 +63,7 @@
                             <input name="feedback[]" id="feedback_{{ $key + 1 }}" type="checkbox"
                                 value="{{ strtolower($label) }}">
                             <label for="feedback_{{ $key + 1 }}"
-                                class="ml-2 text-sm font-medium text-gray-800 dark:text-gray-300">{{ __('chat.modal.feedback.label.' . strtolower($label)) }}</label>
+                                class="ml-2 text-sm font-medium text-gray-800 dark:text-gray-300">{{ __('chat.label.feedback_' . strtolower($label)) }}</label>
                         </div>
                     @endforeach
 
@@ -72,13 +72,13 @@
                             <input name="feedback[]" id="feedback_{{ count($badFeedback) + $key + 1 }}" type="checkbox"
                                 value="{{ strtolower($label) }}">
                             <label for="feedback_{{ count($badFeedback) + $key + 1 }}"
-                                class="ml-2 text-sm font-medium text-gray-800 dark:text-gray-300">{{ __('chat.modal.feedback.label.' . strtolower($label)) }}</label>
+                                class="ml-2 text-sm font-medium text-gray-800 dark:text-gray-300">{{ __('chat.label.feedback_' . strtolower($label)) }}</label>
                         </div>
                     @endforeach
 
                     <div class="flex justify-end">
                         <button data-modal-hide="feedback" type="submit"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('chat.modal.feedback.button.submit') }}</button>
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('chat.button.feedback') }}</button>
                     </div>
                 </form>
             </div>
@@ -110,12 +110,12 @@
         $("#feedback_form >div." + ["good", "bad"][type - 1] + " >input").prop("disabled", false)
         if (type == 1) {
             //Good
-            $("#feedback_form textarea").attr("placeholder", "{{ __('chat.modal.feedback.hint.good') }}")
+            $("#feedback_form textarea").attr("placeholder", "{{ __('chat.label.feedback_good') }}")
         } else if (type == 2) {
             //Bad
             $("#feedback_form >div.bad").show()
             $("#feedback_form textarea").attr("placeholder",
-                "{{ __('chat.modal.feedback.hint.bad') }}")
+                "{{ __('chat.label.feedback_bad') }}")
         }
         if (data) {
             if (data['nice'] === true && type == 1) {

@@ -8,7 +8,7 @@
             <!-- Modal header -->
             <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    {{ __('chat.modal.export.header') }}
+                    {{ __('chat.header.export') }}
                 </h3>
                 <button type="button"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -28,7 +28,7 @@
                         {{ __('room.label.share_link') }}
                     </label>
                     <p id="copiedAlert" class="text-sm text-gray-600 dark:text-green-400" style="display: none;">
-                        {{ __('chat.hint.copied') }}</p>
+                        {{ __('chat.placeholder.copied') }}</p>
                 </div>
                 <div class="flex">
                     <input name="link" onclick="copyShare($(this), $('#copiedAlert'))"

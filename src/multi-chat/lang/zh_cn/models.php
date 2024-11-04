@@ -23,8 +23,8 @@ return [
     'placeholder.description' => '这个模型的相关介绍',
     'placeholder.link' => '该模型的外部相关链接',
 
-    'modal.create_model.header' => '您确定要建立这个設定檔？',
-    'modal.update_model.header' => '您确定要更新这个语言模型設定檔吗',
-    'modal.delete_model.header' => '您确定要删除这个语言模型設定檔吗',
-    'modal.confirm_setting_modal.shrink_max_upload_file_count' => '降低上傳檔案總數限制會刪除超出的使用者檔案，您确定吗?',
+    'modal.create_model.header' => '您确定要建立这个设定檔？',
+    'modal.update_model.header' => '您确定要更新这个语言模型设定檔吗',
+    'modal.delete_model.header' => '您确定要删除这个语言模型设定檔吗',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => '降低上传檔案总数限制会删除超出的使用者檔案，您确定吗?',
 ];

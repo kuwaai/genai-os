@@ -242,7 +242,7 @@
                     <div
                         class="flex items-center p-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                         <button data-modal-hide="system_announcement_modal" type="button" onclick="$modal1.hide();"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('manage.button.close') }}</button>
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('settings.button.close') }}</button>
                     </div>
                 </div>
             </div>
@@ -268,7 +268,7 @@
                     <div
                         class="flex items-center p-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                         <button data-modal-hide="tos_modal" type="button" onclick="$modal2.hide();"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('manage.button.accept') }}</button>
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('settings.button.accept') }}</button>
                     </div>
                 </div>
             </div>
@@ -296,19 +296,19 @@
             <div class="flex items-center justify-center min-h-screen">
                 <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-md w-full">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-                        {{ __('manage.header.confirmUpdate') }}
+                        {{ __('settings.header.confirmUpdate') }}
                     </h2>
                     <p class="text-gray-700 dark:text-gray-300 mb-4">
-                        {{ __('manage.label.reloginWarning') }}
+                        {{ __('settings.label.reloginWarning') }}
                     </p>
                     <div class="flex justify-end">
                         <div id="cancelUpdate"
                             class="mr-2 cursor-pointer inline-block bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 focus:outline-none">
-                            {{ __('manage.button.cancel') }}
+                            {{ __('settings.button.cancel') }}
                         </div>
                         <div id="confirmUpdate"
                             class="cursor-pointer inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none">
-                            {{ __('manage.button.confirm') }}
+                            {{ __('settings.button.confirm') }}
                         </div>
                     </div>
                 </div>
@@ -318,14 +318,14 @@
             <div class="flex items-center justify-center min-h-screen">
                 <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-                        {{ __('manage.header.updateWeb') }}
+                        {{ __('settings.header.updateWeb') }}
                     </h2>
                     <div id="commandOutput"
                         class="bg-gray-100 scrollbar-y-auto scrollbar dark:bg-gray-700 p-4 rounded-lg text-sm h-96 overflow-x-hidden text-gray-900 dark:text-gray-200 whitespace-normal">
                     </div>
                     <div id="refreshPage" onclick='location.reload()'
                         class="mt-4 cursor-pointer hidden inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none">
-                        {{ __('manage.button.refresh') }}
+                        {{ __('settings.button.refresh') }}
                     </div>
                 </div>
             </div>

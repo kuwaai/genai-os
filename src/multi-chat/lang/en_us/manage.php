@@ -2,18 +2,16 @@
 
 return [
     'route' => 'Management',
-    'interface.header' => 'Administrator Management Interface',
+    'header.interface' => 'Admin Management Interface',
 
-    //Tabs
     'tab.groups' => 'Groups',
     'tab.users' => 'Users',
     'tab.llms' => 'Models',
     'tab.settings' => 'Settings',
     'tab.kernel' => 'System',
-    'tab.workers' => 'Task Processors',
+    'tab.workers' => 'Workers',
 
-    //kernel tabs
     'kernel.tab.executors' => 'Executors',
-    'kernel.tab.hub' => 'Model Store',
+    'kernel.tab.hub' => 'Model Hub',
     'kernel.tab.storage' => 'Storage',
 ];

@@ -43,7 +43,7 @@
                             d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
                     <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                        {{ __('users.modal.delete_user.header') }} "<span>NULL</span>"?</h3>
+                        {{ __('users.header.delete_user') }} "<span>NULL</span>"?</h3>
                     <form action="{{ route('manage.user.delete') }}" method="post" class="inline-block">
                         @csrf
                         @method('delete')
@@ -90,7 +90,7 @@
         action="{{ route('manage.user.create') }}">
         @csrf
         <div class="w-full bg-gray-300 dark:bg-gray-600 p-3 flex items-center justify-center">
-            <p class="text-lg mr-auto">{{ __('users.create_user.header') }}</p>
+            <p class="text-lg mr-auto">{{ __('users.header.create_user') }}</p>
             <button type="submit"
                 class="py-2 px-3 bg-green-600 rounded-lg hover:bg-green-700 transition duration-300 text-white">{{ __('users.button.create') }}</button>
         </div>
@@ -107,7 +107,7 @@
                 </div>
                 <div class="md:col-span-2 lg:col-span-1">
                     <label for="create_user_group"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('users.create_user.joined_group') }}</label>
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('users.label.joined_group') }}</label>
                     <input type="text" list="joinable_groups" name="group" autocomplete="off"
                         id="create_user_group"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -172,7 +172,7 @@
                 <button
                     class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
                     onclick="update_stepper(['Menu']);$('#fuzzy_selector').hide();$('#edit_user_form').hide(); $('#menu').show();">←
-                    {{ __('chat.return_to_menu') }}</button>
+                    {{ __('chat.button.return_to_menu') }}</button>
                 <form class="mb-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden"
                     action="{{ route('manage.user.search') }}" method="post">
                     @csrf
@@ -251,7 +251,7 @@
                         </div>
                     @endif
                 @else
-                    <p>{{ __('users.hint.enter_to_search') }}</p>
+                    <p>{{ __('users.placeholder.enter_to_search') }}</p>
                 @endif
             </div>
             <div id="group_selector" class="flex flex-1 h-full"
@@ -262,7 +262,7 @@
                     <button
                         class="text-center cursor-pointer hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-500 rounded p-2 mb-2"
                         onclick="update_stepper(['Menu']);$('#group_selector').hide(); $('#menu').show();">←
-                        {{ __('chat.return_to_menu') }}</button>
+                        {{ __('chat.button.return_to_menu') }}</button>
                     <div
                         class="mb-2 border border-orange-400 dark:border-orange-400 border-1 rounded-lg overflow-hidden">
                         <button onclick='update_tab("users","group_selector",-1)'
@@ -358,7 +358,7 @@
                 <input name="list_group_id" hidden value="{{ session('list_group') }}">
                 <input name="id" hidden>
                 <div class="w-full bg-gray-300 text-white dark:bg-gray-600 p-3 flex items-center justify-center">
-                    <p class="text-lg mr-auto text-black dark:text-white">{{ __('users.group_selector.header') }}</p>
+                    <p class="text-lg mr-auto text-black dark:text-white">{{ __('users.header.group_selector') }}</p>
                     <span id="user_id" class="mr-2">ID:null</span>
                     <a id="delete_user_btn" onclick="delete_user(undefined)" data-modal-target="delete_user_modal"
                         data-modal-toggle="delete_user_modal"
@@ -379,7 +379,7 @@
                         </div>
                         <div class="md:col-span-2 lg:col-span-1">
                             <label for="edit_joined_group"
-                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('users.create_user.joined_group') }}</label>
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('users.label.joined_group') }}</label>
                             <input type="text" list="joinable_groups" name="group" autocomplete="off"
                                 id="edit_joined_group"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -488,7 +488,7 @@
     }
 
     function edit_group_user(id) {
-        $('#edit_user_form >div >p').text("{{ __('users.group_selector.header') }} " + $users[id][0])
+        $('#edit_user_form >div >p').text("{{ __('users.header.group_selector') }} " + $users[id][0])
         $('#edit_user_form input[name=id]').val(id)
         $('#edit_user_form input[name=name]').val($users[id][0])
         $('#edit_user_form input[name=group]').val($users[id][2] == -1 ? "" : $groupnames[$users[id][2]])

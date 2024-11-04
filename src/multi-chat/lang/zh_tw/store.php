@@ -2,20 +2,24 @@
 
 return [
     'route' => '商店',
+
     'button.create' => '建立Bot',
     'button.community' => '社群',
     'button.groups' => '群組',
     'button.private' => '私人',
     'button.system' => '系統',
-    'label.system_bots' => '系統Bots',
-    'hint.must_select_base_model' => '你必須選一個基底模型',
-    'hint.button.system' => '將會被標示為系統Bot，且所有人皆可存取',
-    'hint.button.community' => '任意群組皆可存取',
-    'hint.button.groups' => '目前所在群組可存取',
-    'hint.button.private' => '只有自己可見',
+
+    'placeholder.must_select_base_model' => '你必須選一個基底模型',
+    'placeholder.button.system' => '將會被標示為系統Bot，且所有人皆可存取',
+    'placeholder.button.community' => '任意群組皆可存取',
+    'placeholder.button.groups' => '目前所在群組可存取',
+    'placeholder.button.private' => '只有自己可見',
+
     'label.community_bots' => '社群Bots',
     'label.private' => '私人Bots',
     'label.groups_bots' => '群組Bots',
+    'label.system_bots' => '系統Bots',
+    
     'bot.system_prompt' => '系統提示詞',
     'bot.welcome_message' => '歡迎訊息',
     'bot.name' => '應用名稱',

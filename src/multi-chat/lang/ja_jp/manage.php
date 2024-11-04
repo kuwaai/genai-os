@@ -2,18 +2,16 @@
 
 return [
     'route' => '管理',
-    'interface.header' => '管理者管理インターフェース',
+    'header.interface' => '管理者管理インターフェース',
 
-    //タブ
     'tab.groups' => 'グループ',
     'tab.users' => 'ユーザー',
     'tab.llms' => 'モデル',
     'tab.settings' => '設定',
     'tab.kernel' => 'システム',
-    'tab.workers' => 'タスク処理',
+    'tab.workers' => 'タスクワーカー',
 
-    //システム タブ
-    'kernel.tab.executors' => '実行者',
+    'kernel.tab.executors' => '実行器',
     'kernel.tab.hub' => 'モデルストア',
     'kernel.tab.storage' => 'ストレージ',
 ];

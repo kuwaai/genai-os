@@ -8,9 +8,8 @@ return [
     'label.invite_token' => 'Einladungscode',
     'label.invite_token.invite_token_optional' => 'Einladungscode (optional)',
 
-    'hint.user_created_success' => 'Benutzer erfolgreich erstellt',
+    'placeholder.user_created_success' => 'Benutzer erfolgreich erstellt',
 
-    //Email verify
-    'email.thanks_for_signup' => 'Vielen Dank für Ihre Registrierung! Bevor Sie beginnen können, müssen Sie Ihre E-Mail-Adresse verifizieren. Bitte überprüfen Sie Ihre E-Mails auf eine E-Mail von uns mit einem Verifizierungslink. Wenn Sie keine E-Mail erhalten haben, können wir Ihnen eine neue senden.',
-    'email.new_verify_link_send' => 'Ein neuer Verifizierungslink wurde an Ihre E-Mail-Adresse gesendet.',
+    'email.thanks_for_signup' => 'Vielen Dank für Ihre Registrierung! Bevor Sie beginnen können, müssen Sie Ihre E-Mail-Adresse verifizieren. Bitte überprüfen Sie Ihre E-Mail auf eine E-Mail mit einem Verifizierungslink. Wenn Sie keine E-Mail erhalten haben, können wir Ihnen eine neue senden.',
+    'email.new_verify_link_send' => 'Ein neuer Verifizierungslink wurde an Ihre E-Mail-Adresse gesendet',
 ];

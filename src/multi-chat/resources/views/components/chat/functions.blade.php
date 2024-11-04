@@ -25,10 +25,10 @@
 
     function translate_msg($msg) {
         let msgTranslations = {
-            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('chat.hint.llm_returned_empty') }}",
-            "[Sorry, something is broken, please try again later!]": "{{ __('chat.hint.please_retry_later') }}",
-            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('chat.hint.no_worker') }}",
-            "[Sorry, The input message is too huge!]": "{{ __('chat.hint.input_too_large') }}"
+            "[Oops, the LLM returned empty message, please try again later or report to admins!]": "{{ __('chat.placeholder.llm_returned_empty') }}",
+            "[Sorry, something is broken, please try again later!]": "{{ __('chat.placeholder.please_retry_later') }}",
+            "[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]": "{{ __('chat.placeholder.no_worker') }}",
+            "[Sorry, The input message is too huge!]": "{{ __('chat.placeholder.input_too_large') }}"
         };
 
         for (let original in msgTranslations) {
@@ -370,7 +370,7 @@ xmlns="http://www.w3.org/2000/svg">
                             $(node).children("svg").addClass("hidden");
                             $(node).children("svg").eq(3).removeClass("hidden");
                             $("#error_alert >span").text(
-                                "{{ __('chat.hint.no_worker') }}"
+                                "{{ __('chat.placeholder.no_worker') }}"
                             )
                             $("#error_alert").fadeIn();
                             setTimeout(function() {
@@ -461,7 +461,7 @@ xmlns="http://www.w3.org/2000/svg">
         $(node).children("svg").eq(0).hide();
         $(node).children("svg").eq(1).show();
         if ($(node).children("span")) {
-            $(node).children("span").text("{{ __('chat.hint.copied') }}")
+            $(node).children("span").text("{{ __('chat.placeholder.copied') }}")
         }
         setTimeout(function() {
             $(node).children("svg").eq(0).show();
@@ -488,7 +488,7 @@ xmlns="http://www.w3.org/2000/svg">
             // Handle the response
             $result = data
             if ($result.error == "Backend compiler offline") {
-                $($this).text("{{ __('chat.hint.backend_offline') }}")
+                $($this).text("{{ __('chat.placeholder.backend_offline') }}")
                 $($this).addClass("bg-orange-600 hover:bg-orange-700")
                 setTimeout(function() {
                     $($this).text("{{ __('chat.button.verilog_compile_test') }}")
@@ -499,10 +499,10 @@ xmlns="http://www.w3.org/2000/svg">
             } else {
                 if (JSON.parse(data).success) {
                     $($this).addClass("bg-green-600 hover:bg-green-700")
-                    $($this).text("{{ __('chat.hint.success') }}")
+                    $($this).text("{{ __('chat.placeholder.success') }}")
                 } else {
                     $($this).addClass("bg-red-600 hover:bg-red-700")
-                    $($this).text("{{ __('chat.hint.failed') }}")
+                    $($this).text("{{ __('chat.placeholder.failed') }}")
                 }
                 $($this).parent().after(
                     `<div class="flex ${JSON.parse(data).success ? 'bg-green-200' : 'bg-red-200'} whitespace-pre-wrap"></div>`

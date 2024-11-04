@@ -9,7 +9,7 @@
                     <section class="flex flex-col h-full overflow-hidden">
                         <header>
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                {{ __('manage.interface.header') }}
+                                {{ __('manage.header.interface') }}
                             </h2>
                         </header>
                         <div class="flex-1 flex overflow-hidden flex-col border-gray-700 rounded border-2">

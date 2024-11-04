@@ -7,7 +7,7 @@
     <div class="flex flex-col pb-20">
         <div class="flex justify-center items-center"><i
                 class="fas fa-wifi text-white animate-pulse bg-green-500 rounded-full p-4"></i></div>
-        <span class="text-black dark:text-white animate-bounce pt-2">{{ __('room.connecting.hint') }}</span>
+        <span class="text-black dark:text-white animate-bounce pt-2">{{ __('room.placeholder.connecting') }}</span>
     </div>
 </div>
 
@@ -46,12 +46,12 @@
     function uploadcheck() {
         if (!$("#upload")[0].files || $("#upload")[0].files[0].length <= 0) return;
         if ({{ $upload_max_file_count == '0' ? 'true' : 'false' }}) {
-            showErrorMsg("{{ __('chat.hint.upload_disabled_by_admin') }}");
+            showErrorMsg("{{ __('chat.placeholder.upload_disabled_by_admin') }}");
             return;
         }
 
         if ($("#upload")[0].files[0].size > {{ $upload_max_size_mb * 2 ** 20 }}) {
-            showErrorMsg("{{ __('chat.hint.upload_file_too_large') }}");
+            showErrorMsg("{{ __('chat.placeholder.upload_file_too_large') }}");
             return;
         }
         @if ($upload_allowed_extensions === '*')
@@ -60,7 +60,7 @@
             file_regex = /\.({{ str_replace(',', '|', $upload_allowed_extensions) }})$/;
         @endif
         if (!$("#upload")[0].files[0].name.match(file_regex)) {
-            showErrorMsg("{{ __('chat.hint.upload_not_allowed_ext') }}");
+            showErrorMsg("{{ __('chat.placeholder.upload_not_allowed_ext') }}");
             return;
         }
         $("#attachment").show();
@@ -71,7 +71,7 @@
 <script>
     if ($("#chat_input")) {
         $("#chat_input").prop("readonly", true)
-        $("#chat_input").val("{{ __('chat.hint.processing') }}")
+        $("#chat_input").val("{{ __('chat.placeholder.processing') }}")
         $("#submit_msg").hide()
         if ($("#upload_btn")) $("#upload_btn").hide()
         if ($("#abort_btn")) $("#abort_btn").hide()
@@ -95,7 +95,7 @@
                 $("#submit_msg").hide()
                 if ($("#upload_btn")) $("#upload_btn").hide()
                 if (!isMac) {
-                    $("#chat_input").val("{{ __('chat.hint.processing') }}")
+                    $("#chat_input").val("{{ __('chat.placeholder.processing') }}")
                 }
                 $("#chat_input").prop("readonly", true)
             } else if ($chattable && (($("#chat_input").val().trim() != "") || quoted.length != 0)) {
@@ -128,21 +128,21 @@
                 $("#submit_msg").hide()
                 if ($("#upload_btn")) $("#upload_btn").hide()
                 if (!isMac) {
-                    $("#chat_input").val("{{ __('chat.hint.processing') }}")
+                    $("#chat_input").val("{{ __('chat.placeholder.processing') }}")
                 }
                 $("#chat_input").prop("readonly", true)
             } else {
                 if ($("#chat_input").val().trim() == "") {
                     $("#error_alert >span").text(
-                        "{{ __('chat.hint.send.empty') }}")
+                        "{{ __('chat.placeholder.send.empty') }}")
                 } else if (!$chattable) {
                     $("#error_alert >span").text(
-                        "{{ __('chat.hint.send.still_processing') }}")
+                        "{{ __('chat.placeholder.send.still_processing') }}")
                 } else if (allDisabled) {
                     $("#error_alert >span").text(
-                        "{{ __('chat.hint.must_select_llm') }}")
+                        "{{ __('chat.placeholder.must_select_llm') }}")
                 } else {
-                    $("#error_alert >span").text("{{ __('chat.hint.please_refresh') }}")
+                    $("#error_alert >span").text("{{ __('chat.placeholder.please_refresh') }}")
                 }
                 $("#error_alert").fadeIn();
                 setTimeout(function() {
@@ -161,7 +161,7 @@
             setTimeout(() => {
                 if (finsihed || task.readyState === EventSource.OPEN) {
                     console.log('Connected')
-                    $('#connection_indicator span').text('{{ __('room.connected.hint') }}')
+                    $('#connection_indicator span').text('{{ __('room.placeholder.connected') }}')
                     $('#connection_indicator').fadeOut();
                 }
             }, 1);

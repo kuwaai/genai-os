@@ -53,7 +53,7 @@
 
                 @if (session('status') === 'google-token-updated')
                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.placeholder.updated') }}</p>
                 @endif
             </div>
         </form>
@@ -77,7 +77,7 @@
 
                 @if (session('status') === 'chatgpt-token-updated')
                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.placeholder.updated') }}</p>
                 @endif
             </div>
         </form>
@@ -101,7 +101,7 @@
 
                 @if (session('status') === 'third-party-token-updated')
                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.placeholder.updated') }}</p>
                 @endif
             </div>
         </form>

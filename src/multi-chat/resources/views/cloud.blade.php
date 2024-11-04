@@ -396,7 +396,7 @@
                         <p class="text-gray-600 mb-4">Drag & drop your files here or click to upload.</p>
                         <input type="file" id="file-upload" class="hidden" multiple>
                         <label for="file-upload"
-                            class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg">{{ __('cloud.interface.header') }}</label>
+                            class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg">{{ __('cloud.header.interface') }}</label>
                     </div>
                     <div class="flex-grow border-2 border-gray-400 rounded-lg p-2 flex flex-col">
                         <div class="flex flex-wrap overflow-auto" id="file-list"></div>

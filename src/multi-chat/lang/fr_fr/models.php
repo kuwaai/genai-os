@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'button.new_model' => 'Créer un nouveau modèle',
+    'button.new_model' => 'Créer un modèle',
     'button.delete' => 'Supprimer',
     'button.save' => 'Enregistrer',
     'button.yes' => 'Oui, je confirme',
@@ -17,14 +17,14 @@ return [
     'label.order' => 'Ordre d\'affichage',
     'label.link' => 'Lien externe',
 
-    'header.create_model' => 'Créer une configuration de modèle',
-    'header.update_model' => 'Modifier la configuration du modèle',
+    'header.create_model' => 'Créer un modèle de configuration',
+    'header.update_model' => 'Modifier un modèle de configuration',
 
-    'placeholder.description' => 'Présentation de ce modèle',
-    'placeholder.link' => 'Lien externe associé à ce modèle',
+    'placeholder.description' => 'Une brève description de ce modèle',
+    'placeholder.link' => 'Un lien externe associé à ce modèle',
 
-    'modal.create_model.header' => 'Êtes-vous sûr de vouloir créer ce profil ?',
-    'modal.update_model.header' => 'Êtes-vous sûr de vouloir mettre à jour ce profil de modèle linguistique ?',
-    'modal.delete_model.header' => 'Êtes-vous sûr de vouloir supprimer ce profil de modèle linguistique ?',
-    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'Réduire la limite du nombre total de fichiers téléchargeables supprimera les fichiers utilisateur excédentaires. Êtes-vous sûr ?',
+    'modal.create_model.header' => 'Êtes-vous sûr de vouloir créer ce modèle ?',
+    'modal.update_model.header' => 'Êtes-vous sûr de vouloir mettre à jour ce modèle de configuration ?',
+    'modal.delete_model.header' => 'Êtes-vous sûr de vouloir supprimer ce modèle de configuration ?',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'Réduire la limite du nombre total de fichiers téléchargés supprimera les fichiers des utilisateurs excédant cette limite. Êtes-vous sûr ?',
 ];

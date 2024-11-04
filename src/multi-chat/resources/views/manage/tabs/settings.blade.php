@@ -52,19 +52,19 @@
                         'update' => [
                             'success' => [
                                 'status' => 'success',
-                                'message' => __('settings.hint.saved'),
+                                'message' => __('settings.placeholder.saved'),
                                 'type' => 'green',
                             ],
                             'smtp_not_configured' => [
                                 'status' => 'smtp_not_configured',
-                                'message' => __('settings.hint.smtp_not_configured'),
+                                'message' => __('settings.placeholder.smtp_not_configured'),
                                 'type' => 'blue',
                             ],
                         ],
                         'resetRedis' => [
                             'success' => [
                                 'status' => 'success',
-                                'message' => __('settings.hint.redis_cache_cleared'),
+                                'message' => __('settings.placeholder.redis_cache_cleared'),
                                 'type' => 'green',
                             ],
                         ],
@@ -97,7 +97,7 @@
                             <path
                                 d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                         </svg>
-                        <div class="ml-3 text-sm font-medium">{{ __('settings.hint.saved') }}</div>
+                        <div class="ml-3 text-sm font-medium">{{ __('settings.placeholder.saved') }}</div>
                     </div>
                 @endif
             </div>

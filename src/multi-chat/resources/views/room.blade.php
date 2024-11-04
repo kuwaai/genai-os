@@ -59,7 +59,7 @@
                 @if ($bots->count() == 0)
                     <div
                         class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
-                        {!! __('chat.hint.no_llms') !!}
+                        {!! __('chat.placeholder.no_llms') !!}
                     </div>
                 @else
                     <div class="mb-2">

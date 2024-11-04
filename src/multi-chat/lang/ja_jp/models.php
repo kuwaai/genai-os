@@ -21,10 +21,10 @@ return [
     'header.update_model' => 'モデル設定ファイルの編集',
 
     'placeholder.description' => 'このモデルに関する説明',
-    'placeholder.link' => 'このモデルに関連する外部リンク',
+    'placeholder.link' => 'このモデルの外部関連リンク',
 
-    'modal.create_model.header' => 'この設定ファイルを作成しますか？',
-    'modal.update_model.header' => 'この言語モデルの設定ファイルを更新しますか？',
-    'modal.delete_model.header' => 'この言語モデルの設定ファイルを削除しますか？',
-    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'アップロードできるファイルの合計数を減らすと、超過したユーザーファイルが削除されます。よろしいですか？',
+    'modal.create_model.header' => 'この設定ファイルを本当に作成しますか？',
+    'modal.update_model.header' => 'この言語モデル設定ファイルを本当に更新しますか',
+    'modal.delete_model.header' => 'この言語モデル設定ファイルを本当に削除しますか',
+    'modal.confirm_setting_modal.shrink_max_upload_file_count' => 'アップロードファイルの総数制限を下げると、超過しているユーザーファイルが削除されます。よろしいですか？',
 ];

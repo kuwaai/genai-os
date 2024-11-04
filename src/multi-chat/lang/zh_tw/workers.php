@@ -1,14 +1,12 @@
 <?php
 
 return [
-    //Buttons
     'button.new_executor' => '新增執行器紀錄',
     'button.start' => '啟動任務處理器',
     'button.stop' => '停止所有任務處理器',
     'button.confirm' => '確認',
     'button.cancel' => '取消',
 
-    //Workers
     'label.loading' => '加載中...',
     'label.last_refresh' => '最後刷新時間：:time',
     'label.current_worker_count' => '當前任務處理器數量',

@@ -9,7 +9,7 @@
             <!-- Modal header -->
             <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    {{ __('chat.modal.import.header') }}
+                    {{ __('chat.header.import') }}
                 </h3>
                 <button type="button"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -26,7 +26,7 @@
             <!-- Modal body -->
             <div class="p-6 flex flex-col justify-center">
                 <label for="import_file_input"
-                    class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.modal.import.button.file') }}</label>
+                    class="mx-auto bg-green-500 hover:bg-green-600 px-3 py-2 rounded cursor-pointer text-white">{{ __('chat.button.import_from_file') }}</label>
                 <hr class="my-4 border-black border-gray-300 dark:border-gray-600" />
                 <form method="post" action="{{ route('room.import') }}">
                     @csrf
@@ -40,7 +40,7 @@
                         <input name="room_id" value="{{ request()->route('room_id') }}" hidden>
                     @endif
                     <textarea name="history" id="import_json" rows="5" max-rows="15" oninput="adjustTextareaRows(this)"
-                        placeholder="{{ __('chat.modal.import.hint.drag_and_drop') }}"
+                        placeholder="{{ __('chat.placeholder.drag_and_drop') }}"
                         class="w-full pl-4 pr-12 py-2 rounded text-black scrollbar dark:text-white placeholder-black dark:placeholder-white bg-gray-200 dark:bg-gray-600 border border-gray-300 focus:outline-none shadow-none border-none focus:ring-0 focus:border-transparent rounded-l-md resize-none"></textarea>
                     <input id="import_file_name" name="import_file_name" type='text' hidden>
                 </form>
@@ -81,7 +81,7 @@
             <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                 <button data-modal-hide="importModal" type="button"
                     onclick="$(this).parent().parent().find('form').submit()"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('chat.modal.import.submit') }}</button>
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __('chat.button.import') }}</button>
                 <button data-modal-hide="importModal" type="button"
                     class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('chat.button.cancel') }}</button>
             </div>

@@ -352,7 +352,7 @@ class RoomController extends Controller
             return [
                 'succeed' => false,
                 'url' => null,
-                'msg' => __('chat.hint.upload_disabled_by_admin'),
+                'msg' => __('chat.placeholder.upload_disabled_by_admin'),
             ];
         }
 
