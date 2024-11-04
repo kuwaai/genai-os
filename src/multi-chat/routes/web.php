@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ManageController;
@@ -164,19 +163,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                             ->delete('/', [ProfileController::class, 'destroy'])
                             ->name('profile.destroy');
                     });
-                #---Archives, disabled, should be updated like inspecter or just deleted and replaced by export all data button
-                /*Route::middleware(AdminMiddleware::class . ':tab_Archive')
-            ->prefix('archive')
-            ->group(function () {
-                Route::get('/', function () {
-                    return view('archive');
-                })->name('archive.home');
-
-                Route::get('/{chat_id}', [ArchiveController::class, 'main'])->name('archive.chat');
-                Route::post('/edit', [ArchiveController::class, 'edit'])->name('archive.edit');
-                Route::delete('/delete', [ArchiveController::class, 'delete'])->name('archive.delete');
-            })
-            ->name('archive');*/
 
                 #---Room
                 Route::middleware(AdminMiddleware::class . ':tab_Room')

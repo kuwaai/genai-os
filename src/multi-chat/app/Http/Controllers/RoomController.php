@@ -86,14 +86,11 @@ class RoomController extends Controller
     }
     public function home(Request $request)
     {
-        // The selected bots are stored in the 'llms' session data.
         if ($request->session()->exists('llms')) {
             return view('room');
         } else {
             return view('room.home');
         }
-        // LLMs::findOrFail($chat->bot_id)->enabled == true) {
-        // return redirect()->route('archives', $request->route('chat_id'));
     }
     public function chat_room(Request $request)
     {
