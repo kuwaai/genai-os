@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="flex h-full max-w-7xl mx-auto py-2">
+    <div class="flex h-full mx-auto py-2">
         <div
             class="flex flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-lg overflow-y-auto scrollbar text-gray-700 dark:text-white">
 

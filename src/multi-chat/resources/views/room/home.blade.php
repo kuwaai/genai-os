@@ -20,7 +20,7 @@
     @if (request()->user()->hasPerm('Room_update_import_chat'))
         <x-chat.modals.import_history :llms="$llms ?? []" />
     @endif
-    <div class="flex h-full max-w-7xl mx-auto py-2">
+    <div class="flex h-full mx-auto py-2">
         <div
             class="bg-white dark:bg-gray-800 text-white w-64 hidden sm:flex flex-shrink-0 relative rounded-l-lg overflow-hidden">
             <div class="p-3 flex flex-1 flex-col w-full h-full">

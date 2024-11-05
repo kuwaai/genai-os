@@ -18,7 +18,7 @@
 <body class="antialiased scrollbar">
     <div
         class="min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white flex items-center justify-center">
-        <div class="max-w-7xl mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
+        <div class="mx-auto px-6 pt-6 lg:px-8 lg:pt-8 pb-3">
             <x-logo />
             <div class="mt-4 flex flex-col items-center">
                 @env(['nuk'])
