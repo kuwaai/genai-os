@@ -187,7 +187,7 @@ class SystemController extends Controller
             $buffer = mb_convert_encoding($buffer, 'UTF-8', $encoding);
         }
 
-        if (strpos($buffer, 'password') !== false) {
+        if (strpos($buffer, 'Enter passphrase') !== false) {
             $this->sendError('Password prompt detected. Cancelling job...');
         } elseif (strpos($buffer, 'dubious ownership') !== false) {
             $this->sendError("Dubious ownership detected. Please run: git config --global --add safe.directory {$projectRoot}");
