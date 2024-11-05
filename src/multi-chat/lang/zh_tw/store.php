@@ -20,6 +20,7 @@ return [
     'placeholder.button.groups' => '目前所在群組可存取',
     'placeholder.button.private' => '只有自己可見',
 
+    'label.all_bots' => '全部Bots',
     'label.community_bots' => '社群Bots',
     'label.private' => '私人Bots',
     'label.groups_bots' => '群組Bots',

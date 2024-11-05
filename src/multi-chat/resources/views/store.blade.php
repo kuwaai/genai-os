@@ -65,27 +65,59 @@
                 </div>
             @endif
             @php
-                $system_bots = sortBots($bots->where('visibility', '=', 0));
-                $community_bots = sortBots($bots->where('visibility', '=', 1));
-                $group_bots = $bots->where('visibility', '=', 2);
-                if (!request()->user()->hasPerm('tab_Manage')) {
-                    $group_bots = $group_bots->where('group_id', '=', request()->user()->group_id);
+                $all = collect(); // Initialize $all as a collection
+
+                // Get sorted system bots if the user has the "Store_read_discover_system_bots" permission
+                if (request()->user()->hasPerm('Store_read_discover_system_bots')) {
+                    $system_bots = sortBots($bots->where('visibility', '=', 0));
+                    $all = $all->merge($system_bots); // Add system bots to $all
                 }
-                $group_bots = sortBots($group_bots);
-                $private_bots = $bots->where('visibility', '=', 3)->where('owner_id', '=', request()->user()->id);
-                $private_bots = sortBots($private_bots);
+
+                // Get sorted community bots if the user has the "Store_read_discover_community_bots" permission
+                if (request()->user()->hasPerm('Store_read_discover_community_bots')) {
+                    $community_bots = sortBots($bots->where('visibility', '=', 1));
+                    $all = $all->merge($community_bots); // Add community bots to $all
+                }
+
+                // Get sorted group bots if the user has the "Store_read_discover_group_bots" permission
+                if (request()->user()->hasPerm('Store_read_discover_group_bots')) {
+                    $group_bots = $bots->where('visibility', '=', 2);
+
+                    // Limit group bots to the user's group if they don't have the "tab_Manage" permission
+                    if (!request()->user()->hasPerm('tab_Manage')) {
+                        $group_bots = $group_bots->where('group_id', '=', request()->user()->group_id);
+                    }
+
+                    $group_bots = sortBots($group_bots);
+                    $all = $all->merge($group_bots); // Add group bots to $all
+                }
+
+                // Get sorted private bots if the user has the "Store_read_discover_private_bots" permission
+                if (request()->user()->hasPerm('Store_read_discover_private_bots')) {
+                    $private_bots = $bots->where('visibility', '=', 3)->where('owner_id', '=', request()->user()->id);
+                    $private_bots = sortBots($private_bots);
+                    $all = $all->merge($private_bots); // Add private bots to $all
+                }
+                $all = sortBots($all);
             @endphp
 
             <div class="flex-1 flex overflow-hidden flex-col rounded">
                 <div class="w-full">
                     <ul class="flex w-full text-sm font-medium text-center" data-tabs-toggle="#BotContents"
                         role="tablist">
+                        <li class="flex-1" role="presentation">
+                            <button class="w-full p-4 text-gray-700 dark:text-gray-200 bg-transparent" id="all-tab"
+                                data-tabs-target="#all" type="button" role="tab" aria-controls="all"
+                                aria-selected="{{ session('last_bot_tab') ? 'false' : 'true' }}">
+                                {{ __('store.label.all_bots') }}
+                            </button>
+                        </li>
                         @if (request()->user()->hasPerm('Store_read_discover_system_bots'))
                             <li class="flex-1" role="presentation">
                                 <button class="w-full p-4 text-gray-700 dark:text-gray-200 bg-transparent"
                                     id="system-tab" data-tabs-target="#system" type="button" role="tab"
                                     aria-controls="system"
-                                    aria-selected="{{ session('last_bot_tab') ? 'false' : 'true' }}">
+                                    aria-selected="{{ session('last_bot_tab') == 'system' ? 'true' : 'false' }}">
                                     {{ __('store.label.system_bots') }}
                                 </button>
                             </li>
@@ -124,10 +156,17 @@
                 </div>
 
                 <div id="BotContents" class="flex flex-1 overflow-hidden px-4 mb-2">
+                    <!-- All Bots Tab Content -->
+                    <div class="{{ session('last_bot_tab') ? 'hidden' : '' }} flex flex-1" id="all"
+                        role="tabpanel" aria-labelledby="all-tab">
+                        @if ($all->count() > 0)
+                            <x-store.bot-showcase :bots="$all" :extra="'all_bots-'" />
+                        @endif
+                    </div>
                     <!-- System Bots Tab Content -->
                     @if (request()->user()->hasPerm('Store_read_discover_system_bots'))
-                        <div class="{{ session('last_bot_tab') ? 'hidden' : '' }} flex flex-1" id="system"
-                            role="tabpanel" aria-labelledby="system-tab">
+                        <div class="{{ session('last_bot_tab') == 'system' ? 'hidden' : '' }} flex flex-1"
+                            id="system" role="tabpanel" aria-labelledby="system-tab">
                             @if ($system_bots->count() > 0)
                                 <x-store.bot-showcase :bots="$system_bots" :extra="'official_bots-'" />
                             @endif
@@ -165,7 +204,6 @@
                     @endif
                 </div>
             </div>
-
         </div>
     </div>
 </x-app-layout>
