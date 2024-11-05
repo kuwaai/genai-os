@@ -14,9 +14,6 @@
                         <span id="logoutText">{{ __('hub.button.logout') }}</span>
                     </button>
                 </div>
-
-                <div id="orgBadges" class="flex space-x-2">
-                </div>
             </div>
 
             <div class="flex items-center">
@@ -52,16 +49,10 @@
                 const {
                     username
                 } = data;
-                const [name, orgsString] = username.split('[1morgs: [0m');
-                const orgs = (orgsString || '').trim().split(',').filter(Boolean);
+                const name = username.split('[1morgs: [0m')[0];
 
                 $('#hf_status > div').toggleClass('hidden');
                 $('#userGreeting').text(name.trim());
-                $('#orgBadges').empty().append(
-                    orgs.map(org =>
-                        `<span class="badge bg-blue-200 text-blue-800 rounded-full px-3 py-1">${org.trim()}</span>`).join(
-                        '')
-                );
             }
 
             function performRequest(url, data = {}, onSuccess, onError) {
