@@ -20,13 +20,13 @@
     @if (request()->user()->hasPerm('Room_update_import_chat'))
         <x-chat.modals.import_history :llms="$llms ?? []" />
     @endif
-    <div class="flex h-full mx-auto py-2">
+    <div class="flex h-full mx-auto">
         <div
-            class="bg-white dark:bg-gray-800 text-white w-64 hidden sm:flex flex-shrink-0 relative rounded-l-lg overflow-hidden">
+            class="bg-white dark:bg-gray-800 text-white w-64 hidden sm:flex flex-shrink-0 relative overflow-hidden">
             <div class="p-3 flex flex-1 flex-col w-full h-full">
                 @if ($bots->count() == 0)
                     <div
-                        class="flex-1 h-full flex flex-col w-full text-center rounded-r-lg overflow-hidden justify-center items-center text-gray-700 dark:text-white">
+                        class="flex-1 h-full flex flex-col w-full text-center overflow-hidden justify-center items-center text-gray-700 dark:text-white">
                         {!! __('chat.placeholder.no_llms') !!}
                     </div>
                 @else
@@ -71,7 +71,7 @@
             </div>
         </div>
         <div id="histories_hint"
-            class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
+            class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden">
             <button
                 class="absolute sm:hidden text-center text-black hover:text-black dark:text-white hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 focus:ring-4 focus:ring-blue-300 font-medium text-sm px-5 py-5 focus:outline-none dark:focus:ring-blue-800"
                 type="button" data-drawer-target="chatlist_drawer" data-drawer-show="chatlist_drawer"
