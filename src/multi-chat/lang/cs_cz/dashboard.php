@@ -1,24 +1,23 @@
 <?php
 
 return [
-    'route' => 'Nástroje',
+    'route' => 'Dashboard',
 
-    'header.interface' => 'Správní rozhraní nástrojů',
-    'header.create_rule' => 'Vytvořit pravidlo filtrace',
-    'header.update_rule' => 'Aktualizovat pravidlo filtrace',
+    'header.create_rule' => 'Vytvořit pravidlo filtru',
+    'header.update_rule' => 'Aktualizovat pravidlo filtru',
 
     'tab.statistics' => 'Statistiky',
     'tab.blacklist' => 'Černá listina',
     'tab.feedbacks' => 'Zpětná vazba',
     'tab.logs' => 'Systémové protokoly',
-    'tab.safetyguard' => 'Bezpečnostní filtrace',
+    'tab.safetyguard' => 'Bezpečnostní filtrování',
     'tab.inspect' => 'Prohlížeč zpráv',
 
     'colName.Action' => 'Akce:',
     'colName.Description' => 'Popis:',
     'colName.UserID' => 'ID uživatele:',
     'colName.IP' => 'IP adresa:',
-    'colName.Timestamp' => 'Časové razítko:',
+    'colName.Timestamp' => 'Časová známka:',
 
     'filter.StartDate' => 'Začátek:',
     'filter.EndDate' => 'Konec:',
@@ -29,8 +28,8 @@ return [
 
     'placeholder.PasteRawDataHere' => 'Vložte sem surová data, která chcete převést, nebo sem přetáhněte soubor.',
     
-    'header.ActiveModels' => 'Aktivované modely',
-    'header.InactiveModels' => 'Deaktivované modely',
+    'header.ActiveModels' => 'Aktivní modely',
+    'header.InactiveModels' => 'Neaktivní modely',
     'header.ModelFilter' => 'Filtrovat modely:',
     'header.ExportSetting' => 'Nastavení exportu:',
 
@@ -43,30 +42,30 @@ return [
     'button.delete' => 'Smazat',
     'button.update' => 'Aktualizovat',
 
-    "hint.safety_guard_offline"=>"Bezpečnostní filtrace je v offline režimu",
-    "hint.wip_option"=>"Ve vývoji, v současné době nejsou k dispozici žádné možnosti",
+    "hint.safety_guard_offline"=>"Bezpečnostní filtrování je offline",
+    "hint.wip_option"=>"V práci, momentálně bez možností",
 
     'action.overwrite' => 'Přepsáno systémem',
-    'action.block' => 'Blokovat, možnost varování',
+    'action.block' => 'Blokovat, s volitelnou výstrahou',
     'action.warn' => 'Pouze varování',
     'action.none' => 'Žádná akce',
 
     'msg.SomethingWentWrong' => 'Něco se pokazilo...',
     'msg.choose_target' => 'Vyberte prosím model',
-    'msg.create_rule' => 'Chcete toto pravidlo vytvořit?',
-    'msg.delete_rule' => 'Chcete toto pravidlo smazat?',
-    'msg.update_rule' => 'Chcete toto pravidlo aktualizovat?',
-    'msg.MustHave1Model' => 'Musíte vybrat alespoň jeden model, který chcete exportovat',
-    'msg.InvalidJSONFormat' => 'Chybný formát JSON',
-    'msg.NoRecord' => 'Žádné záznamy',
+    'msg.create_rule' => 'Opravdu chcete vytvořit toto pravidlo?',
+    'msg.delete_rule' => 'Opravdu chcete toto pravidlo smazat?',
+    'msg.update_rule' => 'Opravdu chcete toto pravidlo aktualizovat?',
+    'msg.MustHave1Model' => 'Pro export musíte vybrat alespoň jeden model',
+    'msg.InvalidJSONFormat' => 'Nesprávný formát JSON',
+    'msg.NoRecord' => 'Žádný záznam',
 
-    'rule.filter.keyword' => 'Pravidlo klíčového slova',
+    'rule.filter.keyword' => 'Pravidlo klíčových slov',
     'rule.filter.embedding' => 'Pravidlo vnoření',
     'rule.name' => 'Název pravidla',
     'rule.description' => 'Popis pravidla',
-    'rule.target' => 'Vybrat cílový model pro pravidlo',
+    'rule.target' => 'Zadat model pro pravidlo',
     'rule.action' => 'Akce pravidla',
-    'rule.warning' => 'Zpráva varování (volitelné)',
-    'rule.filter.input' => 'Filtrace vstupu',
-    'rule.filter.output' => 'Filtrace výstupu',
+    'rule.warning' => 'Varovná zpráva (volitelná)',
+    'rule.filter.input' => 'Vstupní filtrování',
+    'rule.filter.output' => 'Výstupní filtrování',
 ];

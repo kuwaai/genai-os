@@ -3,7 +3,6 @@
 return [
     'route' => 'Dashboard',
 
-    'header.interface' => 'Dashboard Management Interface',
     'header.create_rule' => 'Create Filter Rule',
     'header.update_rule' => 'Update Filter Rule',
 
@@ -27,12 +26,12 @@ return [
     'filter.UserID' => 'Operator ID:',
     'filter.IPAddress' => 'IP Address:',
 
-    'placeholder.PasteRawDataHere' => 'Paste raw data to be converted here, or drag the file to this area.',
+    'placeholder.PasteRawDataHere' => 'Paste raw data here to convert, or drag and drop files.',
     
-    'header.ActiveModels' => 'Enabled Models',
-    'header.InactiveModels' => 'Disabled Models',
+    'header.ActiveModels' => 'Active Models',
+    'header.InactiveModels' => 'Inactive Models',
     'header.ModelFilter' => 'Filter Models:',
-    'header.ExportSetting' => 'Export Settings:',
+    'header.ExportSetting' => 'Export Setting:',
 
     'button.ExportAndDownload' => 'Export and Download',
     'button.LoadFile' => 'Load File',
@@ -44,7 +43,7 @@ return [
     'button.update' => 'Update',
 
     "hint.safety_guard_offline"=>"Safety filter system is offline",
-    "hint.wip_option"=>"Work in progress, no options currently available",
+    "hint.wip_option"=>"Work in progress, no options available yet",
 
     'action.overwrite' => 'Overwrite by system',
     'action.block' => 'Block, optional warning',
@@ -52,21 +51,21 @@ return [
     'action.none' => 'No action',
 
     'msg.SomethingWentWrong' => 'Something went wrong...',
-    'msg.choose_target' => 'Please choose a model',
+    'msg.choose_target' => 'Please select a model',
     'msg.create_rule' => 'Are you sure you want to create this rule?',
     'msg.delete_rule' => 'Are you sure you want to delete this rule?',
     'msg.update_rule' => 'Are you sure you want to update this rule?',
     'msg.MustHave1Model' => 'You must select at least one model to export',
     'msg.InvalidJSONFormat' => 'Invalid JSON format',
-    'msg.NoRecord' => 'No records',
+    'msg.NoRecord' => 'No record',
 
     'rule.filter.keyword' => 'Keyword Rule',
     'rule.filter.embedding' => 'Embedding Rule',
     'rule.name' => 'Rule Name',
     'rule.description' => 'Rule Description',
-    'rule.target' => 'Specify models to apply the rule',
+    'rule.target' => 'Specify target models to apply rule',
     'rule.action' => 'Rule Action',
     'rule.warning' => 'Warning message (optional)',
-    'rule.filter.input' => 'Input Filter',
-    'rule.filter.output' => 'Output Filter',
+    'rule.filter.input' => 'Input filter',
+    'rule.filter.output' => 'Output filter',
 ];

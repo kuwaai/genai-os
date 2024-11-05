@@ -2,7 +2,6 @@
 
 return [
     'route' => 'Administration',
-    'header.interface' => 'Interface d\'administration',
 
     'tab.groups' => 'Groupes',
     'tab.users' => 'Utilisateurs',

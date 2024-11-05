@@ -2,7 +2,6 @@
 
 return [
     'route' => 'Správa',
-    'header.interface' => 'Administrátorské rozhraní',
 
     'tab.groups' => 'Skupiny',
     'tab.users' => 'Uživatelé',
@@ -11,7 +10,7 @@ return [
     'tab.kernel' => 'Systém',
     'tab.workers' => 'Pracovníci',
 
-    'kernel.tab.executors' => 'Výkonní pracovníci',
+    'kernel.tab.executors' => 'Spouštěče',
     'kernel.tab.hub' => 'Obchod s modely',
     'kernel.tab.storage' => 'Úložiště',
 ];

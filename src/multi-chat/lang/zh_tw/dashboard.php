@@ -3,7 +3,6 @@
 return [
     'route' => '儀錶板',
 
-    'header.interface' => '儀錶板管理介面',
     'header.create_rule' => '建立過濾規則',
     'header.update_rule' => '更新過濾規則',
 

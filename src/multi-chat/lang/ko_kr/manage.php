@@ -2,7 +2,6 @@
 
 return [
     'route' => '관리',
-    'header.interface' => '관리자 관리 인터페이스',
 
     'tab.groups' => '그룹',
     'tab.users' => '사용자',

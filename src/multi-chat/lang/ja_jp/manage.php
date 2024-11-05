@@ -2,7 +2,6 @@
 
 return [
     'route' => '管理',
-    'header.interface' => '管理者管理インターフェース',
 
     'tab.groups' => 'グループ',
     'tab.users' => 'ユーザー',
@@ -11,7 +10,7 @@ return [
     'tab.kernel' => 'システム',
     'tab.workers' => 'タスクワーカー',
 
-    'kernel.tab.executors' => '実行器',
+    'kernel.tab.executors' => '実行者',
     'kernel.tab.hub' => 'モデルストア',
     'kernel.tab.storage' => 'ストレージ',
 ];

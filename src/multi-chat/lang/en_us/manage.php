@@ -1,8 +1,7 @@
 <?php
 
 return [
-    'route' => 'Management',
-    'header.interface' => 'Admin Management Interface',
+    'route' => 'Admin',
 
     'tab.groups' => 'Groups',
     'tab.users' => 'Users',

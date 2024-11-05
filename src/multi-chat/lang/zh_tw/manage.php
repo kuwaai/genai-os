@@ -2,7 +2,6 @@
 
 return [
     'route' => '管理',
-    'header.interface' => '管理員管理介面',
 
     'tab.groups' => '群組',
     'tab.users' => '使用者',

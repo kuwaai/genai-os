@@ -3,7 +3,6 @@
 return [
     'route' => '仪表板',
 
-    'header.interface' => '仪表板管理界面',
     'header.create_rule' => '创建过滤规则',
     'header.update_rule' => '更新过滤规则',
 
@@ -35,7 +34,7 @@ return [
     'header.ExportSetting' => '导出设置：',
 
     'button.ExportAndDownload' => '导出并下载',
-    'button.LoadFile' => '加载文件',
+    'button.LoadFile' => '载入文件',
     'button.ConvertAndDownload' => '转换并下载',
     'button.create_rule' => '新增规则',
     'button.create' => '创建',
