@@ -98,9 +98,11 @@
                 handleLogout(() => {
                     toggleButtonState(button, false);
                     $('#hf_status > div').toggleClass('hidden');
+                    appendMessage("{{ __('hub.hint.logout_success') }}", true, '#hf-msg')
                 }, (error) => {
                     console.error(error);
                     toggleButtonState(button, false);
+                    appendMessage(error.statusText, false, '#hf-msg')
                 });
             }
 
@@ -110,13 +112,13 @@
 
                 handleLogin($('#token').val(), (data) => {
                     if (data && data.logged_in) {
-                        appendMessage("{{__('hub.hint.login_success')}}", true, '#hf-msg')
                         checkLoginStatus((userData) => {
                             toggleButtonState(button, false);
                             formatUsername(userData);
+                            appendMessage("{{ __('hub.hint.login_success') }}", true, '#hf-msg')
                         });
                     } else {
-                        appendMessage("{{__('hub.hint.login_failed')}}", false, '#hf-msg')
+                        appendMessage("{{ __('hub.hint.login_failed') }}", false, '#hf-msg')
                         toggleButtonState(button, false);
                     }
                 }, (error) => {
@@ -126,6 +128,18 @@
                 });
             }
         </script>
+    </div>
+</div>
+<div id="gatedModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2">
+        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Access Restricted</h3>
+        <p class="text-gray-700 dark:text-gray-300" id="gatedMessage">{{ __('hub.hint.model_gated') }}</p>
+        <a target='new'
+            class="bg-blue-500 homepage_link text-white py-2 px-4 rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 mb-2">{{ __('hub.button.homepage') }}</a>
+        <button onclick='$(this).parent().parent().addClass("hidden")'
+            class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 mt-4">
+            Close
+        </button>
     </div>
 </div>
 
@@ -143,7 +157,7 @@
     <span class="sr-only">Loading...</span>
 </div>
 
-<div id="modelModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
+<div id="modelModal" class="fixed inset-0 flex items-center justify-center hidden z-25 bg-black bg-opacity-50">
     <div
         class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2 max-h-[80vh] overflow-y-auto">
         <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white" id="modalTitle"></h3>
@@ -153,28 +167,19 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 2v4m0 4v8m0 0H8m4 0h4m-2-18a2 2 0 012 2v2a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2h8z" />
             </svg>
-            This model is gated. Please log in to access it.
+            {{ __('hub.hint.model_gated') }}
         </div>
         <h4 class="font-semibold mb-1 text-gray-900 dark:text-white">Files:</h4>
         <ul id="modalFiles" class="list-disc list-inside mb-4 space-y-2 max-h-40 overflow-y-auto scrollbar">
         </ul>
         <button id="downloadButton"
-            class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 mb-2">Download
-            Model</button>
+            class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 mb-2">{{ __('hub.button.download') }}</button>
+        <a target='new'
+            class="bg-blue-500 homepage_link text-white py-2 px-4 rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 mb-2">{{ __('hub.button.homepage') }}</a>
         <button id="closeModal"
             class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 mb-4">Close</button>
         <div id="responseText" class="hidden text-gray-800 dark:text-white mt-2 overflow-y-auto max-h-32 scrollbar">
         </div>
-    </div>
-</div> <!-- Login Modal for Gated Models -->
-<div id="loginModal" class="fixed inset-0 flex items-center justify-center hidden z-50 bg-black bg-opacity-50">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-3/4 lg:w-1/2">
-        <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Access Restricted</h3>
-        <p class="text-gray-700 dark:text-gray-300" id="loginMessage"></p>
-        <button id="closeLoginModal"
-            class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 mt-4">
-            Close
-        </button>
     </div>
 </div>
 
@@ -195,31 +200,31 @@
 
         $('#downloadButton').click(() => {
             const modelName = $('#modalTitle').text().trim();
-            if ($('#gatedIndicator').is(':visible')) {
-                $('#loginMessage').text(
-                    `Access to model ${modelName} is restricted. You must have access to it and be authenticated to access it. Please log in.`
-                );
-                $('#loginModal').removeClass('hidden');
-                return;
-            }
-            const url = "{{ route('manage.kernel.storage.download') }}?model_name=" +
-                encodeURIComponent(modelName);
+            const downloadUrl =
+                `{{ route('manage.kernel.storage.download') }}?model_name=${encodeURIComponent(modelName)}`;
+
             $('#responseText').removeClass('hidden').text('Downloading...');
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error(
-                        `Error: ${response.status} - ${response.statusText}`);
-                    const reader = response.body.getReader(),
+            fetch(downloadUrl)
+                .then(response => response.text())
+                .then(text => {
+                    if (text.includes(
+                            `Access to model ${modelName} is restricted and you are not in the authorized list.`
+                        )) {
+                        $('#gatedModal').removeClass('hidden')
+                        $('#responseText').text('');
+                        removeModel(modelName)
+                        return;
+                    }
+                    const reader = new Response(text).body.getReader(),
                         decoder = new TextDecoder("utf-8");
+
                     (function push() {
-                        return reader.read().then(({
+                        reader.read().then(({
                             done,
                             value
                         }) => {
-                            if (done) {
-                                $('#responseText').append('<br/>Download complete.');
-                                return;
-                            }
+                            if (done) return $('#responseText').append(
+                                '<br/>Download complete.');
                             $('#responseText').append(decoder.decode(value, {
                                 stream: true
                             }));
@@ -227,10 +232,9 @@
                         });
                     })();
                 })
-                .catch(error => {
-                    $('#responseText').append('<br/>Error: ' + error.message);
-                });
+                .catch(error => alert('Error: ' + error.message));
         });
+
 
         $('#closeLoginModal').click(() => $('#loginModal').addClass('hidden'));
     });
@@ -239,7 +243,7 @@
         const params = new URLSearchParams({
             search: searchTerm,
             sort: 'downloads',
-            limit: 10
+            limit: 15
         });
         fetch(`${apiUrl}?${params.toString()}`)
             .then(response => response.json())
@@ -260,33 +264,48 @@
                         `<li class="flex justify-between items-center text-gray-800 dark:text-gray-200"><span class="font-medium">${file.rfilename}</span></li>`
                     );
                 });
+                $('.homepage_link').attr('href', 'https://huggingface.co/' + modelId)
                 $('#modelModal').removeClass('hidden');
             })
             .catch(error => console.error('Error fetching model files:', error));
     }
 
     function displayResults(models) {
-        const resultsGrid = $('#results');
-        resultsGrid.empty();
-        if (models.length === 0) {
-            resultsGrid.append('<div class="col-span-full text-red-500">No models found.</div>');
+        const resultsGrid = $('#results').empty();
+
+        if (!models.length) {
+            resultsGrid.append($('<div>').addClass('col-span-full text-red-500').text('No models found.'));
             return;
         }
+
         models.forEach(model => {
-            resultsGrid.append(`
-            <div class="border my-2 ml-2 mr-4 rounded-lg shadow-md bg-white dark:bg-gray-800 p-4 transition transform hover:scale-105 relative cursor-pointer" onclick="fetchModelFiles('${model.modelId}')">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100" title="${model.modelId}" style="word-wrap: break-word;">${model.modelId}</h2>
-                <p class="text-gray-700 dark:text-gray-300"><strong>Downloads:</strong> ${model.downloads.toLocaleString()}</p>
-                <p class="text-gray-700 dark:text-gray-300"><strong>Likes:</strong> ${model.likes.toLocaleString()}</p>
-                <button class="view-tags-button bg-blue-500 text-white py-1 px-2 rounded mt-2 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600">View Tags</button>
-                <div class="tags hidden mt-2 flex flex-wrap">${model.tags.map(tag => `<span class="bg-blue-100 text-blue-600 text-xs font-medium mr-1 mb-1 px-2.5 py-0.5 rounded-full dark:bg-blue-700 dark:text-blue-300">${tag}</span>`).join('')}</div>
-            </div>
-        `);
+            resultsGrid.append(
+                $('<div>').addClass(
+                    'border my-2 ml-2 mr-4 rounded-lg shadow-md bg-white dark:bg-gray-800 p-4 transition transform hover:scale-105 relative cursor-pointer'
+                )
+                .attr('onclick', `fetchModelFiles('${model.modelId}')`)
+                .append(
+                    $('<h2>').addClass('text-lg font-semibold text-gray-900 dark:text-gray-100')
+                    .attr('title', model.modelId).css('word-wrap', 'break-word').text(model.modelId),
+                    $('<p>').addClass('text-gray-700 dark:text-gray-300').html(
+                        `<strong>Downloads:</strong> ${model.downloads.toLocaleString()}`),
+                    $('<p>').addClass('text-gray-700 dark:text-gray-300').html(
+                        `<strong>Likes:</strong> ${model.likes.toLocaleString()}`),
+                    $('<button>').addClass(
+                        'view-tags-button bg-blue-500 text-white py-1 px-2 rounded mt-2 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600'
+                    ).text('View Tags'),
+                    $('<div>').addClass('tags hidden mt-2 flex flex-wrap').append(
+                        model.tags.map(tag => $('<span>').addClass(
+                            'bg-blue-100 text-blue-600 text-xs font-medium mr-1 mb-1 px-2.5 py-0.5 rounded-full dark:bg-blue-700 dark:text-blue-300'
+                        ).text(tag))
+                    )
+                )
+            );
         });
+
         $('.view-tags-button').click(function(event) {
             event.stopPropagation();
-            const tagsDiv = $(this).next('.tags');
-            tagsDiv.toggleClass('hidden');
+            const tagsDiv = $(this).next('.tags').toggleClass('hidden');
             $(this).text(tagsDiv.hasClass('hidden') ? 'View Tags' : 'Hide Tags');
         });
     }

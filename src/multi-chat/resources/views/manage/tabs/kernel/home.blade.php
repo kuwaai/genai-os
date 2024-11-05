@@ -12,6 +12,7 @@
             <li role="presentation">
                 <button id="hub-tab" data-tabs-target="#hub" type="button" role="tab" aria-selected="false"
                     aria-controls="hub"
+                    onclick="$('#ollama, #kuwa, #huggingface').hide(); $('#button-container').show();"
                     class="block w-full p-4 text-gray-900 dark:text-gray-200 rounded-md transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-600">
                     {{ __('manage.kernel.tab.hub') }}
                 </button>
@@ -35,50 +36,47 @@
         </div>
 
         <!-- Hub Tab Panel -->
-        <div class="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden" id="hub"
-            role="tabpanel" aria-labelledby="hub-tab">
-                <div class="bg-gray-100 dark:bg-gray-700 p-4 m-4 rounded-lg" id="button-container">
-                    <ul class="grid grid-cols-1 gap-2">
-                        <li>
-                            <button id="huggingface-tab"
-                                class="tab-button block w-full p-4 text-gray-900 dark:text-gray-200 rounded-md transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-600"
-                                onclick="$('#button-container').hide(); $('#huggingface').show(); $('#ollama, #kuwa').hide();">
-                                {{ __('hub.tab.huggingface') }}
-                            </button>
-                        </li>
-                        <li>
-                            <button id="ollama-tab"
-                                class="tab-button block w-full p-4 text-gray-900 dark:text-gray-200 rounded-md transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-600"
-                                onclick="$('#button-container').hide(); $('#ollama').show(); $('#huggingface, #kuwa').hide();">
-                                {{ __('hub.tab.ollama') }}
-                            </button>
-                        </li>
-                        <li>
-                            <button id="kuwa-tab"
-                                class="tab-button block w-full p-4 text-gray-900 dark:text-gray-200 rounded-md transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-600"
-                                onclick="$('#button-container').hide(); $('#kuwa').show(); $('#huggingface, #ollama').hide();">
-                                {{ __('hub.tab.kuwa') }}
-                            </button>
-                        </li>
-                    </ul>
+        <div class="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden flex justify-center items-center" id="hub" role="tabpanel"
+            aria-labelledby="hub-tab">
+            <div class="flex justify-center">
+                <div class="bg-gray-100 dark:bg-gray-700 p-4 m-4 rounded-lg flex justify-center items-center flex-col"
+                    id="button-container">
+                    <button id="huggingface-tab"
+                        class="tab-button block p-4 text-gray-900 dark:text-gray-200 rounded-md transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-600"
+                        onclick="$('#button-container').hide(); $('#huggingface').show(); $('#ollama, #kuwa').hide();">
+                        {{ __('hub.tab.huggingface') }}
+                    </button>
+                    <button id="ollama-tab"
+                        class="tab-button block p-4 text-gray-900 dark:text-gray-200 rounded-md transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-600"
+                        onclick="$('#button-container').hide(); $('#ollama').show(); $('#huggingface, #kuwa').hide();">
+                        {{ __('hub.tab.ollama') }}
+                    </button>
+                    <button id="kuwa-tab"
+                        class="tab-button block p-4 text-gray-900 dark:text-gray-200 rounded-md transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-600"
+                        onclick="$('#button-container').hide(); $('#kuwa').show(); $('#huggingface, #ollama').hide();">
+                        {{ __('hub.tab.kuwa') }}
+                    </button>
                 </div>
-                <!-- Hugging Face Tab Panel -->
-                <div class="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden h-full hidden" id="huggingface" role="tabpanel"
-                    aria-labelledby="huggingface-tab">
-                    @include('manage.tabs.kernel.tabs.hub.huggingface')
-                </div>
+            </div>
+            <!-- Hugging Face Tab Panel -->
+            <div class="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden h-full hidden" id="huggingface"
+                role="tabpanel" aria-labelledby="huggingface-tab">
+                @include('manage.tabs.kernel.tabs.hub.huggingface')
+            </div>
 
-                <!-- Ollama Tab Panel -->
-                <div class="hidden flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden" id="ollama" role="tabpanel"
-                    aria-labelledby="ollama-tab">
-                    <!-- Ollama content goes here -->
-                </div>
+            <!-- Ollama Tab Panel -->
+            <div class="hidden flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden" id="ollama" role="tabpanel"
+                aria-labelledby="ollama-tab">
+                <!-- Ollama content goes here -->
+                WIP
+            </div>
 
-                <!-- Kuwa Tab Panel -->
-                <div class="hidden flex-1 bg-gray-50 dark:bg-gray-800 overflow-x-hidden overflow-y-auto scrollbar p-6"
-                    id="kuwa" role="tabpanel" aria-labelledby="kuwa-tab">
-                    <!-- Kuwa content goes here -->
-                </div>
+            <!-- Kuwa Tab Panel -->
+            <div class="hidden flex-1 bg-gray-50 dark:bg-gray-800 overflow-x-hidden overflow-y-auto scrollbar p-6"
+                id="kuwa" role="tabpanel" aria-labelledby="kuwa-tab">
+                <!-- Kuwa content goes here -->
+                WIP
+            </div>
         </div>
 
         <!-- Storage Tab Panel -->

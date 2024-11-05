@@ -18,18 +18,6 @@
 </div>
 
 <script>
-    // Function to remove a model by name
-    function removeModel(folder_name) {
-        return $.ajax({
-            url: "{{ route('manage.kernel.storage.remove') }}",
-            type: 'POST',
-            data: {
-                folder_name: folder_name,
-                _token: "{{ csrf_token() }}"
-            }
-        });
-    }
-
     // Function to fetch and display storage data with a remove button
     function fetchStorageData() {
         $.getJSON('{{ route('manage.kernel.storage') }}', function(data) {
