@@ -235,19 +235,19 @@
                             <button type="button" id="save_bot" data-modal-target="update_modal"
                                 data-modal-toggle="update_modal"
                                 class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                {{ __('executors.button.save') }}
+                                {{ __('store.button.save') }}
                             </button>
                         @endif
                         <button type="button" id="export_bot"
                             class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
                             onclick="exportBot()">
-                            {{ __('executors.button.export') }}
+                            {{ __('store.button.export') }}
                         </button>
                         @if (request()->user()->hasPerm('Store_delete_delete_bot'))
                             <button type="button" id="delete_bot" data-modal-target="delete_modal"
                                 data-modal-toggle="delete_modal"
                                 class="bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                {{ __('executors.button.delete') }}
+                                {{ __('store.button.delete') }}
                             </button>
                         @endif
                     </div>
@@ -293,13 +293,13 @@
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    {{ __('executors.modal.update_model.header') }}</h3>
+                    {{ __('models.modal.update_model.header') }}</h3>
                 <button data-modal-hide="update_modal" type="submit" id="update_bot_btn"
                     class="text-white bg-green-500 hover:bg-green-600 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                    {{ __('executors.button.yes') }}
+                    {{ __('store.button.yes') }}
                 </button>
                 <button data-modal-hide="update_modal" type="button"
-                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('executors.button.no') }}</button>
+                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('store.button.no') }}</button>
             </div>
         </div>
     </div>
@@ -326,13 +326,13 @@
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    {{ __('executors.modal.delete_model.header') }}</h3>
+                    {{ __('models.modal.delete_model.header') }}</h3>
                 <button id="delete_bot_btn" data-modal-hide="delete_modal" type="button"
                     class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                    {{ __('executors.button.yes') }}
+                    {{ __('store.button.yes') }}
                 </button>
                 <button data-modal-hide="delete_modal" type="button"
-                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('executors.button.no') }}</button>
+                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('store.button.no') }}</button>
             </div>
         </div>
     </div>

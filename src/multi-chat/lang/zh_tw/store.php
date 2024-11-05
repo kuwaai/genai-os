@@ -8,6 +8,11 @@ return [
     'button.groups' => '群組',
     'button.private' => '私人',
     'button.system' => '系統',
+    'button.yes' => '是，我確定',
+    'button.no' => '否，取消',
+    'button.save' => '儲存',
+    'button.delete' => '刪除',
+    'button.export' => '匯出',
 
     'placeholder.must_select_base_model' => '你必須選一個基底模型',
     'placeholder.button.system' => '將會被標示為系統Bot，且所有人皆可存取',

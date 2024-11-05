@@ -216,7 +216,7 @@
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                    {{ __('models.modal.update_model.header') }}</h3>
+                                    {{ __('models.header.update_model') }}</h3>
                                 <button data-modal-hide="popup-modal2" type="submit"
                                     class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                     {{ __('models.button.yes') }}
@@ -293,7 +293,7 @@
             DeleteRow($llms[data][4]);
         });
         $("#edit_llm h3:eq(0)").text("{{ __('models.header.update_model') }}")
-        $("#edit_llm h3:eq(1)").text("{{ __('models.modal.update_model.header') }}")
+        $("#edit_llm h3:eq(1)").text("{{ __('models.header.update_model') }}")
         $("#edit_llm h3:eq(2)").text("{{ __('models.modal.delete_model.header') }}")
         $("#delete_button").show()
         $("#edit_llm_btns > button").removeClass("bg-gray-200 dark:bg-gray-600")
@@ -320,7 +320,7 @@
         $("#update_LLM_by_ID input[name='system_prompt']").val("")
         $("#update_LLM_by_ID input[name='react_btn[]']").prop("checked", true);
         $("#edit_llm h3:eq(0)").text("{{ __('models.header.create_model') }}")
-        $("#edit_llm h3:eq(1)").text("{{ __('models.modal.create_model.header') }}")
+        $("#edit_llm h3:eq(1)").text("{{ __('models.header.create_model') }}")
         $("#edit_llm_btns > button").removeClass("bg-gray-600")
         $("#new_llm_btn").removeClass("bg-green-400 dark:bg-green-600")
         $("#new_llm_btn").addClass("bg-green-500 dark:bg-green-700")
