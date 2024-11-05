@@ -42,6 +42,16 @@
             })
         }
 
+        function appendMessage(message, isSuccess, container_id) {
+            const messageDiv = $('<div></div>').text(message).addClass(
+                'mb-2 text-center p-2 rounded-lg border-2').css({
+                'background-color': isSuccess ? '#d4edda' : '#f8d7da',
+                'color': isSuccess ? '#155724' : '#721c24',
+                'border-color': isSuccess ? '#c3e6cb' : '#f5c6cb'
+            }).prependTo(container_id).hide().fadeIn();
+            setTimeout(() => messageDiv.fadeOut(400, () => messageDiv.remove()), 5000);
+        }
+
         function adjustTextareaRows(obj) {
             obj = $(obj)
             if (obj.length) {
@@ -407,7 +417,7 @@
         function search_chat(filter, container) {
             container.find('>div:last() >div').each(function() {
                 $(this).toggle(!filter || $(this).find('a > p').text().toLowerCase().includes(filter
-            .toLowerCase()));
+                    .toLowerCase()));
             });
         }
 

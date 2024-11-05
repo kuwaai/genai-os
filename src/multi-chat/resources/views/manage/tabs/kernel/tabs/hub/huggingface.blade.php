@@ -1,7 +1,8 @@
-<div class="h-full p-6 rounded-lg overflow-hidden">
+<div class="h-full p-4 rounded-lg overflow-hidden">
     <!-- User Authentication Section -->
-    <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md h-full flex flex-col">
-        <div class="flex flex-col space-y-4" id='hf_status'>
+    <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md flex flex-col h-full overflow-hidden space-y-2">
+        <div class="flex flex-col" id='hf_status'>
+            <div id="hf-msg" class="mb-2 text-center rounded-lg"></div>
             <div class="hidden">
                 <div class="flex items-center justify-between">
                     <h2 class="text-2xl font-semibold text-gray-900 dark:text-white" id="userGreeting"></h2>
@@ -10,7 +11,7 @@
                         onclick="handleLogoutButtonClick()">
                         <i id="stop-icon-logout" class="fa fa-spinner fa-spin hidden text-lg mr-2"
                             aria-hidden="true"></i>
-                        <span id="logoutText">{{__('hub.button.logout')}}</span>
+                        <span id="logoutText">{{ __('hub.button.logout') }}</span>
                     </button>
                 </div>
 
@@ -18,18 +19,29 @@
                 </div>
             </div>
 
-            <div class="flex items-center w-full">
-                <input type="text" id="token" placeholder="{{__('hub.label.enter_your_token')}}"
-                    class="border border-gray-300 rounded-l-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
+            <div class="flex items-center">
+                <input type="text" id="token" placeholder="{{ __('hub.label.enter_your_token') }}"
+                    class="border border-gray-300 rounded-l-md p-3 flex-1 text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
                 <button id="loginButton"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 rounded-r-md shadow-md dark:bg-blue-700 dark:hover:bg-blue-800 flex items-center h-12"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 rounded-r-md shadow-md dark:bg-blue-700 dark:hover:bg-blue-800 h-12"
                     onclick="handleLoginButtonClick()">
                     <i id="stop-icon-login" class="fa fa-spinner fa-spin hidden text-lg mr-2" aria-hidden="true"></i>
-                    <span id="loginText">{{__('hub.button.login')}}</span>
+                    <span id="loginText">{{ __('hub.button.login') }}</span>
                 </button>
             </div>
         </div>
+        <div class="flex items-center">
+            <input id="searchInput" type="text" placeholder="{{ __('hub.label.search_for_model') }}"
+                class="border border-gray-300 rounded-l-md p-3 flex-1 text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
+            <button id="searchButton"
+                class="bg-blue-600 text-white py-2 px-4 rounded-r-md transition duration-200 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 h-12 flex items-center">
+                {{ __('hub.button.search') }}
+            </button>
+        </div>
+        <div id="message" class="mt-4 text-gray-300 hidden"></div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-y-auto scrollbar overflow-x-hidden flex-1"
+            id="results"></div>
 
         <script>
             checkLoginStatus(formatUsername);
@@ -106,35 +118,23 @@
                 toggleButtonState(button, true);
 
                 handleLogin($('#token').val(), (data) => {
-                    if (data.logged_in) {
+                    if (data && data.logged_in) {
+                        appendMessage("{{__('hub.hint.login_success')}}", true, '#hf-msg')
                         checkLoginStatus((userData) => {
                             toggleButtonState(button, false);
                             formatUsername(userData);
                         });
                     } else {
+                        appendMessage("{{__('hub.hint.login_failed')}}", false, '#hf-msg')
                         toggleButtonState(button, false);
                     }
                 }, (error) => {
                     console.error(error);
+                    appendMessage(error.statusText, false, '#hf-msg')
                     toggleButtonState(button, false);
                 });
             }
         </script>
-        <!-- Search Section -->
-        <div class="flex-grow mt-4">
-            <div class="flex items-center w-full">
-                <input id="searchInput" type="text" placeholder="{{__('hub.label.search_for_model')}}"
-                    class="border border-gray-300 rounded-l-md p-3 w-full text-gray-900 dark:text-gray-100 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 h-12" />
-                <button id="searchButton"
-                    class="bg-blue-600 text-white py-2 px-4 rounded-r-md transition duration-200 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 h-12 flex items-center">
-                    {{__('hub.button.search')}}
-                </button>
-            </div>
-        </div>
-        <div id="message" class="mt-4 text-gray-300 hidden"></div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6 overflow-y-auto scrollbar overflow-x-hidden h-full"
-            id="results"></div>
     </div>
 </div>
 

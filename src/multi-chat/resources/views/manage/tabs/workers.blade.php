@@ -1,6 +1,6 @@
 <div class="flex flex-col flex-1 h-full mx-auto overflow-y-auto scrollbar">
     <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full">
-        <div id="result-message" class="mb-2 text-center rounded-lg"></div>
+        <div id="worker_result" class="mb-2 text-center rounded-lg"></div>
         <div class="flex flex-col justify-between mb-4 space-y-2">
             <button id="start-workers-button"
                 class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded shadow-md dark:bg-blue-700 dark:hover:bg-blue-800">
@@ -77,16 +77,6 @@
         }
     }
 
-    function appendMessage(message, isSuccess) {
-        const messageDiv = $('<div></div>').text(message).addClass(
-            'mb-2 text-center p-2 rounded-lg border-2').css({
-            'background-color': isSuccess ? '#d4edda' : '#f8d7da',
-            'color': isSuccess ? '#155724' : '#721c24',
-            'border-color': isSuccess ? '#c3e6cb' : '#f5c6cb'
-        }).prependTo('#result-message').hide().fadeIn();
-        setTimeout(() => messageDiv.fadeOut(400, () => messageDiv.remove()), 5000);
-    }
-
     $('#start-workers-button').click(() => $('#start-workers-modal').removeClass('hidden'));
     $('#stop-workers-button').click(() => $('#stop-workers-modal').removeClass('hidden'));
     $('#cancel-start-workers, #cancel-stop-workers').click(() => $(
@@ -112,9 +102,9 @@
                     $('#start-workers-modal').addClass('hidden');
                     canSubmit = false;
                 },
-                success: response => appendMessage(response.message, true),
+                success: response => appendMessage(response.message, true, '#worker_result'),
                 error: xhr => appendMessage('{{ __('workers.label.error') }}: ' + xhr
-                    .responseText, false),
+                    .responseText, false, '#worker_result'),
                 complete: function() {
                     $('#start-workers-button').removeClass(
                         'opacity-50 cursor-not-allowed').prop('disabled', false);
@@ -123,7 +113,7 @@
                     setTimeout(() => canSubmit = true, cooldownDuration);
                 }
             });
-        } else appendMessage('{{ __('workers.label.valid_worker_count') }}', false);
+        } else appendMessage('{{ __('workers.label.valid_worker_count') }}', false, '#worker_result');
     });
 
     $('#confirm-stop-workers').click(function() {
@@ -141,9 +131,9 @@
                 $('#stop-workers-modal').addClass('hidden');
                 canSubmit = false;
             },
-            success: response => appendMessage(response.message, true),
+            success: response => appendMessage(response.message, true, '#worker_result'),
             error: xhr => appendMessage('{{ __('workers.label.error') }}: ' + xhr
-                .responseText, false),
+                .responseText, false, '#worker_result'),
             complete: function() {
                 $('#stop-workers-button').removeClass('opacity-50 cursor-not-allowed')
                     .prop('disabled', false);
