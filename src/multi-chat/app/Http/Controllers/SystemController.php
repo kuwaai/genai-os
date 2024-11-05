@@ -120,7 +120,7 @@ class SystemController extends Controller
             $scriptPath = stripos(PHP_OS, 'WIN') === 0 ? '/executables/bat/production_update.bat' : '/executables/sh/production_update.sh';
             chdir($projectRoot . dirname($scriptPath));
 
-            echo 'data: ' . json_encode(['status' => 'success', 'output' => 'Current dir: ' . getcwd()]) . "\n\n";
+            echo 'data: ' . json_encode(['status' => 'progress', 'output' => 'Current dir: ' . getcwd()]) . "\n\n";
             ob_flush();
             flush();
 
@@ -128,12 +128,18 @@ class SystemController extends Controller
                 $this->runCommand($command, $projectRoot);
             }
 
+            echo 'data: ' . json_encode(['status' => 'progress', 'output' => "Stopping all workers..."]) . "\n\n";
+            ob_flush();
+            flush();
             $workerController = new WorkerController();
             $workerController->stopWorkers();
             if (stripos(PHP_OS, 'WIN') === false) {
                 $this->makeExecutable(basename($scriptPath));
             }
             $this->runCommand((stripos(PHP_OS, 'WIN') === 0 ? '' : './') . basename($scriptPath), $projectRoot);
+            echo 'data: ' . json_encode(['status' => 'progress', 'output' => "Starting 10 workers..."]) . "\n\n";
+            ob_flush();
+            flush();
             $workerController->startWorkers();
             SystemSetting::where('key', 'cache_update_check')->update(['value' => 'no-update']);
             CheckUpdate::dispatch(true);
