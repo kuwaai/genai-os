@@ -1,17 +1,6 @@
 <?php
 
 return [
-    /*
-     |------------------------------------------------- -------------------------
-     | Validation Language Lines
-     |------------------------------------------------- -------------------------
-     |
-     | The following language lines contain the default error messages used by
-     | the validator class. Some of these rules have multiple versions such
-     | as the size rules. Feel free to tweak each of these messages here.
-     |
-     */
-
     'accepted' => ' :attribute 欄位必須接受。 ',
     'accepted_if' => '當 :other 為 :value 時， :attribute 欄位必須接受。 ',
     'active_url' => ' :attribute 欄位必須是有效的網址。 ',

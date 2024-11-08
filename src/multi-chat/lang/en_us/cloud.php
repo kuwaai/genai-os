@@ -1,11 +1,12 @@
 <?php
 
 return [
-    'interface.header' => 'Cloud File Management',
+    'header.interface' => 'Cloud File Management',
     'route' => 'Cloud Files',
 
     'header.confirm_delete' => 'Confirm File Deletion',
-    'header.cannot_preview' => 'Unable to Preview File',
+    'header.cannot_preview' => 'Cannot Preview File',
+    
     'button.open' => 'Open',
     'button.open_tab' => 'Open in New Tab',
     'button.copy_link' => 'Copy Link',
@@ -15,12 +16,12 @@ return [
     'button.delete' => 'Delete',
     'button.preview' => 'Open in New Tab',
 
-    'label.homes' => 'Home',
-    'label.no_files' => 'There are no files in this directory',
+    'label.homes' => 'Home Directory',
+    'label.no_files' => 'No files in this directory',
     'label.used' => 'Used',
     'label.total_space' => 'Total Space',
-    'label.homes' => 'Home',
-    'label.about_to_delete' => 'About to Delete File',
+    'label.homes' => 'Home Directory',
+    'label.about_to_delete' => 'About to delete file',
     'label.delete_warning' => 'This action cannot be undone!',
-    'label.cannot_preview' => 'Sorry, we are unable to preview this file directly. Proceeding will open the file in a new tab, but may trigger an automatic download. Please be aware and do not execute unknown executables or installation files.',
+    'label.cannot_preview' => 'Sorry, we cannot preview this file directly at this time. Continuing will open the file in a new tab, but this may trigger an automatic download. Remember to never execute unknown executables or installation files.',
 ];

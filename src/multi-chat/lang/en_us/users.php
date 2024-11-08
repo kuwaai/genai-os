@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'button.delete' => 'Delete',
+    'button.update' => 'Update',
+    'button.cancel' => 'Cancel',
+    'button.create' => 'Create',
+    'button.return_group_list' => 'Return to Group List',
+
+    'header.menu' => 'Main Menu',
+    'header.group_selector' => 'Group Selector',
+    'header.fuzzy_search' => 'Fuzzy Search',
+    'header.create_user' => 'Create User',
+    'header.create_user' => 'Create a New Account',
+    'header.group_selector' => 'Edit User',
+    'header.delete_user' => 'Confirm Delete User',
+
+    'label.group_selector' => 'Filter users by group',
+    'label.fuzzy_search' => 'Search users by name or email',
+    'label.create_user' => 'Create a user profile',
+    'label.joined_group' => 'Joined Groups',
+    'label.members' => 'Members',
+    'label.other_users' => 'Unassigned Members',
+    'label.name' => 'Name',
+    'label.email' => 'Email',
+    'label.password' => 'Password',
+    'label.update_password' => 'Update Password',
+    'label.detail' => 'Details',
+    'label.require_change_password' => 'Require Password Change on Next Login',
+    'label.extra_setting' => 'Extra Settings',
+    'label.created_at' => 'Created At',
+    'label.updated_at' => 'Updated At',
+
+    'placeholder.enter_to_search' => 'Press Enter to Search',
+    'placeholder.search_user' => 'Search by email or name',
+    'placeholder.email' => 'User Email',
+    'placeholder.username' => 'User Name',
+    'placeholder.group_name' => 'Group Name',
+    'placeholder.new_password' => 'New Password',
+];

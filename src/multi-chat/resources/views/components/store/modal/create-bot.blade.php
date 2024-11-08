@@ -58,7 +58,7 @@
                                                 $radioItems[] = [
                                                     'id' => 'visibility_system_option',
                                                     'title' => __('store.button.system'),
-                                                    'description' => __('store.hint.button.system'),
+                                                    'description' => __('store.placeholder.button.system'),
                                                     'value' => '0',
                                                     'checked' => request()
                                                         ->user()
@@ -76,7 +76,7 @@
                                                 $radioItems[] = [
                                                     'id' => 'visibility_community_option',
                                                     'title' => __('store.button.community'),
-                                                    'description' => __('store.hint.button.community'),
+                                                    'description' => __('store.placeholder.button.community'),
                                                     'value' => '1',
                                                     'checked' => true,
                                                     'onchange' =>
@@ -90,7 +90,7 @@
                                                 $radioItems[] = [
                                                     'id' => 'visibility_group_option',
                                                     'title' => __('store.button.groups'),
-                                                    'description' => __('store.hint.button.groups'),
+                                                    'description' => __('store.placeholder.button.groups'),
                                                     'value' => '2',
                                                     'checked' => request()
                                                         ->user()
@@ -108,7 +108,7 @@
                                                 $radioItems[] = [
                                                     'id' => 'visibility_private_option',
                                                     'title' => __('store.button.private'),
-                                                    'description' => __('store.hint.button.private'),
+                                                    'description' => __('store.placeholder.button.private'),
                                                     'value' => '3',
                                                     'checked' => request()
                                                         ->user()
@@ -294,7 +294,7 @@
             return true;
         }
         if (!$("#create_room input[name='llm_name']").val()) $("#create_error").text(
-            "{{ __('store.hint.must_select_base_model') }}")
+            "{{ __('store.placeholder.must_select_base_model') }}")
         else if (!$("#create_room input[name='bot_name']").val()) $("#create_error").text(
             "{{ __('You must name your bot') }}")
         $("#create_error").show().delay(3000).fadeOut();

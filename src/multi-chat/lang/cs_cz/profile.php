@@ -2,42 +2,38 @@
 
 return [
     'route' => 'Nastavení',
-    'interface.header' => 'Osobní údaje',
+
+    'header.interface' => 'Osobní informace',
+    'header.personal_info' => 'Zde můžete aktualizovat své jméno nebo e-mail',
+    'header.update_password' => 'Aktualizace hesla',
+    'header.api_manage' => 'Správa API',
+    'header.delete_account' => 'Odstranit účet',
+
     'button.save' => 'Uložit',
     'button.copy' => 'Kopírovat',
-    'button.renew' => 'Vygenerovat nový',
+    'button.renew' => 'Obnovit',
     'button.update' => 'Aktualizovat',
     'button.confirm' => 'Potvrdit',
-    "button.change_lang"=>"Změnit jazyk",
-    'hint.updated' => 'Úspěšně aktualizováno',
-    'hint.saved' => 'Uloženo',
-    'hint.nochange'=>'Žádné změny, data zůstávají stejná',
-    'hint.alert'=>'Upozornění',
-    'hint.require_change_password'=>'Pro větší zabezpečení systému, musíte si změnit heslo',
+    "button.change_lang"=>"Přepnout jazyk",
+    'button.delete_account' => 'Odstranit účet',
 
-    //Osobní údaje
-    'header.personal_info' => 'Zde si můžete aktualizovat své jméno nebo email',
+    'placeholder.updated' => 'Aktualizace úspěšná',
+    'placeholder.saved' => 'Uloženo',
+    'placeholder.nochange'=>'Data jsou stejná, žádná aktualizace',
+    'placeholder.alert'=>'Varování',
+    'placeholder.require_change_password'=>'Z důvodu bezpečnostních požadavků systému je nutné změnit heslo',
+
     'label.name' => 'Uživatelské jméno',
     'label.email' => 'E-mail',
-
-    //Heslo
-    'header.update_password' => 'Aktualizujte své heslo',
-    'label.update_password' => 'Zajistěte, aby bylo Vaše heslo dostatečně bezpečné',
+    'label.update_password' => 'Ujišťte se, že používáte dostatečně silné heslo',
     'label.current_password' => 'Současné heslo',
     'label.new_password' => 'Nové heslo',
-    'label.confirm_password' => 'Prosím, zadejte nové heslo znovu',
-
-    //API
-    'header.api_manage' => 'Správa API',
-    'label.api_manage' => 'Spravujte své API klíče, nikdy je nesdílejte s nikým!',
-    'label.taide_api' => 'Kuwa klíč',
-    'label.openai_api' => 'OpenAI API klíč',
-    'label.google_api' => 'Google API klíč',
-    'label.third_party_api' => 'Vlastní klíče API třetích stran (např. Groq, Cerebras)',
-    'label.stay_secure' => 'Vždy sledujte využití Vašich externích klíčů!',
-
-    //Smazání účtu
-    'header.delete_account' => 'Smazat účet',
-    'label.delete_account' => 'Jakmile je Váš účet smazán, všechna související data budou nenávratně ztracena!',
-    'button.delete_account' => 'Smazat účet',
+    'label.confirm_password' => 'Zadejte nové heslo znovu',
+    'label.api_manage' => 'Spravujte své API klíče, neukládejte je kdekoli veřejně!',
+    'label.kuwa_api' => 'Klíč Kuwa',
+    'label.openai_api' => 'Klíč API OpenAI',
+    'label.google_api' => 'Klíč API Google',
+    'label.third_party_api' => 'Vlastní klíč API třetích stran (např.: Groq, Cerebras)',
+    'label.stay_secure' => 'Dbejte na zabezpečení používání externích klíčů!',
+    'label.delete_account' => 'Po smazání vašeho účtu budou všechna související data odstraněna. Proveďte prosím opatrně.',
 ];

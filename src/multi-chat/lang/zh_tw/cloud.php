@@ -1,11 +1,12 @@
 <?php
 
 return [
-    'interface.header' => '雲端檔案管理',
+    'header.interface' => '雲端檔案管理',
     'route' => '雲端檔案',
 
     'header.confirm_delete' => '確認刪除檔案',
     'header.cannot_preview' => '無法預覽文件',
+    
     'button.open' => '開啟',
     'button.open_tab' => '在分頁開啟',
     'button.copy_link' => '複製連接',

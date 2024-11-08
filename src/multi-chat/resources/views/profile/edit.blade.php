@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="flex-1 h-full py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="mx-auto sm:px-6 lg:px-8 space-y-6">
             @if (Auth::user()->hasPerm('Profile_update_email') || Auth::user()->hasPerm('Profile_update_name'))
                 <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                     <div class="max-w-xl">

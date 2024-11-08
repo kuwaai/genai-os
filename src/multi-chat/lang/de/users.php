@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'button.delete' => 'Löschen',
+    'button.update' => 'Aktualisieren',
+    'button.cancel' => 'Abbrechen',
+    'button.create' => 'Erstellen',
+    'button.return_group_list' => 'Zurück zur Gruppenliste',
+
+    'header.menu' => 'Hauptmenü',
+    'header.group_selector' => 'Gruppen-Selektor',
+    'header.fuzzy_search' => 'Unscharfe Suche',
+    'header.create_user' => 'Benutzer erstellen',
+    'header.create_user' => 'Ein neues Konto erstellen',
+    'header.group_selector' => 'Benutzer bearbeiten',
+    'header.delete_user' => 'Benutzer wirklich löschen?',
+
+    'label.group_selector' => 'Beginnen Sie mit der Auswahl von Benutzern aus der Gruppe',
+    'label.fuzzy_search' => 'Suchen Sie nach Benutzern anhand von Name oder E-Mail',
+    'label.create_user' => 'Erstellen Sie ein Benutzerprofil',
+    'label.joined_group' => 'Beigetretene Gruppe',
+    'label.members' => 'Mitglieder',
+    'label.other_users' => 'Keine Gruppenmitglieder',
+    'label.name' => 'Name',
+    'label.email' => 'E-Mail',
+    'label.password' => 'Passwort',
+    'label.update_password' => 'Passwort aktualisieren',
+    'label.detail' => 'Details',
+    'label.require_change_password' => 'Passwortänderung bei der nächsten Anmeldung erforderlich',
+    'label.extra_setting' => 'Zusätzliche Einstellungen',
+    'label.created_at' => 'Erstellt am',
+    'label.updated_at' => 'Aktualisiert am',
+
+    'placeholder.enter_to_search' => 'Drücken Sie Enter zum Suchen',
+    'placeholder.search_user' => 'Suchen Sie nach E-Mail oder Namen',
+    'placeholder.email' => 'Benutzer-E-Mail',
+    'placeholder.username' => 'Benutzername',
+    'placeholder.group_name' => 'Gruppenname',
+    'placeholder.new_password' => 'Neues Passwort',
+];

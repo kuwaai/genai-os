@@ -23,7 +23,7 @@
                 </svg>
                 <h3
                     class="mb-5 text-lg font-normal text-gray-500 flex-col dark:text-gray-400 overflow-hidden flex justify-center items-center">
-                    <span>{{ __('chat.modal.delete_chat.header') }}</span>
+                    <span>{{ __('chat.header.delete_chat') }}</span>
                     <span class="truncate-text overflow-hidden overflow-ellipsis inline-block max-w-[200px] text-lg"
                         style="text-wrap:nowrap">{{ $room->name }}</span>
                 </h3>

@@ -2,42 +2,38 @@
 
 return [
     'route' => '設定',
-    'interface.header' => '個人資料',
+
+    'header.interface' => '個人資料',
+    'header.personal_info' => 'ここで、あなたの名前やメールアドレスを更新できます',
+    'header.update_password' => 'パスワードの更新',
+    'header.api_manage' => 'API管理',
+    'header.delete_account' => 'アカウントの削除',
+
     'button.save' => '保存',
     'button.copy' => 'コピー',
-    'button.renew' => '再び発生',
+    'button.renew' => '再生成',
     'button.update' => '更新',
     'button.confirm' => '確認',
-    "button.change_lang"=>"言語変更",
-    'hint.updated' => '更新成功',
-    'hint.saved' => '保存済み',
-    'hint.nochange'=>'情報は同一であり、更新がありません',
-    'hint.alert'=>'警告',
-    'hint.require_change_password'=>'システムの安全性要求のため、パスワードを変更する必要があります',
+    "button.change_lang"=>"言語切り替え",
+    'button.delete_account' => 'アカウントを削除',
 
-    //Personal Infos
-    'header.personal_info' => 'ここで名前またはメールアドレスを更新できます',
+    'placeholder.updated' => '更新しました',
+    'placeholder.saved' => '保存しました',
+    'placeholder.nochange'=>'データは同じため、更新されていません',
+    'placeholder.alert'=>'警告',
+    'placeholder.require_change_password'=>'システムセキュリティ要件により、パスワードを変更する必要があります',
+
     'label.name' => 'ユーザー名',
-    'label.email' => 'メールアドレス',
-
-    //Password
-    'header.update_password' => 'パスワード更新',
-    'label.update_password' => '必ず安全なパスワードを使用してください',
+    'label.email' => '電子メール',
+    'label.update_password' => '使用しているパスワードが十分に安全であることを確認してください',
     'label.current_password' => '現在のパスワード',
     'label.new_password' => '新しいパスワード',
     'label.confirm_password' => '新しいパスワードをもう一度入力してください',
-
-    //API
-    'header.api_manage' => 'API管理',
-    'label.api_manage' => 'あなたのAPIキーを管理してください。他人に知らせないでください！',
-    'label.taide_api' => 'Kuwaキー',
+    'label.api_manage' => 'あなたのAPIキーを管理してください。他の人に公開しないでください！',
+    'label.kuwa_api' => 'Kuwa キー',
     'label.openai_api' => 'OpenAI APIキー',
     'label.google_api' => 'Google APIキー',
-    'label.third_party_api' => 'カスタムサードパーティ API キー (例: Groq、Cerebras)',
-    'label.stay_secure' => '外部キーの利用には十分にご注意ください！',
-
-    //Delete Account
-    'header.delete_account' => 'アカウント削除',
-    'label.delete_account' => 'アカウントを削除すると、関連するすべてのデータも削除されます。慎重に行ってください',
-    'button.delete_account' => 'アカウント削除',
+    'label.third_party_api' => 'カスタムサードパーティAPIキー（例：Groq、Cerebras）',
+    'label.stay_secure' => '外部キーの使用量にご注意ください！',
+    'label.delete_account' => 'アカウントを削除すると、関連するすべてのデータが削除されます。慎重に行ってください',
 ];

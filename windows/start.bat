@@ -15,20 +15,31 @@ REM Include variables from separate file
 call src\variables.bat
 cd "%~dp0"
 
+SET filePath=packages\composer.bat
+
+REM Check if the file exists
+IF NOT EXIST "%filePath%" (
+    REM Make executable file for Windows
+    echo :: in case DelayedExpansion is on and a path contains ! > "%filePath%"
+    echo setlocal DISABLEDELAYEDEXPANSION >> "%filePath%"
+    echo php "%%~dp0composer.phar" %%* >> "%filePath%"
+)
+
 REM Redis Server
 pushd packages\%redis_folder%
 del dump.rdb
 start /b "" "redis-server.exe" redis.conf
 popd
 
-REM Define number of Redis workers
+pushd "..\src\multi-chat\"
+REM Remove web cache
+rmdir /S /Q storage\framework\cache
+REM Configure PATH for web
+start /b php artisan web:config --settings="updateweb_path=%PATH%"
+REM Define number of workers
 set numWorkers=10
-
-REM Redis workers
-for /l %%i in (1,1,%numWorkers%) do (
-	echo Started a model worker
-    start /b packages\%php_folder%\php.exe ..\src\multi-chat\artisan queue:work --verbose --timeout=6000
-)
+start /b php artisan worker:start %numWorkers%
+popd
 
 :launch_kernel_and_executors
 REM Kernel
@@ -82,6 +93,10 @@ start http://127.0.0.1
 REM Remake public/storage
 pushd "%~dp0..\src\multi-chat"
 rmdir /Q /S "public\storage"
+rmdir /Q /S "storage\app\public\root\custom"
+rmdir /Q /S "storage\app\public\root\database"
+rmdir /Q /S "storage\app\public\root\bin"
+rmdir /Q /S "storage\app\public\root\bot"
 call php artisan storage:link
 popd
 

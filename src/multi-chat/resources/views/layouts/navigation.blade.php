@@ -1,6 +1,6 @@
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
@@ -71,12 +71,12 @@
                         @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
                             <button
                                 class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
-                                onclick="$modal1.show();">{{ __('manage.label.anno') }}</button>
+                                onclick="$modal1.show();">{{ __('settings.label.anno') }}</button>
                         @endif
                         @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
                             <button
                                 class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
-                                onclick="$modal2.show();">{{ __('manage.label.tos') }}</button>
+                                onclick="$modal2.show();">{{ __('settings.label.tos') }}</button>
                         @endif
                         <hr class="border-gray-300 dark:border-gray-600">
                         <!-- Authentication -->
@@ -135,19 +135,9 @@
                     </x-slot>
                 </x-dropdown>
                 @if (Auth::user()->hasPerm('tab_Manage'))
-                    @php
-                        $updateStatus = \App\Models\SystemSetting::checkUpdate();
-                        $updateAvailable = in_array($updateStatus, ['update-available', 'both-ahead-behind']);
-                        $updateFailed = !in_array($updateStatus, [
-                            'no-update',
-                            'up-to-date',
-                            'update-available',
-                            'both-ahead-behind',
-                        ]);
-                    @endphp
-                    <div
-                        class="flex justify-center items-center min-h-screen updateBtn {{ $updateAvailable ? '' : 'hidden' }}">
-                        <button id="updateAvailableBtn" data-tooltip-target="tooltip-default" type="button" onclick='updateWeb()'
+                    <div class="flex justify-center items-center min-h-screen updateBtn hidden">
+                        <button id="updateAvailableBtn" data-tooltip-target="tooltip-default" type="button"
+                            onclick='updateWeb()'
                             class="text-green-500 hover:text-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg p-2 flex items-center transition-transform transform hover:scale-110">
                             <i class="fa fa-download text-2xl"></i>
                         </button>
@@ -158,15 +148,14 @@
                         </div>
                     </div>
 
-                    <div
-                        class="flex justify-center items-center min-h-screen updateBtn {{ $updateFailed ? '' : 'hidden' }}">
+                    <div class="flex justify-center items-center min-h-screen updateBtn hidden">
                         <button id="updateFailedBtn" data-tooltip-target="tooltip-failed" type="button"
                             class="text-red-500 hover:text-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg p-2 flex items-center transition-transform transform hover:scale-110">
                             <i class="fa fa-times-circle text-2xl"></i> <!-- Failed icon -->
                         </button>
                         <div id="tooltip-failed" role="tooltip"
                             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                            Failed to check update: <br> {{ $updateStatus }}
+                            Failed to check update: <br> <span></span>
                             <div class="tooltip-arrow" data-popper-arrow></div>
                         </div>
                     </div>
@@ -196,44 +185,48 @@
                     </div>
 
                     <script>
-                        $(document).ready(function() {
-                            $('#updateFailedBtn').on('click', function() {
-                                // Hide all update buttons and show the spinner
-                                $('.updateBtn').addClass('hidden'); // Hide all buttons
-                                $('#spinnerDiv').removeClass('hidden'); // Show spinner
+                        function checkUpdate(buttonSelector, spinnerSelector, routeUrl, forced = false) {
+                            // Hide all update buttons and show the spinner
+                            $(buttonSelector).addClass('hidden'); // Hide all buttons
+                            $(spinnerSelector).removeClass('hidden'); // Show spinner
 
-                                // Trigger the POST request
-                                $.ajax({
-                                    url: '{{ route('manage.setting.checkUpdate') }}', // Use your route
-                                    type: 'POST',
-                                    data: {
-                                        _token: '{{ csrf_token() }}' // Include CSRF token
-                                    },
-                                    success: function(response) {
-                                        // Handle success response here
-                                        console.log(response);
-                                        // Depending on the response, show the appropriate button
-                                        // You may want to parse the response if it's in JSON format
-                                        if (response === 'update-available') {
-                                            $('#updateAvailableBtn').parent().removeClass(
-                                                'hidden'); // Show update available button
-                                        } else if (response === 'no-update') {
-                                            // Show some other button or handle no update case
-                                        } else {
-                                            $('#updateFailedBtn').parent().removeClass(
-                                                'hidden'); // Show failed button
-                                        }
-                                        $('#spinnerDiv').addClass('hidden');
-                                    },
-                                    error: function(xhr, status, error) {
-                                        // Handle error here
-                                        console.error('Error:', error);
-                                        // Show failed button on error
-                                        $('#updateFailedBtn').parent().removeClass('hidden');
+                            // Trigger the POST request
+                            $.ajax({
+                                url: routeUrl,
+                                type: 'POST',
+                                data: {
+                                    _token: '{{ csrf_token() }}', // Include CSRF token
+                                    forced: forced
+                                },
+                                success: function(response) {
+                                    // Depending on the response, show the appropriate button
+                                    if (response.value === 'update-available') {
+                                        $('#updateAvailableBtn').parent().removeClass('hidden'); // Show update available button
+                                    } else if (response.value === 'no-update') {
+                                        // Show some other button or handle no update case
+                                    } else {
+                                        $('#updateFailedBtn').parent().removeClass('hidden'); // Show failed button
+                                        $('#updateFailedBtn').next().find('span').text(response.value);
                                     }
-                                });
+
+                                    $(spinnerSelector).addClass('hidden'); // Hide spinner
+                                },
+                                error: function(xhr, status, error) {
+                                    // Handle error here
+                                    console.error('Error:', error);
+
+                                    // Show failed button on error
+                                    $('#updateFailedBtn').parent().removeClass('hidden');
+                                    $(spinnerSelector).addClass('hidden'); // Hide spinner
+                                }
                             });
+                        }
+
+                        // Bind the function to the updateFailedBtn click event
+                        $('#updateFailedBtn').on('click', function() {
+                            checkUpdate('.updateBtn', '#spinnerDiv', '{{ route('manage.setting.checkUpdate') }}', true);
                         });
+                        checkUpdate('.updateBtn', '#spinnerDiv', '{{ route('manage.setting.checkUpdate') }}', false)
                     </script>
                 @endif
             </div>
@@ -305,12 +298,12 @@
                 @if (\App\Models\SystemSetting::where('key', 'announcement')->first()->value != '')
                     <button
                         class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
-                        onclick="$modal1.show();">{{ __('manage.label.anno') }}</button>
+                        onclick="$modal1.show();">{{ __('settings.label.anno') }}</button>
                 @endif
                 @if (\App\Models\SystemSetting::where('key', 'tos')->first()->value != '')
                     <button
                         class="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
-                        onclick="$modal2.show();">{{ __('manage.label.tos') }}</button>
+                        onclick="$modal2.show();">{{ __('settings.label.tos') }}</button>
                 @endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

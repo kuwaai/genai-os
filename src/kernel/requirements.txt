@@ -7,3 +7,5 @@ flask_sse
 APScheduler
 #llm-safety-guard>=0.2.0
 uvicorn~=0.29.0
+aiohttp
+huggingface_hub[cli]

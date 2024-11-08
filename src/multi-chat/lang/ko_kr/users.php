@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'button.delete' => '삭제',
+    'button.update' => '업데이트',
+    'button.cancel' => '취소',
+    'button.create' => '만들기',
+    'button.return_group_list' => '그룹 목록으로 돌아가기',
+
+    'header.menu' => '메뉴',
+    'header.group_selector' => '그룹 선택기',
+    'header.fuzzy_search' => '흐릿한 검색기',
+    'header.create_user' => '사용자 만들기',
+    'header.create_user' => '새로운 계정 만들기',
+    'header.group_selector' => '사용자 편집',
+    'header.delete_user' => '사용자를 삭제하시겠습니까?',
+
+    'label.group_selector' => '그룹에서 사용자를 필터링합니다',
+    'label.fuzzy_search' => '이름이나 이메일로 사용자를 검색합니다',
+    'label.create_user' => '사용자 프로필을 만듭니다',
+    'label.joined_group' => '가입한 그룹',
+    'label.members' => '명의 멤버',
+    'label.other_users' => '그룹 멤버 아님',
+    'label.name' => '이름',
+    'label.email' => '이메일',
+    'label.password' => '비밀번호',
+    'label.update_password' => '비밀번호 업데이트',
+    'label.detail' => '상세 정보',
+    'label.require_change_password' => '다음 로그인 시 비밀번호 변경 요구',
+    'label.extra_setting' => '추가 설정',
+    'label.created_at' => '생성됨',
+    'label.updated_at' => '업데이트됨',
+
+    'placeholder.enter_to_search' => 'Enter 키를 눌러 검색',
+    'placeholder.search_user' => '이메일 또는 이름 검색',
+    'placeholder.email' => '사용자 이메일',
+    'placeholder.username' => '사용자 이름',
+    'placeholder.group_name' => '그룹 이름',
+    'placeholder.new_password' => '새 비밀번호',
+];

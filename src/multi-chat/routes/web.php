@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ManageController;
@@ -164,19 +163,6 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                             ->delete('/', [ProfileController::class, 'destroy'])
                             ->name('profile.destroy');
                     });
-                #---Archives, disabled, should be updated like inspecter or just deleted and replaced by export all data button
-                /*Route::middleware(AdminMiddleware::class . ':tab_Archive')
-            ->prefix('archive')
-            ->group(function () {
-                Route::get('/', function () {
-                    return view('archive');
-                })->name('archive.home');
-
-                Route::get('/{chat_id}', [ArchiveController::class, 'main'])->name('archive.chat');
-                Route::post('/edit', [ArchiveController::class, 'edit'])->name('archive.edit');
-                Route::delete('/delete', [ArchiveController::class, 'delete'])->name('archive.delete');
-            })
-            ->name('archive');*/
 
                 #---Room
                 Route::middleware(AdminMiddleware::class . ':tab_Room')
@@ -246,6 +232,9 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::get('/', function () {
                             return view('manage.home');
                         })->name('manage.home');
+                        Route::get('/setup', function () {
+                            return view('manage.setup');
+                        })->name('manage.setup');
                         Route::prefix('group')
                             ->group(function () {
                                 Route::post('/create', [ManageController::class, 'group_create'])->name('manage.group.create');
@@ -266,7 +255,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                         Route::prefix('setting')
                             ->group(function () {
                                 Route::get('/resetRedis', [SystemController::class, 'ResetRedis'])->name('manage.setting.resetRedis');
-                                Route::get('/updateWeb', [SystemController::class, 'updateWeb'])->name('manage.setting.updateWeb');
+                                Route::get('/updateProject', [SystemController::class, 'updateProject'])->name('manage.setting.updateWeb');
                                 Route::post('/sendUpdateInput', [SystemController::class, 'sendUpdateInput'])->name('manage.setting.sendUpdateInput');
                                 Route::post('/checkUpdate', [SystemController::class, 'checkUpdate'])->name('manage.setting.checkUpdate');
                                 Route::patch('/update', [SystemController::class, 'update'])->name('manage.setting.update');
@@ -284,14 +273,24 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
 
                         Route::prefix('kernel')
                             ->group(function () {
-                                Route::get('/fetch-data', [KernelController::class, 'fetchData'])->name('manage.kernel.fetchData');
-                                Route::post('/update-data', [KernelController::class, 'updateData'])->name('manage.kernel.updateData');
-                                Route::post('/delete-data', [KernelController::class, 'deleteData'])->name('manage.kernel.deleteData');
-                                Route::post('/shutdown', [KernelController::class, 'shutdown'])->name('manage.kernel.shutdown');
-                                Route::post('/update-field', [KernelController::class, 'updateField'])->name('manage.kernel.updateField');
-                                Route::post('/create-data', [KernelController::class, 'createData'])->name('manage.kernel.createData');
-                            })
-                            ->name('manage.kernel');
+                                Route::prefix('record')->group(function () {
+                                    Route::get('/fetch-data', [KernelController::class, 'fetchData'])->name('manage.kernel.record.fetchData');
+                                    Route::post('/update-data', [KernelController::class, 'updateData'])->name('manage.kernel.record.updateData');
+                                    Route::post('/delete-data', [KernelController::class, 'deleteData'])->name('manage.kernel.record.deleteData');
+                                    Route::post('/shutdown', [KernelController::class, 'shutdown'])->name('manage.kernel.record.shutdown');
+                                    Route::post('/update-field', [KernelController::class, 'updateField'])->name('manage.kernel.record.updateField');
+                                    Route::post('/create-data', [KernelController::class, 'createData'])->name('manage.kernel.record.createData');
+                                });
+                                Route::prefix('storage')->group(function () {
+                                    Route::get('/', [KernelController::class, 'storage'])->name('manage.kernel.storage');
+                                    Route::get('/jobs', [KernelController::class, 'storage_job'])->name('manage.kernel.storage.jobs');
+                                    Route::get('/download', [KernelController::class, 'storage_download'])->name('manage.kernel.storage.download');
+                                    Route::post('/abort', [KernelController::class, 'storage_abort'])->name('manage.kernel.storage.abort');
+                                    Route::post('/remove', [KernelController::class, 'storage_remove'])->name('manage.kernel.storage.remove');
+                                    Route::post('/hf_login', [KernelController::class, 'storage_hf_login'])->name('manage.kernel.storage.hf_login');
+                                    Route::post('/hf_logout', [KernelController::class, 'storage_hf_logout'])->name('manage.kernel.storage.hf_logout');
+                                });
+                            });
 
                         Route::prefix('workers')
                             ->group(function () {

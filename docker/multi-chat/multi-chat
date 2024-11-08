@@ -28,7 +28,6 @@ exec_redis_workers() {
         php artisan queue:work --verbose --timeout=6000 &
     done
 }
-
 NUM_WORKER=${NUM_WORKER:-1}
 echo "Number of redis workers: $NUM_WORKER"
 exec_redis_workers ${NUM_WORKER}

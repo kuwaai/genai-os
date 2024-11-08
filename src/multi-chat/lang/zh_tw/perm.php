@@ -8,6 +8,7 @@ return [
     'Profile_delete_account' => '刪除帳號',
     'Profile_read_api_token' => '讀取網站API金鑰',
     'Profile_update_api_token' => '更新網站API金鑰',
+
     'Room_update_detail_feedback' => '詳細回饋',
     'Room_read_access_to_api' => '使用網站API',
     'Room_update_send_message' => '傳送訊息',
@@ -18,12 +19,14 @@ return [
     'Room_update_import_chat' => '匯入對話',
     'Room_update_react_message' => '額外操作按鈕',
     'Room_update_ignore_upload_constraint' => '忽略上傳限制',
+
     'Dashboard_read_statistics' => '統計資訊',
     'Dashboard_read_blacklist' => '黑名單',
     'Dashboard_read_feedbacks' => '回饋資料',
     'Dashboard_read_logs' => '系統日誌',
     'Dashboard_read_safetyguard' => '安全過濾',
     'Dashboard_read_inspect' => '訊息瀏覽器',
+
     'Store_create_community_bot' => '社群Bot',
     'Store_create_private_bot' => '私有Bot',
     'Store_create_group_bot' => '群組Bot',
@@ -34,6 +37,7 @@ return [
     'Store_read_discover_private_bots' => '存取自建Bot',
     'Store_read_discover_group_bots' => '存取群組Bot',
     'Store_read_any_modelfile' => '存取任何modelfile',
+    
     'Cloud_read_my_files' => '讀取檔案',
     'Cloud_update_upload_files' => '上傳檔案',
     'Cloud_delete_my_files' => '刪除檔案'

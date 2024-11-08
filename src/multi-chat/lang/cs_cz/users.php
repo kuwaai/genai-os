@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'button.delete' => 'Smazat',
+    'button.update' => 'Aktualizovat',
+    'button.cancel' => 'Zrušit',
+    'button.create' => 'Vytvořit',
+    'button.return_group_list' => 'Zpět na seznam skupin',
+
+    'header.menu' => 'Hlavní nabídka',
+    'header.group_selector' => 'Výběr skupiny',
+    'header.fuzzy_search' => 'Rozostřené vyhledávání',
+    'header.create_user' => 'Vytvořit uživatele',
+    'header.create_user' => 'Vytvořit nový účet',
+    'header.group_selector' => 'Upravit uživatele',
+    'header.delete_user' => 'Opravdu chcete smazat uživatele?',
+
+    'label.group_selector' => 'Filtrovat uživatele podle skupiny',
+    'label.fuzzy_search' => 'Hledat uživatele podle jména nebo emailu',
+    'label.create_user' => 'Vytvořit uživatelský profil',
+    'label.joined_group' => 'Připojené skupiny',
+    'label.members' => 'členů',
+    'label.other_users' => 'Uživatelé bez skupiny',
+    'label.name' => 'Jméno',
+    'label.email' => 'Email',
+    'label.password' => 'Heslo',
+    'label.update_password' => 'Aktualizovat heslo',
+    'label.detail' => 'Detail',
+    'label.require_change_password' => 'Vyžadovat změnu hesla při dalším přihlášení',
+    'label.extra_setting' => 'Další nastavení',
+    'label.created_at' => 'Vytvořeno',
+    'label.updated_at' => 'Aktualizováno',
+
+    'placeholder.enter_to_search' => 'Stiskněte Enter pro vyhledávání',
+    'placeholder.search_user' => 'Hledat email nebo jméno',
+    'placeholder.email' => 'Uživatelský email',
+    'placeholder.username' => 'Uživatelské jméno',
+    'placeholder.group_name' => 'Název skupiny',
+    'placeholder.new_password' => 'Nové heslo',
+];

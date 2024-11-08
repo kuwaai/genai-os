@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="flex-1 h-full py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="mx-auto sm:px-6 lg:px-8 space-y-6">
             <div class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
                 role="alert">
                 <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -8,9 +8,9 @@
                     <path
                         d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                 </svg>
-                <span class="sr-only">{{__("profile.hint.alert")}}</span>
+                <span class="sr-only">{{__("profile.placeholder.alert")}}</span>
                 <div>
-                    <span class="font-medium">{{__('profile.hint.require_change_password')}}</span>
+                    <span class="font-medium">{{__('profile.placeholder.require_change_password')}}</span>
                 </div>
             </div>
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
@@ -58,11 +58,11 @@
                                 @if (session('status') === 'password-updated')
                                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
                                         class="text-sm text-gray-600 dark:text-green-400">
-                                        {{ __('profile.hint.saved') }}</p>
+                                        {{ __('profile.placeholder.saved') }}</p>
                                 @elseif (session('status') === 'password-nochange')
                                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
                                         class="text-sm text-gray-600 dark:text-red-400">
-                                        {{ __('profile.hint.nochange') }}</p>
+                                        {{ __('profile.placeholder.nochange') }}</p>
                                 @endif
                             </div>
                         </form>

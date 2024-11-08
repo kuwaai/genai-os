@@ -383,10 +383,10 @@
         }
         updatePath('/homes/' + {{ Auth::user()->id }});
     </script>
-    <div class="py-2 h-full">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-full">
+    <div class="h-full">
+        <div class="mx-auto h-full">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-full">
-                <div class="p-6 text-gray-900 dark:text-gray-100 h-full flex flex-col">
+                <div class="p-2 text-gray-900 dark:text-gray-100 h-full flex flex-col">
                     <nav class="mb-2">
                         <ul class="flex space-x-2 cloud-path">
                         </ul>
@@ -396,7 +396,7 @@
                         <p class="text-gray-600 mb-4">Drag & drop your files here or click to upload.</p>
                         <input type="file" id="file-upload" class="hidden" multiple>
                         <label for="file-upload"
-                            class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg">{{ __('cloud.interface.header') }}</label>
+                            class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg">{{ __('cloud.header.interface') }}</label>
                     </div>
                     <div class="flex-grow border-2 border-gray-400 rounded-lg p-2 flex flex-col">
                         <div class="flex flex-wrap overflow-auto" id="file-list"></div>

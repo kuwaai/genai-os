@@ -86,14 +86,11 @@ class RoomController extends Controller
     }
     public function home(Request $request)
     {
-        // The selected bots are stored in the 'llms' session data.
         if ($request->session()->exists('llms')) {
             return view('room');
         } else {
             return view('room.home');
         }
-        // LLMs::findOrFail($chat->bot_id)->enabled == true) {
-        // return redirect()->route('archives', $request->route('chat_id'));
     }
     public function chat_room(Request $request)
     {
@@ -127,7 +124,7 @@ class RoomController extends Controller
                 foreach ($rows as $index => $row) {
                     // Splitting each row into columns using tabs as delimiter
                     if ($index === 0) {
-                        $headers = explode("\t", str_replace('    ', "\t", $row));
+                        $headers = explode("\t", $row);
                         if (in_array('content', $headers)) {
                             continue;
                         } else {
@@ -138,9 +135,9 @@ class RoomController extends Controller
                         break;
                     }
                     if (count($headers) === 1) {
-                        $columns = [str_replace('    ', "\t", $row)];
+                        $columns = [$row];
                     } else {
-                        $columns = explode("\t", str_replace('    ', "\t", $row));
+                        $columns = explode("\t", $row);
                     }
 
                     $record = [];
@@ -278,6 +275,7 @@ class RoomController extends Controller
                             $Room = new ChatRoom();
                             $Room->fill(['name' => $filename ?? $historys[0]->content, 'user_id' => $request->user()->id]);
                             $Room->save();
+                            $chatIds = [];
                             foreach ($bot_ids->pluck('id') as $id) {
                                 $chat = new Chats();
                                 $chat->fill(['name' => 'Room Chat', 'bot_id' => $id, 'user_id' => Auth::user()->id, 'roomID' => $Room->id]);
@@ -291,33 +289,35 @@ class RoomController extends Controller
                         $ids = [];
                         $deltaTime = count($historys);
                         $t = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' -' . $deltaTime . ' second'));
-                        $chatIds = Chats::join('bots', 'bots.id', '=', 'chats.bot_id')->join('llms', 'bots.model_id', '=', 'llms.id')->whereIn('chats.id', $chatIds)->select('chats.id', 'llms.access_code')->get();
-                        foreach ($historys as $history) {
-                            $history->isbot = $history->role == 'user' ? false : true;
-                            if ($history->isbot) {
-                                if ($user_msg != null && !in_array($history->model, $appended)) {
+                        if (count($chatIds) > 0) {
+                            $chatIds = Chats::join('bots', 'bots.id', '=', 'chats.bot_id')->join('llms', 'bots.model_id', '=', 'llms.id')->whereIn('chats.id', $chatIds)->select('chats.id', 'llms.access_code')->get();
+                            foreach ($historys as $history) {
+                                $history->isbot = $history->role == 'user' ? false : true;
+                                if ($history->isbot) {
+                                    if ($user_msg != null && !in_array($history->model, $appended)) {
+                                        $record = new Histories();
+                                        $record->fill(['msg' => $user_msg, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'isbot' => false, 'chained' => $history->chain, 'created_at' => $t, 'updated_at' => $t]);
+                                        $record->save();
+                                    }
+                                    $appended[] = $history->model;
+                                    $t2 = date('Y-m-d H:i:s', strtotime($t . ' +' . array_count_values($appended)[$history->model] . ' second'));
                                     $record = new Histories();
-                                    $record->fill(['msg' => $user_msg, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'isbot' => false, 'chained' => $history->chain, 'created_at' => $t, 'updated_at' => $t]);
+                                    $record->fill(['msg' => $history->content == '' ? '* ...thinking... *' : $history->content, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'chained' => $history->chain, 'isbot' => true, 'created_at' => $t2, 'updated_at' => $t2]);
                                     $record->save();
+                                    if ($history->content == '') {
+                                        $ids[] = $record->id;
+                                        Redis::rpush('usertask_' . $request->user()->id, $record->id);
+                                        Redis::expire('usertask_' . $request->user()->id, 1200);
+                                    }
+                                } else {
+                                    $user_msg = $history->content;
+                                    $t = date('Y-m-d H:i:s', strtotime($t . ' +' . ($appended != [] ? max(array_count_values($appended)) : 1) + 1 . ' second'));
+                                    $appended = [];
                                 }
-                                $appended[] = $history->model;
-                                $t2 = date('Y-m-d H:i:s', strtotime($t . ' +' . array_count_values($appended)[$history->model] . ' second'));
-                                $record = new Histories();
-                                $record->fill(['msg' => $history->content == '' ? '* ...thinking... *' : $history->content, 'chat_id' => $chatIds->where('access_code', '=', $history->model)->first()->id, 'chained' => $history->chain, 'isbot' => true, 'created_at' => $t2, 'updated_at' => $t2]);
-                                $record->save();
-                                if ($history->content == '') {
-                                    $ids[] = $record->id;
-                                    Redis::rpush('usertask_' . $request->user()->id, $record->id);
-                                    Redis::expire('usertask_' . $request->user()->id, 1200);
-                                }
-                            } else {
-                                $user_msg = $history->content;
-                                $t = date('Y-m-d H:i:s', strtotime($t . ' +' . ($appended != [] ? max(array_count_values($appended)) : 1) + 1 . ' second'));
-                                $appended = [];
                             }
+                            ImportChat::dispatch($ids, Auth::user()->id);
+                            return Redirect::route('room.chat', $Room->id)->with('selLLMs', $bot_ids->pluck('id')->toarray());
                         }
-                        ImportChat::dispatch($ids, Auth::user()->id);
-                        return Redirect::route('room.chat', $Room->id)->with('selLLMs', $bot_ids->pluck('id')->toarray());
                     }
                 }
             }
@@ -352,7 +352,7 @@ class RoomController extends Controller
             return [
                 'succeed' => false,
                 'url' => null,
-                'msg' => __('chat.hint.upload_disabled_by_admin'),
+                'msg' => __('chat.placeholder.upload_disabled_by_admin'),
             ];
         }
 
@@ -613,8 +613,9 @@ class RoomController extends Controller
             ->with('selLLMs', $selectedLLMs)
             ->with('mode_track', request()->input('mode_track'));
     }
-    
-    public function create_room(Request $request){
+
+    public function create_room(Request $request)
+    {
         $llms = $request->input('llm');
         $Room = new ChatRoom();
         $Room->fill(['name' => __('room.header.new_room'), 'user_id' => Auth::user()->id]);

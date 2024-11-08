@@ -373,7 +373,7 @@ class BotController extends Controller
                 if ($request->input('bot_name')) {
                     $bot->name = $request->input('bot_name');
                 }
-                $bot->description = $request->input('bot_describe') ?? "";
+                $bot->description = $request->input('bot_describe') ?? '';
                 if ($file = $request->file('bot_image')) {
                     if ($bot->image) {
                         Storage::delete($bot->image);
@@ -385,14 +385,20 @@ class BotController extends Controller
                 $bot->save();
             }
         }
-        if ($referer = request()->input('referer')) {
+        if ($referer = $request->input('referer')) {
             if (str_ends_with($referer, 'room')) {
                 return redirect()->route('room.home')->with('llms', request()->input('selected_bots'));
+            } elseif (preg_match('/room\/\d+$/', $referer)) {
+                return redirect()->to($referer);
+            } elseif (str_ends_with($referer, 'store')) {
+                return redirect()
+                    ->route('store.home')
+                    ->with('last_bot_tab', ['system', 'community', 'group', 'private'][$bot->visibility]);
             }
-            return redirect()->to($referer);
-        } else {
-            return redirect()->route('store.home');
         }
+        return redirect()
+            ->route('store.home')
+            ->with('last_bot_tab', ['system', 'private', 'group', 'community'][$bot->visibility]);
     }
     public function delete(Request $request): RedirectResponse
     {

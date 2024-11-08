@@ -107,13 +107,13 @@
                     @if (!session('llms') && request()->user()->hasPerm('Room_read_export_chat'))
                         <x-dropdown-link onclick="event.preventDefault();export_chat()" href="#"
                             data-modal-target="exportModal" data-modal-toggle="exportModal">
-                            {{ __('chat.modal.export.header') }}
+                            {{ __('chat.header.export') }}
                         </x-dropdown-link>
                     @endif
                     @if (request()->user()->hasPerm('Room_update_import_chat'))
                         <x-dropdown-link href="#" onclick="event.preventDefault();"
                             data-modal-target="importModal" data-modal-toggle="importModal">
-                            {{ __('chat.modal.import.header') }}
+                            {{ __('chat.header.import') }}
                         </x-dropdown-link>
                     @endif
                     @if (!session('llms'))
@@ -201,7 +201,7 @@
                 "messages": chatMessages
             }, null, 4))
             //Tab Separate Values
-            var csvContent = "role	model	content	chain\n"; // Define CSV header
+            var tsvContent = "role	model	content	chain\n"; // Define CSV header
 
             $("#chatroom > div > div.flex.w-full.mt-2.space-x-3 ").each(function(index, element) {
                 var historyId = $(element).prop("id").replace("history_", "");
@@ -221,9 +221,9 @@
                     row = `user		${msgText}	\n`;
                 }
 
-                csvContent += row; // Add row to CSV content
+                tsvContent += row; // Add row to CSV content
             });
-            $("#export_tsv").val(csvContent)
+            $("#export_tsv").val(tsvContent)
         }
     </script>
 @endif

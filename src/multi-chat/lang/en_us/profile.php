@@ -1,43 +1,39 @@
 <?php
 
 return [
-    'route' => 'Setting',
-    'interface.header' => 'Personal Profile',
+    'route' => 'Settings',
+
+    'header.interface' => 'Profile',
+    'header.personal_info' => 'You can update your name or email here.',
+    'header.update_password' => 'Update Password',
+    'header.api_manage' => 'API Management',
+    'header.delete_account' => 'Delete Account',
+
     'button.save' => 'Save',
     'button.copy' => 'Copy',
     'button.renew' => 'Regenerate',
     'button.update' => 'Update',
     'button.confirm' => 'Confirm',
     "button.change_lang"=>"Change Language",
-    'hint.updated' => 'Successfully updated',
-    'hint.saved' => 'Saved',
-    'hint.nochange'=>'No update, data is the same',
-    'hint.alert'=>'Warning',
-    'hint.require_change_password'=>'System security requires you to change password',
+    'button.delete_account' => 'Delete Account',
 
-    //Personal Infos
-    'header.personal_info' => 'You can update your name or email below',
+    'placeholder.updated' => 'Updated successfully',
+    'placeholder.saved' => 'Saved',
+    'placeholder.nochange'=>'No changes made',
+    'placeholder.alert'=>'Alert',
+    'placeholder.require_change_password'=>'You are required to change your password due to system security requirements',
+
     'label.name' => 'Username',
     'label.email' => 'Email',
-
-    //Password
-    'header.update_password' => 'Update Password',
-    'label.update_password' => 'Make sure your password is strong',
-    'label.current_password' => 'Current Password',
-    'label.new_password' => 'New Password',
-    'label.confirm_password' => 'Confirm Password',
-
-    //API
-    'header.api_manage' => 'API Management',
-    'label.api_manage' => 'Manage your API Key, don\'t let other people know about it!',
-    'label.taide_api' => 'Kuwa API Key',
+    'label.update_password' => 'Make sure your password is strong enough',
+    'label.current_password' => 'Current password',
+    'label.new_password' => 'New password',
+    'label.confirm_password' => 'Please enter your new password again',
+    'label.api_manage' => 'Manage your API keys, never let anyone know!',
+    'label.kuwa_api' => 'Kuwa Key',
     'label.openai_api' => 'OpenAI API Key',
     'label.google_api' => 'Google API Key',
-    'label.third_party_api' => 'Custom Third-Party API Keys (e.g., Groq, Cerebras)',
-    'label.stay_secure' => 'Please be careful about your external API usage!',
-
-    //Delete Account
-    'header.delete_account' => 'Delete Account',
-    'label.delete_account' => 'Once deleted, all the data relative to your account will be removed.',
-    'button.delete_account' => 'Delete Account',
+    'label.third_party_api' => 'Custom Third-party API Keys (e.g. Groq, Cerebras)',
+    'label.stay_secure' => 'Be mindful of your external key usage!',
+    'label.delete_account' => 'Once your account is deleted, all related data will be cleared. Please proceed with caution',
 ];

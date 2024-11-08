@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Process\Process;
@@ -29,34 +30,35 @@ class WorkerController extends Controller
 
         for ($i = 0; $i < $count; $i++) {
             $logFile = $this->generateLogFileName($logFileBase);
-            $command = PHP_OS_FAMILY === 'Windows' ? "start /B php {$artisanPath} queue:work >> {$logFile} 2>&1" : "php {$artisanPath} queue:work >> {$logFile} 2>&1 &";
+            $command = PHP_OS_FAMILY === 'Windows' ? "start /B php \"{$artisanPath}\" queue:work >> \"{$logFile}\"" : "php {$artisanPath} queue:work >> {$logFile} 2>&1 &";
 
+            $env = [
+                'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value') ?: getenv('PATH'),
+                'GIT_SSH_COMMAND' => SystemSetting::where('key', 'updateweb_git_ssh_command')->value('value') ?? '',
+            ];
             try {
-                Process::fromShellCommandline($command)->start();
-                // Wait until the log file is created as an indication that the worker started
+                $worker = Process::fromShellCommandline($command)->setEnv($env)->setTimeout(null);
+                $worker->run();
                 while (!file_exists($logFile)) {
                     usleep(100000);
                 }
             } catch (\Exception $e) {
-                return response()->json(['message' => __("manage.label.worker_start_failed") . $e->getMessage()], 500);
+                return response()->json(['message' => __('workers.label.worker_start_failed') . $e->getMessage()], 500);
             }
         }
 
-        return response()->json(['message' => __("manage.label.worker_started")]);
+        return response()->json(['message' => __('workers.label.worker_started')]);
     }
 
     // Function to stop all workers and merge log files
     public function stopWorkers()
     {
-        // Signal all queue workers to restart, effectively stopping them
         Artisan::call('queue:restart');
 
-        // Wait up to 5 seconds for all workers to terminate
         for ($elapsedTime = 0; $elapsedTime < 10 && $this->get()->getData()->worker_count > 0; $elapsedTime++) {
             usleep(500000);
         }
 
-        // Merge worker logs into a single file
         $logDirectory = base_path('storage/logs/');
         $mergedLogFile = $logDirectory . 'workers.log';
 
@@ -64,17 +66,16 @@ class WorkerController extends Controller
             $logFiles = glob($logDirectory . 'worker.log.*');
 
             if (empty($logFiles)) {
-                return response()->json(['message' =>  __("manage.label.no_workers")]);
+                return response()->json(['message' => __('workers.label.no_workers')]);
             }
 
-            // Open merged log file for appending, create if not exists
             $mergedFileHandle = fopen($mergedLogFile, 'a') ?: touch($mergedLogFile);
 
             foreach ($logFiles as $logFile) {
                 if (filesize($logFile) > 0) {
                     fwrite($mergedFileHandle, file_get_contents($logFile));
                 }
-                unlink($logFile); // Remove the individual worker log file after merging
+                unlink($logFile);
             }
 
             fclose($mergedFileHandle);
@@ -82,7 +83,7 @@ class WorkerController extends Controller
             \Log::error('Log merge error: ' . $e->getMessage());
         }
 
-        return response()->json(['message' => __("manage.label.worker_stopped")]);
+        return response()->json(['message' => __('workers.label.worker_stopped')]);
     }
 
     // Function to generate a unique log file name
@@ -95,33 +96,61 @@ class WorkerController extends Controller
         return $baseName . '.' . $i;
     }
 
-    // Get the number of active worker processes
-    public function get()
-    {
-        // Define the project root directory.
-        $projectRoot = base_path();
-        $artisanFile = $projectRoot . '/artisan';
+// Get the number of active worker processes
+public function get()
+{
+    $projectRoot = base_path(); // Get the root of the project
+    $artisanFile = $projectRoot . '/artisan'; // Path to the artisan file
+    $count = 0; // Initialize the count of worker processes
 
-        if (PHP_OS_FAMILY === 'Windows') {
-            // Use tasklist to get the processes.
-            $cmd = 'tasklist /FI "IMAGENAME eq php.exe" /FO CSV';
-            $processes = shell_exec($cmd);
+    if (PHP_OS_FAMILY === 'Windows') {
+        // Attempt to use wmic to get the command line of running PHP processes
+        $cmd = 'wmic process where "name=\'php.exe\'" get CommandLine, ProcessId';
+        $processes = shell_exec($cmd);
 
-            // Subtract 2 to account for headers or irrelevant processes.
-            $count = max(0, count(explode("\n", $processes)) - 2);
+        // Check if the output is not empty
+        if (!empty($processes)) {
+            // Split lines and filter out empty lines
+            $lines = array_filter(explode("\n", trim($processes)));
+
+            // Iterate through each line (ignoring the first line which is the header)
+            foreach ($lines as $line) {
+                if (strpos($line, 'php') !== false) { // Check if line contains 'php'
+                    // Extract the command line and check if it includes 'artisan' and the correct path
+                    if (preg_match('/php\s+"([^"]+)"\s+queue:work/', $line, $matches)) {
+                        if (isset($matches[1]) && realpath($matches[1]) === realpath($artisanFile)) {
+                            $count++; // Increment the count if the paths match
+                        }
+                    }
+                }
+            }
         } else {
-            // Use lsof to find PHP processes accessing the artisan file.
-            $cmd = "lsof -t '$artisanFile' | xargs ps -p | grep 'php' | grep -v grep";
+            // Fallback to PowerShell if wmic fails to return any process
+            $cmd = 'powershell -command "Get-Process php | Select-Object Id, Path"';
             $processes = shell_exec($cmd);
+            $lines = array_filter(explode("\n", trim($processes)));
 
-            // Count the number of lines in the output.
-            $count = count(array_filter(explode("\n", trim($processes))));
+            foreach ($lines as $line) {
+                // Check if the line contains the artisan path
+                if (strpos($line, $artisanFile) !== false) {
+                    $count++; // Increment the count if the path matches
+                }
+            }
         }
-
-        return response()->json(['worker_count' => $count]);
+    } else {
+        // For non-Windows systems
+        $cmd = "lsof -t '$artisanFile' | xargs ps -p | grep 'php' | grep -v grep";
+        $processes = shell_exec($cmd);
+        if (empty(trim($processes))) {
+            $cmd = "ps aux | grep 'php' | grep '$artisanFile' | grep -v grep";
+            $processes = shell_exec($cmd);
+        }
+        $count = count(array_filter(explode("\n", trim($processes))));
     }
 
-    // Clean Redis keys (no changes here)
+    return response()->json(['worker_count' => $count]); // Return the count in JSON format
+}
+
     public static function cleanRedisKey($key, $pattern)
     {
         return strpos($key, $pattern) !== false ? substr($key, strpos($key, $pattern)) : $key;

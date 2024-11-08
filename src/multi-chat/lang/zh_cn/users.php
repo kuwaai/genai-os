@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'button.delete' => '删除',
+    'button.update' => '更新',
+    'button.cancel' => '取消',
+    'button.create' => '创建',
+    'button.return_group_list' => '返回群组列表',
+
+    'header.menu' => '主菜单',
+    'header.group_selector' => '群组选择器',
+    'header.fuzzy_search' => '模糊搜索器',
+    'header.create_user' => '创建用户',
+    'header.create_user' => '创建一个新账号',
+    'header.group_selector' => '编辑用户',
+    'header.delete_user' => '确定要删除用户',
+
+    'label.group_selector' => '从群组开始筛选用户',
+    'label.fuzzy_search' => '使用名称或邮箱搜索用户',
+    'label.create_user' => '创建一个用户的配置文件',
+    'label.joined_group' => '加入的群组',
+    'label.members' => '个成员',
+    'label.other_users' => '无群组成员',
+    'label.name' => '名称',
+    'label.email' => '电子邮件',
+    'label.password' => '密码',
+    'label.update_password' => '更新密码',
+    'label.detail' => '详细说明',
+    'label.require_change_password' => '下次登录要求修改密码',
+    'label.extra_setting' => '额外设置',
+    'label.created_at' => '创建时间',
+    'label.updated_at' => '更新时间',
+
+    'placeholder.enter_to_search' => '按下Enter来搜索',
+    'placeholder.search_user' => '搜索邮箱或名称',
+    'placeholder.email' => '用户邮箱',
+    'placeholder.username' => '用户名',
+    'placeholder.group_name' => '群组名称',
+    'placeholder.new_password' => '新密码',
+];

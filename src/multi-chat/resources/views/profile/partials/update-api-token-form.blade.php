@@ -14,8 +14,8 @@
             @method('patch')
 
             <div>
-                <x-input-label for="taide_api" :value="__('profile.label.taide_api')" />
-                <x-text-input type="text" id="taide_api" class="mt-1 block w-full" :value="$user->tokens()->where('name', 'API_Token')->first()->token" readonly />
+                <x-input-label for="kuwa_api" :value="__('profile.label.kuwa_api')" />
+                <x-text-input type="text" id="kuwa_api" class="mt-1 block w-full" :value="$user->tokens()->where('name', 'API_Token')->first()->token" readonly />
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
@@ -53,7 +53,7 @@
 
                 @if (session('status') === 'google-token-updated')
                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.placeholder.updated') }}</p>
                 @endif
             </div>
         </form>
@@ -77,7 +77,7 @@
 
                 @if (session('status') === 'chatgpt-token-updated')
                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.placeholder.updated') }}</p>
                 @endif
             </div>
         </form>
@@ -101,7 +101,7 @@
 
                 @if (session('status') === 'third-party-token-updated')
                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.hint.updated') }}</p>
+                        class="text-sm text-gray-600 dark:text-green-400">{{ __('profile.placeholder.updated') }}</p>
                 @endif
             </div>
         </form>
@@ -111,7 +111,7 @@
             $(document).ready(function() {
                 $("#copyButton").click(function() {
                     event.preventDefault();
-                    var copyText = document.getElementById("taide_api");
+                    var copyText = document.getElementById("kuwa_api");
                     copyText.select();
                     document.execCommand("copy");
 

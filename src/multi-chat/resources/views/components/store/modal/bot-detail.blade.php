@@ -41,8 +41,8 @@
                 </button>
             </div>
             <!-- Modal body -->
-            <form method="post" action="{{ route('store.update') }}" class="p-6" id="update_bot" enctype="multipart/form-data"
-                onsubmit="return checkUpdateBotForm()">
+            <form method="post" action="{{ route('store.update') }}" class="p-6" id="update_bot"
+                enctype="multipart/form-data" onsubmit="return checkUpdateBotForm()">
                 @csrf
                 @method('patch')
                 <input name="id" hidden>
@@ -56,8 +56,9 @@
                                             <img id="llm_img2" class="rounded-full m-auto bg-black" width="50px"
                                                 height="50px">
                                         </label>
-                                        <input id="update-bot_image" name="bot_image" onchange="change_bot_image('#llm_img2', '#update-bot_image')"
-                                               type="file" accept="image/*" style="display:none">
+                                        <input id="update-bot_image" name="bot_image"
+                                            onchange="change_bot_image('#llm_img2', '#update-bot_image')" type="file"
+                                            accept="image/*" style="display:none">
                                     </div>
                                 </div>
                             </div>
@@ -74,7 +75,7 @@
                                                 [
                                                     'id' => 'visibility_system_option2',
                                                     'title' => __('store.button.system'),
-                                                    'description' => __('store.hint.button.system'),
+                                                    'description' => __('store.placeholder.button.system'),
                                                     'value' => '0',
                                                     'checked' => request()
                                                         ->user()
@@ -82,23 +83,27 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 0 ? $('#visibility2').text('" . __('store.button.system') . "') : 1",
+                                                        "this.value == 0 ? $('#visibility2').text('" .
+                                                        __('store.button.system') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                                 [
                                                     'id' => 'visibility_community_option2',
                                                     'title' => __('store.button.community'),
-                                                    'description' => __('store.hint.button.community'),
+                                                    'description' => __('store.placeholder.button.community'),
                                                     'value' => '1',
                                                     'checked' => true,
                                                     'onchange' =>
-                                                        "this.value == 1 ?$('#visibility2').text('" . __('store.button.community') . "') : 1",
+                                                        "this.value == 1 ?$('#visibility2').text('" .
+                                                        __('store.button.community') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                                 [
                                                     'id' => 'visibility_group_option2',
                                                     'title' => __('store.button.groups'),
-                                                    'description' => __('store.hint.button.groups'),
+                                                    'description' => __('store.placeholder.button.groups'),
                                                     'value' => '2',
                                                     'checked' => request()
                                                         ->user()
@@ -106,13 +111,15 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 2 ? $('#visibility2').text('" . __('store.button.groups') . "') : 1",
+                                                        "this.value == 2 ? $('#visibility2').text('" .
+                                                        __('store.button.groups') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                                 [
                                                     'id' => 'visibility_private_option2',
                                                     'title' => __('store.button.private'),
-                                                    'description' => __('store.hint.button.private'),
+                                                    'description' => __('store.placeholder.button.private'),
                                                     'value' => '3',
                                                     'checked' => request()
                                                         ->user()
@@ -120,7 +127,9 @@
                                                         ? false
                                                         : true,
                                                     'onchange' =>
-                                                        "this.value == 3 ? $('#visibility2').text('" . __('store.button.private') . "') : 1",
+                                                        "this.value == 3 ? $('#visibility2').text('" .
+                                                        __('store.button.private') .
+                                                        "') : 1",
                                                     'name' => 'visibility',
                                                 ],
                                             ];
@@ -171,11 +180,12 @@
                                     for="llm_name2">
                                     {{ __('store.bot.base_model') }}
                                 </label>
-                                <input id="llm_name2" type="text" list="llm-list" name="llm_name" autocomplete="off"
+                                <input id="llm_name2" type="text" list="llm-list" name="llm_name"
+                                    autocomplete="off"
                                     oninput="change_bot_image('#llm_img2', '#update-bot_image', $(this).val())"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="{{ __('store.bot.base_model.label') }}">
-                                    @once
+                                @once
                                     <datalist id="llm-list">
                                         @foreach ($result as $LLM)
                                             <option
@@ -225,27 +235,26 @@
                             <button type="button" id="save_bot" data-modal-target="update_modal"
                                 data-modal-toggle="update_modal"
                                 class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                {{ __('manage.button.save') }}
+                                {{ __('store.button.save') }}
                             </button>
                         @endif
                         <button type="button" id="export_bot"
                             class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
-                            onclick="exportBot()"
-                        >
-                            {{ __('manage.button.export') }}
+                            onclick="exportBot()">
+                            {{ __('store.button.export') }}
                         </button>
                         @if (request()->user()->hasPerm('Store_delete_delete_bot'))
                             <button type="button" id="delete_bot" data-modal-target="delete_modal"
                                 data-modal-toggle="delete_modal"
                                 class="bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                                {{ __('manage.button.delete') }}
+                                {{ __('store.button.delete') }}
                             </button>
                         @endif
                     </div>
                 </ul>
                 <input name="referer" value="{{ url()->current() }}" hidden>
-                @foreach(session('llms') ?? [] as $bot_id)
-                <input name="selected_bots[]" value="{{ $bot_id }}" hidden>
+                @foreach (session('llms') ?? [] as $bot_id)
+                    <input name="selected_bots[]" value="{{ $bot_id }}" hidden>
                 @endforeach
             </form>
         </div>
@@ -284,13 +293,13 @@
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    {{ __('manage.modal.update_model.header') }}</h3>
+                    {{ __('models.modal.update_model.header') }}</h3>
                 <button data-modal-hide="update_modal" type="submit" id="update_bot_btn"
                     class="text-white bg-green-500 hover:bg-green-600 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                    {{ __('manage.button.yes') }}
+                    {{ __('store.button.yes') }}
                 </button>
                 <button data-modal-hide="update_modal" type="button"
-                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('manage.button.no') }}</button>
+                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('store.button.no') }}</button>
             </div>
         </div>
     </div>
@@ -317,20 +326,19 @@
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    {{ __('manage.modal.delete_model.header') }}</h3>
+                    {{ __('models.modal.delete_model.header') }}</h3>
                 <button id="delete_bot_btn" data-modal-hide="delete_modal" type="button"
                     class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                    {{ __('manage.button.yes') }}
+                    {{ __('store.button.yes') }}
                 </button>
                 <button data-modal-hide="delete_modal" type="button"
-                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('manage.button.no') }}</button>
+                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">{{ __('store.button.no') }}</button>
             </div>
         </div>
     </div>
 </div>
-<script> 
+<script>
     function detail_update(data, readonly) {
-        console.debug(data);
         $("#save_bot").hide()
         $("#delete_bot").hide()
         if (!readonly) {
@@ -409,27 +417,25 @@
             return true;
         }
         if (!$("#update_bot input[name='llm_name']").val()) $("#create_error").text(
-            "{{ __('store.hint.must_select_base_model') }}")
+            "{{ __('store.placeholder.must_select_base_model') }}")
         else if (!$("#update_bot input[name='bot_name']").val()) $("#create_error").text(
             "{{ __('You must name your bot') }}")
         $("#create_error").show().delay(3000).fadeOut();
         return false;
     }
 
-    function saveTextAsFile(textToWrite, fileNameToSaveAs)
-    {
-        var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'}); 
+    function saveTextAsFile(textToWrite, fileNameToSaveAs) {
+        var textFileAsBlob = new Blob([textToWrite], {
+            type: 'text/plain'
+        });
         var downloadLink = document.createElement("a");
         downloadLink.download = fileNameToSaveAs;
         downloadLink.innerHTML = "Download File";
-        if (window.webkitURL != null)
-        {
+        if (window.webkitURL != null) {
             // Chrome allows the link to be clicked
             // without actually adding it to the DOM.
             downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
-        }
-        else
-        {
+        } else {
             // Firefox requires the link to be added to the DOM
             // before it can be clicked.
             downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
@@ -440,16 +446,30 @@
 
         downloadLink.click();
     }
+
     function formatDate() {
         const date = new Date();
 
-        const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' });
-        const day = date.toLocaleString('en-US', { day: '2-digit' });
-        const month = date.toLocaleString('en-US', { month: 'short' });
+        const dayOfWeek = date.toLocaleString('en-US', {
+            weekday: 'short'
+        });
+        const day = date.toLocaleString('en-US', {
+            day: '2-digit'
+        });
+        const month = date.toLocaleString('en-US', {
+            month: 'short'
+        });
         const year = date.getFullYear();
-        const hours = date.toLocaleString('en-US', { hour: '2-digit', hour12: false });
-        const minutes = date.toLocaleString('en-US', { minute: '2-digit' });
-        const seconds = date.toLocaleString('en-US', { second: '2-digit' });
+        const hours = date.toLocaleString('en-US', {
+            hour: '2-digit',
+            hour12: false
+        });
+        const minutes = date.toLocaleString('en-US', {
+            minute: '2-digit'
+        });
+        const seconds = date.toLocaleString('en-US', {
+            second: '2-digit'
+        });
 
         // Get timezone offset in hours and minutes
         const timezoneOffset = -date.getTimezoneOffset();
@@ -466,20 +486,22 @@
         const blob = await response.blob();
         return new Promise((onSuccess, onError) => {
             try {
-            const reader = new FileReader() ;
-            reader.onload = function(){ onSuccess(this.result) } ;
-            reader.readAsDataURL(blob) ;
-            } catch(e) {
-            onError(e);
+                const reader = new FileReader();
+                reader.onload = function() {
+                    onSuccess(this.result)
+                };
+                reader.readAsDataURL(blob);
+            } catch (e) {
+                onError(e);
             }
         });
     }
 
-    async function exportBot(){
+    async function exportBot() {
         let name = $("#bot_name2").val();
-        let description = $("#bot_describe2").val() ;
+        let description = $("#bot_describe2").val();
         let base_name = $("#llm_name2").val();
-        let base = $(`#llm-list option[value='${base_name}']`).data('access-code') 
+        let base = $(`#llm-list option[value='${base_name}']`).data('access-code')
         let modelfile = ace.edit('modelfile-editor').getValue();
         let follow_base_bot = $("#detail-modal img").data("follow-base-bot");
 
@@ -488,12 +510,12 @@
         modelfile = modelfile.replace(new RegExp(`^${prefix}.*`, "gm"), '');
         modelfile = modelfile.replace(new RegExp(`^${shebang}.*`), '');
         modelfile = `${shebang}\n` + `${prefix} version 0.3.3\n` +
-                    (name ? `${prefix} name "${name}"\n` : "") + 
-                    (description ? `${prefix} description "${description}"\n` : "") + 
-                    (base ? `${prefix} base "${base}"\n` : "") + 
-                    modelfile
+            (name ? `${prefix} name "${name}"\n` : "") +
+            (description ? `${prefix} description "${description}"\n` : "") +
+            (base ? `${prefix} base "${base}"\n` : "") +
+            modelfile
 
-        let boundary= "kuwa"+(Math.random() + 1).toString(36).slice(-5);
+        let boundary = "kuwa" + (Math.random() + 1).toString(36).slice(-5);
         let botfile = [
             `Subject: Exported bot "${encodeURIComponent(name)}"`,
             `Date: ${formatDate()}`,
@@ -522,7 +544,7 @@
             );
         }
         botfile.push(`--${boundary}--`);
-                    
+
         saveTextAsFile(botfile.join('\r\n'), `bot-${name.replace(/\s+/g, '_')}.bot`);
     }
 
@@ -546,25 +568,26 @@
         editor.setTheme("ace/theme/monokai");
     }
     @once
+
     function change_bot_image(bot_image_elem, user_upload_elem, new_base_bot_name) {
-            /**
-             * Dynamically updates the bot's displayed image based on user interaction.
-             *
-             * Image selection priority:
-             * 1. User-uploaded image (highest)
-             * 2. Base bot image (if the bot image hasn't been changed)
-             * 3. Original image (lowest)
-             */
-            const [user_uploaded_image] = $(user_upload_elem)[0].files;
-            const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
-            let bot_image_uri = $(bot_image_elem).attr("src");
-            if (user_uploaded_image) {
-                bot_image_uri = URL.createObjectURL(user_uploaded_image);
-            } else if (follow_base_bot && new_base_bot_name) {
-                const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
-                bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
-            }
-            $(bot_image_elem).attr("src", bot_image_uri);
+        /**
+         * Dynamically updates the bot's displayed image based on user interaction.
+         *
+         * Image selection priority:
+         * 1. User-uploaded image (highest)
+         * 2. Base bot image (if the bot image hasn't been changed)
+         * 3. Original image (lowest)
+         */
+        const [user_uploaded_image] = $(user_upload_elem)[0].files;
+        const follow_base_bot = $(bot_image_elem).data("follow-base-bot") ?? true;
+        let bot_image_uri = $(bot_image_elem).attr("src");
+        if (user_uploaded_image) {
+            bot_image_uri = URL.createObjectURL(user_uploaded_image);
+        } else if (follow_base_bot && new_base_bot_name) {
+            const fallback_image_uri = "{{ asset('/' . config('app.LLM_DEFAULT_IMG')) }}";
+            bot_image_uri = $(`#llm-list option[value="${new_base_bot_name}"]`).attr("src") ?? fallback_image_uri;
         }
+        $(bot_image_elem).attr("src", bot_image_uri);
+    }
     @endonce
 </script>

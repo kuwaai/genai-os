@@ -92,7 +92,7 @@ seed_kernel() {
     then
         return
     fi
-    php artisan web:config --kernel_endpoint ${KUWA_KERNEL_URL} || return 0
+    php artisan web:config --settings="kernel_location=${KUWA_KERNEL_URL}" || return 0
 }
 
 # Import the default bots in bootstrap stage

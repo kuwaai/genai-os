@@ -1,12 +1,13 @@
-import os
+import os, time, subprocess
 from kuwa.client import KuwaClient
 import asyncio
+from tqdm.asyncio import tqdm
 
-# Configure the list of specific files to read
-files_to_read = ["manage.php"]
+# Configure the list of specific files to read; if empty, it will read all files in the source directory
+files_to_read = ['settings.php']  # Leave empty to read all files in zh_tw
 
 # Configure the list of target languages
-languages = ["cs_cz", "de", "en_us", "fr_fr","ja_jp", "ko_kr", "zh_cn"]  # Add more languages as needed
+languages = ["cs_cz", "de", "en_us", "fr_fr", "ja_jp", "ko_kr", "zh_cn"]
 
 def get_key():
     KEY_FILE = '.env'
@@ -29,57 +30,83 @@ client = KuwaClient(
     auth_token=get_key()
 )
 
-async def translate(content, target_language, file_name):
-    while True:
-        print(f"Start processing {target_language}")
-        result = ""
-        async for chunk in client.chat_complete(messages=[{"role": "user", "content": 
-            f"This is laravel lang php file, Please translate this lang file into {target_language} language.\n\n{content}"}]):
-            print(chunk, end='')
-            result += chunk
-        print()
-        result = result.strip().replace("```php", "").replace("```", "").strip()
+# Function to check PHP syntax
+def check_php_syntax(file_path):
+    try:
+        result = subprocess.run(["php", "-l", file_path], capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"Syntax error in {file_path}: {result.stderr.strip()}")
+            return False
+        print(f"No syntax errors detected in {file_path}")
+        return True
+    except Exception as e:
+        print(f"Error checking syntax for {file_path}: {e}")
+        return False
 
-        if result != "429 Resource has been exhausted (e.g. check quota).":
-            # This is for gemini pro
-            break
-        print('eh, 429')
-    # Create the target folder for the language if it doesn't exist
-    target_lang_folder = os.path.join(destination, target_language)
-    os.makedirs(target_lang_folder, exist_ok=True)
+async def translate(content, target_language, file_name, semaphore, progress_bar):
+    async with semaphore:
+        attempt = 0
+        while True:
+            attempt += 1
+            try:
+                result = ""
+                async for chunk in client.chat_complete(messages=[{"role": "user", "content": 
+                    f"This is a Laravel lang PHP file. Please translate this lang file into {target_language} language with no comments.\n\n{content}"}]):
+                    result += chunk
+                result = result.strip().replace("```php", "").replace("```", "").strip()
 
-    # Save the translated content into the respective language folder
-    destination_file = os.path.join(target_lang_folder, file_name)
-    with open(destination_file, 'w', encoding='utf-8') as file:
-        file.write(result)
+                if result != "429 Resource has been exhausted (e.g. check quota).":
+                    # Save to file
+                    target_lang_folder = os.path.join(destination, target_language)
+                    os.makedirs(target_lang_folder, exist_ok=True)
+                    destination_file = os.path.join(target_lang_folder, file_name)
+                    with open(destination_file, 'w', encoding='utf-8') as file:
+                        file.write(result)
 
-    print(f"Translated content saved to {destination_file}")
-    return f"Translated content to {target_language}"
+                    # Check PHP syntax of the output file
+                    if check_php_syntax(destination_file):
+                        break  # Syntax is correct, exit loop
+                    else:
+                        print(f"Retrying translation for {file_name} in {target_language} (attempt {attempt}) due to syntax error...")
+            except Exception as e:
+                print(e)
+                print('Retry processing in 5 seconds...')
+                time.sleep(5)
+        
+        # Update the progress bar after a successful translation
+        progress_bar.update(1)
+        return f"Translated content to {target_language}"
 
-# Define source and destination directories
 source = "../../src/multi-chat/lang/zh_tw"
 destination = "translated"
-
-# Ensure the destination directory exists
 os.makedirs(destination, exist_ok=True)
 
 async def main():
+    semaphore = asyncio.Semaphore(5)  # Limit to 5 concurrent tasks
+    
+    # If files_to_read is empty, get all files from the source directory
+    if not files_to_read:
+        files_to_read.extend([f for f in os.listdir(source) if os.path.isfile(os.path.join(source, f))])
+    
     tasks = []
-    # Iterate through the specified files in the zh_tw directory
+    total_tasks = len(files_to_read) * len(languages)  # Total number of translation jobs
+    
+    # Set up the progress bar with the total number of jobs
+    progress_bar = tqdm(total=total_tasks, desc="Translating files", unit="job")
+
     for file_name in files_to_read:
         file_path = os.path.join(source, file_name)
         if os.path.isfile(file_path):
-            # Read the file content
             with open(file_path, 'r', encoding='utf-8') as file:
                 content = file.read()
                 
-            # Translate the content to each language
-            tasks += [translate(content, lang, file_name) for lang in languages]
+            tasks += [translate(content, lang, file_name, semaphore, progress_bar) for lang in languages]
         else:
             print(f"File {file_name} not found in {source}")
-    # Execute all the process at the same time using async
-    await asyncio.gather(*tasks)
-    print()
-    input("All finished, You can hit Enter and leave now.")
     
+    await asyncio.gather(*tasks)
+    progress_bar.close()
+    print("\nAll translations finished.")
+    input()
+
 asyncio.run(main())

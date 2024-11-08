@@ -23,7 +23,7 @@ class RequestChat implements ShouldQueue
     public $tries = 100; # Wait 1000 seconds in total
     public $timeout = 1200; # For the 100th try, 200 seconds limit is given
     public static $agent_version = 'v1.0';
-    public $filters = ["[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]", '[Oops, the LLM returned empty message, please try again later or report to admins!]', '[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]', '[Sorry, something is broken, please try again later!]'];
+    public $filters = ["[Sorry, There're no machine to process this LLM right now! Please report to Admin or retry later!]", '[Oops, the LLM returned empty message, please try again later or report to admins!]', '[有關Kuwa的相關說明，請以 kuwaai.org 官網的資訊為準。]', '[Sorry, something is broken, please try again later!]'];
 
     /**
      * Create a new job instance.
@@ -153,7 +153,7 @@ class RequestChat implements ShouldQueue
                             ->where('isbot', false)
                             ->last();
                         if ($test_2 !== null) {
-                            $taide_flag = strpos(strtoupper($test_2->msg), strtoupper('taide')) !== false;
+                            $kuwa_flag = strpos(strtoupper($test_2->msg), strtoupper('kuwa')) !== false;
 
                             foreach ($test as $t) {
                                 foreach ($this->filters as $filter) {
@@ -167,10 +167,10 @@ class RequestChat implements ShouldQueue
                             }
                             $this->input = json_encode($test);
                         } else {
-                            $taide_flag = false;
+                            $kuwa_flag = false;
                         }
                         if (trim(\App\Models\SystemSetting::where('key', 'safety_guard_location')->first()->value) !== '') {
-                            $taide_flag = false;
+                            $kuwa_flag = false;
                         }
                     }
                     $response = $client->post($kernel_location . '/' . self::$agent_version . '/chat/completions', [
@@ -220,8 +220,8 @@ class RequestChat implements ShouldQueue
                                     if (!$cache) {
                                         $tmp .= $message;
                                         $outputTmp = $tmp . '...';
-                                        if ($taide_flag) {
-                                            $outputTmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
+                                        if ($kuwa_flag) {
+                                            $outputTmp .= "\n\n[有關Kuwa的相關說明，請以 kuwaai.org 官網的資訊為準。]";
                                         }
                                         if ($warningMessages) {
                                             $outputTmp .= '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
@@ -238,8 +238,8 @@ class RequestChat implements ShouldQueue
                                             if ($this->channel == $this->history_id) {
                                                 $outputTmp .= '...';
                                             }
-                                            if ($taide_flag && $this->channel == $this->history_id) {
-                                                $outputTmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
+                                            if ($kuwa_flag && $this->channel == $this->history_id) {
+                                                $outputTmp .= "\n\n[有關Kuwa的相關說明，請以 kuwaai.org 官網的資訊為準。]";
                                             }
                                             if ($warningMessages) {
                                                 $outputTmp .= '<<<WARNING>>>' . implode("\n", $warningMessages) . '<<</WARNING>>>';
@@ -277,8 +277,8 @@ class RequestChat implements ShouldQueue
                     } else {
                         if ($this->channel != $this->history_id) {
                             Redis::publish($this->channel, 'Ended Ended');
-                        } elseif ($taide_flag) {
-                            $tmp .= "\n\n[有關TAIDE計畫的相關說明，請以 taide.tw 官網的資訊為準。]";
+                        } elseif ($kuwa_flag) {
+                            $tmp .= "\n\n[有關Kuwa的相關說明，請以 kuwaai.org 官網的資訊為準。]";
                         }
                     }
                 } catch (Exception $e) {

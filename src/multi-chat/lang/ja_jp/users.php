@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'button.delete' => '削除',
+    'button.update' => '更新',
+    'button.cancel' => 'キャンセル',
+    'button.create' => '作成',
+    'button.return_group_list' => 'グループリストに戻る',
+
+    'header.menu' => 'メインメニュー',
+    'header.group_selector' => 'グループセレクター',
+    'header.fuzzy_search' => 'あいまい検索',
+    'header.create_user' => 'ユーザー作成',
+    'header.create_user' => '新しいアカウントを作成',
+    'header.group_selector' => 'ユーザー編集',
+    'header.delete_user' => 'ユーザーを削除しますか？',
+
+    'label.group_selector' => 'グループからユーザーを絞り込む',
+    'label.fuzzy_search' => '名前またはメールアドレスでユーザーを検索',
+    'label.create_user' => 'ユーザーのプロファイルを登録する',
+    'label.joined_group' => '参加しているグループ',
+    'label.members' => '名メンバー',
+    'label.other_users' => 'グループメンバーではない',
+    'label.name' => '名前',
+    'label.email' => 'メールアドレス',
+    'label.password' => 'パスワード',
+    'label.update_password' => 'パスワード更新',
+    'label.detail' => '詳細',
+    'label.require_change_password' => '次回ログイン時にパスワード変更を要求',
+    'label.extra_setting' => '追加設定',
+    'label.created_at' => '作成日時',
+    'label.updated_at' => '更新日時',
+
+    'placeholder.enter_to_search' => 'Enterキーを押して検索',
+    'placeholder.search_user' => 'メールアドレスまたは名前を検索',
+    'placeholder.email' => 'ユーザーのメールアドレス',
+    'placeholder.username' => 'ユーザー名',
+    'placeholder.group_name' => 'グループ名',
+    'placeholder.new_password' => '新しいパスワード',
+];

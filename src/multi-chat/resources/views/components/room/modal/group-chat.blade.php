@@ -23,7 +23,7 @@
             <!-- Modal header -->
             <div class="px-6 py-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-base font-semibold text-gray-900 lg:text-xl dark:text-white">
-                    {{ __('room.modal.create_room.header') }}
+                    {{ __('room.header.create_room') }}
                 </h3>
             </div>
             <!-- Modal body -->
@@ -33,7 +33,7 @@
                 <div class="flex justify-between">
                     <p class="inline-block text-sm font-normal text-gray-500 dark:text-gray-400"
                         style="line-height: 1.5rem;">
-                        {{ __('room.modal.label') }}
+                        {{ __('room.placeholder.model') }}
                     </p>
 
                     <x-sorted-list.control-menu :$sorting_methods
@@ -55,7 +55,7 @@
                                     <div class="pl-2 overflow-hidden">
                                         {{-- blade-formatter-disable --}}
                                         <div class="w-full text-lg font-semibold leading-none whitespace-pre-line break-words">{{ $LLM->name }}</div>
-                                        <div class="w-full text-sm leading-none whitespace-pre-line break-words">{{ $LLM->description ? $LLM->description : __('chat.llm.describe_default') }}</div>
+                                        <div class="w-full text-sm leading-none whitespace-pre-line break-words">{{ $LLM->description ? $LLM->description : __('chat.label.llm_describe_default') }}</div>
                                         {{-- blade-formatter-enable --}}
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@
                     </div>
                 </div>
                 <span id="create_error" class="font-medium text-sm text-red-800 rounded-lg dark:text-red-400 hidden"
-                    role="alert">{{ __('You must select at least 1 LLMs') }}</span>
+                    role="alert">{{ __('room.placeholder.must_select_a_bot') }}</span>
             </form>
         </div>
     </div>

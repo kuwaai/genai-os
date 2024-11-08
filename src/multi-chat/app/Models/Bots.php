@@ -15,6 +15,30 @@ class Bots extends Model
     protected $table = 'bots';
     protected $fillable = ['image', 'name', 'type', 'visibility', 'model_id', 'owner_id', 'description', 'config'];
 
+    static function getBots($group_id, $enabled = true)
+    {
+        return self::Join('llms', function ($join) {
+            $join->on('llms.id', '=', 'bots.model_id');
+        })
+            ->leftjoin('users', 'users.id', '=', 'bots.owner_id')
+            ->wherein('bots.model_id', DB::table('group_permissions')->join('permissions', 'group_permissions.perm_id', '=', 'permissions.id')->select(DB::raw('substring(permissions.name, 7) as model_id'), 'perm_id')->where('group_permissions.group_id', $group_id)->where('permissions.name', 'like', 'model_%')->get()->pluck('model_id'))
+            ->where('llms.enabled', '=', $enabled)
+            ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), 'bots.image as image', 'llms.image as base_image', 'llms.name as llm_name', 'users.group_id')
+            ->get();
+    }
+
+    static function getBotsFromIds($ids)
+    {
+        return Bots::whereIn('bots.id', array_map('intval', $ids))
+            ->join('llms', function ($join) {
+                $join->on('llms.id', '=', 'bots.model_id');
+            })
+            ->leftJoin('users', 'users.id', '=', 'bots.owner_id')
+            ->select('llms.*', 'bots.*', DB::raw('COALESCE(bots.description, llms.description) as description'), DB::raw('COALESCE(bots.config, llms.config) as config'), 'bots.image as image', 'llms.image as base_image', 'llms.name as llm_name', 'users.group_id')
+            ->orderBy('bots.id')
+            ->get();
+    }
+
     static function sortBotsByDate($bots)
     {
         /*

@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('login.forgot_password.label') }}
+        {{ __('login.label.forgot_password') }}
     </div>
 
     <!-- Session Status -->

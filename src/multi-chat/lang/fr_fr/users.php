@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'button.delete' => 'Supprimer',
+    'button.update' => 'Mettre à jour',
+    'button.cancel' => 'Annuler',
+    'button.create' => 'Créer',
+    'button.return_group_list' => 'Retour à la liste des groupes',
+
+    'header.menu' => 'Menu principal',
+    'header.group_selector' => 'Sélecteur de groupe',
+    'header.fuzzy_search' => 'Recherche floue',
+    'header.create_user' => 'Créer un utilisateur',
+    'header.create_user' => 'Créer un nouveau compte',
+    'header.group_selector' => 'Modifier un utilisateur',
+    'header.delete_user' => 'Confirmer la suppression de l\'utilisateur',
+
+    'label.group_selector' => 'Filtrer les utilisateurs à partir d’un groupe',
+    'label.fuzzy_search' => 'Rechercher des utilisateurs par nom ou adresse e-mail',
+    'label.create_user' => 'Créer un profil d’utilisateur',
+    'label.joined_group' => 'Groupes rejoints',
+    'label.members' => 'membres',
+    'label.other_users' => 'Utilisateurs sans groupe',
+    'label.name' => 'Nom',
+    'label.email' => 'E-mail',
+    'label.password' => 'Mot de passe',
+    'label.update_password' => 'Mettre à jour le mot de passe',
+    'label.detail' => 'Détails',
+    'label.require_change_password' => 'Demander une modification de mot de passe à la prochaine connexion',
+    'label.extra_setting' => 'Paramètres supplémentaires',
+    'label.created_at' => 'Créé le',
+    'label.updated_at' => 'Mis à jour le',
+
+    'placeholder.enter_to_search' => 'Appuyez sur Entrée pour rechercher',
+    'placeholder.search_user' => 'Rechercher un utilisateur par e-mail ou nom',
+    'placeholder.email' => 'E-mail de l’utilisateur',
+    'placeholder.username' => 'Nom d’utilisateur',
+    'placeholder.group_name' => 'Nom du groupe',
+    'placeholder.new_password' => 'Nouveau mot de passe',
+];

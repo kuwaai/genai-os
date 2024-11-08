@@ -13,6 +13,7 @@ from .functions import load_records, load_variable_from_file, save_variable_to_f
 from .logger import KernelLoggerFactory
 from .safety_middleware import update_safety_guard
 from .routes.executor import executor
+from .routes.model import model
 from .routes.chat import chat
 
 logger = logging.getLogger(__name__)
@@ -49,9 +50,16 @@ def main():
     app.register_blueprint(sse, url_prefix='/')
     app.register_blueprint(executor, url_prefix=f'/{KUWA_KERNEL_API_VERSION}/worker')
     app.register_blueprint(chat, url_prefix=f'/{KUWA_KERNEL_API_VERSION}/chat')
+    app.register_blueprint(model, url_prefix=f'/{KUWA_KERNEL_API_VERSION}/model')
     logger.info("Route list:\n{}\n".format('\n'.join([str(i) for i in app.url_map.iter_rules()])))
     logger.info("Server started")
-    app.run(port=args.port, host=args.host, threaded=True, debug=True)
+    app.run(port=args.port, host=args.host, threaded=True)
+    for model_name in list(download_jobs.keys()):
+        job_details = download_jobs[model_name]
+        job_details['stop_event'].set()
+        if job_details['process']:
+            job_details['process'].terminate()
+        job_details['thread'].join()
     #Stopped, saving to file
     save_variable_to_file(record_file, data)
 

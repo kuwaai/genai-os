@@ -2,42 +2,38 @@
 
 return [
     'route' => 'Einstellungen',
-    'interface.header' => 'Profil',
+
+    'header.interface' => 'Persönliche Daten',
+    'header.personal_info' => 'Hier können Sie Ihren Namen oder Ihre E-Mail-Adresse aktualisieren.',
+    'header.update_password' => 'Passwort aktualisieren',
+    'header.api_manage' => 'API-Verwaltung',
+    'header.delete_account' => 'Konto löschen',
+
     'button.save' => 'Speichern',
     'button.copy' => 'Kopieren',
-    'button.renew' => 'Neue erstellen',
+    'button.renew' => 'Erneuern',
     'button.update' => 'Aktualisieren',
     'button.confirm' => 'Bestätigen',
-    "button.change_lang"=>"Sprachwechsel",
-    'hint.updated' => 'Erfolgreich aktualisiert',
-    'hint.saved' => 'Gespeichert',
-    'hint.nochange'=>'Daten sind identisch, keine Aktualisierung',
-    'hint.alert'=>'Warnung',
-    'hint.require_change_password'=>'Wegen des Systemsicherheits, müssen Sie das Passwort ändern',
+    "button.change_lang"=>"Sprache wechseln",
+    'button.delete_account' => 'Konto löschen',
 
-    //Personal Infos
-    'header.personal_info' => 'Aktualisieren Sie hier Ihren Namen oder Ihre E-Mail',
+    'placeholder.updated' => 'Erfolgreich aktualisiert',
+    'placeholder.saved' => 'Gespeichert',
+    'placeholder.nochange'=>'Daten sind gleich, keine Aktualisierung',
+    'placeholder.alert'=>'Warnung',
+    'placeholder.require_change_password'=>'Aus Sicherheitsgründen müssen Sie Ihr Passwort ändern.',
+
     'label.name' => 'Benutzername',
-    'label.email' => 'E-mail',
-
-    //Password
-    'header.update_password' => 'Passwort aktualisieren',
-    'label.update_password' => 'Stellen Sie sicher, dass Ihr Passwort sicher ist.',
+    'label.email' => 'E-Mail-Adresse',
+    'label.update_password' => 'Stellen Sie sicher, dass Sie ein sicheres Passwort verwenden.',
     'label.current_password' => 'Aktuelles Passwort',
     'label.new_password' => 'Neues Passwort',
-    'label.confirm_password' => 'Neues Passwort wiederholen',
-
-    //API
-    'header.api_manage' => 'API-Verwaltung',
-    'label.api_manage' => 'Verwalten Sie Ihren API-Schlüssel. Geben Sie diesen niemals weiter!',
-    'label.taide_api' => 'Kuwa-API-Schlüssel',
-    'label.openai_api' => 'OpenAI-API-Schlüssel',
-    'label.google_api' => 'Google-API-Schlüssel',
-    'label.third_party_api' => 'Benutzerdefinierte API-Schlüssel von Drittanbietern (z. B. Groq, Cerebras)',
-    'label.stay_secure' => 'Seien Sie vorsichtig mit externen Schlüsseln!',
-
-    //Delete Account
-    'header.delete_account' => 'Konto löschen',
-    'label.delete_account' => 'Wenn Sie Ihr Konto löschen, werden alle Ihre Daten gelöscht. Seien Sie vorsichtig!',
-    'button.delete_account' => 'Konto löschen',
+    'label.confirm_password' => 'Geben Sie das neue Passwort erneut ein',
+    'label.api_manage' => 'Verwalten Sie Ihre API-Schlüssel. Geben Sie diese niemals an Dritte weiter!',
+    'label.kuwa_api' => 'Kuwa-Schlüssel',
+    'label.openai_api' => 'OpenAI API-Schlüssel',
+    'label.google_api' => 'Google API-Schlüssel',
+    'label.third_party_api' => 'Benutzerdefinierter Drittanbieter-API-Schlüssel (z. B. Groq, Cerebras)',
+    'label.stay_secure' => 'Bitte achten Sie auf die Verwendung Ihrer externen Schlüssel!',
+    'label.delete_account' => 'Wenn Sie Ihr Konto löschen, werden alle zugehörigen Daten entfernt. Bitte gehen Sie vorsichtig vor.',
 ];
