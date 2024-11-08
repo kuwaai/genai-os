@@ -85,7 +85,7 @@ if "%option%"=="1" (
     
     if /I "!userInput!"=="y" (
     	echo タ更家...
-    	curl -L -o "taide/taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/nctu6/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1-Q4_K_M.gguf?download=true
+    	curl -L -o "taide/taide-8b-a.3-q4_k_m.gguf" https://huggingface.co/QuantFactory/Llama3-TAIDE-LX-8B-Chat-Alpha1-GGUF/resolve/main/Llama3-TAIDE-LX-8B-Chat-Alpha1.Q4_K_M.gguf
 		echo 更Ч拨
 	) else (
 		echo 盢ぃ穦更赣家
