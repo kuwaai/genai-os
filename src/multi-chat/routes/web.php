@@ -287,6 +287,7 @@ Route::middleware(LanguageMiddleware::class)->group(function () {
                                     Route::get('/download', [KernelController::class, 'storage_download'])->name('manage.kernel.storage.download');
                                     Route::post('/abort', [KernelController::class, 'storage_abort'])->name('manage.kernel.storage.abort');
                                     Route::post('/remove', [KernelController::class, 'storage_remove'])->name('manage.kernel.storage.remove');
+                                    Route::post('/start', [KernelController::class, 'storage_start'])->name('manage.kernel.storage.start');
                                     Route::post('/hf_login', [KernelController::class, 'storage_hf_login'])->name('manage.kernel.storage.hf_login');
                                     Route::post('/hf_logout', [KernelController::class, 'storage_hf_logout'])->name('manage.kernel.storage.hf_logout');
                                 });

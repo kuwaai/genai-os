@@ -79,6 +79,18 @@
             });
         }
 
+        // Function to remove a model by name
+        function startModel(model_path) {
+            return $.ajax({
+                url: "{{ route('manage.kernel.storage.start') }}",
+                type: 'POST',
+                data: {
+                    model_path: model_path,
+                    _token: "{{ csrf_token() }}"
+                }
+            });
+        }
+
         function modelfile_parse(data) {
             const commands = [];
             let currentCommand = {

@@ -28,24 +28,39 @@
                     let parsedModel = parseModelName(model);
 
                     $('#storage-list').append(`
-                    <li class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow flex justify-between items-center">
+                    <li class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow flex items-center">
                         <span>${parsedModel}</span>
-                        <button class="remove-btn bg-red-500 text-white py-1 px-2 rounded" data-model="${model}">
+                        <button class="start-btn bg-green-500 text-white py-1 px-2 rounded ml-auto" data-model="${model}">
+                            Start
+                        </button>
+                        <button class="remove-btn bg-red-500 text-white py-1 px-2 ml-2 rounded" data-model="${model}">
                             Remove
                         </button>
                     </li>
                 `);
                 });
 
-                // Attach click event to each remove button after appending
                 $('.remove-btn').on('click', function() {
                     let modelName = $(this).data('model');
 
-                    // Call removeModel and handle response
                     removeModel(modelName)
                         .done(function(response) {
                             alert('Model removed successfully');
-                            fetchStorageData(); // Refresh list after removal
+                            fetchStorageData();
+                        })
+                        .fail(function(xhr) {
+                            console.error('Failed to remove model:', xhr.responseJSON);
+                            alert('Failed to remove model');
+                        });
+                });
+
+                $('.start-btn').on('click', function() {
+                    let modelName = parseModelName($(this).data('model'));
+
+                    startModel(modelName)
+                        .done(function(response) {
+                            alert('Model started successfully');
+                            fetchStorageData();
                         })
                         .fail(function(xhr) {
                             console.error('Failed to remove model:', xhr.responseJSON);

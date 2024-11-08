@@ -97,6 +97,31 @@ def remove_model():
     except Exception as e:
         return jsonify({"error": f"Failed to remove model '{folder_name}': {str(e)}"}), 500
 
+@model.route("/start", methods=["POST"])
+def start_model():
+    model_path = request.json.get("model_path")
+    if not model_path:
+        return jsonify({"error": "model_path parameter is required"}), 400
+
+    # Base command and optional parameters
+    command = ["kuwa-executor", "huggingface", "--access_code", "hf/" + model_path.replace('/','--')]
+    for arg in ["model_path", "visible_gpu", "limit", "timeout"]:
+        value = request.json.get(arg)
+        if value is not None:
+            command.extend([f"--{arg}", str(value)])
+
+    # Attempt to start the process
+    try:
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True
+        )
+        stdout, stderr = process.communicate()
+        if process.returncode != 0:
+            return jsonify({"error": f"Failed to start model '{model_path}': {stderr.decode().strip()}"}), 500
+        return jsonify({"message": f"Model '{model_path}' has been started successfully."}), 200
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
 @model.route("/", methods=["GET"])
 def list_models():
     cache_dir = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "hub")

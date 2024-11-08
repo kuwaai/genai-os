@@ -181,6 +181,18 @@ class KernelController extends Controller
         ]);
         return response()->json($response->json());
     }
+    public function storage_start(Request $request)
+    {
+        $model_path = $request->input('model_path');
+    
+        $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
+        $apiUrl = "{$baseUrl}/v1.0/model/start";
+    
+        $response = Http::post($apiUrl, [
+            'model_path' => $model_path,
+        ]);
+        return response()->json($response->json());
+    }
     
     public function storage_hf_logout(Request $request)
     {
