@@ -388,6 +388,8 @@ class BotController extends Controller
         if ($referer = $request->input('referer')) {
             if (str_ends_with($referer, 'room')) {
                 return redirect()->route('room.home')->with('llms', request()->input('selected_bots'));
+            } elseif (preg_match('/room\/\d+$/', $referer)) {
+                return redirect()->to($referer);
             } elseif (str_ends_with($referer, 'store')) {
                 return redirect()
                     ->route('store.home')
