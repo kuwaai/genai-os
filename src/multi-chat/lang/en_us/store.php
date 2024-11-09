@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'route' => 'Shop',
+    'route' => 'Store',
 
     'button.create' => 'Create Bot',
     'button.community' => 'Community',
