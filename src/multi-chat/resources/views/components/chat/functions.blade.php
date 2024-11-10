@@ -1,11 +1,13 @@
 <style>
-@keyframes gradient-shift {
+    @keyframes gradient-shift {
         0% {
             background-position: 0% 50%;
         }
+
         50% {
             background-position: 100% 50%;
         }
+
         100% {
             background-position: 0% 50%;
         }
@@ -81,7 +83,6 @@ fill="currentFill" />
 
                 function parseProgressBar(line) {
                     if (line.startsWith('[PROGRESS_BAR]')) {
-                        //Render as progress bar
                         datas = line.replace('[PROGRESS_BAR]', '').split('%/')
                         return `${datas[1]}<div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
     <div class="bg-blue-600 h-2.5 rounded-full animate-pulse animate-gradient-left-to-right" style="width: ${datas[0]}%"></div>
@@ -96,7 +97,9 @@ fill="currentFill" />
                 $msg = this
                 if ($(this).hasClass("bot-msg")) {
                     if (warnings) {
-                        warnings = warnings.filter(function(line){return !line.startsWith('&lt;&lt;&lt;WARNING&gt;&gt;&gt;')}).map(function(line) {
+                        warnings = warnings.filter(function(line) {
+                            return !line.startsWith('&lt;&lt;&lt;WARNING&gt;&gt;&gt;')
+                        }).map(function(line) {
                             return parseProgressBar(line);
                         })
                         var listItems = warnings.map(function(line) {
@@ -109,13 +112,13 @@ fill="currentFill" />
   </div>
 </div>`;
                         });
-                        //Clear previous warning
                         $(this).parent().find("div.warning_msg").remove();
-                        // Append the list items after the target element
                         $(this).after(listItems.join(''));
                     }
                     if (infos) {
-                        infos = infos.filter(function(line){return !line.startsWith('&lt;&lt;&lt;INFO&gt;&gt;&gt;')}).map(function(line) {
+                        infos = infos.filter(function(line) {
+                            return !line.startsWith('&lt;&lt;&lt;INFO&gt;&gt;&gt;')
+                        }).map(function(line) {
                             return parseProgressBar(line);
                         })
                         var listItems = infos.map(function(line) {
@@ -128,15 +131,12 @@ fill="currentFill" />
   </div>
 </div>`;
                         });
-                        //Clear previous warning
                         $(this).parent().find("div.info_msg").remove();
-                        // Append the list items after the target element
                         $(this).after(listItems.join(''));
                         console.log(infos);
                     }
                     $msg = translate_msg($msg.innerHTML);
-                }else{
-                    // Render user uploaded image
+                } else {
                     $msg = replaceImageUrlWithMarkdown($msg.innerHTML)
                 }
                 $(this).html(marked.parse(DOMPurify.sanitize($('<div>').html($msg).text())));
@@ -148,21 +148,27 @@ fill="currentFill" />
                 $(node).find('div.text-sm.space-y-3.break-words > p').addClass('whitespace-pre-wrap');
                 var links = $(node).find('div.text-sm.space-y-3.break-words a');
 
-                // Add classes and set target attribute
                 links.addClass('text-blue-700 hover:text-blue-900').prop('target', '_blank');
 
-                // Display decoded URL
-                links.filter(function(){return isValidURL($(this).text());})
-                     .each(function() {
-                    // Get the current href attribute
-                    var originalUrl = $(this).attr('href');
-
-                    // Decode the URL
-                    var decodedUrl = decodeURIComponent(originalUrl);
-
-                    // Set the decoded URL back to the href attribute
-                    $(this).text(decodedUrl);
-                });
+                links.filter(function() {
+                        return isValidURL($(this).text());
+                    })
+                    .each(function() {
+                        var originalUrl = $(this).attr('href');
+                        var decodedUrl = decodeURIComponent(originalUrl);
+                        var input = $(this).text();
+                        const regex =
+                            /(https?:\/\/[^\s]*\.(?:mp3|wav|ogg|flac|aac|m4a|webm|aiff|alac|opus|wma|amr|midi))/g;
+                        const matches = [...new Set(input.match(regex))];
+                        if (matches) {
+                            for (const match of matches) {
+                                const audioTag =
+                                    `<audio controls><source src="${match}" type="audio/mpeg">Your browser does not support the audio element.</audio>`;
+                                $(this).html(input.replaceAll(match,
+                                    audioTag));
+                            }
+                        }
+                    });
                 $(node).find('div.text-sm.space-y-3.break-words pre code').each(function() {
                     $(this).html(this.textContent)
                     hljs.highlightElement($(this)[0]);
@@ -230,7 +236,7 @@ xmlns="http://www.w3.org/2000/svg">
         var urlPattern = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/;
         return urlPattern.test(url);
     }
-    
+
     function replaceImageUrlWithMarkdown(input) {
         const regex = /(https?:\/\/[^\s]*\.(?:jpeg|jpg|gif|png|avif|webp|bmp|ico|cur|tiff|tif))/g;
         const matches = [...new Set(input.match(regex))];
