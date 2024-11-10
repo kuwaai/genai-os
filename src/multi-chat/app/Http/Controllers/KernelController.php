@@ -12,12 +12,18 @@ class KernelController extends Controller
     public function fetchData()
     {
         $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/worker/read';
-        $response = Http::get($apiUrl);
-        if ($response->successful()) {
-            $data = $response->json();
-            return response()->json($data);
-        } else {
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+
+        try {
+            $response = Http::timeout(5)->get($apiUrl);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json($data);
+            } else {
+                return response()->json(['error' => 'Failed to fetch data'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not reach the API. Please try again later.'], 500);
         }
     }
 
@@ -75,23 +81,36 @@ class KernelController extends Controller
     public function storage()
     {
         $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/model/';
-        $response = Http::get($apiUrl);
-        if ($response->successful()) {
-            $data = $response->json();
-            return response()->json($data);
-        } else {
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+
+        try {
+            $response = Http::timeout(5)->get($apiUrl);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json($data);
+            } else {
+                return response()->json(['error' => 'Failed to fetch data'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not reach the API. Please try again later.'], 500);
         }
     }
+
     public function storage_job()
     {
         $apiUrl = SystemSetting::where('key', 'kernel_location')->first()->value . '/v1.0/model/jobs';
-        $response = Http::get($apiUrl);
-        if ($response->successful()) {
-            $data = $response->json();
-            return response()->json($data);
-        } else {
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+
+        try {
+            $response = Http::timeout(5)->get($apiUrl);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json($data);
+            } else {
+                return response()->json(['error' => 'Failed to fetch data'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not reach the API. Please try again later.'], 500);
         }
     }
 
@@ -153,29 +172,26 @@ class KernelController extends Controller
     public function storage_hf_login(Request $request)
     {
         $token = $request->input('token');
-    
+
         $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
         $apiUrl = "{$baseUrl}/v1.0/model/hf_login";
-    
-        if (!$token) {
-            $response = Http::get($apiUrl);
-        } else {
-            $response = Http::post($apiUrl, [
-                'token' => $token,
-            ]);
+
+        try {
+            $response = !$token ? Http::timeout(5)->get($apiUrl) : Http::timeout(5)->post($apiUrl, ['token' => $token]);
+
+            return $response->successful() ? response()->json($response->json()) : response()->json(['error' => 'Failed to fetch data'], 500);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not reach the API. Please try again later.'], 500);
         }
-    
-        return $response->successful() 
-            ? response()->json($response->json()) 
-            : response()->json(['error' => 'Failed to fetch data'], 500);
     }
+
     public function storage_remove(Request $request)
     {
         $folder_name = $request->input('folder_name');
-    
+
         $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
         $apiUrl = "{$baseUrl}/v1.0/model/remove";
-    
+
         $response = Http::post($apiUrl, [
             'folder_name' => $folder_name,
         ]);
@@ -184,16 +200,16 @@ class KernelController extends Controller
     public function storage_start(Request $request)
     {
         $model_path = $request->input('model_path');
-    
+
         $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
         $apiUrl = "{$baseUrl}/v1.0/model/start";
-    
+
         $response = Http::post($apiUrl, [
             'model_path' => $model_path,
         ]);
         return response()->json($response->json());
     }
-    
+
     public function storage_hf_logout(Request $request)
     {
         $baseUrl = SystemSetting::where('key', 'kernel_location')->first()->value;
