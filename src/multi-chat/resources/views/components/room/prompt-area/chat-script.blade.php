@@ -12,18 +12,16 @@
 </div>
 
 @php
-    use Illuminate\Support\Facades\Cache;
-    use App\Models\SystemSetting;
-
     $verify_uploaded_file = !request()->user()->hasPerm('Room_update_ignore_upload_constraint');
     if (!$verify_uploaded_file) {
         $upload_max_size_mb = PHP_INT_MAX;
         $upload_allowed_extensions = '*';
         $upload_max_file_count = -1;
     } else {
-        $upload_max_size_mb = SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
-        $upload_allowed_extensions = SystemSetting::where('key', 'upload_allowed_extensions')->first()->value;
-        $upload_max_file_count = \App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
+        $upload_max_size_mb = App\Models\SystemSetting::where('key', 'upload_max_size_mb')->first()->value;
+        $upload_allowed_extensions = App\Models\SystemSetting::where('key', 'upload_allowed_extensions')->first()
+            ->value;
+        $upload_max_file_count = App\Models\SystemSetting::where('key', 'upload_max_file_count')->first()->value;
     }
 @endphp
 <script>
@@ -66,15 +64,13 @@
         $("#attachment").show();
         $("#attachment button").text($("#upload")[0].files[0].name)
     }
-</script>
-
-<script>
     if ($("#chat_input")) {
         $("#chat_input").prop("readonly", true)
         $("#chat_input").val("{{ __('chat.placeholder.processing') }}")
         $("#submit_msg").hide()
         if ($("#upload_btn")) $("#upload_btn").hide()
         if ($("#abort_btn")) $("#abort_btn").hide()
+        if ($('#recordButton')) $("#recordButton").hide();
         $chattable = false
     }
     if ($("#prompt_area")) {
@@ -191,7 +187,8 @@
                 $chattable = true
                 $("#submit_msg").show()
                 if ($("#abort_btn")) $("#abort_btn").hide();
-                if ($("#upload_btn")) $("#upload_btn").show()
+                if ($("#upload_btn")) $("#upload_btn").show();
+                if ($('#recordButton')) $("#recordButton").show();
                 $("#chat_input").prop("readonly", false)
                 $("#chat_input").val("")
                 adjustTextareaRows($("#chat_input"))
@@ -249,12 +246,108 @@ xmlns="http://www.w3.org/2000/svg">
                 chatroomFormatter($("#history_" + data["history_id"])[0]);
                 if ($("#abort_btn")) $("#abort_btn").show();
                 if ($("#upload_btn")) $("#upload_btn").hide()
+                if ($('#recordButton')) $("#recordButton").hide();
             }
         });
 
     }
+    let mediaRecorder, audioChunks = [],
+        isRecording = false,
+        startTime, intervalId;
+    const MAX_RECORD_TIME = 43200;
 
-    // Initial connection
+    $('#recordButton').on('click', async function() {
+        const recordIcon = $('#recordIcon');
+        isRecording = !$(this).data('isRecording');
+        $(this).data('isRecording', isRecording);
+
+        if (isRecording) {
+            try {
+                if (!navigator.mediaDevices?.getUserMedia || location.protocol !== 'https:') return alert(
+                    "Audio recording requires HTTPS and browser support.");
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true
+                });
+                recordIcon.toggleClass("fa-circle fa-stop-circle");
+
+                const mimeType = ['audio/webm', 'audio/ogg', 'audio/wav'].find(type => MediaRecorder
+                    .isTypeSupported(type));
+                if (!mimeType) return alert('No supported audio format found.');
+
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType
+                });
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => handleRecordingStop(mimeType, stream);
+
+                mediaRecorder.start();
+                startTime = Date.now();
+                $('#recording').show().find('div').text(formatDuration(0));
+                intervalId = setInterval(updateRecordingTime, 1000);
+            } catch (error) {
+                recordIcon.toggleClass("fa-stop-circle fa-circle");
+                $(this).data('isRecording', false);
+                alert(handleError(error));
+            }
+        } else {
+            stopRecording();
+        }
+    });
+
+    function handleRecordingStop(mimeType, stream) {
+        const audioBlob = new Blob(audioChunks, {
+            type: mimeType
+        });
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const file = new File([audioBlob], `recorded_audio_${timestamp}.${mimeType.split('/')[1]}`, {
+            type: mimeType
+        });
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        $('#upload').prop('files', dataTransfer.files);
+        $("#attachment").show().find("button").text(file.name);
+
+        clearInterval(intervalId);
+        $('#recording').hide();
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+    function updateRecordingTime() {
+        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+        if (elapsedTime >= MAX_RECORD_TIME) {
+            mediaRecorder.stop();
+            alert("Maximum recording time reached (12 hours).");
+        }
+        $('#recording > div').text(formatDuration(elapsedTime));
+    }
+
+    function stopRecording() {
+        if (mediaRecorder?.state === "recording") mediaRecorder.stop();
+        $('#recordIcon').toggleClass("fa-stop-circle fa-circle");
+        mediaRecorder?.stream.getTracks().forEach(track => track.stop());
+    }
+
+    function handleError(error) {
+        switch (error.name) {
+            case "NotAllowedError":
+                return "Microphone access denied.";
+            case "NotFoundError":
+                return "No microphone found.";
+            default:
+                return "Error accessing microphone.";
+        }
+    }
+
+    function formatDuration(seconds) {
+        const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        return `${hours}:${minutes}:${secs}`;
+    }
+
     connect();
 
     if ($("#chat_input")) {

@@ -214,7 +214,7 @@
                 @if (
                     (request()->user()->hasPerm('Room_update_new_chat') && session('llms')) ||
                         (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
-                    <div class="bg-gray-300 dark:bg-gray-500 p-4 flex flex-col overflow-y-hidden">
+                    <div class="bg-gray-300 dark:bg-gray-500 pb-4 px-2 pt-2 flex flex-col overflow-y-hidden">
                         @if (request()->user()->hasPerm('Room_update_new_chat') && session('llms'))
                             <x-room.prompt-area.create :llms="$llms" :tasks="$tasks ?? null" />
                         @elseif (request()->user()->hasPerm('Room_update_send_message') && !session('llms'))
