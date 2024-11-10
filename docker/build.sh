@@ -88,8 +88,7 @@ install_nvidia_container_toolkit() {
                 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
                 # Setup the repository
-                local distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-                curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+                curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
                         sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
                         tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
                 apt-get update
@@ -175,7 +174,6 @@ install_all() {
         elif ! command -v nvidia-smi &> /dev/null; then
                 apt-get update
                 apt-get upgrade
-        else
                 apt-get install curl
                 read -p "Do you want to install NVIDIA GPU drivers? [y/N]: " install_gpu
                 if [[ "$install_gpu" == "y" || "$install_gpu" == "Y" ]]; then
