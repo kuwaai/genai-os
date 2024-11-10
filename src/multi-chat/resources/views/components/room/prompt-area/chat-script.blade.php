@@ -263,8 +263,13 @@ xmlns="http://www.w3.org/2000/svg">
 
         if (isRecording) {
             try {
-                if (!navigator.mediaDevices?.getUserMedia || location.protocol !== 'https:') return alert(
+                if (!navigator.mediaDevices?.getUserMedia || location.protocol !== 'https:') {
+                    isRecording = !$(this).data('isRecording');
+                    $(this).data('isRecording', isRecording);
+                    $('#recordButton').remove();
+                    return alert(
                     "Audio recording requires HTTPS and browser support.");
+                }
 
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: true
