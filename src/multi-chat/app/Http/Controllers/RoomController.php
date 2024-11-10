@@ -358,14 +358,23 @@ class RoomController extends Controller
 
         Log::channel('analyze')->Debug('max_file_size_kb:' . $max_file_size_kb);
         Log::channel('analyze')->Debug('allowed_file_exts:' . $allowed_file_exts);
+        
+        // Check if a file is uploaded
+        if ($request->hasFile('file')) {
+            // Get the MIME type of the uploaded file
+            $mimeType = $request->file('file')->getMimeType();
+            Log::channel('analyze')->Debug('uploaded_file_mime_type:' . $mimeType);
+        }
+        
         $file_validation_rule = ['file', 'max:' . $max_file_size_kb];
         if ($allowed_file_exts !== '*') {
             array_push($file_validation_rule, 'mimes:' . $allowed_file_exts);
         }
+        
         $validator = Validator::make($request->all(), [
             'file' => $file_validation_rule,
         ]);
-
+        
         if ($validator->fails()) {
             $errorString = implode(',', $validator->messages()->all());
             Log::channel('analyze')->Debug("validation failed:\n" . $errorString);
@@ -375,8 +384,8 @@ class RoomController extends Controller
                 'msg' => $errorString,
             ];
         }
-
-        $directory = '/root/homes/' . $request->user()->id; // Directory relative to 'public/storage/'
+        
+        $directory = 'root/homes/' . $request->user()->id; // Directory relative to 'public/storage/'
         $storagePath = public_path('storage/' . $directory); // Adjusted path
         $filePathParts = pathinfo($request->file->getClientOriginalName());
         $fileName = sprintf('%s%s', $filePathParts['filename'], isset($filePathParts['extension']) ? '.' . $filePathParts['extension'] : '');
