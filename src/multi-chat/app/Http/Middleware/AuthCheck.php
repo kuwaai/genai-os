@@ -17,24 +17,36 @@ class AuthCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Default create token
         if ($request->user()->tokens()->where('name', 'API_Token')->count() != 1) {
             $request->user()->tokens()->where('name', 'API_Token')->delete();
             $request->user()->createToken('API_Token', ['access_api']);
         }
-        // Create user dir if not exist
         $user_dir = 'root/homes' . '/' . auth()->id();
         if (!Storage::disk('public')->exists($user_dir)) {
             Storage::disk('public')->makeDirectory($user_dir);
         }
 
         if ($request->user()) {
-            // Force change password
             if ($request->user()->require_change_password) {
                 return redirect()->route('change_password');
             }
+
             if ($request->user()->hasPerm('tab_Manage')) {
-                Redis::throttle('check_update')->block(0)->allow(1)->every(300)->then(fn() => CheckUpdate::dispatch(), fn() => null);
+                $jobs = Redis::lrange('queues:default', 0, -1);
+                $runningJobs = array_map(fn($job) => json_decode($job)->displayName, $jobs);
+            
+                foreach ($jobs as $job) {
+                    $jobData = json_decode($job);
+                    if ($jobData->displayName === 'App\Jobs\CheckUpdate') {
+                        Redis::lrem('queues:default', 0, $job);
+                    }
+                }
+                if (!in_array('App\Jobs\CheckUpdate', $runningJobs)) {
+                    Redis::throttle('check_update')->block(0)->allow(1)->every(300)->then(
+                        fn() => CheckUpdate::dispatch(),
+                        fn() => null
+                    );
+                }
             }
         }
 
