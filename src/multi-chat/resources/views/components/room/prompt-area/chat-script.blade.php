@@ -268,7 +268,7 @@ xmlns="http://www.w3.org/2000/svg">
                     $(this).data('isRecording', isRecording);
                     $('#recordButton').remove();
                     return alert(
-                    "Audio recording requires HTTPS and browser support.");
+                        "{{ __('room.hint.recording_not_supported') }}");
                 }
 
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -278,7 +278,7 @@ xmlns="http://www.w3.org/2000/svg">
 
                 const mimeType = ['audio/webm', 'audio/ogg', 'audio/wav'].find(type => MediaRecorder
                     .isTypeSupported(type));
-                if (!mimeType) return alert('No supported audio format found.');
+                if (!mimeType) return alert("{{ __('room.hint.recording_no_supported_format') }}");
 
                 mediaRecorder = new MediaRecorder(stream, {
                     mimeType
@@ -324,7 +324,7 @@ xmlns="http://www.w3.org/2000/svg">
         const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
         if (elapsedTime >= MAX_RECORD_TIME) {
             mediaRecorder.stop();
-            alert("Maximum recording time reached (12 hours).");
+            alert("{{ __('room.hint.recording_duration_reach_limit') }}");
         }
         $('#recording > div').text(formatDuration(elapsedTime));
     }
@@ -338,11 +338,9 @@ xmlns="http://www.w3.org/2000/svg">
     function handleError(error) {
         switch (error.name) {
             case "NotAllowedError":
-                return "Microphone access denied.";
-            case "NotFoundError":
-                return "No microphone found.";
+                return "{{ __('room.hint.recording_failed_permission') }}";
             default:
-                return "Error accessing microphone.";
+                return "{{ __('room.hint.recording_no_microphone') }}";
         }
     }
 
