@@ -8,6 +8,7 @@ return [
     'button.cancel' => '取消',
 
     'label.loading' => '加載中...',
+    'label.no_workers_boot' => '沒有執行中的任務處理器，點我啟動',
     'label.last_refresh' => '最後刷新時間：:time',
     'label.current_worker_count' => '當前任務處理器數量',
     'label.error_fetching_worker_count' => '獲取任務處理器數量時出錯。',

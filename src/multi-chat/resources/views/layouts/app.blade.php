@@ -241,6 +241,26 @@
             $('#remove-once').remove();
         });
     </script>
+    <div id="start-workers-modal"
+        class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50 z-50">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-bold mb-4 dark:text-white">{{ __('workers.modal.start.title') }}</h2>
+            <label for="modal-worker-count-input"
+                class="block text-gray-700 dark:text-gray-300 mb-2">{{ __('workers.modal.start.label') }}</label>
+            <input id="modal-worker-count-input" type="number" min="1" value='10'
+                class="w-full px-4 py-2 border dark:border-gray-700 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300" />
+            <div class="flex justify-end mt-4">
+                <button id="confirm-start-workers"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-md">{{ __('workers.button.confirm') }}</button>
+                <button id="cancel-start-workers"
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded shadow-md ml-2">{{ __('workers.button.cancel') }}</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#cancel-start-workers, #cancel-stop-workers').click(() => $(
+            '#start-workers-modal, #stop-workers-modal').addClass('hidden'));
+    </script>
     @if (Auth::user()->term_accepted)
         <div data-modal-target="tos_modal"></div>
     @endif

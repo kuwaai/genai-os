@@ -186,47 +186,99 @@
 
                     <script>
                         function checkUpdate(buttonSelector, spinnerSelector, routeUrl, forced = false) {
-                            // Hide all update buttons and show the spinner
-                            $(buttonSelector).addClass('hidden'); // Hide all buttons
-                            $(spinnerSelector).removeClass('hidden'); // Show spinner
+                            $(buttonSelector).addClass('hidden');
+                            $(spinnerSelector).removeClass('hidden');
 
-                            // Trigger the POST request
                             $.ajax({
                                 url: routeUrl,
                                 type: 'POST',
                                 data: {
-                                    _token: '{{ csrf_token() }}', // Include CSRF token
+                                    _token: '{{ csrf_token() }}',
                                     forced: forced
                                 },
                                 success: function(response) {
-                                    // Depending on the response, show the appropriate button
                                     if (response.value === 'update-available') {
-                                        $('#updateAvailableBtn').parent().removeClass('hidden'); // Show update available button
-                                    } else if (response.value === 'no-update') {
-                                        // Show some other button or handle no update case
-                                    } else {
-                                        $('#updateFailedBtn').parent().removeClass('hidden'); // Show failed button
+                                        $('#updateAvailableBtn').parent().removeClass('hidden');
+                                    } else if (response.value === 'no-update') {} else {
+                                        $('#updateFailedBtn').parent().removeClass('hidden');
                                         $('#updateFailedBtn').next().find('span').text(response.value);
                                     }
 
-                                    $(spinnerSelector).addClass('hidden'); // Hide spinner
+                                    $(spinnerSelector).addClass('hidden');
                                 },
                                 error: function(xhr, status, error) {
-                                    // Handle error here
                                     console.error('Error:', error);
 
-                                    // Show failed button on error
                                     $('#updateFailedBtn').parent().removeClass('hidden');
-                                    $(spinnerSelector).addClass('hidden'); // Hide spinner
+                                    $(spinnerSelector).addClass('hidden');
                                 }
                             });
                         }
 
-                        // Bind the function to the updateFailedBtn click event
                         $('#updateFailedBtn').on('click', function() {
                             checkUpdate('.updateBtn', '#spinnerDiv', '{{ route('manage.setting.checkUpdate') }}', true);
                         });
                         checkUpdate('.updateBtn', '#spinnerDiv', '{{ route('manage.setting.checkUpdate') }}', false)
+                    </script>
+
+                    <div class="flex justify-center items-center min-h-screen workerBtn hidden">
+                        <button id="start_worker_btn" data-tooltip-target="tooltip-start-workers" type="button"
+                            class="text-green-500 hover:text-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg p-2 flex items-center transition-transform transform hover:scale-110">
+                            <i class="fa fa-cogs text-orange-400 text-2xl"></i>
+                        </button>
+                        <div id="tooltip-start-workers" role="tooltip"
+                            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+                            {{ __('workers.label.no_workers_boot') }}
+                            <div class="tooltip-arrow" data-popper-arrow></div>
+                        </div>
+                    </div>
+                    <script>
+                        let canSubmit = true
+                        const cooldownDuration = 2000;
+                        $('#start_worker_btn').click(() => $('#start-workers-modal').removeClass('hidden'));
+                        $('#confirm-start-workers').click(function() {
+                            if (!canSubmit) return;
+                            const count = parseInt($('#modal-worker-count-input').val()),
+                                currentCount = $('#worker-count').data('current') || 0;
+                            if (count > 0) {
+                                $.ajax({
+                                    url: '{{ route('manage.workers.start') }}',
+                                    method: 'POST',
+                                    data: {
+                                        '_token': '{{ csrf_token() }}',
+                                        count
+                                    },
+                                    beforeSend: function() {
+                                        $('#start-workers-button').addClass('opacity-50 cursor-not-allowed')
+                                            .prop('disabled', true);
+                                        $('#start-icon').removeClass('fa-play').addClass(
+                                            'fa-spinner fa-spin');
+                                        $('#start-workers-modal').addClass('hidden');
+                                        $('.workerBtn').addClass('hidden')
+                                        canSubmit = false;
+                                    },
+                                    success: response => appendMessage(response.message, true, '#worker_result'),
+                                    error: xhr => appendMessage('{{ __('workers.label.error') }}: ' + xhr
+                                        .responseText, false, '#worker_result'),
+                                    complete: function() {
+                                        $('#start-workers-button').removeClass(
+                                            'opacity-50 cursor-not-allowed').prop('disabled', false);
+                                        $('#start-icon').removeClass('fa-spinner fa-spin').addClass(
+                                            'fa-play');
+                                        setTimeout(() => canSubmit = true, cooldownDuration);
+                                    }
+                                });
+                            } else appendMessage('{{ __('workers.label.valid_worker_count') }}', false, '#worker_result');
+                        });
+
+                        $.ajax({
+                            url: '{{ route('manage.workers.get') }}',
+                            method: 'GET',
+                            success: function(response) {
+                                if (response.worker_count == 0) $('.workerBtn').removeClass('hidden')
+                            },
+                            error: null
+                        });
                     </script>
                 @endif
             </div>

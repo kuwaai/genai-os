@@ -19,22 +19,6 @@
     </div>
 </div>
 
-<div id="start-workers-modal" class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-bold mb-4">{{ __('workers.modal.start.title') }}</h2>
-        <label for="modal-worker-count-input"
-            class="block text-gray-700 dark:text-gray-300 mb-2">{{ __('workers.modal.start.label') }}</label>
-        <input id="modal-worker-count-input" type="number" min="1" value='10'
-            class="w-full px-4 py-2 border dark:border-gray-700 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300" />
-        <div class="flex justify-end mt-4">
-            <button id="confirm-start-workers"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-md">{{ __('workers.button.confirm') }}</button>
-            <button id="cancel-start-workers"
-                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded shadow-md ml-2">{{ __('workers.button.cancel') }}</button>
-        </div>
-    </div>
-</div>
-
 <div id="stop-workers-modal" class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <h2 class="text-lg font-bold mb-4">{{ __('workers.modal.stop.title') }}</h2>
@@ -49,9 +33,7 @@
 </div>
 
 <script>
-    const cooldownDuration = 2000;
-    let canSubmit = true,
-        lastFetchTime = null;
+    let lastFetchTime = null;
 
     function fetchWorkerCount() {
         $.ajax({
@@ -79,42 +61,6 @@
 
     $('#start-workers-button').click(() => $('#start-workers-modal').removeClass('hidden'));
     $('#stop-workers-button').click(() => $('#stop-workers-modal').removeClass('hidden'));
-    $('#cancel-start-workers, #cancel-stop-workers').click(() => $(
-        '#start-workers-modal, #stop-workers-modal').addClass('hidden'));
-
-    $('#confirm-start-workers').click(function() {
-        if (!canSubmit) return;
-        const count = parseInt($('#modal-worker-count-input').val()),
-            currentCount = $('#worker-count').data('current') || 0;
-        if (count > 0) {
-            $.ajax({
-                url: '{{ route('manage.workers.start') }}',
-                method: 'POST',
-                data: {
-                    '_token': '{{ csrf_token() }}',
-                    count
-                },
-                beforeSend: function() {
-                    $('#start-workers-button').addClass('opacity-50 cursor-not-allowed')
-                        .prop('disabled', true);
-                    $('#start-icon').removeClass('fa-play').addClass(
-                        'fa-spinner fa-spin');
-                    $('#start-workers-modal').addClass('hidden');
-                    canSubmit = false;
-                },
-                success: response => appendMessage(response.message, true, '#worker_result'),
-                error: xhr => appendMessage('{{ __('workers.label.error') }}: ' + xhr
-                    .responseText, false, '#worker_result'),
-                complete: function() {
-                    $('#start-workers-button').removeClass(
-                        'opacity-50 cursor-not-allowed').prop('disabled', false);
-                    $('#start-icon').removeClass('fa-spinner fa-spin').addClass(
-                        'fa-play');
-                    setTimeout(() => canSubmit = true, cooldownDuration);
-                }
-            });
-        } else appendMessage('{{ __('workers.label.valid_worker_count') }}', false, '#worker_result');
-    });
 
     $('#confirm-stop-workers').click(function() {
         if (!canSubmit) return;
