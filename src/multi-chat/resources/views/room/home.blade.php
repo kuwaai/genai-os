@@ -64,9 +64,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class='flex flex-col overflow-y-auto scrollbar pr-2 flex-1'>
-                        <x-room.llm :result="$bots" />
-                    </div>
+                    <x-room.llm :result="$bots" />
                 @endif
             </div>
         </div>
