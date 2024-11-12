@@ -426,7 +426,7 @@ class ProfileController extends Controller
             'id' => 'chatcmpl-' . $history->id,
             'model' => $llm->access_code,
             'object' => 'chat.completion',
-            'usage' => [],
+            'usage' => (object)[],
         ];
 
         return response()->json($resp);
