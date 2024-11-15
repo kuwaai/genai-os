@@ -1,7 +1,7 @@
 @props(['bots', 'extra' => ''])
 
 <div class="flex overflow-hidden auto-rows-min w-full bot-showcase gap-2 pr-2 h-full grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 xl:grid-cols-10 2xl:grid-cols-12 mb-auto overflow-y-auto scrollbar"
-    id="{{ $extra }}bot-showcase" onscroll="handleScrollOrResize(this)">
+    id="{{ $extra }}bot-showcase">
     @foreach ($bots as $bot)
         @php
             $bot_image_name = $bot->image ?? $bot->base_image;
