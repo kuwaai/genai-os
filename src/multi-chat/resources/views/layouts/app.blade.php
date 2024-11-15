@@ -457,6 +457,19 @@
                 });
             }
         }
+        function llm_filter(filter, container) {
+            container.find('> li').toggle(!filter);
+
+            if (filter) {
+                container.find('> li').each(function() {
+                    const group = $(this);
+                    const match = group.find('>label >div > div:last() >div')
+                        .filter((_, chat) => $(chat).text().toLowerCase().trim().includes(filter.toLowerCase()))
+                        .length > 0;
+                    group.toggle(match);
+                });
+            }
+        }
 
         function search_chat(filter, container) {
             container.find('>div:last() >div').each(function() {

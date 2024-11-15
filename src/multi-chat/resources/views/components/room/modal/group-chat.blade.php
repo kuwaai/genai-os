@@ -4,8 +4,8 @@
 
 <div id="create-model-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
     tabindex="-1" aria-hidden="true"
-    class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-md flex max-h-full overflow-hidden">
+    class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full">
+    <div class="relative w-full max-w-xl flex h-full overflow-hidden">
         <!-- Modal content -->
         <div
             class="relative bg-white rounded-lg shadow dark:bg-gray-700 overflow-hidden max-h-full flex flex-col w-full">
@@ -39,7 +39,17 @@
                     <x-sorted-list.control-menu :$sorting_methods
                         btn_class="rounded-md text-sm font-normal text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100" />
                 </div>
-                <ul class="my-4 space-y-3 overflow-auto scrollbar flex-1">
+                <div class="mt-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                    <div class="flex">
+                        <div class="w-full">
+                            <input type="search"
+                                oninput="llm_filter($(this).val(), $(this).parent().parent().parent().next())"
+                                class="p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-lg border-l-gray-50 border-l-2 border border-gray-300 dark:bg-gray-700 dark:border-l-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+                                placeholder="{{ __('room.label.search_chat') }}" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <ul class="mt-2 space-y-3 overflow-auto scrollbar flex-1">
                     @foreach ($result as $LLM)
                         <x-sorted-list.item html_tag="li" :$sorting_methods :record="$LLM">
                             <input type="checkbox" name="llm[]" id="llm_create_check_{{ $LLM->id }}"
@@ -64,7 +74,7 @@
                     @endforeach
                 </ul>
                 <div>
-                    <div class="border border-black dark:border-white border-1 rounded-lg overflow-hidden">
+                    <div class="mt-2 border border-black dark:border-white border-1 rounded-lg overflow-hidden">
                         <button type="submit"
                             class="flex menu-btn flex items-center justify-center w-full h-12 dark:hover:bg-gray-500 hover:bg-gray-400 transition duration-300">
                             <p class="flex-1 text-center text-gray-700 dark:text-white">{{ __('room.button.create') }}
