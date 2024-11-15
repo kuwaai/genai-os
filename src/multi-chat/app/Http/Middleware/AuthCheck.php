@@ -27,15 +27,28 @@ class AuthCheck
         }
 
         if ($request->user()) {
+            $jobs = Redis::lrange('queues:default', 0, -1);
+            $runningJobs = [];
+
+            foreach ($jobs as $job) {
+                $jobData = json_decode($job);
+                $displayName = $jobData->displayName;
+
+                if (!in_array($displayName, $runningJobs)) {
+                    $runningJobs[] = $displayName;
+                } elseif (in_array($displayName, ['App\Jobs\CheckUpdate', 'App\Jobs\HealthCheck'])) {
+                    Redis::lrem('queues:default', 0, $job);
+                }
+            }
+
             if ($request->user()->require_change_password) {
                 return redirect()->route('change_password');
             }
 
             if ($request->user()->hasPerm('tab_Manage')) {
-                Redis::throttle('check_update')->block(0)->allow(1)->every(300)->then(
-                    fn() => CheckUpdate::dispatch(),
-                    fn() => null
-                );
+                if (!in_array('App\Jobs\CheckUpdate', $runningJobs)) {
+                    Redis::throttle('check_update')->block(0)->allow(1)->every(300)->then(fn() => CheckUpdate::dispatch(), fn() => null);
+                }
             }
         }
 

@@ -23,14 +23,6 @@ class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     protected $ignore;
 
-    /**
-     * Get the unique ID for the job.
-     */
-    public function uniqueId(): string
-    {
-        return 'check_update_job';
-    }
-
     public function __construct($ignore = false)
     {
         $this->ignore = $ignore;
