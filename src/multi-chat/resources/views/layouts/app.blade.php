@@ -457,13 +457,28 @@
                 });
             }
         }
-        function llm_filter(filter, container) {
+
+        function bot_filter(filter, container) {
             container.find('> li').toggle(!filter);
 
             if (filter) {
                 container.find('> li').each(function() {
                     const group = $(this);
                     const match = group.find('>label >div > div:last() >div')
+                        .filter((_, chat) => $(chat).text().toLowerCase().trim().includes(filter.toLowerCase()))
+                        .length > 0;
+                    group.toggle(match);
+                });
+            }
+        }
+
+        function home_bot_filter(filter, container) {
+            container.find('> form').toggle(!filter);
+
+            if (filter) {
+                container.find('> form').each(function() {
+                    const group = $(this);
+                    const match = group.find('> button > p')
                         .filter((_, chat) => $(chat).text().toLowerCase().trim().includes(filter.toLowerCase()))
                         .length > 0;
                     group.toggle(match);

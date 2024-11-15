@@ -70,13 +70,23 @@
         </div>
         <div id="histories_hint"
             class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl overflow-hidden">
-            <button
-                class="absolute sm:hidden text-center text-black hover:text-black dark:text-white hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 focus:ring-4 focus:ring-blue-300 font-medium text-sm px-5 py-5 focus:outline-none dark:focus:ring-blue-800"
-                type="button" data-drawer-target="chatlist_drawer" data-drawer-show="chatlist_drawer"
-                aria-controls="chatlist_drawer">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="flex justify-end">
+            <div class="flex">
+                <button
+                    class="sm:hidden text-center text-black hover:text-black dark:text-white hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 focus:ring-4 focus:ring-blue-300 font-medium text-sm px-5 py-5 focus:outline-none dark:focus:ring-blue-800"
+                    type="button" data-drawer-target="chatlist_drawer" data-drawer-show="chatlist_drawer"
+                    aria-controls="chatlist_drawer">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="flex-1">
+                    <div class="flex h-full items-center">
+                        <div class="w-full border border-black dark:border-white border-1 rounded-lg overflow-hidden ml-2">
+                            <input type="search"
+                                oninput="home_bot_filter($(this).val(), $(this).parent().parent().parent().parent().next())"
+                                class="p-2.5 m-auto w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-lg border-l-gray-50 border-l-2 border border-gray-300 dark:bg-gray-700 dark:border-l-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+                                placeholder="{{ __('room.label.search_bot') }}" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
                 <x-sorted-list.control-menu :$sorting_methods
                     btn_class="text-sm leading-4 px-5 py-5 font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
             </div>
