@@ -32,21 +32,10 @@ class AuthCheck
             }
 
             if ($request->user()->hasPerm('tab_Manage')) {
-                $jobs = Redis::lrange('queues:default', 0, -1);
-                $runningJobs = array_map(fn($job) => json_decode($job)->displayName, $jobs);
-            
-                foreach ($jobs as $job) {
-                    $jobData = json_decode($job);
-                    if ($jobData->displayName === 'App\Jobs\CheckUpdate') {
-                        Redis::lrem('queues:default', 0, $job);
-                    }
-                }
-                if (!in_array('App\Jobs\CheckUpdate', $runningJobs)) {
-                    Redis::throttle('check_update')->block(0)->allow(1)->every(300)->then(
-                        fn() => CheckUpdate::dispatch(),
-                        fn() => null
-                    );
-                }
+                Redis::throttle('check_update')->block(0)->allow(1)->every(300)->then(
+                    fn() => CheckUpdate::dispatch(),
+                    fn() => null
+                );
             }
         }
 
