@@ -5,7 +5,8 @@
         <input id="chatsTo_{{ $llm->id }}" name="chatsTo[]" value="{{ $llm->id }}" hidden>
     @endforeach
     <div id="recording" class="text-xs mb-[8px] leading-3" style="display:none">
-        <div class="w-full h-full py-[8px] bg-blue-600 hover:bg-red-600 rounded-lg text-white text-center">00:00:00</div>
+        <div class="w-full h-full py-[8px] bg-blue-600 hover:bg-red-600 rounded-lg text-white text-center">00:00:00
+        </div>
     </div>
     <div id="attachment" class="text-xs mb-[8px] mt-[-8px] leading-3" style="display:none">
         <button onclick="event.preventDefault();$('#upload').val(''); $(this).parent().hide();"
@@ -106,6 +107,10 @@
                     <i class="fas fa-paper-plane text-white"></i>
                 </button>
 
+                <button id='abort_btn' onclick="return abortGenerate()"
+                    class="bg-orange-600 h-[40px] w-[40px] hover:bg-orange-500 dark:hover:bg-orange-700 flex items-center justify-center rounded-r-l">
+                    <i class="far fa-stop-circle text-white"></i>
+                </button>
                 <input type="file" id="fileInput" style="display:none;" />
             </div>
         </div>
