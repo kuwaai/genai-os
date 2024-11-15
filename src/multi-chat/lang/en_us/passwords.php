@@ -5,5 +5,5 @@ return [
     'sent' => 'We have emailed you a password reset link.',
     'throttled' => 'Please try again later.',
     'token' => 'This password reset token is invalid.',
-    'user' => 'We can\\'t find a user with that email address.',
+    'user' => 'We cant find a user with that email address.',
 ];

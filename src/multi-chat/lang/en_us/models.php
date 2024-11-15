@@ -12,7 +12,7 @@ return [
     'button.new_model' => 'New Model',
     'button.delete' => 'Delete',
     'button.save' => 'Save',
-    'button.yes' => 'Yes, I\\'m sure',
+    'button.yes' => 'Yes, I\'m sure',
     'button.no' => 'No, Cancel',
     'label.disabled_models' => 'Disabled Models',
     'label.enabled_models' => 'Enabled Models',

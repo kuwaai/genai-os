@@ -17,10 +17,10 @@ return [
     'label.disabled_models' => 'Modèles désactivés',
     'label.enabled_models' => 'Modèles activés',
     'label.model_image' => 'Image du modèle',
-    'label.access_code' => 'Code d\\'accès',
+    'label.access_code' => 'Code daccès',
     'label.model_name' => 'Nom du modèle',
     'label.description' => 'Description',
     'label.version' => 'Version',
-    'label.order' => 'Ordre d\\'affichage',
+    'label.order' => 'Ordre daffichage',
     'label.link' => 'Lien externe',
 ];

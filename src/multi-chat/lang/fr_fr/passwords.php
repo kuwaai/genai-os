@@ -5,5 +5,5 @@ return [
     'sent' => 'Nous avons envoyé un lien de réinitialisation de mot de passe à votre adresse e-mail.',
     'throttled' => 'Veuillez réessayer plus tard.',
     'token' => 'Ce jeton de réinitialisation de mot de passe est invalide.',
-    'user' => 'Aucun utilisateur n\\'a été trouvé avec cette adresse e-mail.',
+    'user' => 'Aucun utilisateur na été trouvé avec cette adresse e-mail.',
 ];

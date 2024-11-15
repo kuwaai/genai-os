@@ -18,7 +18,7 @@ return [
     'button.update' => 'Mettre à jour',
     'button.confirm' => 'Confirmer',
     'button.delete_account' => 'Supprimer le compte',
-    'label.name' => 'Nom d\\'utilisateur',
+    'label.name' => 'Nom dutilisateur',
     'label.email' => 'Courriel',
     'label.update_password' => 'Assurez-vous que le mot de passe que vous utilisez est suffisamment sécurisé.',
     'label.current_password' => 'Mot de passe actuel',
@@ -29,6 +29,6 @@ return [
     'label.openai_api' => 'Clé API OpenAI',
     'label.google_api' => 'Clé API Google',
     'label.third_party_api' => 'Clé API tierce personnalisée (par exemple : Groq, Cerebras)',
-    'label.stay_secure' => 'Faites attention à l\\'utilisation de vos clés externes !',
+    'label.stay_secure' => 'Faites attention à lutilisation de vos clés externes !',
     'label.delete_account' => 'Lorsque vous supprimez votre compte, toutes les données associées sont supprimées. Veuillez agir avec prudence.',
 ];

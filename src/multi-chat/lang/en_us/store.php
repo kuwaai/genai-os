@@ -28,7 +28,7 @@ return [
     'bot.name.label' => 'Name',
     'bot.description' => 'App description',
     'bot.description.label' => 'Description',
-    'bot.system_prompt.label' => 'The system prompt will influence the model\\'s behavior',
+    'bot.system_prompt.label' => 'The system prompt will influence the models behavior',
     'bot.welcome_message.label' => 'Welcome message will only be displayed but not included in the inference',
     'bot.button.create' => 'Create',
     'bot.react_buttons' => 'React',
@@ -42,7 +42,7 @@ return [
     'bot.base_model.label' => 'Base model',
     'bot.before_prompt' => 'User pre-prompt',
     'bot.after_prompt' => 'User post-prompt',
-    'bot.before_prompt.label' => 'This prompt will be added before the user\\'s prompt during inference',
-    'bot.after_prompt.label' => 'This prompt will be added after the user\\'s prompt during inference',
+    'bot.before_prompt.label' => 'This prompt will be added before the users prompt during inference',
+    'bot.after_prompt.label' => 'This prompt will be added after the users prompt during inference',
     'bot.button.chat' => 'Chat',
 ];
