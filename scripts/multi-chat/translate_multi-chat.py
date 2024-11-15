@@ -65,8 +65,8 @@ def json_to_php(json_obj):
 
     for key, value in sorted_items:
         # Escape single quotes in keys and values
-        escaped_key = key.replace("'", "\\'")
-        escaped_value = value.replace("'", "\\'")
+        escaped_key = key.replace("'", "\'")
+        escaped_value = value.replace("'", "\'")
         php_lines.append(f"    '{escaped_key}' => '{escaped_value}',")
     
     php_lines.append("];\n")
@@ -94,6 +94,7 @@ async def translate(zh_tw_path, target_lang_path, output_path, target_language, 
         with open(target_lang_path, 'r', encoding='utf-8') as file:
             translated_target = php_to_json(file.read())
     filtered_translations = {key: value for key, value in translations.items() if key not in translated_target}
+    existing_translation = {key: value for key, value in translated_target.items() if key in translations}
     if len(filtered_translations) > 0:
         content = json_to_php(filtered_translations)
         async with semaphore:
@@ -117,12 +118,12 @@ async def translate(zh_tw_path, target_lang_path, output_path, target_language, 
                         # Check PHP syntax of the output file
                         if check_php_syntax(output_path):
                             if translated_target:
-                                result = json_to_php(translated_target | php_to_json(result))
+                                result = json_to_php(existing_translation | php_to_json(result))
                             else:
                                 result = json_to_php(php_to_json(result))
                             with open(output_path, 'w', encoding='utf-8') as file:
                                 file.write(result)
-                            break
+                            if check_php_syntax(output_path): break
                         else:
                             print(f"Retrying translation for {output_path} in {target_language} (attempt {attempt}) due to syntax error...")
                 except Exception as e:
