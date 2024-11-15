@@ -5,6 +5,7 @@ return [
     'hint.prompt_area' => 'ここにメッセージを入力してください',
     'tooltip.json_btn' => 'エスケープされていないJSON形式',
     'tooltip.TSV' => 'タブ区切り、Excelで読み込み可能',
+    'hint.copied' => 'コピーされました',
     'header.new_chat' => '現在指定されたチャットモデル',
     'header.export' => 'チャットログのエクスポート',
     'header.import' => 'チャットログのインポート',

@@ -3,6 +3,8 @@
 return [
     'route' => 'ダッシュボード',
     'placeholder.PasteRawDataHere' => '変換する生のデータを貼り付けたり、ファイルをここにドラッグ＆ドロップしたりできます。',
+    'hint.safety_guard_offline' => '安全フィルターシステムはオフラインです',
+    'hint.wip_option' => '開発中、現在はオプションがありません',
     'action.overwrite' => 'システムによる上書き',
     'action.block' => 'ブロック、警告をオプションで',
     'action.warn' => '警告のみ',

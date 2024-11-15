@@ -38,8 +38,8 @@ def php_to_json(php_text):
     :return: A JSON object (Python dictionary).
     """
     php_dict = {}
-    # Extract key-value pairs using regex
-    pattern = re.compile(r"'(?P<key>.*?)'\s*=>\s*'(?P<value>.*?)',")
+    # Update regex to match both single and double quotes around the key and value
+    pattern = re.compile(r"['\"](?P<key>.*?)['\"]\s*=>\s*['\"](?P<value>.*?)['\"]\s*,")
     matches = pattern.findall(php_text)
     
     for key, value in matches:

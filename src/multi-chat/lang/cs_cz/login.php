@@ -17,4 +17,5 @@ return [
     'button.sign_in' => 'Přihlásit se',
     'button.sign_up' => 'Registrovat se',
     'button.return' => 'Zpět',
+    'button.register' => 'Registrovat se',
 ];

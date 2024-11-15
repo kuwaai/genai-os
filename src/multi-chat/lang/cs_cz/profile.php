@@ -18,6 +18,7 @@ return [
     'button.update' => 'Aktualizovat',
     'button.confirm' => 'Potvrdit',
     'button.delete_account' => 'Smazat účet',
+    'button.change_lang' => 'Změnit jazyk',
     'label.name' => 'Uživatelské jméno',
     'label.email' => 'E-mailová adresa',
     'label.update_password' => 'Ujistěte se, že používáte dostatečně silné heslo',

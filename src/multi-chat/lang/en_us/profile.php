@@ -18,6 +18,7 @@ return [
     'button.update' => 'Update',
     'button.confirm' => 'Confirm',
     'button.delete_account' => 'Delete Account',
+    'button.change_lang' => 'Change Language',
     'label.name' => 'Username',
     'label.email' => 'Email Address',
     'label.update_password' => 'Please ensure that the password you use is sufficiently secure.',

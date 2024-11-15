@@ -17,6 +17,7 @@ return [
     'concurrent_multichat' => 'Současný chat s více modely',
     'onedgecloud' => 'Podpora výpočetního prostředí Windows a Linux na hraně sítě a v cloudu',
     'totalsolution' => 'Kompletní řešení pro aplikace generativního AI',
+    'opensource' => 'Otevřený kód',
     'button.information' => 'Další informace',
     'button.return_home' => 'Zpět na domovskou stránku',
     'under_maintenance.label' => 'Provádíme údržbu webu,<br>Zkuste to prosím později!',

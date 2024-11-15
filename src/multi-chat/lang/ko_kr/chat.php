@@ -5,6 +5,7 @@ return [
     'hint.prompt_area' => '여기에 메시지를 입력하세요',
     'tooltip.json_btn' => '이스케이프되지 않은 JSON 형식',
     'tooltip.TSV' => '탭으로 구분된, 엑셀에서 가져올 수 있습니다.',
+    'hint.copied' => '복사됨',
     'header.new_chat' => '현재 선택된 채팅 모델',
     'header.export' => '채팅 기록 내보내기',
     'header.import' => '채팅 기록 가져오기',

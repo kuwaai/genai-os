@@ -17,6 +17,7 @@ return [
     'concurrent_multichat' => '동시 다중 모델 채팅',
     'onedgecloud' => 'Windows 및 Linux 에지와 클라우드 컴퓨팅 지원',
     'totalsolution' => '생성형 AI 응용 프로그램을 위한 완벽한 솔루션',
+    'opensource' => '오픈 소스',
     'button.information' => '더 많은 정보',
     'button.return_home' => '홈으로 돌아가기',
     'under_maintenance.label' => '현재 웹사이트 유지보수 중입니다.<br>잠시 후 다시 방문해 주세요!',

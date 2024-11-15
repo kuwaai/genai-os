@@ -3,6 +3,8 @@
 return [
     'route' => 'Nástroje',
     'placeholder.PasteRawDataHere' => 'Zkopírujte sem surová data, nebo sem přetáhněte soubor.',
+    'hint.safety_guard_offline' => 'Bezpečnostní filtr je offline',
+    'hint.wip_option' => 'Ve vývoji, momentálně bez možností',
     'action.overwrite' => 'Přepsat systémem',
     'action.block' => 'Blokovat, volitelně s upozorněním',
     'action.warn' => 'Pouze varování',

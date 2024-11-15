@@ -5,6 +5,7 @@ return [
     'hint.prompt_area' => 'Veuillez saisir votre message ici',
     'tooltip.json_btn' => 'Format JSON sans échappement',
     'tooltip.TSV' => 'Séparé par des tabulations, peut être lu par Excel',
+    'hint.copied' => 'Copié',
     'header.new_chat' => 'Modèle de conversation actuellement sélectionné',
     'header.export' => 'Exporter l’historique des conversations',
     'header.import' => 'Importer l’historique des conversations',

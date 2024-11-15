@@ -3,6 +3,8 @@
 return [
     'route' => 'Dashboard',
     'placeholder.PasteRawDataHere' => 'Please paste raw data to be converted here, you can also drag and drop files here.',
+    'hint.safety_guard_offline' => 'Safety filter system is offline',
+    'hint.wip_option' => 'Work in progress, no options currently available',
     'action.overwrite' => 'Overwrite by system',
     'action.block' => 'Block, optional warning',
     'action.warn' => 'Pure warning',

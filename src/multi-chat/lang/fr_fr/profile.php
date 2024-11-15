@@ -18,6 +18,7 @@ return [
     'button.update' => 'Mettre à jour',
     'button.confirm' => 'Confirmer',
     'button.delete_account' => 'Supprimer le compte',
+    'button.change_lang' => 'Changer la langue',
     'label.name' => 'Nom dutilisateur',
     'label.email' => 'Courriel',
     'label.update_password' => 'Assurez-vous que le mot de passe que vous utilisez est suffisamment sécurisé.',

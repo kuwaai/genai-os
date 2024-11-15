@@ -17,4 +17,5 @@ return [
     'button.sign_in' => 'Anmelden',
     'button.sign_up' => 'Registrieren',
     'button.return' => 'Zurück',
+    'button.register' => 'Registrieren',
 ];

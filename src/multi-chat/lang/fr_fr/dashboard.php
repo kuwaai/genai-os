@@ -3,6 +3,8 @@
 return [
     'route' => 'Tableau de bord',
     'placeholder.PasteRawDataHere' => 'Collez les données brutes à convertir ici ou faites glisser le fichier ici.',
+    'hint.safety_guard_offline' => 'Le système de filtrage de sécurité est hors ligne',
+    'hint.wip_option' => 'En cours, aucune option n’est disponible pour le moment',
     'action.overwrite' => 'Remplacé par le système',
     'action.block' => 'Bloquer, avec avertissement optionnel',
     'action.warn' => 'Avertissement uniquement',

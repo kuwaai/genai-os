@@ -18,6 +18,7 @@ return [
     'button.update' => '업데이트',
     'button.confirm' => '확인',
     'button.delete_account' => '계정 삭제',
+    'button.change_lang' => '언어 변경',
     'label.name' => '사용자 이름',
     'label.email' => '이메일 주소',
     'label.update_password' => '안전한 비밀번호를 사용하십시오.',

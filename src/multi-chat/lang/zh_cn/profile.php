@@ -18,6 +18,7 @@ return [
     'button.update' => '更新',
     'button.confirm' => '確認',
     'button.delete_account' => '刪除帳號',
+    'button.change_lang' => '切换语言',
     'label.name' => '使用者名稱',
     'label.email' => '電子信箱',
     'label.update_password' => '請確保您使用的密碼足夠安全',

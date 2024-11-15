@@ -5,6 +5,7 @@ return [
     'hint.prompt_area' => '請在此輸入訊息',
     'tooltip.json_btn' => '無跳脫的JSON格式',
     'tooltip.TSV' => 'Tab分隔，可由Excel讀入',
+    'hint.copied' => '已複製',
     'header.new_chat' => '目前指定聊天模型',
     'header.export' => '匯出聊天紀錄',
     'header.import' => '匯入聊天紀錄',

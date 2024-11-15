@@ -3,6 +3,8 @@
 return [
     'route' => '儀表板',
     'placeholder.PasteRawDataHere' => '請貼上要轉換的原始資料，也可以將檔案拖移至此。',
+    'hint.safety_guard_offline' => '安全过滤系统处于离线状态',
+    'hint.wip_option' => '待完成，目前暂无选项',
     'action.overwrite' => '由系統改寫',
     'action.block' => '封鎖，可選警告',
     'action.warn' => '純警告',

@@ -18,6 +18,7 @@ return [
     'button.update' => 'Aktualisieren',
     'button.confirm' => 'Bestätigen',
     'button.delete_account' => 'Konto löschen',
+    'button.change_lang' => 'Sprache wechseln',
     'label.name' => 'Benutzername',
     'label.email' => 'E-Mail-Adresse',
     'label.update_password' => 'Stelle sicher, dass du ein sicheres Passwort verwendest',

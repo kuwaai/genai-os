@@ -3,6 +3,8 @@
 return [
     'route' => '대시보드',
     'placeholder.PasteRawDataHere' => '변환할 원시 데이터를 붙여넣거나, 파일을 여기에 드래그 앤 드롭하세요.',
+    'hint.safety_guard_offline' => '안전 필터 시스템이 오프라인 상태입니다',
+    'hint.wip_option' => '개발 중, 현재 옵션 없음',
     'action.overwrite' => '시스템 재작성',
     'action.block' => '차단, 경고 옵션 가능',
     'action.warn' => '경고만',

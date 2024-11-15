@@ -17,6 +17,7 @@ return [
     'concurrent_multichat' => 'Chat multi-modèles simultané',
     'onedgecloud' => 'Prise en charge du calcul en périphérie et dans le cloud Windows et Linux',
     'totalsolution' => 'Solution complète pour les applications d’IA générative',
+    'opensource' => 'Open source',
     'button.information' => 'Plus d’informations',
     'button.return_home' => 'Retour à la page d’accueil',
     'under_maintenance.label' => 'Nous effectuons actuellement la maintenance du site Web, <br>Revenez plus tard !',

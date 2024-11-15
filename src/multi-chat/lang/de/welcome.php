@@ -17,6 +17,7 @@ return [
     'concurrent_multichat' => 'Simultane Multimodell-Chats',
     'onedgecloud' => 'Unterstützung von Windows und Linux Edge & Cloud Computing',
     'totalsolution' => 'Komplette Lösung für generative KI-Anwendungen',
+    'opensource' => 'Open Source',
     'button.information' => 'Weitere Informationen',
     'button.return_home' => 'Zurück zur Startseite',
     'under_maintenance.label' => 'Wir führen derzeit Wartungsarbeiten an der Website durch. <br>Bitte kommen Sie später wieder!',

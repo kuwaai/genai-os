@@ -17,4 +17,5 @@ return [
     'button.sign_in' => '로그인',
     'button.sign_up' => '회원가입',
     'button.return' => '돌아가기',
+    'button.register' => '등록',
 ];

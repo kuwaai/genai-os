@@ -8,4 +8,5 @@ return [
     'email.thanks_for_signup' => '가입해 주셔서 감사합니다! 시작하기 전에 이메일을 확인해야 합니다. 방금 보낸 이메일을 확인하여 확인 링크를 찾으십시오. 이메일을 받지 못한 경우 다시 보낼 수 있습니다.',
     'label.invite_token' => '초대 코드',
     'label.invite_token.invite_token_optional' => '초대 코드(선택 사항)',
+    'email.new_verify_link_send' => '새로운 인증 링크가 귀하의 이메일로 전송되었습니다.',
 ];

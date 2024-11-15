@@ -17,4 +17,5 @@ return [
     'button.sign_in' => '登錄',
     'button.sign_up' => '註冊',
     'button.return' => '返回',
+    'button.register' => '注册',
 ];

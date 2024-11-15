@@ -17,4 +17,5 @@ return [
     'button.sign_in' => 'ログイン',
     'button.sign_up' => '登録',
     'button.return' => '戻る',
+    'button.register' => '登録',
 ];

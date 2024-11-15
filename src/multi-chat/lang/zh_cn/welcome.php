@@ -17,6 +17,7 @@ return [
     'concurrent_multichat' => '同时多模型聊天',
     'onedgecloud' => '支持Windows和Linux边缘与云端运算',
     'totalsolution' => '生成式AI应用的完整解决方案',
+    'opensource' => '开源',
     'button.information' => '更多资讯',
     'button.return_home' => '回首页',
     'under_maintenance.label' => '我们正在进行网站维护，<br>请稍后再来看看！',

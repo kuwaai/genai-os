@@ -3,6 +3,8 @@
 return [
     'route' => 'Dashboard',
     'placeholder.PasteRawDataHere' => 'Bitte fügen Sie die Rohdaten zum Konvertieren hier ein oder ziehen Sie eine Datei hierher.',
+    'hint.safety_guard_offline' => 'Sicherheitsfilter ist offline',
+    'hint.wip_option' => 'In Arbeit, keine Optionen verfügbar',
     'action.overwrite' => 'Übernommen vom System',
     'action.block' => 'Blockieren, Warnung optional',
     'action.warn' => 'Nur Warnung',

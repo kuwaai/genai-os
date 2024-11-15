@@ -18,6 +18,7 @@ return [
     'button.update' => '更新',
     'button.confirm' => '確認',
     'button.delete_account' => 'アカウントを削除',
+    'button.change_lang' => '言語切替',
     'label.name' => 'ユーザー名',
     'label.email' => 'メールアドレス',
     'label.update_password' => '使用するパスワードが十分に安全であることを確認してください',
