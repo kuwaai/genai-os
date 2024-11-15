@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\File;
 use App\Models\LLMs;
 use Illuminate\Support\Collection;
 
-class CheckUpdate implements ShouldQueue, ShouldBeUniqueUntilProcessing
+class CheckUpdate implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
