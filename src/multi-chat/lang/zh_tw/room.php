@@ -25,6 +25,7 @@ return [
 
     'label.share_link' => '分享連結 (目前只有自己可存取)',
     'label.search_chat'=>'搜尋聊天室',
+    'label.search_bot'=>'搜尋Bot',
 
     'hint.recording_not_supported' => '語音錄製失敗，需要HTTPS與瀏覽器支援',
     'hint.recording_no_supported_format' => '語音錄製失敗，找不到支援的錄製格式',
