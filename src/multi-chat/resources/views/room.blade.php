@@ -88,131 +88,96 @@
                 @endif
             </div>
         </div>
-        @if (!request()->route('room_id') && !session('llms'))
-            <div id="histories_hint"
-                class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
-                <button
-                    class="absolute sm:hidden text-center text-black hover:text-black dark:text-white hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 focus:ring-4 focus:ring-blue-300 font-medium text-sm px-5 py-5 focus:outline-none dark:focus:ring-blue-800"
-                    type="button" data-drawer-target="chatlist_drawer" data-drawer-show="chatlist_drawer"
-                    aria-controls="chatlist_drawer">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="flex justify-end">
-                    <x-sorted-list.control-menu :$sorting_methods />
+
+        <div id="histories"
+            class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
+            <x-room.header :llms="$llms" />
+
+            <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
+                <div style="display:none;"
+                    class="bg-red-100 border border-red-400 mt-2 text-red-700 px-4 py-3 rounded relative"
+                    id="error_alert" role="alert">
+                    <span class="block sm:inline"></span>
                 </div>
+                @if (!session('llms'))
+                    @php
+                        $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
+                        $mergedChats = \App\Models\Chatroom::getMergedChats(request()->route('room_id'));
+                        $refers = $mergedChats->where('isbot', true);
+                    @endphp
 
-                <div
-                    class="mb-4 grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 xl:grid-cols-10 2xl:grid-cols-12 mb-auto overflow-y-auto scrollbar">
-                    @foreach ($bots as $bot)
-                        <x-sorted-list.item html_tag="form" :$sorting_methods :record="$bot" method="post"
-                            class="text-black dark:text-white h-[135px] p-2 hover:bg-gray-200 dark:hover:bg-gray-500 transition"
-                            action="{{ route('room.new') }}">
-                            @csrf
-                            <button class="h-full w-full flex flex-col items-center justify-start">
-                                <img class="rounded-full mx-auto bg-black" width="50px" height="50px"
-                                    src="{{ $bot->image ? asset(Storage::url($bot->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                                <p class="text-sm line-clamp-2">{{ $bot->name }}</p>
-                                @if ($bot->description)
-                                    <p class="text-gray-500 dark:text-gray-300 line-clamp-1 max-w-full text-xs">
-                                        {{ $bot->description }}</p>
-                                @endif
-                                <input name="llm[]" value="{{ $bot->id }}" style="display:none;">
-                            </button>
-                        </x-sorted-list.item>
-                    @endforeach
-                </div>
-            </div>
-        @else
-            <div id="histories"
-                class="flex-1 h-full flex flex-col w-full bg-gray-200 dark:bg-gray-600 shadow-xl rounded-r-lg overflow-hidden">
-                <x-room.header :llms="$llms" />
+                    @env('arena')
+                    @php
+                        $output = collect();
+                        $bufferedBotMessages = [];
+                        foreach ($mergedChats as $history) {
+                            if ($history->isbot) {
+                                // If the current element is a bot message, buffer it
+                                $bufferedBotMessages[] = $history;
+                            } else {
+                                // If the current element is not a bot message, check if there are buffered bot messages
+                                if (!empty($bufferedBotMessages)) {
+                                    shuffle($bufferedBotMessages);
+                                    // If there are buffered bot messages, push them into the output collection
+                                    $output = $output->merge($bufferedBotMessages);
 
-                <div id="chatroom" class="flex-1 p-4 overflow-y-auto flex flex-col-reverse scrollbar">
-                    <div style="display:none;"
-                        class="bg-red-100 border border-red-400 mt-2 text-red-700 px-4 py-3 rounded relative"
-                        id="error_alert" role="alert">
-                        <span class="block sm:inline"></span>
-                    </div>
-                    @if (!session('llms'))
-                        @php
-                            $tasks = \Illuminate\Support\Facades\Redis::lrange('usertask_' . Auth::user()->id, 0, -1);
-                            $mergedChats = \App\Models\Chatroom::getMergedChats(request()->route('room_id'));
-                            $refers = $mergedChats->where('isbot', true);
-                        @endphp
-
-                        @env('arena')
-                        @php
-                            $output = collect();
-                            $bufferedBotMessages = [];
-                            foreach ($mergedChats as $history) {
-                                if ($history->isbot) {
-                                    // If the current element is a bot message, buffer it
-                                    $bufferedBotMessages[] = $history;
-                                } else {
-                                    // If the current element is not a bot message, check if there are buffered bot messages
-                                    if (!empty($bufferedBotMessages)) {
-                                        shuffle($bufferedBotMessages);
-                                        // If there are buffered bot messages, push them into the output collection
-                                        $output = $output->merge($bufferedBotMessages);
-
-                                        // Reset the buffered bot messages array
-                                        $bufferedBotMessages = [];
-                                    }
-
-                                    // Push the current non-bot message into the output collection
-                                    $output->push($history);
+                                    // Reset the buffered bot messages array
+                                    $bufferedBotMessages = [];
                                 }
-                            }
-                            if (!empty($bufferedBotMessages)) {
-                                shuffle($bufferedBotMessages);
-                                // If there are buffered bot messages, push them into the output collection
-                                $output = $output->merge($bufferedBotMessages);
 
-                                // Reset the buffered bot messages array
-                                $bufferedBotMessages = [];
+                                // Push the current non-bot message into the output collection
+                                $output->push($history);
                             }
-                            $mergedChats = $output;
-                        @endphp
-                        <div>
-                            @foreach ($mergedChats as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers"
-                                    :anonymous="true" />
-                            @endforeach
-                        </div>
-                    @else
-                        <div>
-                            @foreach ($mergedChats as $history)
-                                <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
-                            @endforeach
-                        </div>
-                        @endenv
-                    @endif
+                        }
+                        if (!empty($bufferedBotMessages)) {
+                            shuffle($bufferedBotMessages);
+                            // If there are buffered bot messages, push them into the output collection
+                            $output = $output->merge($bufferedBotMessages);
 
-                    @if (count($llms) == 1)
-                        <div class="text-black dark:text-white p-2 mb-auto">
-                            <img id="llm_img" class="rounded-full mx-auto bg-black" width="100px" height="100px"
-                                src="{{ $llms[0]->image ?? $llms[0]->base_image ? asset(Storage::url($llms[0]->image ?? $llms[0]->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
-                            <p class="text-center text-sm line-clamp-4 py-1">{{ $llms[0]->name }}</p>
-                            @if ($llms[0]->description)
-                                <p
-                                    class="text-gray-500 dark:text-gray-300 line-clamp-4 max-w-full text-xs text-center py-1">
-                                    {{ $llms[0]->description }}</p>
-                            @endif
-                        </div>
-                    @endif
-                </div>
-                @if (
-                    (request()->user()->hasPerm('Room_update_new_chat') && session('llms')) ||
-                        (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
-                    <div class="bg-gray-300 dark:bg-gray-500 pb-4 px-2 pt-2 flex flex-col overflow-y-hidden">
-                        @if (request()->user()->hasPerm('Room_update_new_chat') && session('llms'))
-                            <x-room.prompt-area.create :llms="$llms" :tasks="$tasks ?? null" />
-                        @elseif (request()->user()->hasPerm('Room_update_send_message') && !session('llms'))
-                            <x-room.prompt-area.request :llms="$llms" :tasks="$tasks ?? null" />
+                            // Reset the buffered bot messages array
+                            $bufferedBotMessages = [];
+                        }
+                        $mergedChats = $output;
+                    @endphp
+                    <div>
+                        @foreach ($mergedChats as $history)
+                            <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers"
+                                :anonymous="true" />
+                        @endforeach
+                    </div>
+                @else
+                    <div>
+                        @foreach ($mergedChats as $history)
+                            <x-chat.message :history="$history" :tasks="$tasks" :refers="$refers" />
+                        @endforeach
+                    </div>
+                    @endenv
+                @endif
+
+                @if (count($llms) == 1)
+                    <div class="text-black dark:text-white p-2 mb-auto">
+                        <img id="llm_img" class="rounded-full mx-auto bg-black" width="100px" height="100px"
+                            src="{{ $llms[0]->image ?? $llms[0]->base_image ? asset(Storage::url($llms[0]->image ?? $llms[0]->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                        <p class="text-center text-sm line-clamp-4 py-1">{{ $llms[0]->name }}</p>
+                        @if ($llms[0]->description)
+                            <p
+                                class="text-gray-500 dark:text-gray-300 line-clamp-4 max-w-full text-xs text-center py-1">
+                                {{ $llms[0]->description }}</p>
                         @endif
                     </div>
                 @endif
             </div>
-        @endif
+            @if (
+                (request()->user()->hasPerm('Room_update_new_chat') && session('llms')) ||
+                    (request()->user()->hasPerm('Room_update_send_message') && !session('llms')))
+                <div class="bg-gray-300 dark:bg-gray-500 pb-4 px-2 pt-2 flex flex-col overflow-y-hidden">
+                    @if (request()->user()->hasPerm('Room_update_new_chat') && session('llms'))
+                        <x-room.prompt-area.create :llms="$llms" :tasks="$tasks ?? null" />
+                    @elseif (request()->user()->hasPerm('Room_update_send_message') && !session('llms'))
+                        <x-room.prompt-area.request :llms="$llms" :tasks="$tasks ?? null" />
+                    @endif
+                </div>
+            @endif
+        </div>
     </div>
 </x-app-layout>
