@@ -458,41 +458,19 @@
             }
         }
 
-        function bot_filter(filter, container) {
-            container.find('> li').toggle(!filter);
+        function filterItems(filter, container, itemSelector, matchSelector, textExtractor) {
+            container.find(itemSelector).toggle(!filter);
 
             if (filter) {
-                container.find('> li').each(function() {
+                container.find(itemSelector).each(function() {
                     const group = $(this);
-                    const match = group.find('>label >div > div:last() >div')
-                        .filter((_, chat) => $(chat).text().toLowerCase().trim().includes(filter.toLowerCase()))
+                    const match = group.find(matchSelector)
+                        .filter((_, element) => textExtractor($(element)).toLowerCase().trim().includes(filter.toLowerCase()))
                         .length > 0;
                     group.toggle(match);
                 });
             }
         }
-
-        function home_bot_filter(filter, container) {
-            container.find('> form').toggle(!filter);
-
-            if (filter) {
-                container.find('> form').each(function() {
-                    const group = $(this);
-                    const match = group.find('> button > p')
-                        .filter((_, chat) => $(chat).text().toLowerCase().trim().includes(filter.toLowerCase()))
-                        .length > 0;
-                    group.toggle(match);
-                });
-            }
-        }
-
-        function search_chat(filter, container) {
-            container.find('>div:last() >div').each(function() {
-                $(this).toggle(!filter || $(this).find('a > p').text().toLowerCase().includes(filter
-                    .toLowerCase()));
-            });
-        }
-
 
         function markdown(node) {
             $(node).html(marked.parse(DOMPurify.sanitize(node[0], {
