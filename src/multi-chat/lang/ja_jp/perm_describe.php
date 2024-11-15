@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => '任意のモデルファイルを読み取るために必要な権限',
     'Cloud_read_my_files' => '個人ディレクトリのファイルを読み取るための権限',
     'Cloud_update_upload_files' => '個人ディレクトリにファイルをアップロードするための権限',
+    'Cloud_delete_my_files' => '個人フォルダのファイルを削除するための権限',
 ];

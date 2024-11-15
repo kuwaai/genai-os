@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Autorisation nécessaire pour lire nimporte quel fichier de modèle',
     'Cloud_read_my_files' => 'Autorisation nécessaire pour lire les fichiers dans le répertoire personnel',
     'Cloud_update_upload_files' => 'Autorisation nécessaire pour télécharger des fichiers dans le répertoire personnel',
+    'Cloud_delete_my_files' => 'Autorisation requise pour supprimer les fichiers de mon répertoire personnel',
 ];

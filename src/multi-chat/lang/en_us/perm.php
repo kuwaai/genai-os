@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Access Any Model File',
     'Cloud_read_my_files' => 'Read Files',
     'Cloud_update_upload_files' => 'Upload Files',
+    'Cloud_delete_my_files' => 'Delete Files',
 ];

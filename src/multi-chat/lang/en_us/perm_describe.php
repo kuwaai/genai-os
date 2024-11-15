@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Permission to read any modelfile',
     'Cloud_read_my_files' => 'Permission to read files in personal directory',
     'Cloud_update_upload_files' => 'Permission to upload files to personal directory',
+    'Cloud_delete_my_files' => 'Permissions required to delete files in your personal directory',
 ];

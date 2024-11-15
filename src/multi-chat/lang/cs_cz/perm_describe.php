@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Povolení k přístupu k libovolnému modelfile',
     'Cloud_read_my_files' => 'Povolení k čtení souborů v osobním adresáři',
     'Cloud_update_upload_files' => 'Povolení k nahrávání souborů do osobního adresáře',
+    'Cloud_delete_my_files' => 'Povolení k odstranění souborů v mém osobním adresáři',
 ];

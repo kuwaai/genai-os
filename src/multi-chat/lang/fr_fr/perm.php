@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Accéder à nimporte quel fichier de modèle',
     'Cloud_read_my_files' => 'Lire les fichiers',
     'Cloud_update_upload_files' => 'Télécharger des fichiers',
+    'Cloud_delete_my_files' => 'Supprimer mes fichiers',
 ];

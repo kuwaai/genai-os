@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Auf jede modelfile zugreifen',
     'Cloud_read_my_files' => 'Dateien lesen',
     'Cloud_update_upload_files' => 'Dateien hochladen',
+    'Cloud_delete_my_files' => 'Dateien löschen',
 ];

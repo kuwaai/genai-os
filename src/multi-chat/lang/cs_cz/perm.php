@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Přístup k jakémukoli souboru modelu',
     'Cloud_read_my_files' => 'Číst soubory',
     'Cloud_update_upload_files' => 'Nahrát soubory',
+    'Cloud_delete_my_files' => 'Smazat soubory',
 ];

@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => 'Berechtigung zum Lesen von beliebigen modelfile',
     'Cloud_read_my_files' => 'Berechtigung zum Lesen von Dateien im persönlichen Verzeichnis',
     'Cloud_update_upload_files' => 'Berechtigung zum Hochladen von Dateien ins persönliche Verzeichnis',
+    'Cloud_delete_my_files' => 'Berechtigungen zum Löschen von Dateien in meinem persönlichen Verzeichnis erforderlich',
 ];

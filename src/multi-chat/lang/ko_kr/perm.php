@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => '모든 modelfile 접근',
     'Cloud_read_my_files' => '파일 읽기',
     'Cloud_update_upload_files' => '파일 업로드',
+    'Cloud_delete_my_files' => '파일 삭제',
 ];

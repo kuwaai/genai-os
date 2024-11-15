@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => '모든 modelfile을 읽는 데 필요한 권한',
     'Cloud_read_my_files' => '개인 디렉토리 파일을 읽는 데 필요한 권한',
     'Cloud_update_upload_files' => '개인 디렉토리에 파일을 업로드하는 데 필요한 권한',
+    'Cloud_delete_my_files' => '개인 디렉토리 파일을 삭제하는 데 필요한 권한',
 ];

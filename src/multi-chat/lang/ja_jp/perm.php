@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => '任意のmodelfileアクセス',
     'Cloud_read_my_files' => 'ファイル閲覧',
     'Cloud_update_upload_files' => 'ファイルアップロード',
+    'Cloud_delete_my_files' => 'ファイルを削除する',
 ];

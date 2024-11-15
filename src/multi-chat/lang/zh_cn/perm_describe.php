@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => '讀取任意modelfile所需的權限',
     'Cloud_read_my_files' => '讀取個人目錄檔案所需的權限',
     'Cloud_update_upload_files' => '上傳檔案至個人目錄所需的權限',
+    'Cloud_delete_my_files' => '删除个人目录文件所需的权限',
 ];

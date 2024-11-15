@@ -36,4 +36,5 @@ return [
     'Store_read_any_modelfile' => '存取任何modelfile',
     'Cloud_read_my_files' => '讀取檔案',
     'Cloud_update_upload_files' => '上傳檔案',
+    'Cloud_delete_my_files' => '删除文件',
 ];
