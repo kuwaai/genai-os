@@ -2,33 +2,28 @@
 
 return [
     'route' => 'Chatroom',
-
-    'button.edit_chatname' => 'Chatroom-Namen bearbeiten',
-    'button.create_room' => 'Chatroom erstellen',
-    'button.share_link' => 'Link teilen',
-    'button.sort_by' => 'Sortieren nach',
-    'button.create' => 'Erstellen',
-
     'header.new_room' => 'Neuer Chatroom',
-    'header.create_room' => 'Chatroom erstellen',
-
-    'placeholder.model' => 'Bitte wählen Sie das Modell, das Sie gleichzeitig verwenden möchten',
-    'placeholder.must_select_a_bot'=>'Sie müssen mindestens einen Bot auswählen',
-    'placeholder.must_select_llms' => 'Sie müssen mindestens ein Modell auswählen!',
-    'placeholder.connecting' => '- Verbinden -',
-    'placeholder.connected' => 'Verbindung hergestellt',
-
+    'header.create_room' => 'Chatroom hinzufügen',
+    'label.share_link' => 'Link teilen (nur für dich)',
+    'label.search_chat' => 'Chatroom suchen',
+    'label.search_bot' => 'Bot suchen',
     'sort_by.date' => 'Nach Datum sortieren',
     'sort_by.name' => 'Nach Name sortieren (a-z)',
     'sort_by.name_desc' => 'Nach Name sortieren (z-a)',
-    'sort_by.model' => 'Nach Modellreihenfolge sortieren',
-
-    'label.share_link' => 'Link teilen (derzeit nur für Sie zugänglich)',
-    'label.search_chat'=>'Chatroom suchen',
-
-    'hint.recording_not_supported' => 'Sprachaufzeichnung fehlgeschlagen. HTTPS und Browser-Unterstützung erforderlich.',
-    'hint.recording_no_supported_format' => 'Sprachaufzeichnung fehlgeschlagen. Kein unterstütztes Aufnahmeformat gefunden.',
-    'hint.recording_duration_reach_limit' => 'Sprachaufzeichnung zu lang (12 Stunden)',
-    'hint.recording_failed_permission' => 'Aufnahmeberechtigungsanforderung abgelehnt. Aufnahme nicht möglich.',
-    'hint.recording_no_microphone' => 'Sprachaufzeichnung fehlgeschlagen. Kein verfügbares Mikrofon gefunden.',
+    'sort_by.model' => 'Nach Modell sortieren',
+    'button.edit_chatname' => 'Chatroom-Name bearbeiten',
+    'button.create_room' => 'Chatroom hinzufügen',
+    'button.share_link' => 'Link teilen',
+    'button.sort_by' => 'Sortieren nach',
+    'button.create' => 'Erstellen',
+    'placeholder.model' => 'Wähle das Modell, mit dem du gleichzeitig arbeiten möchtest',
+    'placeholder.must_select_a_bot' => 'Du musst mindestens einen Bot auswählen',
+    'placeholder.must_select_llms' => 'Du musst mindestens ein Modell auswählen!',
+    'placeholder.connecting' => '- Verbinde -',
+    'placeholder.connected' => 'Verbunden',
+    'hint.recording_not_supported' => 'Sprachaufnahme fehlgeschlagen, HTTPS und Browser-Unterstützung erforderlich',
+    'hint.recording_no_supported_format' => 'Sprachaufnahme fehlgeschlagen, kein unterstütztes Format gefunden',
+    'hint.recording_duration_reach_limit' => 'Sprachaufnahme zu lang (12 Stunden)',
+    'hint.recording_failed_permission' => 'Anfrage zur Aufnahmeberechtigung abgelehnt, Aufnahme nicht möglich',
+    'hint.recording_no_microphone' => 'Sprachaufnahme fehlgeschlagen, kein Mikrofon gefunden',
 ];

@@ -2,8 +2,8 @@
 
 return [
     'reset' => 'Vaše heslo bylo resetováno.',
-    'sent' => 'Na váš e-mail byl odeslán odkaz pro resetování hesla.',
-    'throttled' => 'Prosím, zkuste to znovu později.',
-    'token' => 'Tento token pro resetování hesla není platný.',
+    'sent' => 'Poslali jsme vám e-mail s odkazem pro resetování hesla.',
+    'throttled' => 'Prosím, zkuste to později.',
+    'token' => 'Tento token pro resetování hesla je neplatný.',
     'user' => 'Uživatel s touto e-mailovou adresou nebyl nalezen.',
 ];

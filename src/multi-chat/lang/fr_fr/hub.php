@@ -1,21 +1,18 @@
 <?php
 
 return [
+    'label.enter_your_token' => 'Entrez votre jeton Huggingface',
+    'label.search_for_model' => 'Rechercher un modèle...',
     'tab.huggingface' => 'Huggingface',
     'tab.ollama' => 'Ollama',
     'tab.kuwa' => 'Kuwa',
-
+    'hint.login_failed' => 'Échec de la connexion',
+    'hint.login_success' => 'Connexion réussie',
+    'hint.logout_success' => 'Déconnexion réussie',
+    'hint.model_gated' => 'Ce modèle est restreint, veuillez vous connecter et vous rendre sur sa page pour soumettre une demande afin de l\\'utiliser.',
     'button.login' => 'Se connecter',
     'button.search' => 'Rechercher',
     'button.logout' => 'Se déconnecter',
     'button.download' => 'Télécharger le modèle',
-    'button.homepage' => 'Page d\'accueil du projet',
-
-    'label.enter_your_token' => 'Entrez votre jeton Huggingface',
-    'label.search_for_model' => 'Rechercher un modèle...',
-
-    'hint.login_failed' => 'Connexion échouée',
-    'hint.login_success' => 'Connexion réussie',
-    'hint.logout_success' => 'Déconnexion réussie',
-    'hint.model_gated' => 'Ce modèle est soumis à une restriction d\'accès. Veuillez vous assurer d\'être connecté et de vous rendre sur la page d\'accueil du modèle pour soumettre une demande d\'utilisation.',
+    'button.homepage' => 'Page d\\'accueil du projet',
 ];

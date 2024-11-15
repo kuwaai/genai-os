@@ -10,11 +10,10 @@ return [
     'button.save' => '儲存',
     'button.delete' => '刪除',
     'button.export' => '匯出',
-
     'label.ready' => '就緒',
     'label.busy' => '忙碌',
     'label.accesscode' => '存取代碼',
-    'label.endpoint' => '連接位置',
+    'label.endpoint' => '連線位置',
     'label.status' => '使用狀態',
     'label.historyid' => '記錄ID',
     'label.userid' => '使用者ID',

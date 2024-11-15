@@ -10,7 +10,6 @@ return [
     'button.save' => '保存',
     'button.delete' => '削除',
     'button.export' => 'エクスポート',
-
     'label.ready' => '準備完了',
     'label.busy' => 'ビジー',
     'label.accesscode' => 'アクセスコード',
