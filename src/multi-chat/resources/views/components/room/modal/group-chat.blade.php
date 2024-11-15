@@ -49,7 +49,7 @@
                         </div>
                     </div>
                 </div>
-                <ul class="mt-2 space-y-3 overflow-auto scrollbar flex-1">
+                <ul class="mt-2 space-y-1 overflow-auto scrollbar flex-1">
                     @foreach ($result as $LLM)
                         <x-sorted-list.item html_tag="li" :$sorting_methods :record="$LLM">
                             <input type="checkbox" name="llm[]" id="llm_create_check_{{ $LLM->id }}"
