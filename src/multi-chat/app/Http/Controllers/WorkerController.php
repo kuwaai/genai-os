@@ -95,61 +95,51 @@ class WorkerController extends Controller
         }
         return $baseName . '.' . $i;
     }
+    // Get the number of active worker processes for a specific artisan command
+    public static function getWorkerCount($command = 'queue:work')
+    {
+        $projectRoot = base_path(); // Get the root of the project
+        $artisanFile = $projectRoot . '/artisan'; // Path to the artisan file
+        $count = 0; // Initialize the count of worker processes
 
-// Get the number of active worker processes
-public function get()
-{
-    $projectRoot = base_path(); // Get the root of the project
-    $artisanFile = $projectRoot . '/artisan'; // Path to the artisan file
-    $count = 0; // Initialize the count of worker processes
+        if (PHP_OS_FAMILY === 'Windows') {
+            // Attempt to use wmic to get the command line of running PHP processes
+            $cmd = 'wmic process where "name=\'php.exe\'" get CommandLine, ProcessId';
+            $processes = shell_exec($cmd);
 
-    if (PHP_OS_FAMILY === 'Windows') {
-        // Attempt to use wmic to get the command line of running PHP processes
-        $cmd = 'wmic process where "name=\'php.exe\'" get CommandLine, ProcessId';
-        $processes = shell_exec($cmd);
-
-        // Check if the output is not empty
-        if (!empty($processes)) {
-            // Split lines and filter out empty lines
-            $lines = array_filter(explode("\n", trim($processes)));
-
-            // Iterate through each line (ignoring the first line which is the header)
+            if (!empty($processes)) {
+                $lines = array_filter(explode("\n", trim($processes)));
+            } else {
+                // Fallback to PowerShell if wmic fails
+                $cmd = 'powershell -command "Get-CimInstance Win32_Process -Filter \"Name=\'php.exe\'\" | Select-Object ProcessId, CommandLine"';
+                $processes = shell_exec($cmd);
+                $lines = array_filter(explode("\n", trim($processes)));
+            }
             foreach ($lines as $line) {
-                if (strpos($line, 'php') !== false) { // Check if line contains 'php'
-                    // Extract the command line and check if it includes 'artisan' and the correct path
-                    if (preg_match('/php\s+"([^"]+)"\s+queue:work/', $line, $matches)) {
+                if (strpos($line, 'php') !== false) {
+                    // Check if line contains 'php'
+                    if (preg_match('/php\s+"([^"]+)"\s+' . preg_quote($command, '/') . '/', $line, $matches)) {
                         if (isset($matches[1]) && realpath($matches[1]) === realpath($artisanFile)) {
-                            $count++; // Increment the count if the paths match
+                            $count++;
                         }
                     }
                 }
             }
         } else {
-            // Fallback to PowerShell if wmic fails to return any process
-            $cmd = 'powershell -command "Get-Process php | Select-Object Id, Path"';
+            // For non-Windows systems
+            $cmd = "ps aux | grep 'php' | grep '$artisanFile' | grep '$command' | grep -v grep";
             $processes = shell_exec($cmd);
-            $lines = array_filter(explode("\n", trim($processes)));
+            $count = count(array_filter(explode("\n", trim($processes))));
+        }
 
-            foreach ($lines as $line) {
-                // Check if the line contains the artisan path
-                if (strpos($line, $artisanFile) !== false) {
-                    $count++; // Increment the count if the path matches
-                }
-            }
-        }
-    } else {
-        // For non-Windows systems
-        $cmd = "lsof -t '$artisanFile' | xargs ps -p | grep 'php' | grep -v grep";
-        $processes = shell_exec($cmd);
-        if (empty(trim($processes))) {
-            $cmd = "ps aux | grep 'php' | grep '$artisanFile' | grep -v grep";
-            $processes = shell_exec($cmd);
-        }
-        $count = count(array_filter(explode("\n", trim($processes))));
+        return $count;
     }
 
-    return response()->json(['worker_count' => $count]); // Return the count in JSON format
-}
+    // Main method to return worker count as a JSON response
+    public function get()
+    {
+        return response()->json(['worker_count' => $this->getWorkerCount('queue:work')]);
+    }
 
     public static function cleanRedisKey($key, $pattern)
     {
