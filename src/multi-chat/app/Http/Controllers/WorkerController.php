@@ -45,11 +45,13 @@ class WorkerController extends Controller
     public static function startWorkersWithCommand(string $commandName = 'queue:work', int $count = 10, ?string $logFileBase = null)
     {
         $artisanPath = base_path('artisan');
-        $logFileBase = $logFileBase ?? base_path('storage/logs/worker.log');
 
         for ($i = 0; $i < $count; $i++) {
-            $logFile = self::generateLogFileName($logFileBase);
-            $command = PHP_OS_FAMILY === 'Windows' ? "start /B php \"{$artisanPath}\" {$commandName} >> \"{$logFile}\"" : "php {$artisanPath} {$commandName} >> {$logFile} 2>&1 &";
+            // Generate log file name if needed
+            $logFile = $logFileBase ? self::generateLogFileName($logFileBase) : null;
+
+            // Prepare the command
+            $command = PHP_OS_FAMILY === 'Windows' ? ($logFile ? "start /B php \"{$artisanPath}\" {$commandName} >> \"{$logFile}\"" : "start /B php \"{$artisanPath}\" {$commandName}") : ($logFile ? "php {$artisanPath} {$commandName} >> {$logFile} 2>&1 &" : "php {$artisanPath} {$commandName} &");
 
             $env = [
                 'PATH' => SystemSetting::where('key', 'updateweb_path')->value('value') ?: getenv('PATH'),
@@ -57,12 +59,15 @@ class WorkerController extends Controller
             ];
 
             try {
-                $worker = Process::fromShellCommandline($command)->setEnv($env)->setTimeout(null);
+                // Execute the command
+                $worker = Process::fromShellCommandline($command, base_path())->setEnv($env)->setTimeout(null);
                 $worker->run();
 
-                // Wait until the log file is created
-                while (!file_exists($logFile)) {
-                    usleep(100000);
+                if ($logFile) {
+                    // Wait until the log file is created
+                    while (!file_exists($logFile)) {
+                        usleep(100000);
+                    }
                 }
             } catch (\Exception $e) {
                 return response()->json(['message' => __('workers.label.worker_start_failed') . $e->getMessage()], 500);
@@ -73,22 +78,23 @@ class WorkerController extends Controller
     }
     public function startWorkers(int $count = 10)
     {
-        $scheduler_workers = WorkerController::getWorkerCount('schedule:work');
+        $scheduler_workers = $this::getWorkerCount('schedule:work');
         if ($scheduler_workers['count'] == 0) {
-            WorkerController::startWorkersWithCommand('schedule:work', 1, base_path('storage/logs/scheduler.log'));
+            $this::startWorkersWithCommand('schedule:run', 1);
+            $this::startWorkersWithCommand('schedule:work', 1, base_path('storage/logs/scheduler.log'));
         } elseif ($scheduler_workers['count'] > 1) {
-            WorkerController::killWorkerPIDs($scheduler_workers['pids']);
+            $this::killWorkerPIDs($scheduler_workers['pids']);
             $this->mergeLogFiles('scheduler.log');
-            WorkerController::startWorkersWithCommand('schedule:work', 1, base_path('storage/logs/scheduler.log'));
+            $this::startWorkersWithCommand('schedule:work', 1);
         }
 
-        return $this::startWorkersWithCommand('queue:work', $count);
+        return $this::startWorkersWithCommand('queue:work', $count, base_path('storage/logs/worker.log'));
     }
     private function mergeLogFiles(string $logFilePrefix)
     {
         // Determine the directory and the merged log file
         $logDirectory = base_path('storage/logs/');
-        $mergedLogFile = $logDirectory . 'workers.log';
+        $mergedLogFile = $logDirectory . $logFilePrefix;
 
         // Find all files that match the prefix
         $logFiles = glob($logDirectory . $logFilePrefix . '.*');
