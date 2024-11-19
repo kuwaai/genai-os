@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'reset_password.email.subject' => '密码重置请求',
+    'reset_password.email.intro' => '我们收到您邮箱的密码重置请求，因此发送了此邮件。',
+    'reset_password.email.action' => '重置密码',
+    'reset_password.email.expiration' => '该密码重置链接将在 :count 分钟内失效。',
+    'reset_password.email.no_action' => '如果您没有尝试重置密码，请忽略此邮件。',
+    'reset_password.email.hello' => '您好！',
+    'reset_password.email.whoops' => '糟糕！',
+    'reset_password.email.regards' => '此致',
+    'reset_password.email.trouble_clicking_action' => '如果您无法点击“:actionText”按钮，您可以将该链接复制粘贴到浏览器打开来验证：',
+    'months.January' => '一月',
+    'months.February' => '二月',
+    'months.March' => '三月',
+    'months.April' => '四月',
+    'months.May' => '五月',
+    'months.June' => '六月',
+    'months.July' => '七月',
+    'months.August' => '八月',
+    'months.September' => '九月',
+    'months.October' => '十月',
+    'months.November' => '十一月',
+    'months.December' => '十二月',
+];

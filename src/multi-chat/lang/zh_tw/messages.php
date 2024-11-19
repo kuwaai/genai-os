@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'reset_password.email.subject' => '密碼重設請求',
+    'reset_password.email.intro' => '由於我們收到關於您信箱的密碼重設請求因此送出該信件。',
+    'reset_password.email.action' => '重設密碼',
+    'reset_password.email.expiration' => '該密碼重設連結將在 :count 分鐘內失效。',
+    'reset_password.email.no_action' => '如果你沒有試圖重設密碼，請無視此信件。',
+    'reset_password.email.hello' => '您好！',
+    'reset_password.email.whoops' => '糟糕！',
+    'reset_password.email.regards' => '敬上',
+    'reset_password.email.trouble_clicking_action' => "如果你無法點擊\":actionText\"的按鈕，您可以將該連結複製貼上到瀏覽器打開來驗證：",
+    'months.January' => '一月',
+    'months.February' => '二月',
+    'months.March' => '三月',
+    'months.April' => '四月',
+    'months.May' => '五月',
+    'months.June' => '六月',
+    'months.July' => '七月',
+    'months.August' => '八月',
+    'months.September' => '九月',
+    'months.October' => '十月',
+    'months.November' => '十一月',
+    'months.December' => '十二月',
+];

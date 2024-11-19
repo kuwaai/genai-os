@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'reset_password.email.subject' => 'Demande de réinitialisation de mot de passe',
+    'reset_password.email.intro' => 'Ce courriel vous est envoyé suite à une demande de réinitialisation de mot de passe pour votre compte.',
+    'reset_password.email.action' => 'Réinitialiser le mot de passe',
+    'reset_password.email.expiration' => 'Ce lien de réinitialisation expirera dans :count minutes.',
+    'reset_password.email.no_action' => 'Si vous n’avez pas demandé à réinitialiser votre mot de passe, veuillez ignorer ce courriel.',
+    'reset_password.email.hello' => 'Bonjour !',
+    'reset_password.email.whoops' => 'Oups !',
+    'reset_password.email.regards' => 'Cordialement',
+    'reset_password.email.trouble_clicking_action' => 'Si vous ne pouvez pas cliquer sur le bouton « :actionText », vous pouvez copier et coller le lien ci-dessous dans votre navigateur :',
+    'months.January' => 'Janvier',
+    'months.February' => 'Février',
+    'months.March' => 'Mars',
+    'months.April' => 'Avril',
+    'months.May' => 'Mai',
+    'months.June' => 'Juin',
+    'months.July' => 'Juillet',
+    'months.August' => 'Août',
+    'months.September' => 'Septembre',
+    'months.October' => 'Octobre',
+    'months.November' => 'Novembre',
+    'months.December' => 'Décembre',
+];

@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'reset_password.email.subject' => 'Passwort zurücksetzen Anfrage',
+    'reset_password.email.intro' => 'Wir senden Ihnen diese E-Mail, da wir eine Anfrage zum Zurücksetzen Ihres Passworts für Ihr Konto erhalten haben.',
+    'reset_password.email.action' => 'Passwort zurücksetzen',
+    'reset_password.email.expiration' => 'Dieser Link zum Zurücksetzen des Passworts läuft in :count Minuten ab.',
+    'reset_password.email.no_action' => 'Wenn Sie nicht versucht haben, Ihr Passwort zurückzusetzen, ignorieren Sie bitte diese E-Mail.',
+    'reset_password.email.hello' => 'Hallo!',
+    'reset_password.email.whoops' => 'Hoppla!',
+    'reset_password.email.regards' => 'Mit freundlichen Grüßen',
+    'reset_password.email.trouble_clicking_action' => 'Wenn Sie die Schaltfläche ',
+    'months.January' => 'Januar',
+    'months.February' => 'Februar',
+    'months.March' => 'März',
+    'months.April' => 'April',
+    'months.May' => 'Mai',
+    'months.June' => 'Juni',
+    'months.July' => 'Juli',
+    'months.August' => 'August',
+    'months.September' => 'September',
+    'months.October' => 'Oktober',
+    'months.November' => 'November',
+    'months.December' => 'Dezember',
+];

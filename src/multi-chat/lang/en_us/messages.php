@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'reset_password.email.subject' => 'Reset Password Notification',
+    'reset_password.email.intro' => 'You are receiving this email because we received a password reset request for your account.',
+    'reset_password.email.action' => 'Reset Password',
+    'reset_password.email.expiration' => 'This password reset link will expire in :count minutes.',
+    'reset_password.email.no_action' => 'If you did not request a password reset, no further action is required.',
+    'reset_password.email.hello' => 'Hello!',
+    'reset_password.email.whoops' => 'Whoops!',
+    'reset_password.email.regards' => 'Regards',
+    'reset_password.email.trouble_clicking_action' => "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:",
+    'months.January' => 'January',
+    'months.February' => 'February',
+    'months.March' => 'March',
+    'months.April' => 'April',
+    'months.May' => 'May',
+    'months.June' => 'June',
+    'months.July' => 'July',
+    'months.August' => 'August',
+    'months.September' => 'September',
+    'months.October' => 'October',
+    'months.November' => 'November',
+    'months.December' => 'December',
+];

@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'reset_password.email.subject' => 'Žádost o obnovení hesla',
+    'reset_password.email.intro' => 'Tato zpráva byla odeslána, protože jsme obdrželi žádost o obnovení hesla pro váš e-mail.',
+    'reset_password.email.action' => 'Obnovit heslo',
+    'reset_password.email.expiration' => 'Odkaz na obnovení hesla vyprší za :count minut.',
+    'reset_password.email.no_action' => 'Pokud jste se o obnovení hesla nepokusili, tuto zprávu ignorujte.',
+    'reset_password.email.hello' => 'Dobrý den!',
+    'reset_password.email.whoops' => 'Jejda!',
+    'reset_password.email.regards' => 'S pozdravem',
+    'reset_password.email.trouble_clicking_action' => 'Pokud nemůžete kliknout na tlačítko „:actionText“, můžete odkaz zkopírovat a vložit do prohlížeče pro ověření:',
+    'months.January' => 'Leden',
+    'months.February' => 'Únor',
+    'months.March' => 'Březen',
+    'months.April' => 'Duben',
+    'months.May' => 'Květen',
+    'months.June' => 'Červen',
+    'months.July' => 'Červenec',
+    'months.August' => 'Srpen',
+    'months.September' => 'Září',
+    'months.October' => 'Říjen',
+    'months.November' => 'Listopad',
+    'months.December' => 'Prosinec',
+];

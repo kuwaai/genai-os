@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'reset_password.email.subject' => 'パスワード再設定リクエスト',
+    'reset_password.email.intro' => 'パスワード再設定のリクエストを受け付けましたので、このメールを送信しました。',
+    'reset_password.email.action' => 'パスワードを再設定',
+    'reset_password.email.expiration' => 'パスワード再設定リンクは :count 分後に期限切れになります。',
+    'reset_password.email.no_action' => 'パスワード再設定を試みていない場合は、このメールを無視してください。',
+    'reset_password.email.hello' => 'こんにちは！',
+    'reset_password.email.whoops' => '申し訳ありません！',
+    'reset_password.email.regards' => '敬具',
+    'reset_password.email.trouble_clicking_action' => '「:actionText」ボタンをクリックできない場合は、リンクをコピーしてブラウザに貼り付けてアクセスしてください。',
+    'months.January' => '1月',
+    'months.February' => '2月',
+    'months.March' => '3月',
+    'months.April' => '4月',
+    'months.May' => '5月',
+    'months.June' => '6月',
+    'months.July' => '7月',
+    'months.August' => '8月',
+    'months.September' => '9月',
+    'months.October' => '10月',
+    'months.November' => '11月',
+    'months.December' => '12月',
+];
