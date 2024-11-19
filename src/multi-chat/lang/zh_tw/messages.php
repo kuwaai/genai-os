@@ -22,4 +22,8 @@ return [
     'months.October' => '十月',
     'months.November' => '十一月',
     'months.December' => '十二月',
+    'category.today' => '今天',
+    'category.yesterday' => '昨天',
+    'category.this_week' => '本周',
+    'category.this_month' => '本月',
 ];

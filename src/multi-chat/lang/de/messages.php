@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'category.today' => 'Heute',
+    'category.yesterday' => 'Gestern',
+    'category.this_week' => 'Diese Woche',
+    'category.this_month' => 'Dieser Monat',
     'reset_password.email.subject' => 'Passwort zurücksetzen Anfrage',
     'reset_password.email.intro' => 'Wir senden Ihnen diese E-Mail, da wir eine Anfrage zum Zurücksetzen Ihres Passworts für Ihr Konto erhalten haben.',
     'reset_password.email.action' => 'Passwort zurücksetzen',

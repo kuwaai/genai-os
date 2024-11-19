@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'category.today' => 'Aujourd\'hui',
+    'category.yesterday' => 'Hier',
+    'category.this_week' => 'Cette semaine',
+    'category.this_month' => 'Ce mois-ci',
     'reset_password.email.subject' => 'Demande de réinitialisation de mot de passe',
     'reset_password.email.intro' => 'Ce courriel vous est envoyé suite à une demande de réinitialisation de mot de passe pour votre compte.',
     'reset_password.email.action' => 'Réinitialiser le mot de passe',

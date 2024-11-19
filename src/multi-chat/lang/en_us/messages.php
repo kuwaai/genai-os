@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'category.today' => 'Today',
+    'category.yesterday' => 'Yesterday',
+    'category.this_week' => 'This week',
+    'category.this_month' => 'This month',
     'reset_password.email.subject' => 'Reset Password Notification',
     'reset_password.email.intro' => 'You are receiving this email because we received a password reset request for your account.',
     'reset_password.email.action' => 'Reset Password',
@@ -9,7 +13,7 @@ return [
     'reset_password.email.hello' => 'Hello!',
     'reset_password.email.whoops' => 'Whoops!',
     'reset_password.email.regards' => 'Regards',
-    'reset_password.email.trouble_clicking_action' => "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:",
+    'reset_password.email.trouble_clicking_action' => 'If you',
     'months.January' => 'January',
     'months.February' => 'February',
     'months.March' => 'March',

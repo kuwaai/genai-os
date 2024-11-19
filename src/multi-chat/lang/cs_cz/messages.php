@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'category.today' => 'Dnes',
+    'category.yesterday' => 'Včera',
+    'category.this_week' => 'Tento týden',
+    'category.this_month' => 'Tento měsíc',
     'reset_password.email.subject' => 'Žádost o obnovení hesla',
     'reset_password.email.intro' => 'Tato zpráva byla odeslána, protože jsme obdrželi žádost o obnovení hesla pro váš e-mail.',
     'reset_password.email.action' => 'Obnovit heslo',

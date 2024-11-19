@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'category.today' => '今天',
+    'category.yesterday' => '昨天',
+    'category.this_week' => '本周',
+    'category.this_month' => '本月',
     'reset_password.email.subject' => '密码重置请求',
     'reset_password.email.intro' => '我们收到您邮箱的密码重置请求，因此发送了此邮件。',
     'reset_password.email.action' => '重置密码',

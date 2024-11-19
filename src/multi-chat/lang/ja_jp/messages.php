@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'category.today' => '今日',
+    'category.yesterday' => '昨日',
+    'category.this_week' => '今週',
+    'category.this_month' => '今月',
     'reset_password.email.subject' => 'パスワード再設定リクエスト',
     'reset_password.email.intro' => 'パスワード再設定のリクエストを受け付けましたので、このメールを送信しました。',
     'reset_password.email.action' => 'パスワードを再設定',

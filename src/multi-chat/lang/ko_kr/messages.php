@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'category.today' => '오늘',
+    'category.yesterday' => '어제',
+    'category.this_week' => '이번주',
+    'category.this_month' => '이번달',
     'reset_password.email.subject' => '비밀번호 재설정 요청',
     'reset_password.email.intro' => '귀하의 이메일 계정에 대한 비밀번호 재설정 요청이 접수되어 본 이메일을 발송했습니다.',
     'reset_password.email.action' => '비밀번호 재설정',
