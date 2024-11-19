@@ -22,7 +22,7 @@ class ChatRoom extends Model
     }
     public static function getChatRoomGroup(int $userId)
     {
-        $query = self::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')->where('chats.user_id', $userId)->select('chatrooms.*', DB::raw('count(chats.id) as counts'))->groupBy('chatrooms.id')->orderby('chatrooms.updated_at', 'desc');
+        $query = self::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')->where('chats.user_id', $userId)->select('chatrooms.*', DB::raw('count(chats.id) as counts'))->groupBy('chatrooms.id')->orderby('chatrooms.updated_at', 'desc')->selectSub(self::buildIdentifierSubquery(), 'identifier');
 
         $chatRooms = $query->get();
 

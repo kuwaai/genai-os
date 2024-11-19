@@ -11,13 +11,24 @@
             <h3 class="my-2 font-bold text-xs text-gray-800 dark:text-white text-center">{{ $group }}</h3>
 
             @foreach ($chatRooms as $dc)
-                <div class="rounded-lg">
+                <div id="chatroom_{{$extra}}_{{ $dc->id }}" role="tooltip"
+                    class="absolute flex z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+
+                    @foreach (App\Models\Bots::getBotsFromIds(explode(',', $dc->identifier)) as $llm)
+                        <div
+                            class="mx-1 flex-shrink-0 h-5 w-5 rounded-full bg-black flex items-center justify-center overflow-hidden">
+                            <img class="h-full w-full"
+                                src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                        </div>
+                    @endforeach
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+                <div class="rounded-lg" data-tooltip-target="chatroom_{{$extra}}_{{ $dc->id }}" data-tooltip-placement="top">
                     <div class="max-h-[182px] overflow-y-auto scrollbar">
                         <div class="overflow-hidden rounded mb-1 flex dark:hover:bg-gray-700 hover:bg-gray-200">
                             <a class="menu-btn flex-1 text-gray-700 px-2 dark:text-white w-full flex justify-start items-center overflow-hidden {{ request()->route('room_id') == $dc->id ? 'bg-gray-200 dark:bg-gray-700' : '' }} transition duration-300"
                                 href="{{ route('room.chat', $dc->id) }}">
-                                <p
-                                    class="my-auto leading-none truncate-text overflow-ellipsis overflow-hidden max-h-4">
+                                <p class="my-auto leading-none truncate-text overflow-ellipsis overflow-hidden max-h-4">
                                     {{ $dc->name }}
                                 </p>
                             </a>
