@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ChatRoom extends Model
 {
@@ -13,14 +14,53 @@ class ChatRoom extends Model
     use SoftDeletes;
     protected $table = 'chatrooms';
     protected $fillable = ['name', 'user_id'];
-
     public static function getChatRoomsWithIdentifiers(int $userId)
     {
         $query = self::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')->where('chats.user_id', $userId)->select('chatrooms.*', DB::raw('count(chats.id) as counts'))->groupBy('chatrooms.id')->selectSub(self::buildIdentifierSubquery(), 'identifier');
 
         return $query->get()->groupBy('identifier')->reverse();
     }
+    public static function getChatRoomGroup(int $userId)
+    {
+        $query = self::leftJoin('chats', 'chatrooms.id', '=', 'chats.roomID')->where('chats.user_id', $userId)->select('chatrooms.*', DB::raw('count(chats.id) as counts'))->groupBy('chatrooms.id')->orderby('chatrooms.updated_at', 'desc');
 
+        $chatRooms = $query->get();
+
+        // Group chatrooms by time intervals
+        $grouped = [
+            __('messages.category.today') => [],
+            __('messages.category.yesterday') => [],
+            __('messages.category.this_week') => [],
+            __('messages.category.this_month') => [],
+        ];
+
+        foreach ($chatRooms as $chatRoom) {
+            $updatedAt = Carbon::parse($chatRoom->updated_at);
+
+            if ($updatedAt->isToday()) {
+                $grouped[__('messages.category.today')][] = $chatRoom;
+            } elseif ($updatedAt->isYesterday()) {
+                $grouped[__('messages.category.yesterday')][] = $chatRoom;
+            } elseif ($updatedAt->greaterThanOrEqualTo(now()->startOfWeek())) {
+                $grouped[__('messages.category.this_week')][] = $chatRoom;
+            } elseif ($updatedAt->greaterThanOrEqualTo(now()->startOfMonth())) {
+                $grouped[__('messages.category.this_month')][] = $chatRoom;
+            } else {
+                $currentYear = now()->year;
+                // Translate the month using the messages.months key
+                $month = __(sprintf('messages.months.%s', $updatedAt->format('F')));
+                $year = $updatedAt->year === $currentYear ? '' : " {$updatedAt->year}";
+                $monthYear = $month . $year;
+
+                if (!isset($grouped[$monthYear])) {
+                    $grouped[$monthYear] = [];
+                }
+                $grouped[$monthYear][] = $chatRoom;
+            }
+        }
+
+        return $grouped;
+    }
     // Get chats based on whether they are bot chats or non-bot chats
     public static function getChats($roomId, $isBot)
     {

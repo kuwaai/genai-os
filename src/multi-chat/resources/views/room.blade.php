@@ -30,6 +30,7 @@
         @endif
         @php
             $DC = App\Models\ChatRoom::getChatRoomsWithIdentifiers(Auth::user()->id);
+            $groupedChatRooms = App\Models\ChatRoom::getChatRoomGroup(Auth::user()->id);
 
             try {
                 if (!session('llms')) {
@@ -47,7 +48,7 @@
                 $DC = null;
             }
         @endphp
-        <x-room.rooms.drawer :llms="$llms" :DC="$DC" />
+        <x-room.rooms.drawer :llms="$llms" :DC="$groupedChatRooms" />
     @endif
     @if (request()->user()->hasPerm('Room_update_import_chat'))
         <x-chat.modals.import_history :llms="$llms ?? []" />
