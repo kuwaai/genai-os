@@ -1,6 +1,6 @@
 {{-- The "Create Chatroom" popup --}}
 
-@props(['result', 'sorting_methods'])
+@props(['result', 'sorting_methods', 'llms' => null])
 
 <div id="create-model-modal" data-modal-backdropClasses="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40"
     tabindex="-1" aria-hidden="true"
@@ -98,4 +98,9 @@
             return false;
         }
     }
+    @if ($llms)
+        @foreach ($llms->pluck('id') as $bot_id)
+            $('#llm_create_check_{{ $bot_id }}').click()
+        @endforeach
+    @endif
 </script>

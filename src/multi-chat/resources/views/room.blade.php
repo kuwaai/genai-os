@@ -14,9 +14,6 @@
     @if (request()->user()->hasPerm('Room_delete_chatroom'))
         <x-room.modal.delete_confirm />
     @endif
-    @if (request()->user()->hasPerm('Room_update_new_chat'))
-        <x-room.modal.group-chat :result="$bots" :$sorting_methods />
-    @endif
     @if (!(request()->route('room_id') || session('llms')))
         <x-room.rooms.drawer :result="$bots" />
     @else
@@ -49,6 +46,9 @@
             }
         @endphp
         <x-room.rooms.drawer :llms="$llms" :DC="$groupedChatRooms" />
+    @endif
+    @if (request()->user()->hasPerm('Room_update_new_chat'))
+        <x-room.modal.group-chat :result="$bots" :$sorting_methods :$llms />
     @endif
     @if (request()->user()->hasPerm('Room_update_import_chat'))
         <x-chat.modals.import_history :llms="$llms ?? []" />
