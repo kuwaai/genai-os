@@ -8,7 +8,7 @@
     @foreach ($groupedChatRooms as $group => $chatRooms)
         @if (is_array($chatRooms) && count($chatRooms) > 0)
             <!-- Display the group heading -->
-            <h3 class="my-2 font-bold text-xs text-gray-800 dark:text-white text-center">{{ $group }}</h3>
+            <h3 class="my-1 font-bold text-xs text-gray-800 dark:text-gray-300 text-center">{{ $group }}</h3>
 
             @foreach ($chatRooms as $dc)
                 <div class="rounded-lg">
@@ -38,8 +38,14 @@
                                         @foreach (App\Models\Bots::getBotsFromIds(explode(',', $dc->identifier)) as $llm)
                                             <div
                                                 class="mx-1 flex-shrink-0 h-5 w-5 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                                <img class="h-full w-full"
-                                                    src="{{ $llm->image ? asset(Storage::url($llm->image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                                <img data-tooltip-target="llm_{{$dc->id}}_{{$extra}}_{{ $llm->id }}_chat"
+                                                    data-tooltip-placement="top" class="h-full w-full"
+                                                    src="{{ $llm->image ?? $llm->base_image ? asset(Storage::url($llm->image ?? $llm->base_image)) : '/' . config('app.LLM_DEFAULT_IMG') }}">
+                                                <div id="llm_{{$dc->id}}_{{$extra}}_{{ $llm->id }}_chat" role="tooltip"
+                                                    class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-500">
+                                                    {{ $llm->name }}
+                                                    <div class="tooltip-arrow" data-popper-arrow></div>
+                                                </div>
                                             </div>
                                         @endforeach
                                     </li>
