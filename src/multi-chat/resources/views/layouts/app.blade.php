@@ -199,22 +199,31 @@
             const singleArgCmdKeywords = [
                 'FROM', 'ADAPTER', 'LICENSE', 'TEMPLATE', 'SYSTEM',
                 'BEFORE-PROMPT', 'AFTER-PROMPT'
-            ]
+            ];
+
             return array.map(item => {
                 if (!item) {
-                    return ""
+                    return "";
                 }
+
                 let {
                     name,
                     args
                 } = item;
-                name = name.trim().toUpperCase()
-                args = args.trim()
+
+                if (name.startsWith('#')) {
+                    return name;
+                }
+
+                name = name.trim().toUpperCase();
+                args = args.trim();
+
                 if (singleArgCmdKeywords.includes(name) && args.includes('\n')) {
-                    const multi_line_quote = '"""'
+                    const multi_line_quote = '"""';
                     if (!args.startsWith(multi_line_quote)) {
                         args = multi_line_quote + args;
                     }
+
                     if (args.substring(multi_line_quote.length).indexOf(multi_line_quote) === -1) {
                         let comment_regexp = new RegExp('(?<non_comment>[^#]*)(?<comment>#.*)?', 's');
                         let {
@@ -225,6 +234,7 @@
                         args = non_comment + multi_line_quote + comment;
                     }
                 }
+
                 args = args === '' ? '' : ` ${args}`;
                 return `${name}${args}`;
             }).join('\n');
@@ -465,7 +475,8 @@
                 container.find(itemSelector).each(function() {
                     const group = $(this);
                     const match = group.find(matchSelector)
-                        .filter((_, element) => textExtractor($(element)).toLowerCase().trim().includes(filter.toLowerCase()))
+                        .filter((_, element) => textExtractor($(element)).toLowerCase().trim().includes(filter
+                            .toLowerCase()))
                         .length > 0;
                     group.toggle(match);
                 });
