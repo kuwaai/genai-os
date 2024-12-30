@@ -167,6 +167,11 @@ install_all() {
     install_nvidia_container_toolkit
   fi
   install_kuwa
+  if ! git rev-parse &>/dev/null; then
+    cd genai-os/docker
+  else
+    cd "$(dirname "$0")"
+  fi
   ./run.sh
 }
 
